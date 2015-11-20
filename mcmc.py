@@ -7,6 +7,7 @@ from sympy import *
 from random import random, choice
 from itertools import product, permutations
 from scipy.optimize import curve_fit
+from scipy.misc import comb
 
 import warnings
 warnings.filterwarnings('error')
@@ -96,9 +97,12 @@ class Tree():
         # type probabilities
         self.op_orders = list(set([0] + [n for n in ops.values()]))
         self.move_types = [p for p in permutations(self.op_orders, 2)]
-        # Elementary trees (including leaves), sorted by order
+        # Elementary trees (including leaves), indexed by order
         self.ets = dict([(o, []) for o in self.op_orders])
         self.ets[0] = [self.root]
+        # Distinct parameters used
+        self.dist_par = list(set([n for in in ets[0] if n in self.parameters]))
+        self.n_dist_par = len(self.dist_par)
         # Nodes of the tree (operations + leaves)
         self.nodes = [self.root]
         # Tree size and other properties of the model
@@ -188,6 +192,9 @@ class Tree():
                                             parent=self.root))
             self.nodes.append(self.root.offspring[-1])
             self.ets[0].append(self.root.offspring[-1])
+            if self.root.offspring[-1].value not in self.dist_par:
+                self.dist_par.append(self.root.offspring[-1].value)
+                self.n_dist_par += 1
             self.size += 1
         # Add new root to elementary trees if necessary (that is, iff
         # the old root was a leaf)
@@ -241,6 +248,9 @@ class Tree():
             self.ets[0].remove(o)
         self.root = self.root.offspring[0]
         self.root.parent = None
+        # Update list of distinct parameters
+        self.dist_par = list(set([n for in in ets[0] if n in self.parameters]))
+        self.n_dist_par = len(self.dist_par)
         # Update goodness of fit measures, if necessary
         if update_gof == True:
             self.sse = self.get_sse()
@@ -288,6 +298,9 @@ class Tree():
         for o in node.offspring:
             self.ets[0].append(o)
             self.size += 1
+        # Update list of distinct parameters
+        self.dist_par = list(set([n for in in ets[0] if n in self.parameters]))
+        self.n_dist_par = len(self.dist_par)
         # Update goodness of fit measures, if necessary
         if update_gof == True:
             self.sse = self.get_sse()
@@ -321,6 +334,9 @@ class Tree():
                     break
             if is_parent_et == True:
                 self.ets[len(node.parent.offspring)].append(node.parent)
+        # Update list of distinct parameters
+        self.dist_par = list(set([n for in in ets[0] if n in self.parameters]))
+        self.n_dist_par = len(self.dist_par)
         # Update goodness of fit measures, if necessary
         if update_gof == True:
             self.sse = self.get_sse()
@@ -434,7 +450,7 @@ Node and new is a tuple [node_value, [list, of, offspring, values]]
         return BIC
 
     # -------------------------------------------------------------------------
-    def get_energy(self, bic=False, reset=False):
+    def get_energy(self, bic=False, reset=False, pardeg=False):
         """Calculate the "energy" of a given formula, that is, approximate minus log-posterior of the formula given the data (the approximation coming from the use of the BIC instead of the exactly integrated likelihood).
 
         """
@@ -447,6 +463,10 @@ Node and new is a tuple [node_value, [list, of, offspring, values]]
                 E += self.prior_par['Nopi_%s' % op] * nop / self.PT
             except KeyError:
                 pass
+        # Correct for multiple counting of formulas that are identical
+        # except for the label of the parameters
+        if pardeg:
+            E += np.log(comb(len(self.parameters), self.n_dist_par, exact=True))
         if reset:
             self.E = E
         return E
