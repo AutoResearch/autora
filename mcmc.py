@@ -101,7 +101,7 @@ class Tree():
         self.ets = dict([(o, []) for o in self.op_orders])
         self.ets[0] = [self.root]
         # Distinct parameters used
-        self.dist_par = list(set([n for in self.ets[0]
+        self.dist_par = list(set([n for n in self.ets[0]
                                   if n in self.parameters]))
         self.n_dist_par = len(self.dist_par)
         # Number of commutative order-2 nodes
@@ -254,7 +254,7 @@ class Tree():
         self.root = self.root.offspring[0]
         self.root.parent = None
         # Update list of distinct parameters
-        self.dist_par = list(set([n for in in ets[0] if n in self.parameters]))
+        self.dist_par = list(set([n for n in self.ets[0] if n in self.parameters]))
         self.n_dist_par = len(self.dist_par)
         # Update number of commutative order-2 nodes
         self.n_commute = len([n for n in self.ets[2] if n.value in COMMUTE])
@@ -306,7 +306,7 @@ class Tree():
             self.ets[0].append(o)
             self.size += 1
         # Update list of distinct parameters
-        self.dist_par = list(set([n for in in ets[0] if n in self.parameters]))
+        self.dist_par = list(set([n for n in self.ets[0] if n in self.parameters]))
         self.n_dist_par = len(self.dist_par)
         # Update number of commutative order-2 nodes
         self.n_commute = len([n for n in self.ets[2] if n.value in COMMUTE])
@@ -344,7 +344,7 @@ class Tree():
             if is_parent_et == True:
                 self.ets[len(node.parent.offspring)].append(node.parent)
         # Update list of distinct parameters
-        self.dist_par = list(set([n for in in ets[0] if n in self.parameters]))
+        self.dist_par = list(set([n for n in self.ets[0] if n in self.parameters]))
         self.n_dist_par = len(self.dist_par)
         # Update number of commutative order-2 nodes
         self.n_commute = len([n for n in self.ets[2] if n.value in COMMUTE])
@@ -572,7 +572,7 @@ tuple [node_value, [list, of, offspring, values]].
             dE -= self.n_commute * np.log(2.)
             # new parameter labeling
             newpar = list(set(
-                [n for in in ets[0] if n in self.parameters and n != target] +
+                [n for n in self.ets[0] if n in self.parameters and n != target] +
                 [new]
             ))
             dE += np.log(comb(len(self.parameters), len(newpar), exact=True))
@@ -771,7 +771,7 @@ tuple [node_value, [list, of, offspring, values]].
                 if target.value in COMMUTE:
                     self.n_commute += 1
                 # recalculate distinct parameters
-                self.dist_par = list(set([n for in self.ets[0]
+                self.dist_par = list(set([n for n in self.ets[0]
                                           if n in self.parameters]))
                 self.n_dist_par = len(self.dist_par)
                 # update others
