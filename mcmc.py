@@ -36,7 +36,7 @@ OPS = {
     '/' : 2,
     '**' : 2,
 }
-
+COMMUTE = ('+', '*')
 
 # -----------------------------------------------------------------------------
 # The terms in the energy function
@@ -101,8 +101,11 @@ class Tree():
         self.ets = dict([(o, []) for o in self.op_orders])
         self.ets[0] = [self.root]
         # Distinct parameters used
-        self.dist_par = list(set([n for in in ets[0] if n in self.parameters]))
+        self.dist_par = list(set([n for in self.ets[0]
+                                  if n in self.parameters]))
         self.n_dist_par = len(self.dist_par)
+        # Number of commutative order-2 nodes
+        self.n_commute = len([n for n in self.ets[2] if n.value in COMMUTE])
         # Nodes of the tree (operations + leaves)
         self.nodes = [self.root]
         # Tree size and other properties of the model
@@ -200,6 +203,8 @@ class Tree():
         # the old root was a leaf)
         if oldRoot.offspring == []:
             self.ets[self.root.order].append(self.root)
+        # Update number of commutative order-2 nodes
+        self.n_commute = len([n for n in self.ets[2] if n.value in COMMUTE])
         # Update goodness of fit measures, if necessary
         if update_gof == True:
             self.sse = self.get_sse()
@@ -251,6 +256,8 @@ class Tree():
         # Update list of distinct parameters
         self.dist_par = list(set([n for in in ets[0] if n in self.parameters]))
         self.n_dist_par = len(self.dist_par)
+        # Update number of commutative order-2 nodes
+        self.n_commute = len([n for n in self.ets[2] if n.value in COMMUTE])
         # Update goodness of fit measures, if necessary
         if update_gof == True:
             self.sse = self.get_sse()
@@ -301,6 +308,8 @@ class Tree():
         # Update list of distinct parameters
         self.dist_par = list(set([n for in in ets[0] if n in self.parameters]))
         self.n_dist_par = len(self.dist_par)
+        # Update number of commutative order-2 nodes
+        self.n_commute = len([n for n in self.ets[2] if n.value in COMMUTE])
         # Update goodness of fit measures, if necessary
         if update_gof == True:
             self.sse = self.get_sse()
@@ -337,6 +346,8 @@ class Tree():
         # Update list of distinct parameters
         self.dist_par = list(set([n for in in ets[0] if n in self.parameters]))
         self.n_dist_par = len(self.dist_par)
+        # Update number of commutative order-2 nodes
+        self.n_commute = len([n for n in self.ets[2] if n.value in COMMUTE])
         # Update goodness of fit measures, if necessary
         if update_gof == True:
             self.sse = self.get_sse()
@@ -450,29 +461,35 @@ Node and new is a tuple [node_value, [list, of, offspring, values]]
         return BIC
 
     # -------------------------------------------------------------------------
-    def get_energy(self, bic=False, reset=False, pardeg=False):
+    def get_energy(self, bic=False, reset=False, degcorrect=False):
         """Calculate the "energy" of a given formula, that is, approximate minus log-posterior of the formula given the data (the approximation coming from the use of the BIC instead of the exactly integrated likelihood).
 
         """
+        # Contribtution of the data (recalculating BIC if necessary)
         if bic == True:
             E = self.get_bic() / (2. * self.BT)
         else:
             E = self.bic / (2. * self.BT)
+        # Contribution from the prior
         for op, nop in self.nops.items():
             try:
                 E += self.prior_par['Nopi_%s' % op] * nop / self.PT
             except KeyError:
                 pass
-        # Correct for multiple counting of formulas that are identical
-        # except for the label of the parameters
-        if pardeg:
+        # Correct for multiple counting of formulas
+        if degcorrect:
+            # Parameter labeling
             E += np.log(comb(len(self.parameters), self.n_dist_par, exact=True))
+            # Commutative nodes
+            E += self.n_commute * np.log(2.)
+        # Reset the value, if necessary
         if reset:
             self.E = E
+        # Done
         return E
 
     # -------------------------------------------------------------------------
-    def dE_et(self, target, new):
+    def dE_et(self, target, new, degcorrect=False):
         """Calculate the energy change associated to the replacement of one ET
 by another, both of arbitrary order. "target" is a Node() and "new" is a
 tuple [node_value, [list, of, offspring, values]].
@@ -489,15 +506,30 @@ tuple [node_value, [list, of, offspring, values]].
         except KeyError:
             pass
 
-        # Data
+        # Data and degeneracy correction
         if not self.x.empty:
             bicOld = self.bic
             sseOld = self.sse
             par_valuesOld = deepcopy(self.par_values)
             old = [target.value, [o.value for o in target.offspring]]
+            if degcorrect:
+                # parameter labeling
+                dE -= np.log(
+                    comb(len(self.parameters), self.n_dist_par, exact=True)
+                )
+                # commutative nodes
+                dE -= self.n_commute * np.log(2.)
+            # replace
             added = self.et_replace(target, new, update_gof=True)
             bicNew = self.bic
             par_valuesNew = deepcopy(self.par_values)
+            if degcorrect:
+                # parameter labeling
+                dE += np.log(
+                    comb(len(self.parameters), self.n_dist_par, exact=True)
+                )
+                # commutative nodes
+                dE += self.n_commute * np.log(2.)
             # leave the whole thing as it was before the back & fore
             self.et_replace(added, old, update_gof=False)
             self.bic = bicOld
@@ -515,7 +547,7 @@ tuple [node_value, [list, of, offspring, values]].
 
 
     # -------------------------------------------------------------------------
-    def dE_lr(self, target, new):
+    def dE_lr(self, target, new, degcorrect=False):
         """Calculate the energy change associated to a long-range move (the replacement of the value of a node. "target" is a Node() and "new" is a node_value.
         """
         dE = 0
@@ -530,6 +562,28 @@ tuple [node_value, [list, of, offspring, values]].
         except KeyError:
             pass
 
+        # Degeneracy correction
+        if degcorrect:
+            # old parameter labeling
+            dE -= np.log(
+                comb(len(self.parameters), self.n_dist_par, exact=True)
+            )
+            # old commutative nodes
+            dE -= self.n_commute * np.log(2.)
+            # new parameter labeling
+            newpar = list(set(
+                [n for in in ets[0] if n in self.parameters and n != target] +
+                [new]
+            ))
+            dE += np.log(comb(len(self.parameters), len(newpar), exact=True))
+            # new commutative nodes
+            newn_commute = self.n_commute
+            if target.value in COMMUTE:
+                newn_commute -= 1                
+            if new in COMMUTE:
+                newn_commute += 1
+            dE += newn_commute * np.log(2.)
+        
         # Data
         if not self.x.empty:
             bicOld = self.bic
@@ -556,7 +610,7 @@ tuple [node_value, [list, of, offspring, values]].
 
         
     # -------------------------------------------------------------------------
-    def dE_rr(self, rr=None):
+    def dE_rr(self, rr=None, degcorrect=False):
         """Calculate the energy change associated to a root replacement move. If rr==None, then it returns the energy change associated to pruning the root; otherwise, it returns the dE associated to adding the root replacement "rr".
 
         """
@@ -568,16 +622,31 @@ tuple [node_value, [list, of, offspring, values]].
                 return np.inf, self.par_values
             # Prior: change due to the numbers of each operation
             dE -= self.prior_par['Nopi_%s' % self.root.value] / self.PT
-            # Data
+            # Data and degeneracy correction
             if not self.x.empty:
                 bicOld = self.bic
                 sseOld = self.sse
                 par_valuesOld = deepcopy(self.par_values)
                 oldrr = [self.root.value,
                          [o.value for o in self.root.offspring[1:]]]
+                if degcorrect:
+                    # parameter labeling
+                    dE -= np.log(
+                        comb(len(self.parameters), self.n_dist_par, exact=True)
+                    )
+                    # commutative nodes
+                    dE -= self.n_commute * np.log(2.)
+                # replace
                 self.prune_root(update_gof=False)
                 bicNew = self.get_bic(reset=True, fit=True)
                 par_valuesNew = deepcopy(self.par_values)
+                if degcorrect:
+                    # parameter labeling
+                    dE += np.log(
+                        comb(len(self.parameters), self.n_dist_par, exact=True)
+                    )
+                    # commutative nodes
+                    dE += self.n_commute * np.log(2.)
                 # leave the whole thing as it was before the back & fore
                 self.replace_root(rr=oldrr, update_gof=False)
                 self.bic = bicOld
@@ -602,11 +671,26 @@ tuple [node_value, [list, of, offspring, values]].
                 bicOld = self.bic
                 sseOld = self.sse
                 par_valuesOld = deepcopy(self.par_values)
+                if degcorrect:
+                    # parameter labeling
+                    dE -= np.log(
+                        comb(len(self.parameters), self.n_dist_par, exact=True)
+                    )
+                    # commutative nodes
+                    dE -= self.n_commute * np.log(2.)
+                # replace
                 newroot = self.replace_root(rr=rr, update_gof=False)
                 if newroot == None:
                     return np.inf, self.par_values
                 bicNew = self.get_bic(reset=True, fit=True)
                 par_valuesNew = deepcopy(self.par_values)
+                if degcorrect:
+                    # parameter labeling
+                    dE += np.log(
+                        comb(len(self.parameters), self.n_dist_par, exact=True)
+                    )
+                    # commutative nodes
+                    dE += self.n_commute * np.log(2.)
                 # leave the whole thing as it was before the back & fore
                 self.prune_root(update_gof=False)
                 self.bic = bicOld
@@ -624,8 +708,8 @@ tuple [node_value, [list, of, offspring, values]].
 
        
     # -------------------------------------------------------------------------
-    #### NEED TO DOUBLE CHECK THAT THIS IS ALL CORRECT!!
-    def mcmc_step(self, verbose=False, p_rr=0.05, p_long=.5):
+    #
+    def mcmc_step(self, verbose=False, p_rr=0.05, p_long=.5, degcorrect=False):
         """Make a single MCMC step.
 
         """
@@ -671,14 +755,26 @@ tuple [node_value, [list, of, offspring, values]].
                         nready = True
             dE, par_valuesNew = self.dE_lr(target, new)
             paccept = np.exp(-dE)
-            # Accept / reject
+            # Accept move, if necessary
             dice = random()
             if dice < paccept:
-                # Accept move
+                # update number of operations
                 if target.offspring != []:
                     self.nops[target.value] -= 1
                     self.nops[new] += 1
+                # correct commutative nodes: old
+                if target.value in COMMUTE:
+                    self.n_commute -= 1
+                # move
                 target.value = new
+                # correct commutative nodes: new
+                if target.value in COMMUTE:
+                    self.n_commute += 1
+                # recalculate distinct parameters
+                self.dist_par = list(set([n for in self.ets[0]
+                                          if n in self.parameters]))
+                self.n_dist_par = len(self.dist_par)
+                # update others
                 self.par_values = par_valuesNew
                 self.get_bic(reset=True, fit=False)
                 self.E += dE
