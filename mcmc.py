@@ -102,13 +102,13 @@ class Tree():
         self.ets = dict([(o, []) for o in self.op_orders])
         self.ets[0] = [self.root]
         # Distinct parameters used
-        self.dist_par = list(set([n for n in self.ets[0]
-                                  if n in self.parameters]))
+        self.dist_par = list(set([n.value for n in self.ets[0]
+                                  if n.value in self.parameters]))
         self.n_dist_par = len(self.dist_par)
-        # Number of commutative order-2 nodes
-        self.n_commute = len([n for n in self.ets[2] if n.value in COMMUTE])
         # Nodes of the tree (operations + leaves)
         self.nodes = [self.root]
+        # Number of commutative nodes
+        self.n_commute = len([n for n in self.nodes if n.value in COMMUTE])
         # Tree size and other properties of the model
         self.size = 1
         self.max_size = 50
@@ -202,11 +202,11 @@ class Tree():
         if oldRoot.offspring == []:
             self.ets[self.root.order].append(self.root)
         # Update list of distinct parameters
-        self.dist_par = list(set([n for n in self.ets[0]
-                                  if n in self.parameters]))
+        self.dist_par = list(set([n.value for n in self.ets[0]
+                                  if n.value in self.parameters]))
         self.n_dist_par = len(self.dist_par)
-        # Update number of commutative order-2 nodes
-        self.n_commute = len([n for n in self.ets[2] if n.value in COMMUTE])
+        # Update number of commutative nodes
+        self.n_commute = len([n for n in self.nodes if n.value in COMMUTE])
         # Update goodness of fit measures, if necessary
         if update_gof == True:
             self.sse = self.get_sse()
@@ -256,11 +256,11 @@ class Tree():
         self.root = self.root.offspring[0]
         self.root.parent = None
         # Update list of distinct parameters
-        self.dist_par = list(set([n for n in self.ets[0]
-                                  if n in self.parameters]))
+        self.dist_par = list(set([n.value for n in self.ets[0]
+                                  if n.value in self.parameters]))
         self.n_dist_par = len(self.dist_par)
-        # Update number of commutative order-2 nodes
-        self.n_commute = len([n for n in self.ets[2] if n.value in COMMUTE])
+        # Update number of commutative nodes
+        self.n_commute = len([n for n in self.nodes if n.value in COMMUTE])
         # Update goodness of fit measures, if necessary
         if update_gof == True:
             self.sse = self.get_sse()
@@ -309,10 +309,11 @@ class Tree():
             self.ets[0].append(o)
             self.size += 1
         # Update list of distinct parameters
-        self.dist_par = list(set([n for n in self.ets[0] if n in self.parameters]))
+        self.dist_par = list(set([n.value for n in self.ets[0]
+                                  if n.value in self.parameters]))
         self.n_dist_par = len(self.dist_par)
-        # Update number of commutative order-2 nodes
-        self.n_commute = len([n for n in self.ets[2] if n.value in COMMUTE])
+        # Update number of commutative nodes
+        self.n_commute = len([n for n in self.nodes if n.value in COMMUTE])
         # Update goodness of fit measures, if necessary
         if update_gof == True:
             self.sse = self.get_sse()
@@ -347,10 +348,11 @@ class Tree():
             if is_parent_et == True:
                 self.ets[len(node.parent.offspring)].append(node.parent)
         # Update list of distinct parameters
-        self.dist_par = list(set([n for n in self.ets[0] if n in self.parameters]))
+        self.dist_par = list(set([n.value for n in self.ets[0]
+                                  if n.value in self.parameters]))
         self.n_dist_par = len(self.dist_par)
-        # Update number of commutative order-2 nodes
-        self.n_commute = len([n for n in self.ets[2] if n.value in COMMUTE])
+        # Update number of commutative nodes
+        self.n_commute = len([n for n in self.nodes if n.value in COMMUTE])
         # Update goodness of fit measures, if necessary
         if update_gof == True:
             self.sse = self.get_sse()
@@ -566,6 +568,7 @@ tuple [node_value, [list, of, offspring, values]].
             pass
 
         # Degeneracy correction
+        print self, self.n_dist_par, self.dist_par, self.n_commute
         if degcorrect:
             # old parameter labeling
             dE -= np.log(
@@ -575,14 +578,15 @@ tuple [node_value, [list, of, offspring, values]].
             dE -= self.n_commute * np.log(2.)
             # new parameter labeling
             newpar = list(set(
-                [n for n in self.ets[0] if n in self.parameters and n != target] +
+                [n.value for n in self.ets[0]
+                 if n.value in self.parameters and n != target] +
                 [new]
             ))
             dE += np.log(comb(len(self.parameters), len(newpar), exact=True))
             # new commutative nodes
             newn_commute = self.n_commute
             if target.value in COMMUTE:
-                newn_commute -= 1                
+                newn_commute -= 1
             if new in COMMUTE:
                 newn_commute += 1
             dE += newn_commute * np.log(2.)
@@ -765,18 +769,15 @@ tuple [node_value, [list, of, offspring, values]].
                 if target.offspring != []:
                     self.nops[target.value] -= 1
                     self.nops[new] += 1
-                # correct commutative nodes: old
-                if target.value in COMMUTE:
-                    self.n_commute -= 1
                 # move
                 target.value = new
-                # correct commutative nodes: new
-                if target.value in COMMUTE:
-                    self.n_commute += 1
                 # recalculate distinct parameters
-                self.dist_par = list(set([n for n in self.ets[0]
-                                          if n in self.parameters]))
+                self.dist_par = list(set([n.value for n in self.ets[0]
+                                          if n.value in self.parameters]))
                 self.n_dist_par = len(self.dist_par)
+                # update number of commutative nodes
+                self.n_commute = len([n for n in self.nodes
+                                      if n.value in COMMUTE])
                 # update others
                 self.par_values = par_valuesNew
                 self.get_bic(reset=True, fit=False)
