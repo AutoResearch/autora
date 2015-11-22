@@ -2,6 +2,7 @@ import sys
 import json
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 from copy import deepcopy
 from sympy import *
 from random import random, choice
@@ -69,7 +70,7 @@ class Node():
                 return '(%s**2)' % (self.offspring[0].pr())
             elif self.value == 'pow3':
                 return '(%s**3)' % (self.offspring[0].pr())
-            elif self.value == 'fact':
+            elif self.value == 'fac':
                 return '((%s)!)' % (self.offspring[0].pr())
             else:
                 return '%s(%s)' % (self.value,
@@ -195,14 +196,15 @@ class Tree():
                                             parent=self.root))
             self.nodes.append(self.root.offspring[-1])
             self.ets[0].append(self.root.offspring[-1])
-            if self.root.offspring[-1].value not in self.dist_par:
-                self.dist_par.append(self.root.offspring[-1].value)
-                self.n_dist_par += 1
             self.size += 1
         # Add new root to elementary trees if necessary (that is, iff
         # the old root was a leaf)
         if oldRoot.offspring == []:
             self.ets[self.root.order].append(self.root)
+        # Update list of distinct parameters
+        self.dist_par = list(set([n for n in self.ets[0]
+                                  if n in self.parameters]))
+        self.n_dist_par = len(self.dist_par)
         # Update number of commutative order-2 nodes
         self.n_commute = len([n for n in self.ets[2] if n.value in COMMUTE])
         # Update goodness of fit measures, if necessary
@@ -254,7 +256,8 @@ class Tree():
         self.root = self.root.offspring[0]
         self.root.parent = None
         # Update list of distinct parameters
-        self.dist_par = list(set([n for n in self.ets[0] if n in self.parameters]))
+        self.dist_par = list(set([n for n in self.ets[0]
+                                  if n in self.parameters]))
         self.n_dist_par = len(self.dist_par)
         # Update number of commutative order-2 nodes
         self.n_commute = len([n for n in self.ets[2] if n.value in COMMUTE])
@@ -461,7 +464,7 @@ Node and new is a tuple [node_value, [list, of, offspring, values]]
         return BIC
 
     # -------------------------------------------------------------------------
-    def get_energy(self, bic=False, reset=False, degcorrect=False):
+    def get_energy(self, bic=False, reset=False, degcorrect=True):
         """Calculate the "energy" of a given formula, that is, approximate minus log-posterior of the formula given the data (the approximation coming from the use of the BIC instead of the exactly integrated likelihood).
 
         """
@@ -489,7 +492,7 @@ Node and new is a tuple [node_value, [list, of, offspring, values]]
         return E
 
     # -------------------------------------------------------------------------
-    def dE_et(self, target, new, degcorrect=False):
+    def dE_et(self, target, new, degcorrect=True):
         """Calculate the energy change associated to the replacement of one ET
 by another, both of arbitrary order. "target" is a Node() and "new" is a
 tuple [node_value, [list, of, offspring, values]].
@@ -547,7 +550,7 @@ tuple [node_value, [list, of, offspring, values]].
 
 
     # -------------------------------------------------------------------------
-    def dE_lr(self, target, new, degcorrect=False):
+    def dE_lr(self, target, new, degcorrect=True):
         """Calculate the energy change associated to a long-range move (the replacement of the value of a node. "target" is a Node() and "new" is a node_value.
         """
         dE = 0
@@ -610,7 +613,7 @@ tuple [node_value, [list, of, offspring, values]].
 
         
     # -------------------------------------------------------------------------
-    def dE_rr(self, rr=None, degcorrect=False):
+    def dE_rr(self, rr=None, degcorrect=True):
         """Calculate the energy change associated to a root replacement move. If rr==None, then it returns the energy change associated to pruning the root; otherwise, it returns the dE associated to adding the root replacement "rr".
 
         """
@@ -709,7 +712,7 @@ tuple [node_value, [list, of, offspring, values]].
        
     # -------------------------------------------------------------------------
     #
-    def mcmc_step(self, verbose=False, p_rr=0.05, p_long=.5, degcorrect=False):
+    def mcmc_step(self, verbose=False, p_rr=0.05, p_long=.5, degcorrect=True):
         """Make a single MCMC step.
 
         """
@@ -978,35 +981,6 @@ tuple [node_value, [list, of, offspring, values]].
 # MAIN
 # -----------------------------------------------------------------------------
 # -----------------------------------------------------------------------------
-def test0(num_points=10):
-    x = pd.DataFrame(
-        dict([('x%d' % i, np.random.uniform(0, 10, num_points))
-              for i in range(5)])
-    )
-    eps = np.random.normal(0.0, .5, num_points)
-    y = 50. * np.sin(x['x0']) / x['x2'] - 4. * x['x1'] + 3 + eps
-    x.to_csv('data_x.csv', index=False)
-    y.to_csv('data_y.csv', index=False, header=['y'])
-    prior_par = {'Nopi_/': 5.912205942815285, 'Nopi_cosh': 8.12720511103694, 'Nopi_-': 3.350846072163632, 'Nopi_sin': 5.965917796154835, 'Nopi_tan': 8.127427922862411, 'Nopi_tanh': 7.799259068142255, 'Nopi_**': 6.4734429542245495, 'Nopi_pow2': 3.3017352779079734, 'Nopi_pow3': 5.9907496760026175, 'Nopi_exp': 4.768665265735502, 'Nopi_log': 4.745957377206544, 'Nopi_sqrt': 4.760686909134266, 'Nopi_cos': 5.452564657261127, 'Nopi_sinh': 7.955723540761046, 'Nopi_abs': 6.333544134938385, 'Nopi_+': 5.808163661224514, 'Nopi_*': 5.002213595420244}
-    t = Tree(
-        variables=['x%d' % i for i in range(5)],
-        parameters=['a%d' % i for i in range(10)],
-        x=x, y=y,
-        prior_par=prior_par,
-        BT=5.,
-    )
-    t.et_replace(t.root, ['*', ['x0', 'a0']])
-    t.et_replace(t.root.offspring[0], ['+', ['x0', 'a0']])
-    print t
-    t.prune_root(update_gof=False)
-    print t
-    t.replace_root(rr=['/', ['a1']], update_gof=False)
-    print t
-    print t.nops
-    print t.size
-    print t.nodes
-
-
 def test3(num_points=10, samples=100000):
     # Create the data
     x = pd.DataFrame(
@@ -1019,7 +993,7 @@ def test3(num_points=10, samples=100000):
     y.to_csv('data_y.csv', index=False, header=['y'])
 
     # Create the formula
-    prior_par = {'Nopi_/': 5.912205942815285, 'Nopi_cosh': 8.12720511103694, 'Nopi_-': 3.350846072163632, 'Nopi_sin': 5.965917796154835, 'Nopi_tan': 8.127427922862411, 'Nopi_tanh': 7.799259068142255, 'Nopi_**': 6.4734429542245495, 'Nopi_pow2': 3.3017352779079734, 'Nopi_pow3': 5.9907496760026175, 'Nopi_exp': 4.768665265735502, 'Nopi_log': 4.745957377206544, 'Nopi_sqrt': 4.760686909134266, 'Nopi_cos': 5.452564657261127, 'Nopi_sinh': 7.955723540761046, 'Nopi_abs': 6.333544134938385, 'Nopi_+': 5.808163661224514, 'Nopi_*': 5.002213595420244}
+    prior_par = {'Nopi_/': 5.912205942815285, 'Nopi_cosh': 8.12720511103694, 'Nopi_-': 3.350846072163632, 'Nopi_sin': 5.965917796154835, 'Nopi_tan': 8.127427922862411, 'Nopi_tanh': 7.799259068142255, 'Nopi_**': 6.4734429542245495, 'Nopi_pow2': 3.3017352779079734, 'Nopi_pow3': 5.9907496760026175, 'Nopi_exp': 4.768665265735502, 'Nopi_log': 4.745957377206544, 'Nopi_sqrt': 4.760686909134266, 'Nopi_cos': 5.452564657261127, 'Nopi_sinh': 7.955723540761046, 'Nopi_abs': 6.333544134938385, 'Nopi_+': 5.808163661224514, 'Nopi_*': 5.002213595420244, 'Nopi_fac': 10.}
     t = Tree(
         variables=['x%d' % i for i in range(5)],
         parameters=['a%d' % i for i in range(10)],
@@ -1035,6 +1009,9 @@ def test3(num_points=10, samples=100000):
     print y
     print 50. * np.sin(x['x0']) / x['x2'] - 4. * x['x1'] + 3
 
+    plt.plot(t.predict(x), y)
+    plt.show()
+    
     return t
 
 def test4(num_points=10, samples=1000):
@@ -1052,7 +1029,7 @@ def test4(num_points=10, samples=1000):
     xtest, ytest = x.iloc[:5], y.iloc[:5]
 
     # Create the formula
-    prior_par = {'Nopi_/': 5.912205942815285, 'Nopi_cosh': 8.12720511103694, 'Nopi_-': 3.350846072163632, 'Nopi_sin': 5.965917796154835, 'Nopi_tan': 8.127427922862411, 'Nopi_tanh': 7.799259068142255, 'Nopi_**': 6.4734429542245495, 'Nopi_pow2': 3.3017352779079734, 'Nopi_pow3': 5.9907496760026175, 'Nopi_exp': 4.768665265735502, 'Nopi_log': 4.745957377206544, 'Nopi_sqrt': 4.760686909134266, 'Nopi_cos': 5.452564657261127, 'Nopi_sinh': 7.955723540761046, 'Nopi_abs': 6.333544134938385, 'Nopi_+': 5.808163661224514, 'Nopi_*': 5.002213595420244}
+    prior_par = {'Nopi_/': 5.912205942815285, 'Nopi_cosh': 8.12720511103694, 'Nopi_-': 3.350846072163632, 'Nopi_sin': 5.965917796154835, 'Nopi_tan': 8.127427922862411, 'Nopi_tanh': 7.799259068142255, 'Nopi_**': 6.4734429542245495, 'Nopi_pow2': 3.3017352779079734, 'Nopi_pow3': 5.9907496760026175, 'Nopi_exp': 4.768665265735502, 'Nopi_log': 4.745957377206544, 'Nopi_sqrt': 4.760686909134266, 'Nopi_cos': 5.452564657261127, 'Nopi_sinh': 7.955723540761046, 'Nopi_abs': 6.333544134938385, 'Nopi_+': 5.808163661224514, 'Nopi_*': 5.002213595420244, 'Nopi_fac': 10.}
     t = Tree(
         variables=['x%d' % i for i in range(5)],
         parameters=['a%d' % i for i in range(10)],
@@ -1076,6 +1053,6 @@ if __name__ == '__main__':
     #test1(num_points=NP)
     #print '\n' + '=' * 73 + '\n'
     #test2(num_points=NP)
-    #test3(num_points=NP, samples=NS)
-    test4(num_points=NP, samples=NS)
+    test3(num_points=NP, samples=NS)
+    #test4(num_points=NP, samples=NS)
     
