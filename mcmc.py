@@ -13,7 +13,6 @@ from scipy.misc import comb
 import warnings
 warnings.filterwarnings('error')
 
-
 # -----------------------------------------------------------------------------
 # The accepted operations (key: operation; value: #offspring)
 # -----------------------------------------------------------------------------
@@ -38,13 +37,6 @@ OPS = {
     '**' : 2,
 }
 COMMUTE = ('+', '*')
-
-# -----------------------------------------------------------------------------
-# The terms in the energy function
-# -----------------------------------------------------------------------------
-PTERM = []
-for o in OPS:
-    PTERM.append('Nopi_%s' % o)
 
 # -----------------------------------------------------------------------------
 # The Node class
@@ -134,7 +126,7 @@ class Tree():
         # Goodness of fit measures
         self.sse = self.get_sse()
         self.bic = self.get_bic()
-        self.E = self.get_energy()
+        self.E = self.get_energy(degcorrect=True)
         # Done
         return
 
@@ -169,7 +161,7 @@ class Tree():
         return rr_space
     
     # -------------------------------------------------------------------------
-    def replace_root(self, rr=None, update_gof=True):
+    def replace_root(self, rr=None, update_gof=True, degcorrect=True):
         """Replace the root with a "root replacement" rr (if provided; otherwise choose one at random from self.rr_space). Returns the new root if the move was possible, and None if not (because the replacement would lead to a tree larger than self.max_size."
 
         """
@@ -211,7 +203,7 @@ class Tree():
         if update_gof == True:
             self.sse = self.get_sse()
             self.bic = self.get_bic()
-            self.E = self.get_energy()
+            self.E = self.get_energy(degcorrect=degcorrect)
         return self.root
 
     # -------------------------------------------------------------------------
@@ -232,7 +224,7 @@ class Tree():
         return isPrunable
 
     # -------------------------------------------------------------------------
-    def prune_root(self, update_gof=True):
+    def prune_root(self, update_gof=True, degcorrect=True):
         """Cut the root and its rightmost leaves (provided they are, indeed, leaves), leaving the leftmost branch as the new tree. Returns the pruned root with the same format as the replacement roots in self.rr_space (or None if pruning was impossible).
 
         """
@@ -265,12 +257,13 @@ class Tree():
         if update_gof == True:
             self.sse = self.get_sse()
             self.bic = self.get_bic()
-            self.E = self.get_energy()
+            self.E = self.get_energy(degcorrect=degcorrect)
         # Done
         return rr
 
     # -------------------------------------------------------------------------
-    def _add_et(self, node, et_order=None, et=None, update_gof=True):
+    def _add_et(self, node, et_order=None, et=None, update_gof=True,
+                degcorrect=True):
         """Add an elementary tree replacing the node, which must be a leaf.
 
         """
@@ -318,11 +311,11 @@ class Tree():
         if update_gof == True:
             self.sse = self.get_sse()
             self.bic = self.get_bic()
-            self.E = self.get_energy()
+            self.E = self.get_energy(degcorrect=degcorrect)
         return node
 
     # -------------------------------------------------------------------------
-    def _del_et(self, node, leaf=None, update_gof=True):
+    def _del_et(self, node, leaf=None, update_gof=True, degcorrect=True):
         """Remove an elementary tree, replacing it by a leaf.
 
         """
@@ -357,24 +350,27 @@ class Tree():
         if update_gof == True:
             self.sse = self.get_sse()
             self.bic = self.get_bic()
-            self.E = self.get_energy()
+            self.E = self.get_energy(degcorrect=degcorrect)
         return node
     
     # -------------------------------------------------------------------------
-    def et_replace(self, target, new, update_gof=True):
+    def et_replace(self, target, new, update_gof=True, degcorrect=True):
         """Replace one ET by another one, both of arbitrary order. target is a
 Node and new is a tuple [node_value, [list, of, offspring, values]]
 
         """
         oini, ofin = len(target.offspring), len(new[1])
         if oini == 0:
-            added = self._add_et(target, et=new, update_gof=False)
+            added = self._add_et(target, et=new, update_gof=False,
+                                 degcorrect=degcorrect)
         else:
             if ofin == 0:
-                added = self._del_et(target, leaf=new[0], update_gof=False)
+                added = self._del_et(target, leaf=new[0], update_gof=False,
+                                     degcorrect=degcorrect)
             else:
-                self._del_et(target, update_gof=False)
-                added = self._add_et(target, et=new, update_gof=False)
+                self._del_et(target, update_gof=False, degcorrect=degcorrect)
+                added = self._add_et(target, et=new, update_gof=False,
+                                     degcorrect=degcorrect)
         # Update goodness of fit measures, if necessary
         if update_gof == True:
             self.sse = self.get_sse()
@@ -525,7 +521,8 @@ tuple [node_value, [list, of, offspring, values]].
                 # commutative nodes
                 dE -= self.n_commute * np.log(2.)
             # replace
-            added = self.et_replace(target, new, update_gof=True)
+            added = self.et_replace(target, new, update_gof=True,
+                                    degcorrect=degcorrect)
             bicNew = self.bic
             par_valuesNew = deepcopy(self.par_values)
             if degcorrect:
@@ -536,7 +533,7 @@ tuple [node_value, [list, of, offspring, values]].
                 # commutative nodes
                 dE += self.n_commute * np.log(2.)
             # leave the whole thing as it was before the back & fore
-            self.et_replace(added, old, update_gof=False)
+            self.et_replace(added, old, update_gof=False, degcorrect=degcorrect)
             self.bic = bicOld
             self.sse = sseOld
             self.par_values = par_valuesOld
@@ -643,7 +640,7 @@ tuple [node_value, [list, of, offspring, values]].
                     # commutative nodes
                     dE -= self.n_commute * np.log(2.)
                 # replace
-                self.prune_root(update_gof=False)
+                self.prune_root(update_gof=False, degcorrect=degcorrect)
                 bicNew = self.get_bic(reset=True, fit=True)
                 par_valuesNew = deepcopy(self.par_values)
                 if degcorrect:
@@ -654,7 +651,8 @@ tuple [node_value, [list, of, offspring, values]].
                     # commutative nodes
                     dE += self.n_commute * np.log(2.)
                 # leave the whole thing as it was before the back & fore
-                self.replace_root(rr=oldrr, update_gof=False)
+                self.replace_root(rr=oldrr, update_gof=False,
+                                  degcorrect=degcorrect)
                 self.bic = bicOld
                 self.sse = sseOld
                 self.par_values = par_valuesOld
@@ -685,7 +683,8 @@ tuple [node_value, [list, of, offspring, values]].
                     # commutative nodes
                     dE -= self.n_commute * np.log(2.)
                 # replace
-                newroot = self.replace_root(rr=rr, update_gof=False)
+                newroot = self.replace_root(rr=rr, update_gof=False,
+                                            degcorrect=degcorrect)
                 if newroot == None:
                     return np.inf, self.par_values
                 bicNew = self.get_bic(reset=True, fit=True)
@@ -698,7 +697,7 @@ tuple [node_value, [list, of, offspring, values]].
                     # commutative nodes
                     dE += self.n_commute * np.log(2.)
                 # leave the whole thing as it was before the back & fore
-                self.prune_root(update_gof=False)
+                self.prune_root(update_gof=False, degcorrect=degcorrect)
                 self.bic = bicOld
                 self.sse = sseOld
                 self.par_values = par_valuesOld
@@ -724,24 +723,25 @@ tuple [node_value, [list, of, offspring, values]].
         if topDice < p_rr:
             if random() < .5:
                 # Try to prune the root
-                dE, par_valuesNew = self.dE_rr(rr=None)
+                dE, par_valuesNew = self.dE_rr(rr=None, degcorrect=degcorrect)
                 paccept = np.exp(-dE) / float(self.num_rr)
                 dice = random()
                 if dice < paccept:
                     # Accept move
-                    self.prune_root(update_gof=False)
+                    self.prune_root(update_gof=False, degcorrect=degcorrect)
                     self.par_values = par_valuesNew
                     self.get_bic(reset=True, fit=False)
                     self.E += dE
             else:
                 # Try to replace the root
                 newrr = choice(self.rr_space)
-                dE, par_valuesNew = self.dE_rr(rr=newrr)
+                dE, par_valuesNew = self.dE_rr(rr=newrr, degcorrect=degcorrect)
                 paccept = self.num_rr * np.exp(-dE)
                 dice = random()
                 if dice < paccept:
                     # Accept move
-                    self.replace_root(rr=newrr, update_gof=False)
+                    self.replace_root(rr=newrr, update_gof=False,
+                                      degcorrect=degcorrect)
                     self.par_values = par_valuesNew
                     self.get_bic(reset=True, fit=False)
                     self.E += dE
@@ -759,7 +759,7 @@ tuple [node_value, [list, of, offspring, values]].
                     new = choice(self.ops.keys())
                     if self.ops[new] == self.ops[target.value]:
                         nready = True
-            dE, par_valuesNew = self.dE_lr(target, new)
+            dE, par_valuesNew = self.dE_lr(target, new, degcorrect=degcorrect)
             paccept = np.exp(-dE)
             # Accept move, if necessary
             dice = random()
@@ -824,14 +824,14 @@ tuple [node_value, [list, of, offspring, values]].
             si = len(self.et_space[oini])
             sf = len(self.et_space[ofin])
             # Probability of acceptance
-            dE, par_valuesNew = self.dE_et(target, new)
+            dE, par_valuesNew = self.dE_et(target, new, degcorrect=degcorrect)
             paccept = (qfi * omegai * sf * np.exp(-dE)) / \
                       (qif * omegaf * si)
             # Accept / reject
             dice = random()
             if dice < paccept:
                 # Accept move
-                self.et_replace(target, new)
+                self.et_replace(target, new, degcorrect=degcorrect)
                 self.par_values = par_valuesNew
                 self.get_bic()
                 self.E += dE
@@ -842,10 +842,13 @@ tuple [node_value, [list, of, offspring, values]].
     # -------------------------------------------------------------------------
     def mcmc(self, tracefn='trace.dat', progressfn='progress.dat',
              write_files=True, reset_files=True,
-             burnin=2000, thin=10, samples=10000, verbose=True):
+             burnin=2000, thin=10, samples=10000, verbose=True,
+             degcorrect=True):
         """Sample the space of formula trees using MCMC, and write the trace and some progress information to files (unless write_files is False).
 
         """
+        self.get_energy(reset=True, degcorrect=degcorrect)
+
         # Burnin
         if verbose:
             sys.stdout.write('# Burning in\t')
@@ -853,7 +856,7 @@ tuple [node_value, [list, of, offspring, values]].
             sys.stdout.flush()
             sys.stdout.write('\b' * (50+1))
         for i in range(burnin):
-            self.mcmc_step()
+            self.mcmc_step(degcorrect=degcorrect)
             if verbose and (i % (burnin / 50) == 0):
                 sys.stdout.write('=')
                 sys.stdout.flush()
@@ -872,13 +875,13 @@ tuple [node_value, [list, of, offspring, values]].
             sys.stdout.write('\b' * (50+1))
         for s in range(samples):
             for i in range(thin):
-                self.mcmc_step()
+                self.mcmc_step(degcorrect=degcorrect)
             if verbose and (s % (samples / 50) == 0):
                 sys.stdout.write('=')
                 sys.stdout.flush()
             if write_files:
                 json.dump([s, float(self.bic), float(self.E),
-                           float(self.get_energy()),
+                           float(self.get_energy(degcorrect=degcorrect)),
                            str(self), self.par_values], tracef)
                 tracef.write('\n')
                 tracef.flush()
@@ -928,7 +931,7 @@ tuple [node_value, [list, of, offspring, values]].
             sys.stdout.flush()
             sys.stdout.write('\b' * (50+1))
         for i in range(burnin):
-            self.mcmc_step()
+            self.mcmc_step(degcorrect=True)
             if verbose and (i % (burnin / 50) == 0):
                 sys.stdout.write('=')
                 sys.stdout.flush()
@@ -949,14 +952,14 @@ tuple [node_value, [list, of, offspring, values]].
         for s in range(samples):
             # Warm up the BIC heavily to escape deep wells
             self.BT = 1.e100
-            self.get_energy(bic=True, reset=True)
+            self.get_energy(bic=True, reset=True, degcorrect=True)
             for kk in range(thin/4):
-                self.mcmc_step()
+                self.mcmc_step(degcorrect=True)
             # Back to thermalization
             self.BT = 1.
-            self.get_energy(bic=True, reset=True)
+            self.get_energy(bic=True, reset=True, degcorrect=True)
             for kk in range(thin):
-                self.mcmc_step()
+                self.mcmc_step(degcorrect=True)
             # Make prediction
             ypred[s] = self.predict(x)
             # Output
@@ -965,7 +968,7 @@ tuple [node_value, [list, of, offspring, values]].
                 sys.stdout.flush()
             if write_files:
                 json.dump([s, float(self.bic), float(self.E),
-                           float(self.get_energy()),
+                           float(self.get_energy(degcorrect=True)),
                            str(self), self.par_values], tracef)
                 tracef.write('\n')
                 tracef.flush()
@@ -1003,14 +1006,15 @@ def test3(num_points=10, samples=100000):
         BT=1.,
     )
     # MCMC
-    t.mcmc(burnin=2000, thin=10, samples=samples, verbose=True)
+    t.mcmc(burnin=2000, thin=10, samples=samples, verbose=True,
+           degcorrect=True)
 
     # Predict
     print t.predict(x)
     print y
     print 50. * np.sin(x['x0']) / x['x2'] - 4. * x['x1'] + 3
 
-    plt.plot(t.predict(x), y)
+    plt.plot(t.predict(x), 50. * np.sin(x['x0']) / x['x2'] - 4. * x['x1'] + 3)
     plt.show()
     
     return t
