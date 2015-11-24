@@ -568,7 +568,6 @@ tuple [node_value, [list, of, offspring, values]].
             pass
 
         # Degeneracy correction
-        print self, self.n_dist_par, self.dist_par, self.n_commute
         if degcorrect:
             # old parameter labeling
             dE -= np.log(
@@ -577,11 +576,11 @@ tuple [node_value, [list, of, offspring, values]].
             # old commutative nodes
             dE -= self.n_commute * np.log(2.)
             # new parameter labeling
-            newpar = list(set(
-                [n.value for n in self.ets[0]
-                 if n.value in self.parameters and n != target] +
-                [new]
-            ))
+            newpar = [n.value for n in self.ets[0]
+                      if n.value in self.parameters and n != target]
+            if new in self.parameters:
+                newpar += [new]
+            newpar = list(set(newpar))
             dE += np.log(comb(len(self.parameters), len(newpar), exact=True))
             # new commutative nodes
             newn_commute = self.n_commute
@@ -765,6 +764,7 @@ tuple [node_value, [list, of, offspring, values]].
             # Accept move, if necessary
             dice = random()
             if dice < paccept:
+                Eold = self.E
                 # update number of operations
                 if target.offspring != []:
                     self.nops[target.value] -= 1
