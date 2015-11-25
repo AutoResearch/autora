@@ -36,12 +36,12 @@ def read_target_values(source):
 
     """
     # Number of formulas
-    infn1 = '../../01-Process-Formulas/data/%s.wiki.parsed__num_operations.dat' % (source)
+    infn1 = '../Process-Formulas/data/%s.wiki.parsed__num_operations.dat' % (source)
     with open(infn1) as inf1:
         lines = inf1.readlines()
         nform = sum([int(line.strip().split()[1]) for line in lines])
     # Fraction of each of the operations
-    infn2 = '../../01-Process-Formulas/data/%s.wiki.parsed__operation_type.dat' % (source)
+    infn2 = '../Process-Formulas/data/%s.wiki.parsed__operation_type.dat' % (source)
     with open(infn2) as inf2:
         lines = inf2.readlines()
         target = dict([('Nopi_%s' % line.strip().split()[0],

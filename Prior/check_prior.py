@@ -31,11 +31,6 @@ def parse_options():
     )
     parser.add_option("-r", "--nrep", dest="nrep", type="int", default=1000,
                       help="number of repetitions (default 1000)")
-    """
-    parser.add_option("-c", "--continue",
-                      action="store_true", dest="continue", default=False,
-                      help="continue from last existing set of parameters")
-    """
     return parser
 
 
