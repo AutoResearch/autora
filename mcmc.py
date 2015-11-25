@@ -477,6 +477,10 @@ Node and new is a tuple [node_value, [list, of, offspring, values]]
                 E += self.prior_par['Nopi_%s' % op] * nop / self.PT
             except KeyError:
                 pass
+            try:
+                E += self.prior_par['Nopi2_%s' % op] * nop**2 / self.PT
+            except KeyError:
+                pass
         # Correct for multiple counting of formulas
         if degcorrect:
             # Parameter labeling
@@ -504,6 +508,18 @@ tuple [node_value, [list, of, offspring, values]].
             pass
         try:
             dE += self.prior_par['Nopi_%s' % new[0]] / self.PT
+        except KeyError:
+            pass
+        try:
+            dE += (self.prior_par['Nopi2_%s' % target.value] *
+                   ((self.nops[target.value] - 1)**2 - 
+                    (self.nops[target.value])**2)) / self.PT
+        except KeyError:
+            pass
+        try:
+            dE += (self.prior_par['Nopi2_%s' % new[0]] *
+                   ((self.nops[new[0]] + 1)**2 - 
+                    (self.nops[new[0]])**2)) / self.PT
         except KeyError:
             pass
 
@@ -553,57 +569,73 @@ tuple [node_value, [list, of, offspring, values]].
         """Calculate the energy change associated to a long-range move (the replacement of the value of a node. "target" is a Node() and "new" is a node_value.
         """
         dE = 0
+        par_valuesNew = deepcopy(self.par_values)
 
-        # Prior: change due to the numbers of each operation
-        try:
-            dE -= self.prior_par['Nopi_%s' % target.value] / self.PT
-        except KeyError:
-            pass
-        try:
-            dE += self.prior_par['Nopi_%s' % new] / self.PT
-        except KeyError:
-            pass
+        if target.value != new:
+            # Prior: change due to the numbers of each operation
+            try:
+                dE -= self.prior_par['Nopi_%s' % target.value] / self.PT
+            except KeyError:
+                pass
+            try:
+                dE += self.prior_par['Nopi_%s' % new] / self.PT
+            except KeyError:
+                pass
+            try:
+                dE += (self.prior_par['Nopi2_%s' % target.value] *
+                       ((self.nops[target.value] - 1)**2 - 
+                        (self.nops[target.value])**2)) / self.PT
+            except KeyError:
+                pass
+            try:
+                dE += (self.prior_par['Nopi2_%s' % new] *
+                       ((self.nops[new] + 1)**2 - 
+                        (self.nops[new])**2)) / self.PT
+            except KeyError:
+                pass
 
-        # Degeneracy correction
-        if degcorrect:
-            # old parameter labeling
-            dE -= np.log(
-                comb(len(self.parameters), self.n_dist_par, exact=True)
-            )
-            # old commutative nodes
-            dE -= self.n_commute * np.log(2.)
-            # new parameter labeling
-            newpar = [n.value for n in self.ets[0]
-                      if n.value in self.parameters and n != target]
-            if new in self.parameters:
-                newpar += [new]
-            newpar = list(set(newpar))
-            dE += np.log(comb(len(self.parameters), len(newpar), exact=True))
-            # new commutative nodes
-            newn_commute = self.n_commute
-            if target.value in COMMUTE:
-                newn_commute -= 1
-            if new in COMMUTE:
-                newn_commute += 1
-            dE += newn_commute * np.log(2.)
-        
-        # Data
-        if not self.x.empty:
-            bicOld = self.bic
-            sseOld = self.sse
-            par_valuesOld = deepcopy(self.par_values)
-            old = target.value
-            target.value = new
-            bicNew = self.get_bic(reset=True, fit=True)
-            par_valuesNew = deepcopy(self.par_values)
-            # leave the whole thing as it was before the back & fore
-            target.value = old
-            self.bic = bicOld
-            self.sse = sseOld
-            self.par_values = par_valuesOld
-            dE += (bicNew - bicOld) / (2. * self.BT)
-        else:
-            par_valuesNew = deepcopy(self.par_values)
+
+            # Degeneracy correction
+            if degcorrect:
+                # old parameter labeling
+                dE -= np.log(
+                    comb(len(self.parameters), self.n_dist_par, exact=True)
+                )
+                # old commutative nodes
+                dE -= self.n_commute * np.log(2.)
+                # new parameter labeling
+                newpar = [n.value for n in self.ets[0]
+                          if n.value in self.parameters and n != target]
+                if new in self.parameters:
+                    newpar += [new]
+                newpar = list(set(newpar))
+                dE += np.log(comb(len(self.parameters), len(newpar), exact=True))
+                # new commutative nodes
+                newn_commute = self.n_commute
+                if target.value in COMMUTE:
+                    newn_commute -= 1
+                if new in COMMUTE:
+                    newn_commute += 1
+                dE += newn_commute * np.log(2.)
+
+            # Data
+            if not self.x.empty:
+                bicOld = self.bic
+                sseOld = self.sse
+                par_valuesOld = deepcopy(self.par_values)
+                old = target.value
+                target.value = new
+                bicNew = self.get_bic(reset=True, fit=True)
+                par_valuesNew = deepcopy(self.par_values)
+                # leave the whole thing as it was before the back & fore
+                target.value = old
+                self.bic = bicOld
+                self.sse = sseOld
+                self.par_values = par_valuesOld
+                dE += (bicNew - bicOld) / (2. * self.BT)
+            else:
+                par_valuesNew = deepcopy(self.par_values)
+
         # Done
         try:
             dE = float(dE)
@@ -625,6 +657,12 @@ tuple [node_value, [list, of, offspring, values]].
                 return np.inf, self.par_values
             # Prior: change due to the numbers of each operation
             dE -= self.prior_par['Nopi_%s' % self.root.value] / self.PT
+            try:
+                dE += (self.prior_par['Nopi2_%s' % self.root.value] *
+                       ((self.nops[self.root.value] - 1)**2 - 
+                        (self.nops[self.root.value])**2)) / self.PT
+            except KeyError:
+                pass
             # Data and degeneracy correction
             if not self.x.empty:
                 bicOld = self.bic
@@ -670,6 +708,12 @@ tuple [node_value, [list, of, offspring, values]].
         else:
             # Prior: change due to the numbers of each operation
             dE += self.prior_par['Nopi_%s' % rr[0]] / self.PT
+            try:
+                dE += (self.prior_par['Nopi2_%s' % rr[0]] *
+                       ((self.nops[rr[0]] + 1)**2 - 
+                        (self.nops[rr[0]])**2)) / self.PT
+            except KeyError:
+                pass
             # Data
             if not self.x.empty:
                 bicOld = self.bic
@@ -835,7 +879,7 @@ tuple [node_value, [list, of, offspring, values]].
                 self.par_values = par_valuesNew
                 self.get_bic()
                 self.E += dE
-
+                
         # Done
         return
 
@@ -997,7 +1041,7 @@ def test3(num_points=10, samples=100000):
     y.to_csv('data_y.csv', index=False, header=['y'])
 
     # Create the formula
-    prior_par = {'Nopi_/': 5.912205942815285, 'Nopi_cosh': 8.12720511103694, 'Nopi_-': 3.350846072163632, 'Nopi_sin': 5.965917796154835, 'Nopi_tan': 8.127427922862411, 'Nopi_tanh': 7.799259068142255, 'Nopi_**': 6.4734429542245495, 'Nopi_pow2': 3.3017352779079734, 'Nopi_pow3': 5.9907496760026175, 'Nopi_exp': 4.768665265735502, 'Nopi_log': 4.745957377206544, 'Nopi_sqrt': 4.760686909134266, 'Nopi_cos': 5.452564657261127, 'Nopi_sinh': 7.955723540761046, 'Nopi_abs': 6.333544134938385, 'Nopi_+': 5.808163661224514, 'Nopi_*': 5.002213595420244, 'Nopi_fac': 10.}
+    prior_par = {'Nopi_/': 5.912205942815285, 'Nopi_cosh': 8.12720511103694, 'Nopi_-': 3.350846072163632, 'Nopi_sin': 5.965917796154835, 'Nopi_tan': 8.127427922862411, 'Nopi_tanh': 7.799259068142255, 'Nopi_**': 6.4734429542245495, 'Nopi_pow2': 3.3017352779079734, 'Nopi_pow3': 5.9907496760026175, 'Nopi_exp': 4.768665265735502, 'Nopi_log': 4.745957377206544, 'Nopi_sqrt': 4.760686909134266, 'Nopi_cos': 5.452564657261127, 'Nopi_sinh': 7.955723540761046, 'Nopi_abs': 6.333544134938385, 'Nopi_+': 5.808163661224514, 'Nopi_*': 5.002213595420244, 'Nopi_fac': 10., 'Nopi2_*': 1., }
     t = Tree(
         variables=['x%d' % i for i in range(5)],
         parameters=['a%d' % i for i in range(10)],
