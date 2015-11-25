@@ -27,11 +27,14 @@ def parse_options():
                       help="formulas to generate between parameter updates")
     parser.add_option("-c", "--continue", dest="contfile", default=None,
                       help="continue from parameter values in CONTFILE (default: start from scratch)")
+    parser.add_option("-q", "--quadratic",
+                      action="store_true", dest="quadratic", default=False,
+                      help="fit parameters for quadratic terms (default: False)")
     return parser
 
 
 # -----------------------------------------------------------------------------
-def read_target_values(source):
+def read_target_values(source, quadratic=False):
     """Read the target proportions for each type of operation.
 
     """
@@ -47,6 +50,17 @@ def read_target_values(source):
         target = dict([('Nopi_%s' % line.strip().split()[0],
                         float(line.strip().split()[1]) / nform)
                        for line in lines])
+    # Fraction of each of the operations squared
+    if quadratic:
+        infn3 = '../Process-Formulas/data/%s.wiki.parsed__operation_type_sq.dat' % (source)
+        with open(infn3) as inf3:
+            lines = inf3.readlines()
+            target2 = dict([('Nopi2_%s' % line.strip().split()[0],
+                            float(line.strip().split()[1]) / nform)
+                           for line in lines])
+        for k, v in target2.items():
+            target[k] = v
+    # Done
     return target, nform
 
 
@@ -56,11 +70,17 @@ def update_ppar(tree, current, target, terms=None, step=0.05):
         terms = current.keys()
     for t in terms:
         if current[t] > target[t]:
-            tree.prior_par[t] += random() * step * \
-                            float(current[t] - target[t]) / (target[t] + 1e-10)
+            tree.prior_par[t] += min(
+                .5,
+                random() * step * float(current[t] - target[t]) / \
+                (target[t] + 1e-10)
+            )
         elif current[t] < target[t]:
-            tree.prior_par[t] -= random() * step * \
-                            float(target[t] - current[t]) / (target[t] + 1e-10)
+            tree.prior_par[t] -= min(
+                .5,
+                random() * step * float(target[t] - current[t]) / \
+                (target[t] + 1e-10)
+            )
         else:
             pass
     return
@@ -81,21 +101,27 @@ if __name__ == '__main__':
     opt, args = parser.parse_args()
     if opt.npar == None:
         opt.npar = 2 * opt.nvar
-    target, nform = read_target_values(opt.source)
+    target, nform = read_target_values(opt.source, quadratic=opt.quadratic)
     print opt.contfile
-    print target
+    print '\n>> TARGET:', target
 
     # Create prior parameter dictionary from scratch or load it from file
     if opt.contfile != None:
         ppar = read_prior_par(opt.contfile)
     else:
-        ppar = dict([(k, 10.0) for k in target])
-    print ppar
+        ppar = dict([(k, 5.0) for k in target if k.startswith('Nopi_')] +
+                    [(k, 10.0) for k in target if not k.startswith('Nopi_')])
+    print '\n>> PRIOR_PAR:', ppar
 
     # Preliminaries
-    outFileName = 'prior_param.%s.nv%d.np%d.%s.dat' % (
-        opt.source, opt.nvar, opt.npar, datetime.now(),
-    )
+    if opt.quadratic:
+        outFileName = 'prior_param_sq.%s.nv%d.np%d.%s.dat' % (
+            opt.source, opt.nvar, opt.npar, datetime.now(),
+        )
+    else:
+        outFileName = 'prior_param.%s.nv%d.np%d.%s.dat' % (
+            opt.source, opt.nvar, opt.npar, datetime.now(),
+        )
     with open(outFileName, 'w') as outf:
         print >> outf, '#', ' '.join([o for o in ppar])
     iteration = 0
@@ -117,6 +143,10 @@ if __name__ == '__main__':
             tree.mcmc_step()
             for o, nopi in tree.nops.items():
                 current['Nopi_%s' % o] += nopi
+                try:
+                    current['Nopi2_%s' % o] += nopi * nopi
+                except KeyError:
+                    pass
 
         # Normalize the current counts
         current = dict([(t, float(v) / opt.nrep) for t, v in current.items()])
