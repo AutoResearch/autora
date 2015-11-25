@@ -114,7 +114,7 @@ class Tree():
         self.nops = dict([[o, 0] for o in ops])
         # The parameters of the prior propability (default: 5 everywhere)
         if prior_par == {}:
-            self.prior_par = dict([(t, 5) for t in self.ops])
+            self.prior_par = dict([('Nopi_%s' % t, 10.) for t in self.ops])
         else:
             self.prior_par = prior_par
         # The data
