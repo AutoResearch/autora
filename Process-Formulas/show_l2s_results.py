@@ -33,6 +33,7 @@ M2R = {
     'Div' : '/',
     'sin' : 'sin',
     'tan' : 'tan',
+    'sec' : 'sec',
 }
 
 if __name__ == "__main__":
