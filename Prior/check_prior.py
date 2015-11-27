@@ -53,7 +53,10 @@ if __name__ == '__main__':
         tmp = tmp[:tmp.find('.')]
         opt.npar = int(tmp)
     ppar = read_prior_par(pparFileName)
-    target, nform = read_target_values(opt.source)
+    if opt.quadratic:
+        target, nform = read_target_values(opt.source, quadratic=True)
+    else:
+        target, nform = read_target_values(opt.source, quadratic=False)
 
     print '> ppar =', ppar
     print '> n =', opt.nvar, '; m =', opt.npar
@@ -87,7 +90,6 @@ if __name__ == '__main__':
         for n in range(nform):
             for t in range(20): # thinning
                 tree.mcmc_step()
-            ##print >> sys.stderr, tree.size
             for o, nopi in tree.nops.items():
                 term_count['Nopi_%s' % o][rep] += nopi
                 if opt.quadratic:
