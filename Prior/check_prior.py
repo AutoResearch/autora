@@ -31,6 +31,9 @@ def parse_options():
     )
     parser.add_option("-r", "--nrep", dest="nrep", type="int", default=1000,
                       help="number of repetitions (default 1000)")
+    parser.add_option("-q", "--quadratic",
+                      action="store_true", dest="quadratic", default=False,
+                      help="compare also quadratic terms (default: False)")
     return parser
 
 
@@ -58,7 +61,16 @@ if __name__ == '__main__':
     print '> nform =', nform
 
     # Initialize the counter of numbers of operations
-    term_count = dict([(t, [0] * opt.nrep) for t in ppar])
+    if opt.quadratic:
+        term_count = dict(
+            [(o, [0] * opt.nrep) for o in ppar if o.startswith('Nopi_')] +
+            [('Nopi2_%s' % o[5:], [0] * opt.nrep) for o in ppar
+             if o.startswith('Nopi_')]
+        )
+    else:
+        term_count = dict(
+            [('Nopi_%s' % o, [0] * opt.nrep) for o in self.ops]
+        )
 
     # Do the repetitions of the sampling
     for rep in range(opt.nrep):
@@ -78,6 +90,8 @@ if __name__ == '__main__':
             ##print >> sys.stderr, tree.size
             for o, nopi in tree.nops.items():
                 term_count['Nopi_%s' % o][rep] += nopi
+                if opt.quadratic:
+                    term_count['Nopi2_%s' % o][rep] += nopi*nopi
 
         # Some info to stderr
         print >> sys.stderr, rep+1, tree.size
