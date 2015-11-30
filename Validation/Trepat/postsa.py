@@ -4,7 +4,7 @@ import pandas as pd
 sys.path.append('../../')
 from mcmc import *
 
-sys.path.append('../../10-Prior')
+sys.path.append('../../Prior')
 from fit_prior import read_prior_par
 
 sys.path.append('../')
@@ -26,7 +26,7 @@ NS = 1000
 
 if __name__ == '__main__':
     # Read the data
-    inFileName = 'cadhesome_protein.csv'
+    inFileName = 'data/cadhesome_protein.csv'
     data, x, y = iodata.read_data(
         ylabel=Y, xlabels=VARS, in_fname=inFileName,
     )
@@ -36,6 +36,7 @@ if __name__ == '__main__':
     print prior_par
 
     # SA
-    outFileName = '__'.join((inFileName, sys.argv[1].split('/')[-1]))
+    outFileName = '__'.join((inFileName.split('/')[-1],
+                             sys.argv[1].split('/')[-1]))
     t = post_SA(x, y, VARS, prior_par, npar=6, ns=2000, fn_label=outFileName,
                 T_ini=1., T_fin=0.01, T_sched=0.95)

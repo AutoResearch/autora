@@ -94,6 +94,7 @@ def post_SA(x, y, variables, prior_par, npar=None, ns=1000, fn_label='data',
         t.mcmc(burnin=1, thin=1, samples=ns,
                tracefn=traceFileName, progressfn=progressFileName,
                reset_files=False,
+               degcorrect=False,
                verbose=False)
         if t.E < minE:
             minE = t.E
@@ -120,6 +121,7 @@ def post_SA(x, y, variables, prior_par, npar=None, ns=1000, fn_label='data',
             t.mcmc(burnin=1, thin=1, samples=ns,
                    tracefn=traceFileName, progressfn=progressFileName,
                    reset_files=False,
+                   degcorrect=False,
                    verbose=False)
             curT *= T_sched
         # Check if we missed the best visited formula
