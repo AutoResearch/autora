@@ -4,7 +4,7 @@ import pandas as pd
 sys.path.append('../../')
 from mcmc import *
 
-sys.path.append('../../10-Prior')
+sys.path.append('../../Prior')
 from fit_prior import read_prior_par
 
 import iodata
@@ -24,7 +24,7 @@ THIN = 1000
 
 if __name__ == '__main__':
     # Read the data
-    inFileName = 'cadhesome_protein.csv'
+    inFileName = 'data/cadhesome_protein.csv'
     data, x, y = iodata.read_data(
         ylabel=Y, xlabels=VARS, in_fname=inFileName,
     )

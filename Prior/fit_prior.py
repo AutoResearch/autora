@@ -66,8 +66,10 @@ def read_target_values(source, quadratic=False):
 
 # -----------------------------------------------------------------------------
 def update_ppar(tree, current, target, terms=None, step=0.05):
+    # Which terms should we update? (Default: all)
     if terms == None:
         terms = current.keys()
+    # Update
     for t in terms:
         if current[t] > target[t]:
             tree.prior_par[t] += min(
@@ -83,6 +85,15 @@ def update_ppar(tree, current, target, terms=None, step=0.05):
             )
         else:
             pass
+    # Make sure quadratic terms are not below the minimum allowed
+    for t in [t for t in terms if t.startswith('Nopi2_')]:
+        lint = t.replace('Nopi2_', 'Nopi_')
+        op = t[6:]
+        nopmax = float(tree.max_size) / tree.ops[op] - 1.
+        minval = - tree.prior_par[lint] / nopmax
+        if tree.prior_par[t] < minval:
+            tree.prior_par[t] = minval
+    
     return
 
 
