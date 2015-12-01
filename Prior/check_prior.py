@@ -96,7 +96,7 @@ if __name__ == '__main__':
                     term_count['Nopi2_%s' % o][rep] += nopi*nopi
 
         # Some info to stderr
-        print >> sys.stderr, rep+1, tree.size
+        print >> sys.stderr, rep+1, tree.size, tree
                 
     # Plot the distributions
     df = DataFrame.from_dict(term_count)
