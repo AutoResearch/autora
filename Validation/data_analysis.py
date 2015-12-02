@@ -162,7 +162,7 @@ def model_averaging_valid(x, y, variables, prior_par, npar=None,
             prior_par=prior_par,
             BT=1.0, PT=1.0,
         )
-        ypred = t.trace_predict(xtest, samples=ns, thin=5000, write_files=False)
+        ypred = t.trace_predict(xtest, samples=ns, thin=1000, write_files=False)
         ypredmean = ypred.mean(axis=1)
         ypredmedian = ypred.median(axis=1)
 
