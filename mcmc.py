@@ -994,6 +994,7 @@ tuple [node_value, [list, of, offspring, values]].
             sys.stdout.write('\b' * (50+1))
 
         for s in range(samples):
+            """
             # Warm up the BIC heavily to escape deep wells
             self.BT = 1.e100
             self.get_energy(bic=True, reset=True, degcorrect=True)
@@ -1002,6 +1003,7 @@ tuple [node_value, [list, of, offspring, values]].
             # Back to thermalization
             self.BT = 1.
             self.get_energy(bic=True, reset=True, degcorrect=True)
+            """
             for kk in range(thin):
                 self.mcmc_step(degcorrect=True)
             # Make prediction
