@@ -270,26 +270,25 @@ class Tree():
                                                         parameters=parameters,
                                                         variables=variables)]]
             else:  # neither x nor y are leaves
-                nterm, terms, nopenpar, op = 0, ['('], 1, ''
-                for c in expression[1:]:
-                    if nopenpar == 0:
-                        if c == '(':
-                            nopenpar += 1
-                            terms[nterm] += c
-                        else:
-                            op += c
+                nterm, terms, nopenpar, op, opactive = 0, [''], 0, '', False
+                for c in expression:
+                    if opactive and c != ' ':
+                        op += c
+                    elif opactive and c == ' ':
+                        opactive = False
+                        nterm += 1
+                        terms.append('')
+                    elif nopenpar == 0 and c == ' ':
+                        opactive = True
+                    elif c == '(':
+                        nopenpar += 1
+                        terms[nterm] += c
+                    elif c == ')':
+                        nopenpar -= 1
+                        terms[nterm] += c
                     else:
-                        if c == '(':
-                            nopenpar += 1
-                            terms[nterm] += c
-                        elif c == ')':
-                            nopenpar -= 1
-                            terms[nterm] += c
-                            if nopenpar == 0:
-                                nterm += 1
-                                terms.append('')
-                        else:
-                            terms[nterm] += c
+                        terms[nterm] += c
+                
                 if op != '':
                     if vpreturn:
                         return [op.strip(),
@@ -324,7 +323,6 @@ class Tree():
         """Auxiliary function used to recursively grow a tree from an expression parsed with __parse_recursive().
 
         """
-        print self, target, value, offspring
         try:
             tmpoff = [self.variables[0] for i in range(len(offspring))]
         except IndexError:
@@ -342,8 +340,9 @@ class Tree():
         """
         tlist, parameters, variables = self.__parse_recursive(string,
                                                               vpreturn=True)
-        print tlist
-        self.__init__(parameters=parameters, variables=variables)
+        self.__init__(ops=self.ops, prior_par=self.prior_par,
+                      x=self.x, y=self.y, BT=self.BT, PT=self.PT,
+                      parameters=parameters, variables=variables)
         self.__grow_tree(self.root, tlist[0], tlist[1])
         return
 
@@ -1318,13 +1317,14 @@ def test4(num_points=10, samples=1000):
 
 def test5(string='(P120 + (((ALPHACAT / _a2) + (_a2 * CDH3)) + _a0))'):
     # Create the formula
-    prior_par = {'Nopi_/': 5.912205942815285, 'Nopi_cosh': 8.12720511103694, 'Nopi_-': 3.350846072163632, 'Nopi_sin': 5.965917796154835, 'Nopi_tan': 8.127427922862411, 'Nopi_tanh': 7.799259068142255, 'Nopi_**': 6.4734429542245495, 'Nopi_pow2': 3.3017352779079734, 'Nopi_pow3': 5.9907496760026175, 'Nopi_exp': 4.768665265735502, 'Nopi_log': 4.745957377206544, 'Nopi_sqrt': 4.760686909134266, 'Nopi_cos': 5.452564657261127, 'Nopi_sinh': 7.955723540761046, 'Nopi_abs': 6.333544134938385, 'Nopi_+': 5.808163661224514, 'Nopi_*': 5.002213595420244, 'Nopi_fac': 10.}
+    prior_par = {'Nopi_/': 0, 'Nopi_cosh': 0, 'Nopi_-': 0, 'Nopi_sin': 0, 'Nopi_tan': 0, 'Nopi_tanh': 0, 'Nopi_**': 0, 'Nopi_pow2': 0, 'Nopi_pow3': 0, 'Nopi_exp': 0, 'Nopi_log': 0, 'Nopi_sqrt': 0, 'Nopi_cos': 0, 'Nopi_sinh': 0, 'Nopi_abs': 0, 'Nopi_+': 0, 'Nopi_*': 0, 'Nopi_fac': 0}
 
     t = Tree(prior_par=prior_par)
     t.build_from_string(string)
-    for i in range(10000):
+    for i in range(1000000):
         t.mcmc_step()
-        print '-'*180
+        print '-'*150
+        print t, t.prior_par
         t2 = Tree() 
         t2.build_from_string(str(t))
         print t, t2
