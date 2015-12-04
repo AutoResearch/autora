@@ -5,8 +5,10 @@ XVARS = [
     'CDH1',
     'CDH2',
     'CDH3',
+    'ALPHACAT',
     'BETACAT',
     'P120',
+    'ZO1',
 ]
 
 def read_data(ylabel='Sxx', xlabels=XVARS,

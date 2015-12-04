@@ -21,7 +21,7 @@ XVARS = [
 ]
 
 
-def read_data(ylabel='Barrier', xlabels=XVARS, in_fname='H_features.dat'):
+def read_data(ylabel='Barrier', xlabels=XVARS, in_fname='data/H_features.dat'):
     data = pd.read_csv(in_fname)
     x = data[xlabels]
     y = data[ylabel]
