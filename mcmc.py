@@ -77,7 +77,8 @@ class Tree():
 
     # -------------------------------------------------------------------------
     def __init__(self, ops=OPS, variables=['x'], parameters=['a'],
-                 prior_par={}, x=None, y=None, BT=1., PT=1.):
+                 prior_par={}, x=None, y=None, BT=1., PT=1.,
+                 from_string=None):
         self.root = Node(choice(variables+parameters), offspring=[],
                          parent=None)
         # The poosible operations
@@ -124,6 +125,9 @@ class Tree():
         # BIC and prior temperature
         self.BT = BT 
         self.PT = PT 
+        # Build from string
+        if from_string != None:
+            self.build_from_string(from_string)
         # Goodness of fit measures
         self.sse = self.get_sse()
         self.bic = self.get_bic()
@@ -141,7 +145,6 @@ class Tree():
         """ Parse a string obtained from Tree.__repr__() so that it can be used by build_from_string.
 
         """
-
         if variables == None:
             variables = []
         if parameters == None:
@@ -152,171 +155,49 @@ class Tree():
                 parameters.append(string)
             else:
                 variables.append(string)
-            if vpreturn:
-                return [string, []], list(set(parameters)), list(set(variables))
-            else:
-                return [string, []]
-
-        # Structure is operation(x)
-        elif not string.startswith('(') and string.endswith(')'):
-            op = string[:string.find('(')]
-            x = string[string.find('('):]
-            if vpreturn:
-                return [op, 
-                        [self.__parse_recursive(x,
-                                                parameters=parameters,
-                                                variables=variables)]], \
-                    list(set(parameters)), list(set(variables))
-            else:
-                return [op,
-                        [self.__parse_recursive(x,
-                                                parameters=parameters,
-                                                variables=variables)]]
-        # (Leaf)
-        elif ' ' not in string:
-            string = string[1:-1]
-            if string.startswith('_'):
-                parameters.append(string)
-            else:
-                variables.append(string)
-            if vpreturn:
-                return [string, []], list(set(parameters)), list(set(variables))
-            else:
-                return [string, []]
-        # Structure is (x operation y)
-        elif string.startswith('('):
-            expression = string[1:-1]
-            if not expression.startswith('('): # first term x is a leaf
-                pieces = expression.split(' ')
-                x, op, yothers = pieces[0], pieces[1], pieces[2:]
-                y = ' '.join(yothers)
-                if vpreturn:
-                    return [op,
-                            [self.__parse_recursive(x,
-                                                    parameters=parameters,
-                                                    variables=variables),
-                             self.__parse_recursive(y,
-                                                    parameters=parameters,
-                                                    variables=variables)]], \
-                        list(set(parameters)), list(set(variables))
-                else:
-                    return [op,
-                            [self.__parse_recursive(x,
-                                                    parameters=parameters,
-                                                    variables=variables),
-                             self.__parse_recursive(y,
-                                                    parameters=parameters,
-                                                    variables=variables)]]
-            elif not expression.endswith(')'): # second term y is a leaf
-                pieces = expression.split(' ')
-                xothers, op, y = pieces[:-2], pieces[-2], pieces[-1]
-                x = ' '.join(xothers)
-                if op == '**' and y == '2':
-                    if vpreturn:
-                        return ['pow2',
-                                [self.__parse_recursive(
-                                    x,
-                                    parameters=parameters,
-                                    variables=variables
-                                )]], \
-                            list(set(parameters)), list(set(variables))
-                    else:
-                        return ['pow2',
-                                [self.__parse_recursive(x,
-                                                        parameters=parameters,
-                                                        variables=variables)]]
-                elif op == '**' and y == '3':
-                    if vpreturn:
-                        return ['pow3',
-                                [self.__parse_recursive(
-                                    x,
-                                    parameters=parameters,
-                                    variables=variables
-                                )]], \
-                            list(set(parameters)), list(set(variables))
-                    else:
-                        return ['pow3',
-                                [self.__parse_recursive(x,
-                                                        parameters=parameters,
-                                                        variables=variables)]]
-                elif op == '':
-                    if vpreturn:
-                        return self.__parse_recursive(x,
-                                                      parameters=parameters,
-                                                      variables=variables), \
-                            list(set(parameters)), list(set(variables))
-                    else:
-                        return self.__parse_recursive(x,
-                                                      parameters=parameters,
-                                                      variables=variables)
-                else:
-                    if vpreturn:
-                        return [op,
-                                [self.__parse_recursive(x,
-                                                        parameters=parameters,
-                                                        variables=variables),
-                                 self.__parse_recursive(
-                                     y,
-                                     parameters=parameters,
-                                     variables=variables
-                                 )]], \
-                            list(set(parameters)), list(set(variables))
-                    else:
-                        return [op,
-                                [self.__parse_recursive(x,
-                                                        parameters=parameters,
-                                                        variables=variables),
-                                 self.__parse_recursive(y,
-                                                        parameters=parameters,
-                                                        variables=variables)]]
-            else:  # neither x nor y are leaves
-                nterm, terms, nopenpar, op, opactive = 0, [''], 0, '', False
-                for c in expression:
+            rval = [string, []]
+        # Not a leaf: parse the expression
+        else:
+            ready = False
+            while not ready:
+                nterm, terms, nopenpar, op, opactive = 0, [''], 0, '', True
+                for c in string:
+                    if opactive and c == '(':
+                        opactive = False
                     if opactive and c != ' ':
                         op += c
                     elif opactive and c == ' ':
                         opactive = False
                         nterm += 1
                         terms.append('')
-                    elif nopenpar == 0 and c == ' ':
+                    elif nopenpar == 1 and c == ' ':
                         opactive = True
                     elif c == '(':
+                        if nopenpar > 0:
+                            terms[nterm] += c
                         nopenpar += 1
-                        terms[nterm] += c
                     elif c == ')':
                         nopenpar -= 1
-                        terms[nterm] += c
+                        if nopenpar > 0:
+                            terms[nterm] += c
                     else:
                         terms[nterm] += c
-                
                 if op != '':
-                    if vpreturn:
-                        return [op.strip(),
-                                [self.__parse_recursive(terms[0],
-                                                        parameters=parameters,
-                                                        variables=variables),
-                                 self.__parse_recursive(terms[1],
-                                                        parameters=parameters,
-                                                        variables=variables)]], \
-                            list(set(parameters)), list(set(variables))
-                    else:
-                        return [op.strip(),
-                                [self.__parse_recursive(terms[0],
-                                                        parameters=parameters,
-                                                        variables=variables),
-                                 self.__parse_recursive(terms[1],
-                                                        parameters=parameters,
-                                                        variables=variables)]]
+                    ready = True
+                    rval = [op, [self.__parse_recursive(t,
+                                                        variables=variables,
+                                                        parameters=parameters)
+                                 for t in terms]]
                 else:
-                    if vpreturn:
-                        return self.__parse_recursive(terms[0],
-                                                      parameters=parameters,
-                                                      variables=variables), \
-                            list(set(parameters)), list(set(variables))
+                    if string[0] == '(' and string[-1] == ')':
+                        string = string[1:-1]
                     else:
-                        return self.__parse_recursive(terms[0],
-                                                      parameters=parameters,
-                                                      variables=variables)
+                        raise
+        # Done parsing
+        if vpreturn:
+            return rval, variables, parameters
+        else:
+            return rval
 
     # -------------------------------------------------------------------------
     def __grow_tree(self, target, value, offspring):
@@ -340,6 +221,7 @@ class Tree():
         """
         tlist, parameters, variables = self.__parse_recursive(string,
                                                               vpreturn=True)
+        print tlist
         self.__init__(ops=self.ops, prior_par=self.prior_par,
                       x=self.x, y=self.y, BT=self.BT, PT=self.PT,
                       parameters=parameters, variables=variables)
@@ -1319,15 +1201,13 @@ def test5(string='(P120 + (((ALPHACAT / _a2) + (_a2 * CDH3)) + _a0))'):
     # Create the formula
     prior_par = {'Nopi_/': 0, 'Nopi_cosh': 0, 'Nopi_-': 0, 'Nopi_sin': 0, 'Nopi_tan': 0, 'Nopi_tanh': 0, 'Nopi_**': 0, 'Nopi_pow2': 0, 'Nopi_pow3': 0, 'Nopi_exp': 0, 'Nopi_log': 0, 'Nopi_sqrt': 0, 'Nopi_cos': 0, 'Nopi_sinh': 0, 'Nopi_abs': 0, 'Nopi_+': 0, 'Nopi_*': 0, 'Nopi_fac': 0}
 
-    t = Tree(prior_par=prior_par)
-    t.build_from_string(string)
+    t = Tree(prior_par=prior_par, from_string=string)
     for i in range(1000000):
         t.mcmc_step()
         print '-'*150
-        print t, t.prior_par
-        t2 = Tree() 
-        t2.build_from_string(str(t))
-        print t, t2
+        t2 = Tree(from_string=str(t))
+        print t
+        print t2
         if str(t2) != str(t):
             raise
 
