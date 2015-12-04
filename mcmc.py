@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from copy import deepcopy
 from sympy import *
 from random import random, choice
-from itertools import product
+from itertools import product, permutations
 from scipy.optimize import curve_fit
 from scipy.misc import comb
 
@@ -91,7 +91,7 @@ class Tree():
         # The possible orders of the operations, move types, and move
         # type probabilities
         self.op_orders = list(set([0] + [n for n in ops.values()]))
-        self.move_types = [p for p in product(self.op_orders, repeat=2)]
+        self.move_types = [p for p in permutations(self.op_orders, 2)]
         # Elementary trees (including leaves), indexed by order
         self.ets = dict([(o, []) for o in self.op_orders])
         self.ets[0] = [self.root]
