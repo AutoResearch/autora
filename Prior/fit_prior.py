@@ -66,6 +66,10 @@ def read_target_values(source, quadratic=False):
 
 # -----------------------------------------------------------------------------
 def update_ppar(tree, current, target, terms=None, step=0.05):
+    """ Update the prior parameters using a gradient descend of sorts.
+
+    """
+
     # Which terms should we update? (Default: all)
     if terms == None:
         terms = current.keys()
@@ -108,6 +112,7 @@ def read_prior_par(inFileName):
 # -----------------------------------------------------------------------------
 # -----------------------------------------------------------------------------
 if __name__ == '__main__':
+    MAX_SIZE = 50
     parser = parse_options()
     opt, args = parser.parse_args()
     if opt.npar == None:
@@ -119,12 +124,22 @@ if __name__ == '__main__':
     # Create prior parameter dictionary from scratch or load it from file
     if opt.contfile != None:
         ppar = read_prior_par(opt.contfile)
-        # Add 0s as parameters for the quadratic terms if you loaded
-        # ppar from a file without quadratic terms
-        if opt.quadratic and 'Nopi2_+' not in ppar.keys():
-            for k in target:
-                if k not in ppar.keys():
-                    ppar[k] = 0.0
+        # Add values to parameters for the quadratic terms (and modify
+        # those of the linear terms accordingly) if you loaded ppar
+        # from a file without quadratic terms
+        if opt.quadratic:
+            for t in [t for t in target
+                      if t.startswith('Nopi2_') and t not in ppar.keys()]:
+                ppar[t] = 0.
+                """
+                lint = t.replace('Nopi2_', 'Nopi_')
+                op = t[6:]
+                nopmax = float(MAX_SIZE) / OPS[op] - 1.
+                ppar[lint] /= (1. - float(target[lint]) / nopmax)
+                minval = - ppar[lint] / nopmax 
+                ppar[t] = .5 * minval
+                """ 
+
     else:
         ppar = dict([(k, 5.0) for k in target if k.startswith('Nopi_')] +
                     [(k, 10.0) for k in target if not k.startswith('Nopi_')])
