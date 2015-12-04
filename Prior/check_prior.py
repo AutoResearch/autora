@@ -72,7 +72,7 @@ if __name__ == '__main__':
         )
     else:
         term_count = dict(
-            [('Nopi_%s' % o, [0] * opt.nrep) for o in self.ops]
+            [('Nopi_%s' % o, [0] * opt.nrep) for o in OPS]
         )
 
     # Do the repetitions of the sampling
