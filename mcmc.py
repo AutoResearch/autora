@@ -195,7 +195,7 @@ class Tree():
                         raise
         # Done parsing
         if vpreturn:
-            return rval, variables, parameters
+            return rval, parameters, variables
         else:
             return rval
 
