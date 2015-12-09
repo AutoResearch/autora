@@ -10,35 +10,36 @@ from fit_prior import read_prior_par
 import iodata
 
 VARS = [
-    'eff',
-    'D_max',
-    'D_apr',
-    'D_may',
-    'D_jun',
-    'ET_apr',
-    'ET_may',
-    'ET_jun',
-    'PT_apr',
-    'PT_may',
-    'PT_jun',
-    'PT_jul',
-    'PDO_win',
+    'v1',
+    'v2',
+    'v3',
+    'v4',
+    'v5',
+    'v6',
+    'v7',
+    'v8',
+    'v9',
+    'v10',
+    'v11',
+    'v12',
+    'v13',
+    'v14',
+    'v15',
+    'v16',
 ]
-Y = 'rec'
+Y = 'Barrier'
 NS = 1000
 THIN = 1000
 
 if __name__ == '__main__':
     # Read the data
-    inFileName = 'data/seymour.csv'
     data, x, y = iodata.read_data(
-        ylabel=Y, xlabels=VARS, in_fname=inFileName,
+        ylabel=Y, xlabels=VARS,
     )
     prior_par = read_prior_par(sys.argv[1])
 
     # Get the output file ready
-    outfname = 'sample_charac__%s__%s' % (inFileName.split('/')[-1],
-                                          sys.argv[1].split('/')[-1])
+    outfname = 'sample_charac__%s' % sys.argv[1].split('/')[-1]
     npar = outfname[outfname.find('.np') + 3:]
     npar = int(npar[:npar.find('.')])
     outf = open(outfname, 'w')
