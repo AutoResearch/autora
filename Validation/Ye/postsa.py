@@ -22,7 +22,7 @@ VARS = [
     'ET_may',
     'ET_jun',
     'PT_apr',
-#    'PT_may',
+    'PT_may',
     'PT_jun',
     'PT_jul',
     'PDO_win',

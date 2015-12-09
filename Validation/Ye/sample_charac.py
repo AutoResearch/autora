@@ -4,7 +4,7 @@ import pandas as pd
 sys.path.append('../../')
 from mcmc import *
 
-sys.path.append('../../10-Prior')
+sys.path.append('../../Prior')
 from fit_prior import read_prior_par
 
 import iodata
@@ -26,18 +26,19 @@ VARS = [
 ]
 Y = 'rec'
 NS = 1000
-THIN = 2000
+THIN = 1000
 
 if __name__ == '__main__':
     # Read the data
-    inFileName = 'seymour.csv'
+    inFileName = 'data/seymour.csv'
     data, x, y = iodata.read_data(
         ylabel=Y, xlabels=VARS, in_fname=inFileName,
     )
     prior_par = read_prior_par(sys.argv[1])
 
     # Get the output file ready
-    outfname = 'sample_charac__%s__%s' % (inFileName,sys.argv[1].split('/')[-1])
+    outfname = 'sample_charac__%s__%s' % (inFileName.split('/')[-1],
+                                          sys.argv[1].split('/')[-1])
     npar = outfname[outfname.find('.np') + 3:]
     npar = int(npar[:npar.find('.')])
     outf = open(outfname, 'w')

@@ -18,7 +18,7 @@ XVARS = [
 ]
 
 
-def read_data(ylabel='rec', xlabels=XVARS, in_fname='seymour.csv'):
+def read_data(ylabel='rec', xlabels=XVARS, in_fname='data/seymour.csv'):
     data = pd.read_csv(in_fname)
     
     ### Divide discharges by 1,000 to make the scale more manageable
