@@ -138,7 +138,7 @@ def post_SA(x, y, variables, prior_par, npar=None, ns=1000, fn_label='data',
 
 # -----------------------------------------------------------------------------
 def model_averaging_valid(x, y, variables, prior_par, npar=None,
-                          ns=100, fn_label='data',
+                          ns=100, thin=1000, fn_label='data',
                           method='kfold', k=2):
     """Validate model averaging using k-fold (method="kfold") or leave-k-out (method="lko").
 
@@ -162,7 +162,7 @@ def model_averaging_valid(x, y, variables, prior_par, npar=None,
             prior_par=prior_par,
             BT=1.0, PT=1.0,
         )
-        ypred = t.trace_predict(xtest, samples=ns, thin=1000, write_files=False)
+        ypred = t.trace_predict(xtest, samples=ns, thin=thin, write_files=False)
         ypredmean = ypred.mean(axis=1)
         ypredmedian = ypred.median(axis=1)
 
