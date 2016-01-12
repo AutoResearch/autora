@@ -620,31 +620,38 @@ tuple [node_value, [list, of, offspring, values]].
         except KeyError:
             pass
 
-        # Data and degeneracy correction
+        # Data degeneracy correction
+        if degcorrect:
+            # parameter labeling
+            dE -= np.log(
+                comb(len(self.parameters), self.n_dist_par, exact=True)
+            )
+            # commutative nodes
+            dE -= self.n_commute * np.log(2.)
+            # replace
+            old = [target.value, [o.value for o in target.offspring]]
+            added = self.et_replace(target, new, update_gof=False,
+                                    degcorrect=degcorrect)
+            # parameter labeling
+            dE += np.log(
+                comb(len(self.parameters), self.n_dist_par, exact=True)
+            )
+            # commutative nodes
+            dE += self.n_commute * np.log(2.)
+            # leave the whole thing as it was before the back & fore
+            self.et_replace(added, old, update_gof=False, degcorrect=degcorrect)
+            
+        # Data
         if not self.x.empty:
             bicOld = self.bic
             sseOld = self.sse
             par_valuesOld = deepcopy(self.par_values)
             old = [target.value, [o.value for o in target.offspring]]
-            if degcorrect:
-                # parameter labeling
-                dE -= np.log(
-                    comb(len(self.parameters), self.n_dist_par, exact=True)
-                )
-                # commutative nodes
-                dE -= self.n_commute * np.log(2.)
             # replace
             added = self.et_replace(target, new, update_gof=True,
                                     degcorrect=degcorrect)
             bicNew = self.bic
             par_valuesNew = deepcopy(self.par_values)
-            if degcorrect:
-                # parameter labeling
-                dE += np.log(
-                    comb(len(self.parameters), self.n_dist_par, exact=True)
-                )
-                # commutative nodes
-                dE += self.n_commute * np.log(2.)
             # leave the whole thing as it was before the back & fore
             self.et_replace(added, old, update_gof=False, degcorrect=degcorrect)
             self.bic = bicOld
@@ -760,31 +767,40 @@ tuple [node_value, [list, of, offspring, values]].
                         (self.nops[self.root.value])**2)) / self.PT
             except KeyError:
                 pass
-            # Data and degeneracy correction
+
+            # Degeneracy correction
+            if degcorrect:
+                # parameter labeling
+                dE -= np.log(
+                    comb(len(self.parameters), self.n_dist_par, exact=True)
+                )
+                # commutative nodes
+                dE -= self.n_commute * np.log(2.)
+                # replace
+                oldrr = [self.root.value,
+                         [o.value for o in self.root.offspring[1:]]]
+                self.prune_root(update_gof=False, degcorrect=degcorrect)
+                # parameter labeling
+                dE += np.log(
+                    comb(len(self.parameters), self.n_dist_par, exact=True)
+                )
+                # commutative nodes
+                dE += self.n_commute * np.log(2.)
+                # leave the whole thing as it was before the back & fore
+                self.replace_root(rr=oldrr, update_gof=False,
+                                  degcorrect=degcorrect)
+
+            # Data correction
             if not self.x.empty:
                 bicOld = self.bic
                 sseOld = self.sse
                 par_valuesOld = deepcopy(self.par_values)
                 oldrr = [self.root.value,
                          [o.value for o in self.root.offspring[1:]]]
-                if degcorrect:
-                    # parameter labeling
-                    dE -= np.log(
-                        comb(len(self.parameters), self.n_dist_par, exact=True)
-                    )
-                    # commutative nodes
-                    dE -= self.n_commute * np.log(2.)
                 # replace
                 self.prune_root(update_gof=False, degcorrect=degcorrect)
                 bicNew = self.get_bic(reset=True, fit=True)
                 par_valuesNew = deepcopy(self.par_values)
-                if degcorrect:
-                    # parameter labeling
-                    dE += np.log(
-                        comb(len(self.parameters), self.n_dist_par, exact=True)
-                    )
-                    # commutative nodes
-                    dE += self.n_commute * np.log(2.)
                 # leave the whole thing as it was before the back & fore
                 self.replace_root(rr=oldrr, update_gof=False,
                                   degcorrect=degcorrect)
@@ -811,18 +827,35 @@ tuple [node_value, [list, of, offspring, values]].
                         (self.nops[rr[0]])**2)) / self.PT
             except KeyError:
                 pass
+
+            # Degeneracy correction
+            if degcorrect:
+                # parameter labeling
+                dE -= np.log(
+                    comb(len(self.parameters), self.n_dist_par, exact=True)
+                )
+                # commutative nodes
+                dE -= self.n_commute * np.log(2.)
+                # replace
+                newroot = self.replace_root(rr=rr, update_gof=False,
+                                            degcorrect=degcorrect)
+                if newroot == None:
+                    return np.inf, self.par_values
+                # parameter labeling
+                dE += np.log(
+                    comb(len(self.parameters), self.n_dist_par, exact=True)
+                )
+                # commutative nodes
+                dE += self.n_commute * np.log(2.)
+                # leave the whole thing as it was before the back & fore
+                self.prune_root(update_gof=False, degcorrect=degcorrect)
+
+
             # Data
             if not self.x.empty:
                 bicOld = self.bic
                 sseOld = self.sse
                 par_valuesOld = deepcopy(self.par_values)
-                if degcorrect:
-                    # parameter labeling
-                    dE -= np.log(
-                        comb(len(self.parameters), self.n_dist_par, exact=True)
-                    )
-                    # commutative nodes
-                    dE -= self.n_commute * np.log(2.)
                 # replace
                 newroot = self.replace_root(rr=rr, update_gof=False,
                                             degcorrect=degcorrect)
@@ -830,13 +863,6 @@ tuple [node_value, [list, of, offspring, values]].
                     return np.inf, self.par_values
                 bicNew = self.get_bic(reset=True, fit=True)
                 par_valuesNew = deepcopy(self.par_values)
-                if degcorrect:
-                    # parameter labeling
-                    dE += np.log(
-                        comb(len(self.parameters), self.n_dist_par, exact=True)
-                    )
-                    # commutative nodes
-                    dE += self.n_commute * np.log(2.)
                 # leave the whole thing as it was before the back & fore
                 self.prune_root(update_gof=False, degcorrect=degcorrect)
                 self.bic = bicOld
