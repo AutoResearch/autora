@@ -102,7 +102,9 @@ class Tree():
         # Nodes of the tree (operations + leaves)
         self.nodes = [self.root]
         # Number of commutative nodes
-        self.n_commute = len([n for n in self.nodes if n.value in COMMUTE])
+        self.n_commute = len([n for n in self.nodes
+                              if n.value in COMMUTE
+                              and len(set([o.value for o in n.offspring]))>1])
         # Tree size and other properties of the model
         self.size = 1
         self.max_size = 50
@@ -292,7 +294,9 @@ class Tree():
                                   if n.value in self.parameters]))
         self.n_dist_par = len(self.dist_par)
         # Update number of commutative nodes
-        self.n_commute = len([n for n in self.nodes if n.value in COMMUTE])
+        self.n_commute = len([n for n in self.nodes
+                              if n.value in COMMUTE
+                              and len(set([o.value for o in n.offspring]))>1])
         # Update goodness of fit measures, if necessary
         if update_gof == True:
             self.sse = self.get_sse()
@@ -346,7 +350,9 @@ class Tree():
                                   if n.value in self.parameters]))
         self.n_dist_par = len(self.dist_par)
         # Update number of commutative nodes
-        self.n_commute = len([n for n in self.nodes if n.value in COMMUTE])
+        self.n_commute = len([n for n in self.nodes
+                              if n.value in COMMUTE
+                              and len(set([o.value for o in n.offspring]))>1])
         # Update goodness of fit measures, if necessary
         if update_gof == True:
             self.sse = self.get_sse()
@@ -403,7 +409,9 @@ class Tree():
                                   if n.value in self.parameters]))
         self.n_dist_par = len(self.dist_par)
         # Update number of commutative nodes
-        self.n_commute = len([n for n in self.nodes if n.value in COMMUTE])
+        self.n_commute = len([n for n in self.nodes
+                              if n.value in COMMUTE
+                              and len(set([o.value for o in n.offspring]))>1])
         # Update goodness of fit measures, if necessary
         if update_gof == True:
             self.sse = self.get_sse()
@@ -442,7 +450,9 @@ class Tree():
                                   if n.value in self.parameters]))
         self.n_dist_par = len(self.dist_par)
         # Update number of commutative nodes
-        self.n_commute = len([n for n in self.nodes if n.value in COMMUTE])
+        self.n_commute = len([n for n in self.nodes
+                              if n.value in COMMUTE
+                              and len(set([o.value for o in n.offspring]))>1])
         # Update goodness of fit measures, if necessary
         if update_gof == True:
             self.sse = self.get_sse()
@@ -705,21 +715,24 @@ tuple [node_value, [list, of, offspring, values]].
                 dE -= np.log(
                     comb(len(self.parameters), self.n_dist_par, exact=True)
                 )
-                # old commutative nodes
-                dE -= self.n_commute * np.log(2.)
                 # new parameter labeling
                 newpar = [n.value for n in self.ets[0]
                           if n.value in self.parameters and n != target]
                 if new in self.parameters:
                     newpar += [new]
                 newpar = list(set(newpar))
-                dE += np.log(comb(len(self.parameters), len(newpar), exact=True))
-                # new commutative nodes
-                newn_commute = self.n_commute
-                if target.value in COMMUTE:
-                    newn_commute -= 1
-                if new in COMMUTE:
-                    newn_commute += 1
+                dE += np.log(comb(len(self.parameters), len(newpar),
+                                  exact=True))
+                # commutative nodes
+                dE -= self.n_commute * np.log(2.)
+                old = target.value
+                target.value = new
+                newn_commute = len(
+                    [n for n in self.nodes
+                     if n.value in COMMUTE
+                     and len(set([o.value for o in n.offspring]))>1]
+                )
+                target.value = old
                 dE += newn_commute * np.log(2.)
 
             # Data
@@ -944,7 +957,10 @@ tuple [node_value, [list, of, offspring, values]].
                 self.n_dist_par = len(self.dist_par)
                 # update number of commutative nodes
                 self.n_commute = len([n for n in self.nodes
-                                      if n.value in COMMUTE])
+                                      if n.value in COMMUTE
+                                      and len(
+                                          set([o.value for o in n.offspring])
+                                      ) > 1])
                 # update others
                 self.par_values = par_valuesNew
                 self.get_bic(reset=True, fit=False)
