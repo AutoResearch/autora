@@ -1,8 +1,6 @@
 import sys
 import pandas as pd
 
-
-
 XVARS = {
     'Trepat' : [
         'CDH1',
