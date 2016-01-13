@@ -79,15 +79,16 @@ class Tree():
     def __init__(self, ops=OPS, variables=['x'], parameters=['a'],
                  prior_par={}, x=None, y=None, BT=1., PT=1.,
                  from_string=None):
-        self.root = Node(choice(variables+parameters), offspring=[],
-                         parent=None)
-        # The poosible operations
-        self.ops = ops
         # The variables and parameters
         self.variables = variables
         self.parameters = [p if p.startswith('_') else '_%s' % p
                            for p in parameters]
         self.par_values = dict([(p, 1.) for p in self.parameters])
+        # The root
+        self.root = Node(choice(self.variables+self.parameters), offspring=[],
+                         parent=None)
+        # The poosible operations
+        self.ops = ops
         # The possible orders of the operations, move types, and move
         # type probabilities
         self.op_orders = list(set([0] + [n for n in ops.values()]))
@@ -104,7 +105,7 @@ class Tree():
         # Number of commutative nodes
         self.n_commute = len([n for n in self.nodes
                               if n.value in COMMUTE
-                              and len(set([o.value for o in n.offspring]))>1])
+                              and len(set([o.pr() for o in n.offspring]))>1])
         # Tree size and other properties of the model
         self.size = 1
         self.max_size = 50
@@ -296,7 +297,7 @@ class Tree():
         # Update number of commutative nodes
         self.n_commute = len([n for n in self.nodes
                               if n.value in COMMUTE
-                              and len(set([o.value for o in n.offspring]))>1])
+                              and len(set([o.pr() for o in n.offspring]))>1])
         # Update goodness of fit measures, if necessary
         if update_gof == True:
             self.sse = self.get_sse()
@@ -352,7 +353,7 @@ class Tree():
         # Update number of commutative nodes
         self.n_commute = len([n for n in self.nodes
                               if n.value in COMMUTE
-                              and len(set([o.value for o in n.offspring]))>1])
+                              and len(set([o.pr() for o in n.offspring]))>1])
         # Update goodness of fit measures, if necessary
         if update_gof == True:
             self.sse = self.get_sse()
@@ -411,7 +412,7 @@ class Tree():
         # Update number of commutative nodes
         self.n_commute = len([n for n in self.nodes
                               if n.value in COMMUTE
-                              and len(set([o.value for o in n.offspring]))>1])
+                              and len(set([o.pr() for o in n.offspring]))>1])
         # Update goodness of fit measures, if necessary
         if update_gof == True:
             self.sse = self.get_sse()
@@ -452,7 +453,7 @@ class Tree():
         # Update number of commutative nodes
         self.n_commute = len([n for n in self.nodes
                               if n.value in COMMUTE
-                              and len(set([o.value for o in n.offspring]))>1])
+                              and len(set([o.pr() for o in n.offspring]))>1])
         # Update goodness of fit measures, if necessary
         if update_gof == True:
             self.sse = self.get_sse()
@@ -746,7 +747,7 @@ tuple [node_value, [list, of, offspring, values]].
                 newn_commute = len(
                     [n for n in self.nodes
                      if n.value in COMMUTE
-                     and len(set([o.value for o in n.offspring]))>1]
+                     and len(set([o.pr() for o in n.offspring]))>1]
                 )
                 target.value = old
                 dE += newn_commute * np.log(2.)
@@ -909,7 +910,6 @@ tuple [node_value, [list, of, offspring, values]].
 
        
     # -------------------------------------------------------------------------
-    #
     def mcmc_step(self, verbose=False, p_rr=0.05, p_long=.5, degcorrect=True):
         """Make a single MCMC step.
 
@@ -975,7 +975,7 @@ tuple [node_value, [list, of, offspring, values]].
                 self.n_commute = len([n for n in self.nodes
                                       if n.value in COMMUTE
                                       and len(
-                                          set([o.value for o in n.offspring])
+                                          set([o.pr() for o in n.offspring])
                                       ) > 1])
                 # update others
                 self.par_values = par_valuesNew
