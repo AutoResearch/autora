@@ -118,7 +118,7 @@ class Tree():
         self.nops = dict([[o, 0] for o in ops])
         # The parameters of the prior propability (default: 5 everywhere)
         if prior_par == {}:
-            self.prior_par = dict([('Nopi_%s' % t, 10.) for t in self.ops])
+            self.prior_par = dict([('Nopi_%s' % t, 0.) for t in self.ops])
         else:
             self.prior_par = prior_par
         # The data
@@ -427,7 +427,7 @@ class Tree():
         if self.size == 1:
             return None
         if leaf == None:
-            leaf = choice(self.et_space[0])
+            leaf = choice(self.et_space[0])[0]
         self.nops[node.value] -= 1
         node.value = leaf
         self.ets[len(node.offspring)].remove(node)
@@ -630,6 +630,22 @@ tuple [node_value, [list, of, offspring, values]].
         except KeyError:
             pass
 
+        # Other terms of the acceptance
+        # number of possible move types
+        nif = sum([int(len(self.ets[oi]) > 0 and
+                       (self.size + of - oi) <= self.max_size)
+                   for oi, of in self.move_types])
+        # replace
+        old = [target.value, [o.value for o in target.offspring]]
+        added = self.et_replace(target, new, update_gof=False,
+                                degcorrect=degcorrect)
+        # number of possible move types
+        nfi = sum([int(len(self.ets[oi]) > 0 and
+                       (self.size + of - oi) <= self.max_size)
+                   for oi, of in self.move_types])
+        # leave the whole thing as it was before the back & fore
+        self.et_replace(added, old, update_gof=False, degcorrect=degcorrect)
+            
         # Data degeneracy correction
         if degcorrect:
             # parameter labeling
@@ -675,7 +691,7 @@ tuple [node_value, [list, of, offspring, values]].
             dE = float(dE)
         except:
             dE = np.inf
-        return dE, par_valuesNew
+        return dE, par_valuesNew, nif, nfi
 
 
     # -------------------------------------------------------------------------
@@ -977,25 +993,6 @@ tuple [node_value, [list, of, offspring, values]].
             # target and new ETs
             target = choice(self.ets[oini])
             new = choice(self.et_space[ofin])
-            # qif and qfi
-            nif = sum([int(len(self.ets[oi]) > 0 and
-                           (self.size + of - oi) <= self.max_size)
-                       for oi, of in self.move_types])
-            qif = 1. / nif
-            nfi = sum([int(len(self.ets[oi]) > 0 and
-                           (self.size + ofin - oini + of - oi) <= self.max_size)
-                       for oi, of in self.move_types
-                       if oi != oini and oi != ofin])
-            nfi += sum([
-                int((oi == 0 or len(self.ets[oi]) > 1) and
-                    (self.size + ofin - oini + of - oi) <= self.max_size)
-                for oi, of in self.move_types if oi == oini
-            ])
-            nfi += sum([
-                int((self.size + ofin - oini + of - oi) <= self.max_size)
-                for oi, of in self.move_types if oi == ofin
-            ])
-            qfi = 1. / nfi
             # omegai and omegaf
             omegai = len(self.ets[oini])
             omegaf = len(self.ets[ofin]) + 1
@@ -1007,9 +1004,10 @@ tuple [node_value, [list, of, offspring, values]].
             si = len(self.et_space[oini])
             sf = len(self.et_space[ofin])
             # Probability of acceptance
-            dE, par_valuesNew = self.dE_et(target, new, degcorrect=degcorrect)
-            paccept = (qfi * omegai * sf * np.exp(-dE)) / \
-                      (qif * omegaf * si)
+            dE, par_valuesNew, nif, nfi = self.dE_et(target, new,
+                                                     degcorrect=degcorrect)
+            paccept = (float(nif) * omegai * sf * np.exp(-dE)) / \
+                      (float(nfi) * omegaf * si)
             # Accept / reject
             dice = random()
             if dice < paccept:
