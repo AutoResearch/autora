@@ -464,6 +464,7 @@ class Tree():
             self.bic = self.get_bic()
             self.E = self.get_energy(degcorrect=degcorrect)
         return node
+
     
     # -------------------------------------------------------------------------
     def et_replace(self, target, new, update_gof=True, degcorrect=True):
