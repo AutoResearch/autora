@@ -140,7 +140,7 @@ class Tree():
 
     # -------------------------------------------------------------------------
     def cannonical(self):
-        return str(sympify(str(self).replace('_', '')))
+        return str(sympify(str(self).replace('_', '').replace(' ', '')))
     
     # -------------------------------------------------------------------------
     def __repr__(self):
