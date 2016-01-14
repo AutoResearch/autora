@@ -139,6 +139,10 @@ class Tree():
         return
 
     # -------------------------------------------------------------------------
+    def cannonical(self):
+        return str(sympify(str(self).replace('_', '')))
+    
+    # -------------------------------------------------------------------------
     def __repr__(self):
         return self.root.pr()
         
