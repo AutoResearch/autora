@@ -135,17 +135,21 @@ class Tree():
         self.sse = self.get_sse()
         self.bic = self.get_bic()
         self.E = self.get_energy(degcorrect=True)
+        # To control formula degeneracy (i.e. different trees that
+        # correspond to the same cannoninal formula), we store the
+        # representative tree for each cannonical formula
+        self.representative = {self.cannonical() : (str(self), self.E)}
         # Done
         return
 
     # -------------------------------------------------------------------------
-    def cannonical(self):
-        return str(sympify(str(self).replace('_', '').replace(' ', '')))
-    
-    # -------------------------------------------------------------------------
     def __repr__(self):
         return self.root.pr()
         
+    # -------------------------------------------------------------------------
+    def cannonical(self):
+        return str(sympify(str(self).replace('_', '').replace(' ', '')))
+    
     # -------------------------------------------------------------------------
     def __parse_recursive(self, string, variables=None, parameters=None,
                           vpreturn=False):
@@ -614,6 +618,43 @@ tuple [node_value, [list, of, offspring, values]].
         """
         dE = 0
 
+        # Some terms of the acceptance (number of possible move types
+        # from initial and final configurations, as well as checking
+        # if the tree is cannonically acceptable.
+        # number of possible move types from initial
+        nif = sum([int(len(self.ets[oi]) > 0 and
+                       (self.size + of - oi) <= self.max_size)
+                   for oi, of in self.move_types])
+        # replace
+        old = [target.value, [o.value for o in target.offspring]]
+        old_bic, old_sse, old_energy = self.bic, self.sse, self.E
+        added = self.et_replace(target, new, update_gof=False,
+                                degcorrect=degcorrect)
+        # number of possible move types from final
+        nfi = sum([int(len(self.ets[oi]) > 0 and
+                       (self.size + of - oi) <= self.max_size)
+                   for oi, of in self.move_types])
+        # check for cannonical representative
+        try: # we've seen this cannonical before!
+            cannonical = self.cannonical()
+            rep, rep_energy = self.representative[cannonical]
+            self.get_bic(reset=True, fit=True)
+            new_energy = self.get_energy(bic=False, degcorrect=degcorrect)
+            if new_energy < rep_energy: # Update representative
+                self.representative[cannonical] = (str(self), new_energy)
+            else: # Not the representative: forbidden (undo & return dE=inf)
+                self.et_replace(added, old, update_gof=False,
+                                degcorrect=degcorrect)
+                self.bic, self.sse, self.E = old_bic, old_sse, old_energy
+                return np.inf, deepcopy(self.par_values), nif, nfi
+        except KeyError: # never seen this cannonical formula before: save it
+            self.get_bic(reset=True, fit=True)
+            new_energy = self.get_energy(bic=False, degcorrect=degcorrect)
+            self.representative[cannonical] = (str(self), new_energy)
+            pass
+        # leave the whole thing as it was before the back & fore
+        self.et_replace(added, old, update_gof=False, degcorrect=degcorrect)
+        self.bic, self.sse, self.E = old_bic, old_sse, old_energy
         # Prior: change due to the numbers of each operation
         try:
             dE -= self.prior_par['Nopi_%s' % target.value] / self.PT
@@ -635,22 +676,6 @@ tuple [node_value, [list, of, offspring, values]].
                     (self.nops[new[0]])**2)) / self.PT
         except KeyError:
             pass
-
-        # Other terms of the acceptance
-        # number of possible move types
-        nif = sum([int(len(self.ets[oi]) > 0 and
-                       (self.size + of - oi) <= self.max_size)
-                   for oi, of in self.move_types])
-        # replace
-        old = [target.value, [o.value for o in target.offspring]]
-        added = self.et_replace(target, new, update_gof=False,
-                                degcorrect=degcorrect)
-        # number of possible move types
-        nfi = sum([int(len(self.ets[oi]) > 0 and
-                       (self.size + of - oi) <= self.max_size)
-                   for oi, of in self.move_types])
-        # leave the whole thing as it was before the back & fore
-        self.et_replace(added, old, update_gof=False, degcorrect=degcorrect)
             
         # Data degeneracy correction
         if degcorrect:
@@ -658,8 +683,6 @@ tuple [node_value, [list, of, offspring, values]].
             dE -= np.log(
                 comb(len(self.parameters), self.n_dist_par, exact=True)
             )
-            # commutative nodes
-            dE -= self.n_commute * np.log(2.)
             # replace
             old = [target.value, [o.value for o in target.offspring]]
             added = self.et_replace(target, new, update_gof=False,
@@ -668,8 +691,6 @@ tuple [node_value, [list, of, offspring, values]].
             dE += np.log(
                 comb(len(self.parameters), self.n_dist_par, exact=True)
             )
-            # commutative nodes
-            dE += self.n_commute * np.log(2.)
             # leave the whole thing as it was before the back & fore
             self.et_replace(added, old, update_gof=False, degcorrect=degcorrect)
             
