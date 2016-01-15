@@ -29,22 +29,34 @@ t = Tree(
 
 t.max_size = 7
 
-count, energy, cannonical = {}, {}, {}
+count, energy, cannonical, representatives = {}, {}, {}, {}
 for rep in range(1000000):
     t.mcmc_step(degcorrect=DEGCORRECT)
     print >> sys.stderr, \
         rep+1, t, t.E, t.get_energy(degcorrect=DEGCORRECT), t.n_commute
     if abs(t.E - t.get_energy(degcorrect=DEGCORRECT)) > 1.e-8:
         raise KKError
+    can = t.cannonical()
     try:
         count[str(t)] += 1
     except KeyError:
         count[str(t)] = 1
         energy[str(t)] = t.get_energy(degcorrect=DEGCORRECT)
-        cannonical[str(t)] = t.cannonical()
+        cannonical[str(t)] = can
+    if can not in representatives:
+        representatives[can] = {}
+    try:
+        representatives[can][str(t)] += 1
+    except KeyError:
+        representatives[can][str(t)] = 1
 
-for f in count:
-    print exp(-energy[f]), count[f], \
-        cannonical[f].replace(' ', ''), str(f).replace(' ', '')
 
-pprint(t.representative, sys.stderr)
+with open('test1_out1.tmp', 'w') as outf:
+    for f in count:
+        print >> outf, exp(-energy[f]), count[f], \
+            cannonical[f].replace(' ', ''), str(f).replace(' ', '')
+
+with open('test1_out2.tmp', 'w') as outf:
+    for c in representatives:
+        for s in representatives[c]:
+            print >> outf, representatives[c][s], c, s

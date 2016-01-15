@@ -1002,7 +1002,7 @@ tuple [node_value, [list, of, offspring, values]].
 
        
     # -------------------------------------------------------------------------
-    def mcmc_step(self, verbose=False, p_rr=0.0, p_long=.0, degcorrect=True):
+    def mcmc_step(self, verbose=False, p_rr=0.0, p_long=.45, degcorrect=True):
         """Make a single MCMC step.
 
         """
