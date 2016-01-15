@@ -730,6 +730,31 @@ tuple [node_value, [list, of, offspring, values]].
         par_valuesNew = deepcopy(self.par_values)
 
         if target.value != new:
+
+            # Check if the new tree is cannonically acceptable.
+            old = target.value
+            old_bic, old_sse, old_energy = self.bic, self.sse, self.E
+            target.value = new
+            # check for cannonical representative
+            try: # we've seen this cannonical before!
+                cannonical = self.cannonical()
+                rep, rep_energy = self.representative[cannonical]
+                self.get_bic(reset=True, fit=True)
+                new_energy = self.get_energy(bic=False, degcorrect=degcorrect)
+                if new_energy < rep_energy: # Update representative
+                    self.representative[cannonical] = (str(self), new_energy)
+                else: # Not the representative: forbidden (undo & return dE=inf)
+                    target.value = old
+                    self.bic, self.sse, self.E = old_bic, old_sse, old_energy
+                    return np.inf, deepcopy(self.par_values)
+            except KeyError: # never seen this cannonical form. before: save it
+                self.get_bic(reset=True, fit=True)
+                new_energy = self.get_energy(bic=False, degcorrect=degcorrect)
+                self.representative[cannonical] = (str(self), new_energy)
+            # leave the whole thing as it was before the back & fore
+            target.value = old
+            self.bic, self.sse, self.E = old_bic, old_sse, old_energy
+
             # Prior: change due to the numbers of each operation
             try:
                 dE -= self.prior_par['Nopi_%s' % target.value] / self.PT
@@ -752,7 +777,6 @@ tuple [node_value, [list, of, offspring, values]].
             except KeyError:
                 pass
 
-
             # Degeneracy correction
             if degcorrect:
                 # old parameter labeling
@@ -767,17 +791,6 @@ tuple [node_value, [list, of, offspring, values]].
                 newpar = list(set(newpar))
                 dE += np.log(comb(len(self.parameters), len(newpar),
                                   exact=True))
-                # commutative nodes
-                dE -= self.n_commute * np.log(2.)
-                old = target.value
-                target.value = new
-                newn_commute = len(
-                    [n for n in self.nodes
-                     if n.value in COMMUTE
-                     and len(set([o.pr() for o in n.offspring]))>1]
-                )
-                target.value = old
-                dE += newn_commute * np.log(2.)
 
             # Data
             if not self.x.empty:
