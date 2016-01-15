@@ -639,7 +639,10 @@ tuple [node_value, [list, of, offspring, values]].
             rep, rep_energy = self.representative[cannonical]
             self.get_bic(reset=True, fit=True)
             new_energy = self.get_energy(bic=False, degcorrect=degcorrect)
-            if new_energy < rep_energy: # Update representative
+            if rep == str(self): # This is the representative: continue
+                pass
+            elif (new_energy - rep_energy) < -1.e-6: # Update representative & continue
+                print >> sys.stderr, '# %lf %lf %g' % (new_energy, rep_energy, new_energy - rep_energy)
                 self.representative[cannonical] = (str(self), new_energy)
             else: # Not the representative: forbidden (undo & return dE=inf)
                 self.et_replace(added, old, update_gof=False,
@@ -739,7 +742,9 @@ tuple [node_value, [list, of, offspring, values]].
                 rep, rep_energy = self.representative[cannonical]
                 self.get_bic(reset=True, fit=True)
                 new_energy = self.get_energy(bic=False, degcorrect=degcorrect)
-                if new_energy < rep_energy: # Update representative
+                if rep == str(self): # This is the representative: continue
+                    pass
+                elif (new_energy - rep_energy) < -1.e-6: # Update representative & continue
                     self.representative[cannonical] = (str(self), new_energy)
                 else: # Not the representative: forbidden (undo & return dE=inf)
                     target.value = old
@@ -840,7 +845,9 @@ tuple [node_value, [list, of, offspring, values]].
                 rep, rep_energy = self.representative[cannonical]
                 self.get_bic(reset=True, fit=True)
                 new_energy = self.get_energy(bic=False, degcorrect=degcorrect)
-                if new_energy < rep_energy: # Update representative
+                if rep == str(self): # This is the representative: continue
+                    pass
+                elif (new_energy - rep_energy) < -1.e-6: # Update representative & continue
                     self.representative[cannonical] = (str(self), new_energy)
                 else: # Not the representative: forbidden (undo & return dE=inf)
                     self.replace_root(rr=oldrr, update_gof=False,
@@ -923,7 +930,9 @@ tuple [node_value, [list, of, offspring, values]].
                 rep, rep_energy = self.representative[cannonical]
                 self.get_bic(reset=True, fit=True)
                 new_energy = self.get_energy(bic=False, degcorrect=degcorrect)
-                if new_energy < rep_energy: # Update representative
+                if rep == str(self): # This is the representative: continue
+                    pass
+                elif (new_energy - rep_energy) < -1.e-6: # Update representative & continue
                     self.representative[cannonical] = (str(self), new_energy)
                 else: # Not the representative: forbidden (undo & return dE=inf)
                     self.prune_root(update_gof=False, degcorrect=degcorrect)
@@ -993,7 +1002,7 @@ tuple [node_value, [list, of, offspring, values]].
 
        
     # -------------------------------------------------------------------------
-    def mcmc_step(self, verbose=False, p_rr=0.05, p_long=.5, degcorrect=True):
+    def mcmc_step(self, verbose=False, p_rr=0.0, p_long=.0, degcorrect=True):
         """Make a single MCMC step.
 
         """
