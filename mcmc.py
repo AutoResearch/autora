@@ -619,8 +619,9 @@ tuple [node_value, [list, of, offspring, values]].
         dE = 0
 
         # Some terms of the acceptance (number of possible move types
-        # from initial and final configurations, as well as checking
+        # from initial and final configurations), as well as checking
         # if the tree is cannonically acceptable.
+        
         # number of possible move types from initial
         nif = sum([int(len(self.ets[oi]) > 0 and
                        (self.size + of - oi) <= self.max_size)
