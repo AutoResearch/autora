@@ -602,8 +602,6 @@ Node and new is a tuple [node_value, [list, of, offspring, values]]
         if degcorrect:
             # Parameter labeling
             E += np.log(comb(len(self.parameters), self.n_dist_par, exact=True))
-            # Commutative nodes
-            E += self.n_commute * np.log(2.)
         # Reset the value, if necessary
         if reset:
             self.E = E
@@ -829,6 +827,35 @@ tuple [node_value, [list, of, offspring, values]].
         if rr == None:
             if not self.is_root_prunable():
                 return np.inf, self.par_values
+
+            # Check if the new tree is cannonically acceptable.
+            # replace
+            old_bic, old_sse, old_energy = self.bic, self.sse, self.E
+            oldrr = [self.root.value,
+                     [o.value for o in self.root.offspring[1:]]]
+            self.prune_root(update_gof=False, degcorrect=degcorrect)
+            # check for cannonical representative
+            try: # we've seen this cannonical before!
+                cannonical = self.cannonical()
+                rep, rep_energy = self.representative[cannonical]
+                self.get_bic(reset=True, fit=True)
+                new_energy = self.get_energy(bic=False, degcorrect=degcorrect)
+                if new_energy < rep_energy: # Update representative
+                    self.representative[cannonical] = (str(self), new_energy)
+                else: # Not the representative: forbidden (undo & return dE=inf)
+                    self.replace_root(rr=oldrr, update_gof=False,
+                                      degcorrect=degcorrect)
+                    self.bic, self.sse, self.E = old_bic, old_sse, old_energy
+                    return np.inf, deepcopy(self.par_values)
+            except KeyError: # never seen this cannonical form. before: save it
+                self.get_bic(reset=True, fit=True)
+                new_energy = self.get_energy(bic=False, degcorrect=degcorrect)
+                self.representative[cannonical] = (str(self), new_energy)
+            # leave the whole thing as it was before the back & fore
+            self.replace_root(rr=oldrr, update_gof=False,
+                              degcorrect=degcorrect)
+            self.bic, self.sse, self.E = old_bic, old_sse, old_energy
+
             # Prior: change due to the numbers of each operation
             dE -= self.prior_par['Nopi_%s' % self.root.value] / self.PT
             try:
@@ -844,8 +871,6 @@ tuple [node_value, [list, of, offspring, values]].
                 dE -= np.log(
                     comb(len(self.parameters), self.n_dist_par, exact=True)
                 )
-                # commutative nodes
-                dE -= self.n_commute * np.log(2.)
                 # replace
                 oldrr = [self.root.value,
                          [o.value for o in self.root.offspring[1:]]]
@@ -854,8 +879,6 @@ tuple [node_value, [list, of, offspring, values]].
                 dE += np.log(
                     comb(len(self.parameters), self.n_dist_par, exact=True)
                 )
-                # commutative nodes
-                dE += self.n_commute * np.log(2.)
                 # leave the whole thing as it was before the back & fore
                 self.replace_root(rr=oldrr, update_gof=False,
                                   degcorrect=degcorrect)
@@ -889,6 +912,31 @@ tuple [node_value, [list, of, offspring, values]].
 
         # Root replacement
         else:
+            # Check if the new tree is cannonically acceptable.
+            # replace
+            old_bic, old_sse, old_energy = self.bic, self.sse, self.E
+            newroot = self.replace_root(rr=rr, update_gof=False,
+                                        degcorrect=degcorrect)
+            # check for cannonical representative
+            try: # we've seen this cannonical before!
+                cannonical = self.cannonical()
+                rep, rep_energy = self.representative[cannonical]
+                self.get_bic(reset=True, fit=True)
+                new_energy = self.get_energy(bic=False, degcorrect=degcorrect)
+                if new_energy < rep_energy: # Update representative
+                    self.representative[cannonical] = (str(self), new_energy)
+                else: # Not the representative: forbidden (undo & return dE=inf)
+                    self.prune_root(update_gof=False, degcorrect=degcorrect)
+                    self.bic, self.sse, self.E = old_bic, old_sse, old_energy
+                    return np.inf, deepcopy(self.par_values)
+            except KeyError: # never seen this cannonical form. before: save it
+                self.get_bic(reset=True, fit=True)
+                new_energy = self.get_energy(bic=False, degcorrect=degcorrect)
+                self.representative[cannonical] = (str(self), new_energy)
+            # leave the whole thing as it was before the back & fore
+            self.prune_root(update_gof=False, degcorrect=degcorrect)
+            self.bic, self.sse, self.E = old_bic, old_sse, old_energy
+
             # Prior: change due to the numbers of each operation
             dE += self.prior_par['Nopi_%s' % rr[0]] / self.PT
             try:
@@ -904,8 +952,6 @@ tuple [node_value, [list, of, offspring, values]].
                 dE -= np.log(
                     comb(len(self.parameters), self.n_dist_par, exact=True)
                 )
-                # commutative nodes
-                dE -= self.n_commute * np.log(2.)
                 # replace
                 newroot = self.replace_root(rr=rr, update_gof=False,
                                             degcorrect=degcorrect)
@@ -915,11 +961,8 @@ tuple [node_value, [list, of, offspring, values]].
                 dE += np.log(
                     comb(len(self.parameters), self.n_dist_par, exact=True)
                 )
-                # commutative nodes
-                dE += self.n_commute * np.log(2.)
                 # leave the whole thing as it was before the back & fore
                 self.prune_root(update_gof=False, degcorrect=degcorrect)
-
 
             # Data
             if not self.x.empty:
