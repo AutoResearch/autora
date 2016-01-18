@@ -31,7 +31,7 @@ t.max_size = 7
 
 count, energy, cannonical, representatives = {}, {}, {}, {}
 for rep in range(1000000):
-    t.mcmc_step(degcorrect=DEGCORRECT)
+    t.mcmc_step(p_rr=0.05, p_long=.75, degcorrect=DEGCORRECT)
     print >> sys.stderr, \
         rep+1, t, t.E, t.get_energy(degcorrect=DEGCORRECT), t.n_commute
     if abs(t.E - t.get_energy(degcorrect=DEGCORRECT)) > 1.e-8:

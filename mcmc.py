@@ -627,6 +627,7 @@ tuple [node_value, [list, of, offspring, values]].
         # replace
         old = [target.value, [o.value for o in target.offspring]]
         old_bic, old_sse, old_energy = self.bic, self.sse, self.E
+        old_par_values = deepcopy(self.par_values)
         added = self.et_replace(target, new, update_gof=False,
                                 degcorrect=degcorrect)
         # number of possible move types from final
@@ -648,6 +649,7 @@ tuple [node_value, [list, of, offspring, values]].
                 self.et_replace(added, old, update_gof=False,
                                 degcorrect=degcorrect)
                 self.bic, self.sse, self.E = old_bic, old_sse, old_energy
+                self.par_values = old_par_values
                 return np.inf, deepcopy(self.par_values), nif, nfi
         except KeyError: # never seen this cannonical formula before: save it
             self.get_bic(reset=True, fit=True)
@@ -657,6 +659,7 @@ tuple [node_value, [list, of, offspring, values]].
         # leave the whole thing as it was before the back & fore
         self.et_replace(added, old, update_gof=False, degcorrect=degcorrect)
         self.bic, self.sse, self.E = old_bic, old_sse, old_energy
+        self.par_values = old_par_values
         # Prior: change due to the numbers of each operation
         try:
             dE -= self.prior_par['Nopi_%s' % target.value] / self.PT
@@ -735,6 +738,7 @@ tuple [node_value, [list, of, offspring, values]].
             # Check if the new tree is cannonically acceptable.
             old = target.value
             old_bic, old_sse, old_energy = self.bic, self.sse, self.E
+            old_par_values = deepcopy(self.par_values)
             target.value = new
             # check for cannonical representative
             try: # we've seen this cannonical before!
@@ -749,6 +753,7 @@ tuple [node_value, [list, of, offspring, values]].
                 else: # Not the representative: forbidden (undo & return dE=inf)
                     target.value = old
                     self.bic, self.sse, self.E = old_bic, old_sse, old_energy
+                    self.par_values = old_par_values
                     return np.inf, deepcopy(self.par_values)
             except KeyError: # never seen this cannonical form. before: save it
                 self.get_bic(reset=True, fit=True)
@@ -757,6 +762,7 @@ tuple [node_value, [list, of, offspring, values]].
             # leave the whole thing as it was before the back & fore
             target.value = old
             self.bic, self.sse, self.E = old_bic, old_sse, old_energy
+            self.par_values = old_par_values
 
             # Prior: change due to the numbers of each operation
             try:
@@ -836,6 +842,7 @@ tuple [node_value, [list, of, offspring, values]].
             # Check if the new tree is cannonically acceptable.
             # replace
             old_bic, old_sse, old_energy = self.bic, self.sse, self.E
+            old_par_values = deepcopy(self.par_values)
             oldrr = [self.root.value,
                      [o.value for o in self.root.offspring[1:]]]
             self.prune_root(update_gof=False, degcorrect=degcorrect)
@@ -853,6 +860,7 @@ tuple [node_value, [list, of, offspring, values]].
                     self.replace_root(rr=oldrr, update_gof=False,
                                       degcorrect=degcorrect)
                     self.bic, self.sse, self.E = old_bic, old_sse, old_energy
+                    self.par_values = old_par_values
                     return np.inf, deepcopy(self.par_values)
             except KeyError: # never seen this cannonical form. before: save it
                 self.get_bic(reset=True, fit=True)
@@ -862,6 +870,7 @@ tuple [node_value, [list, of, offspring, values]].
             self.replace_root(rr=oldrr, update_gof=False,
                               degcorrect=degcorrect)
             self.bic, self.sse, self.E = old_bic, old_sse, old_energy
+            self.par_values = old_par_values
 
             # Prior: change due to the numbers of each operation
             dE -= self.prior_par['Nopi_%s' % self.root.value] / self.PT
@@ -922,8 +931,11 @@ tuple [node_value, [list, of, offspring, values]].
             # Check if the new tree is cannonically acceptable.
             # replace
             old_bic, old_sse, old_energy = self.bic, self.sse, self.E
+            old_par_values = deepcopy(self.par_values)
             newroot = self.replace_root(rr=rr, update_gof=False,
                                         degcorrect=degcorrect)
+            if newroot == None: # Root cannot be replaced (due to max_size)
+                return np.inf, deepcopy(self.par_values)                
             # check for cannonical representative
             try: # we've seen this cannonical before!
                 cannonical = self.cannonical()
@@ -937,6 +949,7 @@ tuple [node_value, [list, of, offspring, values]].
                 else: # Not the representative: forbidden (undo & return dE=inf)
                     self.prune_root(update_gof=False, degcorrect=degcorrect)
                     self.bic, self.sse, self.E = old_bic, old_sse, old_energy
+                    self.par_values = old_par_values
                     return np.inf, deepcopy(self.par_values)
             except KeyError: # never seen this cannonical form. before: save it
                 self.get_bic(reset=True, fit=True)
@@ -945,6 +958,7 @@ tuple [node_value, [list, of, offspring, values]].
             # leave the whole thing as it was before the back & fore
             self.prune_root(update_gof=False, degcorrect=degcorrect)
             self.bic, self.sse, self.E = old_bic, old_sse, old_energy
+            self.par_values = old_par_values
 
             # Prior: change due to the numbers of each operation
             dE += self.prior_par['Nopi_%s' % rr[0]] / self.PT
@@ -1002,7 +1016,7 @@ tuple [node_value, [list, of, offspring, values]].
 
        
     # -------------------------------------------------------------------------
-    def mcmc_step(self, verbose=False, p_rr=0.0, p_long=.45, degcorrect=True):
+    def mcmc_step(self, verbose=False, p_rr=0.05, p_long=.45, degcorrect=True):
         """Make a single MCMC step.
 
         """
