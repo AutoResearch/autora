@@ -7,27 +7,45 @@ is, that the sampler samples from the equilibrium distribution).
 """
 
 import sys
-from numpy import exp
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
 from pprint import pprint
+
 
 sys.path.append('..')
 from mcmc import Tree
 
 DEGCORRECT = True
 
+def generate_data():
+    x = pd.DataFrame({'x' : np.linspace(0, 10, 50)})
+    y = 2.5 + x['x'] + np.sin(x['x']) + np.random.normal(0, 2., 50)
+    return x, y
+
+
+x, y = generate_data()
+plt.plot(x['x'], y)
+plt.plot(x['x'], 2.5 + x['x'] + np.sin(x['x']))
+plt.plot(x['x'], 2.5 + x['x'] + np.sin(np.sin(x['x'])))
+plt.plot(x['x'], 2.5 + x['x'])
+plt.savefig('test4_data.pdf')
+plt.show()
+
+
 t = Tree(
+    x=x, y=y,
     ops={'+' : 2, 'sin': 1},
     prior_par={'Nopi_+' : 0, 'Nopi_sin' : 0},
 )
-"""
-t = Tree(
-    parameters=[],
-    ops={'+' : 2},
-    prior_par={'Nopi_+' : 0},
-)
-"""
-
 t.max_size = 7
+print t.x
+print t.y
+
+for rep in range(10000):
+    print >> sys.stderr, 'bi%d' % rep, t
+    t.mcmc_step(p_rr=0.05, p_long=.45, degcorrect=DEGCORRECT)
+
 
 count, energy, cannonical, representatives = {}, {}, {}, {}
 links = {}
@@ -58,18 +76,18 @@ for rep in range(10000000):
     except KeyError:
         representatives[can][str(t)] = 1
 
-with open('test1_net.tmp', 'w') as outf:
+with open('test4_net.tmp', 'w') as outf:
     for c1 in links:
         for c2 in links[c1]:
             print >> outf, \
                 c1.replace(' ', ''), c2.replace(' ', ''), links[c1][c2]
 
-with open('test1_out1.tmp', 'w') as outf:
+with open('test4_out1.tmp', 'w') as outf:
     for f in count:
-        print >> outf, exp(-energy[f]), count[f], \
+        print >> outf, np.exp(-float(energy[f])), count[f], \
             cannonical[f].replace(' ', ''), str(f).replace(' ', '')
 
-with open('test1_out2.tmp', 'w') as outf:
+with open('test4_out2.tmp', 'w') as outf:
     for c in representatives:
         for s in representatives[c]:
             print >> outf, representatives[c][s], c, s

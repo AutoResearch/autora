@@ -119,7 +119,7 @@ class Tree():
         self.nops = dict([[o, 0] for o in ops])
         # The parameters of the prior propability (default: 5 everywhere)
         if prior_par == {}:
-            self.prior_par = dict([('Nopi_%s' % t, 0.) for t in self.ops])
+            self.prior_par = dict([('Nopi_%s' % t, 10.) for t in self.ops])
         else:
             self.prior_par = prior_par
         # The data
@@ -643,7 +643,6 @@ tuple [node_value, [list, of, offspring, values]].
             if rep == str(self): # This is the representative: continue
                 pass
             elif (new_energy - rep_energy) < -1.e-6: # Update representative & continue
-                print >> sys.stderr, '# %lf %lf %g' % (new_energy, rep_energy, new_energy - rep_energy)
                 self.representative[cannonical] = (str(self), new_energy)
             else: # Not the representative: forbidden (undo & return dE=inf)
                 self.et_replace(added, old, update_gof=False,

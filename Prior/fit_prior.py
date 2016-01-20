@@ -141,7 +141,7 @@ if __name__ == '__main__':
                 """ 
 
     else:
-        ppar = dict([(k, 5.0) for k in target if k.startswith('Nopi_')] +
+        ppar = dict([(k, 10.0) for k in target if k.startswith('Nopi_')] +
                     [(k, 10.0) for k in target if not k.startswith('Nopi_')])
     print '\n>> PRIOR_PAR:', ppar
 
