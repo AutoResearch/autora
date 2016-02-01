@@ -146,7 +146,7 @@ def model_averaging_valid(x, y, variables, prior_par, npar=None,
     if method == 'lko':
         ttsplit = cross_validation.LeavePOut(len(y), k)
     elif method == 'kfold':
-        ttsplit = cross_validation.KFold(len(y), n_folds=k)
+        ttsplit = cross_validation.KFold(len(y), shuffle=True, n_folds=k)
     else:
         raise ValueError
     if npar == None:

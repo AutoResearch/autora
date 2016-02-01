@@ -148,7 +148,13 @@ class Tree():
         
     # -------------------------------------------------------------------------
     def cannonical(self):
-        return str(sympify(str(self).replace('_', '').replace(' ', '')))
+        try:
+            can = str(sympify(str(self).replace('_', '').replace(' ', '')))
+        except:
+            print >> sys.stderr, 'WARNING: Could not get cannonical form for', \
+                str(self), ' (using full form!)'
+            can = str(self)
+        return can
     
     # -------------------------------------------------------------------------
     def __parse_recursive(self, string, variables=None, parameters=None,

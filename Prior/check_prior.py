@@ -100,7 +100,7 @@ if __name__ == '__main__':
                 
     # Plot the distributions
     df = DataFrame.from_dict(term_count)
-    fig = df.hist(color='k', alpha=0.5, bins=35, figsize=(30, 20))
+    fig = df.hist(color='k', alpha=0.5, bins=30, figsize=(30, 20))
     for row in fig:
         for panel in row:
             try:

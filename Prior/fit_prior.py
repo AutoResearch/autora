@@ -91,10 +91,13 @@ def update_ppar(tree, current, target, terms=None, step=0.05):
             pass
     # Make sure quadratic terms are not below the minimum allowed
     for t in [t for t in terms if t.startswith('Nopi2_')]:
+        """
         lint = t.replace('Nopi2_', 'Nopi_')
         op = t[6:]
         nopmax = float(tree.max_size) / tree.ops[op] - 1.
         minval = - tree.prior_par[lint] / nopmax
+        """
+        minval = 0.0
         if tree.prior_par[t] < minval:
             tree.prior_par[t] = minval
     
