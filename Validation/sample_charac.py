@@ -68,13 +68,17 @@ if __name__ == '__main__':
     sizeprob = dict([(s, 0) for s in range(t.max_size+1)])
     nparprob = dict([(n, 0) for n in range(npar+1)])
     for i in range(NS):
-        print >> outf, i+1, t.E, t.bic, t
+        print >> outf, ' || '.join(
+            [str(x) for x in [i+1, t.E, t.bic, t.cannonical(), t, t.par_values]]
+        )
         outf.flush()
+        """
         t.BT = 10.
         for kk in range(THIN/3):
             t.mcmc_step()
         t.BT = 1.
         t.get_energy(bic=True, reset=True)
+        """
         for kk in range(THIN):
             t.mcmc_step()
         for v in VARS:

@@ -66,6 +66,7 @@ if __name__ == '__main__':
     print 'Dataset: ', dset
     print 'Model:   ', t
     print 'LaTeX:   ', latex(sympify(str(t).replace('_a', 'a')))
+    print 'Param:   ', t.par_values
 
     print 'SSE:     ', sse
     print 'RMSE:    ', np.sqrt(sse / float(len(y)))
