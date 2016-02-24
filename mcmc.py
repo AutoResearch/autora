@@ -242,6 +242,8 @@ class Tree():
                       x=self.x, y=self.y, BT=self.BT, PT=self.PT,
                       parameters=parameters, variables=variables)
         self.__grow_tree(self.root, tlist[0], tlist[1])
+        self.get_sse()
+        self.get_bic()
         return
 
 

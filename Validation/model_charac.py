@@ -1,4 +1,5 @@
 import sys
+import ast
 import numpy as np
 from scipy.stats import sem
 from sklearn import cross_validation
@@ -21,6 +22,8 @@ def parse_options():
     parser = OptionParser(usage='usage: %prog [options] DATASET MODELSTR')
     parser.add_option("-p", "--priorpar", dest="pparfile", default=None,
                       help="Use priors from this file (default: no priors)")
+    parser.add_option("-v", "--parvalues", dest="par_values", default=None,
+                      help="Use these parameter values (in dictionary format)")
     return parser
 
 # -----------------------------------------------------------------------------
@@ -48,6 +51,8 @@ def cross_val(t, method='kfold', k=2):
 if __name__ == '__main__':
     parser = parse_options()
     opt, args = parser.parse_args()
+    if opt.par_values != None:
+        opt.par_values = ast.literal_eval(opt.par_values)
 
     dset = args[0]
     modelstr = args[1]
@@ -58,7 +63,11 @@ if __name__ == '__main__':
     t.x, t.y = x, y
     if opt.pparfile:
         t.prior_par = read_prior_par(opt.pparfile)
-    sse = t.get_sse(fit=True)
+    if opt.par_values != None:
+        t.par_values = opt.par_values
+        sse = t.get_sse(fit=False)
+    else:
+        sse = t.get_sse(fit=True)
     bic = t.get_bic(reset=True, fit=False)
     serr, aerr = cross_val(t, method='lko', k=1)
 
