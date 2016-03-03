@@ -131,6 +131,8 @@ class Tree():
         # Build from string
         if from_string != None:
             self.build_from_string(from_string)
+        # For fast fitting, we save past successful fits to this formula
+        self.fit_par = {}
         # Goodness of fit measures
         self.sse = self.get_sse()
         self.bic = self.get_bic()
@@ -529,6 +531,8 @@ Node and new is a tuple [node_value, [list, of, offspring, values]]
             if len(parameters) == 0: # Nothing to fit 
                 for p in self.parameters:
                     self.par_values[p] = 1.
+            elif str(self) in self.fit_par:
+                self.par_values = self.fit_par[str(self)]
             else:                    # Do the fit
                 def feval(x, *params):
                     args = [xi for xi in x] + [p for p in params]
@@ -546,6 +550,8 @@ Node and new is a tuple [node_value, [list, of, offspring, values]]
                     for p in self.parameters:
                         if p not in self.par_values:
                             self.par_values[p] = 1.
+                    # Save this fit
+                    self.fit_par[str(self)] = deepcopy(self.par_values)
                 except:
                     print >> sys.stderr, \
                         '#Cannot_fit:_%s # # # # #' % str(self).replace(' ',
