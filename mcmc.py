@@ -36,7 +36,6 @@ OPS = {
     '/' : 2,
     '**' : 2,
 }
-COMMUTE = ('+', '*')
 
 # -----------------------------------------------------------------------------
 # The Node class
@@ -102,10 +101,6 @@ class Tree():
         self.n_dist_par = len(self.dist_par)
         # Nodes of the tree (operations + leaves)
         self.nodes = [self.root]
-        # Number of commutative nodes
-        self.n_commute = len([n for n in self.nodes
-                              if n.value in COMMUTE
-                              and len(set([o.pr() for o in n.offspring]))>1])
         # Tree size and other properties of the model
         self.size = 1
         self.max_size = 50
@@ -312,10 +307,6 @@ class Tree():
         self.dist_par = list(set([n.value for n in self.ets[0]
                                   if n.value in self.parameters]))
         self.n_dist_par = len(self.dist_par)
-        # Update number of commutative nodes
-        self.n_commute = len([n for n in self.nodes
-                              if n.value in COMMUTE
-                              and len(set([o.pr() for o in n.offspring]))>1])
         # Update goodness of fit measures, if necessary
         if update_gof == True:
             self.sse = self.get_sse()
@@ -368,10 +359,6 @@ class Tree():
         self.dist_par = list(set([n.value for n in self.ets[0]
                                   if n.value in self.parameters]))
         self.n_dist_par = len(self.dist_par)
-        # Update number of commutative nodes
-        self.n_commute = len([n for n in self.nodes
-                              if n.value in COMMUTE
-                              and len(set([o.pr() for o in n.offspring]))>1])
         # Update goodness of fit measures, if necessary
         if update_gof == True:
             self.sse = self.get_sse()
@@ -427,10 +414,6 @@ class Tree():
         self.dist_par = list(set([n.value for n in self.ets[0]
                                   if n.value in self.parameters]))
         self.n_dist_par = len(self.dist_par)
-        # Update number of commutative nodes
-        self.n_commute = len([n for n in self.nodes
-                              if n.value in COMMUTE
-                              and len(set([o.pr() for o in n.offspring]))>1])
         # Update goodness of fit measures, if necessary
         if update_gof == True:
             self.sse = self.get_sse()
@@ -468,10 +451,6 @@ class Tree():
         self.dist_par = list(set([n.value for n in self.ets[0]
                                   if n.value in self.parameters]))
         self.n_dist_par = len(self.dist_par)
-        # Update number of commutative nodes
-        self.n_commute = len([n for n in self.nodes
-                              if n.value in COMMUTE
-                              and len(set([o.pr() for o in n.offspring]))>1])
         # Update goodness of fit measures, if necessary
         if update_gof == True:
             self.sse = self.get_sse()
@@ -599,7 +578,7 @@ Node and new is a tuple [node_value, [list, of, offspring, values]]
         """
         # Contribtution of the data (recalculating BIC if necessary)
         if bic == True:
-            E = self.get_bic() / (2. * self.BT)
+            E = self.get_bic(reset=reset) / (2. * self.BT)
         else:
             E = self.bic / (2. * self.BT)
         # Contribution from the prior
@@ -1090,12 +1069,6 @@ tuple [node_value, [list, of, offspring, values]].
                 self.dist_par = list(set([n.value for n in self.ets[0]
                                           if n.value in self.parameters]))
                 self.n_dist_par = len(self.dist_par)
-                # update number of commutative nodes
-                self.n_commute = len([n for n in self.nodes
-                                      if n.value in COMMUTE
-                                      and len(
-                                          set([o.pr() for o in n.offspring])
-                                      ) > 1])
                 # update others
                 self.par_values = par_valuesNew
                 self.get_bic(reset=True, fit=False)
