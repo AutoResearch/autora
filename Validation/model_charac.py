@@ -24,6 +24,9 @@ def parse_options():
                       help="Use priors from this file (default: no priors)")
     parser.add_option("-v", "--parvalues", dest="par_values", default=None,
                       help="Use these parameter values (in dictionary format)")
+    parser.add_option("-l", "--loo",
+                      action="store_false", dest="loo", default=True,
+                      help="don't do the leave one out cross-validation")
     return parser
 
 # -----------------------------------------------------------------------------
@@ -69,9 +72,11 @@ if __name__ == '__main__':
     else:
         sse = t.get_sse(fit=True)
     bic = t.get_bic(reset=True, fit=False)
-    serr, aerr = cross_val(t, method='lko', k=1)
+    if opt.loo:
+        serr, aerr = cross_val(t, method='lko', k=1)
 
     # Output
+    print '-' * 80
     print 'Dataset: ', dset
     print 'Model:   ', t
     print 'LaTeX:   ', latex(sympify(str(t).replace('_a', 'a')))
@@ -81,11 +86,14 @@ if __name__ == '__main__':
     print 'RMSE:    ', np.sqrt(sse / float(len(y)))
     print 'BIC:     ', bic
 
-    print 'LOO-RMSE:', np.sqrt(np.mean(serr))
-    print 'LOO-MSE:  %g+-%g' % (np.mean(serr), sem(serr))
-    print 'LOO-MAE:  %g+-%g' % (np.mean(aerr), sem(aerr))
-
     if opt.pparfile:
         print 'Prior c: ', t.prior_par
-        print '-log(P): ', t.get_energy(degcorrect=False)
+    print '-log(F): ', t.get_energy(degcorrect=False)
+
+    if opt.loo:
+        print 'LOO-RMSE:', np.sqrt(np.mean(serr))
+        print 'LOO-MSE:  %g+-%g' % (np.mean(serr), sem(serr))
+        print 'LOO-MAE:  %g+-%g' % (np.mean(aerr), sem(aerr))
+    print '-' * 80
+
         
