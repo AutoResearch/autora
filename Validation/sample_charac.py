@@ -21,8 +21,8 @@ def parse_options():
     return parser
 
 # -----------------------------------------------------------------------------
-NS = 1000
-THIN = 1000
+NS = 1000000
+THIN = 1
 
 # -----------------------------------------------------------------------------
 if __name__ == '__main__':
@@ -43,9 +43,12 @@ if __name__ == '__main__':
         prior_par = read_prior_par(opt.pparfile)
 
     # Get the output file ready
-    outfname = '%s/sample_charac__%s' % (dset, opt.pparfile.split('/')[-1])
-    npar = outfname[outfname.find('.np') + 3:]
-    npar = int(npar[:npar.find('.')])
+    try:
+        outfname = '%s/sample_charac__%s' % (dset, opt.pparfile.split('/')[-1])
+        npar = outfname[outfname.find('.np') + 3:]
+        npar = int(npar[:npar.find('.')])
+    except AttributeError:
+        outfname = '%s/sample_charac' % (dset)
     outf = open(outfname, 'w')
     print >> outf, '#', prior_par
     
@@ -56,20 +59,22 @@ if __name__ == '__main__':
         x=x, y=y,
         prior_par=prior_par,
     )
+    ##print >> outf, '# Fit parameters:', t.fit_par
     print >> outf, '# Variables: ', t.variables
     print >> outf, '# Parameters:', t.parameters, '\n#'
 
     # Burnin
-    for i in range(100):
-        t.mcmc_step()
+    #for i in range(100):
+    #    t.mcmc_step()
 
     # MCMC
     vprob = dict([(v, 0) for v in VARS])
     sizeprob = dict([(s, 0) for s in range(t.max_size+1)])
     nparprob = dict([(n, 0) for n in range(npar+1)])
     for i in range(NS):
+        print >> sys.stdout, i+1
         print >> outf, ' || '.join(
-            [str(x) for x in [i+1, t.E, t.bic, t.cannonical(), t, t.par_values]]
+            [str(x) for x in [i+1, t.E, t.get_energy(), t.bic, t.canonical(), t, t.par_values]]
         )
         outf.flush()
         """

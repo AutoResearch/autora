@@ -5,13 +5,15 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from copy import deepcopy
 from sympy import *
-from random import random, choice
+from random import seed, random, choice
 from itertools import product, permutations
 from scipy.optimize import curve_fit
 from scipy.misc import comb
 
 import warnings
 warnings.filterwarnings('error')
+
+seed(1111)
 
 # -----------------------------------------------------------------------------
 # The accepted operations (key: operation; value: #offspring)
@@ -80,7 +82,8 @@ class Tree():
                  from_string=None):
         # The variables and parameters
         self.variables = variables
-        self.parameters = [p if p.startswith('_') else '_%s' % p
+        self.parameters = [p if p.startswith('_') and p.endswith('_')
+                           else '_%s_' % p
                            for p in parameters]
         self.par_values = dict([(p, 1.) for p in self.parameters])
         # The root
@@ -131,11 +134,12 @@ class Tree():
         # Goodness of fit measures
         self.sse = self.get_sse()
         self.bic = self.get_bic()
-        self.E = self.get_energy(degcorrect=True)
+        self.E = self.get_energy()
         # To control formula degeneracy (i.e. different trees that
         # correspond to the same cannoninal formula), we store the
-        # representative tree for each cannonical formula
-        self.representative = {self.cannonical() : (str(self), self.E)}
+        # representative tree for each canonical formula
+        self.representative = {self.canonical() :
+                               (str(self), self.E, self.par_values)}
         # Done
         return
 
@@ -144,14 +148,28 @@ class Tree():
         return self.root.pr()
         
     # -------------------------------------------------------------------------
-    def cannonical(self):
+    def canonical(self):
+        """Return the canonical form of a tree.
+
+        """
         try:
-            can = str(sympify(str(self).replace('_', '').replace(' ', '')))
+            cansp = sympify(str(self).replace(' ', ''))
+            can = str(cansp)
+            ps = list([str(s) for s in cansp.free_symbols])
+            positions = []
+            for p in ps:
+                if p.startswith('_') and p.endswith('_'):
+                    positions.append((can.find(p), p))
+            positions.sort()
+            pcount = 1
+            for pos, p in positions:
+                can = can.replace(p, 'c%d' % pcount)
+                pcount += 1
         except:
-            print >> sys.stderr, 'WARNING: Could not get cannonical form for', \
+            print >> sys.stderr, 'WARNING: Could not get canonical form for', \
                 str(self), ' (using full form!)'
             can = str(self)
-        return can
+        return can.replace(' ', '')
     
     # -------------------------------------------------------------------------
     def __parse_recursive(self, string, variables=None, parameters=None,
@@ -271,7 +289,7 @@ class Tree():
         return rr_space
     
     # -------------------------------------------------------------------------
-    def replace_root(self, rr=None, update_gof=True, degcorrect=True):
+    def replace_root(self, rr=None, update_gof=True):
         """Replace the root with a "root replacement" rr (if provided; otherwise choose one at random from self.rr_space). Returns the new root if the move was possible, and None if not (because the replacement would lead to a tree larger than self.max_size."
 
         """
@@ -311,7 +329,7 @@ class Tree():
         if update_gof == True:
             self.sse = self.get_sse()
             self.bic = self.get_bic()
-            self.E = self.get_energy(degcorrect=degcorrect)
+            self.E = self.get_energy()
         return self.root
 
     # -------------------------------------------------------------------------
@@ -332,7 +350,7 @@ class Tree():
         return isPrunable
 
     # -------------------------------------------------------------------------
-    def prune_root(self, update_gof=True, degcorrect=True):
+    def prune_root(self, update_gof=True):
         """Cut the root and its rightmost leaves (provided they are, indeed, leaves), leaving the leftmost branch as the new tree. Returns the pruned root with the same format as the replacement roots in self.rr_space (or None if pruning was impossible).
 
         """
@@ -363,13 +381,12 @@ class Tree():
         if update_gof == True:
             self.sse = self.get_sse()
             self.bic = self.get_bic()
-            self.E = self.get_energy(degcorrect=degcorrect)
+            self.E = self.get_energy()
         # Done
         return rr
 
     # -------------------------------------------------------------------------
-    def _add_et(self, node, et_order=None, et=None, update_gof=True,
-                degcorrect=True):
+    def _add_et(self, node, et_order=None, et=None, update_gof=True):
         """Add an elementary tree replacing the node, which must be a leaf.
 
         """
@@ -418,11 +435,11 @@ class Tree():
         if update_gof == True:
             self.sse = self.get_sse()
             self.bic = self.get_bic()
-            self.E = self.get_energy(degcorrect=degcorrect)
+            self.E = self.get_energy()
         return node
 
     # -------------------------------------------------------------------------
-    def _del_et(self, node, leaf=None, update_gof=True, degcorrect=True):
+    def _del_et(self, node, leaf=None, update_gof=True):
         """Remove an elementary tree, replacing it by a leaf.
 
         """
@@ -455,28 +472,25 @@ class Tree():
         if update_gof == True:
             self.sse = self.get_sse()
             self.bic = self.get_bic()
-            self.E = self.get_energy(degcorrect=degcorrect)
+            self.E = self.get_energy()
         return node
 
     
     # -------------------------------------------------------------------------
-    def et_replace(self, target, new, update_gof=True, degcorrect=True):
+    def et_replace(self, target, new, update_gof=True):
         """Replace one ET by another one, both of arbitrary order. target is a
 Node and new is a tuple [node_value, [list, of, offspring, values]]
 
         """
         oini, ofin = len(target.offspring), len(new[1])
         if oini == 0:
-            added = self._add_et(target, et=new, update_gof=False,
-                                 degcorrect=degcorrect)
+            added = self._add_et(target, et=new, update_gof=False)
         else:
             if ofin == 0:
-                added = self._del_et(target, leaf=new[0], update_gof=False,
-                                     degcorrect=degcorrect)
+                added = self._del_et(target, leaf=new[0], update_gof=False)
             else:
-                self._del_et(target, update_gof=False, degcorrect=degcorrect)
-                added = self._add_et(target, et=new, update_gof=False,
-                                     degcorrect=degcorrect)
+                self._del_et(target, update_gof=False)
+                added = self._add_et(target, et=new, update_gof=False)
         # Update goodness of fit measures, if necessary
         if update_gof == True:
             self.sse = self.get_sse()
@@ -510,7 +524,7 @@ Node and new is a tuple [node_value, [list, of, offspring, values]]
             if len(parameters) == 0: # Nothing to fit 
                 for p in self.parameters:
                     self.par_values[p] = 1.
-            elif str(self) in self.fit_par:
+            elif str(self) in self.fit_par: # Recover previously fit parameters
                 self.par_values = self.fit_par[str(self)]
             else:                    # Do the fit
                 def feval(x, *params):
@@ -533,8 +547,7 @@ Node and new is a tuple [node_value, [list, of, offspring, values]]
                     self.fit_par[str(self)] = deepcopy(self.par_values)
                 except:
                     print >> sys.stderr, \
-                        '#Cannot_fit:_%s # # # # #' % str(self).replace(' ',
-                                                                        '_')
+                        '#Cannot_fit:%s # # # # #' % str(self).replace(' ', '')
         # Sum of squared errors
         ar = [np.array(xi) for xi in xmat] + \
              [self.par_values[p.name] for p in parameters]
@@ -572,7 +585,7 @@ Node and new is a tuple [node_value, [list, of, offspring, values]]
         return BIC
 
     # -------------------------------------------------------------------------
-    def get_energy(self, bic=False, reset=False, degcorrect=True):
+    def get_energy(self, bic=False, reset=False):
         """Calculate the "energy" of a given formula, that is, approximate minus log-posterior of the formula given the data (the approximation coming from the use of the BIC instead of the exactly integrated likelihood).
 
         """
@@ -591,10 +604,6 @@ Node and new is a tuple [node_value, [list, of, offspring, values]]
                 E += self.prior_par['Nopi2_%s' % op] * nop**2 / self.PT
             except KeyError:
                 pass
-        # Correct for multiple counting of formulas
-        if degcorrect:
-            # Parameter labeling
-            E += np.log(comb(len(self.parameters), self.n_dist_par, exact=True))
         # Reset the value, if necessary
         if reset:
             self.E = E
@@ -602,7 +611,7 @@ Node and new is a tuple [node_value, [list, of, offspring, values]]
         return E
 
     # -------------------------------------------------------------------------
-    def dE_et(self, target, new, degcorrect=True):
+    def dE_et(self, target, new):
         """Calculate the energy change associated to the replacement of one ET
 by another, both of arbitrary order. "target" is a Node() and "new" is a
 tuple [node_value, [list, of, offspring, values]].
@@ -611,7 +620,7 @@ tuple [node_value, [list, of, offspring, values]].
 
         # Some terms of the acceptance (number of possible move types
         # from initial and final configurations), as well as checking
-        # if the tree is cannonically acceptable.
+        # if the tree is canonically acceptable.
         
         # number of possible move types from initial
         nif = sum([int(len(self.ets[oi]) > 0 and
@@ -621,35 +630,33 @@ tuple [node_value, [list, of, offspring, values]].
         old = [target.value, [o.value for o in target.offspring]]
         old_bic, old_sse, old_energy = self.bic, self.sse, self.E
         old_par_values = deepcopy(self.par_values)
-        added = self.et_replace(target, new, update_gof=False,
-                                degcorrect=degcorrect)
+        added = self.et_replace(target, new, update_gof=False)
         # number of possible move types from final
         nfi = sum([int(len(self.ets[oi]) > 0 and
                        (self.size + of - oi) <= self.max_size)
                    for oi, of in self.move_types])
-        # check for cannonical representative
-        try: # we've seen this cannonical before!
-            cannonical = self.cannonical()
-            rep, rep_energy = self.representative[cannonical]
+        # check for canonical representative
+        canonical = self.canonical()
+        try: # we've seen this canonical before!
+            rep, rep_energy, rep_par_values = self.representative[canonical]
             self.get_bic(reset=True, fit=True)
-            new_energy = self.get_energy(bic=False, degcorrect=degcorrect)
+            new_energy = self.get_energy(bic=False)
             if rep == str(self): # This is the representative: continue
                 pass
             elif (new_energy - rep_energy) < -1.e-6: # Update representative & continue
-                self.representative[cannonical] = (str(self), new_energy)
+                self.representative[canonical] = (str(self), new_energy, self.par_values)
             else: # Not the representative: forbidden (undo & return dE=inf)
-                self.et_replace(added, old, update_gof=False,
-                                degcorrect=degcorrect)
+                self.et_replace(added, old, update_gof=False)
                 self.bic, self.sse, self.E = old_bic, old_sse, old_energy
                 self.par_values = old_par_values
                 return np.inf, deepcopy(self.par_values), nif, nfi
-        except KeyError: # never seen this cannonical formula before: save it
+        except KeyError: # never seen this canonical formula before: save it
             self.get_bic(reset=True, fit=True)
-            new_energy = self.get_energy(bic=False, degcorrect=degcorrect)
-            self.representative[cannonical] = (str(self), new_energy)
+            new_energy = self.get_energy(bic=False)
+            self.representative[canonical] = (str(self), new_energy, self.par_values)
             pass
         # leave the whole thing as it was before the back & fore
-        self.et_replace(added, old, update_gof=False, degcorrect=degcorrect)
+        self.et_replace(added, old, update_gof=False)
         self.bic, self.sse, self.E = old_bic, old_sse, old_energy
         self.par_values = old_par_values
         # Prior: change due to the numbers of each operation
@@ -673,24 +680,7 @@ tuple [node_value, [list, of, offspring, values]].
                     (self.nops[new[0]])**2)) / self.PT
         except KeyError:
             pass
-            
-        # Data degeneracy correction
-        if degcorrect:
-            # parameter labeling
-            dE -= np.log(
-                comb(len(self.parameters), self.n_dist_par, exact=True)
-            )
-            # replace
-            old = [target.value, [o.value for o in target.offspring]]
-            added = self.et_replace(target, new, update_gof=False,
-                                    degcorrect=degcorrect)
-            # parameter labeling
-            dE += np.log(
-                comb(len(self.parameters), self.n_dist_par, exact=True)
-            )
-            # leave the whole thing as it was before the back & fore
-            self.et_replace(added, old, update_gof=False, degcorrect=degcorrect)
-            
+                        
         # Data
         if not self.x.empty:
             bicOld = self.bic
@@ -698,12 +688,11 @@ tuple [node_value, [list, of, offspring, values]].
             par_valuesOld = deepcopy(self.par_values)
             old = [target.value, [o.value for o in target.offspring]]
             # replace
-            added = self.et_replace(target, new, update_gof=True,
-                                    degcorrect=degcorrect)
+            added = self.et_replace(target, new, update_gof=True)
             bicNew = self.bic
             par_valuesNew = deepcopy(self.par_values)
             # leave the whole thing as it was before the back & fore
-            self.et_replace(added, old, update_gof=False, degcorrect=degcorrect)
+            self.et_replace(added, old, update_gof=False)
             self.bic = bicOld
             self.sse = sseOld
             self.par_values = par_valuesOld
@@ -719,7 +708,7 @@ tuple [node_value, [list, of, offspring, values]].
 
 
     # -------------------------------------------------------------------------
-    def dE_lr(self, target, new, degcorrect=True):
+    def dE_lr(self, target, new):
         """Calculate the energy change associated to a long-range move (the replacement of the value of a node. "target" is a Node() and "new" is a node_value.
         """
         dE = 0
@@ -727,32 +716,47 @@ tuple [node_value, [list, of, offspring, values]].
 
         if target.value != new:
 
-            # Check if the new tree is cannonically acceptable.
+            # Check if the new tree is canonically acceptable.
             old = target.value
             old_bic, old_sse, old_energy = self.bic, self.sse, self.E
             old_par_values = deepcopy(self.par_values)
             target.value = new
-            # check for cannonical representative
-            try: # we've seen this cannonical before!
-                cannonical = self.cannonical()
-                rep, rep_energy = self.representative[cannonical]
+            try:
+                self.nops[old] -= 1
+                self.nops[new] += 1
+            except KeyError:
+                pass
+            # check for canonical representative
+            canonical = self.canonical()
+            try: # we've seen this canonical before!
+                rep, rep_energy, rep_par_values = self.representative[canonical]
                 self.get_bic(reset=True, fit=True)
-                new_energy = self.get_energy(bic=False, degcorrect=degcorrect)
+                new_energy = self.get_energy(bic=False)
                 if rep == str(self): # This is the representative: continue
                     pass
                 elif (new_energy - rep_energy) < -1.e-6: # Update representative & continue
-                    self.representative[cannonical] = (str(self), new_energy)
+                    self.representative[canonical] = (str(self), new_energy, self.par_values)
                 else: # Not the representative: forbidden (undo & return dE=inf)
                     target.value = old
+                    try:
+                        self.nops[old] += 1
+                        self.nops[new] -= 1
+                    except KeyError:
+                        pass
                     self.bic, self.sse, self.E = old_bic, old_sse, old_energy
                     self.par_values = old_par_values
                     return np.inf, deepcopy(self.par_values)
-            except KeyError: # never seen this cannonical form. before: save it
+            except KeyError: # never seen this canonical form. before: save it
                 self.get_bic(reset=True, fit=True)
-                new_energy = self.get_energy(bic=False, degcorrect=degcorrect)
-                self.representative[cannonical] = (str(self), new_energy)
+                new_energy = self.get_energy(bic=False, reset=True)
+                self.representative[canonical] = (str(self), new_energy, self.par_values)
             # leave the whole thing as it was before the back & fore
             target.value = old
+            try:
+                self.nops[old] += 1
+                self.nops[new] -= 1
+            except KeyError:
+                pass
             self.bic, self.sse, self.E = old_bic, old_sse, old_energy
             self.par_values = old_par_values
 
@@ -777,21 +781,6 @@ tuple [node_value, [list, of, offspring, values]].
                         (self.nops[new])**2)) / self.PT
             except KeyError:
                 pass
-
-            # Degeneracy correction
-            if degcorrect:
-                # old parameter labeling
-                dE -= np.log(
-                    comb(len(self.parameters), self.n_dist_par, exact=True)
-                )
-                # new parameter labeling
-                newpar = [n.value for n in self.ets[0]
-                          if n.value in self.parameters and n != target]
-                if new in self.parameters:
-                    newpar += [new]
-                newpar = list(set(newpar))
-                dE += np.log(comb(len(self.parameters), len(newpar),
-                                  exact=True))
 
             # Data
             if not self.x.empty:
@@ -820,7 +809,7 @@ tuple [node_value, [list, of, offspring, values]].
 
         
     # -------------------------------------------------------------------------
-    def dE_rr(self, rr=None, degcorrect=True):
+    def dE_rr(self, rr=None):
         """Calculate the energy change associated to a root replacement move. If rr==None, then it returns the energy change associated to pruning the root; otherwise, it returns the dE associated to adding the root replacement "rr".
 
         """
@@ -831,36 +820,34 @@ tuple [node_value, [list, of, offspring, values]].
             if not self.is_root_prunable():
                 return np.inf, self.par_values
 
-            # Check if the new tree is cannonically acceptable.
+            # Check if the new tree is canonically acceptable.
             # replace
             old_bic, old_sse, old_energy = self.bic, self.sse, self.E
             old_par_values = deepcopy(self.par_values)
             oldrr = [self.root.value,
                      [o.value for o in self.root.offspring[1:]]]
-            self.prune_root(update_gof=False, degcorrect=degcorrect)
-            # check for cannonical representative
-            try: # we've seen this cannonical before!
-                cannonical = self.cannonical()
-                rep, rep_energy = self.representative[cannonical]
+            self.prune_root(update_gof=False)
+            # check for canonical representative
+            canonical = self.canonical()
+            try: # we've seen this canonical before!
+                rep, rep_energy, rep_par_values = self.representative[canonical]
                 self.get_bic(reset=True, fit=True)
-                new_energy = self.get_energy(bic=False, degcorrect=degcorrect)
+                new_energy = self.get_energy(bic=False)
                 if rep == str(self): # This is the representative: continue
                     pass
                 elif (new_energy - rep_energy) < -1.e-6: # Update representative & continue
-                    self.representative[cannonical] = (str(self), new_energy)
+                    self.representative[canonical] = (str(self), new_energy, self.par_values)
                 else: # Not the representative: forbidden (undo & return dE=inf)
-                    self.replace_root(rr=oldrr, update_gof=False,
-                                      degcorrect=degcorrect)
+                    self.replace_root(rr=oldrr, update_gof=False)
                     self.bic, self.sse, self.E = old_bic, old_sse, old_energy
                     self.par_values = old_par_values
                     return np.inf, deepcopy(self.par_values)
-            except KeyError: # never seen this cannonical form. before: save it
+            except KeyError: # never seen this canonical form. before: save it
                 self.get_bic(reset=True, fit=True)
-                new_energy = self.get_energy(bic=False, degcorrect=degcorrect)
-                self.representative[cannonical] = (str(self), new_energy)
+                new_energy = self.get_energy(bic=False)
+                self.representative[canonical] = (str(self), new_energy, self.par_values)
             # leave the whole thing as it was before the back & fore
-            self.replace_root(rr=oldrr, update_gof=False,
-                              degcorrect=degcorrect)
+            self.replace_root(rr=oldrr, update_gof=False)
             self.bic, self.sse, self.E = old_bic, old_sse, old_energy
             self.par_values = old_par_values
 
@@ -873,24 +860,6 @@ tuple [node_value, [list, of, offspring, values]].
             except KeyError:
                 pass
 
-            # Degeneracy correction
-            if degcorrect:
-                # parameter labeling
-                dE -= np.log(
-                    comb(len(self.parameters), self.n_dist_par, exact=True)
-                )
-                # replace
-                oldrr = [self.root.value,
-                         [o.value for o in self.root.offspring[1:]]]
-                self.prune_root(update_gof=False, degcorrect=degcorrect)
-                # parameter labeling
-                dE += np.log(
-                    comb(len(self.parameters), self.n_dist_par, exact=True)
-                )
-                # leave the whole thing as it was before the back & fore
-                self.replace_root(rr=oldrr, update_gof=False,
-                                  degcorrect=degcorrect)
-
             # Data correction
             if not self.x.empty:
                 bicOld = self.bic
@@ -899,12 +868,11 @@ tuple [node_value, [list, of, offspring, values]].
                 oldrr = [self.root.value,
                          [o.value for o in self.root.offspring[1:]]]
                 # replace
-                self.prune_root(update_gof=False, degcorrect=degcorrect)
+                self.prune_root(update_gof=False)
                 bicNew = self.get_bic(reset=True, fit=True)
                 par_valuesNew = deepcopy(self.par_values)
                 # leave the whole thing as it was before the back & fore
-                self.replace_root(rr=oldrr, update_gof=False,
-                                  degcorrect=degcorrect)
+                self.replace_root(rr=oldrr, update_gof=False)
                 self.bic = bicOld
                 self.sse = sseOld
                 self.par_values = par_valuesOld
@@ -920,35 +888,34 @@ tuple [node_value, [list, of, offspring, values]].
 
         # Root replacement
         else:
-            # Check if the new tree is cannonically acceptable.
+            # Check if the new tree is canonically acceptable.
             # replace
             old_bic, old_sse, old_energy = self.bic, self.sse, self.E
             old_par_values = deepcopy(self.par_values)
-            newroot = self.replace_root(rr=rr, update_gof=False,
-                                        degcorrect=degcorrect)
+            newroot = self.replace_root(rr=rr, update_gof=False)
             if newroot == None: # Root cannot be replaced (due to max_size)
                 return np.inf, deepcopy(self.par_values)                
-            # check for cannonical representative
-            try: # we've seen this cannonical before!
-                cannonical = self.cannonical()
-                rep, rep_energy = self.representative[cannonical]
+            # check for canonical representative
+            canonical = self.canonical()
+            try: # we've seen this canonical before!
+                rep, rep_energy, rep_par_values = self.representative[canonical]
                 self.get_bic(reset=True, fit=True)
-                new_energy = self.get_energy(bic=False, degcorrect=degcorrect)
+                new_energy = self.get_energy(bic=False)
                 if rep == str(self): # This is the representative: continue
                     pass
                 elif (new_energy - rep_energy) < -1.e-6: # Update representative & continue
-                    self.representative[cannonical] = (str(self), new_energy)
+                    self.representative[canonical] = (str(self), new_energy, self.par_values)
                 else: # Not the representative: forbidden (undo & return dE=inf)
-                    self.prune_root(update_gof=False, degcorrect=degcorrect)
+                    self.prune_root(update_gof=False)
                     self.bic, self.sse, self.E = old_bic, old_sse, old_energy
                     self.par_values = old_par_values
                     return np.inf, deepcopy(self.par_values)
-            except KeyError: # never seen this cannonical form. before: save it
+            except KeyError: # never seen this canonical form. before: save it
                 self.get_bic(reset=True, fit=True)
-                new_energy = self.get_energy(bic=False, degcorrect=degcorrect)
-                self.representative[cannonical] = (str(self), new_energy)
+                new_energy = self.get_energy(bic=False)
+                self.representative[canonical] = (str(self), new_energy, self.par_values)
             # leave the whole thing as it was before the back & fore
-            self.prune_root(update_gof=False, degcorrect=degcorrect)
+            self.prune_root(update_gof=False)
             self.bic, self.sse, self.E = old_bic, old_sse, old_energy
             self.par_values = old_par_values
 
@@ -961,38 +928,19 @@ tuple [node_value, [list, of, offspring, values]].
             except KeyError:
                 pass
 
-            # Degeneracy correction
-            if degcorrect:
-                # parameter labeling
-                dE -= np.log(
-                    comb(len(self.parameters), self.n_dist_par, exact=True)
-                )
-                # replace
-                newroot = self.replace_root(rr=rr, update_gof=False,
-                                            degcorrect=degcorrect)
-                if newroot == None:
-                    return np.inf, self.par_values
-                # parameter labeling
-                dE += np.log(
-                    comb(len(self.parameters), self.n_dist_par, exact=True)
-                )
-                # leave the whole thing as it was before the back & fore
-                self.prune_root(update_gof=False, degcorrect=degcorrect)
-
             # Data
             if not self.x.empty:
                 bicOld = self.bic
                 sseOld = self.sse
                 par_valuesOld = deepcopy(self.par_values)
                 # replace
-                newroot = self.replace_root(rr=rr, update_gof=False,
-                                            degcorrect=degcorrect)
+                newroot = self.replace_root(rr=rr, update_gof=False)
                 if newroot == None:
                     return np.inf, self.par_values
                 bicNew = self.get_bic(reset=True, fit=True)
                 par_valuesNew = deepcopy(self.par_values)
                 # leave the whole thing as it was before the back & fore
-                self.prune_root(update_gof=False, degcorrect=degcorrect)
+                self.prune_root(update_gof=False)
                 self.bic = bicOld
                 self.sse = sseOld
                 self.par_values = par_valuesOld
@@ -1008,7 +956,7 @@ tuple [node_value, [list, of, offspring, values]].
 
        
     # -------------------------------------------------------------------------
-    def mcmc_step(self, verbose=False, p_rr=0.05, p_long=.45, degcorrect=True):
+    def mcmc_step(self, verbose=False, p_rr=0.05, p_long=.45):
         """Make a single MCMC step.
 
         """
@@ -1017,25 +965,24 @@ tuple [node_value, [list, of, offspring, values]].
         if topDice < p_rr:
             if random() < .5:
                 # Try to prune the root
-                dE, par_valuesNew = self.dE_rr(rr=None, degcorrect=degcorrect)
+                dE, par_valuesNew = self.dE_rr(rr=None)
                 paccept = np.exp(-dE) / float(self.num_rr)
                 dice = random()
                 if dice < paccept:
                     # Accept move
-                    self.prune_root(update_gof=False, degcorrect=degcorrect)
+                    self.prune_root(update_gof=False)
                     self.par_values = par_valuesNew
                     self.get_bic(reset=True, fit=False)
                     self.E += dE
             else:
                 # Try to replace the root
                 newrr = choice(self.rr_space)
-                dE, par_valuesNew = self.dE_rr(rr=newrr, degcorrect=degcorrect)
+                dE, par_valuesNew = self.dE_rr(rr=newrr)
                 paccept = self.num_rr * np.exp(-dE)
                 dice = random()
                 if dice < paccept:
                     # Accept move
-                    self.replace_root(rr=newrr, update_gof=False,
-                                      degcorrect=degcorrect)
+                    self.replace_root(rr=newrr, update_gof=False)
                     self.par_values = par_valuesNew
                     self.get_bic(reset=True, fit=False)
                     self.E += dE
@@ -1053,7 +1000,7 @@ tuple [node_value, [list, of, offspring, values]].
                     new = choice(self.ops.keys())
                     if self.ops[new] == self.ops[target.value]:
                         nready = True
-            dE, par_valuesNew = self.dE_lr(target, new, degcorrect=degcorrect)
+            dE, par_valuesNew = self.dE_lr(target, new)
             paccept = np.exp(-dE)
             # Accept move, if necessary
             dice = random()
@@ -1096,15 +1043,14 @@ tuple [node_value, [list, of, offspring, values]].
             si = len(self.et_space[oini])
             sf = len(self.et_space[ofin])
             # Probability of acceptance
-            dE, par_valuesNew, nif, nfi = self.dE_et(target, new,
-                                                     degcorrect=degcorrect)
+            dE, par_valuesNew, nif, nfi = self.dE_et(target, new)
             paccept = (float(nif) * omegai * sf * np.exp(-dE)) / \
                       (float(nfi) * omegaf * si)
             # Accept / reject
             dice = random()
             if dice < paccept:
                 # Accept move
-                self.et_replace(target, new, degcorrect=degcorrect)
+                self.et_replace(target, new)
                 self.par_values = par_valuesNew
                 self.get_bic()
                 self.E += dE
@@ -1115,12 +1061,11 @@ tuple [node_value, [list, of, offspring, values]].
     # -------------------------------------------------------------------------
     def mcmc(self, tracefn='trace.dat', progressfn='progress.dat',
              write_files=True, reset_files=True,
-             burnin=2000, thin=10, samples=10000, verbose=True,
-             degcorrect=True):
+             burnin=2000, thin=10, samples=10000, verbose=True):
         """Sample the space of formula trees using MCMC, and write the trace and some progress information to files (unless write_files is False).
 
         """
-        self.get_energy(reset=True, degcorrect=degcorrect)
+        self.get_energy(reset=True)
 
         # Burnin
         if verbose:
@@ -1129,7 +1074,7 @@ tuple [node_value, [list, of, offspring, values]].
             sys.stdout.flush()
             sys.stdout.write('\b' * (50+1))
         for i in range(burnin):
-            self.mcmc_step(degcorrect=degcorrect)
+            self.mcmc_step()
             if verbose and (i % (burnin / 50) == 0):
                 sys.stdout.write('=')
                 sys.stdout.flush()
@@ -1148,13 +1093,13 @@ tuple [node_value, [list, of, offspring, values]].
             sys.stdout.write('\b' * (50+1))
         for s in range(samples):
             for i in range(thin):
-                self.mcmc_step(degcorrect=degcorrect)
+                self.mcmc_step()
             if verbose and (s % (samples / 50) == 0):
                 sys.stdout.write('=')
                 sys.stdout.flush()
             if write_files:
                 json.dump([s, float(self.bic), float(self.E),
-                           float(self.get_energy(degcorrect=degcorrect)),
+                           float(self.get_energy()),
                            str(self), self.par_values], tracef)
                 tracef.write('\n')
                 tracef.flush()
@@ -1204,7 +1149,7 @@ tuple [node_value, [list, of, offspring, values]].
             sys.stdout.flush()
             sys.stdout.write('\b' * (50+1))
         for i in range(burnin):
-            self.mcmc_step(degcorrect=True)
+            self.mcmc_step()
             if verbose and (i % (burnin / 50) == 0):
                 sys.stdout.write('=')
                 sys.stdout.flush()
@@ -1226,15 +1171,15 @@ tuple [node_value, [list, of, offspring, values]].
             """
             # Warm up the BIC heavily to escape deep wells
             self.BT = 1.e100
-            self.get_energy(bic=True, reset=True, degcorrect=True)
+            self.get_energy(bic=True, reset=True)
             for kk in range(thin/4):
-                self.mcmc_step(degcorrect=True)
+                self.mcmc_step()
             # Back to thermalization
             self.BT = 1.
-            self.get_energy(bic=True, reset=True, degcorrect=True)
+            self.get_energy(bic=True, reset=True)
             """
             for kk in range(thin):
-                self.mcmc_step(degcorrect=True)
+                self.mcmc_step()
             # Make prediction
             ypred[s] = self.predict(x)
             # Output
@@ -1243,7 +1188,7 @@ tuple [node_value, [list, of, offspring, values]].
                 sys.stdout.flush()
             if write_files:
                 json.dump([s, float(self.bic), float(self.E),
-                           float(self.get_energy(degcorrect=True)),
+                           float(self.get_energy()),
                            str(self), self.par_values], tracef)
                 tracef.write('\n')
                 tracef.flush()
@@ -1281,8 +1226,7 @@ def test3(num_points=10, samples=100000):
         BT=1.,
     )
     # MCMC
-    t.mcmc(burnin=2000, thin=10, samples=samples, verbose=True,
-           degcorrect=True)
+    t.mcmc(burnin=2000, thin=10, samples=samples, verbose=True)
 
     # Predict
     print t.predict(x)
