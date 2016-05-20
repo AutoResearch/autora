@@ -13,8 +13,6 @@ from pprint import pprint
 sys.path.append('..')
 from mcmc import Tree
 
-DEGCORRECT = True
-
 t = Tree(
     ops={'+' : 2, 'sin': 1},
     prior_par={'Nopi_+' : 0, 'Nopi_sin' : 0},
@@ -29,18 +27,18 @@ t = Tree(
 
 t.max_size = 7
 
-count, energy, cannonical, representatives = {}, {}, {}, {}
+count, energy, canonical, representatives = {}, {}, {}, {}
 links = {}
 for rep in range(10000000):
-    cano = t.cannonical()
+    cano = t.canonical()
     if cano not in links:
         links[cano] = {}
-    t.mcmc_step(p_rr=0.05, p_long=.45, degcorrect=DEGCORRECT)
+    t.mcmc_step(p_rr=0.05, p_long=.45)
     print >> sys.stderr, \
-        rep+1, t, t.E, t.get_energy(degcorrect=DEGCORRECT), t.n_commute
-    if abs(t.E - t.get_energy(degcorrect=DEGCORRECT)) > 1.e-8:
+        rep+1, t, t.E, t.get_energy()
+    if abs(t.E - t.get_energy()) > 1.e-8:
         raise KKError
-    can = t.cannonical()
+    can = t.canonical()
     try:
         links[cano][can] += 1
     except KeyError:
@@ -49,8 +47,8 @@ for rep in range(10000000):
         count[str(t)] += 1
     except KeyError:
         count[str(t)] = 1
-        energy[str(t)] = t.get_energy(degcorrect=DEGCORRECT)
-        cannonical[str(t)] = can
+        energy[str(t)] = t.get_energy()
+        canonical[str(t)] = can
     if can not in representatives:
         representatives[can] = {}
     try:
@@ -58,18 +56,18 @@ for rep in range(10000000):
     except KeyError:
         representatives[can][str(t)] = 1
 
-with open('test1_net.tmp', 'w') as outf:
+with open('test1_net.dat', 'w') as outf:
     for c1 in links:
         for c2 in links[c1]:
             print >> outf, \
                 c1.replace(' ', ''), c2.replace(' ', ''), links[c1][c2]
 
-with open('test1_out1.tmp', 'w') as outf:
+with open('test1_out1.dat', 'w') as outf:
     for f in count:
         print >> outf, exp(-energy[f]), count[f], \
-            cannonical[f].replace(' ', ''), str(f).replace(' ', '')
+            canonical[f].replace(' ', ''), str(f).replace(' ', '')
 
-with open('test1_out2.tmp', 'w') as outf:
+with open('test1_out2.dat', 'w') as outf:
     for c in representatives:
         for s in representatives[c]:
             print >> outf, representatives[c][s], c, s
