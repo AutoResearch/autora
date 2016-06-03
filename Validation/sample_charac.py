@@ -1,5 +1,6 @@
 import sys
 import pandas as pd
+from copy import deepcopy
 from optparse import OptionParser
 
 sys.path.append('../')
@@ -21,7 +22,7 @@ def parse_options():
     return parser
 
 # -----------------------------------------------------------------------------
-NS = 1000000
+NS = 300000
 THIN = 1
 
 # -----------------------------------------------------------------------------
@@ -74,7 +75,7 @@ if __name__ == '__main__':
     for i in range(NS):
         print >> sys.stdout, i+1
         print >> outf, ' || '.join(
-            [str(x) for x in [i+1, t.E, t.get_energy(), t.bic, t.canonical(), t, t.par_values]]
+            [str(tmp) for tmp in [i+1, t.E, t.get_energy(), t.bic, t.canonical(), t, t.par_values]]
         )
         outf.flush()
         """
@@ -92,6 +93,37 @@ if __name__ == '__main__':
         nparprob[len(set([n.value for n in t.ets[0]
                           if n.value in t.parameters]))] += 1
         sizeprob[t.size] += 1
+
+    # ------------------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------------------
+    # 2nd MCMC to CHECK IF TRAPPING IS DUE TO REPRESENTATIVE REDEFINITION
+    t2 = Tree(
+        variables=VARS,
+        parameters=['a%d' % i for i in range(npar)],
+        x=x, y=y,
+        prior_par=prior_par,
+    )
+    t2.representative = deepcopy(t.representative)
+    vprob = dict([(v, 0) for v in VARS])
+    sizeprob = dict([(s, 0) for s in range(t2.max_size+1)])
+    nparprob = dict([(n, 0) for n in range(npar+1)])
+    for i in range(3*NS):
+        print >> sys.stdout, i+1
+        print >> outf, ' || '.join(
+            [str(tmp) for tmp in [i+1, t2.E, t2.get_energy(), t2.bic, t2.canonical(), t2, t2.par_values]]
+        )
+        outf.flush()
+        for kk in range(THIN):
+            t2.mcmc_step()
+        for v in VARS:
+            if v in [n.value for n in t2.ets[0]]:
+                vprob[v] += 1
+        nparprob[len(set([n.value for n in t2.ets[0]
+                          if n.value in t2.parameters]))] += 1
+        sizeprob[t2.size] += 1
+    # ------------------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------------------
+
         
     # Report
     print >> outf, '\n# formula size' 

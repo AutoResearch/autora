@@ -611,10 +611,56 @@ Node and new is a tuple [node_value, [list, of, offspring, values]]
         return E
 
     # -------------------------------------------------------------------------
+    def update_representative(self):
+        """Check if we've seen this formula before, either in its current form
+or in another form.
+
+*If we haven't seen it, save it and return 1.
+
+*If we have seen it and this IS the representative, just return 0.
+
+*If we have seen it and the representative has smaller energy, just return -1.
+
+*If we have seen it and the representative has higher energy, update
+the representatitve and return -2.
+
+        """
+        # Check for canonical representative
+        canonical = self.canonical()
+        try:             # We've seen this canonical before!
+            rep, rep_energy, rep_par_values = self.representative[canonical]
+        except KeyError: # Never seen this canonical formula before:
+                         # save it and return 1
+            self.get_bic(reset=True, fit=True)
+            new_energy = self.get_energy(bic=False)
+            self.representative[canonical] = (str(self), new_energy,
+                                              self.par_values)
+            return 1
+
+        # If we've seen this canonical before, check if the
+        # representative needs to be updated
+        if rep == str(self): # This IS the representative: return 0
+            return 0
+        else:
+            self.get_bic(reset=True, fit=True)
+            new_energy = self.get_energy(bic=False)
+            if (new_energy - rep_energy) < -1.e-6: # Update
+                                                   # representative &
+                                                   # return -2
+                print >> sys.stdout, 'Updating rep: ||', canonical, '||', rep, '||', str(self), '||', rep_energy, '||', new_energy
+                print >> sys.stderr, 'Updating rep: ||', canonical, '||',  rep, '||', str(self), '||', rep_energy, '||', new_energy
+                self.representative[canonical] = (str(self),
+                                                  new_energy, self.par_values)
+                return -2
+            else: # Not the representative: return -1
+                return -1
+
+    # -------------------------------------------------------------------------
     def dE_et(self, target, new):
         """Calculate the energy change associated to the replacement of one ET
-by another, both of arbitrary order. "target" is a Node() and "new" is a
-tuple [node_value, [list, of, offspring, values]].
+by another, both of arbitrary order. "target" is a Node() and "new" is
+a tuple [node_value, [list, of, offspring, values]].
+
         """
         dE = 0
 
@@ -635,26 +681,14 @@ tuple [node_value, [list, of, offspring, values]].
         nfi = sum([int(len(self.ets[oi]) > 0 and
                        (self.size + of - oi) <= self.max_size)
                    for oi, of in self.move_types])
-        # check for canonical representative
-        canonical = self.canonical()
-        try: # we've seen this canonical before!
-            rep, rep_energy, rep_par_values = self.representative[canonical]
-            self.get_bic(reset=True, fit=True)
-            new_energy = self.get_energy(bic=False)
-            if rep == str(self): # This is the representative: continue
-                pass
-            elif (new_energy - rep_energy) < -1.e-6: # Update representative & continue
-                self.representative[canonical] = (str(self), new_energy, self.par_values)
-            else: # Not the representative: forbidden (undo & return dE=inf)
-                self.et_replace(added, old, update_gof=False)
-                self.bic, self.sse, self.E = old_bic, old_sse, old_energy
-                self.par_values = old_par_values
-                return np.inf, deepcopy(self.par_values), nif, nfi
-        except KeyError: # never seen this canonical formula before: save it
-            self.get_bic(reset=True, fit=True)
-            new_energy = self.get_energy(bic=False)
-            self.representative[canonical] = (str(self), new_energy, self.par_values)
-            pass
+        # check/update canonical representative
+        rep_res = self.update_representative()
+        if rep_res == -1:
+            # this formula is forbidden
+            self.et_replace(added, old, update_gof=False)
+            self.bic, self.sse, self.E = old_bic, old_sse, old_energy
+            self.par_values = old_par_values
+            return np.inf, deepcopy(self.par_values), nif, nfi
         # leave the whole thing as it was before the back & fore
         self.et_replace(added, old, update_gof=False)
         self.bic, self.sse, self.E = old_bic, old_sse, old_energy
@@ -726,30 +760,19 @@ tuple [node_value, [list, of, offspring, values]].
                 self.nops[new] += 1
             except KeyError:
                 pass
-            # check for canonical representative
-            canonical = self.canonical()
-            try: # we've seen this canonical before!
-                rep, rep_energy, rep_par_values = self.representative[canonical]
-                self.get_bic(reset=True, fit=True)
-                new_energy = self.get_energy(bic=False)
-                if rep == str(self): # This is the representative: continue
+            # check/update canonical representative
+            rep_res = self.update_representative()
+            if rep_res == -1:
+                # this formula is forbidden
+                target.value = old
+                try:
+                    self.nops[old] += 1
+                    self.nops[new] -= 1
+                except KeyError:
                     pass
-                elif (new_energy - rep_energy) < -1.e-6: # Update representative & continue
-                    self.representative[canonical] = (str(self), new_energy, self.par_values)
-                else: # Not the representative: forbidden (undo & return dE=inf)
-                    target.value = old
-                    try:
-                        self.nops[old] += 1
-                        self.nops[new] -= 1
-                    except KeyError:
-                        pass
-                    self.bic, self.sse, self.E = old_bic, old_sse, old_energy
-                    self.par_values = old_par_values
-                    return np.inf, deepcopy(self.par_values)
-            except KeyError: # never seen this canonical form. before: save it
-                self.get_bic(reset=True, fit=True)
-                new_energy = self.get_energy(bic=False, reset=True)
-                self.representative[canonical] = (str(self), new_energy, self.par_values)
+                self.bic, self.sse, self.E = old_bic, old_sse, old_energy
+                self.par_values = old_par_values
+                return np.inf, deepcopy(self.par_values)
             # leave the whole thing as it was before the back & fore
             target.value = old
             try:
@@ -827,25 +850,14 @@ tuple [node_value, [list, of, offspring, values]].
             oldrr = [self.root.value,
                      [o.value for o in self.root.offspring[1:]]]
             self.prune_root(update_gof=False)
-            # check for canonical representative
-            canonical = self.canonical()
-            try: # we've seen this canonical before!
-                rep, rep_energy, rep_par_values = self.representative[canonical]
-                self.get_bic(reset=True, fit=True)
-                new_energy = self.get_energy(bic=False)
-                if rep == str(self): # This is the representative: continue
-                    pass
-                elif (new_energy - rep_energy) < -1.e-6: # Update representative & continue
-                    self.representative[canonical] = (str(self), new_energy, self.par_values)
-                else: # Not the representative: forbidden (undo & return dE=inf)
-                    self.replace_root(rr=oldrr, update_gof=False)
-                    self.bic, self.sse, self.E = old_bic, old_sse, old_energy
-                    self.par_values = old_par_values
-                    return np.inf, deepcopy(self.par_values)
-            except KeyError: # never seen this canonical form. before: save it
-                self.get_bic(reset=True, fit=True)
-                new_energy = self.get_energy(bic=False)
-                self.representative[canonical] = (str(self), new_energy, self.par_values)
+            # check/update canonical representative
+            rep_res = self.update_representative()
+            if rep_res == -1:
+                # this formula is forbidden
+                self.replace_root(rr=oldrr, update_gof=False)
+                self.bic, self.sse, self.E = old_bic, old_sse, old_energy
+                self.par_values = old_par_values
+                return np.inf, deepcopy(self.par_values)
             # leave the whole thing as it was before the back & fore
             self.replace_root(rr=oldrr, update_gof=False)
             self.bic, self.sse, self.E = old_bic, old_sse, old_energy
@@ -895,25 +907,14 @@ tuple [node_value, [list, of, offspring, values]].
             newroot = self.replace_root(rr=rr, update_gof=False)
             if newroot == None: # Root cannot be replaced (due to max_size)
                 return np.inf, deepcopy(self.par_values)                
-            # check for canonical representative
-            canonical = self.canonical()
-            try: # we've seen this canonical before!
-                rep, rep_energy, rep_par_values = self.representative[canonical]
-                self.get_bic(reset=True, fit=True)
-                new_energy = self.get_energy(bic=False)
-                if rep == str(self): # This is the representative: continue
-                    pass
-                elif (new_energy - rep_energy) < -1.e-6: # Update representative & continue
-                    self.representative[canonical] = (str(self), new_energy, self.par_values)
-                else: # Not the representative: forbidden (undo & return dE=inf)
-                    self.prune_root(update_gof=False)
-                    self.bic, self.sse, self.E = old_bic, old_sse, old_energy
-                    self.par_values = old_par_values
-                    return np.inf, deepcopy(self.par_values)
-            except KeyError: # never seen this canonical form. before: save it
-                self.get_bic(reset=True, fit=True)
-                new_energy = self.get_energy(bic=False)
-                self.representative[canonical] = (str(self), new_energy, self.par_values)
+            # check/update canonical representative
+            rep_res = self.update_representative()
+            if rep_res == -1:
+                # this formula is forbidden
+                self.prune_root(update_gof=False)
+                self.bic, self.sse, self.E = old_bic, old_sse, old_energy
+                self.par_values = old_par_values
+                return np.inf, deepcopy(self.par_values)
             # leave the whole thing as it was before the back & fore
             self.prune_root(update_gof=False)
             self.bic, self.sse, self.E = old_bic, old_sse, old_energy
