@@ -13,7 +13,7 @@ from scipy.misc import comb
 import warnings
 warnings.filterwarnings('error')
 
-seed(1111)
+seed(11113)
 
 # -----------------------------------------------------------------------------
 # The accepted operations (key: operation; value: #offspring)
@@ -546,6 +546,8 @@ Node and new is a tuple [node_value, [list, of, offspring, values]]
                     # Save this fit
                     self.fit_par[str(self)] = deepcopy(self.par_values)
                 except:
+                    # Save this (unsuccessful) fit and print warning
+                    self.fit_par[str(self)] = deepcopy(self.par_values)
                     print >> sys.stderr, \
                         '#Cannot_fit:%s # # # # #' % str(self).replace(' ', '')
         # Sum of squared errors
@@ -644,6 +646,9 @@ the representatitve and return -2.
         else:
             self.get_bic(reset=True, fit=True)
             new_energy = self.get_energy(bic=False)
+            # CAUTION: CHANGED TO NEVER UPDATE REPRESENTATIVE!!!!!!!!
+            return -1
+            # END OF CAUTION ZONE
             if (new_energy - rep_energy) < -1.e-6: # Update
                                                    # representative &
                                                    # return -2
