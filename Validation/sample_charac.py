@@ -75,7 +75,7 @@ if __name__ == '__main__':
     for i in range(NS):
         print >> sys.stdout, i+1
         print >> outf, ' || '.join(
-            [str(tmp) for tmp in [i+1, t.E, t.get_energy(), t.bic, t.size, t.canonical(), t, t.par_values]]
+            [str(tmp) for tmp in [i+1, t.E, t.get_energy()[0], t.EB*2, t.bic, t.size, t.canonical(), t, t.par_values]]
         )
         outf.flush()
         """

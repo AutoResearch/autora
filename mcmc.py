@@ -13,7 +13,7 @@ from scipy.misc import comb
 import warnings
 warnings.filterwarnings('error')
 
-seed(11113)
+seed(1111)
 
 # -----------------------------------------------------------------------------
 # The accepted operations (key: operation; value: #offspring)
@@ -134,7 +134,7 @@ class Tree():
         # Goodness of fit measures
         self.sse = self.get_sse()
         self.bic = self.get_bic()
-        self.E = self.get_energy()
+        self.E, self.EB, self.EP = self.get_energy()
         # To control formula degeneracy (i.e. different trees that
         # correspond to the same cannoninal formula), we store the
         # representative tree for each canonical formula
@@ -593,24 +593,27 @@ Node and new is a tuple [node_value, [list, of, offspring, values]]
         """
         # Contribtution of the data (recalculating BIC if necessary)
         if bic == True:
-            E = self.get_bic(reset=reset) / (2. * self.BT)
+            EB = self.get_bic(reset=reset) / 2.
         else:
-            E = self.bic / (2. * self.BT)
+            EB = self.bic / 2.
         # Contribution from the prior
+        EP = 0.0
         for op, nop in self.nops.items():
             try:
-                E += self.prior_par['Nopi_%s' % op] * nop / self.PT
+                EP += self.prior_par['Nopi_%s' % op] * nop
             except KeyError:
                 pass
             try:
-                E += self.prior_par['Nopi2_%s' % op] * nop**2 / self.PT
+                EP += self.prior_par['Nopi2_%s' % op] * nop**2
             except KeyError:
                 pass
         # Reset the value, if necessary
         if reset:
-            self.E = E
+            self.EB = EB
+            self.ET = ET
+            self.E = EB + ET
         # Done
-        return E
+        return EB + EP, EB, EP
 
     # -------------------------------------------------------------------------
     def update_representative(self):
@@ -667,7 +670,7 @@ by another, both of arbitrary order. "target" is a Node() and "new" is
 a tuple [node_value, [list, of, offspring, values]].
 
         """
-        dE = 0
+        dEB, dEP = 0.0, 0.0
 
         # Some terms of the acceptance (number of possible move types
         # from initial and final configurations), as well as checking
@@ -693,30 +696,30 @@ a tuple [node_value, [list, of, offspring, values]].
             self.et_replace(added, old, update_gof=False)
             self.bic, self.sse, self.E = old_bic, old_sse, old_energy
             self.par_values = old_par_values
-            return np.inf, deepcopy(self.par_values), nif, nfi
+            return np.inf, np.inf, np.inf, deepcopy(self.par_values), nif, nfi
         # leave the whole thing as it was before the back & fore
         self.et_replace(added, old, update_gof=False)
         self.bic, self.sse, self.E = old_bic, old_sse, old_energy
         self.par_values = old_par_values
         # Prior: change due to the numbers of each operation
         try:
-            dE -= self.prior_par['Nopi_%s' % target.value] / self.PT
+            dEP -= self.prior_par['Nopi_%s' % target.value]
         except KeyError:
             pass
         try:
-            dE += self.prior_par['Nopi_%s' % new[0]] / self.PT
+            dEP += self.prior_par['Nopi_%s' % new[0]]
         except KeyError:
             pass
         try:
-            dE += (self.prior_par['Nopi2_%s' % target.value] *
+            dEP += (self.prior_par['Nopi2_%s' % target.value] *
                    ((self.nops[target.value] - 1)**2 - 
-                    (self.nops[target.value])**2)) / self.PT
+                    (self.nops[target.value])**2))
         except KeyError:
             pass
         try:
-            dE += (self.prior_par['Nopi2_%s' % new[0]] *
+            dEP += (self.prior_par['Nopi2_%s' % new[0]] *
                    ((self.nops[new[0]] + 1)**2 - 
-                    (self.nops[new[0]])**2)) / self.PT
+                    (self.nops[new[0]])**2))
         except KeyError:
             pass
                         
@@ -735,22 +738,24 @@ a tuple [node_value, [list, of, offspring, values]].
             self.bic = bicOld
             self.sse = sseOld
             self.par_values = par_valuesOld
-            dE += (bicNew - bicOld) / (2. * self.BT)
+            dEB += (bicNew - bicOld) / 2.
         else:
             par_valuesNew = deepcopy(self.par_values)
         # Done
         try:
-            dE = float(dE)
+            dEB = float(dEB)
+            dEP = float(dEP)
+            dE = dEB + dEP
         except:
-            dE = np.inf
-        return dE, par_valuesNew, nif, nfi
+            dEB, dEP, dE = np.inf, np.inf, np.inf
+        return dE, dEB, dEP, par_valuesNew, nif, nfi
 
 
     # -------------------------------------------------------------------------
     def dE_lr(self, target, new):
         """Calculate the energy change associated to a long-range move (the replacement of the value of a node. "target" is a Node() and "new" is a node_value.
         """
-        dE = 0
+        dEB, dEP = 0.0, 0.0
         par_valuesNew = deepcopy(self.par_values)
 
         if target.value != new:
@@ -777,7 +782,7 @@ a tuple [node_value, [list, of, offspring, values]].
                     pass
                 self.bic, self.sse, self.E = old_bic, old_sse, old_energy
                 self.par_values = old_par_values
-                return np.inf, deepcopy(self.par_values)
+                return np.inf, np.inf, np.inf, deepcopy(self.par_values)
             # leave the whole thing as it was before the back & fore
             target.value = old
             try:
@@ -790,21 +795,21 @@ a tuple [node_value, [list, of, offspring, values]].
 
             # Prior: change due to the numbers of each operation
             try:
-                dE -= self.prior_par['Nopi_%s' % target.value] / self.PT
+                dEP -= self.prior_par['Nopi_%s' % target.value] / self.PT
             except KeyError:
                 pass
             try:
-                dE += self.prior_par['Nopi_%s' % new] / self.PT
+                dEP += self.prior_par['Nopi_%s' % new] / self.PT
             except KeyError:
                 pass
             try:
-                dE += (self.prior_par['Nopi2_%s' % target.value] *
+                dEP += (self.prior_par['Nopi2_%s' % target.value] *
                        ((self.nops[target.value] - 1)**2 - 
                         (self.nops[target.value])**2)) / self.PT
             except KeyError:
                 pass
             try:
-                dE += (self.prior_par['Nopi2_%s' % new] *
+                dEP += (self.prior_par['Nopi2_%s' % new] *
                        ((self.nops[new] + 1)**2 - 
                         (self.nops[new])**2)) / self.PT
             except KeyError:
@@ -824,16 +829,18 @@ a tuple [node_value, [list, of, offspring, values]].
                 self.bic = bicOld
                 self.sse = sseOld
                 self.par_values = par_valuesOld
-                dE += (bicNew - bicOld) / (2. * self.BT)
+                dEB += (bicNew - bicOld) / (2. * self.BT)
             else:
                 par_valuesNew = deepcopy(self.par_values)
 
         # Done
         try:
-            dE = float(dE)
+            dEB = float(dEB)
+            dEP = float(dEP)
+            dE = dEB + dEP
         except:
-            dE = np.inf
-        return dE, par_valuesNew
+            dEB, dEP, dE = np.inf, np.inf, np.inf
+        return dE, dEB, dEP, par_valuesNew
 
         
     # -------------------------------------------------------------------------
@@ -841,12 +848,12 @@ a tuple [node_value, [list, of, offspring, values]].
         """Calculate the energy change associated to a root replacement move. If rr==None, then it returns the energy change associated to pruning the root; otherwise, it returns the dE associated to adding the root replacement "rr".
 
         """
-        dE = 0
+        dEB, dEP = 0.0, 0.0
 
         # Root pruning
         if rr == None:
             if not self.is_root_prunable():
-                return np.inf, self.par_values
+                return np.inf, np.inf, np.inf, self.par_values
 
             # Check if the new tree is canonically acceptable.
             # replace
@@ -862,18 +869,18 @@ a tuple [node_value, [list, of, offspring, values]].
                 self.replace_root(rr=oldrr, update_gof=False)
                 self.bic, self.sse, self.E = old_bic, old_sse, old_energy
                 self.par_values = old_par_values
-                return np.inf, deepcopy(self.par_values)
+                return np.inf, np.inf, np.inf, deepcopy(self.par_values)
             # leave the whole thing as it was before the back & fore
             self.replace_root(rr=oldrr, update_gof=False)
             self.bic, self.sse, self.E = old_bic, old_sse, old_energy
             self.par_values = old_par_values
 
             # Prior: change due to the numbers of each operation
-            dE -= self.prior_par['Nopi_%s' % self.root.value] / self.PT
+            dEP -= self.prior_par['Nopi_%s' % self.root.value] / self.PT
             try:
-                dE += (self.prior_par['Nopi2_%s' % self.root.value] *
-                       ((self.nops[self.root.value] - 1)**2 - 
-                        (self.nops[self.root.value])**2)) / self.PT
+                dEP += (self.prior_par['Nopi2_%s' % self.root.value] *
+                        ((self.nops[self.root.value] - 1)**2 - 
+                         (self.nops[self.root.value])**2)) / self.PT
             except KeyError:
                 pass
 
@@ -893,15 +900,17 @@ a tuple [node_value, [list, of, offspring, values]].
                 self.bic = bicOld
                 self.sse = sseOld
                 self.par_values = par_valuesOld
-                dE += (bicNew - bicOld) / (2. * self.BT)
+                dEB += (bicNew - bicOld) / (2. * self.BT)
             else:
                 par_valuesNew = deepcopy(self.par_values)
             # Done
             try:
-                dE = float(dE)
+                dEB = float(dEB)
+                dEP = float(dEP)
+                dE = dEB + dEP
             except:
-                dE = np.inf
-            return dE, par_valuesNew
+                dEB, dEP, dE = np.inf, np.inf, np.inf
+            return dE, dEB, dEP, par_valuesNew
 
         # Root replacement
         else:
@@ -911,7 +920,7 @@ a tuple [node_value, [list, of, offspring, values]].
             old_par_values = deepcopy(self.par_values)
             newroot = self.replace_root(rr=rr, update_gof=False)
             if newroot == None: # Root cannot be replaced (due to max_size)
-                return np.inf, deepcopy(self.par_values)                
+                return np.inf, np.inf, np.inf, deepcopy(self.par_values)     
             # check/update canonical representative
             rep_res = self.update_representative()
             if rep_res == -1:
@@ -919,18 +928,18 @@ a tuple [node_value, [list, of, offspring, values]].
                 self.prune_root(update_gof=False)
                 self.bic, self.sse, self.E = old_bic, old_sse, old_energy
                 self.par_values = old_par_values
-                return np.inf, deepcopy(self.par_values)
+                return np.inf, np.inf, np.inf, deepcopy(self.par_values)
             # leave the whole thing as it was before the back & fore
             self.prune_root(update_gof=False)
             self.bic, self.sse, self.E = old_bic, old_sse, old_energy
             self.par_values = old_par_values
 
             # Prior: change due to the numbers of each operation
-            dE += self.prior_par['Nopi_%s' % rr[0]] / self.PT
+            dEP += self.prior_par['Nopi_%s' % rr[0]] / self.PT
             try:
-                dE += (self.prior_par['Nopi2_%s' % rr[0]] *
-                       ((self.nops[rr[0]] + 1)**2 - 
-                        (self.nops[rr[0]])**2)) / self.PT
+                dEP += (self.prior_par['Nopi2_%s' % rr[0]] *
+                        ((self.nops[rr[0]] + 1)**2 - 
+                         (self.nops[rr[0]])**2)) / self.PT
             except KeyError:
                 pass
 
@@ -942,7 +951,7 @@ a tuple [node_value, [list, of, offspring, values]].
                 # replace
                 newroot = self.replace_root(rr=rr, update_gof=False)
                 if newroot == None:
-                    return np.inf, self.par_values
+                    return np.inf, np.inf, np.inf, self.par_values
                 bicNew = self.get_bic(reset=True, fit=True)
                 par_valuesNew = deepcopy(self.par_values)
                 # leave the whole thing as it was before the back & fore
@@ -950,15 +959,17 @@ a tuple [node_value, [list, of, offspring, values]].
                 self.bic = bicOld
                 self.sse = sseOld
                 self.par_values = par_valuesOld
-                dE += (bicNew - bicOld) / (2. * self.BT)
+                dEB += (bicNew - bicOld) / (2. * self.BT)
             else:
                 par_valuesNew = deepcopy(self.par_values)
             # Done
             try:
-                dE = float(dE)
+                dEB = float(dEB)
+                dEP = float(dEP)
+                dE = dEB + dEP
             except:
-                dE = np.inf
-            return dE, par_valuesNew
+                dEB, dEP, dE = np.inf, np.inf, np.inf
+            return dE, dEB, dEP, par_valuesNew
 
        
     # -------------------------------------------------------------------------
@@ -971,8 +982,9 @@ a tuple [node_value, [list, of, offspring, values]].
         if topDice < p_rr:
             if random() < .5:
                 # Try to prune the root
-                dE, par_valuesNew = self.dE_rr(rr=None)
-                paccept = np.exp(-dE) / float(self.num_rr)
+                dE, dEB, dEP, par_valuesNew = self.dE_rr(rr=None)
+                paccept = np.exp(-dEB / self.BT - dEP / self.PT) / \
+                          float(self.num_rr)
                 dice = random()
                 if dice < paccept:
                     # Accept move
@@ -980,11 +992,13 @@ a tuple [node_value, [list, of, offspring, values]].
                     self.par_values = par_valuesNew
                     self.get_bic(reset=True, fit=False)
                     self.E += dE
+                    self.EB += dEB
+                    self.EP += dEP
             else:
                 # Try to replace the root
                 newrr = choice(self.rr_space)
-                dE, par_valuesNew = self.dE_rr(rr=newrr)
-                paccept = self.num_rr * np.exp(-dE)
+                dE, dEB, dEP, par_valuesNew = self.dE_rr(rr=newrr)
+                paccept = self.num_rr * np.exp(-dEB / self.BT - dEP / self.PT)
                 dice = random()
                 if dice < paccept:
                     # Accept move
@@ -992,6 +1006,8 @@ a tuple [node_value, [list, of, offspring, values]].
                     self.par_values = par_valuesNew
                     self.get_bic(reset=True, fit=False)
                     self.E += dE
+                    self.EB += dEB
+                    self.EP += dEP
 
         # Long-range move
         elif topDice < (p_rr + p_long):
@@ -1006,12 +1022,11 @@ a tuple [node_value, [list, of, offspring, values]].
                     new = choice(self.ops.keys())
                     if self.ops[new] == self.ops[target.value]:
                         nready = True
-            dE, par_valuesNew = self.dE_lr(target, new)
-            paccept = np.exp(-dE)
+            dE, dEB, dEP, par_valuesNew = self.dE_lr(target, new)
+            paccept = np.exp(-dEB / self.BT - dEP / self.PT)
             # Accept move, if necessary
             dice = random()
             if dice < paccept:
-                Eold = self.E
                 # update number of operations
                 if target.offspring != []:
                     self.nops[target.value] -= 1
@@ -1026,6 +1041,8 @@ a tuple [node_value, [list, of, offspring, values]].
                 self.par_values = par_valuesNew
                 self.get_bic(reset=True, fit=False)
                 self.E += dE
+                self.EB += dEB
+                self.EP += dEP
 
         # Elementary tree (short-range) move
         else:
@@ -1049,8 +1066,9 @@ a tuple [node_value, [list, of, offspring, values]].
             si = len(self.et_space[oini])
             sf = len(self.et_space[ofin])
             # Probability of acceptance
-            dE, par_valuesNew, nif, nfi = self.dE_et(target, new)
-            paccept = (float(nif) * omegai * sf * np.exp(-dE)) / \
+            dE, dEB, dEP, par_valuesNew, nif, nfi = self.dE_et(target, new)
+            paccept = (float(nif) * omegai * sf * 
+                       np.exp(-dEB / self.BT - dEP / self.PT)) / \
                       (float(nfi) * omegaf * si)
             # Accept / reject
             dice = random()
@@ -1060,6 +1078,8 @@ a tuple [node_value, [list, of, offspring, values]].
                 self.par_values = par_valuesNew
                 self.get_bic()
                 self.E += dE
+                self.EB += dEB
+                self.EP += dEP
                 
         # Done
         return
