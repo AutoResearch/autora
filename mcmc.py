@@ -124,8 +124,8 @@ class Tree():
         self.x = x if x is not None else pd.DataFrame()
         self.y = y if y is not None else pd.Series()
         # BIC and prior temperature
-        self.BT = BT 
-        self.PT = PT 
+        self.BT = float(BT)
+        self.PT = float(PT)
         # Build from string
         if from_string != None:
             self.build_from_string(from_string)
@@ -795,23 +795,23 @@ a tuple [node_value, [list, of, offspring, values]].
 
             # Prior: change due to the numbers of each operation
             try:
-                dEP -= self.prior_par['Nopi_%s' % target.value] / self.PT
+                dEP -= self.prior_par['Nopi_%s' % target.value]
             except KeyError:
                 pass
             try:
-                dEP += self.prior_par['Nopi_%s' % new] / self.PT
+                dEP += self.prior_par['Nopi_%s' % new]
             except KeyError:
                 pass
             try:
                 dEP += (self.prior_par['Nopi2_%s' % target.value] *
                        ((self.nops[target.value] - 1)**2 - 
-                        (self.nops[target.value])**2)) / self.PT
+                        (self.nops[target.value])**2))
             except KeyError:
                 pass
             try:
                 dEP += (self.prior_par['Nopi2_%s' % new] *
                        ((self.nops[new] + 1)**2 - 
-                        (self.nops[new])**2)) / self.PT
+                        (self.nops[new])**2))
             except KeyError:
                 pass
 
@@ -829,7 +829,7 @@ a tuple [node_value, [list, of, offspring, values]].
                 self.bic = bicOld
                 self.sse = sseOld
                 self.par_values = par_valuesOld
-                dEB += (bicNew - bicOld) / (2. * self.BT)
+                dEB += (bicNew - bicOld) / 2.
             else:
                 par_valuesNew = deepcopy(self.par_values)
 
@@ -876,11 +876,11 @@ a tuple [node_value, [list, of, offspring, values]].
             self.par_values = old_par_values
 
             # Prior: change due to the numbers of each operation
-            dEP -= self.prior_par['Nopi_%s' % self.root.value] / self.PT
+            dEP -= self.prior_par['Nopi_%s' % self.root.value]
             try:
                 dEP += (self.prior_par['Nopi2_%s' % self.root.value] *
                         ((self.nops[self.root.value] - 1)**2 - 
-                         (self.nops[self.root.value])**2)) / self.PT
+                         (self.nops[self.root.value])**2))
             except KeyError:
                 pass
 
@@ -900,7 +900,7 @@ a tuple [node_value, [list, of, offspring, values]].
                 self.bic = bicOld
                 self.sse = sseOld
                 self.par_values = par_valuesOld
-                dEB += (bicNew - bicOld) / (2. * self.BT)
+                dEB += (bicNew - bicOld) / 2.
             else:
                 par_valuesNew = deepcopy(self.par_values)
             # Done
@@ -935,11 +935,11 @@ a tuple [node_value, [list, of, offspring, values]].
             self.par_values = old_par_values
 
             # Prior: change due to the numbers of each operation
-            dEP += self.prior_par['Nopi_%s' % rr[0]] / self.PT
+            dEP += self.prior_par['Nopi_%s' % rr[0]]
             try:
                 dEP += (self.prior_par['Nopi2_%s' % rr[0]] *
                         ((self.nops[rr[0]] + 1)**2 - 
-                         (self.nops[rr[0]])**2)) / self.PT
+                         (self.nops[rr[0]])**2))
             except KeyError:
                 pass
 
@@ -959,7 +959,7 @@ a tuple [node_value, [list, of, offspring, values]].
                 self.bic = bicOld
                 self.sse = sseOld
                 self.par_values = par_valuesOld
-                dEB += (bicNew - bicOld) / (2. * self.BT)
+                dEB += (bicNew - bicOld) / 2.
             else:
                 par_valuesNew = deepcopy(self.par_values)
             # Done
