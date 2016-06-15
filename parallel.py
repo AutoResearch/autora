@@ -18,16 +18,13 @@ class Parallel():
                                BT=1)}
         self.t1 = self.trees[1]
         for BT in [T for T in Ts if T != 1]:
-            self.trees[BT] = deepcopy(self.t1)
+            self.trees[BT] = Tree(ops=ops,
+                                  variables=variables,
+                                  parameters=parameters,
+                                  prior_par=prior_par, x=x, y=y,
+                                  root_value=self.t1.root.value,
+                                  BT=1)
             self.trees[BT].BT = BT
-        # Common representative for all trees
-        self.representative = {
-            self.t1.canonical() : (
-                str(self.t1),
-                self.t1.E,
-                self.t1.par_values,
-            )
-        }
         return
 
     # -------------------------------------------------------------------------
@@ -37,12 +34,6 @@ class Parallel():
         for tree in self.trees.values():
             # MCMC step
             tree.mcmc_step(verbose=verbose, p_rr=p_rr, p_long=p_long)
-            # Update the representative of this canonical formula in all trees
-            canonical = tree.canonical()
-            if canonical not in self.representative:
-                self.representative[canonical] = tree.representative[canonical]
-                for t2 in self.trees.values():
-                    t2.representative[canonical] = self.representative[canonical]
         # Done
         return
 
@@ -81,7 +72,7 @@ if __name__ == '__main__':
     from pprint import pprint
 
     # Temperatures
-    Ts = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    Ts = [1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5]
 
     # Read the data
     prior_par = read_prior_par('Prior/prior_param_sq.named_equations.nv7.np7.2016-06-06 16:43:26.287530.dat')
@@ -103,12 +94,15 @@ if __name__ == '__main__':
     )
     pprint(p.trees)
 
-    for rep in range(100000):
+    for rep in range(1000000):
         print '=' * 77
         p.mcmc_step()
         p.tree_swap()
         pprint(p.trees)
         print '.' * 77
-        for T in p.trees:
+        for T in Ts:
             print T, p.trees[T].E, p.trees[T].get_energy(reset=False)[0]
-            
+        if p.trees[1].representative != p.trees[2].representative:
+            raise
+        if p.trees[1].fit_par != p.trees[2].fit_par:
+            raise

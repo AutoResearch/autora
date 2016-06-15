@@ -13,7 +13,7 @@ from scipy.misc import comb
 import warnings
 warnings.filterwarnings('error')
 
-seed(1111)
+#seed(1111)
 
 # -----------------------------------------------------------------------------
 # The accepted operations (key: operation; value: #offspring)
@@ -79,6 +79,7 @@ class Tree():
     # -------------------------------------------------------------------------
     def __init__(self, ops=OPS, variables=['x'], parameters=['a'],
                  prior_par={}, x=None, y=None, BT=1., PT=1.,
+                 representative={}, fit_par={}, root_value=None,
                  from_string=None):
         # The variables and parameters
         self.variables = variables
@@ -87,8 +88,14 @@ class Tree():
                            for p in parameters]
         self.par_values = dict([(p, 1.) for p in self.parameters])
         # The root
-        self.root = Node(choice(self.variables+self.parameters), offspring=[],
-                         parent=None)
+        if root_value == None:
+            self.root = Node(choice(self.variables+self.parameters),
+                             offspring=[],
+                             parent=None)
+        else:
+            self.root = Node(root_value,
+                             offspring=[],
+                             parent=None)
         # The poosible operations
         self.ops = ops
         # The possible orders of the operations, move types, and move
@@ -130,7 +137,10 @@ class Tree():
         if from_string != None:
             self.build_from_string(from_string)
         # For fast fitting, we save past successful fits to this formula
-        self.fit_par = {}
+        if fit_par == None:
+            self.fit_par = {}
+        else:
+            self.fit_par = fit_par
         # Goodness of fit measures
         self.sse = self.get_sse()
         self.bic = self.get_bic()
@@ -138,8 +148,13 @@ class Tree():
         # To control formula degeneracy (i.e. different trees that
         # correspond to the same cannoninal formula), we store the
         # representative tree for each canonical formula
-        self.representative = {self.canonical() :
-                               (str(self), self.E, self.par_values)}
+        if representative == None:
+            self.representative = {}
+        else:
+            self.representative = representative
+        self.representative[self.canonical()] = (
+            str(self), self.E, self.par_values
+        )
         # Done
         return
 
