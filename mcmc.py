@@ -268,10 +268,8 @@ class Tree():
         """Build the tree from an expression formatted according to Tree.__repr__().
 
         """
-        print self.variables
         tlist, parameters, variables = self.__parse_recursive(string,
                                                               vpreturn=True)
-        print variables
         self.__init__(ops=self.ops, prior_par=self.prior_par,
                       x=self.x, y=self.y, BT=self.BT, PT=self.PT,
                       parameters=parameters, variables=variables)
