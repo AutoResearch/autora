@@ -199,9 +199,11 @@ class Tree():
         # Leaf
         if '(' not in string:
             if string.startswith('_'):
-                parameters.append(string)
+                if string not in parameters:
+                    parameters.append(string)
             else:
-                variables.append(string)
+                if string not in variables:
+                    variables.append(string)
             rval = [string, []]
         # Not a leaf: parse the expression
         else:
@@ -266,8 +268,10 @@ class Tree():
         """Build the tree from an expression formatted according to Tree.__repr__().
 
         """
+        print self.variables
         tlist, parameters, variables = self.__parse_recursive(string,
                                                               vpreturn=True)
+        print variables
         self.__init__(ops=self.ops, prior_par=self.prior_par,
                       x=self.x, y=self.y, BT=self.BT, PT=self.PT,
                       parameters=parameters, variables=variables)
@@ -1163,6 +1167,7 @@ a tuple [node_value, [list, of, offspring, values]].
         atomd = dict([(a.name, a) for a in ex.atoms() if a.is_Symbol])
         variables = [atomd[v] for v in self.variables if v in atomd.keys()]
         parameters = [atomd[p] for p in self.parameters if p in atomd.keys()]
+        print variables, parameters
         flam = lambdify(variables + parameters, ex, "numpy")
         # Prepare variables and parameters
         xmat = [x[v.name] for v in variables]
