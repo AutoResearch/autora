@@ -3,8 +3,6 @@ from random import seed, random, randint
 from numpy import exp
 from mcmc import *
 
-#seed(11111)
-
 class Parallel():
     """ The Parallel class for parallel tempering. """
 
@@ -80,7 +78,18 @@ if __name__ == '__main__':
     from pprint import pprint
 
     # Temperatures
-    Ts = [1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5]
+    Ts = [
+        1,
+        1.20,
+        1.44,
+        1.73,
+        2.07,
+        2.49,
+        2.99,
+        3.58,
+        4.30,
+        5.16,
+    ]
 
     # Read the data
     prior_par = read_prior_par('Prior/prior_param_sq.named_equations.nv7.np7.2016-06-06 16:43:26.287530.dat')

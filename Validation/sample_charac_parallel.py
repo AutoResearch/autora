@@ -37,7 +37,18 @@ if __name__ == '__main__':
     Y = iodata.YLABS[dset]
 
     # Temperatures
-    Ts = [1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5]
+    Ts = [
+        1,
+        1.20,
+        1.44,
+        1.73,
+        2.07,
+        2.49,
+        2.99,
+        3.58,
+        4.30,
+        5.16,
+    ]
 
     # Read the data
     inFileName = '%s/data/%s' % (dset, iodata.FNAMES[dset])
