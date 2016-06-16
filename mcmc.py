@@ -79,14 +79,13 @@ class Tree():
     # -------------------------------------------------------------------------
     def __init__(self, ops=OPS, variables=['x'], parameters=['a'],
                  prior_par={}, x=None, y=None, BT=1., PT=1.,
-                 representative={}, fit_par={}, root_value=None,
-                 from_string=None):
+                 root_value=None, from_string=None):
         # The variables and parameters
         self.variables = variables
         self.parameters = [p if p.startswith('_') and p.endswith('_')
                            else '_%s_' % p
                            for p in parameters]
-        self.par_values = dict([(p, 1.) for p in self.parameters])
+        self.par_values = deepcopy(dict([(p, 1.) for p in self.parameters]))
         # The root
         if root_value == None:
             self.root = Node(choice(self.variables+self.parameters),
@@ -137,10 +136,7 @@ class Tree():
         if from_string != None:
             self.build_from_string(from_string)
         # For fast fitting, we save past successful fits to this formula
-        if fit_par == None:
-            self.fit_par = {}
-        else:
-            self.fit_par = fit_par
+        self.fit_par = {}
         # Goodness of fit measures
         self.sse = self.get_sse()
         self.bic = self.get_bic()
@@ -148,12 +144,9 @@ class Tree():
         # To control formula degeneracy (i.e. different trees that
         # correspond to the same cannoninal formula), we store the
         # representative tree for each canonical formula
-        if representative == None:
-            self.representative = {}
-        else:
-            self.representative = representative
+        self.representative = {}
         self.representative[self.canonical()] = (
-            str(self), self.E, self.par_values
+            str(self), self.E, deepcopy(self.par_values)
         )
         # Done
         return
@@ -538,7 +531,7 @@ Node and new is a tuple [node_value, [list, of, offspring, values]]
             return np.inf
         xmat = [self.x[v.name] for v in variables]
         if fit:
-            if len(parameters) == 0: # Nothing to fit 
+            if len(parameters) == 0: # Nothing to fit
                 for p in self.parameters:
                     self.par_values[p] = 1.
             elif str(self) in self.fit_par: # Recover previously fit parameters
@@ -627,8 +620,8 @@ Node and new is a tuple [node_value, [list, of, offspring, values]]
         # Reset the value, if necessary
         if reset:
             self.EB = EB
-            self.ET = ET
-            self.E = EB + ET
+            self.EP = EP
+            self.E = EB + EP
         # Done
         return EB + EP, EB, EP
 
@@ -656,7 +649,7 @@ the representatitve and return -2.
             self.get_bic(reset=True, fit=True)
             new_energy = self.get_energy(bic=False)
             self.representative[canonical] = (str(self), new_energy,
-                                              self.par_values)
+                                              deepcopy(self.par_values))
             return 1
 
         # If we've seen this canonical before, check if the
@@ -664,18 +657,19 @@ the representatitve and return -2.
         if rep == str(self): # This IS the representative: return 0
             return 0
         else:
-            self.get_bic(reset=True, fit=True)
-            new_energy = self.get_energy(bic=False)
             # CAUTION: CHANGED TO NEVER UPDATE REPRESENTATIVE!!!!!!!!
             return -1
             # END OF CAUTION ZONE
+            self.get_bic(reset=True, fit=True)
+            new_energy = self.get_energy(bic=False)
             if (new_energy - rep_energy) < -1.e-6: # Update
                                                    # representative &
                                                    # return -2
                 print >> sys.stdout, 'Updating rep: ||', canonical, '||', rep, '||', str(self), '||', rep_energy, '||', new_energy
                 print >> sys.stderr, 'Updating rep: ||', canonical, '||',  rep, '||', str(self), '||', rep_energy, '||', new_energy
                 self.representative[canonical] = (str(self),
-                                                  new_energy, self.par_values)
+                                                  new_energy,
+                                                  deepcopy(self.par_values))
                 return -2
             else: # Not the representative: return -1
                 return -1
@@ -799,7 +793,7 @@ a tuple [node_value, [list, of, offspring, values]].
                     pass
                 self.bic, self.sse, self.E = old_bic, old_sse, old_energy
                 self.par_values = old_par_values
-                return np.inf, np.inf, np.inf, deepcopy(self.par_values)
+                return np.inf, np.inf, np.inf, None
             # leave the whole thing as it was before the back & fore
             target.value = old
             try:
@@ -855,9 +849,9 @@ a tuple [node_value, [list, of, offspring, values]].
             dEB = float(dEB)
             dEP = float(dEP)
             dE = dEB + dEP
+            return dE, dEB, dEP, par_valuesNew
         except:
-            dEB, dEP, dE = np.inf, np.inf, np.inf
-        return dE, dEB, dEP, par_valuesNew
+            return np.inf, np.inf, np.inf, None
 
         
     # -------------------------------------------------------------------------
@@ -1055,7 +1049,7 @@ a tuple [node_value, [list, of, offspring, values]].
                                           if n.value in self.parameters]))
                 self.n_dist_par = len(self.dist_par)
                 # update others
-                self.par_values = par_valuesNew
+                self.par_values = deepcopy(par_valuesNew)
                 self.get_bic(reset=True, fit=False)
                 self.E += dE
                 self.EB += dEB
@@ -1165,7 +1159,6 @@ a tuple [node_value, [list, of, offspring, values]].
         atomd = dict([(a.name, a) for a in ex.atoms() if a.is_Symbol])
         variables = [atomd[v] for v in self.variables if v in atomd.keys()]
         parameters = [atomd[p] for p in self.parameters if p in atomd.keys()]
-        print variables, parameters
         flam = lambdify(variables + parameters, ex, "numpy")
         # Prepare variables and parameters
         xmat = [x[v.name] for v in variables]

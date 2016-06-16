@@ -1,7 +1,9 @@
 from copy import deepcopy
-from random import random, randint
+from random import seed, random, randint
 from numpy import exp
 from mcmc import *
+
+#seed(11111)
 
 class Parallel():
     """ The Parallel class for parallel tempering. """
@@ -12,26 +14,29 @@ class Parallel():
         # All trees are initialized to the same tree but with different BT
         Ts.sort()
         self.trees = {1 : Tree(ops=ops,
-                               variables=variables,
-                               parameters=parameters,
-                               prior_par=prior_par, x=x, y=y,
+                               variables=deepcopy(variables),
+                               parameters=deepcopy(parameters),
+                               prior_par=deepcopy(prior_par), x=x, y=y,
                                BT=1)}
         self.t1 = self.trees[1]
         for BT in [T for T in Ts if T != 1]:
-            self.trees[BT] = Tree(ops=ops,
-                                  variables=variables,
-                                  parameters=parameters,
-                                  prior_par=prior_par, x=x, y=y,
-                                  root_value=self.t1.root.value,
-                                  BT=1)
-            self.trees[BT].BT = BT
+            treetmp = Tree(ops=ops,
+                           variables=deepcopy(variables),
+                           parameters=deepcopy(parameters),
+                           prior_par=deepcopy(prior_par), x=x, y=y,
+                           root_value=str(self.t1),
+                           BT=BT)
+            self.trees[BT] = treetmp
+            # Share fitted parameters and representative with other trees
+            self.trees[BT].fit_par = self.t1.fit_par
+            self.trees[BT].representative = self.t1.representative
         return
 
     # -------------------------------------------------------------------------
     def mcmc_step(self, verbose=False, p_rr=0.05, p_long=.45):
         """ Perform a MCMC step in each of the trees. """
         # Loop over all trees
-        for tree in self.trees.values():
+        for T, tree in self.trees.items():
             # MCMC step
             tree.mcmc_step(verbose=verbose, p_rr=p_rr, p_long=p_long)
         # Done
@@ -42,8 +47,10 @@ class Parallel():
         # Choose Ts to swap
         nT1 = randint(0, len(self.trees.keys())-2)
         nT2 = nT1 + 1
-        t1 = self.trees[self.trees.keys()[nT1]]
-        t2 = self.trees[self.trees.keys()[nT2]]
+        Ts = self.trees.keys()
+        Ts.sort()
+        t1 = self.trees[Ts[nT1]]
+        t2 = self.trees[Ts[nT2]]
         # The temperatures and energies
         BT1, BT2 = t1.BT, t2.BT
         EB1, EB2, EP1, EP2 = t1.EB, t2.EB, t1.EP, t2.EP
@@ -60,8 +67,9 @@ class Parallel():
             t1.BT = BT2
             t2.BT = BT1
             self.t1 = self.trees[1]
+            return BT1, BT2
         # Done
-        return
+        return None, None
 
 
 if __name__ == '__main__':
@@ -82,7 +90,7 @@ if __name__ == '__main__':
     data, x, y = iodata.read_data(
         'Trepat', ylabel=Y, xlabels=VARS, in_fname=inFileName,
     )
-    print x, y
+    #print x, y
 
     # Initialize the parallel object
     p = Parallel(
@@ -92,17 +100,27 @@ if __name__ == '__main__':
         x=x, y=y,
         prior_par=prior_par,
     )
-    pprint(p.trees)
 
-    for rep in range(1000000):
+    NREP = 100000
+    for rep in range(NREP):
         print '=' * 77
+        print rep, '/', NREP
         p.mcmc_step()
-        p.tree_swap()
+        print '>> Swaping:', p.tree_swap()
         pprint(p.trees)
         print '.' * 77
         for T in Ts:
-            print T, p.trees[T].E, p.trees[T].get_energy(reset=False)[0]
-        if p.trees[1].representative != p.trees[2].representative:
-            raise
-        if p.trees[1].fit_par != p.trees[2].fit_par:
-            raise
+            energy_ref = p.trees[T].get_energy(reset=False)[0]
+            print T, '\t',  \
+                p.trees[T].E, energy_ref, \
+                p.trees[T].bic
+            if abs(p.trees[T].E - energy_ref) > 1.e-6:
+                print p.trees[T].canonical(), p.trees[T].representative[p.trees[T].canonical()]
+                raise
+            if p.trees[T].representative != p.trees[1].representative:
+                pprint(p.trees[T].representative)
+                pprint(p.trees[1].representative)
+                raise
+            if p.trees[T].fit_par != p.trees[1].fit_par:
+                raise
+
