@@ -1,3 +1,4 @@
+import sys
 from copy import deepcopy
 from random import seed, random, randint
 from numpy import exp
@@ -60,8 +61,8 @@ class Parallel():
         ##DeltaF = F1/BT2 + F2/BT1 - (F1/BT1 + F2/BT2) 
         # Accept change
         if random() < exp(-DeltaE):
-            self.trees[BT1] = t2
-            self.trees[BT2] = t1
+            self.trees[Ts[nT1]] = t2
+            self.trees[Ts[nT2]] = t1
             t1.BT = BT2
             t2.BT = BT1
             self.t1 = self.trees[1]
@@ -69,6 +70,29 @@ class Parallel():
         # Done
         return None, None
 
+    # -------------------------------------------------------------------------
+    def anneal(self, n=10000, factor=5):
+        # Heat up
+        for t in self.trees.values():
+            t.BT *= factor
+        for kk in range(n):
+            print >> sys.stderr, '# Annealing heating at %g: %d / %d' % (
+                self.trees[1].BT, kk, n
+            )
+            self.mcmc_step()
+            self.tree_swap()
+        # Cool down
+        for t in self.trees.values():
+            t.BT /= factor
+        for kk in range(2*n):
+            print >> sys.stderr, '# Annealing cooling at %g: %d / %d' % (
+                self.trees[1].BT, kk, 2*n
+            )
+            self.mcmc_step()
+            self.tree_swap()
+        # Done
+        return
+        
 
 if __name__ == '__main__':
     sys.path.append('Validation/')
@@ -110,7 +134,7 @@ if __name__ == '__main__':
         prior_par=prior_par,
     )
 
-    NREP = 100000
+    NREP = 1000000
     for rep in range(NREP):
         print '=' * 77
         print rep, '/', NREP

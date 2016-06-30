@@ -89,24 +89,40 @@ if __name__ == '__main__':
     vprob = dict([(v, 0) for v in VARS])
     sizeprob = dict([(s, 0) for s in range(p.t1.max_size+1)])
     nparprob = dict([(n, 0) for n in range(npar+1)])
+    last_swap = dict([(T, 0) for T in Ts[:-1]])
+    max_inactive_swap = 0
     for i in range(NS):
+        # Output
         print >> sys.stdout, i+1
         print >> outf, ' || '.join(
             [str(tmp) for tmp in [i+1, p.t1.E, p.t1.get_energy()[0],
                                   p.t1.EB*2, p.t1.bic,
                                   p.t1.size, p.t1.canonical(),
-                                  p.t1, p.t1.par_values]]
+                                  p.t1, p.t1.par_values, max_inactive_swap]]
         )
         outf.flush()
+        # MCMC updates
         for kk in range(THIN):
             p.mcmc_step()
-            p.tree_swap()
+            BT1, BT2 = p.tree_swap()
+            for T in Ts:
+                if abs(p.trees[T].BT - T) > 1e-8:
+                    print p.trees[T].BT, T
+                    raise
+            if BT1 != None:
+                last_swap[BT1] = i
+        # Keep track of some stuff
         for v in VARS:
             if v in [n.value for n in p.t1.ets[0]]:
                 vprob[v] += 1
         nparprob[len(set([n.value for n in p.t1.ets[0]
                           if n.value in p.t1.parameters]))] += 1
         sizeprob[p.t1.size] += 1
+        # Anneal if the some configuration is stuck
+        max_inactive_swap = max([i-last_swap[T] for T in last_swap])
+        if max_inactive_swap > 1000:
+            p.anneal(n=1000, factor=5)
+            last_swap = dict([(T, i) for T in Ts[:-1]])
         
     # Report
     print >> outf, '\n# formula size' 
