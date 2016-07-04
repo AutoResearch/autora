@@ -81,9 +81,9 @@ class Parallel():
             )
             self.mcmc_step()
             self.tree_swap()
-        # Cool down
-        for t in self.trees.values():
-            t.BT /= factor
+        # Cool down (return to original temperatures)
+        for BT, t in self.trees.items():
+            t.BT = float(BT)
         for kk in range(2*n):
             print >> sys.stderr, '# Annealing cooling at %g: %d / %d' % (
                 self.trees[1].BT, kk, 2*n

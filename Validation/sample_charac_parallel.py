@@ -105,10 +105,6 @@ if __name__ == '__main__':
         for kk in range(THIN):
             p.mcmc_step()
             BT1, BT2 = p.tree_swap()
-            for T in Ts:
-                if abs(p.trees[T].BT - T) > 1e-8:
-                    print p.trees[T].BT, T
-                    raise
             if BT1 != None:
                 last_swap[BT1] = i
         # Keep track of some stuff
