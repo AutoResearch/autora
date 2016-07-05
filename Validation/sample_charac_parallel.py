@@ -20,11 +20,22 @@ def parse_options():
     parser = OptionParser(usage='usage: %prog [options] DATASET')
     parser.add_option("-p", "--priorpar", dest="pparfile", default=None,
                       help="Use priors from this file (default: no priors)")
+    parser.add_option("-n", "--nsample", dest="nsample", default=100000,
+                      type='int',
+                      help="Number of samples (default: 100000)")
+    parser.add_option("-t", "--thin", dest="thin", default=10,
+                      type='int',
+                      help="Thinning of the sample (default: 10)")
+    parser.add_option("-b", "--burnin", dest="burnin", default=1000,
+                      type='int',
+                      help="Burn-in (default: 1000)")
+    parser.add_option("-a", "--anneal", dest="anneal", default=1000,
+                      type='int',
+                      help="Annealing threshold. If there are no tree swaps for more than this number of steps, the parallel tempering is annealed (default: 100)")
+    parser.add_option("-f", "--annealf", dest="annealf", default=5,
+                      type='float',
+                      help="Annealing factor: all temperatures are multiplied by this factor during the heating phase of the annealing (default: 5)")
     return parser
-
-# -----------------------------------------------------------------------------
-NS = 1000000
-THIN = 1
 
 # -----------------------------------------------------------------------------
 if __name__ == '__main__':
@@ -82,8 +93,8 @@ if __name__ == '__main__':
     print >> outf, '# Parameters:', p.t1.parameters, '\n#'
 
     # Burnin
-    #for i in range(100):
-    #    p.mcmc_step()
+    for i in range(opt.burnin):
+        p.mcmc_step()
 
     # MCMC
     vprob = dict([(v, 0) for v in VARS])
@@ -91,7 +102,7 @@ if __name__ == '__main__':
     nparprob = dict([(n, 0) for n in range(npar+1)])
     last_swap = dict([(T, 0) for T in Ts[:-1]])
     max_inactive_swap = 0
-    for i in range(NS):
+    for i in range(opt.nsample):
         # Output
         print >> sys.stdout, i+1
         print >> outf, ' || '.join(
@@ -102,7 +113,7 @@ if __name__ == '__main__':
         )
         outf.flush()
         # MCMC updates
-        for kk in range(THIN):
+        for kk in range(opt.thin):
             p.mcmc_step()
             BT1, BT2 = p.tree_swap()
             if BT1 != None:
@@ -116,22 +127,22 @@ if __name__ == '__main__':
         sizeprob[p.t1.size] += 1
         # Anneal if the some configuration is stuck
         max_inactive_swap = max([i-last_swap[T] for T in last_swap])
-        if max_inactive_swap > 1000:
-            p.anneal(n=1000, factor=5)
+        if max_inactive_swap > opt.anneal:
+            p.anneal(n=opt.anneal*opt.thin, factor=opt.annealf)
             last_swap = dict([(T, i) for T in Ts[:-1]])
         
     # Report
     print >> outf, '\n# formula size' 
     for s in sizeprob:
-        print >> outf, s, sizeprob[s] / float(NS)
+        print >> outf, s, sizeprob[s] / float(opt.nsample)
 
     print >> outf, '\n# variable use' 
     for v in vprob:
-        print >> outf, v, vprob[v] / float(NS)
+        print >> outf, v, vprob[v] / float(opt.nsample)
 
     print >> outf, '\n# parameters' 
     for n in nparprob:
-        print >> outf, n, nparprob[n] / float(NS)
+        print >> outf, n, nparprob[n] / float(opt.nsample)
 
     # Done
     outf.close()
