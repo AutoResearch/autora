@@ -6,6 +6,7 @@ from sklearn import cross_validation
 
 sys.path.append('../')
 from mcmc import *
+from parallel import Parallel
 
 # -----------------------------------------------------------------------------
 def BIC_SA(x, y, variables, prior_par, npar=None, ns=1000, fn_label='data',
@@ -138,8 +139,9 @@ def post_SA(x, y, variables, prior_par, npar=None, ns=1000, fn_label='data',
 
 # -----------------------------------------------------------------------------
 def model_averaging_valid(x, y, variables, prior_par, npar=None,
-                          ns=100, thin=1000, fn_label='data',
-                          method='kfold', k=2):
+                          ns=100, thin=10, fn_label='data',
+                          method='kfold', k=2,
+                          parallel=True, par_anneal=200):
     """Validate model averaging using k-fold (method="kfold") or leave-k-out (method="lko").
 
     """
@@ -155,14 +157,27 @@ def model_averaging_valid(x, y, variables, prior_par, npar=None,
     for train_index, test_index in ttsplit:
         xtrain, xtest = x.iloc[train_index], x.iloc[test_index]
         ytrain, ytest = y.iloc[train_index], y.iloc[test_index]
-        t = Tree(
-            variables=variables,
-            parameters=['a%d' % i for i in range(npar)],
-            x=xtrain, y=ytrain,
-            prior_par=prior_par,
-            BT=1.0, PT=1.0,
-        )
-        ypred = t.trace_predict(xtest, samples=ns, thin=thin, write_files=False)
+        if parallel:
+            Ts = [1] + [1.20**i for i in range(1, 10)]
+            p = Parallel(
+                Ts,
+                variables=variables,
+                parameters=['a%d' % i for i in range(npar)],
+                x=xtrain, y=ytrain,
+                prior_par=prior_par,
+            )
+            ypred = p.trace_predict(xtest, samples=ns, thin=thin,
+                                    anneal=par_anneal)
+        else:
+            t = Tree(
+                variables=variables,
+                parameters=['a%d' % i for i in range(npar)],
+                x=xtrain, y=ytrain,
+                prior_par=prior_par,
+                BT=1.0, PT=1.0,
+            )
+            ypred = t.trace_predict(xtest, samples=ns, thin=thin,
+                                    write_files=False)
         ypredmean = ypred.mean(axis=1)
         ypredmedian = ypred.median(axis=1)
 

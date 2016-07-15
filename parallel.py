@@ -71,7 +71,7 @@ class Parallel():
         return None, None
 
     # -------------------------------------------------------------------------
-    def anneal(self, n=10000, factor=5):
+    def anneal(self, n=1000, factor=5):
         # Heat up
         for t in self.trees.values():
             t.BT *= factor
@@ -92,7 +92,52 @@ class Parallel():
             self.tree_swap()
         # Done
         return
-        
+
+    # -------------------------------------------------------------------------
+    def trace_predict(self, x,
+                      burnin=5000, thin=100, samples=10000,
+                      anneal=100, annealf=5, verbose=True):
+        # Burnin
+        if verbose:
+            sys.stdout.write('# Burning in\t')
+            sys.stdout.write('[%s]' % (' ' * 50))
+            sys.stdout.flush()
+            sys.stdout.write('\b' * (50+1))
+        for i in range(burnin):
+            self.mcmc_step()
+            if verbose and (i % (burnin / 50) == 0):
+                sys.stdout.write('=')
+                sys.stdout.flush()
+        # MCMC
+        if verbose:
+            sys.stdout.write('\n# Sampling\t')
+            sys.stdout.write('[%s]' % (' ' * 50))
+            sys.stdout.flush()
+            sys.stdout.write('\b' * (50+1))
+        ypred = {}
+        last_swap = dict([(T, 0) for T in self.trees.keys()[:-1]])
+        max_inactive_swap = 0
+        for s in range(samples):
+            # MCMC updates
+            for kk in range(thin):
+                self.mcmc_step()
+                BT1, BT2 = self.tree_swap()
+                if BT1 != None:
+                    last_swap[BT1] = s
+            # Predict for this sample
+            ypred[s] = self.trees[1].predict(x)
+            if verbose:
+                print s, float(ypred[s]), self.trees[1].bic, self.trees[1]
+            # Anneal if the some configuration is stuck
+            max_inactive_swap = max([s-last_swap[T] for T in last_swap])
+            if max_inactive_swap > anneal:
+                self.anneal(n=anneal*thin, factor=annealf)
+                last_swap = dict([(T, s) for T in self.trees.keys()[:-1]])
+
+        # Done
+        return pd.DataFrame.from_dict(ypred)
+
+
 
 if __name__ == '__main__':
     sys.path.append('Validation/')

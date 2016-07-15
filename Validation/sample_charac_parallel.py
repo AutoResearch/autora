@@ -29,7 +29,7 @@ def parse_options():
     parser.add_option("-b", "--burnin", dest="burnin", default=1000,
                       type='int',
                       help="Burn-in (default: 1000)")
-    parser.add_option("-a", "--anneal", dest="anneal", default=1000,
+    parser.add_option("-a", "--anneal", dest="anneal", default=100,
                       type='int',
                       help="Annealing threshold. If there are no tree swaps for more than this number of steps, the parallel tempering is annealed (default: 100)")
     parser.add_option("-f", "--annealf", dest="annealf", default=5,
