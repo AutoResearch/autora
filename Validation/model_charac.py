@@ -88,7 +88,7 @@ if __name__ == '__main__':
 
     if opt.pparfile:
         print 'Prior c: ', t.prior_par
-    print '-log(F): ', t.get_energy()
+    print '-log(F): ', t.get_energy(bic=False, reset=False)
 
     if opt.loo:
         print 'LOO-RMSE:', np.sqrt(np.mean(serr))
