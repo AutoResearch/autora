@@ -143,7 +143,8 @@ def model_averaging_valid(x, y, variables, prior_par, npar=None,
                           ns=100, thin=10, fn_label='data',
                           method='kfold', k=2,
                           burnin=5000,
-                          parallel=True, par_anneal=100, par_annealf=5.):
+                          parallel=True, par_anneal=100, par_annealf=5.,
+                          progressfn='progress.dat'):
     """Validate model averaging using k-fold (method="kfold") or leave-k-out (method="lko").
 
     """
@@ -168,9 +169,12 @@ def model_averaging_valid(x, y, variables, prior_par, npar=None,
                 x=xtrain, y=ytrain,
                 prior_par=prior_par,
             )
-            ypred = p.trace_predict(xtest, samples=ns, thin=thin,
-                                    burnin=burnin,
-                                    anneal=par_anneal, annealf=par_annealf)
+            ypred = p.trace_predict(
+                xtest, samples=ns, thin=thin,
+                burnin=burnin,
+                anneal=par_anneal, annealf=par_annealf,
+                progressfn=progressfn, reset_files=False,
+            )
         else:
             t = Tree(
                 variables=variables,
