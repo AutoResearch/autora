@@ -22,7 +22,7 @@ VARS = [
     'ZO1',
 ]
 Y = 'Sxx'
-NS = 100
+NS = 1000
 
 if __name__ == '__main__':
     # Read the data
@@ -40,7 +40,8 @@ if __name__ == '__main__':
     npar = priorFileName[priorFileName.find('.np') + 3:]
     npar = int(npar[:npar.find('.')])
     print 'NPAR =', npar
-    mse, mae = model_averaging_valid(x, y, VARS, prior_par, npar=npar, ns=NS,
+    mse, mae = model_averaging_valid(x, y, VARS, prior_par, npar=npar,
+                                     ns=NS, thin=100,
                                      method='lko', k=1)
     print 'RMSE:', np.sqrt(np.mean(mse)), mse
     print 'MAE: ', np.mean(mae), mae
