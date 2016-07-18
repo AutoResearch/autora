@@ -1,4 +1,5 @@
 import sys
+import numpy as np
 from copy import deepcopy
 from random import seed, random, randint
 from numpy import exp
@@ -12,19 +13,20 @@ class Parallel():
                  prior_par={}, x=None, y=None):
         # All trees are initialized to the same tree but with different BT
         Ts.sort()
-        self.trees = {1 : Tree(ops=ops,
-                               variables=deepcopy(variables),
-                               parameters=deepcopy(parameters),
-                               prior_par=deepcopy(prior_par), x=x, y=y,
-                               BT=1)}
-        self.t1 = self.trees[1]
-        for BT in [T for T in Ts if T != 1]:
+        self.Ts = [str(T) for T in Ts]
+        self.trees = {'1' : Tree(ops=ops,
+                                 variables=deepcopy(variables),
+                                 parameters=deepcopy(parameters),
+                                 prior_par=deepcopy(prior_par), x=x, y=y,
+                                 BT=1)}
+        self.t1 = self.trees['1']
+        for BT in [T for T in self.Ts if T != 1]:
             treetmp = Tree(ops=ops,
                            variables=deepcopy(variables),
                            parameters=deepcopy(parameters),
                            prior_par=deepcopy(prior_par), x=x, y=y,
                            root_value=str(self.t1),
-                           BT=BT)
+                           BT=float(BT))
             self.trees[BT] = treetmp
             # Share fitted parameters and representative with other trees
             self.trees[BT].fit_par = self.t1.fit_par
@@ -44,31 +46,25 @@ class Parallel():
     # -------------------------------------------------------------------------
     def tree_swap(self):
         # Choose Ts to swap
-        nT1 = randint(0, len(self.trees.keys())-2)
+        nT1 = randint(0, len(self.Ts)-2)
         nT2 = nT1 + 1
-        Ts = self.trees.keys()
-        Ts.sort()
-        t1 = self.trees[Ts[nT1]]
-        t2 = self.trees[Ts[nT2]]
+        t1 = self.trees[self.Ts[nT1]]
+        t2 = self.trees[self.Ts[nT2]]
         # The temperatures and energies
         BT1, BT2 = t1.BT, t2.BT
         EB1, EB2, EP1, EP2 = t1.EB, t2.EB, t1.EP, t2.EP
         # The energy change
         DeltaE = EB1/BT2 + EB2/BT1 - (EB1/BT1 + EB2/BT2) 
-        ## Option with log prior = entropy
-        ##F1 = E1 - BT1*EP1 (change sign of last term if log prior = - entropy)
-        ##F2 = E2 - BT2*EP2
-        ##DeltaF = F1/BT2 + F2/BT1 - (F1/BT1 + F2/BT2) 
-        # Accept change
+        # Accept/reject change
         if random() < exp(-DeltaE):
-            self.trees[Ts[nT1]] = t2
-            self.trees[Ts[nT2]] = t1
+            self.trees[self.Ts[nT1]] = t2
+            self.trees[self.Ts[nT2]] = t1
             t1.BT = BT2
             t2.BT = BT1
-            self.t1 = self.trees[1]
-            return BT1, BT2
-        # Done
-        return None, None
+            self.t1 = self.trees['1']
+            return self.Ts[nT1], self.Ts[nT2]
+        else:
+            return None, None
 
     # -------------------------------------------------------------------------
     def anneal(self, n=1000, factor=5):
@@ -77,7 +73,7 @@ class Parallel():
             t.BT *= factor
         for kk in range(n):
             print >> sys.stderr, '# Annealing heating at %g: %d / %d' % (
-                self.trees[1].BT, kk, n
+                self.trees['1'].BT, kk, n
             )
             self.mcmc_step()
             self.tree_swap()
@@ -86,7 +82,7 @@ class Parallel():
             t.BT = float(BT)
         for kk in range(2*n):
             print >> sys.stderr, '# Annealing cooling at %g: %d / %d' % (
-                self.trees[1].BT, kk, 2*n
+                self.trees['1'].BT, kk, 2*n
             )
             self.mcmc_step()
             self.tree_swap()
@@ -96,7 +92,9 @@ class Parallel():
     # -------------------------------------------------------------------------
     def trace_predict(self, x,
                       burnin=5000, thin=100, samples=10000,
-                      anneal=100, annealf=5, verbose=True):
+                      anneal=100, annealf=5, verbose=True,
+                      write_files=True,
+                      progressfn='progress.dat',reset_files=True):
         # Burnin
         if verbose:
             sys.stdout.write('# Burning in\t')
@@ -109,36 +107,62 @@ class Parallel():
                 sys.stdout.write('=')
                 sys.stdout.flush()
         # MCMC
+        if write_files:
+            if reset_files:
+                progressf = open(progressfn, 'w')
+            else:
+                progressf = open(progressfn, 'a')
         if verbose:
             sys.stdout.write('\n# Sampling\t')
             sys.stdout.write('[%s]' % (' ' * 50))
             sys.stdout.flush()
             sys.stdout.write('\b' * (50+1))
         ypred = {}
-        last_swap = dict([(T, 0) for T in self.trees.keys()[:-1]])
+        last_swap = dict([(T, 0) for T in self.Ts[:-1]])
         max_inactive_swap = 0
         for s in range(samples):
             # MCMC updates
-            for kk in range(thin):
-                self.mcmc_step()
-                BT1, BT2 = self.tree_swap()
-                if BT1 != None:
-                    last_swap[BT1] = s
-            # Predict for this sample
-            ypred[s] = self.trees[1].predict(x)
-            if verbose:
-                print s, float(ypred[s]), self.trees[1].bic, self.trees[1]
+            ready = False
+            while not ready:
+                for kk in range(thin):
+                    self.mcmc_step()
+                    BT1, BT2 = self.tree_swap()
+                    if BT1 != None:
+                        last_swap[BT1] = s
+                # Predict for this sample (prediction must be finite;
+                # otherwise, repeat
+                ypred[s] = self.trees['1'].predict(x)
+                ready = True not in np.isnan(np.array(ypred[s])) and \
+                        True not in np.isinf(np.array(ypred[s]))
+            # Output
+            if verbose and (s % (samples / 50) == 0):
+                sys.stdout.write('=')
+                sys.stdout.flush()
+            if write_files:
+                progressf.write('%s %d %s %lf %lf %d %s\n' % (
+                    list(x.index), s, str(list(ypred[s])),
+                    self.trees['1'].E, self.trees['1'].bic,
+                    max_inactive_swap,
+                    self.trees['1'],
+                ))
+                progressf.flush()
             # Anneal if the some configuration is stuck
             max_inactive_swap = max([s-last_swap[T] for T in last_swap])
             if max_inactive_swap > anneal:
                 self.anneal(n=anneal*thin, factor=annealf)
-                last_swap = dict([(T, s) for T in self.trees.keys()[:-1]])
+                last_swap = dict([(T, s) for T in self.Ts[:-1]])
 
         # Done
+        if verbose:
+            sys.stdout.write('\n')
+            sys.stdout.flush()
         return pd.DataFrame.from_dict(ypred)
 
-
-
+# -----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
+# Test main
+# -----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 if __name__ == '__main__':
     sys.path.append('Validation/')
     import iodata
@@ -195,10 +219,10 @@ if __name__ == '__main__':
             if abs(p.trees[T].E - energy_ref) > 1.e-6:
                 print p.trees[T].canonical(), p.trees[T].representative[p.trees[T].canonical()]
                 raise
-            if p.trees[T].representative != p.trees[1].representative:
+            if p.trees[T].representative != p.trees['1'].representative:
                 pprint(p.trees[T].representative)
-                pprint(p.trees[1].representative)
+                pprint(p.trees['1'].representative)
                 raise
-            if p.trees[T].fit_par != p.trees[1].fit_par:
+            if p.trees[T].fit_par != p.trees['1'].fit_par:
                 raise
 

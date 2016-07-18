@@ -1,5 +1,6 @@
 import sys
 import os
+import numpy as np
 import pandas as pd
 from copy import deepcopy
 from sklearn import cross_validation
@@ -141,7 +142,8 @@ def post_SA(x, y, variables, prior_par, npar=None, ns=1000, fn_label='data',
 def model_averaging_valid(x, y, variables, prior_par, npar=None,
                           ns=100, thin=10, fn_label='data',
                           method='kfold', k=2,
-                          parallel=True, par_anneal=200):
+                          burnin=5000,
+                          parallel=True, par_anneal=100, par_annealf=5.):
     """Validate model averaging using k-fold (method="kfold") or leave-k-out (method="lko").
 
     """
@@ -167,7 +169,8 @@ def model_averaging_valid(x, y, variables, prior_par, npar=None,
                 prior_par=prior_par,
             )
             ypred = p.trace_predict(xtest, samples=ns, thin=thin,
-                                    anneal=par_anneal)
+                                    burnin=burnin,
+                                    anneal=par_anneal, annealf=par_annealf)
         else:
             t = Tree(
                 variables=variables,
@@ -178,6 +181,7 @@ def model_averaging_valid(x, y, variables, prior_par, npar=None,
             )
             ypred = t.trace_predict(xtest, samples=ns, thin=thin,
                                     write_files=False)
+
         ypredmean = ypred.mean(axis=1)
         ypredmedian = ypred.median(axis=1)
 

@@ -1165,7 +1165,8 @@ a tuple [node_value, [list, of, offspring, values]].
         params = [self.par_values[p.name] for p in parameters]
         args = [xi for xi in xmat] + [p for p in params]
         # Predict
-        return flam(*args)
+        prediction = flam(*args)
+        return pd.Series(prediction, index=list(x.index))
 
     # -------------------------------------------------------------------------
     def trace_predict(

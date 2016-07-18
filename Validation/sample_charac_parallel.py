@@ -100,7 +100,7 @@ if __name__ == '__main__':
     vprob = dict([(v, 0) for v in VARS])
     sizeprob = dict([(s, 0) for s in range(p.t1.max_size+1)])
     nparprob = dict([(n, 0) for n in range(npar+1)])
-    last_swap = dict([(T, 0) for T in Ts[:-1]])
+    last_swap = dict([(T, 0) for T in p.Ts[:-1]])
     max_inactive_swap = 0
     for i in range(opt.nsample):
         # Output
@@ -129,7 +129,7 @@ if __name__ == '__main__':
         max_inactive_swap = max([i-last_swap[T] for T in last_swap])
         if max_inactive_swap > opt.anneal:
             p.anneal(n=opt.anneal*opt.thin, factor=opt.annealf)
-            last_swap = dict([(T, i) for T in Ts[:-1]])
+            last_swap = dict([(T, i) for T in p.Ts[:-1]])
         
     # Report
     print >> outf, '\n# formula size' 
