@@ -94,7 +94,7 @@ class Parallel():
                       burnin=5000, thin=100, samples=10000,
                       anneal=100, annealf=5, verbose=True,
                       write_files=True,
-                      progressfn='progress.dat',reset_files=True):
+                      progressfn='progress.dat', reset_files=True):
         # Burnin
         if verbose:
             sys.stdout.write('# Burning in\t')
