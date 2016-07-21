@@ -79,7 +79,7 @@ if __name__ == '__main__':
     print '-' * 80
     print 'Dataset: ', dset
     print 'Model:   ', t
-    print 'LaTeX:   ', latex(sympify(str(t).replace('_a', 'a')))
+    print 'LaTeX:   ', latex(sympify(t.canonical()))
     print 'Param:   ', t.par_values
 
     print 'SSE:     ', sse
