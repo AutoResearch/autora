@@ -76,7 +76,7 @@ if __name__ == '__main__':
         par_annealf=opt.annealf,
         method='lko', k=1,
         start_end=start_end,
-        progressfn='%s/model_averaging_progress__%s.dat' % (
+        progressfn='%s/model_averaging_progress__%s' % (
             dset, opt.pparfile.split('/')[-1]
         )
     )
