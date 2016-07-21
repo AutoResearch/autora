@@ -33,9 +33,9 @@ def parse_options():
     parser.add_option("-f", "--annealf", dest="annealf", default=5,
                       type='float',
                       help="Annealing factor: all temperatures are multiplied by this factor during the heating phase of the annealing (default: 5)")
-    parser.add_option("-k", "--kth", dest="kth", default=-1,
+    parser.add_option("-k", "--kth", dest="kth", default=0,
                       type='int',
-                      help="Don't do the whole cross-validation, but only the kth fold or leave-one-out point (default: -1=do all folds)")
+                      help="Don't do the whole cross-validation, but only the kth fold or leave-one-out point (default: 0=do all folds)")
     return parser
 
 if __name__ == '__main__':
@@ -58,10 +58,10 @@ if __name__ == '__main__':
     print prior_par
     
     # Start/end of the cross-validation
-    if opt.kth < 0:
+    if opt.kth < 1:
         start_end = (0, len(y))
     else:
-        start_end = (opt.kth, opt.kth+1)
+        start_end = (opt.kth-1, opt.kth)
 
     # Model averaging
     npar = opt.pparfile[opt.pparfile.find('.np') + 3:]
