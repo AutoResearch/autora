@@ -143,6 +143,7 @@ def model_averaging_valid(x, y, variables, prior_par, npar=None,
                           ns=100, thin=10, fn_label='data',
                           method='kfold', k=2,
                           burnin=5000,
+                          start_end=None,
                           parallel=True, par_anneal=100, par_annealf=5.,
                           progressfn='progress.dat'):
     """Validate model averaging using k-fold (method="kfold") or leave-k-out (method="lko").
@@ -156,8 +157,13 @@ def model_averaging_valid(x, y, variables, prior_par, npar=None,
         raise ValueError
     if npar == None:
         npar = 2*len(variables)
+    try:
+        start, end = start_end
+    except:
+        start, end = 0, len(ttsplit)
+
     mse, mae = [], []
-    for train_index, test_index in ttsplit:
+    for train_index, test_index in [tt for tt in ttsplit][start: end]:
         xtrain, xtest = x.iloc[train_index], x.iloc[test_index]
         ytrain, ytest = y.iloc[train_index], y.iloc[test_index]
         if parallel:
