@@ -2,6 +2,13 @@ import sys
 import pandas as pd
 
 XVARS = {
+    'RDFunding' : [
+        'Attractiveness',
+        'Stickiness',
+        'GDP',
+        'GDP.RD',
+        'GDP.PP',
+    ],
     'Trepat' : [
         'CDH1',
         'CDH2',
@@ -49,13 +56,15 @@ XVARS = {
     ]
 }
 YLABS = {
-    'Trepat' : 'Sxx',
-    'Ye'     : 'rec',
+    'RDFunding'    : 'Financial.SuccessRate',
+    'Trepat'       : 'Sxx',
+    'Ye'           : 'rec',
     'Hydrogenation':'Barrier',
 }
 FNAMES = {
-    'Trepat' : 'cadhesome_protein.csv',
-    'Ye'     : 'seymour.csv',
+    'RDFunding'    : 'EU_nature_clean.csv',
+    'Trepat'       : 'cadhesome_protein.csv',
+    'Ye'           : 'seymour.csv',
     'Hydrogenation':'H_features.csv',
 }
 
@@ -68,7 +77,10 @@ def read_data(dset, ylabel=None, xlabels=None, in_fname=None):
     if in_fname == None:
         in_fname = '%s/data/%s' % (dset, FNAMES[dset])
     # Read 
-    if dset == 'Trepat' or dset == 'Ye' or dset=='Hydrogenation':
+    if (dset == 'RDFunding' or
+        dset == 'Trepat' or
+        dset == 'Ye' or
+        dset=='Hydrogenation'):
         data = pd.read_csv(in_fname)
         x = data[xlabels]
         y = data[ylabel]
@@ -77,3 +89,10 @@ def read_data(dset, ylabel=None, xlabels=None, in_fname=None):
 
     # Done
     return data, x, y
+
+# Test main
+if __name__ == '__main__':
+    data, x, y = read_data(sys.argv[1])
+    print data
+    print x
+    print y
