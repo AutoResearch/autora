@@ -95,6 +95,7 @@ if __name__ == '__main__':
     # Burnin
     for i in range(opt.burnin):
         p.mcmc_step()
+        BT1, BT2 = p.tree_swap()
 
     # MCMC
     vprob = dict([(v, 0) for v in VARS])

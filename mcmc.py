@@ -1136,7 +1136,7 @@ a tuple [node_value, [list, of, offspring, values]].
                 sys.stdout.flush()
             if write_files:
                 json.dump([s, float(self.bic), float(self.E),
-                           float(self.get_energy()),
+                           str(self.get_energy()),
                            str(self), self.par_values], tracef)
                 tracef.write('\n')
                 tracef.flush()

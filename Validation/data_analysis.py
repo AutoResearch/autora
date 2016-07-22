@@ -50,7 +50,7 @@ def BIC_SA(x, y, variables, prior_par, npar=None, ns=1000, fn_label='data',
 
 
 # -----------------------------------------------------------------------------
-def post_SA(x, y, variables, prior_par, npar=None, ns=1000, fn_label='data',
+def post_SA(x, y, variables, prior_par, npar=None, ns=1000,
            T_ini=5., T_fin=0.001, T_sched=0.95):
     """Find the formula with the largest posterior (lowest energy) using simulated annealing.
     
@@ -64,75 +64,32 @@ def post_SA(x, y, variables, prior_par, npar=None, ns=1000, fn_label='data',
         x=x, y=y,
         prior_par=prior_par,
         BT=T_ini,
-        PT=1.,
+        PT=min(T_ini, 1.),
     )
-    progressFileName = 'postsa_%s_progress.dat' % fn_label
-    traceFileName = 'postsa_%s_trace.dat' % fn_label
-    try:
-        os.remove(progressFileName)
-    except OSError:
-        pass
-    try:
-        os.remove(traceFileName)
-    except OSError:
-        pass
-    # Thermalize the system to PT=BT=1
+
+    # Anneal
     curT = T_ini
-    minE, minF = np.inf, None
-    while curT > 1.:
-        # Print the "true" (T=1) energy 
-        t.BT = 1.
-        t.get_bic(reset=True, fit=False)
-        t.get_energy(bic=False, reset=True)
-        print curT, t.E, minE
-        # Keep track of the best energy so far
-        if t.E < minE:
-            minE = deepcopy(t.E)
-            minF = deepcopy(t)
-        # Reset T and MCMC
-        t.BT = curT
-        t.get_bic(reset=True, fit=False)
-        t.get_energy(bic=False, reset=True)
-        t.mcmc(burnin=1, thin=1, samples=ns,
-               tracefn=traceFileName, progressfn=progressFileName,
-               reset_files=False,
-               degcorrect=False,
-               verbose=False)
-        if t.E < minE:
-            minE = t.E
-            minF = deepcopy(t)
-        curT *= T_sched
-    # Continue lowering PT=BT until T_fin
+    minE, minF = t.E, deepcopy(t)
     reachedMin = False
-    curT = 1.
     while not reachedMin:
         while t.BT > T_fin:
-            # Print the "true" (T=1) energy 
-            t.BT = t.PT = 1.
-            t.get_bic(reset=True, fit=False)
-            t.get_energy(bic=False, reset=True)
-            print curT, t.E, minE
-            # Keep track of the best energy so far
-            if t.E < minE:
-                minE = deepcopy(t.E)
-                minF = deepcopy(t)
-            # Reset T and MCMC
-            t.BT = t.PT = curT
-            t.get_bic(reset=True, fit=False)
-            t.get_energy(bic=False, reset=True)
-            t.mcmc(burnin=1, thin=1, samples=ns,
-                   tracefn=traceFileName, progressfn=progressFileName,
-                   reset_files=False,
-                   degcorrect=False,
-                   verbose=False)
+            # Print the energy 
+            print t.BT, t.E, t.bic, t.canonical(), \
+                minF.E, minF.bic, minF.canonical(), t.PT
+            # MCMC steps at curT
+            for s in range(ns):
+                t.mcmc_step(verbose=False)
+                if t.E < minE:
+                    minE = deepcopy(t.E)
+                    minF = deepcopy(t)
+            # Cool down
             curT *= T_sched
+            t.BT = curT
+            t.PT = min(curT, 1.)
         # Check if we missed the best visited formula
-        t.BT = t.PT = 1.
-        t.get_bic(reset=True, fit=False)
-        t.get_energy(bic=False, reset=True)
         if t.E > minE:
             t = deepcopy(minF)
-            curT = .2
+            curT = t.BT = t.PT = .2
         else:
             reachedMin = True
     # Done
