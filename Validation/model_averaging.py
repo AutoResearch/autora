@@ -4,11 +4,19 @@ import pandas as pd
 from optparse import OptionParser
 
 sys.path.append('../Prior')
-from fit_prior import read_prior_par
+#from fit_prior import read_prior_par
 sys.path.append('./')
 from data_analysis import model_averaging_valid
 
 import iodata
+
+# -----------------------------------------------------------------------------
+def read_prior_par(inFileName):
+    with open(inFileName) as inf:
+        lines = inf.readlines()
+    ppar = dict(zip(lines[0].strip().split()[1:],
+                    [float(x) for x in lines[-1].strip().split()[1:]]))
+    return ppar
 
 # -----------------------------------------------------------------------------
 def parse_options():
@@ -60,8 +68,14 @@ if __name__ == '__main__':
     # Start/end of the cross-validation
     if opt.kth < 1:
         start_end = (0, len(y))
+        progressfn = '%s/model_averaging_progress__%s' % (
+            dset, opt.pparfile.split('/')[-1]
+        )
     else:
         start_end = (opt.kth-1, opt.kth)
+        progressfn = '%s/model_averaging_progress__%04d__%s' % (
+            dset, opt.kth, opt.pparfile.split('/')[-1]
+        )
 
     # Model averaging
     npar = opt.pparfile[opt.pparfile.find('.np') + 3:]
@@ -76,9 +90,7 @@ if __name__ == '__main__':
         par_annealf=opt.annealf,
         method='lko', k=1,
         start_end=start_end,
-        progressfn='%s/model_averaging_progress__%s' % (
-            dset, opt.pparfile.split('/')[-1]
-        )
+        progressfn=progressfn,
     )
     print 'RMSE:', np.sqrt(np.mean(mse)), mse
     print 'MAE: ', np.mean(mae), mae
