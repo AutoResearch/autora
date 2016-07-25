@@ -1,4 +1,4 @@
-Country,Attractiveness,Stickiness,Success.Rate,GDP,GDP.RD,GDP.PP,Financial.SuccessRate,TotalFundingIncoming.Millions
+Country,Attractiveness,Stickiness,SuccessRate,GDP,GDPRD,GDPPP,FinancialSuccessRate,TotalFundingIncomingMillions
 AT,0.2325103734,0.0836521739,0.0636182903,329295.6,2.99,36000,0.223,1167.46
 BE,0.054813278,0.2252173913,0.1210490921,400643,2.46,33800,0.263,1774.48
 CY,0.0921576763,0.0668173913,0.0421052632,17393.7,0.47,20100,0.15,92.37

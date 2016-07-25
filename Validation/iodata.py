@@ -6,8 +6,8 @@ XVARS = {
         'Attractiveness',
         'Stickiness',
         'GDP',
-        'GDP.RD',
-        'GDP.PP',
+        'GDPRD',
+        'GDPPP',
     ],
     'Trepat' : [
         'CDH1',
@@ -56,7 +56,7 @@ XVARS = {
     ]
 }
 YLABS = {
-    'RDFunding'    : 'Financial.SuccessRate',
+    'RDFunding'    : 'FinancialSuccessRate',
     'Trepat'       : 'Sxx',
     'Ye'           : 'rec',
     'Hydrogenation':'Barrier',
