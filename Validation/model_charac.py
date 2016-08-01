@@ -87,7 +87,7 @@ if __name__ == '__main__':
     print 'BIC:     ', bic
 
     if opt.pparfile:
-        print 'Prior c: ', t.prior_par
+        print 'Prior_c: ', t.prior_par
     print '-log(F): ', t.get_energy(bic=False, reset=False)
 
     if opt.loo:
