@@ -1,6 +1,7 @@
 import sys
 import numpy as np
 import matplotlib.pyplot as plt
+import seaborn as sns
 from optparse import OptionParser
 from pandas import DataFrame
 from random import random, choice
@@ -24,6 +25,10 @@ def parse_options():
     parser.add_option(
         "-n", "--nvar", dest="nvar", type="int", default=-1,
         help="number of varaibles (default specied by PRIOR_PAR_FILENAME)",
+    )
+    parser.add_option(
+        "-t", "--thin", dest="thin", type="int", default=20,
+        help="thining of the sample (default: 20)",
     )
     parser.add_option(
         "-m", "--npar", dest="npar", type="int", default=-1,
@@ -88,7 +93,7 @@ if __name__ == '__main__':
 
         # Sample the formulas and compute the features
         for n in range(nform):
-            for t in range(20): # thinning
+            for t in range(opt.thin): # thinning
                 tree.mcmc_step()
             for o, nopi in tree.nops.items():
                 term_count['Nopi_%s' % o][rep] += nopi
@@ -99,7 +104,10 @@ if __name__ == '__main__':
         print >> sys.stderr, rep+1, tree.size, tree
                 
     # Plot the distributions
+    sns.set_style("whitegrid")
+
     df = DataFrame.from_dict(term_count)
+    print df
     fig = df.hist(color='k', alpha=0.5, bins=30, figsize=(30, 20))
     for row in fig:
         for panel in row:
@@ -122,4 +130,21 @@ if __name__ == '__main__':
         opt.nvar,
         opt.npar,
     )
+    plt.savefig(plotFileName)
+    plt.close()
+
+    df2dict = {'value' : [], 'prop': [], 'dummy': []}
+    for prop in term_count[:3]:
+        for v in term_count[prop]:
+            df2dict['value'].append(v)
+            df2dict['prop'].append(prop) 
+            df2dict['dummy'].append(1) 
+    plotFileName = '%s___%s.nv%d.np%d___violin.pdf' % (
+        pparFileName,
+        opt.source,
+        opt.nvar,
+        opt.npar,
+    )
+    sns.violinplot(x='prop', y='value', data=DataFrame(df2dict),
+                   split=True, inner='stick')
     plt.savefig(plotFileName)
