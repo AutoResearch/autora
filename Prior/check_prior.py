@@ -133,18 +133,10 @@ if __name__ == '__main__':
     plt.savefig(plotFileName)
     plt.close()
 
-    df2dict = {'value' : [], 'prop': [], 'dummy': []}
-    for prop in term_count[:3]:
-        for v in term_count[prop]:
-            df2dict['value'].append(v)
-            df2dict['prop'].append(prop) 
-            df2dict['dummy'].append(1) 
-    plotFileName = '%s___%s.nv%d.np%d___violin.pdf' % (
+    csvFileName = '%s___%s.nv%d.np%d.csv' % (
         pparFileName,
         opt.source,
         opt.nvar,
         opt.npar,
     )
-    sns.violinplot(x='prop', y='value', data=DataFrame(df2dict),
-                   split=True, inner='stick')
-    plt.savefig(plotFileName)
+    df.to_csv(csvFileName)
