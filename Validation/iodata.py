@@ -2,6 +2,10 @@ import sys
 import pandas as pd
 
 XVARS = {
+    'RoughPipes' : [
+        'LogRe',
+        'Drratio',
+    ],
     'RDFunding' : [
         'Attractiveness',
         'Stickiness',
@@ -56,12 +60,14 @@ XVARS = {
     ]
 }
 YLABS = {
+    'RoughPipes'   : 'logf',
     'RDFunding'    : 'FinancialSuccessRate',
     'Trepat'       : 'Sxx',
     'Ye'           : 'rec',
     'Hydrogenation':'Barrier',
 }
 FNAMES = {
+    'RoughPipes'   : 'nikuradze.csv',
     'RDFunding'    : 'EU_nature_clean.csv',
     'Trepat'       : 'cadhesome_protein.csv',
     'Ye'           : 'seymour.csv',
@@ -78,6 +84,7 @@ def read_data(dset, ylabel=None, xlabels=None, in_fname=None):
         in_fname = '%s/data/%s' % (dset, FNAMES[dset])
     # Read 
     if (dset == 'RDFunding' or
+        dset == 'RoughPipes' or
         dset == 'Trepat' or
         dset == 'Ye' or
         dset=='Hydrogenation'):
