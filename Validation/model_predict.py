@@ -1,6 +1,7 @@
 import sys
 import ast
 import numpy as np
+from datetime import datetime
 from scipy.stats import sem
 from sklearn import cross_validation
 from sympy import sympify, latex
@@ -47,8 +48,12 @@ if __name__ == '__main__':
     else:
         t.get_sse(fit=True)
 
-    # Make the prediction
+    # Write output
+    outfname = '%s/model_predict__%s.csv' % (dset, datetime.now())
+    with open(outfname, 'w') as outf:
+        print >> outf, '#', t
+        print >> outf, '#', t.par_values
     ypred = t.predict(x)
     x['yreal'] = y
     x['ypred'] = ypred
-    x.to_csv('%s/model_predict.csv' % dset)
+    x.to_csv(outfname, mode='a')
