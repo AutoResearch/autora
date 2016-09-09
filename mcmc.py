@@ -180,6 +180,10 @@ class Tree():
         return can.replace(' ', '')
     
     # -------------------------------------------------------------------------
+    def latex(self):
+        return latex(sympify(self.canonical()))
+    
+    # -------------------------------------------------------------------------
     def __parse_recursive(self, string, variables=None, parameters=None,
                           vpreturn=False):
         """ Parse a string obtained from Tree.__repr__() so that it can be used by build_from_string.

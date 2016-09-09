@@ -52,6 +52,7 @@ if __name__ == '__main__':
     outfname = '%s/model_predict__%s.csv' % (dset, datetime.now())
     with open(outfname, 'w') as outf:
         print >> outf, '#', t
+        print >> outf, '#', t.latex()
         print >> outf, '#', t.par_values
     ypred = t.predict(x)
     x['yreal'] = y
