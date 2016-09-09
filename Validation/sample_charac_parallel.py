@@ -29,6 +29,12 @@ def parse_options():
     parser.add_option("-b", "--burnin", dest="burnin", default=1000,
                       type='int',
                       help="Burn-in (default: 1000)")
+    parser.add_option("-T", "--nT", dest="nT", default=10,
+                      type='int',
+                      help="Number of temperatures (default: 10)")
+    parser.add_option("-s", "--Tf", dest="Tf", default=1.2,
+                      type='float',
+                      help="Factor between temperatures (default: 1.20)")
     parser.add_option("-a", "--anneal", dest="anneal", default=100,
                       type='int',
                       help="Annealing threshold. If there are no tree swaps for more than this number of steps, the parallel tempering is annealed (default: 100)")
@@ -48,18 +54,7 @@ if __name__ == '__main__':
     Y = iodata.YLABS[dset]
 
     # Temperatures
-    Ts = [
-        1,
-        1.20,
-        1.44,
-        1.73,
-        2.07,
-        2.49,
-        2.99,
-        3.58,
-        4.30,
-        5.16,
-    ]
+    Ts = [1] + [opt.Tf**k for k in range(1, opt.nT)]
 
     # Read the data
     inFileName = '%s/data/%s' % (dset, iodata.FNAMES[dset])
@@ -89,6 +84,7 @@ if __name__ == '__main__':
         x=x, y=y,
         prior_par=prior_par,
     )
+    print >> outf, '# Ts:        ', Ts
     print >> outf, '# Variables: ', p.t1.variables
     print >> outf, '# Parameters:', p.t1.parameters, '\n#'
 
