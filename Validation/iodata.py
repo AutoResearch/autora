@@ -1,4 +1,5 @@
 import sys
+import numpy as np
 import pandas as pd
 
 XVARS = {
@@ -23,6 +24,21 @@ XVARS = {
         'ZO1',
     ],
     'Ye'     : [
+        'eff',
+        'D_max',
+        'D_apr',
+        'D_may',
+        'D_jun',
+        'ET_apr',
+        'ET_may',
+        'ET_jun',
+        'PT_apr',
+        'PT_may',
+        'PT_jun',
+        'PT_jul',
+        'PDO_win',
+    ],
+    'LogYe'     : [
         'eff',
         'D_max',
         'D_apr',
@@ -64,6 +80,7 @@ YLABS = {
     'RDFunding'    : 'FinancialSuccessRate',
     'Trepat'       : 'Sxx',
     'Ye'           : 'rec',
+    'LogYe'        : 'Logrec',
     'Hydrogenation':'Barrier',
 }
 FNAMES = {
@@ -71,6 +88,7 @@ FNAMES = {
     'RDFunding'    : 'EU_nature_clean.csv',
     'Trepat'       : 'cadhesome_protein.csv',
     'Ye'           : 'seymour.csv',
+    'LogYe'        : 'seymour.csv',
     'Hydrogenation':'H_features.csv',
 }
 
@@ -91,6 +109,11 @@ def read_data(dset, ylabel=None, xlabels=None, in_fname=None):
         data = pd.read_csv(in_fname)
         x = data[xlabels]
         y = data[ylabel]
+    elif (dset == 'LogYe'):
+        data = pd.read_csv(in_fname)
+        data['Logrec'] = np.log(data['rec'])
+        x = data[xlabels]
+        y = data[ylabel]        
     else:
         raise
 
