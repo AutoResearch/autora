@@ -4,11 +4,11 @@ import pandas as pd
 
 XVARS = {
     'Citations' : [
-        '1981',
-        '1982',
-        '1983',
-        '1984',
-        '1985',
+        'c1981',
+        'c1982',
+        'c1983',
+        'c1984',
+        'c1985',
     ],
     'RoughPipes' : [
         'LogRe',
@@ -83,7 +83,7 @@ XVARS = {
     ]
 }
 YLABS = {
-    'Citations'    : '2015',
+    'Citations'    : 'c2015',
     'RoughPipes'   : 'logf',
     'RDFunding'    : 'FinancialSuccessRate',
     'Trepat'       : 'Sxx',
