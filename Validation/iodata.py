@@ -3,6 +3,13 @@ import numpy as np
 import pandas as pd
 
 XVARS = {
+    'Citations' : [
+        '1981',
+        '1982',
+        '1983',
+        '1984',
+        '1985',
+    ],
     'RoughPipes' : [
         'LogRe',
         'Drratio',
@@ -76,6 +83,7 @@ XVARS = {
     ]
 }
 YLABS = {
+    'Citations'    : '2015',
     'RoughPipes'   : 'logf',
     'RDFunding'    : 'FinancialSuccessRate',
     'Trepat'       : 'Sxx',
@@ -84,6 +92,7 @@ YLABS = {
     'Hydrogenation':'Barrier',
 }
 FNAMES = {
+    'Citations'    : 'phys_revB_cumul.csv',
     'RoughPipes'   : 'nikuradze.csv',
     'RDFunding'    : 'EU_nature_clean.csv',
     'Trepat'       : 'cadhesome_protein.csv',
@@ -102,6 +111,7 @@ def read_data(dset, ylabel=None, xlabels=None, in_fname=None):
         in_fname = '%s/data/%s' % (dset, FNAMES[dset])
     # Read 
     if (dset == 'RDFunding' or
+        dset == 'Citations' or
         dset == 'RoughPipes' or
         dset == 'Trepat' or
         dset == 'Ye' or
