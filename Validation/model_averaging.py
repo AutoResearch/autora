@@ -35,6 +35,12 @@ def parse_options():
     parser.add_option("-b", "--burnin", dest="burnin", default=5000,
                       type='int',
                       help="Burn-in (default: 5000)")
+    parser.add_option("-T", "--nT", dest="nT", default=10,
+                      type='int',
+                      help="Number of temperatures (default: 10)")
+    parser.add_option("-s", "--Tf", dest="Tf", default=1.2,
+                      type='float',
+                      help="Factor between temperatures (default: 1.20)")
     parser.add_option("-a", "--anneal", dest="anneal", default=20,
                       type='int',
                       help="Annealing threshold. If there are no tree swaps for more than this number of steps, the parallel tempering is annealed (default: 20)")
@@ -86,6 +92,7 @@ if __name__ == '__main__':
         ns=opt.nsample, thin=opt.thin,
         burnin=opt.burnin,
         parallel=True,
+        nT=opt.nT, sT=opt.Tf,
         par_anneal=opt.anneal,
         par_annealf=opt.annealf,
         method='lko', k=1,
