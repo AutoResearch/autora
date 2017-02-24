@@ -78,8 +78,8 @@ XVARS = {
         'rank(TS)',
         'SpecRad(R)',
         'SpecRad(P)',
-        'Type',
-        'ID'
+#        'Type',
+#        'ID'
     ]
 }
 YLABS = {

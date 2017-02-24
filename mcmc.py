@@ -1169,7 +1169,10 @@ a tuple [node_value, [list, of, offspring, values]].
         params = [self.par_values[p.name] for p in parameters]
         args = [xi for xi in xmat] + [p for p in params]
         # Predict
-        prediction = flam(*args)
+        try:
+            prediction = flam(*args)
+        except:
+            prediction = [np.nan for i in range(len(x))]
         return pd.Series(prediction, index=list(x.index))
 
     # -------------------------------------------------------------------------
