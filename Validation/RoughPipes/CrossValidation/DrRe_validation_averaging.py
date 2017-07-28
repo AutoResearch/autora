@@ -79,11 +79,11 @@ if __name__ == '__main__':
         print >> outf, '# ARGUMENTS:', args
     
     # Create a validation set with points with fixed Drratio and a maximum Re
-    xtrain = x[(np.abs(x['Drratio'] - Drtarget) > 1.e-5) | 
+    xtrain = x[(np.abs(x['Drratio'] - Drtarget) > 1.e-5) & 
                (x['LogRe'] < Retarget)]
     xtest = x[(np.abs(x['Drratio'] - Drtarget) <= 1.e-5) |
               (x['LogRe'] >= Retarget)]
-    ytrain = y[(np.abs(x['Drratio'] - Drtarget) > 1.e-5) |
+    ytrain = y[(np.abs(x['Drratio'] - Drtarget) > 1.e-5) &
                (x['LogRe'] < Retarget)]
     ytest = y[(np.abs(x['Drratio'] - Drtarget) <= 1.e-5) | 
               (x['LogRe'] >= Retarget)]
