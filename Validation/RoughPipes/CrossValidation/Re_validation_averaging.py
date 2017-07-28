@@ -99,7 +99,7 @@ if __name__ == '__main__':
         burnin=opt.burnin,
         anneal=opt.anneal, annealf=opt.annealf,
         progressfn=progressfn,
-        reset_files=True,
+        reset_files=False,
     )
     
     ypredmean = ypred.mean(axis=1)
