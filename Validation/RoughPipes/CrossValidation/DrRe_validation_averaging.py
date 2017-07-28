@@ -64,6 +64,7 @@ if __name__ == '__main__':
     Y = iodata.YLABS[dset]
     pparfile = args[0]
     Drtarget = opt.Drtarget
+    Retarget = opt.Retarget
     
     # Read the data
     inFileName = '../data/%s' % (iodata.FNAMES[dset])
@@ -72,19 +73,19 @@ if __name__ == '__main__':
     )
 
     # Prepare output files
-    progressfn = 'Dr%g_validation_averaging.progress' % Drtarget
+    progressfn = 'DrRe%g_%g_validation_averaging.progress' % (Drtarget, Retarget)
     with open(progressfn, 'w') as outf:
         print >> outf, '# OPTIONS  :', opt
         print >> outf, '# ARGUMENTS:', args
     
     # Create a validation set with points with fixed Drratio and a maximum Re
-    xtrain = x[(np.abs(x['Drratio'] - Drtarget) > 1.e-5) & 
+    xtrain = x[(np.abs(x['Drratio'] - Drtarget) > 1.e-5) | 
                (x['LogRe'] < Retarget)]
-    xtest = x[(np.abs(x['Drratio'] - Drtarget) <= 1.e-5) &
+    xtest = x[(np.abs(x['Drratio'] - Drtarget) <= 1.e-5) |
               (x['LogRe'] >= Retarget)]
-    ytrain = y[(np.abs(x['Drratio'] - Drtarget) > 1.e-5) &
+    ytrain = y[(np.abs(x['Drratio'] - Drtarget) > 1.e-5) |
                (x['LogRe'] < Retarget)]
-    ytest = y[(np.abs(x['Drratio'] - Drtarget) <= 1.e-5) & 
+    ytest = y[(np.abs(x['Drratio'] - Drtarget) <= 1.e-5) | 
               (x['LogRe'] >= Retarget)]
     print xtest, '\n', ytest
 
