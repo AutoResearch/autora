@@ -86,6 +86,7 @@ if __name__ == '__main__':
     )
     print >> outf, '# Ts:        ', Ts
     print >> outf, '# Variables: ', p.t1.variables
+    print >> outf, '# Options:   ', opt
     print >> outf, '# Parameters:', p.t1.parameters, '\n#'
 
     # Burnin
