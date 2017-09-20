@@ -39,7 +39,8 @@ def parse_model_properties(inFileName='.model.tmp'):
 
 def main(inFileName):
     dset = inFileName.split('/')[0]
-    priorFileName = inFileName[inFileName.find('__')+2 :]
+    priorFileName = inFileName[inFileName.find('__')+2 :
+                               inFileName.find('.dat')+4]
 
     trace, variables = read_trace(inFileName)
     top = get_top(trace, col=1, n=20)
