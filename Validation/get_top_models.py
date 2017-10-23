@@ -47,7 +47,7 @@ def main(inFileName):
     model_prop = {}
     for i in range(len(top)):
         print '>>>>> MODEL', i+1, top[i][1], top[i][3], top[i][6]
-        cm = 'python model_charac.py -p \"../Prior/%s\" -v \"%s\" %s \"%s\"' % (
+        cm = 'python model_charac.py -l -p \"../Prior/%s\" -v \"%s\" %s \"%s\"' % (
             priorFileName,
             top[i][8],
             dset,

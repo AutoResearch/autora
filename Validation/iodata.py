@@ -80,7 +80,8 @@ XVARS = {
         'SpecRad(P)',
 #        'Type',
 #        'ID'
-    ]
+    ],
+    'Goldenfeld' : ['Re075r_D']
 }
 YLABS = {
     'Citations'    : 'c2015',
@@ -90,6 +91,7 @@ YLABS = {
     'Ye'           : 'rec',
     'LogYe'        : 'Logrec',
     'Hydrogenation':'Barrier',
+    'Goldenfeld'   : 'fRe025'
 }
 FNAMES = {
     'Citations'    : 'phys_revB_cumul.csv',
@@ -99,6 +101,7 @@ FNAMES = {
     'Ye'           : 'seymour.csv',
     'LogYe'        : 'seymour.csv',
     'Hydrogenation':'H_features.csv',
+    'Goldenfeld'   : 'Nikuradze_rescaled.csv'
 }
 
 def read_data(dset, ylabel=None, xlabels=None, in_fname=None):
@@ -115,7 +118,8 @@ def read_data(dset, ylabel=None, xlabels=None, in_fname=None):
         dset == 'RoughPipes' or
         dset == 'Trepat' or
         dset == 'Ye' or
-        dset=='Hydrogenation'):
+        dset=='Hydrogenation' or
+        dset == 'Goldenfeld'):
         data = pd.read_csv(in_fname)
         x = data[xlabels]
         y = data[ylabel]
