@@ -82,6 +82,7 @@ if __name__ == '__main__':
     print 'LaTeX:   ', latex(sympify(t.canonical()))
     print 'Param:   ', t.par_values
 
+    print 'MAE:     ', np.sum(np.abs(y - t.predict(x))) / len(y)
     print 'SSE:     ', sse
     print 'RMSE:    ', np.sqrt(sse / float(len(y)))
     print 'BIC:     ', bic
