@@ -1038,7 +1038,11 @@ a tuple [node_value, [list, of, offspring, values]].
                     if self.ops[new] == self.ops[target.value]:
                         nready = True
             dE, dEB, dEP, par_valuesNew = self.dE_lr(target, new)
-            paccept = np.exp(-dEB / self.BT - dEP / self.PT)
+            try:
+                paccept = np.exp(-dEB / self.BT - dEP / self.PT)
+            except:
+                if (dEB / self.BT + dEP / self.PT) < 0:
+                    paccept = 1.
             # Accept move, if necessary
             dice = random()
             if dice < paccept:
@@ -1082,9 +1086,13 @@ a tuple [node_value, [list, of, offspring, values]].
             sf = len(self.et_space[ofin])
             # Probability of acceptance
             dE, dEB, dEP, par_valuesNew, nif, nfi = self.dE_et(target, new)
-            paccept = (float(nif) * omegai * sf * 
-                       np.exp(-dEB / self.BT - dEP / self.PT)) / \
-                      (float(nfi) * omegaf * si)
+            try:
+                paccept = (float(nif) * omegai * sf * 
+                           np.exp(-dEB / self.BT - dEP / self.PT)) / \
+                           (float(nfi) * omegaf * si)
+            except:
+                if (dEB / self.BT + dEP / self.PT) < -200:
+                    paccept = 1.
             # Accept / reject
             dice = random()
             if dice < paccept:
