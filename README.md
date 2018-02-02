@@ -1,3 +1,3 @@
-# Formulomics Robot Scientist #
+# Rational Machine Scientist #
 
-This repository contains the code of the project "Using a large corpus of mathematical formulas to design a human-like robot scientist".
+This repository contains the code of the project "Designing a rational machine scientist to tackle unsolved scientific problems".
