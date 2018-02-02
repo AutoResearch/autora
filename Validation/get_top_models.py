@@ -43,7 +43,7 @@ def main(inFileName):
                                inFileName.find('.dat')+4]
 
     trace, variables = read_trace(inFileName)
-    top = get_top(trace, col=1, n=20)
+    top = get_top(trace, col=1, n=50)
     model_prop = {}
     for i in range(len(top)):
         print '>>>>> MODEL', i+1, top[i][1], top[i][3], top[i][6]
