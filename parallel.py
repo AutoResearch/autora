@@ -54,9 +54,14 @@ class Parallel():
         BT1, BT2 = t1.BT, t2.BT
         EB1, EB2, EP1, EP2 = t1.EB, t2.EB, t1.EP, t2.EP
         # The energy change
-        DeltaE = EB1/BT2 + EB2/BT1 - (EB1/BT1 + EB2/BT2) 
+        DeltaE = np.float(EB1) * (1./BT2 - 1./BT1) + \
+                 np.float(EB2) * (1./BT1 - 1./BT2)
+        if DeltaE > 0:
+            paccept = exp(-DeltaE)
+        else:
+            paccept = 1.
         # Accept/reject change
-        if random() < exp(-DeltaE):
+        if random() < paccept:
             self.trees[self.Ts[nT1]] = t2
             self.trees[self.Ts[nT2]] = t1
             t1.BT = BT2
