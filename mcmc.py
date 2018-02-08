@@ -156,7 +156,7 @@ class Tree():
         return self.root.pr()
         
     # -------------------------------------------------------------------------
-    def canonical(self):
+    def canonical(self, verbose=False):
         """Return the canonical form of a tree.
 
         """
@@ -174,8 +174,9 @@ class Tree():
                 can = can.replace(p, 'c%d' % pcount)
                 pcount += 1
         except:
-            print >> sys.stderr, 'WARNING: Could not get canonical form for', \
-                str(self), ' (using full form!)'
+            if verbose:
+                print >> sys.stderr, 'WARNING: Could not get canonical form for', \
+                    str(self), '(using full form!)'
             can = str(self)
         return can.replace(' ', '')
     
@@ -254,14 +255,14 @@ class Tree():
             tmpoff = [self.variables[0] for i in range(len(offspring))]
         except IndexError:
             tmpoff = [self.parameters[0] for i in range(len(offspring))]
-        self.et_replace(target, [value, tmpoff])
+        self.et_replace(target, [value, tmpoff], verbose=False)
         for i in range(len(offspring)):
             self.__grow_tree(target.offspring[i],
                              offspring[i][0], offspring[i][1])
         return
 
     # -------------------------------------------------------------------------
-    def build_from_string(self, string):
+    def build_from_string(self, string, verbose=False):
         """Build the tree from an expression formatted according to Tree.__repr__().
 
         """
@@ -271,8 +272,8 @@ class Tree():
                       x=self.x, y=self.y, BT=self.BT, PT=self.PT,
                       parameters=parameters, variables=variables)
         self.__grow_tree(self.root, tlist[0], tlist[1])
-        self.get_sse()
-        self.get_bic()
+        self.get_sse(verbose=verbose)
+        self.get_bic(verbose=verbose)
         return
 
 
@@ -303,7 +304,7 @@ class Tree():
         return rr_space
     
     # -------------------------------------------------------------------------
-    def replace_root(self, rr=None, update_gof=True):
+    def replace_root(self, rr=None, update_gof=True, verbose=False):
         """Replace the root with a "root replacement" rr (if provided; otherwise choose one at random from self.rr_space). Returns the new root if the move was possible, and None if not (because the replacement would lead to a tree larger than self.max_size."
 
         """
@@ -341,9 +342,9 @@ class Tree():
         self.n_dist_par = len(self.dist_par)
         # Update goodness of fit measures, if necessary
         if update_gof == True:
-            self.sse = self.get_sse()
-            self.bic = self.get_bic()
-            self.E = self.get_energy()
+            self.sse = self.get_sse(verbose=verbose)
+            self.bic = self.get_bic(verbose=verbose)
+            self.E = self.get_energy(verbose=verbose)
         return self.root
 
     # -------------------------------------------------------------------------
@@ -364,7 +365,7 @@ class Tree():
         return isPrunable
 
     # -------------------------------------------------------------------------
-    def prune_root(self, update_gof=True):
+    def prune_root(self, update_gof=True, verbose=False):
         """Cut the root and its rightmost leaves (provided they are, indeed, leaves), leaving the leftmost branch as the new tree. Returns the pruned root with the same format as the replacement roots in self.rr_space (or None if pruning was impossible).
 
         """
@@ -393,14 +394,15 @@ class Tree():
         self.n_dist_par = len(self.dist_par)
         # Update goodness of fit measures, if necessary
         if update_gof == True:
-            self.sse = self.get_sse()
-            self.bic = self.get_bic()
-            self.E = self.get_energy()
+            self.sse = self.get_sse(verbose=verbose)
+            self.bic = self.get_bic(verbose=verbose)
+            self.E = self.get_energy(verbose=verbose)
         # Done
         return rr
 
     # -------------------------------------------------------------------------
-    def _add_et(self, node, et_order=None, et=None, update_gof=True):
+    def _add_et(self, node, et_order=None, et=None, update_gof=True,
+                verbose=False):
         """Add an elementary tree replacing the node, which must be a leaf.
 
         """
@@ -447,13 +449,13 @@ class Tree():
         self.n_dist_par = len(self.dist_par)
         # Update goodness of fit measures, if necessary
         if update_gof == True:
-            self.sse = self.get_sse()
-            self.bic = self.get_bic()
-            self.E = self.get_energy()
+            self.sse = self.get_sse(verbose=verbose)
+            self.bic = self.get_bic(verbose=verbose)
+            self.E = self.get_energy(verbose=verbose)
         return node
 
     # -------------------------------------------------------------------------
-    def _del_et(self, node, leaf=None, update_gof=True):
+    def _del_et(self, node, leaf=None, update_gof=True, verbose=False):
         """Remove an elementary tree, replacing it by a leaf.
 
         """
@@ -484,36 +486,39 @@ class Tree():
         self.n_dist_par = len(self.dist_par)
         # Update goodness of fit measures, if necessary
         if update_gof == True:
-            self.sse = self.get_sse()
-            self.bic = self.get_bic()
-            self.E = self.get_energy()
+            self.sse = self.get_sse(verbose=verbose)
+            self.bic = self.get_bic(verbose=verbose)
+            self.E = self.get_energy(verbose=verbose)
         return node
 
     
     # -------------------------------------------------------------------------
-    def et_replace(self, target, new, update_gof=True):
+    def et_replace(self, target, new, update_gof=True, verbose=False):
         """Replace one ET by another one, both of arbitrary order. target is a
 Node and new is a tuple [node_value, [list, of, offspring, values]]
 
         """
         oini, ofin = len(target.offspring), len(new[1])
         if oini == 0:
-            added = self._add_et(target, et=new, update_gof=False)
+            added = self._add_et(target, et=new, update_gof=False,
+                                 verbose=verbose)
         else:
             if ofin == 0:
-                added = self._del_et(target, leaf=new[0], update_gof=False)
+                added = self._del_et(target, leaf=new[0], update_gof=False,
+                                     verbose=verbose)
             else:
-                self._del_et(target, update_gof=False)
-                added = self._add_et(target, et=new, update_gof=False)
+                self._del_et(target, update_gof=False, verbose=verbose)
+                added = self._add_et(target, et=new, update_gof=False,
+                                     verbose=verbose)
         # Update goodness of fit measures, if necessary
         if update_gof == True:
-            self.sse = self.get_sse()
-            self.bic = self.get_bic()
+            self.sse = self.get_sse(verbose=verbose)
+            self.bic = self.get_bic(verbose=verbose)
         # Done
         return added
 
     # -------------------------------------------------------------------------
-    def get_sse(self, fit=True):
+    def get_sse(self, fit=True, verbose=False):
         """Get the sum of squared errors, fitting the expression represented by the Tree to the existing data, if specified (by default, yes).
 
         """
@@ -562,8 +567,10 @@ Node and new is a tuple [node_value, [list, of, offspring, values]]
                 except:
                     # Save this (unsuccessful) fit and print warning
                     self.fit_par[str(self)] = deepcopy(self.par_values)
-                    print >> sys.stderr, \
-                        '#Cannot_fit:%s # # # # #' % str(self).replace(' ', '')
+                    if verbose:
+                        print >> sys.stderr, \
+                            '#Cannot_fit:%s # # # # #' % str(self).replace(' ',
+                                                                           '')
         # Sum of squared errors
         ar = [np.array(xi) for xi in xmat] + \
              [self.par_values[p.name] for p in parameters]
@@ -574,13 +581,14 @@ Node and new is a tuple [node_value, [list, of, offspring, values]]
             else:
                 self.sse = np.sum(se)
         except:
-            print >> sys.stderr, '> Cannot calculate SSE for %s: inf' % self
+            if verbose:
+                print >> sys.stderr, '> Cannot calculate SSE for %s: inf' % self
             self.sse = np.inf
         # Done 
         return self.sse
         
     # -------------------------------------------------------------------------
-    def get_bic(self, reset=True, fit=False):
+    def get_bic(self, reset=True, fit=False, verbose=False):
         """Calculate the Bayesian information criterion (BIC) of the current expression, given the data. If reset==False, the value of self.bic will not be updated (by default, it will).
 
         """
@@ -589,7 +597,7 @@ Node and new is a tuple [node_value, [list, of, offspring, values]]
                 self.bic = 0
             return 0
         # Get the sum of squared errors (fitting, if required)
-        sse = self.get_sse(fit=fit)
+        sse = self.get_sse(fit=fit, verbose=verbose)
         # Calculate the BIC
         parameters = set([p.value for p in self.ets[0]
                           if p.value in self.parameters])
@@ -601,13 +609,13 @@ Node and new is a tuple [node_value, [list, of, offspring, values]]
         return BIC
 
     # -------------------------------------------------------------------------
-    def get_energy(self, bic=False, reset=False):
+    def get_energy(self, bic=False, reset=False, verbose=False):
         """Calculate the "energy" of a given formula, that is, approximate minus log-posterior of the formula given the data (the approximation coming from the use of the BIC instead of the exactly integrated likelihood).
 
         """
         # Contribtution of the data (recalculating BIC if necessary)
         if bic == True:
-            EB = self.get_bic(reset=reset) / 2.
+            EB = self.get_bic(reset=reset, verbose=verbose) / 2.
         else:
             EB = self.bic / 2.
         # Contribution from the prior
@@ -630,7 +638,7 @@ Node and new is a tuple [node_value, [list, of, offspring, values]]
         return EB + EP, EB, EP
 
     # -------------------------------------------------------------------------
-    def update_representative(self):
+    def update_representative(self, verbose=False):
         """Check if we've seen this formula before, either in its current form
 or in another form.
 
@@ -645,13 +653,13 @@ the representatitve and return -2.
 
         """
         # Check for canonical representative
-        canonical = self.canonical()
+        canonical = self.canonical(verbose=verbose)
         try:             # We've seen this canonical before!
             rep, rep_energy, rep_par_values = self.representative[canonical]
         except KeyError: # Never seen this canonical formula before:
                          # save it and return 1
-            self.get_bic(reset=True, fit=True)
-            new_energy = self.get_energy(bic=False)
+            self.get_bic(reset=True, fit=True, verbose=verbose)
+            new_energy = self.get_energy(bic=False, verbose=verbose)
             self.representative[canonical] = (str(self), new_energy,
                                               deepcopy(self.par_values))
             return 1
@@ -664,8 +672,9 @@ the representatitve and return -2.
             # CAUTION: CHANGED TO NEVER UPDATE REPRESENTATIVE!!!!!!!!
             return -1
             # END OF CAUTION ZONE
-            self.get_bic(reset=True, fit=True)
-            new_energy = self.get_energy(bic=False)
+            """
+            self.get_bic(reset=True, fit=True, verbose=verbose)
+            new_energy = self.get_energy(bic=False, verbose=verbose)
             if (new_energy - rep_energy) < -1.e-6: # Update
                                                    # representative &
                                                    # return -2
@@ -677,9 +686,10 @@ the representatitve and return -2.
                 return -2
             else: # Not the representative: return -1
                 return -1
+            """
 
     # -------------------------------------------------------------------------
-    def dE_et(self, target, new):
+    def dE_et(self, target, new, verbose=False):
         """Calculate the energy change associated to the replacement of one ET
 by another, both of arbitrary order. "target" is a Node() and "new" is
 a tuple [node_value, [list, of, offspring, values]].
@@ -699,21 +709,21 @@ a tuple [node_value, [list, of, offspring, values]].
         old = [target.value, [o.value for o in target.offspring]]
         old_bic, old_sse, old_energy = self.bic, self.sse, self.E
         old_par_values = deepcopy(self.par_values)
-        added = self.et_replace(target, new, update_gof=False)
+        added = self.et_replace(target, new, update_gof=False, verbose=verbose)
         # number of possible move types from final
         nfi = sum([int(len(self.ets[oi]) > 0 and
                        (self.size + of - oi) <= self.max_size)
                    for oi, of in self.move_types])
         # check/update canonical representative
-        rep_res = self.update_representative()
+        rep_res = self.update_representative(verbose=verbose)
         if rep_res == -1:
             # this formula is forbidden
-            self.et_replace(added, old, update_gof=False)
+            self.et_replace(added, old, update_gof=False, verbose=verbose)
             self.bic, self.sse, self.E = old_bic, old_sse, old_energy
             self.par_values = old_par_values
             return np.inf, np.inf, np.inf, deepcopy(self.par_values), nif, nfi
         # leave the whole thing as it was before the back & fore
-        self.et_replace(added, old, update_gof=False)
+        self.et_replace(added, old, update_gof=False, verbose=verbose)
         self.bic, self.sse, self.E = old_bic, old_sse, old_energy
         self.par_values = old_par_values
         # Prior: change due to the numbers of each operation
@@ -745,11 +755,12 @@ a tuple [node_value, [list, of, offspring, values]].
             par_valuesOld = deepcopy(self.par_values)
             old = [target.value, [o.value for o in target.offspring]]
             # replace
-            added = self.et_replace(target, new, update_gof=True)
+            added = self.et_replace(target, new, update_gof=True,
+                                    verbose=verbose)
             bicNew = self.bic
             par_valuesNew = deepcopy(self.par_values)
             # leave the whole thing as it was before the back & fore
-            self.et_replace(added, old, update_gof=False)
+            self.et_replace(added, old, update_gof=False, verbose=verbose)
             self.bic = bicOld
             self.sse = sseOld
             self.par_values = par_valuesOld
@@ -767,7 +778,7 @@ a tuple [node_value, [list, of, offspring, values]].
 
 
     # -------------------------------------------------------------------------
-    def dE_lr(self, target, new):
+    def dE_lr(self, target, new, verbose=False):
         """Calculate the energy change associated to a long-range move (the replacement of the value of a node. "target" is a Node() and "new" is a node_value.
         """
         dEB, dEP = 0.0, 0.0
@@ -786,7 +797,7 @@ a tuple [node_value, [list, of, offspring, values]].
             except KeyError:
                 pass
             # check/update canonical representative
-            rep_res = self.update_representative()
+            rep_res = self.update_representative(verbose=verbose)
             if rep_res == -1:
                 # this formula is forbidden
                 target.value = old
@@ -837,7 +848,7 @@ a tuple [node_value, [list, of, offspring, values]].
                 par_valuesOld = deepcopy(self.par_values)
                 old = target.value
                 target.value = new
-                bicNew = self.get_bic(reset=True, fit=True)
+                bicNew = self.get_bic(reset=True, fit=True, verbose=verbose)
                 par_valuesNew = deepcopy(self.par_values)
                 # leave the whole thing as it was before the back & fore
                 target.value = old
@@ -859,7 +870,7 @@ a tuple [node_value, [list, of, offspring, values]].
 
         
     # -------------------------------------------------------------------------
-    def dE_rr(self, rr=None):
+    def dE_rr(self, rr=None, verbose=False):
         """Calculate the energy change associated to a root replacement move. If rr==None, then it returns the energy change associated to pruning the root; otherwise, it returns the dE associated to adding the root replacement "rr".
 
         """
@@ -876,17 +887,17 @@ a tuple [node_value, [list, of, offspring, values]].
             old_par_values = deepcopy(self.par_values)
             oldrr = [self.root.value,
                      [o.value for o in self.root.offspring[1:]]]
-            self.prune_root(update_gof=False)
+            self.prune_root(update_gof=False, verbose=verbose)
             # check/update canonical representative
-            rep_res = self.update_representative()
+            rep_res = self.update_representative(verbose=verbose)
             if rep_res == -1:
                 # this formula is forbidden
-                self.replace_root(rr=oldrr, update_gof=False)
+                self.replace_root(rr=oldrr, update_gof=False, verbose=verbose)
                 self.bic, self.sse, self.E = old_bic, old_sse, old_energy
                 self.par_values = old_par_values
                 return np.inf, np.inf, np.inf, deepcopy(self.par_values)
             # leave the whole thing as it was before the back & fore
-            self.replace_root(rr=oldrr, update_gof=False)
+            self.replace_root(rr=oldrr, update_gof=False, verbose=verbose)
             self.bic, self.sse, self.E = old_bic, old_sse, old_energy
             self.par_values = old_par_values
 
@@ -907,11 +918,11 @@ a tuple [node_value, [list, of, offspring, values]].
                 oldrr = [self.root.value,
                          [o.value for o in self.root.offspring[1:]]]
                 # replace
-                self.prune_root(update_gof=False)
-                bicNew = self.get_bic(reset=True, fit=True)
+                self.prune_root(update_gof=False, verbose=verbose)
+                bicNew = self.get_bic(reset=True, fit=True, verbose=verbose)
                 par_valuesNew = deepcopy(self.par_values)
                 # leave the whole thing as it was before the back & fore
-                self.replace_root(rr=oldrr, update_gof=False)
+                self.replace_root(rr=oldrr, update_gof=False, verbose=verbose)
                 self.bic = bicOld
                 self.sse = sseOld
                 self.par_values = par_valuesOld
@@ -933,19 +944,20 @@ a tuple [node_value, [list, of, offspring, values]].
             # replace
             old_bic, old_sse, old_energy = self.bic, self.sse, self.E
             old_par_values = deepcopy(self.par_values)
-            newroot = self.replace_root(rr=rr, update_gof=False)
+            newroot = self.replace_root(rr=rr, update_gof=False,
+                                        verbose=verbose)
             if newroot == None: # Root cannot be replaced (due to max_size)
                 return np.inf, np.inf, np.inf, deepcopy(self.par_values)     
             # check/update canonical representative
-            rep_res = self.update_representative()
+            rep_res = self.update_representative(verbose=verbose)
             if rep_res == -1:
                 # this formula is forbidden
-                self.prune_root(update_gof=False)
+                self.prune_root(update_gof=False, verbose=verbose)
                 self.bic, self.sse, self.E = old_bic, old_sse, old_energy
                 self.par_values = old_par_values
                 return np.inf, np.inf, np.inf, deepcopy(self.par_values)
             # leave the whole thing as it was before the back & fore
-            self.prune_root(update_gof=False)
+            self.prune_root(update_gof=False, verbose=verbose)
             self.bic, self.sse, self.E = old_bic, old_sse, old_energy
             self.par_values = old_par_values
 
@@ -964,13 +976,14 @@ a tuple [node_value, [list, of, offspring, values]].
                 sseOld = self.sse
                 par_valuesOld = deepcopy(self.par_values)
                 # replace
-                newroot = self.replace_root(rr=rr, update_gof=False)
+                newroot = self.replace_root(rr=rr, update_gof=False,
+                                            verbose=verbose)
                 if newroot == None:
                     return np.inf, np.inf, np.inf, self.par_values
-                bicNew = self.get_bic(reset=True, fit=True)
+                bicNew = self.get_bic(reset=True, fit=True, verbose=verbose)
                 par_valuesNew = deepcopy(self.par_values)
                 # leave the whole thing as it was before the back & fore
-                self.prune_root(update_gof=False)
+                self.prune_root(update_gof=False, verbose=verbose)
                 self.bic = bicOld
                 self.sse = sseOld
                 self.par_values = par_valuesOld
@@ -997,29 +1010,32 @@ a tuple [node_value, [list, of, offspring, values]].
         if topDice < p_rr:
             if random() < .5:
                 # Try to prune the root
-                dE, dEB, dEP, par_valuesNew = self.dE_rr(rr=None)
+                dE, dEB, dEP, par_valuesNew = self.dE_rr(rr=None,
+                                                         verbose=verbose)
                 paccept = np.exp(-dEB / self.BT - dEP / self.PT) / \
                           float(self.num_rr)
                 dice = random()
                 if dice < paccept:
                     # Accept move
-                    self.prune_root(update_gof=False)
+                    self.prune_root(update_gof=False, verbose=verbose)
                     self.par_values = par_valuesNew
-                    self.get_bic(reset=True, fit=False)
+                    self.get_bic(reset=True, fit=False, verbose=verbose)
                     self.E += dE
                     self.EB += dEB
                     self.EP += dEP
             else:
                 # Try to replace the root
                 newrr = choice(self.rr_space)
-                dE, dEB, dEP, par_valuesNew = self.dE_rr(rr=newrr)
+                dE, dEB, dEP, par_valuesNew = self.dE_rr(rr=newrr,
+                                                         verbose=verbose)
                 paccept = self.num_rr * np.exp(-dEB / self.BT - dEP / self.PT)
                 dice = random()
                 if dice < paccept:
                     # Accept move
-                    self.replace_root(rr=newrr, update_gof=False)
+                    self.replace_root(rr=newrr, update_gof=False,
+                                      verbose=verbose)
                     self.par_values = par_valuesNew
-                    self.get_bic(reset=True, fit=False)
+                    self.get_bic(reset=True, fit=False, verbose=verbose)
                     self.E += dE
                     self.EB += dEB
                     self.EP += dEP
@@ -1037,7 +1053,8 @@ a tuple [node_value, [list, of, offspring, values]].
                     new = choice(self.ops.keys())
                     if self.ops[new] == self.ops[target.value]:
                         nready = True
-            dE, dEB, dEP, par_valuesNew = self.dE_lr(target, new)
+            dE, dEB, dEP, par_valuesNew = self.dE_lr(target, new,
+                                                     verbose=verbose)
             try:
                 paccept = np.exp(-dEB / self.BT - dEP / self.PT)
             except:
@@ -1058,7 +1075,7 @@ a tuple [node_value, [list, of, offspring, values]].
                 self.n_dist_par = len(self.dist_par)
                 # update others
                 self.par_values = deepcopy(par_valuesNew)
-                self.get_bic(reset=True, fit=False)
+                self.get_bic(reset=True, fit=False, verbose=verbose)
                 self.E += dE
                 self.EB += dEB
                 self.EP += dEP
@@ -1085,7 +1102,8 @@ a tuple [node_value, [list, of, offspring, values]].
             si = len(self.et_space[oini])
             sf = len(self.et_space[ofin])
             # Probability of acceptance
-            dE, dEB, dEP, par_valuesNew, nif, nfi = self.dE_et(target, new)
+            dE, dEB, dEP, par_valuesNew, nif, nfi = self.dE_et(target, new,
+                                                               verbose=verbose)
             try:
                 paccept = (float(nif) * omegai * sf * 
                            np.exp(-dEB / self.BT - dEP / self.PT)) / \
@@ -1097,9 +1115,9 @@ a tuple [node_value, [list, of, offspring, values]].
             dice = random()
             if dice < paccept:
                 # Accept move
-                self.et_replace(target, new)
+                self.et_replace(target, new, verbose=verbose)
                 self.par_values = par_valuesNew
-                self.get_bic()
+                self.get_bic(verbose=verbose)
                 self.E += dE
                 self.EB += dEB
                 self.EP += dEP
@@ -1110,21 +1128,21 @@ a tuple [node_value, [list, of, offspring, values]].
     # -------------------------------------------------------------------------
     def mcmc(self, tracefn='trace.dat', progressfn='progress.dat',
              write_files=True, reset_files=True,
-             burnin=2000, thin=10, samples=10000, verbose=True):
+             burnin=2000, thin=10, samples=10000, verbose=False, progress=True):
         """Sample the space of formula trees using MCMC, and write the trace and some progress information to files (unless write_files is False).
 
         """
-        self.get_energy(reset=True)
+        self.get_energy(reset=True, verbose=verbose)
 
         # Burnin
-        if verbose:
+        if progress:
             sys.stdout.write('# Burning in\t')
             sys.stdout.write('[%s]' % (' ' * 50))
             sys.stdout.flush()
             sys.stdout.write('\b' * (50+1))
         for i in range(burnin):
-            self.mcmc_step()
-            if verbose and (i % (burnin / 50) == 0):
+            self.mcmc_step(verbose=verbose)
+            if progress and (i % (burnin / 50) == 0):
                 sys.stdout.write('=')
                 sys.stdout.flush()
         # Sample
@@ -1135,27 +1153,27 @@ a tuple [node_value, [list, of, offspring, values]].
             else:
                 tracef = open(tracefn, 'a')
                 progressf = open(progressfn, 'a')
-        if verbose:
+        if progress:
             sys.stdout.write('\n# Sampling\t')
             sys.stdout.write('[%s]' % (' ' * 50))
             sys.stdout.flush()
             sys.stdout.write('\b' * (50+1))
         for s in range(samples):
             for i in range(thin):
-                self.mcmc_step()
-            if verbose and (s % (samples / 50) == 0):
+                self.mcmc_step(verbose=verbose)
+            if progress and (s % (samples / 50) == 0):
                 sys.stdout.write('=')
                 sys.stdout.flush()
             if write_files:
                 json.dump([s, float(self.bic), float(self.E),
-                           str(self.get_energy()),
+                           str(self.get_energy(verbose=verbose)),
                            str(self), self.par_values], tracef)
                 tracef.write('\n')
                 tracef.flush()
                 progressf.write('%d %lf %lf\n' % (s, self.E, self.bic))
                 progressf.flush()
         # Done
-        if verbose:
+        if progress:
             sys.stdout.write('\n')
         return
 
@@ -1189,21 +1207,21 @@ a tuple [node_value, [list, of, offspring, values]].
             x,
             burnin=1000, thin=2000, samples=1000, 
             tracefn='trace.dat', progressfn='progress.dat',
-            write_files=True, reset_files=True, verbose=True,
+            write_files=True, reset_files=True, verbose=False, progress=True,
     ):
         """Sample the space of formula trees using MCMC, and predict y(x) for each of the sampled formula trees.
 
         """
         ypred = {}
         # Burnin
-        if verbose:
+        if progress:
             sys.stdout.write('# Burning in\t')
             sys.stdout.write('[%s]' % (' ' * 50))
             sys.stdout.flush()
             sys.stdout.write('\b' * (50+1))
         for i in range(burnin):
-            self.mcmc_step()
-            if verbose and (i % (burnin / 50) == 0):
+            self.mcmc_step(verbose=verbose)
+            if progress and (i % (burnin / 50) == 0):
                 sys.stdout.write('=')
                 sys.stdout.flush()
         # Sample
@@ -1214,7 +1232,7 @@ a tuple [node_value, [list, of, offspring, values]].
             else:
                 tracef = open(tracefn, 'a')
                 progressf = open(progressfn, 'a')
-        if verbose:
+        if progress:
             sys.stdout.write('\n# Sampling\t')
             sys.stdout.write('[%s]' % (' ' * 50))
             sys.stdout.flush()
@@ -1224,31 +1242,31 @@ a tuple [node_value, [list, of, offspring, values]].
             """
             # Warm up the BIC heavily to escape deep wells
             self.BT = 1.e100
-            self.get_energy(bic=True, reset=True)
+            self.get_energy(bic=True, reset=True, verbose=verbose)
             for kk in range(thin/4):
-                self.mcmc_step()
+                self.mcmc_step(verbose=verbose)
             # Back to thermalization
             self.BT = 1.
-            self.get_energy(bic=True, reset=True)
+            self.get_energy(bic=True, reset=True, verbose=verbose)
             """
             for kk in range(thin):
-                self.mcmc_step()
+                self.mcmc_step(verbose=verbose)
             # Make prediction
             ypred[s] = self.predict(x)
             # Output
-            if verbose and (s % (samples / 50) == 0):
+            if progress and (s % (samples / 50) == 0):
                 sys.stdout.write('=')
                 sys.stdout.flush()
             if write_files:
                 json.dump([s, float(self.bic), float(self.E),
-                           float(self.get_energy()),
+                           float(self.get_energy(verbose=verbose)),
                            str(self), self.par_values], tracef)
                 tracef.write('\n')
                 tracef.flush()
                 progressf.write('%d %lf %lf\n' % (s, self.E, self.bic))
                 progressf.flush()
         # Done
-        if verbose:
+        if progress:
             sys.stdout.write('\n')
         return pd.DataFrame.from_dict(ypred)
 
@@ -1331,7 +1349,7 @@ def test5(string='(P120 + (((ALPHACAT / _a2) + (_a2 * CDH3)) + _a0))'):
 
     t = Tree(prior_par=prior_par, from_string=string)
     for i in range(1000000):
-        t.mcmc_step()
+        t.mcmc_step(verbose=True)
         print '-'*150
         t2 = Tree(from_string=str(t))
         print t
