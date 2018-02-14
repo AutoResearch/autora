@@ -25,6 +25,9 @@ def parse_options():
     parser.add_option("-r", "--repetitions", type="int", default=1000000,
                       dest="nrep",
                       help="formulas to generate between parameter updates")
+    parser.add_option("-M", "--maxsize", type="int", default=50,
+                      dest="max_size",
+                      help="maximum tree (formula) size")
     parser.add_option("-c", "--continue", dest="contfile", default=None,
                       help="continue from parameter values in CONTFILE (default: start from scratch)")
     parser.add_option("-q", "--quadratic",
@@ -150,12 +153,12 @@ if __name__ == '__main__':
 
     # Preliminaries
     if opt.quadratic:
-        outFileName = 'prior_param_sq.%s.nv%d.np%d.%s.dat' % (
-            opt.source, opt.nvar, opt.npar, datetime.now(),
+        outFileName = 'prior_param_sq.%s.nv%d.np%d.maxs%d.%s.dat' % (
+            opt.source, opt.nvar, opt.npar, opt.max_size, datetime.now(),
         )
     else:
-        outFileName = 'prior_param.%s.nv%d.np%d.%s.dat' % (
-            opt.source, opt.nvar, opt.npar, datetime.now(),
+        outFileName = 'prior_param.%s.nv%d.np%d.maxs%d.%s.dat' % (
+            opt.source, opt.nvar, opt.npar, opt.max_size, datetime.now(),
         )
     with open(outFileName, 'w') as outf:
         print >> outf, '#', ' '.join([o for o in ppar])
@@ -169,6 +172,7 @@ if __name__ == '__main__':
                         for o in ppar if o.startswith('Nopi_')]),
             variables=['x%d' % (i+1) for i in range(opt.nvar)],
             parameters=['a%d' % (i+1) for i in range(opt.npar)],
+            max_size=opt.max_size,
             prior_par=ppar,
         )
 
