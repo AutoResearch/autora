@@ -79,6 +79,7 @@ class Tree():
     # -------------------------------------------------------------------------
     def __init__(self, ops=OPS, variables=['x'], parameters=['a'],
                  prior_par={}, x=None, y=None, BT=1., PT=1.,
+                 max_size=50,
                  root_value=None, from_string=None):
         # The variables and parameters
         self.variables = variables
@@ -112,7 +113,7 @@ class Tree():
         self.nodes = [self.root]
         # Tree size and other properties of the model
         self.size = 1
-        self.max_size = 50
+        self.max_size = max_size
         # Space of all possible leaves and elementary trees
         # (dict. indexed by order)
         self.et_space = self.build_et_space()

@@ -10,6 +10,7 @@ class Parallel():
 
     # -------------------------------------------------------------------------
     def __init__(self, Ts, ops=OPS, variables=['x'], parameters=['a'],
+                 max_size=50,
                  prior_par={}, x=None, y=None):
         # All trees are initialized to the same tree but with different BT
         Ts.sort()
@@ -18,6 +19,7 @@ class Parallel():
                                  variables=deepcopy(variables),
                                  parameters=deepcopy(parameters),
                                  prior_par=deepcopy(prior_par), x=x, y=y,
+                                 max_size=max_size,
                                  BT=1)}
         self.t1 = self.trees['1']
         for BT in [T for T in self.Ts if T != 1]:
@@ -26,6 +28,7 @@ class Parallel():
                            parameters=deepcopy(parameters),
                            prior_par=deepcopy(prior_par), x=x, y=y,
                            root_value=str(self.t1),
+                           max_size=max_size,
                            BT=float(BT))
             self.trees[BT] = treetmp
             # Share fitted parameters and representative with other trees
