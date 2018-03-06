@@ -51,23 +51,33 @@ class Node():
         self.order = len(self.offspring)
         return
 
-    def pr(self):
+    def pr(self, show_pow=False):
         if self.offspring == []:
             return '%s' % self.value
         elif len(self.offspring) == 2:
-            return '(%s %s %s)' % (self.offspring[0].pr(),
+            return '(%s %s %s)' % (self.offspring[0].pr(show_pow=show_pow),
                                    self.value,
-                                   self.offspring[1].pr())
+                                   self.offspring[1].pr(show_pow=show_pow))
         else:
-            if self.value == 'pow2':
-                return '(%s ** 2)' % (self.offspring[0].pr())
-            elif self.value == 'pow3':
-                return '(%s ** 3)' % (self.offspring[0].pr())
-            ##elif self.value == 'fac':
-            ##    return '((%s)!)' % (self.offspring[0].pr())
-            else:
+            if show_pow:
                 return '%s(%s)' % (self.value,
-                                   ','.join([o.pr() for o in self.offspring]))
+                                   ','.join([o.pr(show_pow=show_pow)
+                                             for o in self.offspring]))
+            else:
+                if self.value == 'pow2':
+                    return '(%s ** 2)' % (
+                        self.offspring[0].pr(show_pow=show_pow)
+                    )
+                elif self.value == 'pow3':
+                    return '(%s ** 3)' % (
+                        self.offspring[0].pr(show_pow=show_pow)
+                    )
+                else:
+                    return '%s(%s)' % (
+                        self.value,
+                        ','.join([o.pr(show_pow=show_pow)
+                                  for o in self.offspring])
+                    )
 
 
 # -----------------------------------------------------------------------------
@@ -156,6 +166,10 @@ class Tree():
     def __repr__(self):
         return self.root.pr()
         
+    # -------------------------------------------------------------------------
+    def pr(self, show_pow=True):
+        return self.root.pr(show_pow=show_pow)
+
     # -------------------------------------------------------------------------
     def canonical(self, verbose=False):
         """Return the canonical form of a tree.
@@ -1029,7 +1043,13 @@ a tuple [node_value, [list, of, offspring, values]].
                 newrr = choice(self.rr_space)
                 dE, dEB, dEP, par_valuesNew = self.dE_rr(rr=newrr,
                                                          verbose=verbose)
-                paccept = self.num_rr * np.exp(-dEB / self.BT - dEP / self.PT)
+                if self.num_rr > 0 and -dEB / self.BT - dEP / self.PT > 0:
+                    paccept = 1.
+                elif self.num_rr == 0:
+                    paccept = 0.
+                else:
+                    paccept = self.num_rr * np.exp(-dEB / self.BT - \
+                                                   dEP / self.PT)
                 dice = random()
                 if dice < paccept:
                     # Accept move
