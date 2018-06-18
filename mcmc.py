@@ -1027,8 +1027,11 @@ a tuple [node_value, [list, of, offspring, values]].
                 # Try to prune the root
                 dE, dEB, dEP, par_valuesNew = self.dE_rr(rr=None,
                                                          verbose=verbose)
-                paccept = np.exp(-dEB / self.BT - dEP / self.PT) / \
-                          float(self.num_rr)
+                if -dEB / self.BT - dEP / self.PT > 300:
+                    paccept = 1
+                else:
+                    paccept = np.exp(-dEB / self.BT - dEP / self.PT) / \
+                              float(self.num_rr)
                 dice = random()
                 if dice < paccept:
                     # Accept move
@@ -1219,7 +1222,20 @@ a tuple [node_value, [list, of, offspring, values]].
         try:
             prediction = flam(*args)
         except:
+            # Do it point by point
             prediction = [np.nan for i in range(len(x))]
+        """
+        # Do it point by point NOT WORKING!!!
+        prediction = []
+        for xi in xmat:
+            args = [xi] + [p for p in params]
+            try:
+                this_prediction = flam(*args)
+            except:
+                this_prediction = [np.nan]
+            prediction += this_prediction
+        """
+        
         return pd.Series(prediction, index=list(x.index))
 
     # -------------------------------------------------------------------------
