@@ -1,6 +1,7 @@
 import sys
 import json
 import numpy as np
+import scipy
 import pandas as pd
 import matplotlib.pyplot as plt
 from copy import deepcopy
@@ -549,7 +550,11 @@ Node and new is a tuple [node_value, [list, of, offspring, values]]
         variables = [atomd[v] for v in self.variables if v in atomd.keys()]
         parameters = [atomd[p] for p in self.parameters if p in atomd.keys()]
         try:
-            flam = lambdify(variables + parameters, ex, "numpy")
+            flam = lambdify(
+                variables + parameters, ex, [
+                    "numpy",
+                    {'fac' : scipy.special.factorial}
+                ])
         except:
             self.sse = np.inf
             return np.inf
@@ -1213,7 +1218,11 @@ a tuple [node_value, [list, of, offspring, values]].
         atomd = dict([(a.name, a) for a in ex.atoms() if a.is_Symbol])
         variables = [atomd[v] for v in self.variables if v in atomd.keys()]
         parameters = [atomd[p] for p in self.parameters if p in atomd.keys()]
-        flam = lambdify(variables + parameters, ex, "numpy")
+        flam = lambdify(
+            variables + parameters, ex, [
+                "numpy",
+                {'fac' : scipy.special.factorial}
+            ])
         # Prepare variables and parameters
         xmat = [x[v.name] for v in variables]
         params = [self.par_values[p.name] for p in parameters]
