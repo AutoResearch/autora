@@ -97,7 +97,6 @@ class Tree():
         self.parameters = [p if p.startswith('_') and p.endswith('_')
                            else '_%s_' % p
                            for p in parameters]
-        self.par_values = deepcopy(dict([(p, 1.) for p in self.parameters]))
         # The root
         if root_value == None:
             self.root = Node(choice(self.variables+self.parameters),
@@ -138,9 +137,23 @@ class Tree():
             self.prior_par = dict([('Nopi_%s' % t, 10.) for t in self.ops])
         else:
             self.prior_par = prior_par
-        # The data
-        self.x = x if x is not None else pd.DataFrame()
-        self.y = y if y is not None else pd.Series()
+        # The datasets
+        if x is None:
+            self.x = {'d0' : pd.DataFrame()}
+            self.y = {'d0' : pd.Series()}
+        elif isinstance(x, pd.DataFrame):
+            self.x = {'d0' : x}
+            self.y = {'d0' : y}
+        elif isinstance(x, dict):
+            self.x = x
+            self.y = y
+        else:
+            raise TypeError('x must be either a dict or a pandas.DataFrame')
+        # The values of the model parameters (one set of values for each dataset)
+        self.par_values = dict([
+            (ds, deepcopy(dict([(p, 1.) for p in self.parameters])))
+            for ds in self.x
+        ])
         # BIC and prior temperature
         self.BT = float(BT)
         self.PT = float(PT)
@@ -539,9 +552,9 @@ Node and new is a tuple [node_value, [list, of, offspring, values]]
 
         """
         # Return 0 if there is no data
-        if self.x.empty or self.y.empty:
+        if self.x.values()[0].empty or self.y.values()[0].empty:
             self.sse = 0
-            return 0            
+            return 0
         # Convert the Tree into a SymPy expression
         ex = sympify(str(self))
         # Convert the expression to a function that can be used by
@@ -558,52 +571,68 @@ Node and new is a tuple [node_value, [list, of, offspring, values]]
         except:
             self.sse = np.inf
             return np.inf
-        xmat = [self.x[v.name] for v in variables]
         if fit:
             if len(parameters) == 0: # Nothing to fit
-                for p in self.parameters:
-                    self.par_values[p] = 1.
+                for ds in self.x:
+                    for p in self.parameters:
+                        self.par_values[ds][p] = 1.
             elif str(self) in self.fit_par: # Recover previously fit parameters
                 self.par_values = self.fit_par[str(self)]
-            else:                    # Do the fit
-                def feval(x, *params):
-                    args = [xi for xi in x] + [p for p in params]
-                    return flam(*args)
-                try:
-                    # Fit the parameters
-                    res = curve_fit(
-                        feval, xmat, self.y,
-                        p0=[self.par_values[p.name] for p in parameters],
-                        maxfev=10000,
-                    )
-                    # Reassign the values of the parameters
-                    self.par_values = dict([(parameters[i].name, res[0][i])
-                                            for i in range(len(res[0]))])
-                    for p in self.parameters:
-                        if p not in self.par_values:
-                            self.par_values[p] = 1.
-                    # Save this fit
-                    self.fit_par[str(self)] = deepcopy(self.par_values)
-                except:
-                    # Save this (unsuccessful) fit and print warning
-                    self.fit_par[str(self)] = deepcopy(self.par_values)
-                    if verbose:
-                        print >> sys.stderr, \
-                            '#Cannot_fit:%s # # # # #' % str(self).replace(' ',
-                                                                           '')
+            else:                    # Do the fit for all datasets
+                self.fit_par[str(self)] = {}
+                for ds in self.x:
+                    this_x, this_y = self.x[ds], self.y[ds]
+                    xmat = [self.this_x[v.name] for v in variables]
+                    def feval(x, *params):
+                        args = [xi for xi in x] + [p for p in params]
+                        return flam(*args)
+                    try:
+                        # Fit the parameters
+                        res = curve_fit(
+                            feval, xmat, this_y,
+                            p0=[self.par_values[ds][p.name]
+                                for p in parameters],
+                            maxfev=10000,
+                        )
+                        # Reassign the values of the parameters
+                        self.par_values[ds] = dict(
+                            [(parameters[i].name, res[0][i])
+                             for i in range(len(res[0]))]
+                        )
+                        for p in self.parameters:
+                            if p not in self.par_values[ds]:
+                                self.par_values[ds][p] = 1.
+                        # Save this fit
+                        self.fit_par[str(self)][ds] = deepcopy(
+                            self.par_values[ds]
+                        )
+                    except:
+                        # Save this (unsuccessful) fit and print warning
+                        self.fit_par[str(self)][ds] = deepcopy(
+                            self.par_values[ds]
+                        )
+                        if verbose:
+                            print >> sys.stderr, \
+                                '#Cannot_fit:%s # # # # #' % str(self).replace(' ', '')
+
         # Sum of squared errors
-        ar = [np.array(xi) for xi in xmat] + \
-             [self.par_values[p.name] for p in parameters]
-        try:
-            se = np.square(self.y - flam(*ar))
-            if sum(np.isnan(se)) > 0:
-                raise ValueError
-            else:
-                self.sse = np.sum(se)
-        except:
-            if verbose:
-                print >> sys.stderr, '> Cannot calculate SSE for %s: inf' % self
-            self.sse = np.inf
+        self.sse = 0.
+        for ds in self.x:
+            this_x, this_y = self.x[ds], self.y[ds]
+            xmat = [self.this_x[v.name] for v in variables]
+            ar = [np.array(xi) for xi in xmat] + \
+                 [self.par_values[ds][p.name] for p in parameters]
+            try:
+                se = np.square(this_y - flam(*ar))
+                if sum(np.isnan(se)) > 0:
+                    raise ValueError
+                else:
+                    self.sse += np.sum(se)
+            except:
+                if verbose:
+                    print >> sys.stderr, '> Cannot calculate SSE for %s: inf' % self
+                self.sse = np.inf
+
         # Done 
         return self.sse
         
@@ -612,7 +641,7 @@ Node and new is a tuple [node_value, [list, of, offspring, values]]
         """Calculate the Bayesian information criterion (BIC) of the current expression, given the data. If reset==False, the value of self.bic will not be updated (by default, it will).
 
         """
-        if self.x.empty or self.y.empty:
+        if self.x.values()[0].empty or self.y.values()[0].empty:
             if reset:
                 self.bic = 0
             return 0
@@ -621,8 +650,10 @@ Node and new is a tuple [node_value, [list, of, offspring, values]]
         # Calculate the BIC
         parameters = set([p.value for p in self.ets[0]
                           if p.value in self.parameters])
-        k = 1 + len(parameters) # +1 is for the standard deviation of the noise
-        n = len(self.y)
+        k = len(self.y) + len(parameters) # +1 is for the standard deviation of the noise in each dataset
+        n = 0
+        for ds in self.y:
+            n += len(self.y[ds])
         BIC = (k - n) * np.log(n) + n * (np.log(2. * np.pi) + log(sse) + 1)
         if reset == True:
             self.bic = BIC
@@ -769,7 +800,7 @@ a tuple [node_value, [list, of, offspring, values]].
             pass
                         
         # Data
-        if not self.x.empty:
+        if not self.x.values()[0].empty:
             bicOld = self.bic
             sseOld = self.sse
             par_valuesOld = deepcopy(self.par_values)
@@ -862,7 +893,7 @@ a tuple [node_value, [list, of, offspring, values]].
                 pass
 
             # Data
-            if not self.x.empty:
+            if not self.x.values()[0].empty:
                 bicOld = self.bic
                 sseOld = self.sse
                 par_valuesOld = deepcopy(self.par_values)
@@ -931,7 +962,7 @@ a tuple [node_value, [list, of, offspring, values]].
                 pass
 
             # Data correction
-            if not self.x.empty:
+            if not self.x.values()[0].empty:
                 bicOld = self.bic
                 sseOld = self.sse
                 par_valuesOld = deepcopy(self.par_values)
@@ -991,7 +1022,7 @@ a tuple [node_value, [list, of, offspring, values]].
                 pass
 
             # Data
-            if not self.x.empty:
+            if not self.x.values()[0].empty:
                 bicOld = self.bic
                 sseOld = self.sse
                 par_valuesOld = deepcopy(self.par_values)
@@ -1209,9 +1240,22 @@ a tuple [node_value, [list, of, offspring, values]].
 
     # -------------------------------------------------------------------------
     def predict(self, x):
-        """Calculate the value of the formula at the given data x.
+        """Calculate the value of the formula at the given data x. The data x
+must have the same format as the training data and, in particular, it
+it must specify to which dataset the test data belongs, if multiple
+datasets where used for training.
 
         """
+        if isinstance(x, pd.DataFrame):
+            this_x = {'d0' : x}
+            input_type = 'df'
+        elif isinstance(x, dict):
+            this_x = x
+            input_type = 'dict'
+        else:
+            raise TypeError('x must be either a dict or a pandas.DataFrame')
+
+        
         # Convert the Tree into a SymPy expression
         ex = sympify(str(self))
         # Convert the expression to a function
@@ -1223,29 +1267,36 @@ a tuple [node_value, [list, of, offspring, values]].
                 "numpy",
                 {'fac' : scipy.special.factorial}
             ])
-        # Prepare variables and parameters
-        xmat = [x[v.name] for v in variables]
-        params = [self.par_values[p.name] for p in parameters]
-        args = [xi for xi in xmat] + [p for p in params]
-        # Predict
-        try:
-            prediction = flam(*args)
-        except:
-            # Do it point by point
-            prediction = [np.nan for i in range(len(x))]
-        """
-        # Do it point by point NOT WORKING!!!
-        prediction = []
-        for xi in xmat:
-            args = [xi] + [p for p in params]
+        # Loop over datasets
+        predictions = {}
+        for ds in this_x:
+            # Prepare variables and parameters
+            xmat = [this_x[ds][v.name] for v in variables]
+            params = [self.par_values[p.name] for p in parameters]
+            args = [xi for xi in xmat] + [p for p in params]
+            # Predict
             try:
-                this_prediction = flam(*args)
+                prediction = flam(*args)
             except:
-                this_prediction = [np.nan]
-            prediction += this_prediction
-        """
-        
-        return pd.Series(prediction, index=list(x.index))
+                # Do it point by point
+                prediction = [np.nan for i in range(len(this_x[ds]))]
+                """
+                # Do it point by point NOT WORKING!!!
+                prediction = []
+                for xi in xmat:
+                    args = [xi] + [p for p in params]
+                    try:
+                        this_prediction = flam(*args)
+                    except:
+                        this_prediction = [np.nan]
+                    prediction += this_prediction
+                """
+            predictions[ds] = pd.Series(prediction, index=list(this_x[ds].index))
+
+        if input_type == 'df':
+            return predictions['d0']
+        else:
+            return predictions
 
     # -------------------------------------------------------------------------
     def trace_predict(
