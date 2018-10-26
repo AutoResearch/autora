@@ -582,7 +582,7 @@ Node and new is a tuple [node_value, [list, of, offspring, values]]
                 self.fit_par[str(self)] = {}
                 for ds in self.x:
                     this_x, this_y = self.x[ds], self.y[ds]
-                    xmat = [self.this_x[v.name] for v in variables]
+                    xmat = [this_x[v.name] for v in variables]
                     def feval(x, *params):
                         args = [xi for xi in x] + [p for p in params]
                         return flam(*args)
@@ -619,7 +619,7 @@ Node and new is a tuple [node_value, [list, of, offspring, values]]
         self.sse = 0.
         for ds in self.x:
             this_x, this_y = self.x[ds], self.y[ds]
-            xmat = [self.this_x[v.name] for v in variables]
+            xmat = [this_x[v.name] for v in variables]
             ar = [np.array(xi) for xi in xmat] + \
                  [self.par_values[ds][p.name] for p in parameters]
             try:
