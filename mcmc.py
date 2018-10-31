@@ -616,7 +616,7 @@ Node and new is a tuple [node_value, [list, of, offspring, values]]
                                 '#Cannot_fit:%s # # # # #' % str(self).replace(' ', '')
 
         # Sum of squared errors
-        self.sse = 0.
+        self.sse = {}
         for ds in self.x:
             this_x, this_y = self.x[ds], self.y[ds]
             xmat = [this_x[v.name] for v in variables]
@@ -627,11 +627,11 @@ Node and new is a tuple [node_value, [list, of, offspring, values]]
                 if sum(np.isnan(se)) > 0:
                     raise ValueError
                 else:
-                    self.sse += np.sum(se)
+                    self.sse[ds] = np.sum(se)
             except:
                 if verbose:
                     print >> sys.stderr, '> Cannot calculate SSE for %s: inf' % self
-                self.sse = np.inf
+                self.sse[ds] = np.inf
 
         # Done 
         return self.sse
@@ -650,11 +650,11 @@ Node and new is a tuple [node_value, [list, of, offspring, values]]
         # Calculate the BIC
         parameters = set([p.value for p in self.ets[0]
                           if p.value in self.parameters])
-        k = len(self.y) + len(parameters) # +1 is for the standard deviation of the noise in each dataset
-        n = 0
+        k = 1 + len(parameters)
+        BIC = 0.
         for ds in self.y:
-            n += len(self.y[ds])
-        BIC = (k - n) * np.log(n) + n * (np.log(2. * np.pi) + log(sse) + 1)
+            n = len(self.y[ds])
+            BIC += (k - n) * np.log(n) + n * (np.log(2. * np.pi) + log(sse[ds]) + 1)
         if reset == True:
             self.bic = BIC
         return BIC
@@ -758,7 +758,7 @@ a tuple [node_value, [list, of, offspring, values]].
                    for oi, of in self.move_types])
         # replace
         old = [target.value, [o.value for o in target.offspring]]
-        old_bic, old_sse, old_energy = self.bic, self.sse, self.E
+        old_bic, old_sse, old_energy = self.bic, deepcopy(self.sse), self.E
         old_par_values = deepcopy(self.par_values)
         added = self.et_replace(target, new, update_gof=False, verbose=verbose)
         # number of possible move types from final
@@ -770,12 +770,12 @@ a tuple [node_value, [list, of, offspring, values]].
         if rep_res == -1:
             # this formula is forbidden
             self.et_replace(added, old, update_gof=False, verbose=verbose)
-            self.bic, self.sse, self.E = old_bic, old_sse, old_energy
+            self.bic, self.sse, self.E = old_bic, deepcopy(old_sse), old_energy
             self.par_values = old_par_values
             return np.inf, np.inf, np.inf, deepcopy(self.par_values), nif, nfi
         # leave the whole thing as it was before the back & fore
         self.et_replace(added, old, update_gof=False, verbose=verbose)
-        self.bic, self.sse, self.E = old_bic, old_sse, old_energy
+        self.bic, self.sse, self.E = old_bic, deepcopy(old_sse), old_energy
         self.par_values = old_par_values
         # Prior: change due to the numbers of each operation
         try:
@@ -802,7 +802,7 @@ a tuple [node_value, [list, of, offspring, values]].
         # Data
         if not self.x.values()[0].empty:
             bicOld = self.bic
-            sseOld = self.sse
+            sseOld = deepcopy(self.sse)
             par_valuesOld = deepcopy(self.par_values)
             old = [target.value, [o.value for o in target.offspring]]
             # replace
@@ -813,7 +813,7 @@ a tuple [node_value, [list, of, offspring, values]].
             # leave the whole thing as it was before the back & fore
             self.et_replace(added, old, update_gof=False, verbose=verbose)
             self.bic = bicOld
-            self.sse = sseOld
+            self.sse = deepcopy(sseOld)
             self.par_values = par_valuesOld
             dEB += (bicNew - bicOld) / 2.
         else:
@@ -839,7 +839,7 @@ a tuple [node_value, [list, of, offspring, values]].
 
             # Check if the new tree is canonically acceptable.
             old = target.value
-            old_bic, old_sse, old_energy = self.bic, self.sse, self.E
+            old_bic, old_sse, old_energy = self.bic, deepcopy(self.sse), self.E
             old_par_values = deepcopy(self.par_values)
             target.value = new
             try:
@@ -857,7 +857,7 @@ a tuple [node_value, [list, of, offspring, values]].
                     self.nops[new] -= 1
                 except KeyError:
                     pass
-                self.bic, self.sse, self.E = old_bic, old_sse, old_energy
+                self.bic, self.sse, self.E = old_bic, deepcopy(old_sse), old_energy
                 self.par_values = old_par_values
                 return np.inf, np.inf, np.inf, None
             # leave the whole thing as it was before the back & fore
@@ -867,7 +867,7 @@ a tuple [node_value, [list, of, offspring, values]].
                 self.nops[new] -= 1
             except KeyError:
                 pass
-            self.bic, self.sse, self.E = old_bic, old_sse, old_energy
+            self.bic, self.sse, self.E = old_bic, deepcopy(old_sse), old_energy
             self.par_values = old_par_values
 
             # Prior: change due to the numbers of each operation
@@ -895,7 +895,7 @@ a tuple [node_value, [list, of, offspring, values]].
             # Data
             if not self.x.values()[0].empty:
                 bicOld = self.bic
-                sseOld = self.sse
+                sseOld = deepcopy(self.sse)
                 par_valuesOld = deepcopy(self.par_values)
                 old = target.value
                 target.value = new
@@ -904,7 +904,7 @@ a tuple [node_value, [list, of, offspring, values]].
                 # leave the whole thing as it was before the back & fore
                 target.value = old
                 self.bic = bicOld
-                self.sse = sseOld
+                self.sse = deepcopy(sseOld)
                 self.par_values = par_valuesOld
                 dEB += (bicNew - bicOld) / 2.
             else:
@@ -934,7 +934,7 @@ a tuple [node_value, [list, of, offspring, values]].
 
             # Check if the new tree is canonically acceptable.
             # replace
-            old_bic, old_sse, old_energy = self.bic, self.sse, self.E
+            old_bic, old_sse, old_energy = self.bic, deepcopy(self.sse), self.E
             old_par_values = deepcopy(self.par_values)
             oldrr = [self.root.value,
                      [o.value for o in self.root.offspring[1:]]]
@@ -944,12 +944,12 @@ a tuple [node_value, [list, of, offspring, values]].
             if rep_res == -1:
                 # this formula is forbidden
                 self.replace_root(rr=oldrr, update_gof=False, verbose=verbose)
-                self.bic, self.sse, self.E = old_bic, old_sse, old_energy
+                self.bic, self.sse, self.E = old_bic, deepcopy(old_sse), old_energy
                 self.par_values = old_par_values
                 return np.inf, np.inf, np.inf, deepcopy(self.par_values)
             # leave the whole thing as it was before the back & fore
             self.replace_root(rr=oldrr, update_gof=False, verbose=verbose)
-            self.bic, self.sse, self.E = old_bic, old_sse, old_energy
+            self.bic, self.sse, self.E = old_bic, deepcopy(old_sse), old_energy
             self.par_values = old_par_values
 
             # Prior: change due to the numbers of each operation
@@ -964,7 +964,7 @@ a tuple [node_value, [list, of, offspring, values]].
             # Data correction
             if not self.x.values()[0].empty:
                 bicOld = self.bic
-                sseOld = self.sse
+                sseOld = deepcopy(self.sse)
                 par_valuesOld = deepcopy(self.par_values)
                 oldrr = [self.root.value,
                          [o.value for o in self.root.offspring[1:]]]
@@ -975,7 +975,7 @@ a tuple [node_value, [list, of, offspring, values]].
                 # leave the whole thing as it was before the back & fore
                 self.replace_root(rr=oldrr, update_gof=False, verbose=verbose)
                 self.bic = bicOld
-                self.sse = sseOld
+                self.sse = deepcopy(sseOld)
                 self.par_values = par_valuesOld
                 dEB += (bicNew - bicOld) / 2.
             else:
@@ -993,7 +993,7 @@ a tuple [node_value, [list, of, offspring, values]].
         else:
             # Check if the new tree is canonically acceptable.
             # replace
-            old_bic, old_sse, old_energy = self.bic, self.sse, self.E
+            old_bic, old_sse, old_energy = self.bic, deepcopy(self.sse), self.E
             old_par_values = deepcopy(self.par_values)
             newroot = self.replace_root(rr=rr, update_gof=False,
                                         verbose=verbose)
@@ -1004,12 +1004,12 @@ a tuple [node_value, [list, of, offspring, values]].
             if rep_res == -1:
                 # this formula is forbidden
                 self.prune_root(update_gof=False, verbose=verbose)
-                self.bic, self.sse, self.E = old_bic, old_sse, old_energy
+                self.bic, self.sse, self.E = old_bic, deepcopy(old_sse), old_energy
                 self.par_values = old_par_values
                 return np.inf, np.inf, np.inf, deepcopy(self.par_values)
             # leave the whole thing as it was before the back & fore
             self.prune_root(update_gof=False, verbose=verbose)
-            self.bic, self.sse, self.E = old_bic, old_sse, old_energy
+            self.bic, self.sse, self.E = old_bic, deepcopy(old_sse), old_energy
             self.par_values = old_par_values
 
             # Prior: change due to the numbers of each operation
@@ -1024,7 +1024,7 @@ a tuple [node_value, [list, of, offspring, values]].
             # Data
             if not self.x.values()[0].empty:
                 bicOld = self.bic
-                sseOld = self.sse
+                sseOld = deepcopy(self.sse)
                 par_valuesOld = deepcopy(self.par_values)
                 # replace
                 newroot = self.replace_root(rr=rr, update_gof=False,
@@ -1036,7 +1036,7 @@ a tuple [node_value, [list, of, offspring, values]].
                 # leave the whole thing as it was before the back & fore
                 self.prune_root(update_gof=False, verbose=verbose)
                 self.bic = bicOld
-                self.sse = sseOld
+                self.sse = deepcopy(sseOld)
                 self.par_values = par_valuesOld
                 dEB += (bicNew - bicOld) / 2.
             else:
