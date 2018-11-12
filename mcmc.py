@@ -146,7 +146,10 @@ class Tree():
             self.y = {'d0' : y}
         elif isinstance(x, dict):
             self.x = x
-            self.y = y
+            if y is None:
+                self.y = dict([(ds, pd.Series()) for ds in self.x])
+            else:
+                self.y = y
         else:
             raise TypeError('x must be either a dict or a pandas.DataFrame')
         # The values of the model parameters (one set of values for each dataset)
@@ -1272,7 +1275,7 @@ datasets where used for training.
         for ds in this_x:
             # Prepare variables and parameters
             xmat = [this_x[ds][v.name] for v in variables]
-            params = [self.par_values[p.name] for p in parameters]
+            params = [self.par_values[ds][p.name] for p in parameters]
             args = [xi for xi in xmat] + [p for p in params]
             # Predict
             try:
