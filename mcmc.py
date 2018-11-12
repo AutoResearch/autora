@@ -188,6 +188,17 @@ class Tree():
         return self.root.pr(show_pow=show_pow)
 
     # -------------------------------------------------------------------------
+    # NEED TO DOUBLE CHECK THIS METHOD!!!!
+    def set_par_values(self, par_values):
+        if set(par_values.keys()) == set(self.parameters):
+            # Single set of parameters
+            self.par_values = {'d0' : deepcopy(par_values)}
+        else:
+            # Several sets: simply overwrite
+            self.par_values = deepcopy(par_values)
+        return
+
+    # -------------------------------------------------------------------------
     def canonical(self, verbose=False):
         """Return the canonical form of a tree.
 
