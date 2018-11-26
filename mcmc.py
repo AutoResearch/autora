@@ -583,8 +583,8 @@ Node and new is a tuple [node_value, [list, of, offspring, values]]
                     {'fac' : scipy.special.factorial}
                 ])
         except:
-            self.sse = np.inf
-            return np.inf
+            self.sse = dict([(ds, np.inf) for ds in self.x])
+            return self.sse
         if fit:
             if len(parameters) == 0: # Nothing to fit
                 for ds in self.x:
