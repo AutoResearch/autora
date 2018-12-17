@@ -190,12 +190,18 @@ class Tree():
     # -------------------------------------------------------------------------
     # NEED TO DOUBLE CHECK THIS METHOD!!!!
     def set_par_values(self, par_values):
-        if set(par_values.keys()) == set(self.parameters):
-            # Single set of parameters
-            self.par_values = {'d0' : deepcopy(par_values)}
-        else:
-            # Several sets: simply overwrite
+        if set(par_values.keys()) == set(self.x.keys()):
+            # Parameter sets match the data: simply overwrite
             self.par_values = deepcopy(par_values)
+        elif (set(self.parameters) <= set(par_values.keys()) and
+              len(self.x.keys()) == 1):
+            # The par_values provided are enough to specify all model
+            # parameters (self.parameters is a subset of
+            # par_lavues.keys()) and there is only one dataset: use
+            # the data to specify the dataset label.
+            self.par_values = {self.x.keys()[0] : deepcopy(par_values)}
+        else:
+            raise ValueError('Parameter datasets do not match x/y datasets.')
         return
 
     # -------------------------------------------------------------------------
