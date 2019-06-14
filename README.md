@@ -3,7 +3,7 @@
 This repository contains the code of the project "A Bayesian machine scientist to aid in the solution of challenging scientific problems."
 
 
-# Tutorial for the Bayesian machine scientist 
+## Tutorial 
 
 This tutorial illustrates how to program a Bayesian machine scientist, using the code provided here. The tutorial assumes general knowledge of Python programming. We start by importing all necessary Python modules:
 
@@ -27,7 +27,7 @@ from parallel import *
 from fit_prior import read_prior_par
 ```
 
-## Loading and preparing the data 
+### Loading and preparing the data 
 
 We then load the data. In this particular case, we load the salmon stocks data. The features (independent variables) are loaded into a Pandas `DataFrame` named `x`, whereas the target (dependent) variable is loaded into a Pandas `Series` named `y`. Data should **always** be loaded in these formats to avoid problems. 
 
@@ -62,12 +62,13 @@ x.head()
 | 4 | 0.012463 | 9060  | 796   | 4100  | 7600  | 8.4    | 12.3   | 13.2   | 7.5    | 8.3    | 8.8    | 9.2    | -0.472  |
 
 
-## Initializing the Bayesian machine scienstist 
+### Initializing the Bayesian machine scienstist 
 
 We start by initializing the machine scientist. This involves three steps:
-- **Reading the prior hyperparameters.** The values of the hyperparameters depend on the number of variables `nv` and parameters `np`considered during the search. Many combinations of `nv` and `np` have hyperparameters calculated in the `Prior` directory. Otherwise, the hyperparameters should be fit. 
-- **Setting the "temperatures" for the parallel tempering.** If you don't know what parallel tempering is, you can read it in the Methods section of the paper, or just leave it as is in the code. In general, more temperatures (here 20) lead to better sampling of the expression space (we use a maximum of 100 different temperatures)
-- **Initializing the (parallel) scientist.**
+
+* **Reading the prior hyperparameters.** The values of the hyperparameters depend on the number of variables `nv` and parameters `np`considered during the search. Many combinations of `nv` and `np` have hyperparameters calculated in the `Prior` directory. Otherwise, the hyperparameters should be fit. 
+* **Setting the "temperatures" for the parallel tempering.** If you don't know what parallel tempering is, you can read it in the Methods section of the paper, or just leave it as is in the code. In general, more temperatures (here 20) lead to better sampling of the expression space (we use a maximum of 100 different temperatures)
+* **Initializing the (parallel) scientist.**
 
 
 ```python
@@ -87,7 +88,7 @@ pms = Parallel(
 )
 ```
 
-## Sampling expressions with the Bayesian machine scientist 
+### Sampling expressions with the Bayesian machine scientist 
 
 We are now ready to start sampling expressions with the Bayesian machine scientist, using MCMC. In its simplest form, one just needs to run the `mcmc_step()` and the `tree_swap()` methods as many times as necessary. `mcmc_step()` performs an MCMC update at each of the temperatures of the parallel tempering, whereas `tree_swap()` attempts to swap the expressions at two consecutive temperatures.
 
@@ -164,7 +165,7 @@ plt.show()
 ![png](https://bitbucket.org/rguimera/machine-scientist/raw/15fee6e33181e1f2e39c60919c1a111b086001ac/Images/output_17_0.png)
 
 
-## Making predictions with the Bayesian machine scientist 
+### Making predictions with the Bayesian machine scientist 
 
 Finally, we typically want to make predictions with models. In this regard, the interface of the machine scientist is similar to those in Scikit Learn: to make a prediction we call the `predict(x)` method, with an argument that has the same format as the training `x`, that is, a Pandas `DataFrame` with the exact same columns.
 
@@ -182,7 +183,7 @@ plt.show()
 ![png](https://bitbucket.org/rguimera/machine-scientist/raw/15fee6e33181e1f2e39c60919c1a111b086001ac/Images/output_20_0.png)
 
 
-## Further refinements 
+### Further refinements 
 
 The examples above are only intended to illustrate how a basic MCMC would be implemented. In practice, there are other considerations that we kept in mind in all the experiments reported in the manuscriot, and that anyone using the code should too:
 
