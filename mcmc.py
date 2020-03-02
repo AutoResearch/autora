@@ -9,7 +9,7 @@ from sympy import *
 from random import seed, random, choice
 from itertools import product, permutations
 from scipy.optimize import curve_fit
-from scipy.misc import comb
+#from scipy.misc import comb
 
 import warnings
 warnings.filterwarnings('error')
@@ -110,7 +110,7 @@ class Tree():
         self.ops = ops
         # The possible orders of the operations, move types, and move
         # type probabilities
-        self.op_orders = list(set([0] + [n for n in ops.values()]))
+        self.op_orders = list(set([0] + [n for n in list(ops.values())]))
         self.move_types = [p for p in permutations(self.op_orders, 2)]
         # Elementary trees (including leaves), indexed by order
         self.ets = dict([(o, []) for o in self.op_orders])
@@ -194,12 +194,12 @@ class Tree():
             # Parameter sets match the data: simply overwrite
             self.par_values = deepcopy(par_values)
         elif (set(self.parameters) <= set(par_values.keys()) and
-              len(self.x.keys()) == 1):
+              len(list(self.x.keys())) == 1):
             # The par_values provided are enough to specify all model
             # parameters (self.parameters is a subset of
             # par_lavues.keys()) and there is only one dataset: use
             # the data to specify the dataset label.
-            self.par_values = {self.x.keys()[0] : deepcopy(par_values)}
+            self.par_values = {list(self.x.keys())[0] : deepcopy(par_values)}
         else:
             raise ValueError('Parameter datasets do not match x/y datasets.')
         return
@@ -224,8 +224,8 @@ class Tree():
                 pcount += 1
         except:
             if verbose:
-                print >> sys.stderr, 'WARNING: Could not get canonical form for', \
-                    str(self), '(using full form!)'
+                print('WARNING: Could not get canonical form for', \
+                    str(self), '(using full form!)', file=sys.stderr)
             can = str(self)
         return can.replace(' ', '')
     
@@ -333,7 +333,7 @@ class Tree():
         """
         et_space = dict([(o, []) for o in self.op_orders])
         et_space[0] = [[x, []] for x in self.variables + self.parameters]
-        for op, noff in self.ops.items():
+        for op, noff in list(self.ops.items()):
             for vs in product(et_space[0], repeat=noff):
                 et_space[noff].append([op, [v[0] for v in vs]])
         return et_space
@@ -344,7 +344,7 @@ class Tree():
 
         """
         rr_space = []
-        for op, noff in self.ops.items():
+        for op, noff in list(self.ops.items()):
             if noff == 1:
                 rr_space.append([op, []])
             else:
@@ -572,7 +572,7 @@ Node and new is a tuple [node_value, [list, of, offspring, values]]
 
         """
         # Return 0 if there is no data
-        if self.x.values()[0].empty or self.y.values()[0].empty:
+        if list(self.x.values())[0].empty or list(self.y.values())[0].empty:
             self.sse = 0
             return 0
         # Convert the Tree into a SymPy expression
@@ -580,8 +580,8 @@ Node and new is a tuple [node_value, [list, of, offspring, values]]
         # Convert the expression to a function that can be used by
         # curve_fit, i.e. that takes as arguments (x, a0, a1, ..., an)
         atomd = dict([(a.name, a) for a in ex.atoms() if a.is_Symbol])
-        variables = [atomd[v] for v in self.variables if v in atomd.keys()]
-        parameters = [atomd[p] for p in self.parameters if p in atomd.keys()]
+        variables = [atomd[v] for v in self.variables if v in list(atomd.keys())]
+        parameters = [atomd[p] for p in self.parameters if p in list(atomd.keys())]
         try:
             flam = lambdify(
                 variables + parameters, ex, [
@@ -632,8 +632,7 @@ Node and new is a tuple [node_value, [list, of, offspring, values]]
                             self.par_values[ds]
                         )
                         if verbose:
-                            print >> sys.stderr, \
-                                '#Cannot_fit:%s # # # # #' % str(self).replace(' ', '')
+                            print('#Cannot_fit:%s # # # # #' % str(self).replace(' ', ''), file=sys.stderr)
 
         # Sum of squared errors
         self.sse = {}
@@ -650,7 +649,7 @@ Node and new is a tuple [node_value, [list, of, offspring, values]]
                     self.sse[ds] = np.sum(se)
             except:
                 if verbose:
-                    print >> sys.stderr, '> Cannot calculate SSE for %s: inf' % self
+                    print('> Cannot calculate SSE for %s: inf' % self, file=sys.stderr)
                 self.sse[ds] = np.inf
 
         # Done 
@@ -661,7 +660,7 @@ Node and new is a tuple [node_value, [list, of, offspring, values]]
         """Calculate the Bayesian information criterion (BIC) of the current expression, given the data. If reset==False, the value of self.bic will not be updated (by default, it will).
 
         """
-        if self.x.values()[0].empty or self.y.values()[0].empty:
+        if list(self.x.values())[0].empty or list(self.y.values())[0].empty:
             if reset:
                 self.bic = 0
             return 0
@@ -691,7 +690,7 @@ Node and new is a tuple [node_value, [list, of, offspring, values]]
             EB = self.bic / 2.
         # Contribution from the prior
         EP = 0.0
-        for op, nop in self.nops.items():
+        for op, nop in list(self.nops.items()):
             try:
                 EP += self.prior_par['Nopi_%s' % op] * nop
             except KeyError:
@@ -820,7 +819,7 @@ a tuple [node_value, [list, of, offspring, values]].
             pass
                         
         # Data
-        if not self.x.values()[0].empty:
+        if not list(self.x.values())[0].empty:
             bicOld = self.bic
             sseOld = deepcopy(self.sse)
             par_valuesOld = deepcopy(self.par_values)
@@ -913,7 +912,7 @@ a tuple [node_value, [list, of, offspring, values]].
                 pass
 
             # Data
-            if not self.x.values()[0].empty:
+            if not list(self.x.values())[0].empty:
                 bicOld = self.bic
                 sseOld = deepcopy(self.sse)
                 par_valuesOld = deepcopy(self.par_values)
@@ -982,7 +981,7 @@ a tuple [node_value, [list, of, offspring, values]].
                 pass
 
             # Data correction
-            if not self.x.values()[0].empty:
+            if not list(self.x.values())[0].empty:
                 bicOld = self.bic
                 sseOld = deepcopy(self.sse)
                 par_valuesOld = deepcopy(self.par_values)
@@ -1042,7 +1041,7 @@ a tuple [node_value, [list, of, offspring, values]].
                 pass
 
             # Data
-            if not self.x.values()[0].empty:
+            if not list(self.x.values())[0].empty:
                 bicOld = self.bic
                 sseOld = deepcopy(self.sse)
                 par_valuesOld = deepcopy(self.par_values)
@@ -1130,7 +1129,7 @@ a tuple [node_value, [list, of, offspring, values]].
                     new = choice(self.variables + self.parameters)
                     nready = True
                 else:
-                    new = choice(self.ops.keys())
+                    new = choice(list(self.ops.keys()))
                     if self.ops[new] == self.ops[target.value]:
                         nready = True
             dE, dEB, dEP, par_valuesNew = self.dE_lr(target, new,
@@ -1280,8 +1279,8 @@ datasets where used for training.
         ex = sympify(str(self))
         # Convert the expression to a function
         atomd = dict([(a.name, a) for a in ex.atoms() if a.is_Symbol])
-        variables = [atomd[v] for v in self.variables if v in atomd.keys()]
-        parameters = [atomd[p] for p in self.parameters if p in atomd.keys()]
+        variables = [atomd[v] for v in self.variables if v in list(atomd.keys())]
+        parameters = [atomd[p] for p in self.parameters if p in list(atomd.keys())]
         flam = lambdify(
             variables + parameters, ex, [
                 "numpy",
@@ -1417,9 +1416,9 @@ def test3(num_points=10, samples=100000):
     t.mcmc(burnin=2000, thin=10, samples=samples, verbose=True)
 
     # Predict
-    print t.predict(x)
-    print y
-    print 50. * np.sin(x['x0']) / x['x2'] - 4. * x['x1'] + 3
+    print(t.predict(x))
+    print(y)
+    print(50. * np.sin(x['x0']) / x['x2'] - 4. * x['x1'] + 3)
 
     plt.plot(t.predict(x), 50. * np.sin(x['x0']) / x['x2'] - 4. * x['x1'] + 3)
     plt.show()
@@ -1448,14 +1447,14 @@ def test4(num_points=10, samples=1000):
         x=xtrain, y=ytrain,
         prior_par=prior_par,
     )
-    print xtest
+    print(xtest)
 
     # Predict
     ypred = t.trace_predict(xtest, samples=samples, burnin=10000)
 
-    print ypred
-    print ytest
-    print 50. * np.sin(xtest['x0']) / xtest['x2'] - 4. * xtest['x1'] + 3
+    print(ypred)
+    print(ytest)
+    print(50. * np.sin(xtest['x0']) / xtest['x2'] - 4. * xtest['x1'] + 3)
     
     # Done
     return t
@@ -1467,10 +1466,10 @@ def test5(string='(P120 + (((ALPHACAT / _a2) + (_a2 * CDH3)) + _a0))'):
     t = Tree(prior_par=prior_par, from_string=string)
     for i in range(1000000):
         t.mcmc_step(verbose=True)
-        print '-'*150
+        print('-'*150)
         t2 = Tree(from_string=str(t))
-        print t
-        print t2
+        print(t)
+        print(t2)
         if str(t2) != str(t):
             raise
 

@@ -40,7 +40,7 @@ class Parallel():
     def mcmc_step(self, verbose=False, p_rr=0.05, p_long=.45):
         """ Perform a MCMC step in each of the trees. """
         # Loop over all trees
-        for T, tree in self.trees.items():
+        for T, tree in list(self.trees.items()):
             # MCMC step
             tree.mcmc_step(verbose=verbose, p_rr=p_rr, p_long=p_long)
         # Done
@@ -77,21 +77,21 @@ class Parallel():
     # -------------------------------------------------------------------------
     def anneal(self, n=1000, factor=5):
         # Heat up
-        for t in self.trees.values():
+        for t in list(self.trees.values()):
             t.BT *= factor
         for kk in range(n):
-            print >> sys.stderr, '# Annealing heating at %g: %d / %d' % (
+            print('# Annealing heating at %g: %d / %d' % (
                 self.trees['1'].BT, kk, n
-            )
+            ), file=sys.stderr)
             self.mcmc_step()
             self.tree_swap()
         # Cool down (return to original temperatures)
-        for BT, t in self.trees.items():
+        for BT, t in list(self.trees.items()):
             t.BT = float(BT)
         for kk in range(2*n):
-            print >> sys.stderr, '# Annealing cooling at %g: %d / %d' % (
+            print('# Annealing cooling at %g: %d / %d' % (
                 self.trees['1'].BT, kk, 2*n
-            )
+            ), file=sys.stderr)
             self.mcmc_step()
             self.tree_swap()
         # Done
@@ -213,19 +213,19 @@ if __name__ == '__main__':
 
     NREP = 1000000
     for rep in range(NREP):
-        print '=' * 77
-        print rep, '/', NREP
+        print('=' * 77)
+        print(rep, '/', NREP)
         p.mcmc_step()
-        print '>> Swaping:', p.tree_swap()
+        print('>> Swaping:', p.tree_swap())
         pprint(p.trees)
-        print '.' * 77
+        print('.' * 77)
         for T in Ts:
             energy_ref = p.trees[T].get_energy(reset=False)[0]
-            print T, '\t',  \
+            print(T, '\t',  \
                 p.trees[T].E, energy_ref, \
-                p.trees[T].bic
+                p.trees[T].bic)
             if abs(p.trees[T].E - energy_ref) > 1.e-6:
-                print p.trees[T].canonical(), p.trees[T].representative[p.trees[T].canonical()]
+                print(p.trees[T].canonical(), p.trees[T].representative[p.trees[T].canonical()])
                 raise
             if p.trees[T].representative != p.trees['1'].representative:
                 pprint(p.trees[T].representative)

@@ -61,7 +61,7 @@ def read_target_values(source, quadratic=False):
             target2 = dict([('Nopi2_%s' % line.strip().split()[0],
                             float(line.strip().split()[1]) / nform)
                            for line in lines])
-        for k, v in target2.items():
+        for k, v in list(target2.items()):
             target[k] = v
     # Done
     return target, nform
@@ -75,7 +75,7 @@ def update_ppar(tree, current, target, terms=None, step=0.05):
 
     # Which terms should we update? (Default: all)
     if terms == None:
-        terms = current.keys()
+        terms = list(current.keys())
     # Update
     for t in terms:
         if current[t] > target[t]:
@@ -111,8 +111,8 @@ def update_ppar(tree, current, target, terms=None, step=0.05):
 def read_prior_par(inFileName):
     with open(inFileName) as inf:
         lines = inf.readlines()
-    ppar = dict(zip(lines[0].strip().split()[1:],
-                    [float(x) for x in lines[-1].strip().split()[1:]]))
+    ppar = dict(list(zip(lines[0].strip().split()[1:],
+                    [float(x) for x in lines[-1].strip().split()[1:]])))
     return ppar
 
 # -----------------------------------------------------------------------------
@@ -124,8 +124,8 @@ if __name__ == '__main__':
     if opt.npar == None:
         opt.npar = 2 * opt.nvar
     target, nform = read_target_values(opt.source, quadratic=opt.quadratic)
-    print opt.contfile
-    print '\n>> TARGET:', target
+    print(opt.contfile)
+    print('\n>> TARGET:', target)
 
     # Create prior parameter dictionary from scratch or load it from file
     if opt.contfile != None:
@@ -135,7 +135,7 @@ if __name__ == '__main__':
         # from a file without quadratic terms
         if opt.quadratic:
             for t in [t for t in target
-                      if t.startswith('Nopi2_') and t not in ppar.keys()]:
+                      if t.startswith('Nopi2_') and t not in list(ppar.keys())]:
                 ppar[t] = 0.
                 """
                 lint = t.replace('Nopi2_', 'Nopi_')
@@ -149,7 +149,7 @@ if __name__ == '__main__':
     else:
         ppar = dict([(k, 10.0) for k in target if k.startswith('Nopi_')] +
                     [(k, 0.0) for k in target if not k.startswith('Nopi_')])
-    print '\n>> PRIOR_PAR:', ppar
+    print('\n>> PRIOR_PAR:', ppar)
 
     # Preliminaries
     if opt.quadratic:
@@ -161,7 +161,7 @@ if __name__ == '__main__':
             opt.source, opt.nvar, opt.npar, opt.max_size, datetime.now(),
         )
     with open(outFileName, 'w') as outf:
-        print >> outf, '#', ' '.join([o for o in ppar])
+        print('#', ' '.join([o for o in ppar]), file=outf)
     iteration = 0
 
     # Do the loop!
@@ -180,7 +180,7 @@ if __name__ == '__main__':
         current = dict([(t, 0) for t in ppar])
         for rep in range(opt.nrep):
             tree.mcmc_step()
-            for o, nopi in tree.nops.items():
+            for o, nopi in list(tree.nops.items()):
                 current['Nopi_%s' % o] += nopi
                 try:
                     current['Nopi2_%s' % o] += nopi * nopi
@@ -188,16 +188,16 @@ if __name__ == '__main__':
                     pass
 
         # Normalize the current counts
-        current = dict([(t, float(v) / opt.nrep) for t, v in current.items()])
+        current = dict([(t, float(v) / opt.nrep) for t, v in list(current.items())])
         
         # Output some info to stdout and to output file
-        print 40 * '-'
-        print tree.prior_par
+        print(40 * '-')
+        print(tree.prior_par)
         with open(outFileName, 'a') as outf:
-            print >> outf, iteration, ' '.join([str(v) for v in ppar.values()])
+            print(iteration, ' '.join([str(v) for v in list(ppar.values())]), file=outf)
         for t in ppar:
-            print t, current[t], target[t], \
-                '%.1f' % (float(current[t] - target[t]) * 100. / target[t])
+            print(t, current[t], target[t], \
+                '%.1f' % (float(current[t] - target[t]) * 100. / target[t]))
         iteration += 1
 
         # Update parameters
@@ -206,5 +206,5 @@ if __name__ == '__main__':
             update_ppar(tree, current, target, step=opt.fact)
         else:         # a single randomly chosen term
             update_ppar(tree, current, target, step=opt.fact,
-                        terms=[choice(current.keys())])
+                        terms=[choice(list(current.keys()))])
         ppar = tree.prior_par
