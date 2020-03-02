@@ -41,7 +41,7 @@ t.x.to_csv('test4_datax.csv', index=False)
 t.y.to_csv('test4_datay.csv', index=False)
 
 for rep in range(10000):
-    print >> sys.stderr, 'bi%d' % rep, t
+    print('bi%d' % rep, t, file=sys.stderr)
     t.mcmc_step()
 
 
@@ -52,8 +52,7 @@ for rep in range(10000000):
     if cano not in links:
         links[cano] = {}
     t.mcmc_step()
-    print >> sys.stderr, \
-        rep+1, t, t.E, t.get_energy()
+    print(rep+1, t, t.E, t.get_energy(), file=sys.stderr)
     if abs(t.E - t.get_energy()) > 1.e-8:
         raise KKError
     can = t.canonical()
@@ -77,15 +76,14 @@ for rep in range(10000000):
 with open('test4_net.dat', 'w') as outf:
     for c1 in links:
         for c2 in links[c1]:
-            print >> outf, \
-                c1.replace(' ', ''), c2.replace(' ', ''), links[c1][c2]
+            print(c1.replace(' ', ''), c2.replace(' ', ''), links[c1][c2], file=outf)
 
 with open('test4_out1.dat', 'w') as outf:
     for f in count:
-        print >> outf, np.exp(-float(energy[f])), count[f], \
-            canonical[f].replace(' ', ''), str(f).replace(' ', '')
+        print(np.exp(-float(energy[f])), count[f], \
+            canonical[f].replace(' ', ''), str(f).replace(' ', ''), file=outf)
 
 with open('test4_out2.dat', 'w') as outf:
     for c in representatives:
         for s in representatives[c]:
-            print >> outf, representatives[c][s], c, s
+            print(representatives[c][s], c, s, file=outf)

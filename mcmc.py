@@ -140,14 +140,14 @@ class Tree():
         # The datasets
         if x is None:
             self.x = {'d0' : pd.DataFrame()}
-            self.y = {'d0' : pd.Series()}
+            self.y = {'d0' : pd.Series(dtype=float)}
         elif isinstance(x, pd.DataFrame):
             self.x = {'d0' : x}
             self.y = {'d0' : y}
         elif isinstance(x, dict):
             self.x = x
             if y is None:
-                self.y = dict([(ds, pd.Series()) for ds in self.x])
+                self.y = dict([(ds, pd.Series(dtype=float)) for ds in self.x])
             else:
                 self.y = y
         else:
