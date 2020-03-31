@@ -1,6 +1,8 @@
 # Bayesian Machine Scientist #
 
-This repository contains the code of the project "A Bayesian machine scientist to aid in the solution of challenging scientific problems."
+This repository contains the code of the paper:
+
+Guimera, R, Reichardt, I, Aguilar-Mogas, A, Massucci, FA, Miranda, M, Pallares, J, Sales-Pardo, M. A Bayesian machine scientist to aid in the solution of challenging scientific problems, Sci. Adv. 6 (5) , eaav6971 (2020).
 
 
 ## Tutorial 
@@ -141,8 +143,8 @@ So let's take a look at the objects we stored. Here is the best model sampled by
 
 
 ```python
-print 'Best model:\t', mdl_model
-print 'Desc. length:\t', mdl
+print('Best model:\t', mdl_model)
+print('Desc. length:\t', mdl)
 ```
 
     Best model:	log((eff * _a10_))
