@@ -38,13 +38,13 @@ class Experiment_GUI(Frame):
         self.listbox_IVs = Listbox(self._root, selectmode=SINGLE)
         self.listbox_DVs = Listbox(self._root, selectmode=SINGLE)
         self.listbox_output = Listbox(self._root, selectmode=SINGLE)
-        self.button_refresh = Button(self._root, text="LOAD", fg="blue", command=self.load_experiment)
-        self.button_selection_up = Button(self._root, text="  /\\  ", command=self.exp_selection_up)
-        self.button_selection_down = Button(self._root, text="  \\/  ", command=self.exp_selection_down)
-        self.button_run = Button(self._root, text="RUN EXPERIMENT", command=self.run_experiment, fg="green")
+        self.button_refresh = Button(self._root, text="LOAD", fg="blue", command=self.load_experiment, bg="#fbfc9f")
+        self.button_selection_up = Button(self._root, text="  /\\  ", command=self.exp_selection_up, bg="#6b87b5")
+        self.button_selection_down = Button(self._root, text="  \\/  ", command=self.exp_selection_down, bg="#6b87b5")
+        self.button_run = Button(self._root, text="RUN EXPERIMENT", command=self.run_experiment, bg="#d2ffbf")
 
         # bind events
-        self.listbox_experiments.bind('<<ListboxSelect>>', self.load_experiment_event)
+        self.listbox_experiments.bind('<<ListboxSelect>>', self.select_experiment)
 
         # set up experiment path
         if path is not None:
@@ -147,7 +147,7 @@ class Experiment_GUI(Frame):
             self.listbox_experiments.insert(END, file)
         self.listbox_experiments.grid(rowspan=2, column=0)
 
-    def load_experiment_event(self, evt):
+    def select_experiment(self, evt):
 
         # fetch selection
         w = evt.widget
@@ -156,7 +156,7 @@ class Experiment_GUI(Frame):
 
             index = int(w.curselection()[0])
             value = w.get(index)
-            self.load_experiment(value)
+            self._exp_name = value
 
         self.update_experiments()
 
