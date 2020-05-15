@@ -12,8 +12,8 @@ class Experiment_Table_GUI(Experiment_Toplevel_GUI):
     # Initialize GUI.
     def __init__(self, exp, update=True):
 
-        num_rows = 1
-        num_cols = 2
+        num_rows = 2
+        num_cols = 1
 
         Experiment_Toplevel_GUI.__init__(self, num_rows, num_cols, exp)
 
@@ -24,7 +24,7 @@ class Experiment_Table_GUI(Experiment_Toplevel_GUI):
         # set up data for table
         self.tree = ttk.Treeview(self._root, style="mystyle.Treeview")
 
-        Grid.columnconfigure(self._root, 0, minsize=650)
+        Grid.rowconfigure(self._root, 0, minsize=300)
         self.init_window(update)
 
     def init_window(self, update=True):

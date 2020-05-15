@@ -20,15 +20,15 @@ class Experiment_Plot_GUI(Experiment_Toplevel_GUI):
     # Initialize GUI.
     def __init__(self, exp, IV=None, DV=None):
 
-        num_rows = 1
-        num_cols = 2
+        num_rows = 2
+        num_cols = 1
 
         self.IV = IV
         self.DV = DV
 
         Experiment_Toplevel_GUI.__init__(self, num_rows, num_cols, exp)
 
-        Grid.columnconfigure(self._root, 0, minsize=700)
+        Grid.rowconfigure(self._root, 0, minsize=300)
         self.init_window()
 
     def init_window(self):

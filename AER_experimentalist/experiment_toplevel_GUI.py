@@ -8,7 +8,7 @@ class Experiment_Toplevel_GUI():
     _close_color = "#ba2014"
     _font_family = "Helvetica"
     _font_size = 14
-    _close_text = "      X      "
+    _close_text = "CLOSE"
 
     _experiments_path = "experiments/"
     _root = None
@@ -43,7 +43,7 @@ class Experiment_Toplevel_GUI():
                                  font=(self._font_family, self._font_size))
 
         # Close window button
-        self.button_close.grid(row=0, column=1, sticky=N + S + E + W)
+        self.button_close.grid(row=num_rows-1, column=0, sticky=N + S + E + W)
 
         # Resize
         wpad = 3
