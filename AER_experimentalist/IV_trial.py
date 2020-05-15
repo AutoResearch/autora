@@ -3,10 +3,10 @@ import time
 
 class IV_Trial(IV):
 
-    _variable_label = "Trial"
+    _variable_label = "trial"
     _UID = ""
-    _name = "trial"
-    _units = ""
+    _name = "Trial"
+    _units = "trials"
     _priority = 0
     _value_range = (0, 10000000)
     _value = 0

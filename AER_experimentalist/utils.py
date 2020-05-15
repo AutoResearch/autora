@@ -6,17 +6,18 @@ def trial_to_list(trial=None, IVList = None, DVList = None):
     messages = list()
 
     if trial is not None:
-        messages.append("--- TRIAL " + trial + " ---")
+        messages.append("--- Step " + str(trial) + " ---")
 
     if IVList is not None:
         for IV in IVList:
-            messages.append("IV " + IV[0] + str(IV[1]))
+            messages.append("IV " + str(IV[0]) + " = " + str(IV[1]))
 
-    if IVList is not None:
-        messages.append("--- MEASUREMENT: ")
+    if DVList is not None:
+        messages.append("--- Measurement: ")
         for DV in DVList:
-            messages.append("DV " + DV[0] + str(DV[1]))
+            messages.append("DV " + str(DV[0]) + " = " + str(DV[1]))
 
+    return messages
 
 def get_experiment_files(path):
 

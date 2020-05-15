@@ -22,7 +22,7 @@ class IV(Variable):
     # Reads and sets value of independent variable from a dictionary with variable_label being the key
     def set_value_from_dict(self, dictionary, position):
 
-        value_list  = dictionary.get(self.get_variable_label(), default = None)
+        value_list  = dictionary.get(self.get_variable_label())
 
         if value_list is None:
             raise Exception("Could not find value with label '" + self.get_variable_label() + "' in dictionary.")
@@ -31,20 +31,6 @@ class IV(Variable):
             raise Exception("Queried position " + str(position) + " for variable " + self.get_variable_label() + "'exceeds number of available positions for that variable in the dictionary.")
 
         self.set_value(value_list[position])
-
-    # Reads and sets value of independent variable from a dictionary with variable_label being the key
-    def get_value_from_dict(self, dictionary, position):
-
-        value_list  = dictionary.get(self.get_variable_label(), default = None)
-
-        if value_list is None:
-            raise Exception("Could not find value with label '" + self.get_variable_label() + "' in dictionary.")
-
-        if position > len(value_list):
-            raise Exception("Queried position " + str(position) + " for variable " + self.get_variable_label() + "'exceeds number of available positions for that variable in the dictionary.")
-
-        return value_list[position]
-
 
     # Set whether this dependent variable is treated as covariate.
     def set_covariate(self, is_covariate):

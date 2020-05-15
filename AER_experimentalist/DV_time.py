@@ -4,9 +4,9 @@ import time
 
 class DV_Time(DV, V_Time):
 
-    _variable_label = "Time"
+    _variable_label = "time_DV"
     _UID = ""
-    _name = "time"
+    _name = "Time"
     _units = "s"
     _priority = 0
     _value_range = (0, 604800) # don't record more than a week
@@ -17,11 +17,9 @@ class DV_Time(DV, V_Time):
     # Initializes reference time.
     # The reference time usually denotes the beginning of an experiment trial.
     def __init__(self, *args, **kwargs):
+        print(self._variable_label)
         super(DV_Time, self).__init__(*args, **kwargs)
-
-    # Resets reference time.
-    def reset(self):
-        self._t0 = time.time()
+        print(self._variable_label)
 
     # Measure number of seconds relative to reference time
     def measure(self):

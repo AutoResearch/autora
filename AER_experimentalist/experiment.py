@@ -8,6 +8,9 @@ import pandas
 class Experiment():
 
     _path = ""
+    _data_path = ""
+    _sequences_folder = "experiments/sequences/"
+    _data_folder = "experiments/data/"
 
     IVs = list()
     DVs = list()
@@ -20,6 +23,8 @@ class Experiment():
     _IV_trial_idx = -1  # index of independent variable "trial"
     _IV_time_idx = -1   # index of independent variable "time"
     _DV_time_idx = -1   # index of dependent variable "time"
+
+    _current_trial = 0
 
     _ITI = 0.5     # inter trial interval in seconds
 
@@ -37,7 +42,7 @@ class Experiment():
         self._IV_trial_idx = -1
         self._IV_time_idx = -1
         self._DV_time_idx = -1
-        self._ITI = 0.5
+        self._ITI = 1.0
 
         # read experiment file
         file = open(path, "r")
@@ -54,7 +59,9 @@ class Experiment():
                 string = string.replace('IV:', '')
                 labels = string.split(',')
                 for idx, label in enumerate(labels):
-                    (IV_class, variable_label, UID, name, units, priority, value_range) = IV_labels.get(label)
+                    if (label in IV_labels) is False:
+                        raise Exception('Could not identify sequence variable: ' + label)
+                    (IV_class, name, UID, variable_label, units, priority, value_range) = IV_labels.get(label)
                     # overwrite priority
                     priority = idx
                     self.IVs.append(IV_class(variable_label, UID, name, units, priority, value_range))
@@ -73,38 +80,43 @@ class Experiment():
                 # read in variables
                 labels = string.split(',')
                 for idx, label in enumerate(labels):
-                    (IV_class, variable_label, UID, name, units, priority, value_range) = DV_labels.get(label)
+                    if (label in DV_labels) is False:
+                        raise Exception('Could not identify sequence variable: ' + label)
+                    (V_class, name, UID, variable_label, units, priority, value_range) = DV_labels.get(label)
                     # overwrite priority
                     priority = idx
                     if(covariate):
-                        self.CVs.append(IV_class(variable_label, UID, name, units, priority, value_range))
+                        self.CVs.append(V_class(variable_label, UID, name, units, priority, value_range))
                         self.CVs(-1).set_covariate(True)
                     else:
-                        self.DVs.append(IV_class(variable_label, UID, name, units, priority, value_range))
+                        self.DVs.append(V_class(variable_label, UID, name, units, priority, value_range))
 
-            # read CSV file
-            if (string.find('CSV:') != -1):
-                string = string.replace('CSV:', '')
-                csv_path = '/experiments/' + string
+            # read sequence file
+            if (string.find('Sequence:') != -1):
+                string = string.replace('Sequence:', '')
+                csv_path = self._sequences_folder + string
                 self.read_csv(csv_path)
 
+            # read data file path
+            if (string.find('Data:') != -1):
+                string = string.replace('Data:', '')
+                self._data_path = self._data_folder + string
 
+        # initialize experiment
+        self.init_experiment()
 
     def read_csv(self, csv_path):
 
-        # read in all desired independent variables
-        colnames = list()
-        for IV in self.IVs:
-            colnames.append(IV.get_variable_label())
-
         # read CSV
-        data = pandas.read_csv(csv_path, names=colnames)
+        sequence_data = pandas.read_csv(csv_path, header=0)
+
+        colnames = sequence_data.columns
 
         # generate dictionary that contains experiment sequence
         self.sequence = dict()
 
         for IV_name in colnames:
-            seq = data[IV_name].tolist()
+            seq = sequence_data[IV_name].tolist()
             self.sequence[IV_name] = seq
 
     # Initializes the experiment
@@ -127,6 +139,9 @@ class Experiment():
             if isinstance(dependent_variable, DV_Time):
                 self._DV_time_idx = idx
 
+        # execute inter-trial interval
+        self.ITI()
+
         # initialize trial and time variables
         if self._IV_trial_idx != -1:
             self.IVs[self._IV_trial_idx].set_value(0)
@@ -145,6 +160,8 @@ class Experiment():
         # (there could be multiple measurements per nominal trial).
         if self._IV_trial_idx != -1:
             trial_IV = self.IVs[self._IV_trial_idx]
+            if self.sequence.get(trial_IV.get_variable_label()) is None:
+                raise Exception("Could not find the 'trial' variable in the sequence.")
             self.actual_trials = range(0, len(self.sequence.get(trial_IV.get_variable_label())))
 
         else:
@@ -154,12 +171,13 @@ class Experiment():
     # Run the experiment
     def run_experiment(self):
 
+        self.init_experiment()
+
         # run experiment
         for trial in self.actual_trials:
 
             self._current_trial = trial
             self.run_trial()
-            time.sleep(self._ITI)
 
     # Runs a single experiment trial.
     def run_trial(self):
@@ -170,6 +188,21 @@ class Experiment():
         for independent_variable in self.IVs:
             # fetch value for variable
             independent_variable.set_value_from_dict(self.sequence, trial)
+
+        # reset time stamp of trial_IV if new trial begins
+        if self._IV_time_idx != -1 and self._IV_trial_idx != -1 and trial > 0:
+            current_trial = self.sequence[self.IVs[self._IV_trial_idx].get_variable_label()][trial]
+            last_trial = self.sequence[self.IVs[self._IV_trial_idx].get_variable_label()][trial-1]
+            if current_trial != last_trial:
+                self.ITI()
+                self.IVs[self._IV_time_idx].reset()
+
+        # reset time stamp of trial_DV if new trial begins
+        if self._DV_time_idx != -1 and self._IV_trial_idx != -1 and trial > 0:
+            current_trial = self.sequence[self.IVs[self._IV_trial_idx].get_variable_label()][trial]
+            last_trial = self.sequence[self.IVs[self._IV_trial_idx].get_variable_label()][trial-1]
+            if current_trial != last_trial:
+                self.DVs[self._DV_time_idx].reset()
 
         # after values are set, we can start to manipulate without significant delays
         for independent_variable in self.IVs:
@@ -188,21 +221,60 @@ class Experiment():
     def get_current_trial(self):
         return self._current_trial
 
+    # determine whether current actual trial marks the end of a nominal trial
+    def is_end_of_trial(self):
 
-    def get_IV_names(self):
+        # return true if no trial variable exists
+        if self._IV_trial_idx == -1:
+            return True
+
+        IV_trial = self.IVs[self._IV_trial_idx]
+        trial_sequence = self.sequence.get(IV_trial.get_variable_label())
+
+        # return true of the current actual trial marks the last in the sequence
+        if self._current_trial >= (len(trial_sequence)-1):
+            return True
+
+        # return true if this trial marks the end of a nominal trial
+        if trial_sequence[self._current_trial] != trial_sequence[self._current_trial+1]:
+            return True
+        else:
+            return False
+
+    def get_IV(self, variable_label):
+
+        for IV in self.IVs:
+            if IV.get_variable_label() ==  variable_label:
+                return IV
+
+        return None
+
+    def get_DV_CV(self, variable_label):
+
+        for DV in self.DVs:
+            if DV.get_variable_label() == variable_label:
+                return DV
+
+        for CV in self.CVs:
+            if CV.get_variable_label() == variable_label:
+                return CV
+
+        return None
+
+    def get_IV_labels(self):
         names = list()
         for IV in self.IVs:
             names.append(IV.get_variable_label())
 
         return names
 
-    def get_DV_names(self):
+    def get_DV_labels(self):
         names = list()
         for DV in self.DVs:
             names.append(DV.get_variable_label())
         return names
 
-    def get_CV_names(self):
+    def get_CV_labels(self):
         names = list()
         for CV in self.CVs:
             names.append(CV.get_variable_label())
@@ -217,7 +289,7 @@ class Experiment():
         IV_description = list()
 
         for IV in self.IVs:
-            IV_description.append((IV.get_variable_label(), IV.get_value_from_dict(self.sequence, trial)))
+            IV_description.append((IV.get_name(), IV.get_value_from_dict(self.sequence, trial)))
 
         return IV_description
 

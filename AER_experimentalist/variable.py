@@ -43,9 +43,9 @@ class Variable():
 
     # Cap value of variable
     def __cap_value__(self, value):
-        minimum = np.ones(value.shape) * self._value_range[0]
-        maximum = np.ones(value.shape) * self._value_range[1]
-        return np.min(np.max(value, minimum), maximum)
+        minimum = self._value_range[0]
+        maximum = self._value_range[1]
+        return np.min([np.max([value, minimum]), maximum])
 
     # Get value.
     def get_value(self):
@@ -55,6 +55,19 @@ class Variable():
     def set_value(self, value):
         self._value = self.__cap_value__(value)
 
+    # Reads and sets value of independent variable from a dictionary with variable_label being the key
+    def get_value_from_dict(self, dictionary, position):
+
+        value_list  = dictionary.get(self.get_variable_label())
+
+        if value_list is None:
+            raise Exception("Could not find value with label '" + self.get_variable_label() + "' in dictionary.")
+
+        if position > len(value_list):
+            raise Exception("Queried position " + str(position) + " for variable " + self.get_variable_label() + "'exceeds number of available positions for that variable in the dictionary.")
+
+        return value_list[position]
+
     # Get variable label.
     def get_variable_label(self):
         return self._variable_label
@@ -62,3 +75,19 @@ class Variable():
     # Set variable label.
     def set_variable_label(self, variable_label):
         self._variable_label = variable_label
+
+    # Get variable name.
+    def get_name(self):
+        return self._name
+
+    # Set variable name.
+    def set_name(self, name):
+        self._name = name
+
+    # Get variable units.
+    def get_units(self):
+        return self._units
+
+    # Set variable units.
+    def set_units(self, units):
+        self._unitt = units
