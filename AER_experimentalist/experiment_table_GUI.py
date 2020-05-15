@@ -24,6 +24,7 @@ class Experiment_Table_GUI(Experiment_Toplevel_GUI):
         # set up data for table
         self.tree = ttk.Treeview(self._root, style="mystyle.Treeview")
 
+        Grid.columnconfigure(self._root, 0, minsize=650)
         self.init_window(update)
 
     def init_window(self, update=True):

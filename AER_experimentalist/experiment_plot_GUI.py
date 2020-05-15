@@ -28,6 +28,7 @@ class Experiment_Plot_GUI(Experiment_Toplevel_GUI):
 
         Experiment_Toplevel_GUI.__init__(self, num_rows, num_cols, exp)
 
+        Grid.columnconfigure(self._root, 0, minsize=700)
         self.init_window()
 
     def init_window(self):
@@ -35,7 +36,7 @@ class Experiment_Plot_GUI(Experiment_Toplevel_GUI):
         # set up GUI
         self._root.title(self._title)
 
-        self._fig = Figure(figsize=(5, 5), dpi=100)
+        self._fig = Figure(figsize=(3, 3), dpi=100)
         self._axis = self._fig.add_subplot(111)
         self._axis.scatter([0], [0], s=self._scatter_area, facecolors='none', edgecolors=self._scatter_color)
         self._axis.set_xlabel('Independent Variable', fontsize=self._font_size)

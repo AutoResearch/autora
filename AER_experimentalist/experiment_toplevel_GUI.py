@@ -7,8 +7,8 @@ class Experiment_Toplevel_GUI():
     _label_color = "#DDDDDD"
     _close_color = "#ba2014"
     _font_family = "Helvetica"
-    _font_size = 16
-    _close_text = "CLOSE"
+    _font_size = 14
+    _close_text = "      X      "
 
     _experiments_path = "experiments/"
     _root = None
@@ -28,7 +28,7 @@ class Experiment_Toplevel_GUI():
         for col in range(num_cols):
             Grid.columnconfigure(self._root, col, weight=1)
 
-        Grid.columnconfigure(self._root, num_cols-1, minsize=100)
+        #Grid.columnconfigure(self._root, num_cols-1, minsize=50)
 
         # set styles
         self.close_button_style = ttk.Style()
@@ -46,10 +46,11 @@ class Experiment_Toplevel_GUI():
         self.button_close.grid(row=0, column=1, sticky=N + S + E + W)
 
         # Resize
-        pad = 3
+        wpad = 3
+        hpad = 67
         self._geom = '400x400+0+0'
         self._root.geometry("{0}x{1}+0+0".format(
-            self._root.winfo_screenwidth() - pad, self._root.winfo_screenheight() - pad))
+            self._root.winfo_screenwidth() - wpad, self._root.winfo_screenheight() - hpad))
         self._root.bind('<Escape>', self.toggle_geom)
 
     def toggle_geom(self, event):

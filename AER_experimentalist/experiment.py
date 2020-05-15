@@ -26,7 +26,7 @@ class Experiment():
 
     _current_trial = 0
 
-    _ITI = 0.5     # inter trial interval in seconds
+    _ITI = 2.0     # inter trial interval in seconds
 
     # Initialization requires path to experiment file
     def __init__(self, path):

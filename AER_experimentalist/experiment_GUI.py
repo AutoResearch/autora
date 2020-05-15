@@ -28,10 +28,11 @@ class Experiment_GUI(Frame):
     _DV_fgcolor = "#000000"
     _listbox_bgcolor = "white"
     _font_family = "Helvetica"
-    _font_size = 16
+    _font_size = 12
+    _font_size_button = 14
 
-    _bulk_output = True
-    _use_OLED = False
+    _bulk_output = False
+    _use_OLED = True
 
     _root = None
     _abort = False
@@ -54,35 +55,35 @@ class Experiment_GUI(Frame):
 
         self.IV_label_style = ttk.Style()
         self.IV_label_style.configure("IV.TLabel", foreground=self._IV_fgcolor, background="white",
-                                   font=(self._font_family, self._font_size), anchor="center")
+                                   font=(self._font_family, self._font_size_button), anchor="center")
 
         self.DV_label_style = ttk.Style()
         self.DV_label_style.configure("DV.TLabel", foreground=self._DV_fgcolor, background="white",
-                                      font=(self._font_family, self._font_size), anchor="center")
+                                      font=(self._font_family, self._font_size_button), anchor="center")
 
         self.up_down_button_style = ttk.Style()
         self.up_down_button_style.configure("UpDown.TButton", foreground="black", background=self._up_down_bgcolor,
-                                   font=(self._font_family, self._font_size))
+                                   font=(self._font_family, self._font_size_button))
 
         self.run_exp_button_style = ttk.Style()
         self.run_exp_button_style.configure("Run.TButton", foreground="black",
                                             background=self._run_exp_bgcolor,
-                                            font=(self._font_family, self._font_size))
+                                            font=(self._font_family, self._font_size_button))
 
         self.stop_exp_button_style = ttk.Style()
         self.stop_exp_button_style.configure("Stop.TButton", foreground="black",
                                             background=self._stop_exp_bgcolor,
-                                            font=(self._font_family, self._font_size))
+                                            font=(self._font_family, self._font_size_button))
 
         self.load_exp_button_style = ttk.Style()
         self.load_exp_button_style.configure("Load.TButton", foreground="black",
                                             background=self._load_exp_bgcolor,
-                                            font=(self._font_family, self._font_size))
+                                            font=(self._font_family, self._font_size_button))
 
         self.visualize_exp_button_style = ttk.Style()
         self.visualize_exp_button_style.configure("Viz.TButton", foreground="black",
                                              background=self._visualize_exp_bgcolor,
-                                             font=(self._font_family, self._font_size))
+                                             font=(self._font_family, self._font_size_button))
 
 
         # fit grid to cell
@@ -93,8 +94,8 @@ class Experiment_GUI(Frame):
             Grid.columnconfigure(self._root, col, weight=1)
 
         # set size
-        Grid.rowconfigure(self._root, 3, minsize=100)
-        Grid.rowconfigure(self._root, 0, minsize=100)
+        Grid.rowconfigure(self._root, 3, minsize=80)
+        Grid.rowconfigure(self._root, 0, minsize=80)
         Grid.columnconfigure(self._root, 6, minsize=200)
 
         # set up window components
@@ -227,10 +228,11 @@ class Experiment_GUI(Frame):
         self.button_table.grid(row=3, column=6, sticky=N + S + E + W)
 
         # resize
-        pad = 3
-        self._geom = '900x400+0+0'
+        hpad = 67
+        wpad = 3
+        self._geom = '800x400+0+0'
         self._root.geometry("{0}x{1}+0+0".format(
-            self._root.winfo_screenwidth() - pad, self._root.winfo_screenheight() - pad))
+            self._root.winfo_screenwidth() - wpad, self._root.winfo_screenheight() - hpad))
         self._root.bind('<Escape>', self.toggle_geom)
 
     def toggle_geom(self, event):
@@ -435,6 +437,7 @@ class Experiment_GUI(Frame):
 
     def update_OLED(self, messages):
         if self._use_OLED:
+            self._OLED.clear_display()
             self._OLED.append_and_show_message(messages)
 
     def clear_output(self):
@@ -493,12 +496,7 @@ class Experiment_GUI(Frame):
         for trial in self._exp.actual_trials:
 
             if self._abort:
-                msg = "ABORTED"
-                self.update_output(msg)
-                self.update_OLED(msg)
-                self.init_RUN_button()
                 self.load_experiment()
-                self._root.update()
                 break
 
             self._exp.set_current_trial(trial)
@@ -540,8 +538,15 @@ class Experiment_GUI(Frame):
                 self._root.update()
 
         # display end of experiment
-        self.update_output(self._msg_experiment_finish)
+        if self._abort is True:
+            msg = "ABORTED"
+        else:
+            msg = self._msg_experiment_finish
+
+        self.update_output(msg)
         self.clear_OLED()
-        self.update_OLED(self._msg_experiment_finish)
+        self.update_OLED(msg)
         self.init_RUN_button()
         self._root.update()
+
+

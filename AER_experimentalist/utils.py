@@ -15,7 +15,7 @@ def trial_to_list(trial=None, IVList = None, DVList = None):
     if DVList is not None:
         messages.append("--- Measurement: ")
         for DV in DVList:
-            messages.append("DV " + str(DV[0]) + " = " + str(DV[1]))
+            messages.append("DV " + str(DV[0]) + " = " + str(round(DV[1],4)))
 
     return messages
 

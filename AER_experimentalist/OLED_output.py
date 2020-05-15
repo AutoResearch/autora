@@ -3,11 +3,11 @@ from tinkerforge.bricklet_oled_128x64_v2 import BrickletOLED128x64V2
 
 class OLED_Output():
 
-    _UID = "MjY"
+    _UID = "NNa"
     _HOST = "localhost"
     _PORT = 4223
 
-    _MAX_LINES = 6
+    _MAX_LINES = 7
 
     _messages = list()
 
@@ -54,10 +54,13 @@ class OLED_Output():
     # Append a message.
     def append_message(self, messages):
 
-        for msg in messages:
-            self._messages.append(msg)
+        if isinstance(messages, str):
+            self._messages.append(messages)
+        else:
+            for msg in messages:
+                self._messages.append(msg)
 
-        while self._messages.count() > self._MAX_LINES:
+        while len(self._messages) > self._MAX_LINES:
             self._messages.pop(0)
 
     # Append a message and show on display.
