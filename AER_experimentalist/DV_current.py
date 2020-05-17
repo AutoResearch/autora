@@ -9,7 +9,7 @@ class DV_Current(DV):
     _name = "current0"
     _units = "mA"
     _priority = 0
-    _value_range = (0, 20)
+    _value_range = (0, 2000)
     _value = 0
 
     _HOST = "localhost"
@@ -39,4 +39,4 @@ class DV_Current(DV):
     # Waits until specified time has passed relative to reference time
     def measure(self):
         current = self._id020.get_current(self.channel)
-        self.set_value(current)
+        self.set_value(current/1000000.0)

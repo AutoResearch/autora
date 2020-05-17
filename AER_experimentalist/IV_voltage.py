@@ -1,6 +1,7 @@
 from IV import IV
 from tinkerforge.ip_connection import IPConnection
 from tinkerforge.bricklet_industrial_analog_out_v2 import BrickletIndustrialAnalogOutV2
+import time
 
 class IV_Voltage(IV):
 
@@ -40,3 +41,6 @@ class IV_Voltage(IV):
     def manipulate(self):
         self._iao.set_voltage(self.get_value())
         self._iao.set_enabled(True)
+
+    def clean_up(self):
+        self.stop()

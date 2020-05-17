@@ -190,12 +190,13 @@ class Experiment():
             independent_variable.set_value_from_dict(self.sequence, trial)
 
         # reset time stamp of trial_IV if new trial begins
-        if self._IV_time_idx != -1 and self._IV_trial_idx != -1 and trial > 0:
+        if self._IV_trial_idx != -1 and trial > 0:
             current_trial = self.sequence[self.IVs[self._IV_trial_idx].get_variable_label()][trial]
             last_trial = self.sequence[self.IVs[self._IV_trial_idx].get_variable_label()][trial-1]
             if current_trial != last_trial:
                 self.ITI()
-                self.IVs[self._IV_time_idx].reset()
+                if self._IV_time_idx != -1:
+                    self.IVs[self._IV_time_idx].reset()
 
         # reset time stamp of trial_DV if new trial begins
         if self._DV_time_idx != -1 and self._IV_trial_idx != -1 and trial > 0:
@@ -347,3 +348,13 @@ class Experiment():
         data_frame = pandas.DataFrame(data, columns = column_names)
 
         data_frame.to_csv(path)
+
+    def clean_up(self):
+        for IV in self.IVs:
+            IV.clean_up()
+
+        for DV in self.DVs:
+            DV.clean_up()
+
+        for CV in self.CVs:
+            CV.clean_up()

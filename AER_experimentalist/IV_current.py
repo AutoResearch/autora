@@ -41,3 +41,6 @@ class IV_Current(IV):
     def manipulate(self):
         self._iao.set_current(self.get_value())
         self._iao.set_enabled(True)
+
+    def clean_up(self):
+        self.stop()

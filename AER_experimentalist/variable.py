@@ -91,3 +91,6 @@ class Variable():
     # Set variable units.
     def set_units(self, units):
         self._unitt = units
+
+    def clean_up(self):
+        pass

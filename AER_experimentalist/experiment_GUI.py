@@ -548,5 +548,6 @@ class Experiment_GUI(Frame):
         self.update_OLED(msg)
         self.init_RUN_button()
         self._root.update()
+        self._exp.clean_up()
 
 

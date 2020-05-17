@@ -4,12 +4,12 @@ from tinkerforge.bricklet_industrial_dual_analog_in_v2 import BrickletIndustrial
 
 class DV_Voltage(DV):
 
-    _variable_label = "Voltage 0"
+    _variable_label = "voltage0"
     _UID = "MjY"
-    _name = "voltage0"
+    _name = "Voltage 0"
     _units = "mV"
     _priority = 0
-    _value_range = (-35, 35)
+    _value_range = (-3500, 3500)
     _value = 0
 
     _HOST = "localhost"
@@ -27,7 +27,7 @@ class DV_Voltage(DV):
 
         self._ipcon.connect(self._HOST, self._PORT)  # Connect to brickd
 
-        if(self._name == "voltage1"):
+        if(self._variable_label == "voltage1"):
             self.channel = 1
         else:
             self.channel = 0

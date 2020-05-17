@@ -5,6 +5,9 @@
 
 from experiment_GUI import Experiment_GUI
 from tkinter import *
+from utils import *
+
+init_epaper()
 
 root = Tk()
 
