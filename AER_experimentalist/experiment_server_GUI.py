@@ -9,10 +9,12 @@ import experiment_config as config
 import os
 import types
 
-class Experiment_GUI(Frame):
+class Experiment_Server_GUI(Frame):
 
     # GUI settings
-    _title = "Experiment Environment"
+    _title = "Experiment Server"
+    _status = ""
+
     _experiments_path = config.experiments_path
     _sequences_path = config.sequences_path
     _data_path = config.data_path
@@ -35,7 +37,7 @@ class Experiment_GUI(Frame):
     _font_size_button = config.font_size_button
 
     _bulk_output = False
-    _use_OLED = True
+    _use_OLED = False
 
     _root = None
     _abort = False
@@ -459,6 +461,9 @@ class Experiment_GUI(Frame):
 
     def update_STOP_button(self, progress):
         self.button_run.configure(text="STOP" + "(" + str(round(progress)) + "%)")
+
+    def set_status(self, status, message=""):
+        pass
 
     def stop_experiment(self):
         self._abort = True

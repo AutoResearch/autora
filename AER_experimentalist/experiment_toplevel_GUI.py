@@ -1,16 +1,17 @@
 from tkinter import *
 from tkinter import ttk
+import experiment_config as config
 
 class Experiment_Toplevel_GUI():
 
     # GUI settings
     _label_color = "#DDDDDD"
-    _close_color = "#ba2014"
-    _font_family = "Helvetica"
-    _font_size = 14
+    _close_color = config.stop_bgcolor
+    _font_family = config.font_family
+    _font_size = config.font_size_button
     _close_text = "CLOSE"
 
-    _experiments_path = "experiments/"
+    _experiments_path = config.experiments_path
     _root = None
     _exp = None
 

@@ -2,6 +2,7 @@ from variable_labels import IV_labels, DV_labels
 from IV_trial import IV_Trial
 from IV_time import IV_Time
 from DV_time import DV_Time
+import experiment_config as config
 import time
 import pandas
 
@@ -9,8 +10,8 @@ class Experiment():
 
     _path = ""
     _data_path = ""
-    _sequences_folder = "experiments/sequences/"
-    _data_folder = "experiments/data/"
+    _sequences_folder = config.sequences_path
+    _data_folder = config.data_path
 
     IVs = list()
     DVs = list()
