@@ -43,6 +43,7 @@ class Parallel():
         for T, tree in list(self.trees.items()):
             # MCMC step
             tree.mcmc_step(verbose=verbose, p_rr=p_rr, p_long=p_long)
+        self.t1 = self.trees['1']
         # Done
         return
 
