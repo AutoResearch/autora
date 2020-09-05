@@ -2,10 +2,10 @@
 import socket
 import os.path
 import experiment_config as config
-import file_upload_server_protocol as protocol
+import experiment_server_protocol as protocol
 from experiment_server_GUI import Experiment_Server_GUI
 
-class File_Upload_Server():
+class Experiment_Server():
 
     HOST = config.HOST_IP  # The server's hostname or IP address
     PORT = config.HOST_PORT  # The port used by the server
@@ -42,8 +42,8 @@ class File_Upload_Server():
 
             # get connection
             self._conn, self._addr = self._s.accept()
-
             with self._conn:
+                print('Connected by', self._addr)
 
                 # update GUI
                 self.print_status(protocol.SERVER_STATUS_CONNECTED, "Connected by " + str(self._addr) + ".")
@@ -124,10 +124,10 @@ class File_Upload_Server():
 
     def print_status(self, status, msg):
         if self.GUI is not None:
-            self.GUI.update_status(status, msg)
+            self.GUI.set_status(status, msg)
         else:
             print("Server: " + msg)
 
 
-upload_server = File_Upload_Server()
-upload_server.launch()
+exp_server = Experiment_Server()
+exp_server.launch()
