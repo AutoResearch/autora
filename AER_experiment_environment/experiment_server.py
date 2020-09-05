@@ -2,28 +2,25 @@
 import socket
 import os.path
 import experiment_config as config
-import file_upload_server_protocol as protocol
-from experiment_server_GUI import Experiment_Server_GUI
+import client_server_protocol as protocol
+from client_server_interface import Client_Server_Interface
+# from experiment_server_GUI import Experiment_Server_GUI
 
-class File_Upload_Server():
-
-    HOST = config.HOST_IP  # The server's hostname or IP address
-    PORT = config.HOST_PORT  # The port used by the server
-
-    GUI = None
+class Experiment_Server(Client_Server_Interface):
 
     _abort = False
+    _data_collected = False
 
-    def __init__(self, HOST=None, PORT=None, GUI=None):
+    exp_folder_path = config.experiments_path
+    seq_folder_path = config.sequences_path
+    data_folder_path = config.data_path
+    session_folder_path = config.session_path
 
-        if HOST is not None:
-            self.HOST = HOST
+    main_directory = config.server_path
 
-        if PORT is not None:
-            self.PORT = PORT
+    def __init__(self, session_ID=None, host=None, port=None, gui=None):
 
-        if GUI is not None:
-            self.GUI = GUI
+        super().__init__(session_ID, host, port, gui)
 
     def launch(self):
 
@@ -33,101 +30,219 @@ class File_Upload_Server():
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as self._s:
 
             # associate the socket with a specific network interface and port number
-            self._s.bind((self.HOST, self.PORT))
+            self._s.bind((self.host, self.port))
 
             #  enables server to accept() connections
             self._s.listen()
 
-            self.print_status(protocol.SERVER_STATUS_LISTENING, "Listening for client.")
+            # keep listening for connections until server is aborted
+            while True:
+                self._print_status(protocol.STATUS_LISTENING, "Listening for client.")
+                self._print_status(protocol.STATUS_LISTENING, self.host)
 
-            # get connection
-            self._conn, self._addr = self._s.accept()
+                # get connection
+                self._socket, self._addr = self._s.accept()
 
-            with self._conn:
+                with self._socket:
 
-                # update GUI
-                self.print_status(protocol.SERVER_STATUS_CONNECTED, "Connected by " + str(self._addr) + ".")
+                    # update GUI
+                    self._print_status(protocol.STATUS_CONNECTED, "Connected by " + str(self._addr) + ".")
 
-                while True:
-                    data = self._conn.recv(1024)
+                    while True:
+                        data = self._socket.recv(1024)
 
-                    if data != b'':
-                        print(repr(data))
+                        if data != b'':
+                            print(repr(data))
 
-                    if data == protocol.INITIATE_TRANSFER:
+                        # if a connection is established, get the session ID
+                        # the protocol cannot continue without identifying the session ID between client and server
 
-                        self.print_status(protocol.SERVER_STATUS_INITIATED_TRANSFER, "Initiated file transfer.")
-                        self._conn.sendall(protocol.OK)
-                        self.receive_file()
+                        if data == protocol.CLEAR_SESSIONS:
+                            self._set_status(protocol.STATUS_CLEARING_SESSIONS)
+                            self._send_confirmation()
+                            self._clear_sessions(config.server_path)
+                            self._print_status(protocol.STATUS_CLEARING_SESSIONS, "All sessions cleared.")
 
-                    elif data == protocol.REQUEST_COMPLETE:
+                        elif  data == protocol.TRANSFER_SESSION_ID:
+                            self._set_status(protocol.STATUS_TRANSFERRING_SESSION_ID)
+                            self._send_confirmation()
+                            self._receive_session_ID()
+                            self._print_status(protocol.STATUS_RECEIVED_SESSION_ID,
+                                              "Received session ID: " + str(self.session_ID) + ".")
 
-                        self.print_status(protocol.SERVER_STATUS_COMPLETED_TRANSFER, "File transfer complete.")
-                        self._conn.sendall(protocol.OK)
+                        elif data == protocol.NEGOTIATE_STATUS:
+                            self._print_status(protocol.STATUS_INITIATED_TRANSFER, "Negotiating status.")
+                            self._socket.sendall(protocol.OK)
+                            self._negotiate_status()
+                            if self.job_status == protocol.JOB_STATUS_COMPLETED_JOB:
+                                break
 
-                    if self._abort is True:
-                        self._close_server()
-                        break
+                        elif data == protocol.INITIATE_TRANSFER:
 
+                            self._print_status(protocol.STATUS_INITIATED_TRANSFER, "Initiated file transfer.")
+                            self._socket.sendall(protocol.OK)
+                            self._receive_file()
 
-    def receive_file(self):
+                        elif data == protocol.START_EXPERIMENT:
+                            self._print_status(protocol.STATUS_REQUESTING_EXP, "Received experiment request.")
+                            self._socket.sendall(protocol.OK)
+                            # collecting experiment name
+                            while True:
+                                data = self._socket.recv(1024)
 
-        file_path = ""
+                                if data == protocol.TRANSFER_FILEPATH:
+                                    self._print_status(protocol.STATUS_RECEIVING_FILE_PATH, "Receiving file path.")
+                                    self._socket.sendall(protocol.OK)
 
-        while True:
-            data = self._conn.recv(1024)
+                                    file_path = self._socket.recv(1024).decode(protocol.STRING_FORMAT)
+                                    self._print_status(protocol.STATUS_RECEIVING_FILE_PATH,
+                                                       file_path)
+                                    self._socket.sendall(protocol.OK)
+                                    self.exp_file_path = file_path
+                                    break
 
-            if data == protocol.TRANSFER_FILEPATH:
-                self.print_status(protocol.SERVER_STATUS_RECEIVING_FILE_PATH, "Receiving file path.")
-                self._conn.sendall(protocol.OK)
+                            self._run_experiment()
 
-                file_path = self._conn.recv(1024)
-                self.print_status(protocol.SERVER_STATUS_RECEIVING_FILE_PATH, file_path.decode(protocol.STRING_FORMAT))
-                self._conn.sendall(protocol.OK)
+                        elif data == protocol.REQUEST_COMPLETE:
+                            self._print_status(protocol.STATUS_COMPLETED_TRANSFER, "File transfer complete.")
+                            self._socket.sendall(protocol.OK)
+                            self._terminate_session()
+                            break
 
-            if data == protocol.TRANSFER_DATA:
+                        if self.job_status == protocol.JOB_STATUS_COMPLETED_EXPERIMENT:
+                            if self._data_collected is True:
+                                self._send_data_file()
 
-                self._conn.sendall(protocol.OK)
+                        if self._abort is True:
+                            break
 
-                if file_path is "":
-                    self.print_status(protocol.SERVER_STATUS_ERROR,
-                                      "File transfer failed: Did not receive file path.")
+                if self._abort is True:
                     break
 
-                try:
-                    f = open(file_path, 'wb')
-                    data = self._conn.recv(1024)
-                    self.print_status(protocol.SERVER_STATUS_RECEIVING_FILE_DATA, "Receiving file...")
-                    while data != protocol.TRANSFER_COMPLETE:
-                        f.write(data)
-                        print(repr(data))
-                        self._conn.sendall(protocol.OK)
-                        data = self._conn.recv(1024)
-                    f.close()
-                    self._conn.sendall(protocol.OK)
-                    self.print_status(protocol.SERVER_STATUS_RECEIVING_FILE_DATA, "Completed file transfer.")
-                    break
-                except:
-                    self.print_status(protocol.SERVER_STATUS_ERROR,
-                                      "Could not write to file path: " + file_path)
-                    break
-
+            self._close_server()
 
     def abort(self):
         self._abort = True
-        self.print_status(protocol.SERVER_STATUS_ABORT, "Aborted.")
+        self._print_status(protocol.STATUS_ABORT, "Aborted.")
+        # need to connect to server once to make it close
+        try:
+            socket.socket(socket.AF_INET,
+                          socket.SOCK_STREAM).connect((self.host, self.port))
+        except Exception as e:
+            self._print_status(protocol.STATUS_ERROR, "Error:" + str(e))
+
 
     def _close_server(self):
-        self._s.shutdown()
         self._s.close()
-        self.print_status(protocol.SERVER_STATUS_ABORT, "Server Closed.")
+        self._print_status(protocol.STATUS_ABORT, "Server Closed.")
 
-    def print_status(self, status, msg):
-        if self.GUI is not None:
-            self.GUI.update_status(status, msg)
+    def _set_session_ID(self, session_ID):
+        self.session_ID = session_ID
+        self.session_file_path = self.session_folder_path + str(self.session_ID) + '.session'
+
+    def _receive_session_ID(self):
+
+        while True:
+
+            data = self._socket.recv(1024)
+
+            if data != b'':
+                session_ID = data.decode(protocol.STRING_FORMAT)
+                self._set_session_ID(session_ID)
+                self._socket.sendall(protocol.OK)
+                break
+
+        self._set_status(protocol.STATUS_CONNECTED)
+        self._load_job_status()
+
+
+    def _print_status(self, status, msg):
+        if self.gui is not None:
+            self.gui.update_status(status, msg)
         else:
             print("Server: " + msg)
 
+    def _negotiate_status(self):
 
-upload_server = File_Upload_Server()
-upload_server.launch()
+        # initialization
+        while True:
+            data = self._socket.recv(1024)
+
+            if data == protocol.TRANSFER_CLIENT_STATUS:
+                self._print_status(protocol.STATUS_NEGOTIATING_STATUS, "Receiving client status...")
+                self._socket.sendall(protocol.OK)
+                break
+
+        # receiving client status
+        client_status = None
+
+        while True:
+            data = self._socket.recv(1024)
+
+            if data != b'':
+                data = data.decode(protocol.STRING_FORMAT)
+                client_status = int(data)
+                self._socket.sendall(protocol.OK)
+                break
+
+        # negotiating status
+        if self.job_status is not None:
+            new_job_status = self.job_status # min(self.job_status, client_status)
+            if self.data_file_path is not None:
+                if os.path.exists(self.main_directory + self.data_file_path) is True:
+                    self._data_collected = True
+        else:
+            new_job_status = client_status
+
+        if new_job_status == protocol.JOB_STATUS_REQUESTED_EXPERIMENT: # need to go one step back
+            new_job_status = protocol.JOB_STATUS_SENT_SEQUENCE_FILE
+        self._set_job_status(new_job_status)
+
+        # send new server status
+        self._send_and_confirm(protocol.TRANSFER_SERVER_STATUS)
+        self._send_and_confirm(bytes(str(self.job_status), 'utf-8'))
+
+        # save status
+        self._save_job_status()
+        self._print_status(protocol.STATUS_NEGOTIATING_STATUS, "Negotiated job status: " + str(self.job_status))
+
+    def _send_data_file(self):
+        self._print_status(protocol.STATUS_INITIATED_TRANSFER, "Sending data file...")
+        self._send_file(self.data_file_path)
+        self._set_job_status(protocol.JOB_STATUS_COMPLETED_JOB)
+        self._save_job_status()
+
+
+    def _run_experiment(self):
+        self._set_job_status(protocol.JOB_STATUS_REQUESTED_EXPERIMENT)
+        self._save_job_status()
+
+        if self.gui is not None:
+            # need to pass experiment file name to gui
+            exp_file_name = os.path.basename(self.exp_file_path)
+            self._print_status(protocol.STATUS_INITIATED_TRANSFER, exp_file_name)
+            self.gui.load_experiment(exp_file_name)
+            self.gui.run_experiment(plot=True)
+        else:
+            # TODO: leaving this for test purposes
+            self.data_file_path = self.data_folder_path + 'experiment1_data.csv'
+            self._wrap_up_experiment(self.data_file_path)
+
+    def _wrap_up_experiment(self, data_file_path):
+        self._print_status(protocol.STATUS_REQUESTING_EXP, "Wrapping up experiment...")
+        self.data_file_path = data_file_path
+        self._data_collected = True
+        self._set_job_status(protocol.JOB_STATUS_COMPLETED_EXPERIMENT)
+        self._save_job_status()
+
+    def _terminate_session(self):
+        self._print_status(protocol.STATUS_TERMINATING_SESSION, "Terminating session...")
+        self.exp_file_path = ''
+        self.seq_file_path = ''
+        self.data_file_path = ''
+        self.session_ID = None
+        self._data_collected = False
+
+
+# upload_server = Experiment_Server()
+# upload_server.launch()

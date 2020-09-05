@@ -27,7 +27,6 @@ class Experiment_Plot_GUI(Experiment_Toplevel_GUI):
         self.DV = DV
 
         Experiment_Toplevel_GUI.__init__(self, num_rows, num_cols, exp)
-
         Grid.rowconfigure(self._root, 0, minsize=300)
         self.init_window()
 
@@ -50,6 +49,7 @@ class Experiment_Plot_GUI(Experiment_Toplevel_GUI):
 
         # update plot
         self.update_plot()
+
 
     def update_plot(self):
 

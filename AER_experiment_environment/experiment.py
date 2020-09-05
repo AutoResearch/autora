@@ -30,8 +30,9 @@ class Experiment():
     _ITI = 2.0     # inter trial interval in seconds
 
     # Initialization requires path to experiment file
-    def __init__(self, path):
+    def __init__(self, path, main_directory = ""):
         self._path = path
+        self._main_dir = main_directory
 
         # initialize
         self.IVs = list()
@@ -96,7 +97,7 @@ class Experiment():
             if (string.find('Sequence:') != -1):
                 string = string.replace('Sequence:', '')
                 csv_path = self._sequences_folder + string
-                self.read_csv(csv_path)
+                self.read_csv(self._main_dir + csv_path)
 
             # read data file path
             if (string.find('Data:') != -1):
@@ -328,7 +329,13 @@ class Experiment():
         time.sleep(self._ITI)
 
     # writes current independent and dependent variables to csv file
-    def data_to_csv(self, path):
+    def data_to_csv(self, filepath=None):
+
+        if filepath is not None:
+            filepath = filepath
+        else:
+            filepath = self._data_path
+
         # generate data frame
 
         column_names = list()
@@ -348,7 +355,7 @@ class Experiment():
 
         data_frame = pandas.DataFrame(data, columns = column_names)
 
-        data_frame.to_csv(path)
+        data_frame.to_csv(filepath)
 
     def clean_up(self):
         for IV in self.IVs:

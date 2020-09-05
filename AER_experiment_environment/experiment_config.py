@@ -1,10 +1,13 @@
+server_path = "server data/"
+client_path = "client data/"
 experiments_path = "experiments/"
 sequences_path = "experiments/sequences/"
 data_path = "experiments/data/"
+session_path = "sessions/"
 
 LOCAL_HOST = '127.0.0.1'
 HOST_IP = LOCAL_HOST
-HOST_PORT = 47777
+HOST_PORT = 47778
 
 font_family = "Helvetica"
 font_size = 12
