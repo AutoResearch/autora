@@ -6,7 +6,7 @@ from experimentalist_GUI import Experimentalist_GUI
 import experiment_config as config
 from experiment_server import Experiment_Server
 import threading, queue
-
+import os
 
 def runloop(gui=None, run_local=False):
     '''
@@ -21,8 +21,9 @@ def runloop(gui=None, run_local=False):
     if run_local is True:
         experiment_server = Experiment_Server(gui=gui)
     else:
-        host_name = socket.gethostname()
-        host_ip = socket.gethostbyname(host_name)
+        # host_name = socket.gethostname()
+        # host_ip = socket.gethostbyname(host_name)
+        host_ip = os.popen("hostname -I").readline()[:-2]
         experiment_server = Experiment_Server(gui=gui, host=host_ip)
     gui.server_running = True
     gui.experiment_server = experiment_server

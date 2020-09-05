@@ -38,7 +38,7 @@ class Experiment_Server(Client_Server_Interface):
             # keep listening for connections until server is aborted
             while True:
                 self._print_status(protocol.STATUS_LISTENING, "Listening for client.")
-                self._print_status(protocol.STATUS_LISTENING, self.host)
+                self._print_status(protocol.STATUS_LISTENING, self.host + ":" + self.port)
 
                 # get connection
                 self._socket, self._addr = self._s.accept()
