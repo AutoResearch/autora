@@ -203,7 +203,7 @@ class Experiment_Client(Client_Server_Interface):
 
 
 session_ID = 1
-host = '127.0.0.1'
+host = '192.168.188.27'
 port = 47778
 exp_client = Experiment_Client(session_ID, host=host, port=port)
 exp_client.submit_job("experiment1.exp", clear_sessions=True)
