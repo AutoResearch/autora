@@ -1,2 +1,2 @@
 # AER_tinkerforge
-autonomous empirical research for electrical circuits
+autonomous empirical research of electrical circuits
