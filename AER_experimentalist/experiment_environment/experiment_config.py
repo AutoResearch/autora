@@ -1,4 +1,4 @@
-server_path = "AER_experimentalist/experiment_environment/server data/"
+server_path = "server data/"
 client_path = "AER_experimentalist/experiment_environment/client data/"
 experiments_path = "experiments/"
 sequences_path = "experiments/sequences/"

@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 import numpy as np
-from variable import Variable
+from AER_experimentalist.experiment_environment.variable import Variable
 
 class Tinkerforge_Variable(Variable):
 
@@ -8,9 +8,9 @@ class Tinkerforge_Variable(Variable):
     _UID = ""
     _priority = 0
 
-    def __init__(self, UID="", name="", units="", priority="", value_range=(0,1), type=float):
+    def __init__(self, variable_label="", UID="", name="", units="", priority="", value_range=(0,1), type=float):
 
-        super().__init__(name=name, value_range=value_range, units=units, type=type)
+        super().__init__(name=name, value_range=value_range, units=units, type=type, variable_label=variable_label)
 
         self._UID = UID
         self._priority = priority

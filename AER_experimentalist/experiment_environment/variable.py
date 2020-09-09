@@ -25,7 +25,7 @@ class Variable():
         if variable_label == "":
             self._variable_label = self._name
         else:
-            self._variable_label = self._variable_label
+            self._variable_label = variable_label
 
     # Get range of variable.
     # The variable range determines the minimum and maximum allowed value to be manipulated or measured.
@@ -54,13 +54,14 @@ class Variable():
     # Reads and sets value of independent variable from a dictionary with variable_label being the key
     def get_value_from_dict(self, dictionary, position):
 
-        value_list  = dictionary.get(self.get_variable_label())
+        value_list  = dictionary.get(self.get_name()) # get_variable_label()
 
         if value_list is None:
-            raise Exception("Could not find value with label '" + self.get_variable_label() + "' in dictionary.")
+            print(dictionary.keys())
+            raise Exception("Could not find value with name '" + self.get_name() + "' in dictionary.")
 
         if position > len(value_list):
-            raise Exception("Queried position " + str(position) + " for variable " + self.get_variable_label() + "'exceeds number of available positions for that variable in the dictionary.")
+            raise Exception("Queried position " + str(position) + " for variable " + self.get_name() + "'exceeds number of available positions for that variable in the dictionary.")
 
         return value_list[position]
 

@@ -1,10 +1,10 @@
-from IV_time import IV_Time
-from IV_trial import IV_Trial
-from IV_voltage import IV_Voltage
-from IV_current import IV_Current
-from DV_time import DV_Time
-from DV_voltage import DV_Voltage
-from DV_current import DV_Current
+from AER_experimentalist.experiment_environment.IV_time import IV_Time
+from AER_experimentalist.experiment_environment.IV_trial import IV_Trial
+from AER_experimentalist.experiment_environment.IV_voltage import IV_Voltage
+from AER_experimentalist.experiment_environment.IV_current import IV_Current
+from AER_experimentalist.experiment_environment.DV_time import DV_Time
+from AER_experimentalist.experiment_environment.DV_voltage import DV_Voltage
+from AER_experimentalist.experiment_environment.DV_current import DV_Current
 
 IV_labels = {'time_IV': (IV_Time, 'Time', '', 'time_IV', 's', 1, (0, 3600)),
              'trial': (IV_Trial, 'Trial', '', 'trial', 'trials', 0, (0, 10000000)),

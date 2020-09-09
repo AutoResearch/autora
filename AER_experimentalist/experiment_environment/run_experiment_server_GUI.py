@@ -1,6 +1,6 @@
-from experiment_server_GUI import Experiment_Server_GUI
+from AER_experimentalist.experiment_environment.experiment_server_GUI import Experiment_Server_GUI
 from tkinter import *
-from utils import *
+from AER_experimentalist.experiment_environment.utils import *
 
 run_local = False
 

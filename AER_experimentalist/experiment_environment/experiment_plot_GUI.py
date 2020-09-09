@@ -1,6 +1,6 @@
 from tkinter import *
 from tkinter import ttk
-from experiment_toplevel_GUI import Experiment_Toplevel_GUI
+from AER_experimentalist.experiment_environment.experiment_toplevel_GUI import Experiment_Toplevel_GUI
 
 import matplotlib
 matplotlib.use("TkAgg")
@@ -55,11 +55,11 @@ class Experiment_Plot_GUI(Experiment_Toplevel_GUI):
 
         if self._exp is not None and self.IV is not None and self.DV is not None:
 
-            current_trial = len(self._exp.data[self.DV.get_variable_label()])
+            current_trial = len(self._exp.data[self.DV.get_name()])
 
             # get all data points until current trial
-            x = self._exp.sequence[self.IV.get_variable_label()][0:current_trial]
-            y = self._exp.data[self.DV.get_variable_label()][0:current_trial]
+            x = self._exp.sequence[self.IV.get_name()][0:current_trial]
+            y = self._exp.data[self.DV.get_name()][0:current_trial]
 
             self._axis.clear()
             self._axis.scatter(x, y, s=self._scatter_area, facecolors='none', edgecolors=self._scatter_color)

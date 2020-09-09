@@ -1,8 +1,8 @@
-from variable_labels import IV_labels, DV_labels
-from IV_trial import IV_Trial
-from IV_time import IV_Time
-from DV_time import DV_Time
-import experiment_config as config
+from AER_experimentalist.experiment_environment.variable_labels import IV_labels, DV_labels
+from AER_experimentalist.experiment_environment.IV_trial import IV_Trial
+from AER_experimentalist.experiment_environment.IV_time import IV_Time
+from AER_experimentalist.experiment_environment.DV_time import DV_Time
+import AER_experimentalist.experiment_environment.experiment_config as config
 import time
 import pandas
 import AER_experimentalist.experimentalist_config as cfg
@@ -64,10 +64,10 @@ class Experiment():
                 for idx, label in enumerate(labels):
                     if (label in IV_labels) is False:
                         raise Exception('Could not identify sequence variable: ' + label)
-                    (IV_class, name, UID, variable_label, units, priority, value_range) = IV_labels.get(label)
+                    (IV_class, variable_label, UID, name, units, priority, value_range) = IV_labels.get(label)
                     # overwrite priority
                     priority = idx
-                    self.IVs.append(IV_class(variable_label, UID, name, units, priority, value_range))
+                    self.IVs.append(IV_class(variable_label=variable_label, UID=UID, name=name, units=units, priority=priority, value_range=value_range))
 
             # read dependent variables and covariates from line
             elif(string.find(cfg.exp_file_DV_label) != -1 or string.find(cfg.exp_file_CV_label) != -1):
@@ -83,16 +83,18 @@ class Experiment():
                 # read in variables
                 labels = string.split(',')
                 for idx, label in enumerate(labels):
+                    if label == '':
+                        continue
                     if (label in DV_labels) is False:
                         raise Exception('Could not identify sequence variable: ' + label)
-                    (V_class, name, UID, variable_label, units, priority, value_range) = DV_labels.get(label)
+                    (V_class, variable_label, UID, name, units, priority, value_range) = DV_labels.get(label)
                     # overwrite priority
                     priority = idx
                     if(covariate):
-                        self.CVs.append(V_class(variable_label, UID, name, units, priority, value_range))
+                        self.CVs.append(V_class(variable_label=variable_label, UID=UID, name=name, units=units, priority=priority, value_range=value_range))
                         self.CVs(-1).set_covariate(True)
                     else:
-                        self.DVs.append(V_class(variable_label, UID, name, units, priority, value_range))
+                        self.DVs.append(V_class(variable_label=variable_label, UID=UID, name=name, units=units, priority=priority, value_range=value_range))
 
             # read sequence file
             if (string.find(cfg.exp_file_sequence_label) != -1):
@@ -127,7 +129,7 @@ class Experiment():
 
         # set up data
         for dependent_variable in self.DVs:
-            self.data[dependent_variable.get_variable_label()] = list()
+            self.data[dependent_variable.get_name()] = list()
 
         # determine indices for independent variables trial and time
         for idx, independent_variable in enumerate(self.IVs):
@@ -163,13 +165,13 @@ class Experiment():
         # (there could be multiple measurements per nominal trial).
         if self._IV_trial_idx != -1:
             trial_IV = self.IVs[self._IV_trial_idx]
-            if self.sequence.get(trial_IV.get_variable_label()) is None:
+            if self.sequence.get(trial_IV.get_name()) is None:
                 raise Exception("Could not find the 'trial' variable in the sequence.")
-            self.actual_trials = range(0, len(self.sequence.get(trial_IV.get_variable_label())))
+            self.actual_trials = range(0, len(self.sequence.get(trial_IV.get_name())))
 
         else:
             # pick first variable in sequence and determine number of trials based on that
-            self.actual_trials = range(0, len(self.sequence[0]))
+            self.actual_trials = range(0, len(self.sequence[list(self.sequence.keys())[0]]))
 
     # Run the experiment
     def run_experiment(self):
@@ -194,8 +196,8 @@ class Experiment():
 
         # reset time stamp of trial_IV if new trial begins
         if self._IV_trial_idx != -1 and trial > 0:
-            current_trial = self.sequence[self.IVs[self._IV_trial_idx].get_variable_label()][trial]
-            last_trial = self.sequence[self.IVs[self._IV_trial_idx].get_variable_label()][trial-1]
+            current_trial = self.sequence[self.IVs[self._IV_trial_idx].get_name()][trial]
+            last_trial = self.sequence[self.IVs[self._IV_trial_idx].get_name()][trial-1]
             if current_trial != last_trial:
                 self.ITI()
                 if self._IV_time_idx != -1:
@@ -203,8 +205,8 @@ class Experiment():
 
         # reset time stamp of trial_DV if new trial begins
         if self._DV_time_idx != -1 and self._IV_trial_idx != -1 and trial > 0:
-            current_trial = self.sequence[self.IVs[self._IV_trial_idx].get_variable_label()][trial]
-            last_trial = self.sequence[self.IVs[self._IV_trial_idx].get_variable_label()][trial-1]
+            current_trial = self.sequence[self.IVs[self._IV_trial_idx].get_name()][trial]
+            last_trial = self.sequence[self.IVs[self._IV_trial_idx].get_name()][trial-1]
             if current_trial != last_trial:
                 self.DVs[self._DV_time_idx].reset()
 
@@ -215,7 +217,7 @@ class Experiment():
         # measure dependent variables
         for dependent_variable in self.DVs:
             dependent_variable.measure()
-            self.data[dependent_variable.get_variable_label()].append(dependent_variable.get_value())
+            self.data[dependent_variable.get_name()].append(dependent_variable.get_value())
 
     # gets the current trial
     def set_current_trial(self, trial):
@@ -233,7 +235,7 @@ class Experiment():
             return True
 
         IV_trial = self.IVs[self._IV_trial_idx]
-        trial_sequence = self.sequence.get(IV_trial.get_variable_label())
+        trial_sequence = self.sequence.get(IV_trial.get_name())
 
         # return true of the current actual trial marks the last in the sequence
         if self._current_trial >= (len(trial_sequence)-1):
@@ -245,22 +247,22 @@ class Experiment():
         else:
             return False
 
-    def get_IV(self, variable_label):
+    def get_IV(self, name):
 
         for IV in self.IVs:
-            if IV.get_variable_label() ==  variable_label:
+            if IV.get_name() ==  name:
                 return IV
 
         return None
 
-    def get_DV_CV(self, variable_label):
+    def get_DV_CV(self, name):
 
         for DV in self.DVs:
-            if DV.get_variable_label() == variable_label:
+            if DV.get_name() == name:
                 return DV
 
         for CV in self.CVs:
-            if CV.get_variable_label() == variable_label:
+            if CV.get_name() == name:
                 return CV
 
         return None
@@ -344,14 +346,14 @@ class Experiment():
 
         # add dependent variables
         for IV in self.IVs:
-            column_names.append(IV.get_variable_label())
-            data[IV.get_variable_label()] = self.sequence[IV.get_variable_label()]
+            column_names.append(IV.get_name())
+            data[IV.get_name()] = self.sequence[IV.get_name()]
         pass
 
         # add independent variables
         for DV in self.DVs:
-            column_names.append(DV.get_variable_label())
-            data[DV.get_variable_label()] = self.data[DV.get_variable_label()]
+            column_names.append(DV.get_name())
+            data[DV.get_name()] = self.data[DV.get_name()]
         pass
 
         data_frame = pandas.DataFrame(data, columns = column_names)
