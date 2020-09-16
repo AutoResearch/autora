@@ -11,8 +11,8 @@ from itertools import product, permutations
 from scipy.optimize import curve_fit
 #from scipy.misc import comb
 
-import warnings
-warnings.filterwarnings('error')
+#import warnings
+#warnings.filterwarnings('error')
 
 #seed(1111)
 
