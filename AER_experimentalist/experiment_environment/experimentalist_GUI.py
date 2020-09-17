@@ -242,7 +242,9 @@ class Experimentalist_GUI(Frame):
             if len(self.listbox_DVs.curselection()) > 0:
                 index = int(self.listbox_DVs.curselection()[0])
                 value = self.listbox_DVs.get(index)
-                self._DV_name = value
+                for DV in self._exp.DVs:
+                    if DV.get_variable_label() == value:
+                        self._DV_name = DV.get_name()
         else:
             self._DV_name = name
 
@@ -254,7 +256,9 @@ class Experimentalist_GUI(Frame):
             if len(self.listbox_IVs.curselection()) > 0:
                 index = int(self.listbox_IVs.curselection()[0])
                 value = self.listbox_IVs.get(index)
-                self._IV_name = value
+                for IV in self._exp.IVs:
+                    if IV.get_variable_label() == value:
+                        self._IV_name = IV.get_name()
         else:
             self._IV_name = name
 
@@ -290,12 +294,12 @@ class Experimentalist_GUI(Frame):
             return
 
         if self._IV_name is not None:
-            IV = self._IV_name
+            IV = self._exp.get_IV(self._IV_name).get_variable_label()
         else:
             IV = ""
 
         if self._DV_name is not None:
-            DV = self._DV_name
+            DV = self._exp.get_DV_CV(self._DV_name).get_variable_label()
         else:
             DV = ""
 

@@ -3,8 +3,8 @@ from tinkerforge_variable import Tinkerforge_Variable
 
 class DV(Tinkerforge_Variable):
 
-    _variable_label = "DV"
-    _name = "Dependent Variable"
+    _name = "DV"
+    _variable_label = "Dependent Variable"
 
     _is_covariate = False
 

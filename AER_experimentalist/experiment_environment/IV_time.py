@@ -4,9 +4,9 @@ import time
 
 class IV_Time(IV, V_Time):
 
-    _variable_label = "time_IV"
+    _name = "time_IV"
     _UID = ""
-    _name = "Time"
+    _variable_label = "Time"
     _units = "s"
     _priority = 0
     _value_range = (0, 3600)

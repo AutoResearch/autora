@@ -268,22 +268,41 @@ class Experiment():
         return None
 
     def get_IV_labels(self):
-        names = list()
+        labels = list()
         for IV in self.IVs:
-            names.append(IV.get_variable_label())
+            labels.append(IV.get_variable_label())
 
-        return names
+        return labels
 
     def get_DV_labels(self):
-        names = list()
+        labels = list()
         for DV in self.DVs:
-            names.append(DV.get_variable_label())
-        return names
+            labels.append(DV.get_variable_label())
+        return labels
 
     def get_CV_labels(self):
+        labels = list()
+        for CV in self.CVs:
+            labels.append(CV.get_variable_label())
+        return labels
+
+    def get_IV_names(self):
+        names = list()
+        for IV in self.IVs:
+            names.append(IV.get_name())
+
+        return names
+
+    def get_DV_names(self):
+        names = list()
+        for DV in self.DVs:
+            names.append(DV.get_name())
+        return names
+
+    def get_CV_names(self):
         names = list()
         for CV in self.CVs:
-            names.append(CV.get_variable_label())
+            names.append(CV.get_name())
         return names
 
         # get list of current IV's

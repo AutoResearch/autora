@@ -64,8 +64,8 @@ class Experiment_Plot_GUI(Experiment_Toplevel_GUI):
             self._axis.clear()
             self._axis.scatter(x, y, s=self._scatter_area, facecolors='none', edgecolors=self._scatter_color)
 
-            self._axis.set_xlabel(self.IV.get_name() + ' (' + self.IV.get_units() + ')', fontsize=self._font_size)
-            self._axis.set_ylabel(self.DV.get_name() + ' (' + self.DV.get_units() + ')', fontsize=self._font_size)
+            self._axis.set_xlabel(self.IV.get_variable_label() + ' (' + self.IV.get_units() + ')', fontsize=self._font_size)
+            self._axis.set_ylabel(self.DV.get_variable_label() + ' (' + self.DV.get_units() + ')', fontsize=self._font_size)
             self._axis.set_title('Live Plot')
             self._axis.grid()
 

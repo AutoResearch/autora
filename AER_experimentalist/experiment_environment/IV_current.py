@@ -4,9 +4,9 @@ from tinkerforge.bricklet_industrial_analog_out_v2 import BrickletIndustrialAnal
 
 class IV_Current(IV):
 
-    _variable_label = "Source Current"
-    _UID = "MST"
     _name = "source_current"
+    _UID = "MST"
+    _variable_label = "Source Current"
     _units = "µA"
     _priority = 0
     _value_range = (0, 20000)

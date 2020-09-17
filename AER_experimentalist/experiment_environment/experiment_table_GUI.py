@@ -46,9 +46,9 @@ class Experiment_Table_GUI(Experiment_Toplevel_GUI):
         if self._exp is not None:
             # get variables to display
             variable_list = list()
-            IV_list = self._exp.get_IV_labels()
-            CV_list = self._exp.get_CV_labels()
-            DV_list = self._exp.get_DV_labels()
+            IV_list = self._exp.get_IV_names()
+            CV_list = self._exp.get_CV_names()
+            DV_list = self._exp.get_DV_names()
 
             if len(IV_list) > 0:
                 for variable in IV_list:
@@ -67,13 +67,13 @@ class Experiment_Table_GUI(Experiment_Toplevel_GUI):
 
             # set headers
             for IV in self._exp.IVs:
-                self.tree.heading(IV.get_variable_label(), text=IV.get_name(), anchor=W)
+                self.tree.heading(IV.get_name(), text=IV.get_variable_label(), anchor=W)
 
             for CV in self._exp.CVs:
-                self.tree.heading(CV.get_variable_label(), text=CV.get_name(), anchor=W)
+                self.tree.heading(CV.get_name(), text=CV.get_variable_label(), anchor=W)
 
             for DV in self._exp.DVs:
-                self.tree.heading(DV.get_variable_label(), text=DV.get_name(), anchor=W)
+                self.tree.heading(DV.get_name(), text=DV.get_variable_label(), anchor=W)
 
     def update_table(self):
 
@@ -95,13 +95,13 @@ class Experiment_Table_GUI(Experiment_Toplevel_GUI):
                 value_list = list()
 
                 for IV in self._exp.IVs:
-                    value_list.append(str(self._exp.sequence[IV.get_variable_label()][trial]))
+                    value_list.append(str(self._exp.sequence[IV.get_name()][trial]))
 
                 for CV in self._exp.CVs:
-                    value_list.append(str(self._exp.data[CV.get_variable_label()][trial]))
+                    value_list.append(str(self._exp.data[CV.get_name()][trial]))
 
                 for DV in self._exp.DVs:
-                    value_list.append(str(self._exp.data[DV.get_variable_label()][trial]))
+                    value_list.append(str(self._exp.data[DV.get_name()][trial]))
 
                 self.tree.insert("", END, text="Step " + str(trial), values=value_list)
 

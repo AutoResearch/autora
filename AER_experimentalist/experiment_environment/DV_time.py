@@ -4,9 +4,9 @@ import time
 
 class DV_Time(DV, V_Time):
 
-    _variable_label = "time_DV"
+    _name = "time_DV"
     _UID = ""
-    _name = "Time"
+    _variable_label = "Time"
     _units = "s"
     _priority = 0
     _value_range = (0, 604800) # don't record more than a week

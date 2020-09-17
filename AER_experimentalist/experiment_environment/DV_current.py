@@ -4,9 +4,9 @@ from tinkerforge.bricklet_industrial_dual_0_20ma_v2 import BrickletIndustrialDua
 
 class DV_Current(DV):
 
-    _variable_label = "Current 0"
-    _UID = "Hfg"
     _name = "current0"
+    _UID = "Hfg"
+    _variable_label = "Current 0"
     _units = "mA"
     _priority = 0
     _value_range = (0, 2000)

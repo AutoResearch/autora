@@ -3,8 +3,8 @@ from tinkerforge_variable import Tinkerforge_Variable
 
 class IV(Tinkerforge_Variable):
 
-    _variable_label = "IV"
-    _name = "Independent Variable"
+    _name = "IV"
+    _variable_label = "Independent Variable"
 
     def __init__(self, *args, **kwargs):
         super(IV, self).__init__(*args, **kwargs)
