@@ -2,6 +2,7 @@ import socket
 import AER_experimentalist.experiment_environment.experiment_config as config
 import AER_experimentalist.experiment_environment.client_server_protocol as protocol
 from AER_experimentalist.experiment_environment.client_server_interface import Client_Server_Interface
+from os import path
 
 class Experiment_Client(Client_Server_Interface):
 
@@ -18,6 +19,10 @@ class Experiment_Client(Client_Server_Interface):
 
         if experiment_file_name is not None:
             self.exp_file_path = self.exp_folder_path + experiment_file_name
+
+        # update client path
+        if path.exists(self.main_directory) is False:
+            self.main_directory = "client data/"
 
     def submit_job(self, experiment_file_name = None, clear_sessions=False):
 
@@ -124,7 +129,7 @@ class Experiment_Client(Client_Server_Interface):
     def _request_clear_sessions(self):
         self._print_status(protocol.STATUS_CLEARING_SESSIONS, "Clearing sessions...")
         self._send_and_confirm(protocol.CLEAR_SESSIONS)
-        self._clear_sessions(config.client_path)
+        self._clear_sessions(self.main_directory)
         self._print_status(protocol.STATUS_CLEARING_SESSIONS, "All sessions cleared.")
 
     def _send_session_ID(self):
@@ -205,6 +210,6 @@ class Experiment_Client(Client_Server_Interface):
 
 # session_ID = 1
 # host = '192.168.188.27'
-# port = 47777
+# port = 47778
 # exp_client = Experiment_Client(session_ID, host=host, port=port)
 # exp_client.submit_job("experiment2.exp", clear_sessions=True)

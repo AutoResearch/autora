@@ -41,27 +41,28 @@ experimentalist = Experimantalist(study_name=study_name,
                                   experiment_server_port=port)
 
 # THEORIST
-theorist = Theorist(object_of_study=study_object, architecture_search_strategy=architecture_search_strategy.DARTS)
+# theorist = Theorist(object_of_study=study_object, architecture_search_strategy=architecture_search_strategy.DARTS)
 
 
 # AUTONOMOUS EMPIRICAL RESEARCH
 
 # seed object of study with data
-seed_data = experimentalist.seed(study_object)
+seed_data = experimentalist.seed(study_object, datafile="experiment_0_data.csv")
 study_object.add_data(seed_data)
 
-for cycle in range(AER_cycles):
 
-    # generate computational model to explain object of study
-    model = theorist.run_model_search(study_object)
-
-    # generate experiment based on the generated computational model and object of study
-    experiment_file_path = experimentalist.sample_experiment(model, study_object)
-
-    # collect data from experiment
-    data = experimentalist.commission_experiment(experiment_file_path)
-
-    # add new data to object of study
-    study_object.add_data(data)
-
-# TODO: for AER_class, make sure to log the cycle state, so that the cycle can be reinitiated at the point it was last interrupted
+# for cycle in range(AER_cycles):
+#
+#     # generate computational model to explain object of study
+#     model = theorist.run_model_search(study_object)
+#
+#     # generate experiment based on the generated computational model and object of study
+#     experiment_file_path = experimentalist.sample_experiment(model, study_object)
+#
+#     # collect data from experiment
+#     data = experimentalist.commission_experiment(experiment_file_path)
+#
+#     # add new data to object of study
+#     study_object.add_data(data)
+#
+# # TODO: for AER_class, make sure to log the cycle state, so that the cycle can be reinitiated at the point it was last interrupted

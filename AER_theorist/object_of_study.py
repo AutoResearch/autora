@@ -50,11 +50,11 @@ class Object_Of_Study(Dataset):
 
         # set up data
         for var in self.dependent_variables:
-            self.data[var.get_variable_label()] = list()
+            self.data[var.get_name()] = list()
         for var in self.independent_variables:
-            self.data[var.get_variable_label()] = list()
+            self.data[var.get_name()] = list()
         for var in self.covariates:
-            self.data[var.get_variable_label()] = list()
+            self.data[var.get_name()] = list()
         self.data[AER_cfg.experiment_label] = list()
 
     def __len__(self):
@@ -99,6 +99,15 @@ class Object_Of_Study(Dataset):
             input_labels.append(var.get_variable_label())
 
         return input_labels
+
+    def __get_input_names__(self):
+        input_names = list()
+        for var in self.independent_variables:
+            input_names.append(var.get_name())
+        for var in self.covariates:
+            input_names.append(var.get_name())
+
+        return input_names
 
     def get_all_data(self):
 

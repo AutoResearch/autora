@@ -35,7 +35,6 @@ class Theorist_DARTS(Theorist, ABC):
         logging.info('gpu device = %d' % darts_cfg.gpu)
         logging.info("configuration = %s", darts_cfg)
 
-
     def commission_model_search(self):
         pass
 
