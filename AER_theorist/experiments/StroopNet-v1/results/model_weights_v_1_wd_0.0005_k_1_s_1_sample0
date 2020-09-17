@@ -1,0 +1,16 @@
+digraph {
+	node [align=center fontname=times fontsize=20 height=0.5 penwidth=2 shape=rect style=filled width=0.5]
+	edge [fontname=times fontsize=20]
+rankdir=LR
+	COLOR_red [fillcolor=darkseagreen2]
+	COLOR_green [fillcolor=darkseagreen2]
+	WORD_red [fillcolor=darkseagreen2]
+	WORD_green [fillcolor=darkseagreen2]
+	TASK_color [fillcolor=darkseagreen2]
+	TASK_word [fillcolor=darkseagreen2]
+	0 [fillcolor=lightblue]
+	COLOR_red -> 0 [label="(0) subtract" fillcolor=gray]
+	COLOR_green -> 0 [label="(1) linear" fillcolor=gray]
+	out [fillcolor=palegoldenrod]
+	0 -> out [fillcolor=gray]
+}

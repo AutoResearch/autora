@@ -16,10 +16,14 @@ class seed_strategy(Enum):
     PROBABILITY_DISTRIBUTION = 3
     CLASS = 4
 
+
+class sample_strategy(Enum):
+    ADVERSARIAL = 1
+    UNCERTAINTY = 2
+
 class Experimantalist():
 
-    object_of_study = None
-    experiment_name = "Default"
+    study_name = "Default"
     experiment_id = 0
 
     _seed_strategy = seed_strategy.UNIFORM
@@ -30,10 +34,9 @@ class Experimantalist():
     _experiment_server_host = None
     _experiment_server_port = None
 
-    def __init__(self, study_name, object_of_study, experiment_server_host=None, experiment_server_port=None):
+    def __init__(self, study_name, experiment_server_host=None, experiment_server_port=None):
 
         self.study_name = study_name
-        self.object_of_study = object_of_study
         self._experiment_server_host = experiment_server_host
         self._experiment_server_port = experiment_server_port
 
@@ -56,7 +59,7 @@ class Experimantalist():
     def set_experiment_id(self, experiment_id):
         self.experiment_id = experiment_id
 
-    def seed(self, datafile=""):
+    def seed(self, object_of_study, datafile=""):
 
         # seed with data file
         if datafile != "":
@@ -65,18 +68,18 @@ class Experimantalist():
             if os.path.exists(file_path) is False:
                 Exception("Seed data file does not exist: " + file_path)
             else:
-                self.object_of_study.data = self.load_experiment_data(file_path, experiment_id=0)
+                return self.load_experiment_data(object_of_study, file_path, experiment_id=0)
 
         else:
             self.set_experiment_id(0)
-            experiment_file_path = self.generate_seed_experiment()
-            self.commission_experiment(experiment_file_path)
+            experiment_file_path = self.generate_seed_experiment(object_of_study)
+            return self.commission_experiment(experiment_file_path)
 
     def set_seed_strategy(self, strategy: seed_strategy, seed_parameters = list()):
         self._seed_strategy = strategy
         self._seed_parameters = seed_parameters
 
-    def load_experiment_data(self, file_path):
+    def load_experiment_data(self, object_of_study, file_path):
         # read experiment file
         file = open(file_path, "r")
         for line in file:
@@ -88,19 +91,19 @@ class Experimantalist():
             # generate dictionary that contains experiment sequence
             data = dict()
 
-            for IV in self.object_of_study.independent_variables:
+            for IV in object_of_study.independent_variables:
                 if IV.get_name() in data:
                     data[IV.get_name()] = data[IV.get_name()].tolist()
                 else:
                     Exception('Could not find independent variable "' + IV.get_name() + '" in experiment data file: ' + file_path)
 
-            for DV in self.object_of_study.dependent_variables:
+            for DV in object_of_study.dependent_variables:
                 if DV.get_name() in data:
                     data[DV.get_name()] = data[DV.get_name()].tolist()
                 else:
                     Exception('Could not find dependent variable "' + DV.get_name() + '" in experiment data file: ' + file_path)
 
-            for CV in self.object_of_study.covariates:
+            for CV in object_of_study.covariates:
                 if CV.get_name() in data:
                     data[CV.get_name()] = data[CV.get_name()].tolist()
                 else:
@@ -116,7 +119,7 @@ class Experimantalist():
 
             return data
 
-    def generate_seed_experiment(self):
+    def generate_seed_experiment(self, object_of_study):
 
         experiment_design = list()
 
@@ -126,7 +129,7 @@ class Experimantalist():
             # determine tested values for each independent variable
             resolution = self._seed_parameters[0]
 
-            for var in self.object_of_study.independent_variables:
+            for var in object_of_study.independent_variables:
                 factor = Factor(var.get_name(),
                                 np.linspace(var._value_range[0], var._value_range[1], resolution).tolist())
                 experiment_design.append(factor)
@@ -137,17 +140,17 @@ class Experimantalist():
         block = fully_cross_block(experiment_design, experiment_design, [])
         experiment_sequence = synthesize_trials_non_uniform(block, 1)[0]
 
-        experiment_file_path = self._write_experiment(experiment_sequence)
+        experiment_file_path = self._write_experiment(object_of_study, experiment_sequence)
 
         return experiment_file_path
 
-    def _write_experiment(self, experiment_sequence):
+    def _write_experiment(self, object_of_study, experiment_sequence):
         experiment_file_path = self._write_experiment_file()
-        self._write_sequence_file(experiment_sequence)
+        self._write_sequence_file(object_of_study, experiment_sequence)
 
         return experiment_file_path
 
-    def _write_experiment_file(self):
+    def _write_experiment_file(self, object_of_study):
 
         # specify names
         experiment_file_path = self._experiments_path + AER_cfg.experiment_file_prefix + str(self.experiment_id) + '.exp'
@@ -161,19 +164,19 @@ class Experimantalist():
 
         # write independent variables
         f.write(exp_cfg.exp_file_IV_label)
-        for var in self.object_of_study.independent_variables:
+        for var in object_of_study.independent_variables:
             f.write(var.get_name())
         f.write('\n')
 
         # write dependent variables
         f.write(exp_cfg.exp_file_DV_label)
-        for var in self.object_of_study.dependent_variables:
+        for var in object_of_study.dependent_variables:
             f.write(var.get_name())
         f.write('\n')
 
         # write covariates
         f.write(exp_cfg.exp_file_CV_label)
-        for var in self.object_of_study.covariates:
+        for var in object_of_study.covariates:
             f.write(var.get_name())
         f.write('\n')
 
@@ -278,11 +281,19 @@ class Experimantalist():
             data = self.load_experiment_data(data_file_path_dst)
 
             # add sequence and data to object of study
-            self.object_of_study.add_data(data)
+            return data
 
         else:
             raise Exception('Client could not retrieve experiment data from server.')
 
 
+    def sample_experiment(self, model, object_of_study):
 
+        # increment experiment id
+        self.set_experiment_id(self.experiment_id+1)
+
+        # todo: implement
+
+        # return experiment_file_path
+        pass
 

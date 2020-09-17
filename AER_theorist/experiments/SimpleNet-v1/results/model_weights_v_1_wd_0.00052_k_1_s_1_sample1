@@ -1,0 +1,12 @@
+digraph {
+	node [align=center fontname=times fontsize=20 height=0.5 penwidth=2 shape=rect style=filled width=0.5]
+	edge [fontname=times fontsize=20]
+rankdir=LR
+	s1 [fillcolor=darkseagreen2]
+	s2 [fillcolor=darkseagreen2]
+	0 [fillcolor=lightblue]
+	s1 -> 0 [label="(0) exp" fillcolor=gray]
+	s2 -> 0 [label="(1) subtract" fillcolor=gray]
+	out [fillcolor=palegoldenrod]
+	0 -> out [fillcolor=gray]
+}
