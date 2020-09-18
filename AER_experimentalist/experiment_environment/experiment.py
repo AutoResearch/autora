@@ -194,7 +194,7 @@ class Experiment():
             # fetch value for variable
             independent_variable.set_value_from_dict(self.sequence, trial)
 
-        # reset time stamp of trial_IV if new trial begins
+        # reset time stamp of trial_IV if new trial begins, also initiate ITI
         if self._IV_trial_idx != -1 and trial > 0:
             current_trial = self.sequence[self.IVs[self._IV_trial_idx].get_name()][trial]
             last_trial = self.sequence[self.IVs[self._IV_trial_idx].get_name()][trial-1]
@@ -202,6 +202,11 @@ class Experiment():
                 self.ITI()
                 if self._IV_time_idx != -1:
                     self.IVs[self._IV_time_idx].reset()
+        # if there is no trial_IV, reset time stamp and initiate ITI anyway
+        elif self._IV_trial_idx == -1:
+            self.ITI()
+            if self._IV_time_idx != -1:
+                self.IVs[self._IV_time_idx].reset()
 
         # reset time stamp of trial_DV if new trial begins
         if self._DV_time_idx != -1 and self._IV_trial_idx != -1 and trial > 0:
@@ -209,6 +214,10 @@ class Experiment():
             last_trial = self.sequence[self.IVs[self._IV_trial_idx].get_name()][trial-1]
             if current_trial != last_trial:
                 self.DVs[self._DV_time_idx].reset()
+        # if no trial is specified, then reset time stamp anyway
+        elif self._IV_trial_idx == -1 and self._DV_time_idx != -1:
+            self.DVs[self._DV_time_idx].reset()
+
 
         # after values are set, we can start to manipulate without significant delays
         for independent_variable in self.IVs:
