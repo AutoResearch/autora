@@ -47,7 +47,7 @@ experimentalist = Experimantalist(study_name=study_name,
 # AUTONOMOUS EMPIRICAL RESEARCH
 
 # seed object of study with data
-seed_data = experimentalist.seed(study_object, datafile="experiment_0_data.csv")
+seed_data = experimentalist.seed(study_object, n=100)
 study_object.add_data(seed_data)
 
 

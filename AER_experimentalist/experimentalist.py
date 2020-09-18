@@ -69,7 +69,9 @@ class Experimantalist():
 
         else:
             if self._seed_strategy == seed_strategy.UNIFORM:
-                self._seed_parameters = [n]
+                # determine number of values for each independent variable for total number of data points assuming full counterbalancing
+                n_variables = len(object_of_study.independent_variables)
+                self._seed_parameters = [int(np.round(n**(1/float(n_variables))))]
             else:
                 raise Exception('Seed strategy not implemented.')
 

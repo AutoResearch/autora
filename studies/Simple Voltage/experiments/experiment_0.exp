@@ -1,5 +1,0 @@
-IV:source_voltage
-DV:voltage0
-CV:
-Sequence:experiment_0_sequence.csv
-Data:experiment_0_data.csv
