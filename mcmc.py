@@ -323,6 +323,7 @@ class Tree():
         self.__grow_tree(self.root, tlist[0], tlist[1])
         self.get_sse(verbose=verbose)
         self.get_bic(verbose=verbose)
+        self.fit_par = {} # Forget all values fitted so far
         return
 
 
