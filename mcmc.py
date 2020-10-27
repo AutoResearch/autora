@@ -11,8 +11,8 @@ from itertools import product, permutations
 from scipy.optimize import curve_fit
 #from scipy.misc import comb
 
-import warnings
-warnings.filterwarnings('error')
+#import warnings
+#warnings.filterwarnings('error')
 
 #seed(1111)
 
@@ -323,6 +323,7 @@ class Tree():
         self.__grow_tree(self.root, tlist[0], tlist[1])
         self.get_sse(verbose=verbose)
         self.get_bic(verbose=verbose)
+        self.fit_par = {} # Forget all values fitted so far
         return
 
 
