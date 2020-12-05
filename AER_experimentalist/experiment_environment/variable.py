@@ -15,8 +15,9 @@ class Variable():
     _value_range = (0, 1)
     _value = 0
     _variable_label = "" # used for plotting
+    _rescale = 1
 
-    def __init__(self, name="", value_range=(0,1), units="", type = outputTypes.REAL, variable_label=""):
+    def __init__(self, name="", value_range=(0,1), units="", type = outputTypes.REAL, variable_label="", rescale=1):
 
         self._name = name
         self._units = units
@@ -26,6 +27,7 @@ class Variable():
             self._variable_label = self._name
         else:
             self._variable_label = variable_label
+        self._rescale = rescale
 
     # Get range of variable.
     # The variable range determines the minimum and maximum allowed value to be manipulated or measured.
@@ -45,7 +47,7 @@ class Variable():
 
     # Get value.
     def get_value(self):
-        return self._value
+        return self._value * self._rescale
 
     # Set value.
     def set_value(self, value):
@@ -63,7 +65,19 @@ class Variable():
         if position > len(value_list):
             raise Exception("Queried position " + str(position) + " for variable " + self.get_name() + "'exceeds number of available positions for that variable in the dictionary.")
 
-        return value_list[position]
+        return value_list[position] * self._rescale
+
+    def get_value_list_from_dict(self, dictionary):
+        value_list = dictionary.get(self.get_name())  # get_variable_label()
+
+        if value_list is None:
+            print(dictionary.keys())
+            raise Exception("Could not find value with name '" + self.get_name() + "' in dictionary.")
+
+        rescaled_list = [element * self._rescale for element in value_list]
+
+        return rescaled_list
+
 
     # Get variable name.
     def get_name(self):

@@ -1,13 +1,9 @@
 import sys
 from graphviz import Digraph
 
-try:
-  from cnnsimple.operations import *
-except:
-  from operations import *
+from AER_theorist.darts.operations import *
 
-
-def plot(genotype, steps, filename, fileFormat='pdf', viewFile=None, full_label=False, param_list=(), input_labels=()):
+def plot(genotype, filename, fileFormat='pdf', viewFile=None, full_label=False, param_list=(), input_labels=()):
 
   decimals_to_display = 2
   g = Digraph(
@@ -21,11 +17,21 @@ def plot(genotype, steps, filename, fileFormat='pdf', viewFile=None, full_label=
     g.node(input_node, fillcolor='darkseagreen2')
   # assert len(genotype) % 2 == 0
 
+  # determine number of steps (intermediate nodes)
+  steps = 0
+  for op, j in genotype:
+    if j == 0:
+      steps += 1
+
   for i in range(steps):
     g.node(str(i), fillcolor='lightblue')
 
+  n = len(input_labels)
+  start = 0
   for i in range(steps):
-    for k in [2*i, 2*i + 1]:
+    end = start + n
+    # for k in [2*i, 2*i + 1]:
+    for k in range(start, end): # adapted this iteration from get_genotype() in model_search.py
       op, j = genotype[k]
       if j < len(input_labels):
         u = input_labels[j]
@@ -39,7 +45,9 @@ def plot(genotype, steps, filename, fileFormat='pdf', viewFile=None, full_label=
           op_label = get_operation_label(op, params, decimals=decimals_to_display)
           g.edge(u, v, label=op_label, fillcolor="gray")
         else:
-          g.edge(u, v, label='(' + str(k) + ') ' + op_label, fillcolor="gray")
+          g.edge(u, v, label='(' + str(j+start) + ') ' + op_label, fillcolor="gray") # '(' + str(k) + ') '
+    start = end
+    n += 1
 
   g.node("out", fillcolor='palegoldenrod')
   for i in range(steps):

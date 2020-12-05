@@ -3,10 +3,7 @@ import numpy as np
 import torch.nn as nn
 from torch.autograd import Variable
 
-try:
-  from cnnsimple.model_search import Network
-except:
-  from model_search import Network
+from AER_theorist.darts.model_search import Network
 
 def _concat(xs):
   return torch.cat([x.view(-1) for x in xs])

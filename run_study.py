@@ -1,7 +1,9 @@
-from AER_experimentalist.experiment_environment.variable import Variable
+from AER_experimentalist.experiment_environment.variable import Variable as Var
 from AER_experimentalist.experimentalist import Experimantalist
 from AER_theorist.object_of_study import Object_Of_Study
-from AER_theorist.theorist import *
+from AER_theorist.theorist_darts import Theorist_DARTS
+from AER_theorist.theorist_GUI import Theorist_GUI
+from tkinter import *
 
 # GENERAL PARAMETERS
 
@@ -14,14 +16,16 @@ AER_cycles = 1
 # OBJECT OF STUDY
 
 # specify independent variable
-source_voltage = Variable(name='source_voltage',
+source_voltage = Var(name='source_voltage',
                           value_range=(0, 4000),
                           units="mV",
+                          rescale = 0.0001,             # need to convert to V to keep input values small
                           variable_label='Source Voltage')
 
 # specify dependent variable
-target_voltage = Variable(name='voltage0',
+target_voltage = Var(name='voltage0',
                           units="mV",
+                          rescale = 0.0001,             # need to convert to V to keep input values small
                           variable_label='Target Voltage')
 
 # list dependent and independent variables
@@ -41,20 +45,36 @@ experimentalist = Experimantalist(study_name=study_name,
                                   experiment_server_port=port)
 
 # THEORIST
-# theorist = Theorist(object_of_study=study_object, architecture_search_strategy=architecture_search_strategy.DARTS)
-
+theorist = Theorist_DARTS(study_name)
 
 # AUTONOMOUS EMPIRICAL RESEARCH
 
-# seed object of study with data
 seed_data = experimentalist.seed(study_object, n=100)
 study_object.add_data(seed_data)
+
+# # generate computational model to explain object of study
+# model = theorist.search_model(study_object)
+# # generate experiment based on the generated computational model and object of study
+# experiment_file_path = experimentalist.sample_experiment(model, study_object)
+
+# print("experiment file path: " + experiment_file_path)
+# # seed object of study with data
+# seed_data = experimentalist.seed(study_object, datafile="experiment_0_data.csv")
+# study_object.add_data(seed_data)
+#
+#
+# root = Tk()
+# app = Theorist_GUI(theorist=theorist, object_of_study=study_object, root=root)
+# root.mainloop()
+#
+# theorist.GUI(study_object)
+
 
 
 # for cycle in range(AER_cycles):
 #
 #     # generate computational model to explain object of study
-#     model = theorist.run_model_search(study_object)
+#     model = theorist.search_model(study_object)
 #
 #     # generate experiment based on the generated computational model and object of study
 #     experiment_file_path = experimentalist.sample_experiment(model, study_object)

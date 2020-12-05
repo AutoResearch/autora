@@ -4,9 +4,9 @@ import numpy as np
 n_models_sampled = 1            # num of (distinct) model architectures sampled from final architecture weights
 sample_amp = 100                # amplifies architecture weight differences before passing through softmax
 reinitialize_weights = False     # whether to train sampled models on novel weights
-max_k = 2                       # maximum number of computations (nodes) in model
+max_k = 1                       # maximum number of computations (nodes) in model
 min_k = 1                       # minimum number of computations (nodes) in model
-max_seed = 5                    # maximum number of seeds tested
+max_seed = 2                    # maximum number of seeds tested
 num_data_points = 10          # total number of queried data points from object of study
 
 # training
@@ -42,3 +42,7 @@ output_file_folder = 'results'                                 # folder for simu
 arch_weight_decay_list = [6e-4] # np.linspace(0, 6e-4, 6)               # list of architecture weight decays searched over (this decay scales with number of degrees of freedom)
 num_node_list = np.linspace(min_k, max_k, (max_k-min_k)+1)     # list of k's searched over
 seed_list = np.linspace(1, max_seed, max_seed)                 # list of seeds searched over
+csv_model_file_name = 'model_file_name'
+csv_arch_file_name = 'arch_file_name'
+csv_num_graph_node = 'num_graph_node'
+csv_log_loss = 'log_loss'

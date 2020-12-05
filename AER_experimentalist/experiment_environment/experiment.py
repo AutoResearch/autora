@@ -28,7 +28,8 @@ class Experiment():
 
     _current_trial = 0
 
-    _ITI = 2.0     # inter trial interval in seconds
+    _ITI = 1.0     # inter trial interval in seconds
+    _measurement_onset_asynchrony = 1.0
 
     # Initialization requires path to experiment file
     def __init__(self, path, main_directory = ""):
@@ -45,7 +46,6 @@ class Experiment():
         self._IV_trial_idx = -1
         self._IV_time_idx = -1
         self._DV_time_idx = -1
-        self._ITI = 1.0
 
         # read experiment file
         file = open(path, "r")
@@ -218,10 +218,13 @@ class Experiment():
         elif self._IV_trial_idx == -1 and self._DV_time_idx != -1:
             self.DVs[self._DV_time_idx].reset()
 
-
         # after values are set, we can start to manipulate without significant delays
         for independent_variable in self.IVs:
             independent_variable.manipulate()
+
+        # if there is no control by time variables, then allow for some time for manipulation to take effect
+        if self._IV_time_idx == -1 and self._DV_time_idx == -1:
+            self.delay_measurement()
 
         # measure dependent variables
         for dependent_variable in self.DVs:
@@ -358,6 +361,9 @@ class Experiment():
 
     def ITI(self):
         time.sleep(self._ITI)
+
+    def delay_measurement(self):
+        time.sleep(self._measurement_onset_asynchrony)
 
     # writes current independent and dependent variables to csv file
     def data_to_csv(self, filepath=None):

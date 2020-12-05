@@ -4,17 +4,10 @@ import torch.nn.functional as F
 from torch.autograd import Variable
 import numpy as np
 
-try:
-  from cnnsimple.FanOut import FanOut
-  from cnnsimple.operations import *
-  from cnnsimple.genotypes import PRIMITIVES
-  from cnnsimple.genotypes import Genotype
-  import cnnsimple.utils as utils
-except:
-  from fan_out import Fan_Out
-  from operations import *
-  from genotypes import PRIMITIVES
-  from genotypes import Genotype
+from AER_theorist.darts.fan_out import Fan_Out
+from AER_theorist.darts.operations import *
+from AER_theorist.darts.genotypes import PRIMITIVES
+from AER_theorist.darts.genotypes import Genotype
 
 # for 2 input nodes, 1 output node and 4 intermediate nodes, there are 14 possible edges (x 8 operations)
 
@@ -236,7 +229,7 @@ class Network(nn.Module):
     # this function uses the architecture weights to retrieve the operations with the highest weights
     def _parse(weights):
       gene = []
-      n = 2
+      n = self._n_input_states # 2 ... changed this to adapt to number of input states
       start = 0
       for i in range(self._steps):
         end = start + n

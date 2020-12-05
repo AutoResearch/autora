@@ -12,9 +12,9 @@ import AER_theorist.darts.darts_config as darts_cfg
 import AER_config as AER_cfg
 
 # old
-from SimpleNet_dataset import SimpleNetDataset
-from object_of_study import outputTypes
-import SimpleNet_dataset as SimpleNetDatasetFile
+from AER_theorist.darts.SimpleNet_dataset import SimpleNetDataset
+from AER_theorist.darts.object_of_study import outputTypes
+import AER_theorist.darts.SimpleNet_dataset as SimpleNetDatasetFile
 
 def create_output_file_name(file_prefix, log_version = None, weight_decay = None, k = None, seed = None):
 
