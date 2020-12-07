@@ -3,6 +3,7 @@ from AER_experimentalist.experimentalist import Experimantalist
 from AER_theorist.object_of_study import Object_Of_Study
 from AER_theorist.theorist_darts import Theorist_DARTS
 from AER_theorist.theorist_GUI import Theorist_GUI
+from AER_GUI import AER_GUI
 from tkinter import *
 
 # GENERAL PARAMETERS
@@ -49,25 +50,24 @@ theorist = Theorist_DARTS(study_name)
 
 # AUTONOMOUS EMPIRICAL RESEARCH
 
-seed_data = experimentalist.seed(study_object, n=100)
+# seed_data = experimentalist.seed(study_object, n=20)
+# study_object.add_data(seed_data)
+
+# seed object of study with data
+seed_data = experimentalist.seed(study_object, datafile="experiment_0_data.csv")
 study_object.add_data(seed_data)
 
-# # generate computational model to explain object of study
-# model = theorist.search_model(study_object)
-# # generate experiment based on the generated computational model and object of study
-# experiment_file_path = experimentalist.sample_experiment(model, study_object)
 
-# print("experiment file path: " + experiment_file_path)
-# # seed object of study with data
-# seed_data = experimentalist.seed(study_object, datafile="experiment_0_data.csv")
-# study_object.add_data(seed_data)
-#
-#
 # root = Tk()
-# app = Theorist_GUI(theorist=theorist, object_of_study=study_object, root=root)
+# app = Theorist_GUI(object_of_study=study_object, theorist=theorist, root=root)
 # root.mainloop()
-#
+
 # theorist.GUI(study_object)
+
+
+root = Tk()
+app = AER_GUI(object_of_study=study_object, theorist=theorist, experimentalist=experimentalist, root=root)
+root.mainloop()
 
 
 

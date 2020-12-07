@@ -5,7 +5,7 @@ Genotype = namedtuple('Genotype', 'normal normal_concat')
 
 # PRIMITIVES = [
 #     'none',
-#     'exp',
+#     'relu',
 # ]
 
 
@@ -16,4 +16,5 @@ PRIMITIVES = [
     'linear',
     'sigmoid',
     'exp',
+    'relu',
 ]

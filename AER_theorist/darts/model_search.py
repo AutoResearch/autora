@@ -27,6 +27,9 @@ class MixedOp(nn.Module):
 
       # add the operation
       self._ops.append(op)
+      # if primitive == 'relu':
+      #   op[0].weight.data.fill_(1.0)
+      #   op[0].bias.data.fill_(0.001)
 
   def forward(self, x, weights):
     # there are 8 weights for all the eight primitives. then it returns the weighted sum of all operations performed on a given input

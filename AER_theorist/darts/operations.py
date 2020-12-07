@@ -13,7 +13,7 @@ OPS = {
   'relu' : lambda C, stride, affine: nn.Sequential(
     # EDIT 11/04/19 SM: adapting to new SimpleNet data
     # nn.Conv2d(C, C, kernel_size=1, padding=0, bias=True),
-    nn.Linear(1, 1, bias=False),
+    nn.Linear(1, 1, bias=True),
     nn.ReLU(inplace=False),
     ),
   'sigmoid': lambda C, stride, affine: nn.Sequential(

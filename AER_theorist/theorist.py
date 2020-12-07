@@ -17,6 +17,8 @@ class Plot_Types(Enum):
     IMAGE = 2
     LINE_SCATTER = 3
     SURFACE_SCATTER = 4
+    MULTI_LINE = 5
+    MODEL = 6
 
 class Theorist(ABC):
 
@@ -124,6 +126,10 @@ class Theorist(ABC):
         self.update_loss_plot()
         self.update_pattern_plot()
         return self._performance_plots
+
+    @abstractmethod
+    def get_supplementary_plots(self, object_of_study):
+        pass
 
     @abstractmethod
     def update_loss_plot(self):

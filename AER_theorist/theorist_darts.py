@@ -226,6 +226,7 @@ class Theorist_DARTS(Theorist, ABC):
         self.arch_lr_log[:] = np.nan
         self.architecture_weights_log = np.empty(
             (self.model_search_epochs, self.num_arch_edges, self.num_arch_ops))  # log architecture weights
+        self.architecture_weights_log[:] = np.nan
 
         graph_filename = utils.create_output_file_name(file_prefix=darts_cfg.graph_filename,
                                                        log_version=self.model_search_id,
@@ -276,6 +277,9 @@ class Theorist_DARTS(Theorist, ABC):
         self.target_pattern = target.detach().numpy()
         self.prediction_pattern = self.model(input).detach().numpy()
 
+        # log architecture weights
+        self.architecture_weights_log[epoch, :, :] = torch.nn.functional.softmax(self.model.alphas_normal, dim=-1).data.numpy()
+
 
     def log_model_search(self, object_of_study):
 
@@ -316,7 +320,14 @@ class Theorist_DARTS(Theorist, ABC):
         self.update_model_fit_plots(object_of_study)
         return self._performance_plots
 
+    def get_supplementary_plots(self, object_of_study):
+        self.update_arch_weights_plots()
+        return self._supplementary_plots
+
     def update_lr_plot(self):
+
+        if hasattr(self, 'param_lr_log') is not True:
+            return
 
         # type
         type = Plot_Types.LINE
@@ -352,6 +363,9 @@ class Theorist_DARTS(Theorist, ABC):
         self._performance_plots[self._lr_plot_name] = plot_dict
 
     def update_loss_plot(self):
+
+        if hasattr(self, 'train_error_log') is not True:
+            return
 
         # type
         type = Plot_Types.LINE
@@ -392,6 +406,9 @@ class Theorist_DARTS(Theorist, ABC):
         self._performance_plots[self._loss_plot_name] = plot_dict
 
     def update_model_fit_plots(self, object_of_study):
+
+        if hasattr(self, 'model') is not True:
+            return
 
         # get all possible plots
         (IV_list_1, IV_list_2, DV_list) = self.get_model_fit_plot_list(object_of_study)
@@ -475,6 +492,67 @@ class Theorist_DARTS(Theorist, ABC):
 
         # combine each IV
         return (IV_list_1, IV_list_2, DV_list)
+
+
+    def update_arch_weights_plots(self):
+
+        if hasattr(self, 'architecture_weights_log') is False:
+            return
+        # type
+        type = Plot_Types.LINE
+
+        # x axis label
+        x_label = "Epoch"
+
+        # x axis limits
+        x_limit = [1, self.architecture_weights_log.shape[0]]
+
+        for edge in range(self.num_arch_edges):
+
+        #     self.num_arch_edges = model.alphas_normal.data.shape[0]  # number of architecture edges
+        #     self.num_arch_ops = model.alphas_normal.data.shape[1]  # number of operations
+        #     self.arch_ops_labels = PRIMITIVES  # operations
+        #     self.train_error_log = np.empty((self.model_search_epochs, 1))  # log training error
+        #     self.valid_error_log = np.empty((self.model_search_epochs, 1))  # log validation error
+        #     self.train_error_log[:] = np.nan
+        #     self.valid_error_log[:] = np.nan
+        #     self.architecture_weights_log = np.empty(
+        #         (self.model_search_epochs, self.num_arch_edges, self.num_arch_ops))  # log architecture weights
+
+            # plot name
+            plot_name = "Edge " + str(edge)
+
+            # y axis label
+            y_label = "Edge Weight (" + str(edge) + ")"
+
+            # x data
+            x = list()
+
+            # y data
+            y = list()
+            legend = list()
+
+            # add line (y-data and legend) for each primitive
+            for op_idx, operation in enumerate(self.arch_ops_labels):
+
+                x.append(np.linspace(1, self.architecture_weights_log.shape[0], self.architecture_weights_log.shape[0]))
+                y.append(self.architecture_weights_log[:, edge, op_idx])
+                legend.append(operation)
+
+            # y axis limits
+            if np.isnan(self.architecture_weights_log[:, edge, :]).all():
+                y_limit = [0, 1]
+            else:
+                y_limit = [np.nanmin(np.nanmin(self.architecture_weights_log[:, edge, :])),
+                           np.nanmax(np.nanmax(self.architecture_weights_log[:, edge, :]))]
+            if y_limit[0] == y_limit[1]:
+                y_limit = [0, 1]
+
+            # generate plot dictionary
+            plot_dict = self._generate_line_plot_dict(type, x, y, x_limit, y_limit, x_label, y_label, legend)
+            self._supplementary_plots[plot_name] = plot_dict
+
+        return self._supplementary_plots
 
     def _generate_line_plot_dict(self, type, x, y, x_limit=None, y_limit=None, x_label=None, y_label=None, legend=None, image=None, x_model=None, y_model=None, x_highlighted=None, y_highlighted=None):
         # generate plot dictionary

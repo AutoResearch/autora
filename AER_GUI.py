@@ -11,17 +11,14 @@ import matplotlib
 matplotlib.use("TkAgg")
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
+import matplotlib.image as mpimg
 
 from enum import Enum
 
-class Plot_Windows(Enum):
-    PERFORMANCE = 1
-    SUPPLEMENTARY = 2
-
-class Theorist_GUI(Frame):
+class AER_GUI(Frame):
 
     # GUI settings
-    _title = "Theorist"
+    _title = "AER"
 
     # general settings
     _msg_modeling_start = "# START"
@@ -36,13 +33,15 @@ class Theorist_GUI(Frame):
     _listbox_bgcolor = "white"
     _font_family = config.font_family
     _font_size = config.font_size
+    _title_font_size = config.title_font_size
     _font_size_button = config.font_size_button
 
     # grid parameters
-    _model_plot_height = 250
-    _run_button_width = 100
-    _parameter_listbox_width = 150
-    _parameter_button_width = 30
+    _model_plot_height = 220
+    _run_button_width = 150
+    _theorist_plot_width = 200
+    _theorist_button_width = 30
+    _experimentalist_plot_width = _theorist_plot_width
 
     _root = None
     _running = False
@@ -52,6 +51,7 @@ class Theorist_GUI(Frame):
     _last_epoch = 0
 
     # plot parameters
+    _reset_theorist_plot = False
     model_plot_img = None
     _plot_fontSize = 10
     _scatter_area = 50
@@ -61,21 +61,26 @@ class Theorist_GUI(Frame):
                     'r:', 'g:', 'b:', 'c:', 'm:', 'y:', 'k:']
 
     # Initialize GUI.
-    def __init__(self, object_of_study, theorist, root=None):
+    def __init__(self, object_of_study, theorist, experimentalist, root=None):
 
         # set up window
         if root is not None:
             self._root = root
 
-        self.theorist = theorist
         self.object_of_study = object_of_study
+        self.theorist = theorist
+        self.experimentalist = theorist
 
         Frame.__init__(self, self._root)
 
         # define styles
         self.label_style = ttk.Style()
         self.label_style.configure("Default.TLabel", foreground="black", background=self._label_bgcolor,
-                                   font=(self._font_family, self._font_size), anchor="center")
+                                   font=(self._font_family, self._title_font_size), anchor="center")
+
+        self.active_label_style = ttk.Style()
+        self.active_label_style.configure("Active.TLabel", foreground="red", background=self._label_bgcolor,
+                                   font=(self._font_family, self._title_font_size), anchor="center")
 
         self.up_down_button_style = ttk.Style()
         self.up_down_button_style.configure("UpDown.TButton", foreground="black", background=self._up_down_bgcolor,
@@ -93,109 +98,102 @@ class Theorist_GUI(Frame):
 
 
         # configure grid
-        for row in range(3):
+        for row in range(4):
             Grid.rowconfigure(self._root, row, weight=1)
 
-        for col in range(7):
+        for col in range(5):
             Grid.columnconfigure(self._root, col, weight=1)
 
         # set size
-        # Grid.rowconfigure(self._root, 3, minsize=80)
-        Grid.rowconfigure(self._root, 0, minsize=self._model_plot_height)
+        Grid.rowconfigure(self._root, 1, minsize=self._model_plot_height)
         Grid.columnconfigure(self._root, 0, minsize=self._run_button_width)
-        Grid.columnconfigure(self._root, 1, minsize=self._parameter_listbox_width)
-        Grid.columnconfigure(self._root, 2, minsize=self._parameter_button_width)
+        Grid.columnconfigure(self._root, 1, minsize=self._theorist_plot_width)
+        Grid.columnconfigure(self._root, 3, minsize=self._experimentalist_plot_width)
 
         # set up window components
 
-        # main panel
+        # AER control panel
+
+        self.label_aer = ttk.Label(self._root, text='AER Control', style='Default.TLabel')
+
+        self.listbox_status = Listbox(self._root, selectmode=SINGLE, font=(self._font_family, self._font_size),
+                                          bg=self._listbox_bgcolor)
+
         self.button_run = ttk.Button(self._root,
                                       text=self._default_run_text,
-                                      command=self.run_meta_search,
-                                      style="Viz.TButton")
+                                      command=self.run_study,
+                                      style="Run.TButton")
 
         self.button_stop = ttk.Button(self._root,
                                      text=self._default_stop_text,
-                                     command=self.stop_meta_search,
-                                     style="Viz.TButton")
+                                     command=self.stop_study,
+                                     style="Stop.TButton")
 
 
-        # self.model_plot_canvas = Canvas(self._root, width=280, height=250)
+
+        # theorist
+
+        self.label_theorist = ttk.Label(self._root, text='Theorist', style='Default.TLabel')
+
         self.model_plot_canvas = Label(self._root)
-        self._model_plot_width = self._run_button_width + self._parameter_listbox_width + self._parameter_button_width
 
-        # parameter control
+        self._fig_theorist = Figure(figsize=(1, 1), dpi=100)
+        self._axis_theorist = self._fig_theorist.add_subplot(111)
+        self._fig_theorist.subplots_adjust(bottom=0.2)
+        self._fig_theorist.subplots_adjust(left=0.35)
+        self._axis_theorist.plot([0],[0])
+        self._axis_theorist.set_xlabel('Ordinate', fontsize=self._font_size)
+        self._axis_theorist.set_ylabel('Epochs', fontsize=self._font_size)
+        self._axis_theorist.set_title('No Data Available', fontsize=self._font_size)
+        self._axis_theorist.grid()
+        self._canvas_theorist = FigureCanvasTkAgg(self._fig_theorist, self._root)
 
-        self.listbox_parameters = Listbox(self._root, selectmode=SINGLE, font=(self._font_family, self._font_size),
-                                          bg = self._listbox_bgcolor)
-        self.listbox_parameters.bind('<Double-Button>', self.modify_parameter)
+        # self.model_plot_canvas = Label(self._root)
+        self._theorist_canvas_width = self._theorist_plot_width + self._theorist_button_width
 
-        self.button_parameters_selection_up = ttk.Button(self._root,
-                                             text="  /\\  ",
-                                             command=self.parameters_selection_up,
-                                             style="UpDown.TButton")
-
-        self.button_parameters_selection_down = ttk.Button(self._root,
-                                               text="  \\/  ",
-                                               command=self.parameters_selection_down,
-                                               style="UpDown.TButton")
-
-        # performance plot
-
-        self.listbox_performance = Listbox(self._root, selectmode=SINGLE, font=(self._font_family, self._font_size),
+        self.listbox_theorist = Listbox(self._root, selectmode=SINGLE, font=(self._font_family, self._font_size),
                                           bg=self._listbox_bgcolor)
-        self.listbox_performance.bind('<<ListboxSelect>>', self.update_plot(plot_type=Plot_Windows.PERFORMANCE))
+        self.listbox_theorist.bind('<<ListboxSelect>>', self.update_theorist_plot(plots=None))
 
-        self.button_performance_selection_up = ttk.Button(self._root,
+        self.button_theorist_selection_up = ttk.Button(self._root,
                                                          text="  /\\  ",
-                                                         command=self.performance_selection_up,
+                                                         command=self.theorist_selection_up,
                                                          style="UpDown.TButton")
 
-        self.button_performance_selection_down = ttk.Button(self._root,
+        self.button_theorist_selection_down = ttk.Button(self._root,
                                                            text="  \\/  ",
-                                                           command=self.performance_selection_down,
+                                                           command=self.theorist_selection_down,
                                                            style="UpDown.TButton")
 
-        self._fig_performance = Figure(figsize=(1, 1), dpi=100)
-        self._axis_performance_line = self._fig_performance.add_subplot(111)
-        self._fig_performance.subplots_adjust(bottom=0.2)
-        self._fig_performance.subplots_adjust(left=0.35)
-        self._axis_performance_line.plot([0],[0])
-        # self._axis_performance.scatter([0], [0], s=self._scatter_area, facecolors='none', edgecolors=self._scatter_color)
-        self._axis_performance_line.set_xlabel('Ordinate', fontsize=self._font_size)
-        self._axis_performance_line.set_ylabel('Epochs', fontsize=self._font_size)
-        self._axis_performance_line.set_title('No Data Available', fontsize=self._font_size)
-        self._axis_performance_line.grid()
-        self._canvas_performance = FigureCanvasTkAgg(self._fig_performance, self._root)
+        # experimentalist
 
+        self.label_experimentalist = ttk.Label(self._root, text='Experimentalist', style='Default.TLabel')
+        
 
-        # supplementary plot
-
-        self.listbox_supplementary = Listbox(self._root, selectmode=SINGLE, font=(self._font_family, self._font_size),
+        self.listbox_experimentalist = Listbox(self._root, selectmode=SINGLE, font=(self._font_family, self._font_size),
                                            bg=self._listbox_bgcolor)
-        self.listbox_supplementary.bind('<<ListboxSelect>>', self.update_plot(plot_type=Plot_Windows.SUPPLEMENTARY))
+        self.listbox_experimentalist.bind('<<ListboxSelect>>', self.update_experimentalist_plot(plots=None))
 
-        self.button_supplementary_selection_up = ttk.Button(self._root,
+        self.button_experimentalist_up = ttk.Button(self._root,
                                                           text="  /\\  ",
-                                                          command=self.supplementary_selection_up,
+                                                          command=self.experimentalist_selection_up,
                                                           style="UpDown.TButton")
 
-        self.button_supplementary_selection_down = ttk.Button(self._root,
+        self.button_experimentalist_down = ttk.Button(self._root,
                                                             text="  \\/  ",
-                                                            command=self.supplementary_selection_down,
+                                                            command=self.experimentalist_selection_down,
                                                             style="UpDown.TButton")
 
-        self._fig_supplementary= Figure(figsize=(1, 1), dpi=100)
-        self._axis_supplementary_line = self._fig_supplementary.add_subplot(111)
-        self._fig_supplementary.subplots_adjust(bottom=0.2)
-        self._fig_supplementary.subplots_adjust(left=0.35)
-        self._axis_supplementary_line.plot([0], [0])
-        # self._axis_performance.scatter([0], [0], s=self._scatter_area, facecolors='none', edgecolors=self._scatter_color)
-        self._axis_supplementary_line.set_xlabel('Epochs', fontsize=self._font_size)
-        self._axis_supplementary_line.set_ylabel('Ordinate', fontsize=self._font_size)
-        self._axis_supplementary_line.set_title('No Data Available', fontsize=self._font_size)
-        self._axis_supplementary_line.grid()
-        self._canvas_supplementary = FigureCanvasTkAgg(self._fig_supplementary, self._root)
+        self._fig_experimentalist = Figure(figsize=(1, 1), dpi=100)
+        self._axis_experimentalist = self._fig_experimentalist.add_subplot(111)
+        self._fig_experimentalist.subplots_adjust(bottom=0.2)
+        self._fig_experimentalist.subplots_adjust(left=0.35)
+        self._axis_experimentalist.plot([0], [0])
+        self._axis_experimentalist.set_xlabel('Independent Var', fontsize=self._font_size)
+        self._axis_experimentalist.set_ylabel('Dependent Var', fontsize=self._font_size)
+        self._axis_experimentalist.set_title('No Data Available', fontsize=self._font_size)
+        self._axis_experimentalist.grid()
+        self._canvas_experimentalist = FigureCanvasTkAgg(self._fig_experimentalist, self._root)
 
         self.init_window()
 
@@ -204,27 +202,33 @@ class Theorist_GUI(Frame):
         # set up GUI
         self._root.title(self._title)
 
-        # main panel
-        self.button_run.grid(row=2, column=0, sticky=N + S + E + W)
-        self.button_stop.grid(row=1, column=0, sticky=N + S + E + W)
-        self.model_plot_canvas.grid(row=0, column=0, columnspan=3, sticky=N + S + E + W)
+        # AER status
+        self.label_aer.grid(row=0, column=0, sticky=N + S + E + W)
+        self.listbox_status.grid(row=1, column=0, sticky=N + S + E + W)
+        self.button_stop.grid(row=2, column=0, sticky=N + S + E + W)
+        self.button_run.grid(row=3, column=0, sticky=N + S + E + W)
 
-        # parameter control
-        self.listbox_parameters.grid(row=1, rowspan=2, column=1, sticky=N + S + E + W)
-        self.button_parameters_selection_up.grid(row=1, column=2, sticky=N + S + E + W)
-        self.button_parameters_selection_down.grid(row=2, column=2, sticky=N + S + E + W)
 
-        # performance plot
-        self.listbox_performance.grid(row=1, rowspan=2, column=3, sticky=N + S + E + W)
-        self.button_performance_selection_up.grid(row=1, column=4, sticky=N + S + E + W)
-        self.button_performance_selection_down.grid(row=2, column=4, sticky=N + S + E + W)
-        self._canvas_performance.get_tk_widget().grid(row=0, column=3, columnspan=2, sticky=N + S + E + W)
+        # theorist
+        self.label_theorist.grid(row=0, column=1, columnspan=2, sticky=N + S + E + W)
 
-        # supplementary plot
-        self.listbox_supplementary.grid(row=1, rowspan=2, column=5, sticky=N + S + E + W)
-        self.button_supplementary_selection_up.grid(row=1, column=6, sticky=N + S + E + W)
-        self.button_supplementary_selection_down.grid(row=2, column=6, sticky=N + S + E + W)
-        self._canvas_supplementary.get_tk_widget().grid(row=0, column=5, columnspan=2, sticky=N + S + E + W)
+        self.model_plot_canvas.grid(row=1, column=1, columnspan=2, sticky=N + S + E + W)
+        self._canvas_theorist.get_tk_widget().grid(row=1, column=1, columnspan=2, sticky=N + S + E + W)
+
+        self.listbox_theorist.grid(row=2, rowspan=2, column=1, sticky=N + S + E + W)
+        self.button_theorist_selection_up.grid(row=2, column=2, sticky=N + S + E + W)
+        self.button_theorist_selection_down.grid(row=3, column=2, sticky=N + S + E + W)
+
+
+        # experimentalist
+        self.label_experimentalist.grid(row=0, column=3, columnspan=2, sticky=N + S + E + W)
+
+        self._canvas_experimentalist.get_tk_widget().grid(row=1, column=3, columnspan=2, sticky=N + S + E + W)
+
+        self.listbox_experimentalist.grid(row=2, rowspan=2, column=3, columnspan=2, sticky=N + S + E + W)
+        self.button_experimentalist_up.grid(row=2, column=4, sticky=N + S + E + W)
+        self.button_experimentalist_down.grid(row=3, column=4, sticky=N + S + E + W)
+
 
         # resize
         hpad = 67
@@ -240,51 +244,21 @@ class Theorist_GUI(Frame):
         self._root.geometry(self._geom)
         self._geom = geom
 
-    def parameters_selection_up(self):
+    def theorist_selection_up(self):
 
-        self.move_listbox_selection(self.listbox_parameters, -1)
-        # self.set_DV_name()
+        self.move_listbox_selection(self.listbox_theorist, -1)
 
-    def parameters_selection_down(self):
+    def theorist_selection_down(self):
 
-        self.move_listbox_selection(self.listbox_parameters, +1)
-        # self.set_DV_name()
+        self.move_listbox_selection(self.listbox_theorist, +1)
 
-    def performance_selection_up(self):
+    def experimentalist_selection_up(self):
 
-        self.move_listbox_selection(self.listbox_performance, -1)
-        # self.set_DV_name()
+        self.move_listbox_selection(self.listbox_experimentalist, -1)
 
-    def performance_selection_down(self):
+    def experimentalist_selection_down(self):
 
-        self.move_listbox_selection(self.listbox_performance, +1)
-        # self.set_DV_name()
-
-    def supplementary_selection_up(self):
-
-        self.move_listbox_selection(self.listbox_supplementary, -1)
-        # self.set_DV_name()
-
-    def supplementary_selection_down(self):
-
-        self.move_listbox_selection(self.listbox_supplementary, +1)
-        self.set_DV_name()
-
-
-    def set_DV_name(self, name=None):
-        pass
-
-        # if name is None:
-        #     if len(self.listbox_DVs.curselection()) > 0:
-        #         index = int(self.listbox_DVs.curselection()[0])
-        #         value = self.listbox_DVs.get(index)
-        #         for DV in self._exp.DVs:
-        #             if DV.get_variable_label() == value:
-        #                 self._DV_name = DV.get_name()
-        # else:
-        #     self._DV_name = name
-        #
-        # self.update_plot_button()
+        self.move_listbox_selection(self.listbox_experimentalist, +1)
 
     def move_listbox_selection(self, listbox, movement):
 
@@ -309,6 +283,10 @@ class Theorist_GUI(Frame):
         listbox.select_set(position)
         listbox.activate(position)
 
+    def update_status(self, msg):
+        self.listbox_status.insert(END, msg)
+        self.set_listbox_selection(self.listbox_status, self.listbox_status.size() - 1)
+        self.listbox_status.yview_moveto(1)
 
     def update_run_button(self, epoch=0, num_epochs=1, meta_idx=0, num_meta_idx=0):
         if self._running is True:
@@ -327,111 +305,57 @@ class Theorist_GUI(Frame):
                                             + str(meta_idx)
                                             + " (" + str_percent + "%)"
                                             + " / "
-                                            + str(num_meta_idx), command=self.resume_meta_search)
+                                            + str(num_meta_idx), command=self.resume_study)
             else:
                 self.button_run.config(text="PAUSE\n"
                                             + str(meta_idx)
                                             + " (" + str_percent + "%)"
                                             + " / "
-                                            + str(num_meta_idx), command=self.pause_meta_search)
+                                            + str(num_meta_idx), command=self.pause_study)
         else:
-            self.button_run.config(text=self._default_run_text, command=self.run_meta_search)
+            self.button_run.config(text=self._default_run_text, command=self.run_study)
 
     def update_model_plot(self):
         # load image
         model_image_path = self.theorist.plot_model(self.object_of_study)
-        image = Image.open(model_image_path)
 
-        # resize image
-        width, height = image.size
-        resized_width = width * (self._model_plot_height/height)
-        resized_height = height * (self._model_plot_width/width)
-        if resized_width > self._model_plot_width:
-            width = self._model_plot_width
-            height = resized_height
-        elif resized_height > self._model_plot_height:
-            width = resized_width
-            height = self._model_plot_height
-        else:
-            width = self._model_plot_width
-            height = resized_height
-        image = image.resize((int(width), int(height)), Image.ANTIALIAS)
-
-        # draw image
-        img = ImageTk.PhotoImage(image)
-        self.model_plot_canvas.config(image = img)
-
+        image = mpimg.imread(model_image_path)
+        self._axis_theorist.cla()
+        self._axis_theorist.imshow(image)
+        self._axis_theorist.get_xaxis().set_visible(False)
+        self._axis_theorist.get_yaxis().set_visible(False)
+        self._canvas_theorist.draw()
+        self._reset_theorist_plot = True
         # needed here, otherwise canvas doesn't update
-        self._root.update()
+        # self._root.update()
 
-    def update_parameter_list(self, model_search_parameters):
-        self.listbox_parameters.delete(0, 'end')
-        keys = model_search_parameters.keys()
-        for key in keys:
-            param_label = key + " = " + str(model_search_parameters[key][0])
-            self.listbox_parameters.insert(END, param_label)
 
-    def update_performance_plot_list(self, performance_plots):
-        self.listbox_performance.delete(0, 'end')
-        keys = performance_plots.keys()
+    def update_theorist_plot_list(self, theorist_plots):
+        self.listbox_theorist.delete(0, 'end')
+        keys = theorist_plots.keys()
         for key in keys:
             param_label = key
-            self.listbox_performance.insert(END, param_label)
+            self.listbox_theorist.insert(END, param_label)
 
-    def update_supplementary_plot_list(self, supplementary_plots):
-        self.listbox_supplementary.delete(0, 'end')
-        keys = supplementary_plots.keys()
+    def update_experimentalist_plot_list(self, experimentalist_plots):
+        self.listbox_experimentalist.delete(0, 'end')
+        keys = experimentalist_plots.keys()
         for key in keys:
             param_label = key
-            self.listbox_supplementary.insert(END, param_label)
+            self.listbox_experimentalist.insert(END, param_label)
 
-    def modify_parameter(self, click):
-        listbox_selection = self.listbox_parameters.curselection()[0]
-        listbox_value = str(self.listbox_parameters.get(listbox_selection))
-        key = listbox_value.split(" =")[0]
+    def update_experimentalist_plot(self, plots=None):
+        pass
 
-        model_search_parameters = self.theorist.get_model_search_parameters()
-        if key in model_search_parameters.keys():
-            if model_search_parameters[key][1] is True: # parameter is modifiable
-                new_param_value = simpledialog.askstring(key, "Please enter new value:",
-                                                         parent=self._root)
-                if new_param_value is not None:
-                    self.theorist.set_model_search_parameter(key, new_param_value)
-            else:
-                messagebox.showinfo(key, "Parameter cannot be altered while running.")
-
-        model_search_parameters = self.theorist.get_model_search_parameters()
-        self.update_parameter_list(model_search_parameters)
-
-    def update_plot(self, plot_type=None, plots=None):
+    def update_theorist_plot(self, plots=None):
         from AER_theorist.theorist import Plot_Types
 
-        if plot_type == Plot_Windows.PERFORMANCE:
-            relevant_listbox = self.listbox_performance
-
-            if isinstance(plots, dict) is False:
-                plots = self.theorist.get_performance_plots(self.object_of_study)
-
-            if hasattr(self, '_axis_performance_line'):
-                plot_axis = self._axis_performance_line
-
-            if hasattr(self, '_canvas_performance'):
-                plot_canvas = self._canvas_performance
-
-        elif plot_type == Plot_Windows.SUPPLEMENTARY:
-            relevant_listbox = self.listbox_supplementary
-
-            if isinstance(plots, dict) is False:
-                plots = self.theorist.get_supplementary_plots(self.object_of_study)
-
-            if hasattr(self, '_axis_supplementary_line'):
-                plot_axis = self._axis_supplementary_line
-
-            if hasattr(self, '_canvas_supplementary'):
-                plot_canvas = self._canvas_supplementary
-
-        else:
-            return
+        relevant_listbox = self.listbox_theorist
+        if plots is None:
+            plots = self.theorist.get_performance_plots(self.object_of_study)
+        plot_axis = self._axis_theorist
+        plot_canvas = self._canvas_theorist
+        
 
         listbox_selection = relevant_listbox.curselection()
         if len(listbox_selection) == 0:
@@ -444,6 +368,22 @@ class Theorist_GUI(Frame):
 
         if key in plots.keys():
             plot_dict = plots[key]
+
+
+            if self._reset_theorist_plot:
+                self._fig_theorist = Figure(figsize=(1, 1), dpi=100)
+                self._axis_theorist = self._fig_theorist.add_subplot(111)
+                self._fig_theorist.subplots_adjust(bottom=0.2)
+                self._fig_theorist.subplots_adjust(left=0.35)
+                self._axis_theorist.plot([0], [0])
+                self._axis_theorist.set_xlabel('Ordinate', fontsize=self._font_size)
+                self._axis_theorist.set_ylabel('Epochs', fontsize=self._font_size)
+                self._axis_theorist.set_title('No Data Available', fontsize=self._font_size)
+                self._axis_theorist.grid()
+                self._canvas_theorist = FigureCanvasTkAgg(self._fig_theorist, self._root)
+                self._canvas_theorist.get_tk_widget().grid(row=1, column=1, columnspan=2, sticky=N + S + E + W)
+
+                self._reset_theorist_plot = False
 
             type = plot_dict[self.theorist.plot_key_type]
             if type == Plot_Types.LINE:
@@ -475,6 +415,10 @@ class Theorist_GUI(Frame):
                 plot_axis.legend(loc=2, fontsize="small")
 
                 plot_canvas.draw()
+
+            elif type == Plot_Types.MODEL:
+                self.update_model_plot()
+                return
 
             elif type == Plot_Types.IMAGE:
 
@@ -566,27 +510,27 @@ class Theorist_GUI(Frame):
             # finalize performance plot
             plot_axis.set_title(key, fontsize=self._plot_fontSize)
             plot_canvas.draw()
+            # plot_canvas.get_tk_widget().lift()
 
 
         else:
             raise Exception("Key '" + str(key) + "' not found in dictionary performance_plots.")
 
-    def update_supplementary_plot(self):
-        pass
-
-    def stop_meta_search(self):
+    def stop_study(self):
         self._running = False
         if self._paused is True:
             self.reset_gui()
 
-    def pause_meta_search(self):
+    def pause_study(self):
         self._paused = True
 
-    def resume_meta_search(self):
+    def resume_study(self):
         self._paused = False
-        self.run_meta_search(resume=True)
+        self.run_study(resume=True)
 
-    def run_meta_search(self, resume=False):
+    def run_study(self, resume=False):
+
+        from AER_theorist.theorist import Plot_Types
 
         if resume is False:
             self._running = True
@@ -608,17 +552,12 @@ class Theorist_GUI(Frame):
                 [arch_weight_decay_df, num_graph_nodes, seed] = meta_params
                 self.theorist.init_model_search(self.object_of_study)
 
-                # update model parameters
-                model_search_parameters = self.theorist.get_model_search_parameters()
-                self.update_parameter_list(model_search_parameters)
-
                 # update performance plot list
                 performance_plots = self.theorist.get_performance_plots(self.object_of_study)
-                self.update_performance_plot_list(performance_plots)
-
-                # update supplementary plot list
-                supplementary_plots = self.theorist.get_supplementary_plots(self.object_of_study)
-                self.update_supplementary_plot_list(supplementary_plots)
+                plot_dict = dict()
+                plot_dict[self.theorist.plot_key_type] = Plot_Types.MODEL
+                performance_plots["model architecture"] = plot_dict
+                self.update_theorist_plot_list(performance_plots)
 
             for epoch in range(self.theorist.model_search_epochs):
 
@@ -643,23 +582,16 @@ class Theorist_GUI(Frame):
 
                 self.theorist.run_model_search_epoch(epoch)
 
-                # update model plot
-                self.update_model_plot()
-
-                # update parameter list
-                model_search_parameters = self.theorist.get_model_search_parameters()
+                # update GUI
+                self._root.update()
 
                 # update performance plot
                 self.theorist.log_plot_data(epoch, self.object_of_study)
                 performance_plots  = self.theorist.get_performance_plots(self.object_of_study)
-                self.update_plot(Plot_Windows.PERFORMANCE, performance_plots)
-
-                # update supplementary plot
-                supplementary_plots = self.theorist.get_supplementary_plots(self.object_of_study)
-                self.update_plot(Plot_Windows.SUPPLEMENTARY, supplementary_plots)
-
-                self.update_parameter_list(model_search_parameters)
-
+                plot_dict = dict()
+                plot_dict[self.theorist.plot_key_type] = Plot_Types.MODEL
+                performance_plots["model architecture"] = plot_dict
+                self.update_theorist_plot(performance_plots)
 
             if self._running is True:
                 self.theorist.log_model_search(self.object_of_study)
@@ -676,7 +608,6 @@ class Theorist_GUI(Frame):
 
     def reset_gui(self):
         self.update_run_button()
-        self.listbox_parameters.delete(0, 'end')
-        self.listbox_performance.delete(0, 'end')
-        self.listbox_supplementary.delete(0, 'end')
+        self.listbox_theorist.delete(0, 'end')
+        self.listbox_experimentalist.delete(0, 'end')
         self._root.update()
