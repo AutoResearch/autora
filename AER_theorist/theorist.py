@@ -57,6 +57,7 @@ class Theorist(ABC):
     plot_key_y_model = "y model"
     plot_key_x_highlighted_data = "x highlighted data"
     plot_key_y_highlighted_data = "y highlighted data"
+    plot_key_z_highlighted_data = "z highlighted data"
 
     target_pattern = []
     prediction_pattern = []
@@ -192,3 +193,32 @@ class Theorist(ABC):
         fh.setFormatter(logging.Formatter(log_format))
         # adds file name to logger
         logging.getLogger().addHandler(fh)
+
+    def _generate_line_plot_dict(self, type, x, y, x_limit=None, y_limit=None, x_label=None, y_label=None, legend=None, image=None, x_model=None, y_model=None, x_highlighted=None, y_highlighted=None):
+        # generate plot dictionary
+        plot_dict = dict()
+        plot_dict[self.plot_key_type] = type
+        plot_dict[self.plot_key_x_data] = x
+        plot_dict[self.plot_key_y_data] = y
+        if x_limit is not None:
+            plot_dict[self.plot_key_x_limit] = x_limit
+        if y_limit is not None:
+            plot_dict[self.plot_key_y_limit] = y_limit
+        if x_label is not None:
+            plot_dict[self.plot_key_x_label] = x_label
+        if y_label is not None:
+            plot_dict[self.plot_key_y_label] = y_label
+        if legend is not None:
+            plot_dict[self.plot_key_legend] = legend
+        if image is not None:
+            plot_dict[self.plot_key_image] = image
+        if x_model is not None:
+            plot_dict[self.plot_key_x_model] = x_model
+        if y_model is not None:
+            plot_dict[self.plot_key_y_model] = y_model
+        if x_highlighted is not None:
+            plot_dict[self.plot_key_x_highlighted_data] = x_highlighted
+        if y_highlighted is not None:
+            plot_dict[self.plot_key_y_highlighted_data] = y_highlighted
+
+        return plot_dict

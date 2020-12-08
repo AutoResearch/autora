@@ -7,11 +7,11 @@ reinitialize_weights = False     # whether to train sampled models on novel weig
 max_k = 1                       # maximum number of computations (nodes) in model
 min_k = 1                       # minimum number of computations (nodes) in model
 min_seed = 1                    # minimum seed tested
-max_seed = 2                    # maximum seed tested
+max_seed = 1                    # maximum seed tested
 num_data_points = 10          # total number of queried data points from object of study
 
 # training
-epochs = 100                     # num of training epochs (30)
+epochs = 3 #100                     # num of training epochs (30)
 arch_updates_per_epoch = 5      # num of architecture updates per epoch (20)
 param_updates_per_epoch = 100    # num of weight updates per epoch (20)
 batch_size = 20                 # batch size (64)

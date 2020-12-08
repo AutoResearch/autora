@@ -14,7 +14,8 @@ class Object_Of_Study(Dataset):
     covariates = list()
     data = dict()
 
-    _experiment_label = 'AER_experiment'
+    key_experiment_id = 'AER_Experiment'
+
     _normalize_input = False
     _normalize_output = False
 
@@ -60,10 +61,15 @@ class Object_Of_Study(Dataset):
             self.data[var.get_name()] = list()
         self.data[AER_cfg.experiment_label] = list()
 
-    def __len__(self):
-        return len(self.data[AER_cfg.experiment_label])
+    def __len__(self, experiment_id=None):
+        if experiment_id is None:
+            return len(self.data[self.key_experiment_id])
+        else:
+            return self.data[self.key_experiment_id].count(experiment_id)
 
-    def __getitem__(self, idx):
+    def __getitem__(self, idx, experiment_id=None):
+
+        # determine relevant experiment id
 
         # get input data
         input_data = list()
@@ -88,17 +94,40 @@ class Object_Of_Study(Dataset):
 
         return input, output
 
+    def get_last_experiment_id(self):
+        return np.max(self.data[self.key_experiment_id])
+
+    def get_experiment_indices(self, experiment_id):
+        indices = [i for i, x in enumerate(self.data[self.key_experiment_id]) if x == experiment_id]
+        return indices
+
     # potentially redundant with: get_all_data
-    def get_dataset(self):
+    def get_dataset(self, experiment_id=None):
 
-        # create empty tensor
-        input_dataset = torch.empty(len(self), self.__get_input_length__()).float()
-        output_dataset = torch.empty(len(self), self.__get_output_length__()).float()
+        # determine length of data set
+        if experiment_id is None:
+            num_data_points = len(self)
+        else:
+            num_data_points = self.__len__(experiment_id)
 
-        for idx in range(len(self)):
-            (input, output) = self.__getitem__(idx)
-            input_dataset[idx,:] = input
-            output_dataset[idx, :] = output
+        # create an empty tensor
+        input_dataset = torch.empty(num_data_points, self.__get_input_length__()).float()
+        output_dataset = torch.empty(num_data_points, self.__get_output_length__()).float()
+
+        if experiment_id is None:
+            for idx in range(len(self)):
+                (input, output) = self.__getitem__(idx)
+                input_dataset[idx,:] = input
+                output_dataset[idx, :] = output
+        else:
+            experiment_indices = self.get_experiment_indices(experiment_id)
+            sub_idx = 0
+            for idx in range(len(self)):
+                (input, output) = self.__getitem__(idx)
+                if idx in experiment_indices:
+                    input_dataset[sub_idx, :] = input
+                    output_dataset[sub_idx, :] = output
+                    sub_idx += 1
 
         return input_dataset, output_dataset
 
@@ -149,6 +178,26 @@ class Object_Of_Study(Dataset):
                 DV_values[row] = value_mean
 
         return DV_values
+
+    def get_plot_list(self):
+        IV_list_1 = list()
+        IV_list_2 = list()
+        DV_list = list()
+
+        # combine each IV with each IV with each DV
+        independent_variables_1 = self.independent_variables + self.covariates
+        independent_variables_2 = [None] + self.independent_variables + self.covariates
+
+        for IV1 in independent_variables_1:
+            for IV2 in independent_variables_2:
+                for DV in self.dependent_variables:
+                    if IV1 != IV2:
+                        IV_list_1.append(IV1)
+                        IV_list_2.append(IV2)
+                        DV_list.append(DV)
+
+        # combine each IV
+        return (IV_list_1, IV_list_2, DV_list)
 
     def get_variable_data(self, variable):
         var_data = list()

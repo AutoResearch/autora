@@ -1,5 +1,6 @@
 from AER_experimentalist.experiment_environment.variable import Variable as Var
-from AER_experimentalist.experimentalist import Experimantalist
+from AER_experimentalist.experimentalist import Experimentalist
+from AER_experimentalist.experimentalist_popper import Experimentalist_Popper
 from AER_theorist.object_of_study import Object_Of_Study
 from AER_theorist.theorist_darts import Theorist_DARTS
 from AER_theorist.theorist_GUI import Theorist_GUI
@@ -41,9 +42,10 @@ study_object = Object_Of_Study(name=study_name,
 # EXPERIMENTALIST
 
 # initialize experimentalist
-experimentalist = Experimantalist(study_name=study_name,
+experimentalist = Experimentalist_Popper(study_name=study_name,
                                   experiment_server_host=host,
-                                  experiment_server_port=port)
+                                  experiment_server_port=port,
+                                  seed_data_file="experiment_0_data.csv")
 
 # THEORIST
 theorist = Theorist_DARTS(study_name)
@@ -53,9 +55,9 @@ theorist = Theorist_DARTS(study_name)
 # seed_data = experimentalist.seed(study_object, n=20)
 # study_object.add_data(seed_data)
 
-# seed object of study with data
-seed_data = experimentalist.seed(study_object, datafile="experiment_0_data.csv")
-study_object.add_data(seed_data)
+# # seed object of study with data
+# seed_data = experimentalist.seed(study_object, datafile="experiment_0_data.csv")
+# study_object.add_data(seed_data)
 
 
 # root = Tk()

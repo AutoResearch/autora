@@ -9,6 +9,8 @@ from AER_experimentalist.experiment_environment.experiment_client import Experim
 from sweetpea.primitives import Factor
 from sweetpea import fully_cross_block, synthesize_trials_non_uniform
 from enum import Enum
+from AER_theorist.theorist import Plot_Types
+from abc import ABC, abstractmethod
 
 class seed_strategy(Enum):
     UNIFORM = 1
@@ -18,10 +20,11 @@ class sample_strategy(Enum):
     ADVERSARIAL = 1
     UNCERTAINTY = 2
 
-class Experimantalist():
+class Experimentalist(ABC):
 
     study_name = "Default"
     experiment_id = 0
+    seed_data_file = ""
 
     _seed_strategy = seed_strategy.UNIFORM
     _seed_parameters = [100]
@@ -31,11 +34,12 @@ class Experimantalist():
     _experiment_server_host = None
     _experiment_server_port = None
 
-    def __init__(self, study_name, experiment_server_host=None, experiment_server_port=None):
+    def __init__(self, study_name, experiment_server_host=None, experiment_server_port=None, seed_data_file=""):
 
         self.study_name = study_name
         self._experiment_server_host = experiment_server_host
         self._experiment_server_port = experiment_server_port
+        self.seed_data_file = seed_data_file
 
         # generate folder for this study (if none exists yet)
         study_path = AER_cfg.studies_folder + study_name + "/"
@@ -57,6 +61,10 @@ class Experimantalist():
         self.experiment_id = experiment_id
 
     def seed(self, object_of_study, datafile="", n=100):
+
+        # did the user specify a seed data file?
+        if datafile == "" and self.seed_data_file != "":
+            datafile = self.seed_data_file
 
         # seed with data file
         if datafile != "":
@@ -119,7 +127,7 @@ class Experimantalist():
             experiment_id_sequence = list()
             for i in range(num_elements):
                 experiment_id_sequence.append(self.experiment_id)
-            curated_data[AER_cfg.experiment_label] = experiment_id_sequence
+            curated_data[object_of_study.key_experiment_id] = experiment_id_sequence
 
             return curated_data
 
@@ -290,7 +298,102 @@ class Experimantalist():
         else:
             raise Exception('Client could not retrieve experiment data from server.')
 
+    def get_model_fit_plots(self, object_of_study, model):
 
+        # get all possible plots
+        (IV_list_1, IV_list_2, DV_list) = self.get_model_fit_plot_list(object_of_study)
+
+        # for each plot
+        for IV1, IV2, DV in zip(IV_list_1, IV_list_2, DV_list):
+
+            IVs = [IV1, IV2]
+
+            # generate model prediction
+            resolution = 100
+            counterbalanced_input = object_of_study.get_counterbalanced_input(resolution)
+            if IV2 is None:  # prepare line plot
+                x_prediction = object_of_study.get_IVs_from_input(counterbalanced_input, IV1)
+            else:
+                x_prediction = (object_of_study.get_IVs_from_input(counterbalanced_input, IV1), object_of_study.get_IVs_from_input(counterbalanced_input, IV2))
+            y_prediction = model(counterbalanced_input)
+
+            # get data points
+            (input, output)  = object_of_study.get_dataset()
+            if IV2 is None:  # prepare line plot
+                x_data = object_of_study.get_IVs_from_input(input, IV1)
+            else:
+                x_data = (object_of_study.get_IVs_from_input(input, IV1), object_of_study.get_IVs_from_input(input, IV2))
+            y_data = object_of_study.get_DV_from_output(output, DV)
+
+            # determine y limits
+            y_limit = [np.amin(y_data.numpy()), np.amax(y_data.numpy())]
+
+            # determine y_label
+            y_label = DV.get_variable_label()
+
+            # determine legend:
+            legend = ('Data', 'Prediction')
+
+            # select data based on whether this is a line or a surface plot
+            if IV2 is None: # prepare line plot
+
+                # determine plot type
+                type = Plot_Types.LINE_SCATTER
+                plot_name = DV.get_name() + "(" + IV1.get_name() + ")"
+
+                # determine x limits
+                x_limit = object_of_study.get_variable_limits(IV1)
+
+                # determine x_label
+                x_label = IV1.get_variable_label()
+
+            else: # prepare surface plot
+                # determine plot type
+                type = Plot_Types.SURFACE_SCATTER
+
+                # determine x limits
+                x_limit = (object_of_study.get_variable_limits(IV1),
+                           object_of_study.get_variable_limits(IV2))
+
+                # determine x_labels
+                x_label = (IV1.get_variable_label(), IV2.get_variable_label())
+
+            plot_dict = self._generate_plot_dict(type, x=x_data.detach().numpy(), y=y_data.detach().numpy(), x_limit=x_limit, y_limit=y_limit, x_label=x_label, y_label=y_label,
+                                     legend=legend, image=None, x_model=x_prediction.detach().numpy(), y_model=y_prediction.detach().numpy(), x_highlighted=None,
+                                     y_highlighted=None)
+            self._performance_plots[plot_name] = plot_dict
+
+
+    def _generate_plot_dict(self, type, x, y, x_limit=None, y_limit=None, x_label=None, y_label=None, legend=None, image=None, x_model=None, y_model=None, x_highlighted=None, y_highlighted=None):
+        # generate plot dictionary
+        plot_dict = dict()
+        plot_dict[self.plot_key_type] = type
+        plot_dict[self.plot_key_x_data] = x
+        plot_dict[self.plot_key_y_data] = y
+        if x_limit is not None:
+            plot_dict[self.plot_key_x_limit] = x_limit
+        if y_limit is not None:
+            plot_dict[self.plot_key_y_limit] = y_limit
+        if x_label is not None:
+            plot_dict[self.plot_key_x_label] = x_label
+        if y_label is not None:
+            plot_dict[self.plot_key_y_label] = y_label
+        if legend is not None:
+            plot_dict[self.plot_key_legend] = legend
+        if image is not None:
+            plot_dict[self.plot_key_image] = image
+        if x_model is not None:
+            plot_dict[self.plot_key_x_model] = x_model
+        if y_model is not None:
+            plot_dict[self.plot_key_y_model] = y_model
+        if x_highlighted is not None:
+            plot_dict[self.plot_key_x_highlighted_data] = x_highlighted
+        if y_highlighted is not None:
+            plot_dict[self.plot_key_y_highlighted_data] = y_highlighted
+
+        return plot_dict
+
+    @abstractmethod
     def sample_experiment(self, model, object_of_study):
 
         # increment experiment id

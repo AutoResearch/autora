@@ -1,4 +1,4 @@
-from abc import ABC, abstractmethod
+from abc import ABC
 from AER_theorist.theorist import Theorist
 from AER_theorist.theorist import Plot_Types
 from AER_theorist.darts.model_search import Network
@@ -129,7 +129,7 @@ class Theorist_DARTS(Theorist, ABC):
             self.log_model_search(object_of_study)
             self._meta_parameters_iteration += 1
 
-        self.get_best_model(object_of_study)
+        return self.get_best_model(object_of_study)
 
 
     def get_best_model(self, object_of_study):
@@ -435,6 +435,15 @@ class Theorist_DARTS(Theorist, ABC):
                 x_data = (object_of_study.get_IVs_from_input(input, IV1), object_of_study.get_IVs_from_input(input, IV2))
             y_data = object_of_study.get_DV_from_output(output, DV)
 
+            # get highlighted data points from last experiment
+            last_experiment_id = object_of_study.get_last_experiment_id()
+            (input_highlighted, output_highlighted) = object_of_study.get_dataset(experiment_id=last_experiment_id)
+            if IV2 is None:  # prepare line plot
+                x_data_highlighted = object_of_study.get_IVs_from_input(input_highlighted, IV1)
+            else:
+                x_data_highlighted = (object_of_study.get_IVs_from_input(input_highlighted, IV1), object_of_study.get_IVs_from_input(input_highlighted, IV2))
+            y_data_highlighted = object_of_study.get_DV_from_output(output_highlighted, DV)
+
             # determine y limits
             y_limit = [np.amin(y_data.numpy()), np.amax(y_data.numpy())]
 
@@ -442,7 +451,7 @@ class Theorist_DARTS(Theorist, ABC):
             y_label = DV.get_variable_label()
 
             # determine legend:
-            legend = ('Data', 'Prediction')
+            legend = ('All Data', 'Prediction', 'Novel Data')
 
             # select data based on whether this is a line or a surface plot
             if IV2 is None: # prepare line plot
@@ -469,28 +478,12 @@ class Theorist_DARTS(Theorist, ABC):
                 x_label = (IV1.get_variable_label(), IV2.get_variable_label())
 
             plot_dict = self._generate_line_plot_dict(type, x=x_data.detach().numpy(), y=y_data.detach().numpy(), x_limit=x_limit, y_limit=y_limit, x_label=x_label, y_label=y_label,
-                                     legend=legend, image=None, x_model=x_prediction.detach().numpy(), y_model=y_prediction.detach().numpy(), x_highlighted=None,
-                                     y_highlighted=None)
+                                     legend=legend, image=None, x_model=x_prediction.detach().numpy(), y_model=y_prediction.detach().numpy(), x_highlighted=x_data_highlighted.detach().numpy(),
+                                     y_highlighted=y_data_highlighted.detach().numpy())
             self._performance_plots[plot_name] = plot_dict
 
     def get_model_fit_plot_list(self, object_of_study):
-        IV_list_1 = list()
-        IV_list_2 = list()
-        DV_list = list()
-
-        # combine each IV with each IV with each DV
-        independent_variables_1 = object_of_study.independent_variables + object_of_study.covariates
-        independent_variables_2 = [None] + object_of_study.independent_variables + object_of_study.covariates
-
-        for IV1 in independent_variables_1:
-            for IV2 in independent_variables_2:
-                for DV in object_of_study.dependent_variables:
-                    if IV1 != IV2:
-                        IV_list_1.append(IV1)
-                        IV_list_2.append(IV2)
-                        DV_list.append(DV)
-
-        # combine each IV
+        (IV_list_1, IV_list_2, DV_list) = object_of_study.get_plot_list()
         return (IV_list_1, IV_list_2, DV_list)
 
 
@@ -508,16 +501,6 @@ class Theorist_DARTS(Theorist, ABC):
         x_limit = [1, self.architecture_weights_log.shape[0]]
 
         for edge in range(self.num_arch_edges):
-
-        #     self.num_arch_edges = model.alphas_normal.data.shape[0]  # number of architecture edges
-        #     self.num_arch_ops = model.alphas_normal.data.shape[1]  # number of operations
-        #     self.arch_ops_labels = PRIMITIVES  # operations
-        #     self.train_error_log = np.empty((self.model_search_epochs, 1))  # log training error
-        #     self.valid_error_log = np.empty((self.model_search_epochs, 1))  # log validation error
-        #     self.train_error_log[:] = np.nan
-        #     self.valid_error_log[:] = np.nan
-        #     self.architecture_weights_log = np.empty(
-        #         (self.model_search_epochs, self.num_arch_edges, self.num_arch_ops))  # log architecture weights
 
             # plot name
             plot_name = "Edge " + str(edge)
@@ -553,35 +536,6 @@ class Theorist_DARTS(Theorist, ABC):
             self._supplementary_plots[plot_name] = plot_dict
 
         return self._supplementary_plots
-
-    def _generate_line_plot_dict(self, type, x, y, x_limit=None, y_limit=None, x_label=None, y_label=None, legend=None, image=None, x_model=None, y_model=None, x_highlighted=None, y_highlighted=None):
-        # generate plot dictionary
-        plot_dict = dict()
-        plot_dict[self.plot_key_type] = type
-        plot_dict[self.plot_key_x_data] = x
-        plot_dict[self.plot_key_y_data] = y
-        if x_limit is not None:
-            plot_dict[self.plot_key_x_limit] = x_limit
-        if y_limit is not None:
-            plot_dict[self.plot_key_y_limit] = y_limit
-        if x_label is not None:
-            plot_dict[self.plot_key_x_label] = x_label
-        if y_label is not None:
-            plot_dict[self.plot_key_y_label] = y_label
-        if legend is not None:
-            plot_dict[self.plot_key_legend] = legend
-        if image is not None:
-            plot_dict[self.plot_key_image] = image
-        if x_model is not None:
-            plot_dict[self.plot_key_x_model] = x_model
-        if y_model is not None:
-            plot_dict[self.plot_key_y_model] = y_model
-        if x_highlighted is not None:
-            plot_dict[self.plot_key_x_highlighted_data] = x_highlighted
-        if y_highlighted is not None:
-            plot_dict[self.plot_key_y_highlighted_data] = y_highlighted
-
-        return plot_dict
 
     def update_pattern_plot(self):
 

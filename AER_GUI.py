@@ -17,6 +17,8 @@ from enum import Enum
 
 class AER_GUI(Frame):
 
+    AER_cycles = 5
+
     # GUI settings
     _title = "AER"
 
@@ -69,7 +71,7 @@ class AER_GUI(Frame):
 
         self.object_of_study = object_of_study
         self.theorist = theorist
-        self.experimentalist = theorist
+        self.experimentalist = experimentalist
 
         Frame.__init__(self, self._root)
 
@@ -114,7 +116,7 @@ class AER_GUI(Frame):
 
         # AER control panel
 
-        self.label_aer = ttk.Label(self._root, text='AER Control', style='Default.TLabel')
+        self.label_aer = ttk.Label(self._root, text='AER Status', style='Default.TLabel')
 
         self.listbox_status = Listbox(self._root, selectmode=SINGLE, font=(self._font_family, self._font_size),
                                           bg=self._listbox_bgcolor)
@@ -288,6 +290,22 @@ class AER_GUI(Frame):
         self.set_listbox_selection(self.listbox_status, self.listbox_status.size() - 1)
         self.listbox_status.yview_moveto(1)
 
+    def update_status_theorist(self, msg):
+        msg = "Theorist: " + msg
+        self.update_status(msg)
+
+    def update_status_experimentalist(self, msg):
+        msg = "Experimentalist: " + msg
+        self.update_status(msg)
+
+    def activate_theorist(self):
+        self.label_theorist.config(style = "Active.TLabel")
+        self.label_experimentalist.config(style = "Default.TLabel")
+
+    def activate_experimentalist(self):
+        self.label_experimentalist.config(style = "Active.TLabel")
+        self.label_theorist.config(style = "Default.TLabel")
+
     def update_run_button(self, epoch=0, num_epochs=1, meta_idx=0, num_meta_idx=0):
         if self._running is True:
             if self._paused is True:
@@ -329,6 +347,18 @@ class AER_GUI(Frame):
         # needed here, otherwise canvas doesn't update
         # self._root.update()
 
+    def get_theorist_plots(self):
+        from AER_theorist.theorist import Plot_Types
+        # collect performance plots
+        performance_plots = self.theorist.get_performance_plots(self.object_of_study)
+        plot_dict = dict()
+        # add model plot
+        plot_dict[self.theorist.plot_key_type] = Plot_Types.MODEL
+        performance_plots["model architecture"] = plot_dict
+        # collect supplementary plots
+        supplementary_plots = self.theorist.get_supplementary_plots(self.object_of_study)
+        theorist_plots = {**performance_plots, **supplementary_plots}
+        return theorist_plots
 
     def update_theorist_plot_list(self, theorist_plots):
         self.listbox_theorist.delete(0, 'end')
@@ -352,7 +382,7 @@ class AER_GUI(Frame):
 
         relevant_listbox = self.listbox_theorist
         if plots is None:
-            plots = self.theorist.get_performance_plots(self.object_of_study)
+            plots = self.get_theorist_plots()
         plot_axis = self._axis_theorist
         plot_canvas = self._canvas_theorist
         
@@ -458,10 +488,16 @@ class AER_GUI(Frame):
                 del plot_axis.lines[:]  # remove previous lines
                 plots = list()
                 # plot data
-                plots.append(plot_axis.scatter(x_data, y_data, marker='.', c='r', label=legend[0]))
+                plots.append(plot_axis.scatter(x_data, y_data, marker='.', c='k', label=legend[0]))
 
                 # plot model prediction
                 plots.append(plot_axis.plot(x_model, y_model, 'k', label=legend[1]))
+
+                # plot highlighted data
+                if self.theorist.plot_key_x_highlighted_data in plot_dict.keys():
+                    x_highlighted = plot_dict[self.theorist.plot_key_x_highlighted_data]
+                    y_highlighted = plot_dict[self.theorist.plot_key_y_highlighted_data]
+                    plots.append(plot_axis.scatter(x_highlighted, y_highlighted, marker='.', c='r', label=legend[2]))
 
                 # adjust axes
                 plot_axis.set_xlim(x_limit[0], x_limit[1])
@@ -491,9 +527,16 @@ class AER_GUI(Frame):
                 plots = list()
 
                 # plot data
-                plots.append(plot_axis.scatter(x1_data, x2_data, y_data, color = (1, 0, 0, 0.5), label=legend[0]))
+                plots.append(plot_axis.scatter(x1_data, x2_data, y_data, color = (0, 0, 0, 0), label=legend[0]))
+
                 # plot model prediction
                 plots.append(plot_axis.plot_surface(x1_model, x2_model, y_model, color=(0, 0, 0, 0.5), label=legend[1]))
+
+                # plot highlighted data
+                if self.theorist.plot_key_x_highlighted_data in plot_dict.keys():
+                    (x1_highlighted, x2_highlighted) = plot_dict[self.theorist.plot_key_x_highlighted_data]
+                    y_highlighted = plot_dict[self.theorist.plot_key_y_highlighted_data]
+                    plots.append(plot_axis.scatter(x1_highlighted, x2_highlighted, y_highlighted, color=(1, 0, 0, 0.5), label=legend[2]))
 
                 # adjust axes
                 plot_axis.set_xlim(x1_limit[0], x1_limit[1])
@@ -517,15 +560,18 @@ class AER_GUI(Frame):
             raise Exception("Key '" + str(key) + "' not found in dictionary performance_plots.")
 
     def stop_study(self):
+        self.update_status("Aborting study...")
         self._running = False
         if self._paused is True:
             self.reset_gui()
 
     def pause_study(self):
+        self.update_status("Pausing study...")
         self._paused = True
 
     def resume_study(self):
         self._paused = False
+        self.update_status("Resuming study...")
         self.run_study(resume=True)
 
     def run_study(self, resume=False):
@@ -538,70 +584,114 @@ class AER_GUI(Frame):
             self.update_run_button()
             self._root.update()
 
-            # initialize meta-parameter search
+            new_param_value = simpledialog.askstring("AER Cycles", "Please enter number of autonomous research cycles:",
+                                                     parent=self._root)
+            if new_param_value is not None:
+                self.AER_cycles = int(new_param_value)
+
+        # (Main) AER Loop
+        for AER_cycle in range(self.AER_cycles):
+
+            status_msg = "AER CYCLE " + str(AER_cycle+1) + "/" + str(self.AER_cycles)
+            self.update_status(status_msg)
+            status_msg = "------------------"
+            self.update_status(status_msg)
+
+            # Experimentalist: collect seed data
+            self.activate_experimentalist()
+            if AER_cycle == 0:
+                status_msg = "Collecting seed data"
+                self.update_status_experimentalist(status_msg)
+                seed_data = self.experimentalist.seed(self.object_of_study)
+                self.object_of_study.add_data(seed_data)
+            else:
+                # TODO: implement experimentalist procedure
+                # 1) get best fitting model from theorist
+                # 2) update experimentalist plots (best fitting model)
+                # 2) determine optimal experiment
+                # 4) update experimentalist plots
+                # 5) commission experiment
+                # 6) update experimentalist plots
+                # 7) move on to theorist
+                return
+
+            # Theorist: initialize meta-parameter search
+            self.activate_theorist()
+            status_msg = "Initializing model search"
+            self.update_status_theorist(status_msg)
             self.theorist.init_meta_search(self.object_of_study)
 
-        # perform architecture search for different hyper-parameters
-        for idx, meta_params in enumerate(self.theorist._meta_parameters):
-
-            if resume is True:
-                if idx < self._last_meta_param_idx:
-                    continue
-            else:
-
-                [arch_weight_decay_df, num_graph_nodes, seed] = meta_params
-                self.theorist.init_model_search(self.object_of_study)
-
-                # update performance plot list
-                performance_plots = self.theorist.get_performance_plots(self.object_of_study)
-                plot_dict = dict()
-                plot_dict[self.theorist.plot_key_type] = Plot_Types.MODEL
-                performance_plots["model architecture"] = plot_dict
-                self.update_theorist_plot_list(performance_plots)
-
-            for epoch in range(self.theorist.model_search_epochs):
+            # Theorist: perform architecture search for different hyper-parameters
+            for idx, meta_params in enumerate(self.theorist._meta_parameters):
 
                 if resume is True:
-                    if epoch < self._last_epoch:
+                    if idx < self._last_meta_param_idx:
                         continue
+                else:
+                    status_msg = "Model search " + str(idx+1) + "/" + str(len(self.theorist._meta_parameters))
+                    self.update_status_theorist(status_msg)
+                    [arch_weight_decay_df, num_graph_nodes, seed] = meta_params
+                    self.theorist.init_model_search(self.object_of_study)
 
-                # check if still running
-                if self._running is False:
-                    break
+                    # update theorist plot list
+                    theorist_plots = self.get_theorist_plots()
+                    self.update_theorist_plot_list(theorist_plots)
 
-                # check if paused
-                if self._paused is True:
-                    self._last_meta_param_idx = idx
-                    self._last_epoch = epoch
-                    self.update_run_button(meta_idx=idx+1, num_meta_idx=len(self.theorist._meta_parameters))
+                for epoch in range(self.theorist.model_search_epochs):
+
+                    if resume is True:
+                        if epoch < self._last_epoch:
+                            continue
+
+                    # check if still running
+                    if self._running is False:
+                        break
+
+                    # check if paused
+                    if self._paused is True:
+                        self._last_meta_param_idx = idx
+                        self._last_epoch = epoch
+                        self.update_run_button(meta_idx=idx+1, num_meta_idx=len(self.theorist._meta_parameters))
+                        self._root.update()
+                        return
+
+                    # update run button
+                    self.update_run_button(epoch=epoch+1, num_epochs=self.theorist.model_search_epochs, meta_idx=idx+1, num_meta_idx=len(self.theorist._meta_parameters))
+
+                    self.theorist.run_model_search_epoch(epoch)
+
+                    # update GUI
                     self._root.update()
-                    return
 
-                # update run button
-                self.update_run_button(epoch=epoch+1, num_epochs=self.theorist.model_search_epochs, meta_idx=idx+1, num_meta_idx=len(self.theorist._meta_parameters))
+                    # update performance plot
+                    self.theorist.log_plot_data(epoch, self.object_of_study)
+                    theorist_plots = self.get_theorist_plots()
+                    self.update_theorist_plot(theorist_plots)
 
-                self.theorist.run_model_search_epoch(epoch)
+                if self._running is True:
+                    self.theorist.log_model_search(self.object_of_study)
+                    self.theorist._meta_parameters_iteration += 1
 
-                # update GUI
-                self._root.update()
-
-                # update performance plot
-                self.theorist.log_plot_data(epoch, self.object_of_study)
-                performance_plots  = self.theorist.get_performance_plots(self.object_of_study)
-                plot_dict = dict()
-                plot_dict[self.theorist.plot_key_type] = Plot_Types.MODEL
-                performance_plots["model architecture"] = plot_dict
-                self.update_theorist_plot(performance_plots)
-
+            # Theorist: determine best-fitting model
             if self._running is True:
-                self.theorist.log_model_search(self.object_of_study)
-                self.theorist._meta_parameters_iteration += 1
+                status_msg = "Determining best-fitting model..."
+                self.update_status_theorist(status_msg)
+                self._root.update()
+                self.best_model = self.theorist.get_best_model(self.object_of_study)
 
-        if self._running is True:
-            self.theorist.get_best_model(self.object_of_study)
-        else:
+            self.activate_experimentalist()
+            # Experimenter: update experiment plot
+
+            # Experimenter: sample novel experiment
+            status_msg = "Identifying novel experiment..."
+            self.update_status_experimentalist(status_msg)
+            self._root.update()
+            experiment_path = self.experimentalist.sample_experiment(self.best_model, self.object_of_study)
+
+        if self._running is not True:
             # reset gui elements
-            self.reset_gui()
+            # self.reset_gui()
+            pass
 
         self._running = False
 
