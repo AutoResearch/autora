@@ -7,3 +7,5 @@ exp_file_data_label = 'Data:'
 client_experiments_path = 'AER_experimentalist/experiment_environment/client data/experiments/'
 client_sequences_path = 'AER_experimentalist/experiment_environment/client data/experiments/sequences/'
 client_data_path = 'AER_experimentalist/experiment_environment/client data/experiments/data/'
+
+conditions_per_experiment = 20

@@ -9,7 +9,7 @@ from AER_experimentalist.experiment_environment.experiment_client import Experim
 from sweetpea.primitives import Factor
 from sweetpea import fully_cross_block, synthesize_trials_non_uniform
 from enum import Enum
-from AER_theorist.theorist import Plot_Types
+from AER_utils import Plot_Types
 from abc import ABC, abstractmethod
 
 class seed_strategy(Enum):
@@ -25,6 +25,7 @@ class Experimentalist(ABC):
     study_name = "Default"
     experiment_id = 0
     seed_data_file = ""
+    conditions_per_experiment = exp_cfg.conditions_per_experiment
 
     _seed_strategy = seed_strategy.UNIFORM
     _seed_parameters = [100]
@@ -33,6 +34,8 @@ class Experimentalist(ABC):
 
     _experiment_server_host = None
     _experiment_server_port = None
+    _novel_experiment_sequence = None
+    _plots = dict()
 
     def __init__(self, study_name, experiment_server_host=None, experiment_server_port=None, seed_data_file=""):
 
@@ -162,7 +165,7 @@ class Experimentalist(ABC):
 
         return experiment_file_path
 
-    def _write_experiment_file(self, object_of_study):
+    def _write_experiment_file(self, object_of_study, experiment_id = None):
 
         # specify names
         experiment_file_path = self._experiments_path + AER_cfg.experiment_file_prefix + str(self.experiment_id) + '.exp'
@@ -298,6 +301,10 @@ class Experimentalist(ABC):
         else:
             raise Exception('Client could not retrieve experiment data from server.')
 
+    def get_model_fit_plot_list(self, object_of_study):
+        (IV_list_1, IV_list_2, DV_list) = object_of_study.get_plot_list()
+        return (IV_list_1, IV_list_2, DV_list)
+
     def get_model_fit_plots(self, object_of_study, model):
 
         # get all possible plots
@@ -361,46 +368,61 @@ class Experimentalist(ABC):
             plot_dict = self._generate_plot_dict(type, x=x_data.detach().numpy(), y=y_data.detach().numpy(), x_limit=x_limit, y_limit=y_limit, x_label=x_label, y_label=y_label,
                                      legend=legend, image=None, x_model=x_prediction.detach().numpy(), y_model=y_prediction.detach().numpy(), x_highlighted=None,
                                      y_highlighted=None)
-            self._performance_plots[plot_name] = plot_dict
+            self._plots[plot_name] = plot_dict
 
 
     def _generate_plot_dict(self, type, x, y, x_limit=None, y_limit=None, x_label=None, y_label=None, legend=None, image=None, x_model=None, y_model=None, x_highlighted=None, y_highlighted=None):
         # generate plot dictionary
         plot_dict = dict()
-        plot_dict[self.plot_key_type] = type
-        plot_dict[self.plot_key_x_data] = x
-        plot_dict[self.plot_key_y_data] = y
+        plot_dict[AER_cfg.plot_key_type] = type
+        plot_dict[AER_cfg.plot_key_x_data] = x
+        plot_dict[AER_cfg.plot_key_y_data] = y
         if x_limit is not None:
-            plot_dict[self.plot_key_x_limit] = x_limit
+            plot_dict[AER_cfg.plot_key_x_limit] = x_limit
         if y_limit is not None:
-            plot_dict[self.plot_key_y_limit] = y_limit
+            plot_dict[AER_cfg.plot_key_y_limit] = y_limit
         if x_label is not None:
-            plot_dict[self.plot_key_x_label] = x_label
+            plot_dict[AER_cfg.plot_key_x_label] = x_label
         if y_label is not None:
-            plot_dict[self.plot_key_y_label] = y_label
+            plot_dict[AER_cfg.plot_key_y_label] = y_label
         if legend is not None:
-            plot_dict[self.plot_key_legend] = legend
+            plot_dict[AER_cfg.plot_key_legend] = legend
         if image is not None:
-            plot_dict[self.plot_key_image] = image
+            plot_dict[AER_cfg.plot_key_image] = image
         if x_model is not None:
-            plot_dict[self.plot_key_x_model] = x_model
+            plot_dict[AER_cfg.plot_key_x_model] = x_model
         if y_model is not None:
-            plot_dict[self.plot_key_y_model] = y_model
+            plot_dict[AER_cfg.plot_key_y_model] = y_model
         if x_highlighted is not None:
-            plot_dict[self.plot_key_x_highlighted_data] = x_highlighted
+            plot_dict[AER_cfg.plot_key_x_highlighted_data] = x_highlighted
         if y_highlighted is not None:
-            plot_dict[self.plot_key_y_highlighted_data] = y_highlighted
+            plot_dict[AER_cfg.plot_key_y_highlighted_data] = y_highlighted
 
         return plot_dict
 
-    @abstractmethod
     def sample_experiment(self, model, object_of_study):
 
+        self.init_experiment_search(model, object_of_study)
+
+        for condition in self.conditions_per_experiment:
+            self.sample_experiment_condition(model, object_of_study, condition)
+
+        experiment_file_path = self._write_experiment(object_of_study, self._novel_experiment_sequence)
+
+        return experiment_file_path
+
+    # method for initializing experiment search
+    @abstractmethod
+    def init_experiment_search(self, model, object_of_study):
         # increment experiment id
         self.set_experiment_id(self.experiment_id+1)
+        return
 
-        # todo: implement
-
-        # return experiment_file_path
+    # experiment search single condition
+    @abstractmethod
+    def sample_experiment_condition(self, model, object_of_study, condition):
         pass
 
+    def get_plots(self, object_of_study, model):
+        self.get_model_fit_plots(object_of_study, model)
+        return self._plots

@@ -3,6 +3,7 @@ from tkinter import ttk
 from tkinter import simpledialog, messagebox
 from PIL import Image, ImageTk
 import AER_config as config
+from AER_utils import Plot_Types
 import os
 import numpy as np
 import time
@@ -404,7 +405,6 @@ class Theorist_GUI(Frame):
         self.update_parameter_list(model_search_parameters)
 
     def update_plot(self, plot_type=None, plots=None):
-        from AER_theorist.theorist import Plot_Types
 
         if plot_type == Plot_Windows.PERFORMANCE:
             relevant_listbox = self.listbox_performance
@@ -566,7 +566,6 @@ class Theorist_GUI(Frame):
             # finalize performance plot
             plot_axis.set_title(key, fontsize=self._plot_fontSize)
             plot_canvas.draw()
-
 
         else:
             raise Exception("Key '" + str(key) + "' not found in dictionary performance_plots.")

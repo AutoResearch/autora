@@ -1,6 +1,6 @@
 from abc import ABC
 from AER_theorist.theorist import Theorist
-from AER_theorist.theorist import Plot_Types
+from AER_utils import Plot_Types
 from AER_theorist.darts.model_search import Network
 from AER_theorist.darts.architect import Architect
 from AER_theorist.darts.genotypes import PRIMITIVES
@@ -165,6 +165,7 @@ class Theorist_DARTS(Theorist, ABC):
         model.fix_architecture(True, new_weights=alphas_normal)
 
         # return winning model
+        self.model = model
         return model
 
     def init_model_search(self, object_of_study):
@@ -359,7 +360,7 @@ class Theorist_DARTS(Theorist, ABC):
         legend = ('Parameter LR', 'Architecture LR')
 
         # generate plot dictionary
-        plot_dict = self._generate_line_plot_dict(type, x, y, x_limit, y_limit, x_label, y_label, legend)
+        plot_dict = self._generate_plot_dict(type, x, y, x_limit, y_limit, x_label, y_label, legend)
         self._performance_plots[self._lr_plot_name] = plot_dict
 
     def update_loss_plot(self):
@@ -402,7 +403,7 @@ class Theorist_DARTS(Theorist, ABC):
         legend = ('Training Loss', 'Validation Loss')
 
         # generate plot dictionary
-        plot_dict = self._generate_line_plot_dict(type, x, y, x_limit, y_limit, x_label, y_label, legend)
+        plot_dict = self._generate_plot_dict(type, x, y, x_limit, y_limit, x_label, y_label, legend)
         self._performance_plots[self._loss_plot_name] = plot_dict
 
     def update_model_fit_plots(self, object_of_study):
@@ -477,7 +478,7 @@ class Theorist_DARTS(Theorist, ABC):
                 # determine x_labels
                 x_label = (IV1.get_variable_label(), IV2.get_variable_label())
 
-            plot_dict = self._generate_line_plot_dict(type, x=x_data.detach().numpy(), y=y_data.detach().numpy(), x_limit=x_limit, y_limit=y_limit, x_label=x_label, y_label=y_label,
+            plot_dict = self._generate_plot_dict(type, x=x_data.detach().numpy(), y=y_data.detach().numpy(), x_limit=x_limit, y_limit=y_limit, x_label=x_label, y_label=y_label,
                                      legend=legend, image=None, x_model=x_prediction.detach().numpy(), y_model=y_prediction.detach().numpy(), x_highlighted=x_data_highlighted.detach().numpy(),
                                      y_highlighted=y_data_highlighted.detach().numpy())
             self._performance_plots[plot_name] = plot_dict
@@ -532,7 +533,7 @@ class Theorist_DARTS(Theorist, ABC):
                 y_limit = [0, 1]
 
             # generate plot dictionary
-            plot_dict = self._generate_line_plot_dict(type, x, y, x_limit, y_limit, x_label, y_label, legend)
+            plot_dict = self._generate_plot_dict(type, x, y, x_limit, y_limit, x_label, y_label, legend)
             self._supplementary_plots[plot_name] = plot_dict
 
         return self._supplementary_plots
@@ -560,7 +561,7 @@ class Theorist_DARTS(Theorist, ABC):
         y_label = "Pattern"
 
         # generate plot dictionary
-        plot_dict = self._generate_line_plot_dict(type, x, y, x_label=x_label, y_label=y_label, image=im)
+        plot_dict = self._generate_plot_dict(type, x, y, x_label=x_label, y_label=y_label, image=im)
         self._performance_plots[self._pattern_plot_name] = plot_dict
 
 
