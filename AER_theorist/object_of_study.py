@@ -94,6 +94,40 @@ class Object_Of_Study(Dataset):
 
         return input, output
 
+    def get_random_input_sample(self):
+
+        # sample input data
+        input_data = list()
+
+        for var in self.independent_variables:
+            sample = np.random.uniform(var.__get_value_range__()[0] * var._rescale,
+                                       var.__get_value_range__()[1] * var._rescale)
+            input_data.append(sample)
+
+        for var in self.covariates:
+            sample = np.random.uniform(var.__get_value_range__()[0] * var._rescale,
+                                       var.__get_value_range__()[1] * var._rescale)
+            input_data.append(sample)
+
+        input = torch.tensor(input_data).float()
+
+        # normalize if required
+        if self._normalize_input:
+            input = self.normalize_variables(input, self.independent_variables)
+
+        return input
+
+    def new_experiment_sequence(self):
+        experiment_sequence = dict()
+
+        for var in self.independent_variables:
+            experiment_sequence[var.get_name()] = list()
+
+        for var in self.covariates:
+            experiment_sequence[var.get_name()] = list()
+
+        return experiment_sequence
+
     def get_last_experiment_id(self):
         return np.max(self.data[self.key_experiment_id])
 
@@ -240,9 +274,59 @@ class Object_Of_Study(Dataset):
                 break
         return column
 
+    def get_IV_name(self, idx):
+        if idx < len(self.independent_variables):
+            name = self.independent_variables[idx].get_name()
+        else:
+            idx = idx - len(self.independent_variables)
+            if idx < len(self.covariates):
+                name = self.covariates[idx].get_name()
+            else:
+                raise Exception("Index exceeds number of independent variables.")
+        return name
+
+    def get_DV_name(self, idx):
+        if idx < len(self.dependent_variables):
+            name = self.dependent_variables[idx].get_name()
+            return name
+        else:
+            raise Exception("Index exceeds number of dependent variables.")
+
     def get_variable_limits(self, var):
         limits = [var.__get_value_range__()[0] * var._rescale, var.__get_value_range__()[1] * var._rescale]
         return limits
+
+    def rescale_experiment_sequence(self, sequence):
+        rescaled_sequence = dict()
+        for key in sequence:
+            values = sequence[key]
+            rescale = self.get_IV_rescale_from_name(key)
+            values_rescaled = [val * rescale for val in values]
+            rescaled_sequence[key] = values_rescaled
+
+        return rescaled_sequence
+
+    def get_IV_rescale_from_name(self, IV_name):
+
+        for var in self.independent_variables:
+            if var.get_name() == IV_name:
+                return var._rescale
+
+        for var in self.covariates:
+            if var.get_name() == IV_name:
+                return var._rescale
+
+    def get_IV_limits_from_name(self, IV_name):
+
+        for var in self.independent_variables:
+            if var.get_name() == IV_name:
+                return self.get_variable_limits(var)
+
+        for var in self.covariates:
+            if var.get_name() == IV_name:
+                return self.get_variable_limits(var)
+
+        return None
 
     def get_variable_summary_stats(self, variables):
 

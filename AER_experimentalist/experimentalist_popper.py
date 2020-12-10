@@ -2,6 +2,7 @@ import AER_config as AER_cfg
 import numpy as np
 import AER_experimentalist.experimentalist_config as exp_cfg
 from torch import nn
+import torch
 import torch.optim as optim
 from torch.autograd import Variable
 import AER_experimentalist.experimentalist_popper_config as popper_config
@@ -68,30 +69,66 @@ class Experimentalist_Popper(Experimentalist, ABC):
         self.popper_pattern_data = np.concatenate((popper_prediction.detach().numpy(), popper_target.detach().numpy()),
                                                   axis=1)
 
-        # import matplotlib.pyplot as plt
-        # plt.plot(self.popper_loss_log)
-        # plt.ylabel('some numbers')
-        # plt.show()
         return
 
     def sample_experiment_condition(self, model, object_of_study, condition):
 
-        # todo: loop through each input pattern
-        # # once the popper network is trained, invert the network to determine optimal experiment conditions
-        # for optimization_epoch in range(self.num_optimization_epochs):
-        #     # set up input to popper model
-        #     popper_input_optim = popper_input.clone().detach()
-        #     popper_input_optim.requires_grad = True
-        #     # feedforward pass on popper network
-        #     popper_prediction = popper_net(popper_input_optim)
-        #     # compute gradient that maximizes output of popper network (i.e. predicted loss of original model)
-        #     popper_loss_optim = -popper_prediction
-        #     popper_loss_optim.backwards()
-        #     # apply gradient to input
-        #     popper_input_optim += -self.optim_lr * popper_input_optim.grad
+        # sample initial condition for experiment
+        input_sample = object_of_study.get_random_input_sample()
+        popper_input = Variable(input_sample, requires_grad=True)
 
-        # todo: turn resulting input into new experiment conditions
-        pass
+        # obtain limits
+        IV_limit_list = list()
+        for idx in range(len(input_sample)):
+            IV_name = object_of_study.get_IV_name(idx)
+            IV_limit_list.append(object_of_study.get_IV_limits_from_name(IV_name))
+
+        # invert the popper network to determine optimal experiment conditions
+        for optimization_epoch in range(self.num_optimization_epochs):
+            # feedforward pass on popper network
+            popper_prediction = self.popper_net(popper_input)
+            # compute gradient that maximizes output of popper network (i.e. predicted loss of original model)
+            popper_loss_optim = -popper_prediction
+            popper_loss_optim.backward()
+            # compute new input
+            with torch.no_grad():
+
+                # first add repulsion from variable limits
+                for idx in range(len(input_sample)):
+                    IV_value = input_sample[idx]
+                    IV_limits = IV_limit_list[idx]
+                    dist_to_min = np.abs(IV_value - np.min(IV_limits))
+                    dist_to_max = np.abs(IV_value - np.max(IV_limits))
+                    repulsion_from_min = popper_config.limit_repulsion/(dist_to_min**2)
+                    repulsion_from_max = popper_config.limit_repulsion / (dist_to_max ** 2)
+                    IV_value_repulsed = IV_value + repulsion_from_min - repulsion_from_max
+                    popper_input[idx] = IV_value_repulsed
+
+                # now add gradient for theory loss maximization
+                popper_input += -self.optim_lr * popper_input.grad
+
+                # finally, clip input variable from it's limits
+                for idx in range(len(input_sample)):
+                    IV_raw_value = input_sample[idx]
+                    IV_limits = IV_limit_list[idx]
+                    IV_clipped_value = np.min([IV_raw_value, np.max(IV_limits)-popper_config.limit_offset])
+                    IV_clipped_value = np.max([IV_clipped_value, np.min(IV_limits)+popper_config.limit_offset])
+                    popper_input[idx] = IV_clipped_value
+
+        # add condition to new experiment sequence
+        for idx in range(len(input_sample)):
+            IV_name = object_of_study.get_IV_name(idx)
+            IV_rescale = object_of_study.get_IV_rescale_from_name(IV_name)
+            IV_limits = IV_limit_list[idx]
+            IV_value = input_sample[idx].detach().numpy()
+            # first clip value
+            IV_clipped_value = np.min([IV_raw_value, np.max(IV_limits) - popper_config.limit_offset])
+            IV_clipped_value = np.max([IV_clipped_value, np.min(IV_limits) + popper_config.limit_offset])
+            # make sure to convert variable to original scale
+            IV_clipped_sclaed_value = IV_clipped_value / IV_rescale
+
+            self._experiment_sequence[IV_name].append(IV_clipped_sclaed_value)
+
 
     def get_plots(self, model, object_of_study):
         self.update_popper_learning_curve()
@@ -150,7 +187,7 @@ class Experimentalist_Popper(Experimentalist, ABC):
         y = np.linspace(1, int(self.popper_pattern_data.shape[0]), int(self.popper_pattern_data.shape[0]))
 
         # axis labels
-        x_label = "Predicted (Predicted vs. Actual)"
+        x_label = "Predicted vs. Actual"
         y_label = "Experiment Condition"
 
         # generate plot dictionary

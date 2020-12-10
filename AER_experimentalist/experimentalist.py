@@ -34,7 +34,8 @@ class Experimentalist(ABC):
 
     _experiment_server_host = None
     _experiment_server_port = None
-    _novel_experiment_sequence = None
+    _experiment_sequence = None
+    _experiment_conditions = None
     _plots = dict()
 
     def __init__(self, study_name, experiment_server_host=None, experiment_server_port=None, seed_data_file=""):
@@ -63,7 +64,10 @@ class Experimentalist(ABC):
     def set_experiment_id(self, experiment_id):
         self.experiment_id = experiment_id
 
-    def seed(self, object_of_study, datafile="", n=100):
+    def seed(self, object_of_study, datafile="", n=None):
+
+        if n is None:
+            n = exp_cfg.conditions_per_experiment
 
         # did the user specify a seed data file?
         if datafile == "" and self.seed_data_file != "":
@@ -332,6 +336,30 @@ class Experimentalist(ABC):
                 x_data = (object_of_study.get_IVs_from_input(input, IV1), object_of_study.get_IVs_from_input(input, IV2))
             y_data = object_of_study.get_DV_from_output(output, DV)
 
+            # get highlighted data points from last experiment
+            last_experiment_id = object_of_study.get_last_experiment_id()
+            (input_highlighted, output_highlighted) = object_of_study.get_dataset(experiment_id=last_experiment_id)
+            if IV2 is None:  # prepare line plot
+                x_data_highlighted = object_of_study.get_IVs_from_input(input_highlighted, IV1)
+            else:
+                x_data_highlighted = (object_of_study.get_IVs_from_input(input_highlighted, IV1),
+                                      object_of_study.get_IVs_from_input(input_highlighted, IV2))
+            y_data_highlighted = object_of_study.get_DV_from_output(output_highlighted, DV)
+
+            # add x conditions
+
+            if self._experiment_sequence is not None:
+                x_conditions = list()
+                experiment_sequence_rescaled = object_of_study.rescale_experiment_sequence(self._experiment_sequence)
+                if IV2 is None:
+                    for value in experiment_sequence_rescaled[IV1.get_name()]:
+                        x_conditions.append(value)
+                else:
+                    for x1_value, x2_value in zip(experiment_sequence_rescaled[IV1.get_name()], experiment_sequence_rescaled[IV2.get_name()]):
+                        x_conditions.append((x1_value, x2_value))
+            else:
+                x_conditions = None
+
             # determine y limits
             y_limit = [np.amin(y_data.numpy()), np.amax(y_data.numpy())]
 
@@ -339,7 +367,9 @@ class Experimentalist(ABC):
             y_label = DV.get_variable_label()
 
             # determine legend:
-            legend = ('Data', 'Prediction')
+            legend = ['Data', 'Prediction', 'Novel Data']
+            if self._experiment_sequence is not None:
+                legend.append('Queried Data')
 
             # select data based on whether this is a line or a surface plot
             if IV2 is None: # prepare line plot
@@ -366,12 +396,12 @@ class Experimentalist(ABC):
                 x_label = (IV1.get_variable_label(), IV2.get_variable_label())
 
             plot_dict = self._generate_plot_dict(type, x=x_data.detach().numpy(), y=y_data.detach().numpy(), x_limit=x_limit, y_limit=y_limit, x_label=x_label, y_label=y_label,
-                                     legend=legend, image=None, x_model=x_prediction.detach().numpy(), y_model=y_prediction.detach().numpy(), x_highlighted=None,
-                                     y_highlighted=None)
+                                     legend=legend, image=None, x_model=x_prediction.detach().numpy(), y_model=y_prediction.detach().numpy(), x_highlighted=x_data_highlighted,
+                                     y_highlighted=y_data_highlighted, x_conditions=x_conditions)
             self._plots[plot_name] = plot_dict
 
 
-    def _generate_plot_dict(self, type, x, y, x_limit=None, y_limit=None, x_label=None, y_label=None, legend=None, image=None, x_model=None, y_model=None, x_highlighted=None, y_highlighted=None):
+    def _generate_plot_dict(self, type, x, y, x_limit=None, y_limit=None, x_label=None, y_label=None, legend=None, image=None, x_model=None, y_model=None, x_highlighted=None, y_highlighted=None, x_conditions=None, y_conditions=None):
         # generate plot dictionary
         plot_dict = dict()
         plot_dict[AER_cfg.plot_key_type] = type
@@ -397,6 +427,8 @@ class Experimentalist(ABC):
             plot_dict[AER_cfg.plot_key_x_highlighted_data] = x_highlighted
         if y_highlighted is not None:
             plot_dict[AER_cfg.plot_key_y_highlighted_data] = y_highlighted
+        if x_conditions is not None:
+            plot_dict[AER_cfg.plot_key_x_conditions] = x_conditions
 
         return plot_dict
 
@@ -407,7 +439,7 @@ class Experimentalist(ABC):
         for condition in self.conditions_per_experiment:
             self.sample_experiment_condition(model, object_of_study, condition)
 
-        experiment_file_path = self._write_experiment(object_of_study, self._novel_experiment_sequence)
+        experiment_file_path = self._write_experiment(object_of_study, self._experiment_sequence)
 
         return experiment_file_path
 
@@ -416,6 +448,7 @@ class Experimentalist(ABC):
     def init_experiment_search(self, model, object_of_study):
         # increment experiment id
         self.set_experiment_id(self.experiment_id+1)
+        self._experiment_sequence = object_of_study.new_experiment_sequence()
         return
 
     # experiment search single condition

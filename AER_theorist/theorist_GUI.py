@@ -445,17 +445,17 @@ class Theorist_GUI(Frame):
         if key in plots.keys():
             plot_dict = plots[key]
 
-            type = plot_dict[self.theorist.plot_key_type]
+            type = plot_dict[config.plot_key_type]
             if type == Plot_Types.LINE:
 
                 # get relevant data
-                x_data = plot_dict[self.theorist.plot_key_x_data]
-                y_data = plot_dict[self.theorist.plot_key_y_data]
-                x_limit = plot_dict[self.theorist.plot_key_x_limit]
-                y_limit = plot_dict[self.theorist.plot_key_y_limit]
-                x_label = plot_dict[self.theorist.plot_key_x_label]
-                y_label = plot_dict[self.theorist.plot_key_y_label]
-                legend = plot_dict[self.theorist.plot_key_legend]
+                x_data = plot_dict[config.plot_key_x_data]
+                y_data = plot_dict[config.plot_key_y_data]
+                x_limit = plot_dict[config.plot_key_x_limit]
+                y_limit = plot_dict[config.plot_key_y_limit]
+                x_label = plot_dict[config.plot_key_x_label]
+                y_label = plot_dict[config.plot_key_y_label]
+                legend = plot_dict[config.plot_key_legend]
 
                 # generate plots
                 plot_axis.cla()
@@ -479,11 +479,11 @@ class Theorist_GUI(Frame):
             elif type == Plot_Types.IMAGE:
 
                 # get relevant data
-                image = plot_dict[self.theorist.plot_key_image]
-                x_data = plot_dict[self.theorist.plot_key_x_data]
-                y_data = plot_dict[self.theorist.plot_key_y_data]
-                x_label = plot_dict[self.theorist.plot_key_x_label]
-                y_label = plot_dict[self.theorist.plot_key_y_label]
+                image = plot_dict[config.plot_key_image]
+                x_data = plot_dict[config.plot_key_x_data]
+                y_data = plot_dict[config.plot_key_y_data]
+                x_label = plot_dict[config.plot_key_x_label]
+                y_label = plot_dict[config.plot_key_y_label]
 
                 # generate image
                 plot_axis.cla()
@@ -499,15 +499,15 @@ class Theorist_GUI(Frame):
             elif type == Plot_Types.LINE_SCATTER:
 
                 # get relevant data
-                x_data = plot_dict[self.theorist.plot_key_x_data]
-                y_data = plot_dict[self.theorist.plot_key_y_data]
-                x_model = plot_dict[self.theorist.plot_key_x_model]
-                y_model = plot_dict[self.theorist.plot_key_y_model]
-                x_limit = plot_dict[self.theorist.plot_key_x_limit]
-                y_limit = plot_dict[self.theorist.plot_key_y_limit]
-                x_label = plot_dict[self.theorist.plot_key_x_label]
-                y_label = plot_dict[self.theorist.plot_key_y_label]
-                legend = plot_dict[self.theorist.plot_key_legend]
+                x_data = plot_dict[config.plot_key_x_data]
+                y_data = plot_dict[config.plot_key_y_data]
+                x_model = plot_dict[config.plot_key_x_model]
+                y_model = plot_dict[config.plot_key_y_model]
+                x_limit = plot_dict[config.plot_key_x_limit]
+                y_limit = plot_dict[config.plot_key_y_limit]
+                x_label = plot_dict[config.plot_key_x_label]
+                y_label = plot_dict[config.plot_key_y_label]
+                legend = plot_dict[config.plot_key_legend]
 
                 # generate plots
                 plot_axis.cla()
@@ -532,15 +532,15 @@ class Theorist_GUI(Frame):
             elif type == Plot_Types.SURFACE_SCATTER:
 
                 # get relevant data
-                (x1_data, x2_data) = plot_dict[self.theorist.plot_key_x_data]
-                y_data = plot_dict[self.theorist.plot_key_y_data]
-                (x1_model, x2_model) = plot_dict[self.theorist.plot_key_x_model]
-                y_model = plot_dict[self.theorist.plot_key_y_model]
-                (x1_limit, x2_limit) = plot_dict[self.theorist.plot_key_x_limit]
-                y_limit = plot_dict[self.theorist.plot_key_y_limit]
-                (x1_label, x2_label) = plot_dict[self.theorist.plot_key_x_label]
-                y_label = plot_dict[self.theorist.plot_key_y_label]
-                legend = plot_dict[self.theorist.plot_key_legend]
+                (x1_data, x2_data) = plot_dict[config.plot_key_x_data]
+                y_data = plot_dict[config.plot_key_y_data]
+                (x1_model, x2_model) = plot_dict[config.plot_key_x_model]
+                y_model = plot_dict[config.plot_key_y_model]
+                (x1_limit, x2_limit) = plot_dict[config.plot_key_x_limit]
+                y_limit = plot_dict[config.plot_key_y_limit]
+                (x1_label, x2_label) = plot_dict[config.plot_key_x_label]
+                y_label = plot_dict[config.plot_key_y_label]
+                legend = plot_dict[config.plot_key_legend]
 
                 # generate plots
                 plot_axis.cla()

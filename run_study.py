@@ -45,7 +45,8 @@ study_object = Object_Of_Study(name=study_name,
 experimentalist = Experimentalist_Popper(study_name=study_name,
                                   experiment_server_host=host,
                                   experiment_server_port=port,
-                                  seed_data_file="experiment_0_data.csv")
+                                  seed_data_file="experiment_0_data.csv"
+                                         )
 
 # THEORIST
 theorist = Theorist_DARTS(study_name)
@@ -55,22 +56,21 @@ theorist = Theorist_DARTS(study_name)
 # seed_data = experimentalist.seed(study_object, n=20)
 # study_object.add_data(seed_data)
 
-# # seed object of study with data
-# seed_data = experimentalist.seed(study_object, datafile="experiment_0_data.csv")
-# study_object.add_data(seed_data)
+# seed object of study with data
+seed_data = experimentalist.seed(study_object, datafile="experiment_0_data.csv")
+study_object.add_data(seed_data)
 
 
-# root = Tk()
-# app = Theorist_GUI(object_of_study=study_object, theorist=theorist, root=root)
-# root.mainloop()
+root = Tk()
+app = Theorist_GUI(object_of_study=study_object, theorist=theorist, root=root)
+root.mainloop()
 
 # theorist.GUI(study_object)
 
 
-root = Tk()
-app = AER_GUI(object_of_study=study_object, theorist=theorist, experimentalist=experimentalist, root=root)
-root.mainloop()
-
+# root = Tk()
+# app = AER_GUI(object_of_study=study_object, theorist=theorist, experimentalist=experimentalist, root=root)
+# root.mainloop()
 
 
 # for cycle in range(AER_cycles):

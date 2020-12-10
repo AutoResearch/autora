@@ -406,12 +406,10 @@ class AER_GUI(Frame):
             self.listbox_experimentalist.insert(END, param_label)
 
     def update_theorist_plot(self, event):
-        print('theorist plot call')
         plots = self.get_theorist_plots()
         self.update_plot(plots=plots, plot_type=Plot_Windows.THEORIST)
 
     def update_experimentalist_plot(self, event):
-        print('experimantlist plot call')
         plots = self.get_experimentalist_plots()
         plot_name = self.update_plot(plots=plots, plot_type=Plot_Windows.EXPERIMENTALIST)
         success = self.set_listbox_selection_to_value(self.listbox_theorist, plot_name)
@@ -552,6 +550,11 @@ class AER_GUI(Frame):
                 y_label = plot_dict[config.plot_key_y_label]
                 legend = plot_dict[config.plot_key_legend]
 
+                if config.plot_key_x_conditions in plot_dict:
+                    x_conditions = plot_dict[config.plot_key_x_conditions]
+                else:
+                    x_conditions = None
+
                 # generate plots
                 plot_axis.cla()
                 del plot_axis.lines[:]  # remove previous lines
@@ -562,11 +565,26 @@ class AER_GUI(Frame):
                 # plot model prediction
                 plots.append(plot_axis.plot(x_model, y_model, 'k', label=legend[1]))
 
+                legend_idx = 1
+
                 # plot highlighted data
                 if config.plot_key_x_highlighted_data in plot_dict.keys():
+                    legend_idx += 1
                     x_highlighted = plot_dict[config.plot_key_x_highlighted_data]
                     y_highlighted = plot_dict[config.plot_key_y_highlighted_data]
-                    plots.append(plot_axis.scatter(x_highlighted, y_highlighted, marker='.', c='r', label=legend[2]))
+                    plots.append(plot_axis.scatter(x_highlighted, y_highlighted, marker='.', c='r', label=legend[legend_idx]))
+
+                # plot conditions
+                if config.plot_key_x_conditions in plot_dict.keys():
+                    for idx, condition in enumerate(x_conditions):
+                        if idx == 0:
+                            legend_idx += 1
+                        x = [condition, condition]
+                        y = [y_limit[0], y_limit[1]]
+                        if idx == 0:
+                            plots.append(plot_axis.plot(x, y, 'b', label=legend[legend_idx]))
+                        else:
+                            plots.append(plot_axis.plot(x, y, 'b'))
 
                 # adjust axes
                 plot_axis.set_xlim(x_limit[0], x_limit[1])
@@ -591,6 +609,16 @@ class AER_GUI(Frame):
                 y_label = plot_dict[config.plot_key_y_label]
                 legend = plot_dict[config.plot_key_legend]
 
+                if config.plot_key_x_conditions in plot_dict:
+                    x_conditions = plot_dict[config.plot_key_x_conditions]
+                else:
+                    x_conditions = None
+
+                if config.plot_key_y_conditions in plot_dict:
+                    y_conditions = plot_dict[config.plot_key_y_conditions]
+                else:
+                    y_conditions = None
+
                 # generate plots
                 plot_axis.cla()
                 plots = list()
@@ -601,11 +629,26 @@ class AER_GUI(Frame):
                 # plot model prediction
                 plots.append(plot_axis.plot_surface(x1_model, x2_model, y_model, color=(0, 0, 0, 0.5), label=legend[1]))
 
+                legend_idx = 1
+
                 # plot highlighted data
                 if config.plot_key_x_highlighted_data in plot_dict.keys():
+                    legend_idx += 1
                     (x1_highlighted, x2_highlighted) = plot_dict[config.plot_key_x_highlighted_data]
                     y_highlighted = plot_dict[config.plot_key_y_highlighted_data]
                     plots.append(plot_axis.scatter(x1_highlighted, x2_highlighted, y_highlighted, color=(1, 0, 0, 0.5), label=legend[2]))
+
+                # plot conditions
+                for idx, x1_x2_condition in enumerate(x_conditions):
+                    if idx == 0:
+                        legend_idx += 1
+                    x1 = [x1_x2_condition[0], x1_x2_condition[0]]
+                    x2 = [x1_x2_condition[1], x1_x2_condition[1]]
+                    y = [y_limit[0], y_limit[1]]
+                    if idx == 0:
+                        plots.append(plot_axis.plot(x1, x2, y, 'r', label=legend[legend_idx]))
+                    else:
+                        plots.append(plot_axis.plot(x1, x2, y, 'r'))
 
                 # adjust axes
                 plot_axis.set_xlim(x1_limit[0], x1_limit[1])
@@ -666,23 +709,17 @@ class AER_GUI(Frame):
             self.update_status(status_msg)
             status_msg = "------------------"
             self.update_status(status_msg)
+            self._root.update()
 
             # Experimentalist: collect seed data
             self.activate_experimentalist()
             if AER_cycle == 0:
                 status_msg = "Collecting seed data"
                 self.update_status_experimentalist(status_msg)
+                self._root.update()
                 seed_data = self.experimentalist.seed(self.object_of_study)
                 self.object_of_study.add_data(seed_data)
             else:
-                # TODO: implement experimentalist procedure
-                # x) get best fitting model from theorist
-                # x) update experimentalist plots (best fitting model)
-                # 2) determine optimal experiment
-                # 4) update experimentalist plots
-                # 5) commission experiment
-                # 6) update experimentalist plots
-                # 7) move on to theorist
 
                 # activate experimenter
                 self.activate_experimentalist()
@@ -705,9 +742,40 @@ class AER_GUI(Frame):
                 self.update_plot(plots=experimentalist_plots, plot_type=Plot_Windows.EXPERIMENTALIST)
 
                 # Experimenter: identifying novel experiment conditions
-                # for condition in self.experimentalist.conditions_per_experiment:
-                #     self.sample_experiment_condition(self.best_model, self.object_of_study, condition)
-                return
+                status_msg = "Identifying " + str(self.experimentalist.conditions_per_experiment) \
+                             + " experiment conditions..."
+                self.update_status_experimentalist(status_msg)
+                self._root.update()
+                for condition in range(self.experimentalist.conditions_per_experiment):
+                    self.experimentalist.sample_experiment_condition(self.best_model, self.object_of_study, condition)
+
+                # plot new experiment conditions
+                experimentalist_plots = self.experimentalist.get_plots(self.best_model, self.object_of_study)
+                self.update_experimentalist_plot_list(experimentalist_plots)
+                self.update_plot(plots=experimentalist_plots, plot_type=Plot_Windows.EXPERIMENTALIST)
+                self._root.update()
+
+                # write novel experiment
+                status_msg = "Writing experiment..."
+                self.update_status_experimentalist(status_msg)
+                self._root.update()
+                experiment_file_path = self.experimentalist._write_experiment(self.object_of_study, self.experimentalist._experiment_sequence)
+
+                # collect data from experiment
+                status_msg = "Commissioning experiment..."
+                self.update_status_experimentalist(status_msg)
+                self._root.update()
+                data = self.experimentalist.commission_experiment(object_of_study=self.object_of_study, experiment_file_path=experiment_file_path)
+
+                # add new data to object of study
+                status_msg = "Adding collected data..."
+                self.update_status_experimentalist(status_msg)
+                self.object_of_study.add_data(data)
+                experimentalist_plots = self.experimentalist.get_plots(self.best_model, self.object_of_study)
+                self.update_experimentalist_plot_list(experimentalist_plots)
+                self.update_plot(plots=experimentalist_plots, plot_type=Plot_Windows.EXPERIMENTALIST)
+                self._root.update()
+
 
             # Theorist: initialize meta-parameter search
             self.activate_theorist()
@@ -781,7 +849,7 @@ class AER_GUI(Frame):
 
         self._running = False
         status_msg = "DONE"
-        self.update_status_theorist(status_msg)
+        self.update_status(status_msg)
 
 
     def reset_gui(self):

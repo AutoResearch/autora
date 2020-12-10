@@ -129,6 +129,13 @@ class Theorist_DARTS(Theorist, ABC):
             self.log_model_search(object_of_study)
             self._meta_parameters_iteration += 1
 
+        best_model = self.get_best_model(object_of_study)
+        best_model_plot_path = os.path.join(self.results_path, "best_model")
+        genotype = best_model.genotype()
+        (n_params_total, n_params_base, param_list) = best_model.countParameters()
+        viz.plot(genotype.normal, best_model_plot_path, fileFormat='png',
+                 input_labels=object_of_study.__get_input_labels__(), full_label=True, param_list=param_list)
+
         return self.get_best_model(object_of_study)
 
 
@@ -306,10 +313,14 @@ class Theorist_DARTS(Theorist, ABC):
         
         self._model_summary_list.append(model_eval_filepath)
 
-    def plot_model(self, object_of_study):
+    def plot_model(self, object_of_study, model=None):
+
+        if model is None:
+            genotype = self.model.genotype()
+        else:
+            genotype = model.genotype()
 
         # save model plot
-        genotype = self.model.genotype()
         viz.plot(genotype.normal, self.graph_filepath, fileFormat='png',
                  input_labels=object_of_study.__get_input_labels__())
 
@@ -564,6 +575,13 @@ class Theorist_DARTS(Theorist, ABC):
         plot_dict = self._generate_plot_dict(type, x, y, x_label=x_label, y_label=y_label, image=im)
         self._performance_plots[self._pattern_plot_name] = plot_dict
 
+    def get_model_filename(self, arch_weight_decay_df, num_graph_nodes, seed):
+        filename = utils.create_output_file_name(file_prefix='model_weights',
+                                                         log_version=self.model_search_id,
+                                                         weight_decay=arch_weight_decay_df,
+                                                         k=num_graph_nodes,
+                                                         seed=seed)
+        return filename
 
     def get_model_filename(self, arch_weight_decay_df, num_graph_nodes, seed):
         filename = utils.create_output_file_name(file_prefix='model_weights',
