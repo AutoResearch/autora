@@ -74,7 +74,21 @@ class Experimentalist_Popper(Experimentalist, ABC):
     def sample_experiment_condition(self, model, object_of_study, condition):
 
         # sample initial condition for experiment
-        input_sample = object_of_study.get_random_input_sample()
+
+        # get input, target and prediction
+        (input_data, output_data) = object_of_study.get_dataset()
+        model_prediction = model(input_data)
+        model_loss = (model_prediction - output_data) ** 2 * self.mse_scale
+
+        # feed model losses through softmax
+        probabilities = torch.exp(model_loss * popper_config.optim_beta) / torch.sum(torch.exp(model_loss * popper_config.optim_beta))
+        probabilities_transformed = torch.flatten(torch.transpose(probabilities, 0, 1))
+        # sample data point in proportion to model loss
+        transform_category = torch.distributions.categorical.Categorical(probabilities_transformed)
+        index = transform_category.sample()
+        input_sample = torch.flatten(input_data[index, :])
+
+        # input_sample = object_of_study.get_random_input_sample()
         popper_input = Variable(input_sample, requires_grad=True)
 
         # obtain limits

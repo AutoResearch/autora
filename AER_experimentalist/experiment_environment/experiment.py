@@ -32,7 +32,7 @@ class Experiment():
     _measurement_onset_asynchrony = 1.0
 
     # Initialization requires path to experiment file
-    def __init__(self, path, main_directory = ""):
+    def __init__(self, path=None, main_directory = ""):
         self._path = path
         self._main_dir = main_directory
 
@@ -46,6 +46,12 @@ class Experiment():
         self._IV_trial_idx = -1
         self._IV_time_idx = -1
         self._DV_time_idx = -1
+
+        if self._path is not None:
+            self.load_experiment(self._path)
+
+    def load_experiment(self, path):
+        self._path = path
 
         # read experiment file
         file = open(path, "r")

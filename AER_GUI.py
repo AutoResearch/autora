@@ -378,13 +378,16 @@ class AER_GUI(Frame):
     def get_theorist_plots(self):
         # collect performance plots
         performance_plots = self.theorist.get_performance_plots(self.object_of_study)
-        plot_dict = dict()
-        # add model plot
-        plot_dict[config.plot_key_type] = Plot_Types.MODEL
-        performance_plots["model architecture"] = plot_dict
         # collect supplementary plots
         supplementary_plots = self.theorist.get_supplementary_plots(self.object_of_study)
+
         theorist_plots = {**performance_plots, **supplementary_plots}
+
+        # add model plot
+        plot_dict = dict()
+        plot_dict[config.plot_key_type] = Plot_Types.MODEL
+        theorist_plots["model architecture"] = plot_dict
+
         return theorist_plots
 
     def update_theorist_plot_list(self, theorist_plots):
@@ -417,7 +420,7 @@ class AER_GUI(Frame):
             plots = self.get_theorist_plots()
             self.update_plot(plots=plots, plot_type=Plot_Windows.THEORIST)
 
-    def update_plot(self, plots=None, plot_type=Plot_Windows.THEORIST):
+    def update_plot(self, plots=None, plot_type=Plot_Windows.THEORIST, save=False, AER_step=1):
 
         if plot_type == Plot_Windows.THEORIST:
 
@@ -476,7 +479,6 @@ class AER_GUI(Frame):
                 self._axis_theorist.grid()
                 self._canvas_theorist = FigureCanvasTkAgg(self._fig_theorist, self._root)
                 self._canvas_theorist.get_tk_widget().grid(row=1, column=1, columnspan=2, sticky=N + S + E + W)
-
                 self._reset_theorist_plot = False
 
             type = plot_dict[config.plot_key_type]
@@ -665,6 +667,18 @@ class AER_GUI(Frame):
             # finalize performance plot
             plot_axis.set_title(key, fontsize=self._plot_fontSize)
             plot_canvas.draw()
+
+            # save plot
+            if save is True:
+                self._root.update()
+                if plot_type == Plot_Windows.THEORIST:
+                    plot_filepath = os.path.join(self.theorist.results_path, 'plot_AER_step_' + str(AER_step) + '_theorist_' + key + '.png')
+                    self._fig_theorist.savefig(plot_filepath)
+                elif plot_type == Plot_Windows.EXPERIMENTALIST:
+                    plot_filepath = os.path.join(self.theorist.results_path,
+                                                 'plot_AER_step_' + str(AER_step) + '_experimentalist_' + key + '.png')
+                    self._fig_experimentalist.savefig(plot_filepath)
+
             return key
             # plot_canvas.get_tk_widget().lift()
 
@@ -679,8 +693,10 @@ class AER_GUI(Frame):
             self.reset_gui()
 
     def pause_study(self):
-        self.update_status("Pausing study...")
-        self._paused = True
+        # self.update_status("Pausing study...")
+        # self._paused = True
+        # todo: implement proper pausing
+        pass
 
     def resume_study(self):
         self._paused = False
@@ -776,6 +792,11 @@ class AER_GUI(Frame):
                 self.update_plot(plots=experimentalist_plots, plot_type=Plot_Windows.EXPERIMENTALIST)
                 self._root.update()
 
+                # save all experimentalist plots
+                experimentalist_plots = self.experimentalist.get_plots(self.best_model, self.object_of_study)
+                for item in range(self.listbox_experimentalist.size()):
+                    self.set_listbox_selection(self.listbox_experimentalist, item)
+                    self.update_plot(plot_type=Plot_Windows.EXPERIMENTALIST, plots=experimentalist_plots, save=True, AER_step=(AER_cycle + 1))
 
             # Theorist: initialize meta-parameter search
             self.activate_theorist()
@@ -831,7 +852,49 @@ class AER_GUI(Frame):
                     self.update_plot(plots=theorist_plots, plot_type=Plot_Windows.THEORIST)
 
                 if self._running is True:
+
+                    # save all performance plots
+                    theorist_plots = self.get_theorist_plots()
+                    for item in range(self.listbox_theorist.size()):
+                        self.set_listbox_selection(self.listbox_theorist, item)
+                        self.update_plot(plot_type=Plot_Windows.THEORIST, plots=theorist_plots, save=True,
+                                         AER_step=(AER_cycle + 1))
+
+                    status_msg = "Evaluating architecture..."
+                    self.update_status_theorist(status_msg)
+                    self._root.update()
                     self.theorist.log_model_search(self.object_of_study)
+
+                    # self.theorist.evaluate_model_search(self.object_of_study)
+
+                    # Theorist: evaluate model architecture
+
+                    # initialize meta evaluation
+                    self.theorist.init_meta_evaluation(self.object_of_study)
+
+                    # perform architecture search for different hyper-parameters
+                    for eval_meta_params in self.theorist._eval_meta_parameters:
+
+                        status_msg = "Evaluation " + str(idx + 1) + "/" + str(len(self.theorist._eval_meta_parameters))
+                        self.update_status_theorist(status_msg)
+
+                        self.theorist.init_model_evaluation(self.object_of_study)
+                        # loop over epochs
+                        for epoch in range(self.theorist.eval_epochs):
+                            # run single epoch
+                            self.theorist.run_eval_epoch(epoch, self.object_of_study)
+                            # log performance (for plotting purposes)
+                            self.theorist.log_plot_data(epoch, self.object_of_study)
+                            theorist_plots = self.get_theorist_plots()
+                            self.update_plot(plots=theorist_plots, plot_type=Plot_Windows.THEORIST)
+                            self._root.update()
+
+                        # log model evaluation
+                        self.theorist.log_model_evaluation(self.object_of_study)
+
+                    # sum up meta evaluation
+                    self.theorist.log_meta_evaluation(self.object_of_study)
+
                     self.theorist._meta_parameters_iteration += 1
 
             # Theorist: determine best-fitting model
@@ -840,6 +903,9 @@ class AER_GUI(Frame):
                 self.update_status_theorist(status_msg)
                 self._root.update()
                 self.best_model = self.theorist.get_best_model(self.object_of_study)
+                self.theorist.model = self.best_model
+
+
 
 
         if self._running is not True:

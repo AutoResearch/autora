@@ -8,7 +8,7 @@ OPS = {
   'linear' : lambda C, stride, affine: nn.Sequential(
     # EDIT 11/04/19 SM: adapting to new SimpleNet data
     # nn.Conv2d(C, C, kernel_size=1, padding=0, bias=True),
-    nn.Linear(1, 1, bias=False)
+    nn.Linear(1, 1, bias=True)
     ),
   'relu' : lambda C, stride, affine: nn.Sequential(
     # EDIT 11/04/19 SM: adapting to new SimpleNet data
@@ -19,7 +19,7 @@ OPS = {
   'sigmoid': lambda C, stride, affine: nn.Sequential(
     # EDIT 11/04/19 SM: adapting to new SimpleNet data
     # nn.Conv2d(C, C, kernel_size=1, padding=0, bias=True),
-    nn.Linear(1, 1, bias=False),
+    nn.Linear(1, 1, bias=True),
     nn.Sigmoid(),
   ),
   'add': lambda C, stride, affine: nn.Sequential(
@@ -33,7 +33,7 @@ OPS = {
     NegIdentity()
   ),
   'exp': lambda C, stride, affine: nn.Sequential(
-    nn.Linear(1, 1, bias=False),
+    nn.Linear(1, 1, bias=True),
     Exponential(),
   ),
   '1/x': lambda C, stride, affine: nn.Sequential(
@@ -74,7 +74,8 @@ def get_operation_label(op_name, params_org, decimals=4):
     for idx, param in enumerate(params):
       classifier_str = classifier_str + format_string.format(param)
       if (idx == (np.round(num_params / 2)-1)):
-        classifier_str = classifier_str + ') | .+('
+        # classifier_str = classifier_str + ') | .+('
+        classifier_str = classifier_str + ') .+('
       elif (idx == (num_params-1)):
         classifier_str = classifier_str + ')'
       else:

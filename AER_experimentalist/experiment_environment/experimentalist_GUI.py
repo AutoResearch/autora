@@ -488,8 +488,8 @@ class Experimentalist_GUI(Frame):
             self._table_GUI.close()
             self._table_GUI = None
 
-        if self.experiment_server is not None:
-            self.experiment_server._wrap_up_experiment(self._exp._data_path)
+        # if self.experiment_server is not None:
+        #     self.experiment_server._wrap_up_experiment(self._exp._data_path)
 
         self.update_output(msg)
         self.clear_OLED()
@@ -497,6 +497,8 @@ class Experimentalist_GUI(Frame):
         self.init_run()
         self._root.update()
         self._exp.clean_up()
+
+        return self._exp._data_path
 
     # def open_automated_plot(self):
     #

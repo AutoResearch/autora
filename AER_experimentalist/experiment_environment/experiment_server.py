@@ -18,9 +18,11 @@ class Experiment_Server(Client_Server_Interface):
 
     main_directory = config.server_path
 
-    def __init__(self, session_ID=None, host=None, port=None, gui=None):
+    def __init__(self, session_ID=None, host=None, port=None, gui=None, exp=None):
 
         super().__init__(session_ID, host, port, gui)
+
+        self.exp = exp
 
     def launch(self):
 
@@ -217,16 +219,28 @@ class Experiment_Server(Client_Server_Interface):
         self._set_job_status(protocol.JOB_STATUS_REQUESTED_EXPERIMENT)
         self._save_job_status()
 
+        exp_file_name = os.path.basename(self.exp_file_path)
+
         if self.gui is not None:
             # need to pass experiment file name to gui
-            exp_file_name = os.path.basename(self.exp_file_path)
             self._print_status(protocol.STATUS_INITIATED_TRANSFER, exp_file_name)
             self.gui.load_experiment(exp_file_name)
-            self.gui.run_experiment(plot=True)
+            self.data_file_path = self.gui.run_experiment(plot=True)
         else:
+            if self.exp is None:
+                raise Exception("Cannot run experiment, no experiment specified.")
+            else:
+                self.exp.load_experiment(exp_file_name)
+                self.exp.run_experiment()
+                self.data_file_path = config.server_path + self.exp._data_path
+                self.exp.data_to_csv(self.data_file_path)
+
+        # wrap up experiment
+        self._wrap_up_experiment(self.data_file_path)
+
             # TODO: leaving this for test purposes
-            self.data_file_path = self.data_folder_path + 'experiment1_data.csv'
-            self._wrap_up_experiment(self.data_file_path)
+            # self.data_file_path = self.data_folder_path + 'experiment1_data.csv'
+            # self._wrap_up_experiment(self.data_file_path)
 
     def _wrap_up_experiment(self, data_file_path):
         self._print_status(protocol.STATUS_REQUESTING_EXP, "Wrapping up experiment...")

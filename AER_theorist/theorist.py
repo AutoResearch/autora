@@ -37,6 +37,9 @@ class Theorist(ABC):
     target_pattern = []
     prediction_pattern = []
 
+    model_search_epochs = 100
+    eval_epochs = 100
+
     def __init__(self, study_name):
 
         self.model_search_id = 0
@@ -65,6 +68,43 @@ class Theorist(ABC):
         else:
             raise Exception("Key '" + str(key) + "' not in dictionary self._model_search_parameters")
 
+    def search_model(self, object_of_study):
+        # initialize model search
+        self.init_meta_search(object_of_study)
+
+        # perform architecture search for different hyper-parameters
+        for meta_params in self._meta_parameters:
+            self.init_model_search(object_of_study)
+            for epoch in range(self.model_search_epochs):
+                self.run_model_search_epoch(epoch)
+            self.log_model_search(object_of_study)
+            self.evaluate_model_search(object_of_study)
+            self._meta_parameters_iteration += 1
+
+        return self.get_best_model(object_of_study, plot_model=True)
+
+    def evaluate_model_search(self, object_of_study):
+
+        # initialize model search
+        self.init_meta_evaluation(object_of_study)
+
+        # perform architecture search for different hyper-parameters
+        for eval_meta_params in self._eval_meta_parameters:
+            self.init_model_evaluation(object_of_study)
+            # loop over epochs
+            for epoch in range(self.eval_epochs):
+                logging.info('epoch %d', epoch)
+                # run single epoch
+                self.run_eval_epoch(epoch, object_of_study)
+                # log performance (for plotting purposes)
+                self.log_plot_data(epoch, object_of_study)
+
+            # log model evaluation
+            self.log_model_evaluation(object_of_study)
+
+        # sum up meta evaluation
+        self.log_meta_evaluation(object_of_study)
+
     @abstractmethod
     def assign_model_search_parameters(self):
         pass
@@ -79,10 +119,6 @@ class Theorist(ABC):
         self.setup_logging()
 
     @abstractmethod
-    def search_model(self, object_of_study):
-        pass
-
-    @abstractmethod
     def init_model_search(self, object_of_study):
         pass
 
@@ -92,6 +128,30 @@ class Theorist(ABC):
 
     @abstractmethod
     def log_model_search(self, object_of_study):
+        pass
+
+    @abstractmethod
+    def init_meta_evaluation(self, object_of_study):
+        pass
+
+    @abstractmethod
+    def init_model_evaluation(self, object_of_study):
+        pass
+
+    @abstractmethod
+    def run_eval_epoch(self, object_of_study):
+        pass
+
+    @abstractmethod
+    def log_model_evaluation(self, object_of_study):
+        pass
+
+    @abstractmethod
+    def log_meta_evaluation(self, object_of_study):
+        pass
+
+    @abstractmethod
+    def get_best_model(self, object_of_study):
         pass
 
     @abstractmethod

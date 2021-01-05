@@ -208,7 +208,7 @@ class Network(nn.Module):
     alphas_normal_sample = Variable(torch.zeros(alphas_normal.data.shape))
 
     for edge in range(alphas_normal.data.shape[0]):
-      W_soft = F.softmax(alphas_normal[edge] * sample_amp)
+      W_soft = F.softmax(alphas_normal[edge] * sample_amp, dim=0)
       k_sample = np.random.choice(range(len(W_soft)), p=W_soft.data.numpy())
       alphas_normal_sample[edge, k_sample] = 1
 

@@ -27,6 +27,8 @@ class Theorist_DARTS(Theorist, ABC):
     criterion = None
 
     _model_summary_list = list()
+    _eval_meta_parameters = list()      # meta parameters for model evaluation
+    _meta_parameters = list()           # meta parameters for model search
 
     _lr_plot_name = "Learning Rates"
 
@@ -34,6 +36,7 @@ class Theorist_DARTS(Theorist, ABC):
         super(Theorist_DARTS, self).__init__(study_name)
 
         self.model_search_epochs = darts_cfg.epochs
+        self.eval_epochs = darts_cfg.eval_epochs
 
     def get_model_search_parameters(self):
 
@@ -51,8 +54,8 @@ class Theorist_DARTS(Theorist, ABC):
         self._model_search_parameters["params momentum"] = [self.optimizer.param_groups[0]['momentum'], True, lm_float]
         self._model_search_parameters["params weight decay"] = [self.optimizer.param_groups[0]['weight_decay'], True, lm_float]
         self._model_search_parameters["classifier weight decay"] = [self.model._classifier_weight_decay, True, lm_float]
-        self._model_search_parameters["params current lr"] = [self.optimizer.param_groups[0]['lr'], True, lm_float]
-        self._model_search_parameters["params min lr"] = [self.scheduler.eta_min, True, lm_float]
+        self._model_search_parameters["params max lr"] = [darts_cfg.learning_rate, False, lm_float] # self.optimizer.param_groups[0]['lr']
+        self._model_search_parameters["params min lr"] = [darts_cfg.learning_rate_min, False, lm_float]
 
         # training protocol parameters
         self._model_search_parameters["training set proportion"] = [darts_cfg.train_portion, False, lm_float]
@@ -74,10 +77,13 @@ class Theorist_DARTS(Theorist, ABC):
         self.optimizer.param_groups[0]['weight_decay'] = self._model_search_parameters["params weight decay"][0]
         self.model._classifier_weight_decay = self._model_search_parameters["classifier weight decay"][0]
         self.optimizer.param_groups[0]['lr'] = self._model_search_parameters["params current lr"][0]
-        self.scheduler.eta_min = self._model_search_parameters["params min lr"][0]
+        # self.scheduler.eta_min = self._model_search_parameters["params min lr"][0]
 
     def init_meta_search(self, object_of_study):
         super(Theorist_DARTS, self).init_meta_search(object_of_study)
+
+        # clear model summary list
+        self._model_summary_list = list()
 
         # define loss function
         self.criterion = utils.get_loss_function(object_of_study.__get_output_type__())
@@ -108,6 +114,12 @@ class Theorist_DARTS(Theorist, ABC):
 
         return self._meta_parameters[iteration]
 
+    def get_eval_meta_parameters(self, iteration = None):
+        if iteration is None:
+            iteration = self._eval_meta_parameters_iteration
+
+        return self._eval_meta_parameters[iteration]
+
     def get_next_meta_parameters(self):
         self._meta_parameters_iteration += 1
         return self.get_meta_parameters()
@@ -116,30 +128,7 @@ class Theorist_DARTS(Theorist, ABC):
         raise Exception('Not implemented.')
         pass
 
-    def search_model(self, object_of_study):
-        # initialize model search
-        self.init_meta_search(object_of_study)
-
-        # perform architecture search for different hyper-parameters
-        for meta_params in self._meta_parameters:
-            [arch_weight_decay_df, num_graph_nodes, seed] = meta_params
-            self.init_model_search(object_of_study)
-            for epoch in range(self.model_search_epochs):
-                self.run_model_search_epoch(epoch)
-            self.log_model_search(object_of_study)
-            self._meta_parameters_iteration += 1
-
-        best_model = self.get_best_model(object_of_study)
-        best_model_plot_path = os.path.join(self.results_path, "best_model")
-        genotype = best_model.genotype()
-        (n_params_total, n_params_base, param_list) = best_model.countParameters()
-        viz.plot(genotype.normal, best_model_plot_path, fileFormat='png',
-                 input_labels=object_of_study.__get_input_labels__(), full_label=True, param_list=param_list)
-
-        return self.get_best_model(object_of_study)
-
-
-    def get_best_model(self, object_of_study):
+    def get_best_model(self, object_of_study, plot_model=False):
 
         # determine best model
         best_loss = None
@@ -173,7 +162,224 @@ class Theorist_DARTS(Theorist, ABC):
 
         # return winning model
         self.model = model
+
+        # plot model
+        if plot_model:
+            best_model_plot_path = os.path.join(self.results_path, "best_model")
+            genotype = self.model.genotype()
+            (n_params_total, n_params_base, param_list) = self.model.countParameters()
+            viz.plot(genotype.normal, best_model_plot_path, fileFormat='png',
+                     input_labels=object_of_study.__get_input_labels__(), full_label=True, param_list=param_list)
+
         return model
+
+    # def evaluate_model_search(self, object_of_study):
+    #
+    #     [arch_weight_decay_df, num_graph_nodes, seed] = self.get_meta_parameters()
+    #     model_eval_filepath = self.evaluate_architectures(object_of_study, self.train_queue, self.valid_queue,
+    #                                                       self.model,
+    #                                                       arch_weight_decay_df, num_graph_nodes, seed)
+    #     self._model_summary_list.append(model_eval_filepath)
+
+    def init_meta_evaluation(self, object_of_study=None):
+
+        model = self.model
+        max_num_architectures = model.max_alphas_normal().shape[0] * model.max_alphas_normal().shape[1]
+        n_architectures_sampled = np.min([max_num_architectures, darts_cfg.n_architectures_sampled])
+
+        # set up meta parameters for model evaluation
+        self._eval_meta_parameters = list()
+        self._eval_meta_parameters_iteration = 0
+        for arch_sample in range(n_architectures_sampled):
+            for init_sample in range(darts_cfg.n_initializations_sampled):
+                meta_parameters = [arch_sample, init_sample]
+                self._eval_meta_parameters.append(meta_parameters)
+
+        # set up log components
+        self._eval_criterion_loss_log = list()
+        self._eval_model_name_log = list()
+        self._eval_arch_name_log = list()
+        self._eval_num_graph_node_log = list()
+
+        # generate general model file name
+        [arch_weight_decay_df, num_graph_nodes, seed] = self.get_meta_parameters()
+        self._eval_model_filename_gen = self.get_model_weights_filename(arch_weight_decay_df, num_graph_nodes, seed)
+        self._eval_summary_filename_gen = self.get_model_filename(arch_weight_decay_df, num_graph_nodes, seed)
+        self._eval_arch_filename_gen = self.get_architecture_filename(arch_weight_decay_df, num_graph_nodes, seed)
+
+        # subsample models and retrain
+        self._eval_sampled_weights = list()
+
+    def init_model_evaluation(self, object_of_study):
+
+        self.train_error_log = np.empty((self.eval_epochs, 1))  # log training error
+        self.valid_error_log = np.empty((self.eval_epochs, 1))  # log validation err
+        self.param_lr_log = np.empty((self.eval_epochs, 1))  # log model learning rate
+        self.arch_lr_log = np.empty((self.eval_epochs, 1))  # log architecture learning rate
+        self.architecture_weights_log = np.empty(
+            (self.eval_epochs, self.num_arch_edges, self.num_arch_ops))  # log architecture weights
+        self.train_error_log[:] = np.nan
+        self.valid_error_log[:] = np.nan
+        self.param_lr_log[:] = np.nan
+        self.arch_lr_log[:] = np.nan
+        self.architecture_weights_log[:] = np.nan
+
+        # get model search meta parameters
+        [arch_weight_decay_df, num_graph_nodes, seed] = self.get_meta_parameters()
+
+        # get evaluation meta parameters (architecture id and parameterization id)
+        [arch_sample_id, param_sample_id] = self.get_eval_meta_parameters()
+        n_eval_meta_configurations = len(self._eval_meta_parameters)
+
+        logging.info('architecture evaluation for sampled model: %d / %d', self._eval_meta_parameters_iteration + 1, n_eval_meta_configurations)
+
+        # sample architecture weights
+        found_weights = False
+        if (arch_sample_id == 0):
+            candidate_weights = self.model.max_alphas_normal()
+            found_weights = True
+        else:
+            candidate_weights = self.model.sample_alphas_normal(darts_cfg.sample_amp)
+
+        arch_search_attempt = 0
+        while found_weights is False:
+            weights_are_novel = True
+            for logged_weights in self._eval_sampled_weights:
+                if torch.eq(logged_weights, candidate_weights).all():
+                    weights_are_novel = False
+            if weights_are_novel:
+                novel_weights = candidate_weights
+                found_weights = True
+            else:
+                candidate_weights = self.model.sample_alphas_normal()
+                if arch_search_attempt > darts_cfg.max_arch_search_attempts:
+                    found_weights = True
+            arch_search_attempt += 1
+
+        # store sampled architecture weights
+        self._eval_sampled_weights.append(candidate_weights)
+
+        # sample parameter initialization
+
+        # reinitialize weights if desired
+        if darts_cfg.reinitialize_weights:
+            self._eval_model = Network(object_of_study.__get_output_dim__(), self.criterion, steps=int(num_graph_nodes),
+                                n_input_states=object_of_study.__get_input_dim__(),
+                                classifier_weight_decay=darts_cfg.classifier_weight_decay)
+            if darts_cfg.eval_custom_initialization:
+                self._eval_model.apply(init_weights)
+        else:
+            self._eval_model = copy.deepcopy(self.model)
+
+        self._eval_model.fix_architecture(True, candidate_weights)
+
+        # optimizer is standard stochastic gradient decent with some momentum and weight decay
+        self._eval_optimizer = torch.optim.SGD(
+            self._eval_model.parameters(),
+            darts_cfg.eval_learning_rate,
+            momentum=darts_cfg.eval_momentum,
+            weight_decay=darts_cfg.eval_weight_decay)
+
+        # Set the learning rate of each parameter group using a cosine annealing schedule (model optimization)
+        self._eval_scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
+            self._eval_optimizer, float(darts_cfg.eval_epochs), eta_min=darts_cfg.learning_rate_min)
+
+        self._eval_model.train()  # Sets the module in training mode
+
+        # set model to currently evaluated model (for plot purposes)
+        self._eval_loss_log = list()
+        self._model_org = copy.deepcopy(self.model)
+        self.model = self._eval_model
+
+    def run_eval_epoch(self, epoch, object_of_study):
+
+        # get new learning rate
+        lr = self._eval_scheduler.get_last_lr()[0]
+
+        # get input and target
+        input_search, target_search = next(iter(self.train_queue))
+        input = Variable(input_search, requires_grad=False)  # .cuda()
+        target = Variable(target_search, requires_grad=False)  # .cuda(async=True)
+
+        input, target = format_input_target(input, target, self.criterion)
+
+        # zero out gradients
+        self._eval_optimizer.zero_grad()
+        # compute loss for the model
+        logits = self._eval_model(input)
+        loss = self.criterion(logits, target)
+        # update gradients for model
+        loss.backward()
+        # clips the gradient norm
+        nn.utils.clip_grad_norm_(self._eval_model.parameters(), darts_cfg.grad_clip)
+        # moves optimizer one step (applies gradients to weights)
+        self._eval_optimizer.step()
+        # applies weight decay to classifier weights
+        self._eval_model.apply_weight_decay_to_classifier(lr)
+
+        # if in debug mode, print loss during architecture evaluation
+
+        # training loss
+        logging.info('criterion loss %f', loss)
+        self._eval_loss_log.append(loss.detach().numpy())
+        # moves the annealing scheduler forward to determine new learning rate
+        self._eval_scheduler.step()
+
+        # validation loss
+        validation_loss = infer(self.valid_queue, self._eval_model, self.criterion, silent=True)
+
+        self.train_error_log[epoch] = loss.detach().numpy()
+        self.valid_error_log[epoch] = validation_loss.detach().numpy()
+
+    def log_model_evaluation(self, object_of_study):
+
+        # get meta parameters
+        [arch_weight_decay_df, num_graph_nodes, seed] = self.get_meta_parameters()
+        [arch_sample_id, param_sample_id] = self.get_eval_meta_parameters()
+
+        # evaluate model
+        criterion_loss = infer(self.valid_queue, self._eval_model, self.criterion, silent=True)
+        self._eval_criterion_loss_log.append(criterion_loss.numpy())
+
+        # get model name
+        model_filename = self._eval_model_filename_gen + '_sample' + str(arch_sample_id) + '_' + str(param_sample_id)
+        arch_filename = self._eval_arch_filename_gen + '_sample' + str(arch_sample_id) + '_' + str(param_sample_id)
+        model_filepath = os.path.join(self.results_path, model_filename + '.pt')
+        arch_filepath = os.path.join(self.results_path, arch_filename + '.pt')
+        model_graph_filepath = os.path.join(self.results_path, model_filename)
+        self._eval_model_name_log.append(model_filename)
+        self._eval_arch_name_log.append(arch_filename)
+        self._eval_num_graph_node_log.append(num_graph_nodes)
+        genotype = self._eval_model.genotype()
+
+        # save model
+        utils.save(self._eval_model, model_filepath)
+        torch.save(self._eval_model.alphas_normal, arch_filepath)
+        print('Saving model weights: ' + model_filepath)
+        (n_params_total, n_params_base, param_list) = self._eval_model.countParameters()
+        viz.plot(genotype.normal, model_graph_filepath, viewFile=False,
+                 input_labels=object_of_study.__get_input_labels__(), param_list=param_list, full_label=True)
+        print('Saving model graph: ' + model_graph_filepath)
+        print('Saving architecture weights: ' + arch_filepath)
+
+        self.model = self._model_org
+
+    def log_meta_evaluation(self, object_of_study):
+
+        # get name for csv log file
+        model_filename_csv = self._eval_summary_filename_gen + '.csv'
+        model_filepath = os.path.join(self.results_path, model_filename_csv)
+
+        # save csv file
+        rows = zip(self._eval_model_name_log, self._eval_arch_name_log, self._eval_num_graph_node_log, self._eval_criterion_loss_log)
+        with open(model_filepath, "w") as f:
+            writer = csv.writer(f)
+            writer.writerow([darts_cfg.csv_model_file_name, darts_cfg.csv_arch_file_name, darts_cfg.csv_num_graph_node,
+                             darts_cfg.csv_log_loss])
+            for row in rows:
+                writer.writerow(row)
+
+        self._model_summary_list.append(model_filepath)
 
     def init_model_search(self, object_of_study):
 
@@ -183,6 +389,10 @@ class Theorist_DARTS(Theorist, ABC):
         self.model = Network(object_of_study.__get_output_dim__(), self.criterion, steps=int(num_graph_nodes),
                         n_input_states=object_of_study.__get_input_dim__(),
                         classifier_weight_decay=darts_cfg.classifier_weight_decay)
+
+        # initialize model
+        if darts_cfg.custom_initialization:
+            self.model.apply(init_weights)
 
         # log size of parameter space
         logging.info("param size: %fMB", utils.count_parameters_in_MB(self.model))
@@ -211,10 +421,6 @@ class Theorist_DARTS(Theorist, ABC):
             train_data, batch_size=darts_cfg.batch_size,
             sampler=torch.utils.data.sampler.SubsetRandomSampler(indices[split:num_train]),
             pin_memory=True, num_workers=0)
-
-        # Set the learning rate of each parameter group using a cosine annealing schedule (model optimization)
-        self.scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
-            self.optimizer, float(self.model_search_epochs), eta_min=darts_cfg.learning_rate_min)
 
         # generate an architecture of the model
         darts_cfg.arch_weight_decay_df = arch_weight_decay_df
@@ -245,11 +451,6 @@ class Theorist_DARTS(Theorist, ABC):
 
 
     def run_model_search_epoch(self, epoch):
-        # get new learning rate
-        lr = self.scheduler.get_last_lr()[0]
-        # log new learning rate
-        logging.info('epoch: %d', epoch)
-        logging.info('learning rate: %e', lr)
 
         # returns the genotype of the model
         genotype = self.model.genotype()
@@ -260,7 +461,7 @@ class Theorist_DARTS(Theorist, ABC):
         print(F.softmax(self.model.alphas_normal, dim=-1))
 
         # training (for one epoch)
-        train_obj = train(self.train_queue, self.valid_queue, self.model, self.architect, self.criterion, self.optimizer, lr,
+        train_obj = train(self.train_queue, self.valid_queue, self.model, self.architect, self.criterion, self.optimizer,
                           darts_cfg.arch_updates_per_epoch, darts_cfg.param_updates_per_epoch)
         # log accuracy on training set
         logging.info('training accuracy: %f', train_obj)
@@ -269,9 +470,6 @@ class Theorist_DARTS(Theorist, ABC):
         valid_obj = infer(self.valid_queue, self.model, self.criterion)
         # log accuracy on validation set
         logging.info('validation accuracy: %f', valid_obj)
-
-        # moves the annealing scheduler forward to determine new learning rate
-        self.scheduler.step()
 
         self.train_error_log[epoch] = train_obj
         self.valid_error_log[epoch] = valid_obj
@@ -299,7 +497,7 @@ class Theorist_DARTS(Theorist, ABC):
                  input_labels=object_of_study.__get_input_labels__())
 
         # stores the model and architecture
-        model_filename = self.get_model_filename(arch_weight_decay_df, num_graph_nodes, seed)
+        model_filename = self.get_model_weights_filename(arch_weight_decay_df, num_graph_nodes, seed)
         arch_filename = self.get_architecture_filename(arch_weight_decay_df, num_graph_nodes, seed)
 
         model_filepath = os.path.join(self.results_path, model_filename + '.pt')
@@ -308,21 +506,26 @@ class Theorist_DARTS(Theorist, ABC):
         utils.save(self.model, model_filepath)
         torch.save(self.model.alphas_normal, arch_filepath)
 
-        model_eval_filepath = self.evaluate_architectures(object_of_study, self.train_queue, self.valid_queue, self.model,
-                                                          arch_weight_decay_df, num_graph_nodes, seed)
-        
-        self._model_summary_list.append(model_eval_filepath)
-
-    def plot_model(self, object_of_study, model=None):
+    def plot_model(self, object_of_study, model=None, full_label=False):
 
         if model is None:
-            genotype = self.model.genotype()
-        else:
-            genotype = model.genotype()
+            model = self.model
 
-        # save model plot
-        viz.plot(genotype.normal, self.graph_filepath, fileFormat='png',
-                 input_labels=object_of_study.__get_input_labels__())
+        # get genotype
+        genotype = model.genotype()
+
+        if full_label:
+            # get parameter list
+            (n_params_total, n_params_base, param_list) = model.countParameters()
+
+            # save model plot with parameters
+            viz.plot(genotype.normal, self.graph_filepath, fileFormat='png',
+                         input_labels=object_of_study.__get_input_labels__(), param_list=param_list, full_label=full_label)
+
+        else:
+            # save model plot without parameters
+            viz.plot(genotype.normal, self.graph_filepath, fileFormat='png',
+                     input_labels=object_of_study.__get_input_labels__())
 
         return self.graph_filepath + ".png"
 
@@ -355,7 +558,7 @@ class Theorist_DARTS(Theorist, ABC):
         y = (y_param_lr, y_arch_lr)
 
         # axis limits
-        x_limit = [1, self.model_search_epochs]
+        x_limit = [1, len(self.param_lr_log)]
 
         if np.isnan(self.param_lr_log[:]).all() and np.isnan(self.arch_lr_log[:]).all():
             y_limit = [0, 1]
@@ -393,7 +596,7 @@ class Theorist_DARTS(Theorist, ABC):
         y = (y_train, y_valid)
 
         # axis limits
-        x_limit = [1, self.model_search_epochs]
+        x_limit = [1, len(self.train_error_log)]
 
         if np.isnan(self.train_error_log[:]).all() and np.isnan(self.valid_error_log[:]).all():
             y_limit = [0, 1]
@@ -407,8 +610,8 @@ class Theorist_DARTS(Theorist, ABC):
             add_str = " (MSE)"
         elif isinstance(self.criterion , nn.cross_entropy) or isinstance(self.criterion , nn.nn.CrossEntropyLoss):
             add_str = " (Cross-Entropy)"
-        x_label = "Loss" + add_str
-        y_label = "Epochs"
+        y_label = "Loss" + add_str
+        x_label = "Epochs"
 
         # legend
         legend = ('Training Loss', 'Validation Loss')
@@ -457,6 +660,8 @@ class Theorist_DARTS(Theorist, ABC):
             y_data_highlighted = object_of_study.get_DV_from_output(output_highlighted, DV)
 
             # determine y limits
+            # y_limit = [np.amin([np.amin(y_data.numpy()), np.amin(y_prediction.detach().numpy()) ]),
+            #            np.amax([np.amax(y_data.numpy()), np.amax(y_prediction.detach().numpy()) ])]
             y_limit = [np.amin(y_data.numpy()), np.amax(y_data.numpy())]
 
             # determine y_label
@@ -576,14 +781,14 @@ class Theorist_DARTS(Theorist, ABC):
         self._performance_plots[self._pattern_plot_name] = plot_dict
 
     def get_model_filename(self, arch_weight_decay_df, num_graph_nodes, seed):
-        filename = utils.create_output_file_name(file_prefix='model_weights',
+        filename = utils.create_output_file_name(file_prefix='model',
                                                          log_version=self.model_search_id,
                                                          weight_decay=arch_weight_decay_df,
                                                          k=num_graph_nodes,
                                                          seed=seed)
         return filename
 
-    def get_model_filename(self, arch_weight_decay_df, num_graph_nodes, seed):
+    def get_model_weights_filename(self, arch_weight_decay_df, num_graph_nodes, seed):
         filename = utils.create_output_file_name(file_prefix='model_weights',
                                                          log_version=self.model_search_id,
                                                          weight_decay=arch_weight_decay_df,
@@ -608,67 +813,80 @@ class Theorist_DARTS(Theorist, ABC):
       num_graph_node_log = list()
 
       # generate general model file name
-      model_filename_gen = self.get_model_filename(arch_weight_decay_df, num_graph_nodes, seed)
-
+      model_filename_gen = self.get_model_weights_filename(arch_weight_decay_df, num_graph_nodes, seed)
+      summary_filename_gen = self.get_model_filename(arch_weight_decay_df, num_graph_nodes, seed)
       arch_filename_gen = self.get_architecture_filename(arch_weight_decay_df, num_graph_nodes, seed)
 
+      max_num_architectures = model.max_alphas_normal().shape[0] * model.max_alphas_normal().shape[1]
+      n_architectures_sampled = np.min([max_num_architectures, darts_cfg.n_architectures_sampled])
 
       # subsample models and retrain
       sampled_weights = list()
-      for sample_id in range(darts_cfg.n_models_sampled):
+      for arch_sample_id in range(n_architectures_sampled):
 
-          logging.info('architecture evaluation for sampled model: %d / %d', sample_id+1, darts_cfg.n_models_sampled)
+          logging.info('architecture evaluation for sampled model: %d / %d', arch_sample_id+1, n_architectures_sampled)
 
           # sample architecture weights
           found_weights = False
-          if(sample_id == 0):
+          if(arch_sample_id == 0):
               candidate_weights = model.max_alphas_normal()
               found_weights = True
           else:
               candidate_weights = model.sample_alphas_normal(darts_cfg.sample_amp)
 
+          arch_search_attempt = 0
           while found_weights is False:
                 weights_are_novel = True
                 for logged_weights in sampled_weights:
-                    if torch.eq(logged_weights, candidate_weights).all() is True:
+                    if torch.eq(logged_weights, candidate_weights).all():
                         weights_are_novel = False
                 if weights_are_novel:
                     novel_weights = candidate_weights
                     found_weights = True
                 else:
                     candidate_weights = model.sample_alphas_normal()
+                    if arch_search_attempt > darts_cfg.max_arch_search_attempts:
+                        found_weights = True
+                arch_search_attempt += 1
 
           # store sampled architecture weights
           sampled_weights.append(candidate_weights)
 
-          # reinitialize weights if desired
-          if darts_cfg.reinitialize_weights:
-              new_model = Network(object_of_study.__get_output_dim__(), criterion, steps=int(num_graph_nodes), n_input_states=object_of_study.__get_input_dim__(), classifier_weight_decay=darts_cfg.classifier_weight_decay)
-          else:
-              new_model = copy.deepcopy(model)
+          for param_sample_id in range(darts_cfg.n_initializations_sampled):
 
-          new_model.fix_architecture(True, candidate_weights)
+              logging.info('parameter evaluation for sampled model: %d / %d', param_sample_id + 1,
+                           darts_cfg.n_initializations_sampled)
 
-          # optimizer is standard stochastic gradient decent with some momentum and weight decay
-          optimizer = torch.optim.SGD(
-              new_model.parameters(),
-              darts_cfg.learning_rate,
-              momentum=darts_cfg.momentum,
-              weight_decay=darts_cfg.weight_decay)
+              # reinitialize weights if desired
+              if darts_cfg.reinitialize_weights:
+                  new_model = Network(object_of_study.__get_output_dim__(), criterion, steps=int(num_graph_nodes), n_input_states=object_of_study.__get_input_dim__(), classifier_weight_decay=darts_cfg.classifier_weight_decay)
+                  if darts_cfg.eval_custom_initialization:
+                    new_model.apply(init_weights)
+              else:
+                  new_model = copy.deepcopy(model)
 
-          # Set the learning rate of each parameter group using a cosine annealing schedule (model optimization)
-          scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
-              optimizer, float(self.model_search_epochs), eta_min=darts_cfg.learning_rate_min)
+              new_model.fix_architecture(True, candidate_weights)
 
-          # train model
-          for epoch in range(self.model_search_epochs):
+              # optimizer is standard stochastic gradient decent with some momentum and weight decay
+              optimizer = torch.optim.SGD(
+                  new_model.parameters(),
+                  darts_cfg.eval_learning_rate,
+                  momentum=darts_cfg.eval_momentum,
+                  weight_decay=darts_cfg.eval_weight_decay)
 
-              # get new learning rate
-              lr = scheduler.get_last_lr()[0]
+              # Set the learning rate of each parameter group using a cosine annealing schedule (model optimization)
+              scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
+                  optimizer, float(darts_cfg.eval_epochs), eta_min=darts_cfg.learning_rate_min)
 
               new_model.train()  # Sets the module in training mode
 
-              for param_step in range(darts_cfg.param_updates_per_epoch):
+              loss_log = list()
+              # train model
+              for epoch in range(darts_cfg.eval_epochs):
+
+                  # get new learning rate
+                  lr = scheduler.get_last_lr()[0]
+
                   # get input and target
                   input_search, target_search = next(iter(train_queue))
                   input = Variable(input_search, requires_grad=False)  # .cuda()
@@ -688,40 +906,46 @@ class Theorist_DARTS(Theorist, ABC):
                   # moves optimizer one step (applies gradients to weights)
                   optimizer.step()
                   # applies weight decay to classifier weights
-                  model.apply_weight_decay_to_classifier(lr)
+                  new_model.apply_weight_decay_to_classifier(lr)
 
-              # if in debug mode, print loss during architecture evaluation
-              logging.info('epoch %d', epoch)
-              logging.info('criterion loss %f', loss)
+                  # if in debug mode, print loss during architecture evaluation
+                  logging.info('epoch %d', epoch)
+                  logging.info('criterion loss %f', loss)
+                  loss_log.append(loss.detach().numpy())
+                  # moves the annealing scheduler forward to determine new learning rate
+                  scheduler.step()
 
-              # moves the annealing scheduler forward to determine new learning rate
-              scheduler.step()
+              # import matplotlib.pyplot as plt
+              # plt.clf()
+              # plt.plot(loss_log)
+              # plt.show()
 
-          # evaluate model
-          criterion_loss = infer(valid_queue, new_model, criterion, silent = True)
-          criterion_loss_log.append(criterion_loss.numpy())
+              # evaluate model
+              criterion_loss = infer(valid_queue, new_model, criterion, silent = True)
+              criterion_loss_log.append(criterion_loss.numpy())
 
-          # get model name
-          model_filename = model_filename_gen + '_sample' + str(sample_id)
-          arch_filename = arch_filename_gen + '_sample' + str(sample_id)
-          model_filepath = os.path.join(self.results_path, model_filename + '.pt')
-          arch_filepath = os.path.join(self.results_path, arch_filename + '.pt')
-          model_graph_filepath = os.path.join(self.results_path, model_filename)
-          model_name_log.append(model_filename)
-          arch_name_log.append(arch_filename)
-          num_graph_node_log.append(num_graph_nodes)
-          genotype = new_model.genotype()
+              # get model name
+              model_filename = model_filename_gen + '_sample' + str(arch_sample_id) + '_' + str(param_sample_id)
+              arch_filename = arch_filename_gen + '_sample' + str(arch_sample_id) + '_' + str(param_sample_id)
+              model_filepath = os.path.join(self.results_path, model_filename + '.pt')
+              arch_filepath = os.path.join(self.results_path, arch_filename + '.pt')
+              model_graph_filepath = os.path.join(self.results_path, model_filename)
+              model_name_log.append(model_filename)
+              arch_name_log.append(arch_filename)
+              num_graph_node_log.append(num_graph_nodes)
+              genotype = new_model.genotype()
 
-          # save model
-          utils.save(new_model, model_filepath)
-          torch.save(new_model.alphas_normal, arch_filepath)
-          print('Saving model weights: ' + model_filepath)
-          viz.plot(genotype.normal, model_graph_filepath, viewFile=False, input_labels=object_of_study.__get_input_labels__())
-          print('Saving model graph: ' + model_graph_filepath)
-          print('Saving architecture weights: ' + arch_filepath)
+              # save model
+              utils.save(new_model, model_filepath)
+              torch.save(new_model.alphas_normal, arch_filepath)
+              print('Saving model weights: ' + model_filepath)
+              (n_params_total, n_params_base, param_list) = new_model.countParameters()
+              viz.plot(genotype.normal, model_graph_filepath, viewFile=False, input_labels=object_of_study.__get_input_labels__(), param_list=param_list, full_label=True)
+              print('Saving model graph: ' + model_graph_filepath)
+              print('Saving architecture weights: ' + arch_filepath)
 
       # get name for csv log file
-      model_filename_csv = model_filename_gen + '.csv'
+      model_filename_csv = summary_filename_gen + '.csv'
       model_filepath = os.path.join(self.results_path, model_filename_csv)
 
       # save csv file
@@ -744,7 +968,7 @@ def format_input_target(input, target, criterion):
 
 
 # trains model for one architecture epoch
-def train(train_queue, valid_queue, model, architect, criterion, optimizer, lr, arch_updates_per_epoch=1, param_updates_per_epoch = 1):
+def train(train_queue, valid_queue, model, architect, criterion, optimizer, arch_updates_per_epoch=1, param_updates_per_epoch = 1):
   objs = utils.AvgrageMeter() # metric that averages
 
   objs_log = torch.zeros(arch_updates_per_epoch)
@@ -763,10 +987,26 @@ def train(train_queue, valid_queue, model, architect, criterion, optimizer, lr, 
     input_search, target_search = format_input_target(input_search, target_search, criterion)
 
     # FIRST STEP: UPDATE ARCHITECTURE (ALPHA)
-    architect.step(input_search, target_search, lr, optimizer, unrolled=darts_cfg.unrolled)
+    architect.step(input_search, target_search, optimizer, unrolled=darts_cfg.unrolled)
+
+    # Set the learning rate of each parameter group using a cosine annealing schedule (model optimization)
+    optimizer = torch.optim.SGD(
+        model.parameters(),
+        darts_cfg.learning_rate,
+        momentum=darts_cfg.momentum,
+        weight_decay=darts_cfg.weight_decay)
+
+    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
+        optimizer, float(param_updates_per_epoch), eta_min=darts_cfg.learning_rate_min)
 
     # SECOND STEP: UPDATE MODEL PARAMETERS (W)
     for param_step in range(param_updates_per_epoch):
+
+      # get new learning rate
+      lr = scheduler.get_last_lr()[0]
+      # log new learning rate
+      logging.info('param_step: %d', param_step)
+      logging.info('learning rate: %e', lr)
 
       # get input and target
       input_search, target_search = next(iter(train_queue))
@@ -788,6 +1028,9 @@ def train(train_queue, valid_queue, model, architect, criterion, optimizer, lr, 
       optimizer.step()
       # applies weight decay to classifier weights
       model.apply_weight_decay_to_classifier(lr)
+
+      # moves the annealing scheduler forward to determine new learning rate
+      scheduler.step()
 
       # compute accuracy metrics
       n = input.size(0)
@@ -823,6 +1066,21 @@ def infer(valid_queue, model, criterion, silent = False):
           logging.info('architecture step (accuracy): %03d (%e)', step, objs.avg)
 
   return objs.avg
+
+def init_weights(m):
+    if type(m) == nn.Linear:
+        # uniform initialization
+        if darts_cfg.init_method == darts_cfg.InitMethod.UNIFORM:
+            nn.init.uniform_(m.weight, a=darts_cfg.init_uniform_interval[0], b=darts_cfg.init_uniform_interval[1])
+            if m.bias is not None:
+                nn.init.uniform_(m.bias, a=darts_cfg.init_uniform_interval[0], b=darts_cfg.init_uniform_interval[1])
+
+        # normal initialization
+        elif darts_cfg.init_method == darts_cfg.InitMethod.NORMAL:
+            nn.init.normal_(m.weight, mean=darts_cfg.init_normal_mean, std=darts_cfg.init_normal_std)
+            if m.bias is not None:
+                nn.init.normal_(m.bias, mean=darts_cfg.init_normal_mean, std=darts_cfg.init_normal_std)
+
 
 
 # def architecture_search(self, object_of_study, arch_weight_decay_df, num_graph_nodes, seed):
@@ -926,7 +1184,7 @@ def infer(valid_queue, model, criterion, silent = False):
 #              input_labels=object_of_study.__get_input_labels__())
 #
 #     # stores the model and architecture
-#     model_filename = self.get_model_filename(arch_weight_decay_df, num_graph_nodes, seed)
+#     model_filename = self.get_model_weights_filename(arch_weight_decay_df, num_graph_nodes, seed)
 #     arch_filename = self.get_architecture_filename(arch_weight_decay_df, num_graph_nodes, seed)
 #
 #     model_filepath = os.path.join(self.results_path, model_filename + '.pt')

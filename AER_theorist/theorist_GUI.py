@@ -404,7 +404,7 @@ class Theorist_GUI(Frame):
         model_search_parameters = self.theorist.get_model_search_parameters()
         self.update_parameter_list(model_search_parameters)
 
-    def update_plot(self, plot_type=None, plots=None):
+    def update_plot(self, plot_type=None, plots=None, save=False):
 
         if plot_type == Plot_Windows.PERFORMANCE:
             relevant_listbox = self.listbox_performance
@@ -566,6 +566,10 @@ class Theorist_GUI(Frame):
             # finalize performance plot
             plot_axis.set_title(key, fontsize=self._plot_fontSize)
             plot_canvas.draw()
+            if save is True:
+                plot_filepath = os.path.join(self.theorist.results_path, 'plot_' + key + '.png')
+                self._fig_performance.savefig(plot_filepath)
+
 
         else:
             raise Exception("Key '" + str(key) + "' not found in dictionary performance_plots.")
@@ -665,7 +669,15 @@ class Theorist_GUI(Frame):
                 self.theorist._meta_parameters_iteration += 1
 
         if self._running is True:
-            self.theorist.get_best_model(self.object_of_study)
+            best_model = self.theorist.get_best_model(self.object_of_study, plot_model=True)
+
+            # save all performance plots
+            self.theorist.model = best_model
+            performance_plots = self.theorist.get_performance_plots(self.object_of_study)
+            for item in range(self.listbox_performance.size()):
+                self.set_listbox_selection(self.listbox_performance, item)
+                self.update_plot(Plot_Windows.PERFORMANCE, performance_plots, save=True)
+
         else:
             # reset gui elements
             self.reset_gui()

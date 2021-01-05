@@ -361,7 +361,8 @@ class Experimentalist(ABC):
                 x_conditions = None
 
             # determine y limits
-            y_limit = [np.amin(y_data.numpy()), np.amax(y_data.numpy())]
+            y_limit = [np.amin([np.amin(y_data.numpy()), np.amin(y_prediction.detach().numpy())]),
+                       np.amax([np.amax(y_data.numpy()), np.amax(y_prediction.detach().numpy())])]
 
             # determine y_label
             y_label = DV.get_variable_label()

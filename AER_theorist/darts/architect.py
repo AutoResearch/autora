@@ -20,6 +20,7 @@ class Architect(object):
     else:
       self.network_weight_decay_df = 0
     self.model = model
+    self.lr = args.arch_learning_rate
     # architecture is optimized using Adam
     self.optimizer = torch.optim.Adam(self.model.arch_parameters(),
         lr=args.arch_learning_rate, betas=(0.5, 0.999), weight_decay=args.arch_weight_decay)
@@ -58,28 +59,28 @@ class Architect(object):
     unrolled_model = self._construct_model_from_theta(theta.sub(eta, moment+dtheta))
     return unrolled_model
 
-  def step(self, input_valid, target_valid, eta, network_optimizer, unrolled, input_train=None, target_train=None):
+  def step(self, input_valid, target_valid, network_optimizer, unrolled, input_train=None, target_train=None, eta=1):
     # input_train, target_train only needed for approximation (unrolled=True) of architecture gradient
     # when performing a single weigh update
     #
     # initialize gradients to be zero
     self.optimizer.zero_grad()
     # use different backward step depending on whether to use 2nd order approximation for gradient update
-    if unrolled:
+    if unrolled: # probably using eta of parameter update here
         self._backward_step_unrolled(input_train, target_train, input_valid, target_valid, eta, network_optimizer)
     else:
-        self._backward_step(input_valid, target_valid, eta)
+        self._backward_step(input_valid, target_valid)
     # move Adam one step
     self.optimizer.step()
 
   # backward step (using first order approximation?)
-  def _backward_step(self, input_valid, target_valid, eta=1):
+  def _backward_step(self, input_valid, target_valid):
     loss = self.model._loss(input_valid, target_valid)
     loss.backward()
 
     # weight decay proportional to degrees of freedom
     for p in self.model.arch_parameters():
-      p.data.sub_((self.decay_weights * eta))  # weight decay
+      p.data.sub_((self.decay_weights * self.lr))  # weight decay
 
 
   # backward pass using second order approximation
