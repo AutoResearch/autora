@@ -6,16 +6,15 @@ from os import path
 
 class Experiment_Client(Client_Server_Interface):
 
-    exp_folder_path = config.experiments_path
-    seq_folder_path = config.sequences_path
-    data_folder_path = config.data_path
-    session_folder_path = config.session_path
-
-    main_directory = config.client_path
-
     def __init__(self, session_ID, host=None, port=None, gui=None, experiment_file_name=None):
 
         super().__init__(session_ID, host, port, gui)
+
+        self.exp_folder_path = config.experiments_path
+        self.seq_folder_path = config.sequences_path
+        self.data_folder_path = config.data_path
+        self.session_folder_path = config.session_path
+        self.main_directory = config.client_path
 
         if experiment_file_name is not None:
             self.exp_file_path = self.exp_folder_path + experiment_file_name
@@ -110,6 +109,7 @@ class Experiment_Client(Client_Server_Interface):
     def _receive_data_file(self):
         self._print_status(protocol.STATUS_INITIATED_TRANSFER, "Receiving data file...")
         self._receive_file()
+        print("Received data file")
         self._set_job_status(protocol.JOB_STATUS_RECEIVED_DATA_FILE)
         self._save_job_status()
 
@@ -162,6 +162,7 @@ class Experiment_Client(Client_Server_Interface):
         # send client status
         self._send_and_confirm(protocol.TRANSFER_CLIENT_STATUS)
         self._send_and_confirm(bytes(str(self.job_status), 'utf-8'))
+        self._print_status(protocol.STATUS_NEGOTIATING_STATUS, "Sent job status: " + str(self.job_status))
 
         # receive final status from server
         while True:

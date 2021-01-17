@@ -300,20 +300,29 @@ class Network(nn.Module):
             if (parameter.requires_grad == True):
               n_params_total += parameter.data.numel()
 
-        if print_parameters:
-          print('Edge (' + str(idx) + '): ' + get_operation_label(PRIMITIVES[np.asscalar(maxIdx[0])], tmp_param_list))
-        param_list.append(tmp_param_list)
+      print_parameters = True
+      if print_parameters:
+        print('Edge (' + str(idx) + '): ' + get_operation_label(PRIMITIVES[np.asscalar(maxIdx[0])], tmp_param_list))
+      param_list.append(tmp_param_list)
 
-    # get parameters from final linear classifier
-    tmp_param_list = list()
-    for parameter in self.classifier.parameters():
-      for subparameter in parameter:
-        tmp_param_list.append(subparameter.data.numpy().squeeze())
+    # # get parameters from final linear classifier
+    # tmp_param_list = list()
+    # for parameter in self.classifier.parameters():
+    #   for subparameter in parameter:
+    #     tmp_param_list.append(subparameter.data.numpy().squeeze())
 
-    if print_parameters:
-      print('Classifier: ' + get_operation_label('classifier', tmp_param_list))
+    # get parameters from final linear for each edge
+    for edge in range(self._steps):
+      tmp_param_list = list()
+      # add weight
+      tmp_param_list.append(self.classifier._parameters['weight'].data[:,edge].numpy())
+      # add partial bias (bias of classifier units will be devided by number of edges)
+      if 'bias' in self.classifier._parameters.keys() and edge == 0:
+        tmp_param_list.append(self.classifier._parameters['bias'].data.numpy())
+      param_list.append(tmp_param_list)
 
-    param_list.append(tmp_param_list)
+      if print_parameters:
+        print('Classifier from Edge ' + str(edge) + ': ' + get_operation_label('classifier', tmp_param_list))
 
     return (n_params_total, n_params_base, param_list)
 

@@ -1,11 +1,174 @@
+import AER_config as aer_config
+import AER_theorist.darts.darts_config as darts_config
 import matplotlib.pyplot as plt
 import matplotlib
+import seaborn as sns
 from matplotlib.gridspec import GridSpec
 from mpl_toolkits import mplot3d
 import imageio
 import time
 import numpy as np
+import os
+import pandas
 
+
+def plot_darts_summary(study_name, y_name, x1_name, x2_name=None, y_label=None, x1_label=None, x2_label=None, metric='min'):
+
+    if y_label is None:
+        y_label = y_name
+
+    if x1_label is None:
+        x1_label = x1_name
+
+    if x2_label is None:
+        x2_label = x2_name
+
+    # determine directory for study results
+    results_path = aer_config.studies_folder \
+                        + study_name + "/" \
+                        + aer_config.models_folder \
+                        + aer_config.models_results_folder
+
+    # read in all csv files
+    files = list()
+    for file in os.listdir(results_path):
+        if file.endswith(".csv"):
+            files.append(os.path.join(results_path, file))
+
+    # generate a plot dictionary
+    plot_dict = dict()
+    plot_dict[darts_config.csv_arch_file_name] = list()
+    plot_dict[y_name] = list()
+    plot_dict[x1_name] = list()
+    if x2_name is not None:
+        plot_dict[x2_name] = list()
+
+    # load csv files into a common dictionary
+    for file in files:
+        data = pandas.read_csv(file, header=0)
+        plot_dict[darts_config.csv_arch_file_name].extend(data[darts_config.csv_arch_file_name])
+        plot_dict[y_name].extend(data[y_name])
+        plot_dict[x1_name].extend(data[x1_name])
+        if x2_name is not None:
+            plot_dict[x2_name].extend(data[x2_name])
+
+    model_name_list = plot_dict[darts_config.csv_arch_file_name]
+    x1_data = np.asarray(plot_dict[x1_name])
+    y_data = np.asarray(plot_dict[y_name])
+    if x2_name is None: # determine for each value of x1 the lowest y
+        x1_data = np.asarray(plot_dict[x1_name])
+        x1_unique = np.sort(np.unique(x1_data))
+
+        y_plot = np.empty(x1_unique.shape)
+        y_plot[:] = np.nan
+        x1_plot = np.empty(x1_unique.shape)
+        x1_plot[:] = np.nan
+        for idx_unique, x1_unique_val in enumerate(x1_unique):
+            y_match = list()
+            model_name_match = list()
+            for idx_data, x_data_val in enumerate(x1_data):
+                if x1_unique_val == x_data_val:
+                    y_match.append(y_data[idx_data])
+                    model_name_match.append(model_name_list[idx_data])
+            x1_plot[idx_unique] = x1_unique_val
+
+            if metric is 'min':
+                y_plot[idx_unique] = np.min(y_match)
+                idx_target = np.argmin(y_match)
+            elif metric is 'max':
+                y_plot[idx_unique] = np.max(y_match)
+                idx_target = np.argmax(y_match)
+            elif metric is 'mean':
+                y_plot[idx_unique] = np.mean(y_match)
+                idx_target = 0
+            else:
+                raise Exception('Argument "metric" may either be "min", "max" or "mean".')
+
+            print(x1_label + " = " + str(x1_unique_val) + " (" + str(y_plot[idx_unique]) + "): " + model_name_match[idx_target])
+
+    else: # determine for each combination of x1 and x2 (unique rows) the lowest y
+        x2_data = np.asarray(plot_dict[x2_name])
+        x2_unique = np.sort(np.unique(x2_data))
+
+        y_plot = list()
+        x1_plot = list()
+        x2_plot = list()
+        for idx_x2_unique, x2_unique_val in enumerate(x2_unique):
+
+            # collect all x1 and y values matching the current x2 value
+            model_name_x2_match = list()
+            y_x2_match=list()
+            x1_x2_match = list()
+            for idx_x2_data, x2_data_val in enumerate(x2_data):
+                if x2_unique_val == x2_data_val:
+                    model_name_x2_match.append(model_name_list[idx_x2_data])
+                    y_x2_match.append(y_data[idx_x2_data])
+                    x1_x2_match.append(x1_data[idx_x2_data])
+
+            # now determine unique x1 values for current x2 value
+            x1_unique = np.sort(np.unique(x1_x2_match))
+            x1_x2_plot = np.empty(x1_unique.shape)
+            x1_x2_plot[:] = np.nan
+            y_x2_plot = np.empty(x1_unique.shape)
+            y_x2_plot[:] = np.nan
+            for idx_x1_unique, x1_unique_val in enumerate(x1_unique):
+                y_x2_x1_match = list()
+                model_name_x2_x1_match = list()
+                for idx_x1_data, x1_data_val in enumerate(x1_x2_match):
+                    if x1_unique_val == x1_data_val:
+                        model_name_x2_x1_match.append(model_name_x2_match[idx_x1_data])
+                        y_x2_x1_match.append(y_x2_match[idx_x1_data])
+                x1_x2_plot[idx_x1_unique] = x1_unique_val
+
+                if metric is 'min':
+                    y_x2_plot[idx_x1_unique] = np.min(y_x2_x1_match)
+                    idx_target = np.argmin(y_x2_x1_match)
+                elif metric is 'max':
+                    y_x2_plot[idx_x1_unique] = np.max(y_x2_x1_match)
+                    idx_target = np.argmax(y_x2_x1_match)
+                elif metric is 'mean':
+                    y_x2_plot[idx_x1_unique] = np.mean(y_x2_x1_match)
+                    idx_target = 0
+                else:
+                    raise Exception('Argument "metric" may either be "min", "max" or "mean".')
+
+                print(x1_label + " = " + str(x1_unique_val) + ", " + \
+                      x2_label + " = " + str(x2_unique_val) + " (" + \
+                    str(y_x2_plot[idx_x1_unique]) + "): " + model_name_x2_x1_match[idx_target])
+            y_plot.append(y_x2_plot)
+            x1_plot.append(x1_x2_plot)
+            x2_plot.append(x2_unique_val)
+    # plot
+
+    # todo: incorporate
+    # sns.despine(trim=True)
+    # plt.axhline(1, c = 'b')
+
+    if x2_name is None:
+
+        data_plot = pandas.DataFrame({x1_label:x1_plot, y_label:y_plot})
+        sns.lineplot(x=x1_label, y=y_label, data=data_plot)
+        sns.despine(trim=True)
+        plt.show()
+
+    else:
+
+        # produce data frame:
+        x1_df = list()
+        x2_df = list()
+        y_df = list()
+        for idx_x2, x2 in enumerate(x2_plot):
+            for idx_x1, x1 in enumerate(x1_plot[idx_x2]):
+                x1_df.append(x1)
+                x2_df.append(x2)
+                y_df.append(y_plot[idx_x2][idx_x1])
+
+        data_plot = pandas.DataFrame({x1_label: x1_df, x2_label: x2_df, y_label: y_df})
+        sns.lineplot(data=data_plot, x=x1_label, y=y_label, hue=x2_label, linewidth = 1)
+        sns.despine(trim=True)
+        plt.show()
+
+# old
 class DebugWindow:
 
     def __init__(self, num_epochs, numArchEdges=1, numArchOps=1, ArchOpsLabels=(), fitPlot3D = False, show_arch_weights=True):

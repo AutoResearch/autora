@@ -6,22 +6,25 @@ import AER_config as AER_cfg
 from typing import List, Dict
 import torch
 import numpy as np
+import copy
+import random
 
 class Object_Of_Study(Dataset):
 
-    independent_variables = list()
-    dependent_variables = list()
-    covariates = list()
-    data = dict()
 
     key_experiment_id = 'AER_Experiment'
 
-    _normalize_input = False
-    _normalize_output = False
 
     def __init__(self, name, independent_variables: List[Variable], dependent_variables: List[Variable], covariates=list(), input_dimensions=None, output_dimensions=None, output_type=None):
 
         self.name = name
+
+        self.independent_variables = list()
+        self.dependent_variables = list()
+        self.covariates = list()
+        self.data = dict()
+        self._normalize_input = False
+        self._normalize_output = False
 
         # set independent and dependent variables
         if len(independent_variables) == 0:
@@ -198,20 +201,25 @@ class Object_Of_Study(Dataset):
                         value_log.append(output[idx, DV_idx])
                 value_mean = np.mean(value_log)
                 DV_values[row] = value_mean
+            return unique_IV_values, DV_values
         else:
             IV1_idx = self.get_IV_idx(IV1)
             IV2_idx = self.get_IV_idx(IV2)
-            unique_IV_rows = np.unique(input[:, [IV1_idx, IV2_idx]])
-            DV_values = np.empty((unique_IV_rows.shape[0], 1))
+            unique_IV_rows = np.unique(input[:, [IV1_idx, IV2_idx]], axis=0)
+            DV_values = np.empty((unique_IV_rows.shape[0]))
+            IV1_values = np.empty((unique_IV_rows.shape[0]))
+            IV2_values = np.empty((unique_IV_rows.shape[0]))
             for row, combination in enumerate(unique_IV_rows):
                 value_log = list()
                 for idx in range(output.shape[0]):
-                    if combination == input[idx, [IV1_idx, IV2_idx]]:
+                    if (combination == input[idx, [IV1_idx, IV2_idx]]).all():
                         value_log.append(output[idx, DV_idx])
                 value_mean = np.mean(value_log)
                 DV_values[row] = value_mean
-
-        return DV_values
+                IV1_values[row] = combination[0]
+                IV2_values[row] = combination[1]
+            unique_IV_values = (IV1_values, IV2_values)
+            return unique_IV_values, DV_values
 
     def get_plot_list(self):
         IV_list_1 = list()
@@ -399,6 +407,32 @@ class Object_Of_Study(Dataset):
         for var in self.dependent_variables:
             output_data.append(var.get_value_from_dict(self.data, 0))
         return len(output_data)
+
+    def split(self, proportion=0.5):
+
+        split_copy = copy.deepcopy(self)
+
+        # determine indices to be split
+        num_data_points = self.__len__()
+        indices = range(num_data_points)
+        num_samples = round(proportion*num_data_points)
+        samples = random.sample(indices, num_samples)
+
+        split_copy.data = dict()
+
+        # first add samples to the new copy
+        for key in self.data.keys():
+            split_copy.data[key] = list()
+            for samp in samples:
+                split_copy.data[key].append(self.data[key][samp])
+
+        # now remove samples from original object
+        for key in self.data.keys():
+            values = self.data[key]
+            values = [i for j, i in enumerate(values) if j not in samples]
+            self.data[key] = values
+
+        return split_copy
 
     # potentially redundant with: get_dataset
     def get_all_data(self):

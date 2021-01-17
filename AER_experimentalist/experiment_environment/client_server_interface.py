@@ -6,24 +6,22 @@ import time
 
 class Client_Server_Interface():
 
-    host = config.HOST_IP       # The server's hostname or IP address
-    port = config.HOST_PORT     # The port used by the server
-
-    job_status = None
-    session_ID = None
-
-    exp_file_path = ""       # path to experiment file
-    seq_file_path = ""       # path to sequence file
-    data_file_path = ""      # path to data file
-    session_file_path = ""   # path to session file
-
-    main_directory = ""     # path to main directory
-
-    session_folder_path = config.session_path # path to session folder
-
-    gui = None
 
     def __init__(self, session_ID=None, host=None, port=None, gui=None):
+
+        self.exp_file_path = ""  # path to experiment file
+        self.seq_file_path = ""  # path to sequence file
+        self.data_file_path = ""  # path to data file
+        self.session_file_path = ""  # path to session file
+        self.main_directory = ""  # path to main directory
+
+        self.gui = None
+        self.host = config.HOST_IP  # The server's hostname or IP address
+        self.port = config.HOST_PORT  # The port used by the server
+
+        self.job_status = None
+
+        self.session_folder_path = config.session_path  # path to session folder
 
         if host is not None:
             self.host = host
@@ -71,6 +69,7 @@ class Client_Server_Interface():
             line = file.read(1024)
 
         self._send_and_confirm(protocol.TRANSFER_COMPLETE)
+        print('after complete')
         self._print_status(protocol.STATUS_COMPLETED_TRANSFER, "Completed file transfer.")
 
 
@@ -102,7 +101,9 @@ class Client_Server_Interface():
                     f = open(self.main_directory + file_path.decode(protocol.STRING_FORMAT), 'wb')
                     data = self._socket.recv(1024)
                     self._print_status(protocol.STATUS_RECEIVING_FILE_DATA, "Receiving file...")
-                    while data != protocol.TRANSFER_COMPLETE:
+                    while True: #data != protocol.TRANSFER_COMPLETE:
+                        if data == protocol.TRANSFER_COMPLETE:
+                            break
                         f.write(data)
                         print(repr(data))
                         self._socket.sendall(protocol.OK)

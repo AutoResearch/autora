@@ -5,6 +5,7 @@ from AER_theorist.darts.model_search import Network
 from AER_theorist.darts.architect import Architect
 from AER_theorist.darts.genotypes import PRIMITIVES
 from torch.autograd import Variable
+from AER_experimentalist.experiment_environment.variable import outputTypes as output_types
 
 import torch
 import torch.nn as nn
@@ -13,6 +14,7 @@ import pandas
 import logging
 import numpy as np
 import AER_theorist.darts.darts_config as darts_cfg
+import AER_config as aer_config
 import AER_theorist.darts.utils as utils
 import AER_theorist.darts.visualize as viz
 import copy
@@ -24,16 +26,23 @@ class Theorist_DARTS(Theorist, ABC):
 
     simulation_files = 'AER_theorist/darts/*.py'
 
-    criterion = None
-
-    _model_summary_list = list()
-    _eval_meta_parameters = list()      # meta parameters for model evaluation
-    _meta_parameters = list()           # meta parameters for model search
-
     _lr_plot_name = "Learning Rates"
 
     def __init__(self, study_name):
         super(Theorist_DARTS, self).__init__(study_name)
+
+        self.criterion = None
+
+        self._model_summary_list = list()
+        self._eval_meta_parameters = list()  # meta parameters for model evaluation
+        self._meta_parameters = list()  # meta parameters for model search
+
+        self._eval_criterion_loss_log = list()
+        self._eval_model_name_log = list()
+        self._eval_arch_name_log = list()
+        self._eval_num_graph_node_log = list()
+        self._eval_arch_weight_decay_log = list()
+        self._eval_num_params_log = list()
 
         self.model_search_epochs = darts_cfg.epochs
         self.eval_epochs = darts_cfg.eval_epochs
@@ -138,7 +147,7 @@ class Theorist_DARTS(Theorist, ABC):
             # read CSV
             data = pandas.read_csv(summary_file, header=0)
 
-            log_losses = np.asarray(data[darts_cfg.csv_log_loss])
+            log_losses = np.asarray(data[darts_cfg.csv_loss])
             log_losses = log_losses.astype(float)
             min_loss_index = np.argmin(log_losses)
 
@@ -200,6 +209,11 @@ class Theorist_DARTS(Theorist, ABC):
         self._eval_model_name_log = list()
         self._eval_arch_name_log = list()
         self._eval_num_graph_node_log = list()
+        self._eval_arch_weight_decay_log = list()
+        self._eval_num_params_log = list()
+        self._validation_log_list = dict()
+        for key in self._validation_sets:
+            self._validation_log_list[key] = list()
 
         # generate general model file name
         [arch_weight_decay_df, num_graph_nodes, seed] = self.get_meta_parameters()
@@ -331,6 +345,34 @@ class Theorist_DARTS(Theorist, ABC):
         self.train_error_log[epoch] = loss.detach().numpy()
         self.valid_error_log[epoch] = validation_loss.detach().numpy()
 
+    def _validate_model(self, key):
+        if key in self._validation_sets.keys():
+            # retrieve object of study
+            object_of_study = self._validation_sets[key]
+            (input, target) = object_of_study.get_dataset()
+
+            # determine criterion
+            output_type = object_of_study.__get_output_type__()
+            criterion = utils.get_loss_function(output_type)
+
+            # compute loss
+            logits = self._eval_model(input)
+
+            # compute BIC appropriate output types
+            if output_type == output_types.CLASS or output_type == output_types.PROBABILITY_SAMPLE:
+                loss = utils.compute_BIC(output_type, self._eval_model, input, target)
+            else:
+                if output_type == output_types.CLASS:
+                    loss = criterion(logits, torch.flatten(target.long()))
+                else:
+                    loss = criterion(logits, target)
+
+            loss = loss.detach().numpy()
+            return loss
+
+        else:
+            raise Exception('No validation set named "' + key + '".')
+
     def log_model_evaluation(self, object_of_study):
 
         # get meta parameters
@@ -341,6 +383,11 @@ class Theorist_DARTS(Theorist, ABC):
         criterion_loss = infer(self.valid_queue, self._eval_model, self.criterion, silent=True)
         self._eval_criterion_loss_log.append(criterion_loss.numpy())
 
+        # for each validation set, compute validation log
+        for idx, key in enumerate(self._validation_sets.keys()):
+            loss = self._validate_model(key)
+            self._validation_log_list[key].append(loss)
+
         # get model name
         model_filename = self._eval_model_filename_gen + '_sample' + str(arch_sample_id) + '_' + str(param_sample_id)
         arch_filename = self._eval_arch_filename_gen + '_sample' + str(arch_sample_id) + '_' + str(param_sample_id)
@@ -350,6 +397,9 @@ class Theorist_DARTS(Theorist, ABC):
         self._eval_model_name_log.append(model_filename)
         self._eval_arch_name_log.append(arch_filename)
         self._eval_num_graph_node_log.append(num_graph_nodes)
+        self._eval_arch_weight_decay_log.append(arch_weight_decay_df)
+        num_params, _, _ = self._eval_model.countParameters()
+        self._eval_num_params_log.append(num_params)
         genotype = self._eval_model.genotype()
 
         # save model
@@ -371,11 +421,31 @@ class Theorist_DARTS(Theorist, ABC):
         model_filepath = os.path.join(self.results_path, model_filename_csv)
 
         # save csv file
-        rows = zip(self._eval_model_name_log, self._eval_arch_name_log, self._eval_num_graph_node_log, self._eval_criterion_loss_log)
+
+        # generate header
+        header = [darts_cfg.csv_model_file_name, darts_cfg.csv_arch_file_name, darts_cfg.csv_num_graph_node,
+                  darts_cfg.csv_arch_weight_decay, darts_cfg.csv_num_params, darts_cfg.csv_loss]
+
+        # collect log data
+        zip_data = list()
+        zip_data.append(self._eval_model_name_log)
+        zip_data.append(self._eval_arch_name_log)
+        zip_data.append(self._eval_num_graph_node_log)
+        zip_data.append(self._eval_arch_weight_decay_log)
+        zip_data.append(self._eval_num_params_log)
+        zip_data.append(self._eval_criterion_loss_log)
+
+        # add log data from additional validation sets
+        for key in self._validation_log_list.keys():
+            header.append(key)
+            validation_log = self._validation_log_list[key]
+            zip_data.append(validation_log)
+
+        rows = zip(*zip_data)
+
         with open(model_filepath, "w") as f:
             writer = csv.writer(f)
-            writer.writerow([darts_cfg.csv_model_file_name, darts_cfg.csv_arch_file_name, darts_cfg.csv_num_graph_node,
-                             darts_cfg.csv_log_loss])
+            writer.writerow(header)
             for row in rows:
                 writer.writerow(row)
 
@@ -471,6 +541,8 @@ class Theorist_DARTS(Theorist, ABC):
         # log accuracy on validation set
         logging.info('validation accuracy: %f', valid_obj)
 
+        logging.info('epoch: %d', epoch)
+
         self.train_error_log[epoch] = train_obj
         self.valid_error_log[epoch] = valid_obj
 
@@ -481,7 +553,8 @@ class Theorist_DARTS(Theorist, ABC):
         # get full data set:
         (input, target) = object_of_study.get_dataset()
         self.target_pattern = target.detach().numpy()
-        self.prediction_pattern = self.model(input).detach().numpy()
+        #self.prediction_pattern = self.model(input).detach().numpy()
+        self.prediction_pattern = model_formatted(self.model, input, object_of_study).detach().numpy()
 
         # log architecture weights
         self.architecture_weights_log[epoch, :, :] = torch.nn.functional.softmax(self.model.alphas_normal, dim=-1).data.numpy()
@@ -608,8 +681,10 @@ class Theorist_DARTS(Theorist, ABC):
         add_str = ""
         if isinstance(self.criterion , nn.MSELoss):
             add_str = " (MSE)"
-        elif isinstance(self.criterion , nn.cross_entropy) or isinstance(self.criterion , nn.nn.CrossEntropyLoss):
+        elif isinstance(self.criterion , nn.CrossEntropyLoss):
             add_str = " (Cross-Entropy)"
+        else:
+            add_str = ""
         y_label = "Loss" + add_str
         x_label = "Epochs"
 
@@ -630,39 +705,43 @@ class Theorist_DARTS(Theorist, ABC):
 
         # for each plot
         for IV1, IV2, DV in zip(IV_list_1, IV_list_2, DV_list):
-
             IVs = [IV1, IV2]
 
             # generate model prediction
-            resolution = 100
+            n_variables = len(object_of_study.independent_variables)
+            resolution = int(np.round(aer_config.max_data_points_simulated**(1/float(n_variables))))
+
             counterbalanced_input = object_of_study.get_counterbalanced_input(resolution)
+            #y_prediction = self.model(counterbalanced_input).detach().numpy()
+            y_prediction = model_formatted(self.model, counterbalanced_input, object_of_study).detach().numpy()
             if IV2 is None:  # prepare line plot
-                x_prediction = object_of_study.get_IVs_from_input(counterbalanced_input, IV1)
+                # x_prediction = object_of_study.get_IVs_from_input(counterbalanced_input, IV1).detach().numpy().flatten()
+                # y_prediction = object_of_study.average_DV_for_IVs(DV, IVs, counterbalanced_input.detach().numpy(), y_prediction)
+                x_prediction, y_prediction = object_of_study.average_DV_for_IVs(DV, IVs, counterbalanced_input.detach().numpy(), y_prediction)
             else:
-                x_prediction = (object_of_study.get_IVs_from_input(counterbalanced_input, IV1), object_of_study.get_IVs_from_input(counterbalanced_input, IV2))
-            y_prediction = self.model(counterbalanced_input)
+                x_prediction, y_prediction = object_of_study.average_DV_for_IVs(DV, IVs, counterbalanced_input.detach().numpy(), y_prediction)
 
             # get data points
             (input, output)  = object_of_study.get_dataset()
             if IV2 is None:  # prepare line plot
-                x_data = object_of_study.get_IVs_from_input(input, IV1)
+                x_data = object_of_study.get_IVs_from_input(input, IV1).detach().numpy().flatten()
             else:
-                x_data = (object_of_study.get_IVs_from_input(input, IV1), object_of_study.get_IVs_from_input(input, IV2))
-            y_data = object_of_study.get_DV_from_output(output, DV)
+                x_data = (object_of_study.get_IVs_from_input(input, IV1).detach().numpy().flatten(), object_of_study.get_IVs_from_input(input, IV2).detach().numpy().flatten())
+            y_data = object_of_study.get_DV_from_output(output, DV).detach().numpy().flatten()
 
             # get highlighted data points from last experiment
             last_experiment_id = object_of_study.get_last_experiment_id()
             (input_highlighted, output_highlighted) = object_of_study.get_dataset(experiment_id=last_experiment_id)
             if IV2 is None:  # prepare line plot
-                x_data_highlighted = object_of_study.get_IVs_from_input(input_highlighted, IV1)
+                x_data_highlighted = object_of_study.get_IVs_from_input(input_highlighted, IV1).detach().numpy().flatten()
             else:
-                x_data_highlighted = (object_of_study.get_IVs_from_input(input_highlighted, IV1), object_of_study.get_IVs_from_input(input_highlighted, IV2))
-            y_data_highlighted = object_of_study.get_DV_from_output(output_highlighted, DV)
+                x_data_highlighted = (object_of_study.get_IVs_from_input(input_highlighted, IV1).detach().numpy().flatten(), object_of_study.get_IVs_from_input(input_highlighted, IV2).detach().numpy().flatten())
+            y_data_highlighted = object_of_study.get_DV_from_output(output_highlighted, DV).detach().numpy().flatten()
 
             # determine y limits
             # y_limit = [np.amin([np.amin(y_data.numpy()), np.amin(y_prediction.detach().numpy()) ]),
             #            np.amax([np.amax(y_data.numpy()), np.amax(y_prediction.detach().numpy()) ])]
-            y_limit = [np.amin(y_data.numpy()), np.amax(y_data.numpy())]
+            y_limit = [np.amin(y_data), np.amax(y_data)]
 
             # determine y_label
             y_label = DV.get_variable_label()
@@ -686,6 +765,7 @@ class Theorist_DARTS(Theorist, ABC):
             else: # prepare surface plot
                 # determine plot type
                 type = Plot_Types.SURFACE_SCATTER
+                plot_name = DV.get_name() + "(" + IV1.get_name() + ", " + IV2.get_name() + ")"
 
                 # determine x limits
                 x_limit = (object_of_study.get_variable_limits(IV1),
@@ -694,9 +774,9 @@ class Theorist_DARTS(Theorist, ABC):
                 # determine x_labels
                 x_label = (IV1.get_variable_label(), IV2.get_variable_label())
 
-            plot_dict = self._generate_plot_dict(type, x=x_data.detach().numpy(), y=y_data.detach().numpy(), x_limit=x_limit, y_limit=y_limit, x_label=x_label, y_label=y_label,
-                                     legend=legend, image=None, x_model=x_prediction.detach().numpy(), y_model=y_prediction.detach().numpy(), x_highlighted=x_data_highlighted.detach().numpy(),
-                                     y_highlighted=y_data_highlighted.detach().numpy())
+            plot_dict = self._generate_plot_dict(type, x=x_data, y=y_data, x_limit=x_limit, y_limit=y_limit, x_label=x_label, y_label=y_label,
+                                     legend=legend, image=None, x_model=x_prediction, y_model=y_prediction, x_highlighted=x_data_highlighted,
+                                     y_highlighted=y_data_highlighted)
             self._performance_plots[plot_name] = plot_dict
 
     def get_model_fit_plot_list(self, object_of_study):
@@ -779,6 +859,16 @@ class Theorist_DARTS(Theorist, ABC):
         # generate plot dictionary
         plot_dict = self._generate_plot_dict(type, x, y, x_label=x_label, y_label=y_label, image=im)
         self._performance_plots[self._pattern_plot_name] = plot_dict
+
+    def _meta_parameters_to_str(self):
+        [arch_weight_decay_df, num_graph_nodes, seed] = self.get_meta_parameters()
+        label = 'decay_' + str(arch_weight_decay_df) + '_k_' + str(num_graph_nodes) + '_seed_' + str(seed)
+        return label
+
+    def _eval_meta_parameters_to_str(self):
+        [arch_sample_id, param_sample_id] = self.get_eval_meta_parameters()
+        label = 'arch_' + str(arch_sample_id) + '_param_' + str(param_sample_id)
+        return label
 
     def get_model_filename(self, arch_weight_decay_df, num_graph_nodes, seed):
         filename = utils.create_output_file_name(file_prefix='model',
@@ -952,12 +1042,18 @@ class Theorist_DARTS(Theorist, ABC):
       rows = zip(model_name_log, arch_name_log, num_graph_node_log, criterion_loss_log)
       with open(model_filepath, "w") as f:
           writer = csv.writer(f)
-          writer.writerow([darts_cfg.csv_model_file_name, darts_cfg.csv_arch_file_name, darts_cfg.csv_num_graph_node, darts_cfg.csv_log_loss])
+          writer.writerow([darts_cfg.csv_model_file_name, darts_cfg.csv_arch_file_name, darts_cfg.csv_num_graph_node, darts_cfg.csv_loss])
           for row in rows:
               writer.writerow(row)
 
       return model_filepath
 
+
+def model_formatted(model, input, object_of_study):
+    m = utils.get_output_format(object_of_study.__get_output_type__())
+    output = model(input)
+    output_formatted = m(output)
+    return output_formatted
 
 def format_input_target(input, target, criterion):
 
@@ -965,7 +1061,6 @@ def format_input_target(input, target, criterion):
         target = target.squeeze()
 
     return (input, target)
-
 
 # trains model for one architecture epoch
 def train(train_queue, valid_queue, model, architect, criterion, optimizer, arch_updates_per_epoch=1, param_updates_per_epoch = 1):
@@ -977,7 +1072,7 @@ def train(train_queue, valid_queue, model, architect, criterion, optimizer, arch
     # for step, (input, target) in enumerate(train_queue): # for every pattern
 
     model.train() # Sets the module in training mode
-    logging.info("architecture step: %d", arch_step)
+    # logging.info("architecture step: %d", arch_step)
 
     # get a random minibatch from the search queue with replacement
     input_search, target_search = next(iter(valid_queue))
@@ -1005,8 +1100,8 @@ def train(train_queue, valid_queue, model, architect, criterion, optimizer, arch
       # get new learning rate
       lr = scheduler.get_last_lr()[0]
       # log new learning rate
-      logging.info('param_step: %d', param_step)
-      logging.info('learning rate: %e', lr)
+      # logging.info('param_step: %d', param_step)
+      # logging.info('learning rate: %e', lr)
 
       # get input and target
       input_search, target_search = next(iter(train_queue))

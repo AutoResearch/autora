@@ -22,28 +22,22 @@ class sample_strategy(Enum):
 
 class Experimentalist(ABC):
 
-    study_name = "Default"
-    experiment_id = 0
-    seed_data_file = ""
-    conditions_per_experiment = exp_cfg.conditions_per_experiment
 
-    _seed_strategy = seed_strategy.UNIFORM
-    _seed_parameters = [100]
+    def __init__(self, study_name, experiment_server_host=None, experiment_server_port=None, seed_data_file="", experiment_design=None):
 
-    _experiments_path = ""
-
-    _experiment_server_host = None
-    _experiment_server_port = None
-    _experiment_sequence = None
-    _experiment_conditions = None
-    _plots = dict()
-
-    def __init__(self, study_name, experiment_server_host=None, experiment_server_port=None, seed_data_file=""):
+        self.experiment_id = 0
+        self.conditions_per_experiment = exp_cfg.conditions_per_experiment
+        self._experiment_sequence = None
+        self._seed_parameters = [100]
+        self._seed_strategy = seed_strategy.UNIFORM
+        self._plots = dict()
 
         self.study_name = study_name
         self._experiment_server_host = experiment_server_host
         self._experiment_server_port = experiment_server_port
+        self._experiment_design = experiment_design
         self.seed_data_file = seed_data_file
+
 
         # generate folder for this study (if none exists yet)
         study_path = AER_cfg.studies_folder + study_name + "/"
@@ -56,6 +50,7 @@ class Experimentalist(ABC):
         print('Experiment dir : {}'.format(study_path))
 
         self._experiments_path = study_path + AER_cfg.experiment_folder
+        self.set_experiment_id(0)
 
     def configure_experiment_client(self, experiment_server_host, experiment_server_port):
         self._experiment_server_host = experiment_server_host
@@ -90,7 +85,6 @@ class Experimentalist(ABC):
             else:
                 raise Exception('Seed strategy not implemented.')
 
-            self.set_experiment_id(0)
             experiment_file_path = self.generate_seed_experiment(object_of_study)
             return self.commission_experiment(object_of_study, experiment_file_path)
 
@@ -138,7 +132,7 @@ class Experimentalist(ABC):
 
             return curated_data
 
-    def generate_seed_experiment(self, object_of_study):
+    def generate_seed_experiment_default(self, object_of_study):
 
         experiment_design = list()
 
@@ -158,6 +152,15 @@ class Experimentalist(ABC):
         # generated crossed experiment with SweetPea
         block = fully_cross_block(experiment_design, experiment_design, [])
         experiment_sequence = synthesize_trials_non_uniform(block, 1)[0]
+
+        return experiment_sequence
+
+    def generate_seed_experiment(self, object_of_study):
+
+        if self._experiment_design is None:
+            experiment_sequence = self.generate_seed_experiment_default(object_of_study)
+        else:
+            experiment_sequence = self._experiment_design.generate(object_of_study)
 
         experiment_file_path = self._write_experiment(object_of_study, experiment_sequence)
 
@@ -183,20 +186,26 @@ class Experimentalist(ABC):
 
         # write independent variables
         f.write(exp_cfg.exp_file_IV_label)
-        for var in object_of_study.independent_variables:
+        for idx, var in enumerate(object_of_study.independent_variables):
             f.write(var.get_name())
+            if idx < len(object_of_study.independent_variables) - 1:
+                f.write(',')
         f.write('\n')
 
         # write dependent variables
         f.write(exp_cfg.exp_file_DV_label)
-        for var in object_of_study.dependent_variables:
+        for idx, var in enumerate(object_of_study.dependent_variables):
             f.write(var.get_name())
+            if idx < len(object_of_study.dependent_variables) - 1:
+                f.write(',')
         f.write('\n')
 
         # write covariates
         f.write(exp_cfg.exp_file_CV_label)
-        for var in object_of_study.covariates:
+        for idx, var in enumerate(object_of_study.covariates):
             f.write(var.get_name())
+            if idx < len(object_of_study.covariates) - 1:
+                f.write(',')
         f.write('\n')
 
         # write sequence file name
@@ -438,7 +447,16 @@ class Experimentalist(ABC):
         self.init_experiment_search(model, object_of_study)
 
         for condition in self.conditions_per_experiment:
-            self.sample_experiment_condition(model, object_of_study, condition)
+            for i in range(exp_cfg.max_num_rejections):
+                trial = self.sample_experiment_condition(model, object_of_study, condition)
+                if self._experiment_design is not None:
+                    valid = self._experiment_design.validate_trial(object_of_study, trial, self._experiment_sequence)
+                    if valid:
+                        break
+                else:
+                    break
+            for key in trial.keys():
+                self._experiment_sequence[key].append(trial[key])
 
         experiment_file_path = self._write_experiment(object_of_study, self._experiment_sequence)
 

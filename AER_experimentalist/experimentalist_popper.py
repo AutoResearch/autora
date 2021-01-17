@@ -15,23 +15,22 @@ from abc import ABC, abstractmethod
 
 class Experimentalist_Popper(Experimentalist, ABC):
 
-    n_hidden = popper_config.n_hidden
-    num_training_epochs = popper_config.num_training_epochs
-    num_optimization_epochs = popper_config.num_optimization_epochs
-    lr = popper_config.lr
-    optim_lr = popper_config.optim_lr
-    mse_scale = popper_config.mse_scale
-    momentum = popper_config.momentum
-    weight_decay = popper_config.weight_decay
-
-    _popper_loss_plot_name = "Loss of Popper Network"
-    _popper_pattern_plot_name = "Predicted vs. Actual Model Loss"
-    popper_loss_log = list()
-    popper_pattern_data = None
-
     def __init__(self, study_name, experiment_server_host=None, experiment_server_port=None, seed_data_file=""):
         super(Experimentalist_Popper, self).__init__(study_name, experiment_server_host, experiment_server_port, seed_data_file)
 
+        self._popper_loss_plot_name = "Loss of Popper Network"
+        self._popper_pattern_plot_name = "Predicted vs. Actual Model Loss"
+
+        self.n_hidden = popper_config.n_hidden
+        self.num_training_epochs = popper_config.num_training_epochs
+        self.num_optimization_epochs = popper_config.num_optimization_epochs
+        self.lr = popper_config.lr
+        self.optim_lr = popper_config.optim_lr
+        self.mse_scale = popper_config.mse_scale
+        self.momentum = popper_config.momentum
+        self.weight_decay = popper_config.weight_decay
+        self.popper_loss_log = list()
+        self.popper_pattern_data = None
 
     def init_experiment_search(self, model, object_of_study):
         super(Experimentalist_Popper, self).init_experiment_search(model, object_of_study)
@@ -129,6 +128,8 @@ class Experimentalist_Popper(Experimentalist, ABC):
                     IV_clipped_value = np.max([IV_clipped_value, np.min(IV_limits)+popper_config.limit_offset])
                     popper_input[idx] = IV_clipped_value
 
+        experiment_trial = dict()
+
         # add condition to new experiment sequence
         for idx in range(len(input_sample)):
             IV_name = object_of_study.get_IV_name(idx)
@@ -141,7 +142,10 @@ class Experimentalist_Popper(Experimentalist, ABC):
             # make sure to convert variable to original scale
             IV_clipped_sclaed_value = IV_clipped_value / IV_rescale
 
-            self._experiment_sequence[IV_name].append(IV_clipped_sclaed_value)
+            experiment_trial[IV_name] = IV_clipped_sclaed_value
+            #self._experiment_sequence[IV_name].append(IV_clipped_sclaed_value)
+
+        return experiment_trial
 
 
     def get_plots(self, model, object_of_study):

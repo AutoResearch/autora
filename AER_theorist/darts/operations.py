@@ -61,6 +61,14 @@ OPS = {
   #   ),
 }
 
+
+def isiterable(p_object):
+  try:
+    it = iter(p_object)
+  except TypeError:
+    return False
+  return True
+
 def get_operation_label(op_name, params_org, decimals=4):
 
   params = params_org.copy()
@@ -71,31 +79,52 @@ def get_operation_label(op_name, params_org, decimals=4):
   if (op_name == 'classifier'):
     num_params = len(params)
     classifier_str = 'x.*('
-    for idx, param in enumerate(params):
-      classifier_str = classifier_str + format_string.format(param)
-      if (idx == (np.round(num_params / 2)-1)):
-        # classifier_str = classifier_str + ') | .+('
-        classifier_str = classifier_str + ') .+('
-      elif (idx == (num_params-1)):
-        classifier_str = classifier_str + ')'
+    for param_idx, param in enumerate(params):
+
+      if param_idx > 0:
+        classifier_str = classifier_str + ' .+('
+
+      if isiterable(param.tolist()):
+        for value_idx, value in enumerate(param.tolist()):
+          if value_idx < len(param)-1:
+            classifier_str = classifier_str + format_string.format(value) + " + "
+          else:
+            classifier_str = classifier_str + format_string.format(value) + ")"
+
       else:
-        classifier_str = classifier_str + ','
+        classifier_str = classifier_str + format_string.format(param) + ")"
 
+    return classifier_str
 
+  num_params = len(params)
   params.extend([0, 0, 0])
 
-  labels = {
-    'none': '',
-    'linear': str(format_string.format(params[0])) + ' * x',
-    'relu': 'ReLU(' + str(format_string.format(params[0])) + ' * x)',
-    'sigmoid': '1/(1+e^(-' + str(format_string.format(params[0])) + ' * x))',
-    'add': '+ x',
-    'subtract': '- x',
-    'exp': 'e^(' + str(format_string.format(params[0])) + ' * x)',
-    '1/x': '1 / (' + str(format_string.format(params[0])) + ' * x)',
-    'ln': 'ln(' + str(format_string.format(params[0])) + ' * x)',
-    'classifier': classifier_str
-  }
+  if num_params == 1: # without bias
+    labels = {
+      'none': '',
+      'linear': str(format_string.format(params[0])) + ' * x',
+      'relu': 'ReLU(' + str(format_string.format(params[0])) + ' * x)',
+      'sigmoid': '1/(1+e^(-' + str(format_string.format(params[0])) + ' * x))',
+      'add': '+ x',
+      'subtract': '- x',
+      'exp': 'e^(' + str(format_string.format(params[0])) + ' * x)',
+      '1/x': '1 / (' + str(format_string.format(params[0])) + ' * x)',
+      'ln': 'ln(' + str(format_string.format(params[0])) + ' * x)',
+      'classifier': classifier_str
+    }
+  else: # with bias
+    labels = {
+      'none': '',
+      'linear': str(format_string.format(params[0])) + ' * x + ' + str(format_string.format(params[1])),
+      'relu': 'ReLU(' + str(format_string.format(params[0])) + ' * x + ' + str(format_string.format(params[1])) + ')',
+      'sigmoid': '1/(1+e^(-(' + str(format_string.format(params[0])) + ' * x + ' + str(format_string.format(params[1])) + ')))',
+      'add': '+ x',
+      'subtract': '- x',
+      'exp': 'e^(' + str(format_string.format(params[0])) + ' * x + ' + str(format_string.format(params[1])) + ')',
+      '1/x': '1 / (' + str(format_string.format(params[0])) + ' * x + ' + str(format_string.format(params[1])) + ')',
+      'ln': 'ln(' + str(format_string.format(params[0])) + ' * x + ' + str(format_string.format(params[1])) + ')',
+      'classifier': classifier_str
+    }
 
   return labels.get(op_name, '')
 

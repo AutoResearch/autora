@@ -4,24 +4,21 @@ from enum import Enum
 
 class outputTypes(Enum):
     REAL = 1
-    PROBABILITY = 2
-    PROBABILITY_DISTRIBUTION = 3
-    CLASS = 4
+    SIGMOID = 2
+    PROBABILITY = 3                 # single probability
+    PROBABILITY_SAMPLE = 4          # sample from single probability
+    PROBABILITY_DISTRIBUTION = 5    # probability distribution over classes
+    CLASS = 6                       # sample from probability distribution over classes
+
 
 class Variable():
-
-    _name = "" # used to specify variable in dataset
-    _units = ""
-    _value_range = (0, 1)
-    _value = 0
-    _variable_label = "" # used for plotting
-    _rescale = 1
 
     def __init__(self, name="", value_range=(0,1), units="", type = outputTypes.REAL, variable_label="", rescale=1):
 
         self._name = name
         self._units = units
         self._value_range = value_range
+        self._value = 0
         self.type = type
         if variable_label == "":
             self._variable_label = self._name

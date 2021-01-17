@@ -2,6 +2,7 @@ studies_folder = 'studies/'
 experiment_folder = 'experimentation/'
 models_folder = 'modeling/'
 models_results_folder = 'results/'
+models_results_plots_folder = 'results/plots/'
 models_scripts_folder = 'scripts/'
 experiment_file_prefix = 'experiment_'
 sequence_file_suffix = 'sequence'
@@ -20,6 +21,10 @@ up_down_bgcolor = "#6b87b5"
 stop_bgcolor = "#ba2014"
 listbox_bgcolor = "white"
 
+plot_colors = ['r', 'g', 'b', 'c', 'm', 'y', 'k',
+                    'r--', 'g--', 'b--', 'c--', 'm--', 'y--', 'k--',
+                    'r:', 'g:', 'b:', 'c:', 'm:', 'y:', 'k:']
+
 plot_key_type = "plot type"
 plot_key_x_data = "x data"
 plot_key_y_data = "y data"
@@ -35,3 +40,5 @@ plot_key_x_highlighted_data = "x highlighted data"
 plot_key_y_highlighted_data = "y highlighted data"
 plot_key_z_highlighted_data = "z highlighted data"
 plot_key_x_conditions = "x condition"
+
+max_data_points_simulated = 100

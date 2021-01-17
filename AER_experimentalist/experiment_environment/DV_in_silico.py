@@ -20,7 +20,7 @@ class DV_In_Silico(Variable):
 
     # Waits until specified time has passed relative to reference time
     def measure(self):
-        measurement = self._participant.get_value(self._variable_label)
+        measurement = self._participant.get_value(self._name)
         self.set_value(measurement)
 
     # Get whether this dependent variable is treated as covariate.

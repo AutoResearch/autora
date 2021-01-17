@@ -6,6 +6,7 @@ import shutil
 import csv
 import glob
 from torch.autograd import Variable
+from AER_experimentalist.experiment_environment.variable import outputTypes
 
 # new
 import AER_theorist.darts.darts_config as darts_cfg
@@ -13,7 +14,7 @@ import AER_config as AER_cfg
 
 # old
 from AER_theorist.darts.SimpleNet_dataset import SimpleNetDataset
-from AER_theorist.darts.object_of_study import outputTypes
+# from AER_theorist.darts.object_of_study import outputTypes
 import AER_theorist.darts.SimpleNet_dataset as SimpleNetDatasetFile
 
 def create_output_file_name(file_prefix, log_version = None, weight_decay = None, k = None, seed = None):
@@ -66,14 +67,69 @@ def get_loss_function(outputType):
 
     dataSets = {
         outputTypes.REAL:  nn.MSELoss(),
-        outputTypes.PROBABILITY: nn.MSELoss(),
+        outputTypes.PROBABILITY: sigmid_mse,
+        outputTypes.PROBABILITY_SAMPLE: sigmid_mse,
         outputTypes.PROBABILITY_DISTRIBUTION: cross_entropy,
         outputTypes.CLASS: nn.CrossEntropyLoss(),
+        outputTypes.SIGMOID: sigmid_mse
     }
 
     return dataSets.get(outputType, nn.MSELoss)
 
-# old
+def get_output_format(outputType):
+
+    dataSets = {
+        outputTypes.REAL:  nn.Identity(),
+        outputTypes.PROBABILITY: nn.Sigmoid(),
+        outputTypes.PROBABILITY_SAMPLE: nn.Sigmoid(),
+        outputTypes.PROBABILITY_DISTRIBUTION: nn.Softmax(dim=1),
+        outputTypes.CLASS: nn.Softmax(dim=1),
+        outputTypes.SIGMOID: nn.Sigmoid(),
+    }
+
+    return dataSets.get(outputType, nn.MSELoss)
+
+def sigmid_mse(output, target):
+    m = nn.Sigmoid()
+    output = m(output)
+    loss = torch.mean((output - target)**2)
+    return loss
+
+
+def compute_BIC(output_type, model, input, target):
+
+    # compute raw model output
+    classifier_output = model(input)
+
+    # compute associated probability
+    m = get_output_format(output_type)
+    prediction = m(classifier_output).detach()
+
+    if output_type == outputTypes.CLASS:
+        target_flattened = torch.flatten(target.long())
+        llik = 0
+        for idx in range(len(target_flattened)):
+            lik = prediction[idx,target_flattened[idx]]
+            llik += np.log(lik)
+        n = len(target_flattened)  # number of data points
+
+    elif output_type == outputTypes.PROBABILITY_SAMPLE:
+        lik_ones = np.sum(np.multiply(prediction, target), axis=1)
+        lik_zeroes = np.sum(np.multiply(1-prediction, 1-target), axis=1)
+        llik = np.sum(np.log(lik_ones)) + np.sum(np.log(lik_zeroes))  # log likelihood
+        n = len(lik_ones)  # number of data points
+
+    else:
+        raise Exception('BIC computation not implemented for output type ' + str(outputTypes.PROBABILITY) + '.')
+
+    k, _, _ = model.countParameters()  # for most likely architecture
+    BIC = np.log(n) * k - 2 * llik
+
+    return BIC
+
+
+
+    # old
 def compute_BIC_AIC(soft_targets, soft_prediction, model):
 
     lik = np.sum(np.multiply(soft_prediction, soft_targets), axis=1)    # likelihood of data given model

@@ -9,30 +9,32 @@ import AER_experimentalist.experimentalist_config as cfg
 
 class Experiment():
 
-    _path = ""
-    _data_path = ""
-    _sequences_folder = config.sequences_path
-    _data_folder = config.data_path
-
-    IVs = list()
-    DVs = list()
-    CVs = list()
-
-    sequence = dict()   # stores experiment sequence (values for independent variables)
-    data = dict()       # stores collected data (measurements for dependent variables)
-    actual_trials = 0   # indicates current trial
-
-    _IV_trial_idx = -1  # index of independent variable "trial"
-    _IV_time_idx = -1   # index of independent variable "time"
-    _DV_time_idx = -1   # index of dependent variable "time"
-
-    _current_trial = 0
-
-    _ITI = 1.0     # inter trial interval in seconds
-    _measurement_onset_asynchrony = 1.0
 
     # Initialization requires path to experiment file
     def __init__(self, path=None, main_directory = ""):
+
+        self._path = ""
+        self._data_path = ""
+        self._sequences_folder = config.sequences_path
+        self._data_folder = config.data_path
+
+        self.IVs = list()
+        self.DVs = list()
+        self.CVs = list()
+
+        self.sequence = dict()  # stores experiment sequence (values for independent variables)
+        self.data = dict()  # stores collected data (measurements for dependent variables)
+        self.actual_trials = 0  # indicates current trial
+
+        self._IV_trial_idx = -1  # index of independent variable "trial"
+        self._IV_time_idx = -1  # index of independent variable "time"
+        self._DV_time_idx = -1  # index of dependent variable "time"
+
+        self._current_trial = 0
+
+        self._ITI = 1.0  # inter trial interval in seconds
+        self._measurement_onset_asynchrony = 1.0
+
         self._path = path
         self._main_dir = main_directory
 
@@ -52,6 +54,13 @@ class Experiment():
 
     def load_experiment(self, path):
         self._path = path
+
+        self.IVs = list()
+        self.DVs = list()
+        self.CVs = list()
+
+        self.sequence = dict()
+        self.data = dict()
 
         # read experiment file
         file = open(path, "r")
@@ -73,7 +82,12 @@ class Experiment():
                     (IV_class, variable_label, UID, name, units, priority, value_range) = IV_labels.get(label)
                     # overwrite priority
                     priority = idx
-                    self.IVs.append(IV_class(variable_label=variable_label, UID=UID, name=name, units=units, priority=priority, value_range=value_range))
+                    if UID is None:
+                        self.IVs.append(
+                            IV_class(variable_label=variable_label, name=name, units=units,
+                                     value_range=value_range))
+                    else:
+                        self.IVs.append(IV_class(variable_label=variable_label, UID=UID, name=name, units=units, priority=priority, value_range=value_range))
 
             # read dependent variables and covariates from line
             elif(string.find(cfg.exp_file_DV_label) != -1 or string.find(cfg.exp_file_CV_label) != -1):
@@ -97,10 +111,18 @@ class Experiment():
                     # overwrite priority
                     priority = idx
                     if(covariate):
-                        self.CVs.append(V_class(variable_label=variable_label, UID=UID, name=name, units=units, priority=priority, value_range=value_range))
+                        if UID is None: # todo: resolve UID and priority argument issue. UID/priority arguments are required for tinkerforge IVs which inherit from IV but not for IV_in_silico which inherits from Variable
+                            self.CVs.append(V_class(variable_label=variable_label, name=name, units=units,
+                                                    value_range=value_range))
+                        else:
+                            self.CVs.append(V_class(variable_label=variable_label, UID=UID, name=name, units=units, priority=priority, value_range=value_range))
                         self.CVs(-1).set_covariate(True)
                     else:
-                        self.DVs.append(V_class(variable_label=variable_label, UID=UID, name=name, units=units, priority=priority, value_range=value_range))
+                        if UID is None:
+                            self.DVs.append(V_class(variable_label=variable_label, name=name, units=units,
+                                                    value_range=value_range))
+                        else:
+                            self.DVs.append(V_class(variable_label=variable_label, UID=UID, name=name, units=units, priority=priority, value_range=value_range))
 
             # read sequence file
             if (string.find(cfg.exp_file_sequence_label) != -1):
@@ -132,6 +154,8 @@ class Experiment():
 
     # Initializes the experiment
     def init_experiment(self):
+
+        self.data = dict()
 
         # set up data
         for dependent_variable in self.DVs:
@@ -183,7 +207,6 @@ class Experiment():
     def run_experiment(self):
 
         self.init_experiment()
-
         # run experiment
         for trial in self.actual_trials:
 

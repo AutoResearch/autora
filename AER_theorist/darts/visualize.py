@@ -26,6 +26,7 @@ def plot(genotype, filename, fileFormat='pdf', viewFile=None, full_label=False, 
   for i in range(steps):
     g.node(str(i), fillcolor='lightblue')
 
+  params_counter = 0
   n = len(input_labels)
   start = 0
   for i in range(steps):
@@ -42,6 +43,7 @@ def plot(genotype, filename, fileFormat='pdf', viewFile=None, full_label=False, 
         op_label = op
         if full_label:
           params = param_list[k]
+          params_counter = k
           op_label = get_operation_label(op, params, decimals=decimals_to_display)
           g.edge(u, v, label=op_label, fillcolor="gray")
         else:
@@ -52,7 +54,7 @@ def plot(genotype, filename, fileFormat='pdf', viewFile=None, full_label=False, 
   g.node("out", fillcolor='palegoldenrod')
   for i in range(steps):
     if full_label:
-      params = param_list[-1]
+      params = param_list[params_counter+1+i] # count from k
       op_label = get_operation_label('classifier', params, decimals=decimals_to_display)
       g.edge(str(i), "out", label=op_label, fillcolor="gray")
     else:

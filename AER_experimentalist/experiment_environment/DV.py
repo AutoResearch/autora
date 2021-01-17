@@ -3,12 +3,12 @@ from tinkerforge_variable import Tinkerforge_Variable
 
 class DV(Tinkerforge_Variable):
 
-    _name = "DV"
-    _variable_label = "Dependent Variable"
-
-    _is_covariate = False
-
     def __init__(self, *args, **kwargs):
+        self._name = "DV"
+        self._variable_label = "Dependent Variable"
+
+        self._is_covariate = False
+
         super(DV, self).__init__(*args, **kwargs)
 
     # Method for measuring dependent variable.

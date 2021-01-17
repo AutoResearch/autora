@@ -5,6 +5,7 @@ from AER_experimentalist.experiment_environment.variable import *
 import AER_config as AER_cfg
 from typing import List, Dict
 import torch
+import copy
 
 class Object_Of_Study(Dataset):
 

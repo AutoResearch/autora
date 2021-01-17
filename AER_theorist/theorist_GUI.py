@@ -54,6 +54,7 @@ class Theorist_GUI(Frame):
 
     # plot parameters
     model_plot_img = None
+    _2d_plot = True
     _plot_fontSize = 10
     _scatter_area = 50
     _scatter_color = "#FF0000"
@@ -159,6 +160,7 @@ class Theorist_GUI(Frame):
 
         self._fig_performance = Figure(figsize=(1, 1), dpi=100)
         self._axis_performance_line = self._fig_performance.add_subplot(111)
+        self._axis_performance_line_3d = self._fig_performance.add_subplot(111)
         self._fig_performance.subplots_adjust(bottom=0.2)
         self._fig_performance.subplots_adjust(left=0.35)
         self._axis_performance_line.plot([0],[0])
@@ -404,7 +406,7 @@ class Theorist_GUI(Frame):
         model_search_parameters = self.theorist.get_model_search_parameters()
         self.update_parameter_list(model_search_parameters)
 
-    def update_plot(self, plot_type=None, plots=None, save=False):
+    def update_plot(self, plot_type=None, plots=None, save=False, plot_name=""):
 
         if plot_type == Plot_Windows.PERFORMANCE:
             relevant_listbox = self.listbox_performance
@@ -446,6 +448,29 @@ class Theorist_GUI(Frame):
             plot_dict = plots[key]
 
             type = plot_dict[config.plot_key_type]
+
+            if plot_type == Plot_Windows.PERFORMANCE:
+
+                if type == Plot_Types.SURFACE_SCATTER:
+                    self._switch_performance_3d_plot()
+                else:
+                    self._switch_performance_2d_plot()
+
+                if hasattr(self, '_axis_performance_line'):
+                    plot_axis = self._axis_performance_line
+
+                if hasattr(self, '_canvas_performance'):
+                    plot_canvas = self._canvas_performance
+
+            elif plot_type == Plot_Windows.SUPPLEMENTARY:
+
+                if hasattr(self, '_axis_supplementary_line'):
+                    plot_axis = self._axis_supplementary_line
+
+                if hasattr(self, '_canvas_supplementary'):
+                    plot_canvas = self._canvas_supplementary
+
+
             if type == Plot_Types.LINE:
 
                 # get relevant data
@@ -549,7 +574,7 @@ class Theorist_GUI(Frame):
                 # plot data
                 plots.append(plot_axis.scatter(x1_data, x2_data, y_data, color = (1, 0, 0, 0.5), label=legend[0]))
                 # plot model prediction
-                plots.append(plot_axis.plot_surface(x1_model, x2_model, y_model, color=(0, 0, 0, 0.5), label=legend[1]))
+                plots.append(plot_axis.plot_trisurf(x1_model, x2_model, y_model, color=(0, 0, 0, 0.5), label=legend[1]))
 
                 # adjust axes
                 plot_axis.set_xlim(x1_limit[0], x1_limit[1])
@@ -557,25 +582,60 @@ class Theorist_GUI(Frame):
                 plot_axis.set_zlim(y_limit[0], y_limit[1])
 
                 # set labels
-                self.mismatchPlot.set_xlabel(x1_label, fontsize=self._plot_fontSize)
-                self.mismatchPlot.set_ylabel(x2_label, fontsize=self._plot_fontSize)
-                self.mismatchPlot.set_zlabel(y_label, fontsize=self._plot_fontSize)
-
-                pass
+                plot_axis.set_xlabel(x1_label, fontsize=self._plot_fontSize)
+                plot_axis.set_ylabel(x2_label, fontsize=self._plot_fontSize)
+                plot_axis.set_zlabel(y_label, fontsize=self._plot_fontSize)
 
             # finalize performance plot
             plot_axis.set_title(key, fontsize=self._plot_fontSize)
             plot_canvas.draw()
             if save is True:
-                plot_filepath = os.path.join(self.theorist.results_path, 'plot_' + key + '.png')
-                self._fig_performance.savefig(plot_filepath)
+                if plot_name is not "":
+                    plot_filepath = os.path.join(self.theorist.results_plots_path, 'plot_' + plot_name + '_' + key + '.png')
+                else:
+                    plot_filepath = os.path.join(self.theorist.results_plots_path, 'plot_' + key + '.png')
+                if plot_type == Plot_Windows.PERFORMANCE:
+                    self._fig_performance.savefig(plot_filepath)
+                else:
+                    self._fig_supplementary.savefig(plot_filepath)
+
 
 
         else:
             raise Exception("Key '" + str(key) + "' not found in dictionary performance_plots.")
 
-    def update_supplementary_plot(self):
-        pass
+    def _switch_performance_2d_plot(self):
+        if self._2d_plot:
+            return
+        self._fig_performance = Figure(figsize=(1, 1), dpi=100)
+        self._axis_performance_line = self._fig_performance.add_subplot(111)
+        self._axis_performance_line.plot([0], [0])
+        self._axis_performance_line.set_xlabel('Ordinate', fontsize=self._font_size)
+        self._axis_performance_line.set_ylabel('Epochs', fontsize=self._font_size)
+        self._axis_performance_line.set_title('No Data Available', fontsize=self._font_size)
+        self._configure_performance_plot()
+        self._2d_plot = True
+
+    def _switch_performance_3d_plot(self):
+        if not self._2d_plot:
+            return
+        self._fig_performance = Figure(figsize=(1, 1), dpi=100)
+        self._axis_performance_line = self._fig_performance.add_subplot(111, projection='3d')
+        self._axis_performance_line.plot([0], [0], [0])
+        self._axis_performance_line.set_xlabel('X', fontsize=self._font_size)
+        self._axis_performance_line.set_ylabel('Y', fontsize=self._font_size)
+        self._axis_performance_line.set_zlabel('Z', fontsize=self._font_size)
+        self._axis_performance_line.set_title('No Data Available', fontsize=self._font_size)
+        self._configure_performance_plot()
+        self._2d_plot = False
+
+    def _configure_performance_plot(self):
+        self._fig_performance.subplots_adjust(bottom=0.2)
+        self._fig_performance.subplots_adjust(left=0.35)
+        self._axis_performance_line.grid()
+        self._canvas_performance = FigureCanvasTkAgg(self._fig_performance, self._root)
+        self._canvas_performance.get_tk_widget().grid(row=0, column=3, columnspan=2, sticky=N + S + E + W)
+        self._root.update()
 
     def stop_meta_search(self):
         self._running = False
@@ -610,6 +670,8 @@ class Theorist_GUI(Frame):
 
                 [arch_weight_decay_df, num_graph_nodes, seed] = meta_params
                 self.theorist.init_model_search(self.object_of_study)
+
+                meta_param_str = self.theorist._meta_parameters_to_str()
 
                 # update model parameters
                 model_search_parameters = self.theorist.get_model_search_parameters()
@@ -666,17 +728,69 @@ class Theorist_GUI(Frame):
 
             if self._running is True:
                 self.theorist.log_model_search(self.object_of_study)
+
+                # save all performance plots
+                performance_plots = self.theorist.get_performance_plots(self.object_of_study)
+                for item in range(self.listbox_performance.size()):
+                    self.set_listbox_selection(self.listbox_performance, item)
+                    plot_str = meta_param_str + "_search"
+                    self.update_plot(Plot_Windows.PERFORMANCE, performance_plots, save=True, plot_name=plot_str)
+                # save all supplementary plots
+                supplementary_plots = self.theorist.get_supplementary_plots(self.object_of_study)
+                for item in range(self.listbox_supplementary.size()):
+                    self.set_listbox_selection(self.listbox_supplementary, item)
+                    self.update_plot(Plot_Windows.SUPPLEMENTARY, supplementary_plots, save=True, plot_name=meta_param_str)
+
+                # Theorist: evaluate model architecture
+
+                # initialize meta evaluation
+                self.theorist.init_meta_evaluation(self.object_of_study)
+
+                # perform architecture search for different hyper-parameters
+                for eval_meta_params in self.theorist._eval_meta_parameters:
+
+                    eval_param_str = self.theorist._eval_meta_parameters_to_str()
+
+                    self.update_run_button(meta_idx=idx+1, num_meta_idx=len(self.theorist._eval_meta_parameters))
+
+                    self.theorist.init_model_evaluation(self.object_of_study)
+                    # loop over epochs
+                    for epoch in range(self.theorist.eval_epochs):
+                        # run single epoch
+                        self.theorist.run_eval_epoch(epoch, self.object_of_study)
+                        # log performance (for plotting purposes)
+                        self.theorist.log_plot_data(epoch, self.object_of_study)
+                        performance_plots = self.theorist.get_performance_plots(self.object_of_study)
+                        self.update_plot(Plot_Windows.PERFORMANCE, performance_plots)
+                        self._root.update()
+                        self.update_run_button(epoch=epoch + 1, num_epochs=self.theorist.eval_epochs,
+                                               meta_idx=idx + 1, num_meta_idx=len(self.theorist._eval_meta_parameters))
+
+                    # save all performance plots
+                    performance_plots = self.theorist.get_performance_plots(self.object_of_study)
+                    for item in range(self.listbox_performance.size()):
+                        self.set_listbox_selection(self.listbox_performance, item)
+                        plot_str = meta_param_str + "_eval_" + eval_param_str
+                        self.update_plot(Plot_Windows.PERFORMANCE, performance_plots, save=True, plot_name=plot_str)
+
+                    # log model evaluation
+                    self.theorist.log_model_evaluation(self.object_of_study)
+
+                # sum up meta evaluation
+                self.theorist.log_meta_evaluation(self.object_of_study)
+
                 self.theorist._meta_parameters_iteration += 1
 
         if self._running is True:
             best_model = self.theorist.get_best_model(self.object_of_study, plot_model=True)
 
-            # save all performance plots
-            self.theorist.model = best_model
-            performance_plots = self.theorist.get_performance_plots(self.object_of_study)
-            for item in range(self.listbox_performance.size()):
-                self.set_listbox_selection(self.listbox_performance, item)
-                self.update_plot(Plot_Windows.PERFORMANCE, performance_plots, save=True)
+            # # save all performance plots
+            # self.theorist.model = best_model
+            # performance_plots = self.theorist.get_performance_plots(self.object_of_study)
+            # for item in range(self.listbox_performance.size()):
+            #     self.set_listbox_selection(self.listbox_performance, item)
+            #     plot_str = meta_param_str + "_eval_"
+            #     self.update_plot(Plot_Windows.PERFORMANCE, performance_plots, save=True, plot_name=plot_str)
 
         else:
             # reset gui elements

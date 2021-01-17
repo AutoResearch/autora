@@ -20,7 +20,7 @@ class IV_In_Silico(Variable):
 
     # Waits until specified time has passed relative to reference time
     def manipulate(self):
-        self._participant.set_value(self._variable_label, self.get_value())
+        self._participant.set_value(self._name, self.get_value())
 
     # Set whether this dependent variable is treated as covariate.
     def set_covariate(self, is_covariate):
