@@ -3,9 +3,11 @@ from graphviz import Digraph
 
 from AER_theorist.darts.operations import *
 
-def plot(genotype, filename, fileFormat='pdf', viewFile=None, full_label=False, param_list=(), input_labels=()):
+def plot(genotype, filename, fileFormat='pdf', viewFile=None, full_label=False, param_list=(), input_labels=(), out_dim=None, out_fnc=None):
 
   decimals_to_display = 2
+  format_string = "{:." + "{:.0f}".format(decimals_to_display) + "f}"
+
   g = Digraph(
       format=fileFormat,
       edge_attr=dict(fontsize='20', fontname="times"),
@@ -14,7 +16,7 @@ def plot(genotype, filename, fileFormat='pdf', viewFile=None, full_label=False, 
   g.body.extend(['rankdir=LR'])
 
   for input_node in input_labels:
-    g.node(input_node, fillcolor='darkseagreen2')
+    g.node(input_node, fillcolor='#F1EDB9') # fillcolor='darkseagreen2'
   # assert len(genotype) % 2 == 0
 
   # determine number of steps (intermediate nodes)
@@ -24,7 +26,7 @@ def plot(genotype, filename, fileFormat='pdf', viewFile=None, full_label=False, 
       steps += 1
 
   for i in range(steps):
-    g.node(str(i), fillcolor='lightblue')
+    g.node(str(i), fillcolor='#BBCCF9') # fillcolor='lightblue'
 
   params_counter = 0
   n = len(input_labels)
@@ -39,11 +41,11 @@ def plot(genotype, filename, fileFormat='pdf', viewFile=None, full_label=False, 
       else:
         u = str(j-2)
       v = str(i)
+      params_counter = k
       if op is not 'none':
         op_label = op
         if full_label:
           params = param_list[k]
-          params_counter = k
           op_label = get_operation_label(op, params, decimals=decimals_to_display)
           g.edge(u, v, label=op_label, fillcolor="gray")
         else:
@@ -51,14 +53,47 @@ def plot(genotype, filename, fileFormat='pdf', viewFile=None, full_label=False, 
     start = end
     n += 1
 
-  g.node("out", fillcolor='palegoldenrod')
+  # determine output nodes
+
+  out_nodes = list()
+  if out_dim is None:
+    out_nodes.append("out")
+  else:
+    biases = None
+    if full_label:
+      params = param_list[params_counter + 1]
+      if len(params) > 1:
+        biases = params[1]  # first node contains biases
+
+    for idx in range(out_dim):
+      out_str = ''
+      # specify node ID
+      if out_fnc is not None:
+        out_str = out_str + out_fnc + '(x_' + str(idx)
+      else:
+        out_str = '(x_' + str(idx)
+
+      # if available, add bias
+      if biases is not None:
+        out_str = out_str + ' + ' + format_string.format(biases[idx]) + ')'
+      else:
+        out_str = out_str + ')'
+
+      # add node
+      g.node(out_str, fillcolor='#CBE7C7')  # fillcolor='palegoldenrod'
+      out_nodes.append(out_str)
+
   for i in range(steps):
     if full_label:
-      params = param_list[params_counter+1+i] # count from k
-      op_label = get_operation_label('classifier', params, decimals=decimals_to_display)
-      g.edge(str(i), "out", label=op_label, fillcolor="gray")
+      params_org = param_list[params_counter+1+i] # count from k
+      for out_idx, out_str in enumerate(out_nodes):
+        params = list()
+        params.append(params_org[0][out_idx])
+        op_label = get_operation_label('classifier', params, decimals=decimals_to_display)
+        g.edge(str(i), out_str, label=op_label, fillcolor="gray")
     else:
-      g.edge(str(i), "out", fillcolor="gray")
+      for out_idx, out_str in enumerate(out_nodes):
+        g.edge(str(i), out_str, label='linear', fillcolor="gray")
 
   if viewFile is None:
     if(fileFormat == 'pdf'):

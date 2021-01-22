@@ -1,9 +1,10 @@
 import torch
 import numpy as np
 import torch.nn as nn
+import torch.nn.functional as F
 from torch.autograd import Variable
 
-from AER_theorist.darts.model_search import Network
+from AER_theorist.darts.model_search import Network, DARTS_Type
 
 def _concat(xs):
   return torch.cat([x.view(-1) for x in xs])
@@ -19,6 +20,17 @@ class Architect(object):
       self.network_weight_decay_df = args.arch_weight_decay_df
     else:
       self.network_weight_decay_df = 0
+
+    if hasattr(args, 'arch_weight_decay_base'):
+      self.arch_weight_decay_base = args.arch_weight_decay_base * model._steps
+    else:
+      self.arch_weight_decay_base = 0
+
+    if hasattr(args, 'fair_darts_loss_weight'):
+      self.fair_darts_loss_weight = args.fair_darts_loss_weight
+    else:
+      self.fair_darts_loss_weight = 1
+
     self.model = model
     self.lr = args.arch_learning_rate
     # architecture is optimized using Adam
@@ -44,8 +56,11 @@ class Architect(object):
 
     self.decay_weights = Variable(torch.zeros(self.model.arch_parameters()[0].data.shape))
     for idx, param in enumerate(n_params):
-      self.decay_weights[:, idx] = param
-    self.decay_weights = self.decay_weights * self.network_weight_decay_df
+      if param > 0:
+        self.decay_weights[:, idx] = param * self.network_weight_decay_df + self.arch_weight_decay_base
+      else:
+        self.decay_weights[:, idx] = param
+    self.decay_weights = self.decay_weights
     self.decay_weights = self.decay_weights.data
 
   def _compute_unrolled_model(self, input, target, eta, network_optimizer):
@@ -75,7 +90,15 @@ class Architect(object):
 
   # backward step (using first order approximation?)
   def _backward_step(self, input_valid, target_valid):
-    loss = self.model._loss(input_valid, target_valid)
+    if self.model.DARTS_type == DARTS_Type.ORIGINAL:
+      loss = self.model._loss(input_valid, target_valid)
+    elif self.model.DARTS_type == DARTS_Type.FAIR:
+      loss1 = self.model._loss(input_valid, target_valid)
+      loss2 = -F.mse_loss(torch.sigmoid(self.model.alphas_normal), 0.5 * torch.ones(self.model.alphas_normal.shape, requires_grad=False)) # torch.tensor(0.5, requires_grad=False)
+      loss = loss1 + self.fair_darts_loss_weight * loss2
+    else:
+      raise Exception("DARTS Type " + str(self.DARTS_type) + " not implemented")
+
     loss.backward()
 
     # weight decay proportional to degrees of freedom
@@ -88,7 +111,15 @@ class Architect(object):
 
     # gets the model
     unrolled_model = self._compute_unrolled_model(input_train, target_train, eta, network_optimizer)
-    unrolled_loss = unrolled_model._loss(input_valid, target_valid)
+
+    if self.model.DARTS_type == DARTS_Type.ORIGINAL:
+      unrolled_loss = unrolled_model._loss(input_valid, target_valid)
+    elif self.model.DARTS_type == DARTS_Type.FAIR:
+      loss1 = self.model._loss(input_valid, target_valid)
+      loss2 = -F.mse_loss(torch.sigmoid(self.model.alphas_normal), torch.tensor(0.5, requires_grad=False))
+      unrolled_loss = loss1 + self.ifair_darts_loss_weight * loss2
+    else:
+      raise Exception("DARTS Type " + str(self.DARTS_type) + " not implemented")
 
     unrolled_loss.backward()
     dalpha = [v.grad for v in unrolled_model.arch_parameters()]

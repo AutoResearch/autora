@@ -77,7 +77,13 @@ def get_operation_label(op_name, params_org, decimals=4):
 
   classifier_str = ''
   if (op_name == 'classifier'):
-    num_params = len(params)
+
+    value = params[0]
+    classifier_str = format_string.format(value) + ' * x'
+
+    return classifier_str
+
+  if (op_name == 'classifier_concat'):
     classifier_str = 'x.*('
     for param_idx, param in enumerate(params):
 

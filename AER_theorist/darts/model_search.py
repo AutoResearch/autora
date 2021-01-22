@@ -9,6 +9,12 @@ from AER_theorist.darts.operations import *
 from AER_theorist.darts.genotypes import PRIMITIVES
 from AER_theorist.darts.genotypes import Genotype
 
+from enum import Enum
+
+class DARTS_Type(Enum):
+    ORIGINAL = 1        # Liu, Simonyan & Yang (2018). Darts: Differentiable architecture search
+    FAIR = 2            # Chu, Zhou, Zhang & Li (2020). Fair darts: Eliminating unfair advantages in differentiable architecture search
+
 # for 2 input nodes, 1 output node and 4 intermediate nodes, there are 14 possible edges (x 8 operations)
 
 class MixedOp(nn.Module):
@@ -87,8 +93,9 @@ class Cell(nn.Module):
 class Network(nn.Module):
 
   # EDIT 11/04/19 SM: adapting to new SimpleNet data (changed steps from 4 to 2)
-  def __init__(self, num_classes, criterion, steps=2, n_input_states = 2, architecture_fixed = False, classifier_weight_decay = 0):
+  def __init__(self, num_classes, criterion, steps=2, n_input_states = 2, architecture_fixed = False, classifier_weight_decay = 0, darts_type=DARTS_Type.ORIGINAL):
     super(Network, self).__init__()
+    self.DARTS_type = darts_type
     # set parameters
     self._C = 1                                         # number of channels  EDIT 11/04/19 SM: adapting to new SimpleNet data (set self._C to 1 instead of C)
     self._num_classes = num_classes                     # number of output classes
@@ -157,7 +164,12 @@ class Network(nn.Module):
     if self._architecture_fixed:
       weights = self.alphas_normal
     else:
-      weights = F.softmax(self.alphas_normal, dim=-1)
+      if self.DARTS_type==DARTS_Type.ORIGINAL:
+        weights = F.softmax(self.alphas_normal, dim=-1)
+      elif self.DARTS_type==DARTS_Type.FAIR:
+        weights = torch.sigmoid(self.alphas_normal)
+      else:
+        raise Exception("DARTS Type " + str(self.DARTS_type) + " not implemented")
 
       # then apply cell with weights
     # input_states = [s0, s1]
@@ -202,13 +214,30 @@ class Network(nn.Module):
       self.alphas_normal = new_weights
     return
 
-  def sample_alphas_normal(self, sample_amp=1):
+  def sample_alphas_normal(self, sample_amp=1, fair_darts_weight_threshold=0):
 
     alphas_normal = self.alphas_normal.clone()
     alphas_normal_sample = Variable(torch.zeros(alphas_normal.data.shape))
 
     for edge in range(alphas_normal.data.shape[0]):
-      W_soft = F.softmax(alphas_normal[edge] * sample_amp, dim=0)
+      if self.DARTS_type == DARTS_Type.ORIGINAL:
+        W_soft = F.softmax(alphas_normal[edge] * sample_amp, dim=0)
+      elif self.DARTS_type == DARTS_Type.FAIR:
+        transformed_alphas_normal = torch.sigmoid(alphas_normal[edge])
+        above_threshold = False
+        for idx in range(len(transformed_alphas_normal.data)):
+            if transformed_alphas_normal.data[idx] > fair_darts_weight_threshold:
+              above_threshold = True
+              break
+        if above_threshold:
+          W_soft = F.softmax(transformed_alphas_normal, dim=0)
+        else:
+          W_soft = Variable(torch.zeros(alphas_normal[edge].shape))
+          W_soft[PRIMITIVES.index('none')] = 1
+
+      else:
+        raise Exception("DARTS Type " + str(self.DARTS_type) + " not implemented")
+
       k_sample = np.random.choice(range(len(W_soft)), p=W_soft.data.numpy())
       alphas_normal_sample[edge, k_sample] = 1
 
@@ -322,7 +351,7 @@ class Network(nn.Module):
       param_list.append(tmp_param_list)
 
       if print_parameters:
-        print('Classifier from Edge ' + str(edge) + ': ' + get_operation_label('classifier', tmp_param_list))
+        print('Classifier from Edge ' + str(edge) + ': ' + get_operation_label('classifier_concat', tmp_param_list))
 
     return (n_params_total, n_params_base, param_list)
 

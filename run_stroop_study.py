@@ -5,7 +5,7 @@ from AER_experimentalist.experiment_environment.variable import outputTypes as o
 from AER_experimentalist.experimentalist_popper import Experimentalist_Popper
 from AER_experimentalist.experimentalist import Experimentalist
 from AER_theorist.object_of_study import Object_Of_Study
-from AER_theorist.theorist_darts import Theorist_DARTS
+from AER_theorist.theorist_darts import Theorist_DARTS, DARTS_Type
 import AER_experimentalist.experiment_environment.experiment_config as exp_cfg
 from AER_theorist.theorist_GUI import Theorist_GUI
 from AER_GUI import AER_GUI
@@ -115,8 +115,12 @@ experimentalist_validation = Experimentalist_Popper(study_name="Stroop Model Sam
 # THEORIST
 
 # initialize theorist
-theorist = Theorist_DARTS(study_name)
-theorist.plot = True
+theorist = Theorist_DARTS(study_name, darts_type=DARTS_Type.FAIR)
+
+# specify plots
+plots = list()
+plots.append(theorist._loss_plot_name)
+theorist.plot()
 
 # AUTONOMOUS EMPIRICAL RESEARCH
 

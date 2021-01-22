@@ -2,6 +2,7 @@ from AER_experimentalist.experiment_environment.participant_in_silico import Par
 import torch
 import torch.nn as nn
 from torch.autograd import Variable
+from graphviz import Digraph
 
 class Stroop_Model(nn.Module):
     def __init__(self):
@@ -33,9 +34,9 @@ class Stroop_Model(nn.Module):
             input = input.view(1, len(input))
 
         # convert inputs
-        color = torch.zeros(1, 2)
-        word = torch.zeros(1, 2)
-        task = torch.zeros(1, 2)
+        color = torch.zeros(input.shape[0], 2)
+        word = torch.zeros(input.shape[0], 2)
+        task = torch.zeros(input.shape[0], 2)
 
         color[:, 0:2] = input[:, 0:2]
         word[:, 0:2] = input[:, 2:4]
@@ -132,6 +133,107 @@ class Participant_Stroop(Participant_In_Silico):
         transform_category = torch.distributions.categorical.Categorical(probabilities_transformed)
         index = transform_category.sample()
         self.output_sample = index
+
+    def compute_BIC(self, object_of_study, num_params = None):
+
+        (input, target) = object_of_study.get_dataset()
+
+        input_full = torch.zeros(input.shape[0], 6)
+        input_full[:, 0] = self.color_red[0, 0]
+        input_full[:, 1] = self.color_green[0, 0]
+        input_full[:, 2] = self.word_red[0, 0]
+        input_full[:, 3] = self.word_green[0, 0]
+        input_full[:, 4] = self.task_color[0, 0]
+        input_full[:, 5] = self.task_word[0, 0]
+
+        for idx, IV in enumerate(object_of_study.independent_variables):
+            variable_name = IV.get_name()
+            if variable_name is "color_red":
+                input_full[:, 0] = input[:, idx]
+            if variable_name is "color_green":
+                input_full[:, 1] = input[:, idx]
+            if variable_name is "word_red":
+                input_full[:, 2] = input[:, idx]
+            if variable_name is "word_green":
+                input_full[:, 3] = input[:, idx]
+            if variable_name is "task_color":
+                input_full[:, 4] = input[:, idx]
+            if variable_name is "task_word":
+                input_full[:, 5] = input[:, idx]
+
+        output_fnc = nn.Softmax(dim=1)
+        return super(Participant_Stroop, self).compute_BIC(input_full, target, output_fnc, num_params)
+
+    def graph_simple(self, filepath):
+
+        # formatting
+        decimals = 2
+        format_string = "{:." + "{:.0f}".format(decimals) + "f}"
+
+        # set up graph
+        g = Digraph(
+            format='pdf',
+            edge_attr=dict(fontsize='20', fontname="times"),
+            node_attr=dict(style='filled', shape='rect', align='center', fontsize='20', height='0.5', width='0.5',
+                           penwidth='2', fontname="times"),
+            engine='dot')
+        g.body.extend(['rankdir=LR'])
+
+        # add input nodes
+        red = 'Color Red'
+        green = 'Color Green'
+        g.node('Color Red', fillcolor='#F1EDB9')
+        g.node('Color Green', fillcolor='#F1EDB9')
+
+        # add hidden nodes
+        hidden1 = '0'
+        hidden2 = '1'
+        g.node('0', fillcolor='#BBCCF9')
+        g.node('1', fillcolor='#BBCCF9')
+
+        # add output node
+        out1 = 'Logistic(x1)'
+        out2 = 'Logistic(x2)'
+        g.node(out1, fillcolor='#CBE7C7')
+        g.node(out2, fillcolor='#CBE7C7')
+
+        # add links from input to hidden
+        value = self.model.input_color_hidden_color.weight.data[0, 0]
+        bias = self.model.bias[0]
+        str = format_string.format(value) + " * x " + format_string.format(bias)
+        g.edge(red, hidden1, label=str, fillcolor="gray")
+
+        value = self.model.input_color_hidden_color.weight.data[0, 1]
+        str = format_string.format(value) + " * x"
+        g.edge(red, hidden2, label=str, fillcolor="gray")
+
+        value = self.model.input_color_hidden_color.weight.data[1, 0]
+        str = format_string.format(value) + " * x"
+        g.edge(green, hidden1, label=str, fillcolor="gray")
+
+        value = self.model.input_color_hidden_color.weight.data[1, 1]
+        str = format_string.format(value) + " * x " + format_string.format(bias)
+        g.edge(green, hidden2, label=str, fillcolor="gray")
+
+        # add links from hidden to output
+        value1 = self.model.hidden_color_output.weight.data[0, 0]
+        value2 = self.model.hidden_color_output.weight.data[0, 1]
+        # str = 'x.*(' + format_string.format(value1) + ' + ' + format_string.format(value2) + ')'
+        str = format_string.format(value1) + " * x " + format_string.format(bias)
+        g.edge(hidden1, out1, label=str, fillcolor="gray")
+        str = format_string.format(value2) + " * x"
+        g.edge(hidden1, out2, label=str, fillcolor="gray")
+
+        value1 = self.model.hidden_color_output.weight.data[1, 0]
+        value2 = self.model.hidden_color_output.weight.data[1, 1]
+        str = format_string.format(value1) + " * x"
+        g.edge(hidden2, out1, label=str, fillcolor="gray")
+        str = format_string.format(value2) + " * x " + format_string.format(bias)
+        g.edge(hidden2, out2, label=str, fillcolor="gray")
+
+        # save graph
+        g.render(filepath, view=False)
+
 
 def run_exp(model):
 

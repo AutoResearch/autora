@@ -4,6 +4,8 @@ import glob
 import shutil
 import logging
 import AER_config as aer_config
+import time
+import csv
 
 from AER_utils import Plot_Types
 from AER_theorist.theorist_GUI import Theorist_GUI
@@ -28,18 +30,21 @@ class Theorist(ABC):
         self.scripts_path = ""
         self.results_path = ""
         self.results_plots_path = ""
+        self.results_weights_path = ""
         self.simulation_files = ""
+        self.theorist_name = "theorist"
 
         self._meta_parameters = list()
         self._meta_parameters_iteration = 0
         self._eval_meta_parameters_iteration = 0
 
-        self.plot = False
+        self.generate_plots = False
 
         self._model_search_parameters = dict()
         self._performance_plots = dict()
         self._supplementary_plots = dict()
         self._validation_sets = dict()
+        self.plot_name_list = list()
 
         self.target_pattern = []
         self.prediction_pattern = []
@@ -80,16 +85,20 @@ class Theorist(ABC):
 
         # perform architecture search for different hyper-parameters
         for meta_params in self._meta_parameters:
+            self.start_search_timestamp = time.time()
             self.init_model_search(object_of_study)
             for epoch in range(self.model_search_epochs):
                 self.run_model_search_epoch(epoch)
-                if self.plot:
+                if self.generate_plots:
                     self.log_plot_data(epoch, object_of_study)
             self.log_model_search(object_of_study)
-            if self.plot:
+            if self.generate_plots:
                 self.plot_model_search(object_of_study)
             self.evaluate_model_search(object_of_study)
+            self.log_time_elapsed()
             self._meta_parameters_iteration += 1
+
+        self.log_meta_search(object_of_study)
 
         return self.get_best_model(object_of_study, plot_model=True)
 
@@ -110,7 +119,7 @@ class Theorist(ABC):
                 self.log_plot_data(epoch, object_of_study)
 
             # plot evaluation
-            if self.plot:
+            if self.generate_plots:
                 self.plot_model_eval(object_of_study)
 
             # log model evaluation
@@ -122,18 +131,43 @@ class Theorist(ABC):
         self.log_meta_evaluation(object_of_study)
 
     def plot_model_search(self, object_of_study):
-        plot_label = self._meta_parameters_to_str()
-        self.plot(object_of_study, plot_label)
+        plot_label = self.theorist_name + "_" + self._meta_parameters_to_str()
+
+        # get performance plots
+        all_performance_plots = self.get_performance_plots(object_of_study)
+        performance_plots = self.select_plots(all_performance_plots)
+        self.save_plots(performance_plots, plot_label)
+
+        # supplementary plots
+        all_supplementary_plots = self.get_supplementary_plots(object_of_study)
+        supplementary_plots = self.select_plots(all_supplementary_plots)
+        self.save_plots(supplementary_plots, plot_label)
 
     def plot_model_eval(self, object_of_study):
-        plot_label = self._meta_parameters_to_str() + "_" + self._eval_meta_parameters_to_str()
-        self.plot(object_of_study, plot_label)
+        plot_label = self.theorist_name + "_" + self._meta_parameters_to_str() + "_" + self._eval_meta_parameters_to_str()
 
-    def plot(self, object_of_study, plot_label):
-        performance_plots = self.get_performance_plots(object_of_study)
+        # performance plots
+        all_performance_plots = self.get_performance_plots(object_of_study)
+        performance_plots = self.select_plots(all_performance_plots)
+
         self.save_plots(performance_plots, plot_label)
-        supplementary_plots = self.get_supplementary_plots(object_of_study)
-        self.save_plots(supplementary_plots, plot_label)
+
+    def select_plots(self, full_plot_dict):
+        plot_dict = dict()
+        if len(self.plot_name_list) == 0:
+            plot_dict = full_plot_dict
+        else:
+            for plot_name in self.plot_name_list:
+                if plot_name in full_plot_dict.keys():
+                    plot_dict[plot_name] = full_plot_dict[plot_name]
+
+        return plot_dict
+
+    def plot(self, plot=True, plot_name_list=None):
+        self.generate_plots = plot
+        if plot_name_list is not None:
+            self.plot_name_list = plot_name_list
+
 
     def save_plots(self, plot_list, plot_label):
 
@@ -273,6 +307,18 @@ class Theorist(ABC):
             plot_filepath = os.path.join(self.results_plots_path, 'plot_' + plot_label + '_' + key + '.png')
             plot_fig.savefig(plot_filepath)
 
+    def log_time_elapsed(self):
+        stop = time.time()
+        elapsed = stop - self.start_search_timestamp
+
+        meta_param_names = self._meta_parameter_names_to_str_list()
+        meta_param_values = self._meta_parameter_values_to_str_list()
+
+        for name, value in zip(meta_param_names, meta_param_values):
+            self.time_elapsed_log[name].append(value)
+        self.time_elapsed_log[aer_config.log_key_timestamp].append(str(elapsed))
+
+
     def clear_validation_sets(self):
         self._validation_sets = dict()
 
@@ -294,6 +340,42 @@ class Theorist(ABC):
     def init_meta_search(self, object_of_study):
         self.model_search_id += 1
         self.setup_logging()
+
+        # initialize dictionary for logging the time elapsed associated with each meta search condition
+        self.time_elapsed_log = dict()
+        names = self._meta_parameter_names_to_str_list()
+        for name in names:
+            self.time_elapsed_log[name] = list()
+        self.time_elapsed_log[aer_config.log_key_timestamp] = list()
+
+    @abstractmethod
+    def log_meta_search(self, object_of_study):
+        # write time elapsed for each meta parameter condition to csv
+        self.time_elapsed_to_csv()
+
+    def time_elapsed_to_csv(self):
+
+        # timestamps to csv
+        filename_csv = self.theorist_name + '_search_' + str(self.model_search_id) + '_timestamps.csv'
+        filepath = os.path.join(self.results_path, filename_csv)
+
+        # format data
+        header = list()
+        zip_data = list()
+        # add log data from additional validation sets
+        for key in self.time_elapsed_log.keys():
+            header.append(key)
+            timestamp_log = self.time_elapsed_log[key]
+            zip_data.append(timestamp_log)
+
+        rows = zip(*zip_data)
+
+        # write data to csv
+        with open(filepath, "w") as f:
+            writer = csv.writer(f)
+            writer.writerow(header)
+            for row in rows:
+                writer.writerow(row)
 
     @abstractmethod
     def init_model_search(self, object_of_study):
@@ -357,6 +439,14 @@ class Theorist(ABC):
         pass
 
     @abstractmethod
+    def _meta_parameter_names_to_str_list(self):
+        pass
+
+    @abstractmethod
+    def _meta_parameter_values_to_str_list(self):
+        pass
+
+    @abstractmethod
     def _eval_meta_parameters_to_str(self):
         pass
 
@@ -389,11 +479,19 @@ class Theorist(ABC):
                             + aer_config.models_folder \
                             + aer_config.models_results_plots_folder
 
+        self.results_weights_path = aer_config.studies_folder \
+                                  + self.study_name + "/" \
+                                  + aer_config.models_folder \
+                                  + aer_config.models_results_weights_folder
+
         if not os.path.exists(self.results_path):
             os.mkdir(self.results_path)
 
         if not os.path.exists(self.results_plots_path):
             os.mkdir(self.results_plots_path)
+
+        if not os.path.exists(self.results_weights_path):
+            os.mkdir(self.results_weights_path)
 
     def copy_scripts(self, scripts_to_save=None):
 

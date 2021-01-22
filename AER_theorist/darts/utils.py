@@ -17,9 +17,12 @@ from AER_theorist.darts.SimpleNet_dataset import SimpleNetDataset
 # from AER_theorist.darts.object_of_study import outputTypes
 import AER_theorist.darts.SimpleNet_dataset as SimpleNetDatasetFile
 
-def create_output_file_name(file_prefix, log_version = None, weight_decay = None, k = None, seed = None):
+def create_output_file_name(file_prefix, log_version = None, weight_decay = None, k = None, seed = None, theorist=None):
 
     output_str = file_prefix
+
+    if theorist is not None:
+        output_str += '_' + str(theorist)
 
     if log_version is not None:
         output_str += '_v_' + str(log_version)
@@ -85,6 +88,19 @@ def get_output_format(outputType):
         outputTypes.PROBABILITY_DISTRIBUTION: nn.Softmax(dim=1),
         outputTypes.CLASS: nn.Softmax(dim=1),
         outputTypes.SIGMOID: nn.Sigmoid(),
+    }
+
+    return dataSets.get(outputType, nn.MSELoss)
+
+def get_output_str(outputType):
+
+    dataSets = {
+        outputTypes.REAL:  None,
+        outputTypes.PROBABILITY: 'Sigmoid',
+        outputTypes.PROBABILITY_SAMPLE: 'Sigmoid',
+        outputTypes.PROBABILITY_DISTRIBUTION: 'Softmax',
+        outputTypes.CLASS: 'Softmax',
+        outputTypes.SIGMOID: 'Sigmoid',
     }
 
     return dataSets.get(outputType, nn.MSELoss)

@@ -1,6 +1,7 @@
 import AER_config as aer_config
 import AER_theorist.darts.darts_config as darts_config
 import matplotlib.pyplot as plt
+from matplotlib import pyplot
 import matplotlib
 import seaborn as sns
 from matplotlib.gridspec import GridSpec
@@ -12,7 +13,12 @@ import os
 import pandas
 
 
-def plot_darts_summary(study_name, y_name, x1_name, x2_name=None, y_label=None, x1_label=None, x2_label=None, metric='min'):
+def plot_darts_summary(study_name, y_name, x1_name, x2_name=None, y_label=None, x1_label=None, x2_label=None, metric='min', y_reference=None, y_reference_label=None, figure_dimensions=None, title='', y_limit=None, x_limit=None, theorist_filter=None):
+
+    palette = 'PuBu'
+
+    if figure_dimensions is None:
+        figure_dimensions = (4, 3)
 
     if y_label is None:
         y_label = y_name
@@ -22,6 +28,9 @@ def plot_darts_summary(study_name, y_name, x1_name, x2_name=None, y_label=None, 
 
     if x2_label is None:
         x2_label = x2_name
+
+    if y_reference_label is None:
+        y_reference_label = 'Data Generating Model'
 
     # determine directory for study results
     results_path = aer_config.studies_folder \
@@ -33,7 +42,14 @@ def plot_darts_summary(study_name, y_name, x1_name, x2_name=None, y_label=None, 
     files = list()
     for file in os.listdir(results_path):
         if file.endswith(".csv"):
+            if 'model_' not in file:
+                continue
+
+            if theorist_filter is not None:
+                if theorist_filter not in file:
+                    continue
             files.append(os.path.join(results_path, file))
+
 
     # generate a plot dictionary
     plot_dict = dict()
@@ -139,34 +155,81 @@ def plot_darts_summary(study_name, y_name, x1_name, x2_name=None, y_label=None, 
             x1_plot.append(x1_x2_plot)
             x2_plot.append(x2_unique_val)
     # plot
+    # plt.axhline
 
-    # todo: incorporate
-    # sns.despine(trim=True)
-    # plt.axhline(1, c = 'b')
+
+    fig, ax = pyplot.subplots(figsize=figure_dimensions)
 
     if x2_name is None:
 
         data_plot = pandas.DataFrame({x1_label:x1_plot, y_label:y_plot})
-        sns.lineplot(x=x1_label, y=y_label, data=data_plot)
-        sns.despine(trim=True)
-        plt.show()
+        # sns.lineplot(x=x1_label, y=y_label, data=data_plot, linewidth = 2, ax=ax)
+        colors = sns.color_palette(palette, 10)
+        color = colors[-1]
+        sns.lineplot(x=x1_plot, y=y_plot, marker='o', linewidth=2, ax=ax, label='Reconstructed Model', color=color)
+        ax.set_xlabel(x1_label)
+        ax.set_ylabel(y_label)
+        ax.set_title(title)
+
+        if y_limit is not None:
+            ax.set_ylim(y_limit)
+
+        if x_limit is not None:
+            ax.set_xlim(x_limit)
+
+        # generate legend
+        # ax.scatter(x1_plot, y_plot, marker='.', c='r')
+        # g = sns.relplot(data=data_plot, x=x1_label, y=y_label, ax=ax)
+        # g._legend.remove()
+        if y_reference is not None:
+            ax.axhline(y_reference, c='black', linestyle='dashed', label=y_reference_label)
+            # generate legend
+            handles, _ = ax.get_legend_handles_labels()
+            ax.legend(handles=handles)
 
     else:
 
         # produce data frame:
-        x1_df = list()
-        x2_df = list()
-        y_df = list()
-        for idx_x2, x2 in enumerate(x2_plot):
-            for idx_x1, x1 in enumerate(x1_plot[idx_x2]):
-                x1_df.append(x1)
-                x2_df.append(x2)
-                y_df.append(y_plot[idx_x2][idx_x1])
+        # x1_df = list()
+        # x2_df = list()
+        # y_df = list()
+        # for idx_x2, x2 in enumerate(x2_plot):
+        #     for idx_x1, x1 in enumerate(x1_plot[idx_x2]):
+        #         x1_df.append(x1)
+        #         x2_df.append(x2)
+        #         y_df.append(y_plot[idx_x2][idx_x1])
+        #
+        # data_plot = pandas.DataFrame({x1_label: x1_df, x2_label: x2_df, y_label: y_df})
+        # data_plot[x2_label] = pandas.Categorical(data_plot[x2_label], ordered=True)
+        # sns.lineplot(data=data_plot, x=x1_label, y=y_label, hue=x2_label, linewidth = 2, ax=ax)
+        # forcing markers same style:
+        # sns.lineplot(x="n_index", y="value", hue="logic", style="logic", markers=["o", "o"], data=df)
 
-        data_plot = pandas.DataFrame({x1_label: x1_df, x2_label: x2_df, y_label: y_df})
-        sns.lineplot(data=data_plot, x=x1_label, y=y_label, hue=x2_label, linewidth = 1)
-        sns.despine(trim=True)
-        plt.show()
+        colors= sns.color_palette(palette, len(x2_plot))
+
+        for idx, x2 in enumerate(x2_plot):
+
+            x1_plot_line = x1_plot[idx]
+            y_plot_line = y_plot[idx]
+            label = x2_label + ' = ' + str(x2)
+            color = colors[idx]
+
+            sns.lineplot(x=x1_plot_line, y=y_plot_line, marker='o', linewidth=2, ax=ax, label=label, color=color)
+
+        if y_reference is not None:
+            ax.axhline(y_reference, c='black', linestyle='dashed', label=y_reference_label)
+        handles, _ = ax.get_legend_handles_labels()
+        ax.legend(handles=handles)
+        plt.setp(ax.get_legend().get_texts(), fontsize='8')
+
+        if y_limit is not None:
+            ax.set_ylim(y_limit)
+
+        if x_limit is not None:
+            ax.set_xlim(x_limit)
+
+    sns.despine(trim=True)
+    plt.show()
 
 # old
 class DebugWindow:

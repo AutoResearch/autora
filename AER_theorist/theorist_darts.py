@@ -1,7 +1,7 @@
 from abc import ABC
 from AER_theorist.theorist import Theorist
 from AER_utils import Plot_Types
-from AER_theorist.darts.model_search import Network
+from AER_theorist.darts.model_search import Network, DARTS_Type
 from AER_theorist.darts.architect import Architect
 from AER_theorist.darts.genotypes import PRIMITIVES
 from torch.autograd import Variable
@@ -28,9 +28,10 @@ class Theorist_DARTS(Theorist, ABC):
 
     _lr_plot_name = "Learning Rates"
 
-    def __init__(self, study_name):
+    def __init__(self, study_name, darts_type=DARTS_Type.ORIGINAL):
         super(Theorist_DARTS, self).__init__(study_name)
 
+        self.DARTS_type = darts_type
         self.criterion = None
 
         self._model_summary_list = list()
@@ -41,11 +42,21 @@ class Theorist_DARTS(Theorist, ABC):
         self._eval_model_name_log = list()
         self._eval_arch_name_log = list()
         self._eval_num_graph_node_log = list()
+        self._eval_theorist_log = list()
         self._eval_arch_weight_decay_log = list()
         self._eval_num_params_log = list()
+        self._eval_num_edges_log = list()
 
         self.model_search_epochs = darts_cfg.epochs
         self.eval_epochs = darts_cfg.eval_epochs
+
+        if self.DARTS_type == DARTS_Type.ORIGINAL:
+            self.theorist_name = 'original_darts'
+        elif self.DARTS_type == DARTS_Type.FAIR:
+            self.theorist_name = 'fair_darts'
+        else:
+            raise Exception("DARTS Type " + str(self.DARTS_type) + " not implemented")
+
 
     def get_model_search_parameters(self):
 
@@ -164,7 +175,8 @@ class Theorist_DARTS(Theorist, ABC):
         model = Network(object_of_study.__get_output_dim__(),
                         self.criterion,
                         steps=best_num_graph_nodes,
-                        n_input_states=object_of_study.__get_input_dim__())
+                        n_input_states=object_of_study.__get_input_dim__(),
+                        darts_type=self.DARTS_type)
         utils.load(model, model_path)
         alphas_normal = torch.load(arch_path)
         model.fix_architecture(True, new_weights=alphas_normal)
@@ -174,11 +186,13 @@ class Theorist_DARTS(Theorist, ABC):
 
         # plot model
         if plot_model:
-            best_model_plot_path = os.path.join(self.results_path, "best_model")
+            filename = "best_model_" + self.theorist_name
+            best_model_plot_path = os.path.join(self.results_path, filename)
             genotype = self.model.genotype()
             (n_params_total, n_params_base, param_list) = self.model.countParameters()
             viz.plot(genotype.normal, best_model_plot_path, fileFormat='png',
-                     input_labels=object_of_study.__get_input_labels__(), full_label=True, param_list=param_list)
+                     input_labels=object_of_study.__get_input_labels__(), full_label=True, param_list=param_list,
+                     out_dim=object_of_study.__get_output_dim__(), out_fnc=utils.get_output_str(object_of_study.__get_output_type__()))
 
         return model
 
@@ -209,11 +223,16 @@ class Theorist_DARTS(Theorist, ABC):
         self._eval_model_name_log = list()
         self._eval_arch_name_log = list()
         self._eval_num_graph_node_log = list()
+        self._eval_theorist_log = list()
         self._eval_arch_weight_decay_log = list()
         self._eval_num_params_log = list()
+        self._eval_num_edges_log = list()
         self._validation_log_list = dict()
         for key in self._validation_sets:
             self._validation_log_list[key] = list()
+
+        self.candidate_weights = None
+        self.current_arch_sample_id = None
 
         # generate general model file name
         [arch_weight_decay_df, num_graph_nodes, seed] = self.get_meta_parameters()
@@ -247,31 +266,49 @@ class Theorist_DARTS(Theorist, ABC):
 
         logging.info('architecture evaluation for sampled model: %d / %d', self._eval_meta_parameters_iteration + 1, n_eval_meta_configurations)
 
-        # sample architecture weights
-        found_weights = False
-        if (arch_sample_id == 0):
-            candidate_weights = self.model.max_alphas_normal()
-            found_weights = True
+        if self.current_arch_sample_id is None:
+            sample_new_weights = True
         else:
-            candidate_weights = self.model.sample_alphas_normal(darts_cfg.sample_amp)
+            # if this is the same arch sample id then do not sample new weights
+            if arch_sample_id == self.current_arch_sample_id:
+                sample_new_weights = False
+            else:
+                sample_new_weights = True
 
-        arch_search_attempt = 0
-        while found_weights is False:
-            weights_are_novel = True
-            for logged_weights in self._eval_sampled_weights:
-                if torch.eq(logged_weights, candidate_weights).all():
-                    weights_are_novel = False
-            if weights_are_novel:
-                novel_weights = candidate_weights
+        if sample_new_weights:
+            # sample architecture weights
+            found_weights = False
+            if (arch_sample_id == 0):
+                candidate_weights = self.model.max_alphas_normal()
                 found_weights = True
             else:
-                candidate_weights = self.model.sample_alphas_normal()
-                if arch_search_attempt > darts_cfg.max_arch_search_attempts:
+                candidate_weights = self.model.sample_alphas_normal(sample_amp=darts_cfg.sample_amp,
+                                                                    fair_darts_weight_threshold=darts_cfg.fair_darts_weight_threshold)
+
+            arch_search_attempt = 0
+            while found_weights is False:
+                weights_are_novel = True
+                for logged_weights in self._eval_sampled_weights:
+                    if torch.eq(logged_weights, candidate_weights).all():
+                        weights_are_novel = False
+                if weights_are_novel:
+                    novel_weights = candidate_weights
                     found_weights = True
-            arch_search_attempt += 1
+                else:
+                    candidate_weights = self.model.sample_alphas_normal(sample_amp=darts_cfg.sample_amp,
+                                                                        fair_darts_weight_threshold=darts_cfg.fair_darts_weight_threshold)
+                    if arch_search_attempt > darts_cfg.max_arch_search_attempts:
+                        found_weights = True
+                arch_search_attempt += 1
+
+        else:
+            # use old weights
+            candidate_weights = self.candidate_weights
 
         # store sampled architecture weights
         self._eval_sampled_weights.append(candidate_weights)
+        self.candidate_weights = candidate_weights
+        self.current_arch_sample_id = arch_sample_id
 
         # sample parameter initialization
 
@@ -279,7 +316,8 @@ class Theorist_DARTS(Theorist, ABC):
         if darts_cfg.reinitialize_weights:
             self._eval_model = Network(object_of_study.__get_output_dim__(), self.criterion, steps=int(num_graph_nodes),
                                 n_input_states=object_of_study.__get_input_dim__(),
-                                classifier_weight_decay=darts_cfg.classifier_weight_decay)
+                                classifier_weight_decay=darts_cfg.classifier_weight_decay,
+                                darts_type=self.DARTS_type)
             if darts_cfg.eval_custom_initialization:
                 self._eval_model.apply(init_weights)
         else:
@@ -391,8 +429,8 @@ class Theorist_DARTS(Theorist, ABC):
         # get model name
         model_filename = self._eval_model_filename_gen + '_sample' + str(arch_sample_id) + '_' + str(param_sample_id)
         arch_filename = self._eval_arch_filename_gen + '_sample' + str(arch_sample_id) + '_' + str(param_sample_id)
-        model_filepath = os.path.join(self.results_path, model_filename + '.pt')
-        arch_filepath = os.path.join(self.results_path, arch_filename + '.pt')
+        model_filepath = os.path.join(self.results_weights_path, model_filename + '.pt')
+        arch_filepath = os.path.join(self.results_weights_path, arch_filename + '.pt')
         model_graph_filepath = os.path.join(self.results_path, model_filename)
         self._eval_model_name_log.append(model_filename)
         self._eval_arch_name_log.append(arch_filename)
@@ -400,7 +438,11 @@ class Theorist_DARTS(Theorist, ABC):
         self._eval_arch_weight_decay_log.append(arch_weight_decay_df)
         num_params, _, _ = self._eval_model.countParameters()
         self._eval_num_params_log.append(num_params)
+        num_non_zero_edges = self._eval_model.alphas_normal.data.shape[0] - int(np.sum(self._eval_model.alphas_normal.data[:,PRIMITIVES.index('none')].numpy()))
+        self._eval_num_edges_log.append(num_non_zero_edges)
         genotype = self._eval_model.genotype()
+        self._eval_theorist_log.append(self.theorist_name)
+
 
         # save model
         utils.save(self._eval_model, model_filepath)
@@ -408,7 +450,8 @@ class Theorist_DARTS(Theorist, ABC):
         print('Saving model weights: ' + model_filepath)
         (n_params_total, n_params_base, param_list) = self._eval_model.countParameters()
         viz.plot(genotype.normal, model_graph_filepath, viewFile=False,
-                 input_labels=object_of_study.__get_input_labels__(), param_list=param_list, full_label=True)
+                 input_labels=object_of_study.__get_input_labels__(), param_list=param_list, full_label=True,
+                 out_dim=object_of_study.__get_output_dim__(), out_fnc=utils.get_output_str(object_of_study.__get_output_type__()))
         print('Saving model graph: ' + model_graph_filepath)
         print('Saving architecture weights: ' + arch_filepath)
 
@@ -423,16 +466,19 @@ class Theorist_DARTS(Theorist, ABC):
         # save csv file
 
         # generate header
-        header = [darts_cfg.csv_model_file_name, darts_cfg.csv_arch_file_name, darts_cfg.csv_num_graph_node,
-                  darts_cfg.csv_arch_weight_decay, darts_cfg.csv_num_params, darts_cfg.csv_loss]
+        header = [darts_cfg.csv_theorist_name, darts_cfg.csv_model_file_name, darts_cfg.csv_arch_file_name, darts_cfg.csv_num_graph_node,
+                  darts_cfg.csv_arch_weight_decay, darts_cfg.csv_num_params, darts_cfg.csv_num_edges,
+                  darts_cfg.csv_loss]
 
         # collect log data
         zip_data = list()
+        zip_data.append(self._eval_theorist_log)
         zip_data.append(self._eval_model_name_log)
         zip_data.append(self._eval_arch_name_log)
         zip_data.append(self._eval_num_graph_node_log)
         zip_data.append(self._eval_arch_weight_decay_log)
         zip_data.append(self._eval_num_params_log)
+        zip_data.append(self._eval_num_edges_log)
         zip_data.append(self._eval_criterion_loss_log)
 
         # add log data from additional validation sets
@@ -458,7 +504,8 @@ class Theorist_DARTS(Theorist, ABC):
         # initializes the model given number of channels, output classes and the training criterion
         self.model = Network(object_of_study.__get_output_dim__(), self.criterion, steps=int(num_graph_nodes),
                         n_input_states=object_of_study.__get_input_dim__(),
-                        classifier_weight_decay=darts_cfg.classifier_weight_decay)
+                        classifier_weight_decay=darts_cfg.classifier_weight_decay,
+                        darts_type=self.DARTS_type)
 
         # initialize model
         if darts_cfg.custom_initialization:
@@ -513,12 +560,15 @@ class Theorist_DARTS(Theorist, ABC):
         self.architecture_weights_log[:] = np.nan
 
         graph_filename = utils.create_output_file_name(file_prefix=darts_cfg.graph_filename,
+                                                       theorist=self.theorist_name,
                                                        log_version=self.model_search_id,
                                                        weight_decay=arch_weight_decay_df,
                                                        k=num_graph_nodes,
                                                        seed=seed)
         self.graph_filepath = os.path.join(self.results_path, graph_filename)
 
+    def log_meta_search(self, object_of_study):
+        super(Theorist_DARTS, self).log_meta_search(object_of_study)
 
     def run_model_search_epoch(self, epoch):
 
@@ -528,7 +578,10 @@ class Theorist_DARTS(Theorist, ABC):
         logging.info('genotype: %s', genotype)
 
         # prints and log weights of the normal and reduced architecture
-        print(F.softmax(self.model.alphas_normal, dim=-1))
+        if self.DARTS_type == DARTS_Type.ORIGINAL:
+            print(F.softmax(self.model.alphas_normal, dim=-1))
+        elif self.DARTS_type == DARTS_Type.FAIR:
+            print(torch.sigmoid(self.model.alphas_normal))
 
         # training (for one epoch)
         train_obj = train(self.train_queue, self.valid_queue, self.model, self.architect, self.criterion, self.optimizer,
@@ -557,7 +610,11 @@ class Theorist_DARTS(Theorist, ABC):
         self.prediction_pattern = model_formatted(self.model, input, object_of_study).detach().numpy()
 
         # log architecture weights
-        self.architecture_weights_log[epoch, :, :] = torch.nn.functional.softmax(self.model.alphas_normal, dim=-1).data.numpy()
+        if self.DARTS_type == DARTS_Type.ORIGINAL:
+            logged_weights = torch.nn.functional.softmax(self.model.alphas_normal, dim=-1).data.numpy()
+        elif self.DARTS_type == DARTS_Type.FAIR:
+            logged_weights = torch.sigmoid(self.model.alphas_normal).data.numpy()
+        self.architecture_weights_log[epoch, :, :] = logged_weights
 
 
     def log_model_search(self, object_of_study):
@@ -567,14 +624,16 @@ class Theorist_DARTS(Theorist, ABC):
         # save model plot
         genotype = self.model.genotype()
         viz.plot(genotype.normal, self.graph_filepath, fileFormat='png',
-                 input_labels=object_of_study.__get_input_labels__())
+                 input_labels=object_of_study.__get_input_labels__(),
+                 out_dim=object_of_study.__get_output_dim__(),
+                 out_fnc=utils.get_output_str(object_of_study.__get_output_type__()))
 
         # stores the model and architecture
         model_filename = self.get_model_weights_filename(arch_weight_decay_df, num_graph_nodes, seed)
         arch_filename = self.get_architecture_filename(arch_weight_decay_df, num_graph_nodes, seed)
 
-        model_filepath = os.path.join(self.results_path, model_filename + '.pt')
-        arch_filepath = os.path.join(self.results_path, arch_filename + '.pt')
+        model_filepath = os.path.join(self.results_weights_path, model_filename + '.pt')
+        arch_filepath = os.path.join(self.results_weights_path, arch_filename + '.pt')
 
         utils.save(self.model, model_filepath)
         torch.save(self.model.alphas_normal, arch_filepath)
@@ -593,12 +652,14 @@ class Theorist_DARTS(Theorist, ABC):
 
             # save model plot with parameters
             viz.plot(genotype.normal, self.graph_filepath, fileFormat='png',
-                         input_labels=object_of_study.__get_input_labels__(), param_list=param_list, full_label=full_label)
+                         input_labels=object_of_study.__get_input_labels__(), param_list=param_list, full_label=full_label,
+                     out_dim=object_of_study.__get_output_dim__(), out_fnc=utils.get_output_str(object_of_study.__get_output_type__()))
 
         else:
             # save model plot without parameters
             viz.plot(genotype.normal, self.graph_filepath, fileFormat='png',
-                     input_labels=object_of_study.__get_input_labels__())
+                     input_labels=object_of_study.__get_input_labels__(),
+                     out_dim=object_of_study.__get_output_dim__(), out_fnc=utils.get_output_str(object_of_study.__get_output_type__()))
 
         return self.graph_filepath + ".png"
 
@@ -865,6 +926,15 @@ class Theorist_DARTS(Theorist, ABC):
         label = 'decay_' + str(arch_weight_decay_df) + '_k_' + str(num_graph_nodes) + '_seed_' + str(seed)
         return label
 
+    def _meta_parameter_names_to_str_list(self):
+        names = ('decay', 'k', 'seed')
+        return names
+
+    def _meta_parameter_values_to_str_list(self):
+        [arch_weight_decay_df, num_graph_nodes, seed] = self.get_meta_parameters()
+        values = (str(arch_weight_decay_df), str(num_graph_nodes), str(seed))
+        return values
+
     def _eval_meta_parameters_to_str(self):
         [arch_sample_id, param_sample_id] = self.get_eval_meta_parameters()
         label = 'arch_' + str(arch_sample_id) + '_param_' + str(param_sample_id)
@@ -872,6 +942,7 @@ class Theorist_DARTS(Theorist, ABC):
 
     def get_model_filename(self, arch_weight_decay_df, num_graph_nodes, seed):
         filename = utils.create_output_file_name(file_prefix='model',
+                                                         theorist=self.theorist_name,
                                                          log_version=self.model_search_id,
                                                          weight_decay=arch_weight_decay_df,
                                                          k=num_graph_nodes,
@@ -880,6 +951,7 @@ class Theorist_DARTS(Theorist, ABC):
 
     def get_model_weights_filename(self, arch_weight_decay_df, num_graph_nodes, seed):
         filename = utils.create_output_file_name(file_prefix='model_weights',
+                                                         theorist=self.theorist_name,
                                                          log_version=self.model_search_id,
                                                          weight_decay=arch_weight_decay_df,
                                                          k=num_graph_nodes,
@@ -888,6 +960,7 @@ class Theorist_DARTS(Theorist, ABC):
 
     def get_architecture_filename(self, arch_weight_decay_df, num_graph_nodes, seed):
         filename = utils.create_output_file_name(file_prefix='architecture_weights',
+                                                         theorist=self.theorist_name,
                                                          log_version=self.model_search_id,
                                                          weight_decay=arch_weight_decay_df,
                                                          k=num_graph_nodes,
@@ -922,7 +995,8 @@ class Theorist_DARTS(Theorist, ABC):
               candidate_weights = model.max_alphas_normal()
               found_weights = True
           else:
-              candidate_weights = model.sample_alphas_normal(darts_cfg.sample_amp)
+              candidate_weights = model.sample_alphas_normal(sample_amp=darts_cfg.sample_amp,
+                                                             air_darts_weight_threshold=darts_cfg.fair_darts_weight_threshold)
 
           arch_search_attempt = 0
           while found_weights is False:
@@ -934,7 +1008,8 @@ class Theorist_DARTS(Theorist, ABC):
                     novel_weights = candidate_weights
                     found_weights = True
                 else:
-                    candidate_weights = model.sample_alphas_normal()
+                    candidate_weights = model.sample_alphas_normal(sample_amp=darts_cfg.sample_amp,
+                                                                   fair_darts_weight_threshold=darts_cfg.fair_darts_weight_threshold)
                     if arch_search_attempt > darts_cfg.max_arch_search_attempts:
                         found_weights = True
                 arch_search_attempt += 1
@@ -949,7 +1024,10 @@ class Theorist_DARTS(Theorist, ABC):
 
               # reinitialize weights if desired
               if darts_cfg.reinitialize_weights:
-                  new_model = Network(object_of_study.__get_output_dim__(), criterion, steps=int(num_graph_nodes), n_input_states=object_of_study.__get_input_dim__(), classifier_weight_decay=darts_cfg.classifier_weight_decay)
+                  new_model = Network(object_of_study.__get_output_dim__(), criterion, steps=int(num_graph_nodes),
+                                      n_input_states=object_of_study.__get_input_dim__(),
+                                      classifier_weight_decay=darts_cfg.classifier_weight_decay,
+                                      darts_type=self.DARTS_type)
                   if darts_cfg.eval_custom_initialization:
                     new_model.apply(init_weights)
               else:
@@ -1017,8 +1095,8 @@ class Theorist_DARTS(Theorist, ABC):
               # get model name
               model_filename = model_filename_gen + '_sample' + str(arch_sample_id) + '_' + str(param_sample_id)
               arch_filename = arch_filename_gen + '_sample' + str(arch_sample_id) + '_' + str(param_sample_id)
-              model_filepath = os.path.join(self.results_path, model_filename + '.pt')
-              arch_filepath = os.path.join(self.results_path, arch_filename + '.pt')
+              model_filepath = os.path.join(self.results_weights_path, model_filename + '.pt')
+              arch_filepath = os.path.join(self.results_weights_path, arch_filename + '.pt')
               model_graph_filepath = os.path.join(self.results_path, model_filename)
               model_name_log.append(model_filename)
               arch_name_log.append(arch_filename)
@@ -1030,7 +1108,8 @@ class Theorist_DARTS(Theorist, ABC):
               torch.save(new_model.alphas_normal, arch_filepath)
               print('Saving model weights: ' + model_filepath)
               (n_params_total, n_params_base, param_list) = new_model.countParameters()
-              viz.plot(genotype.normal, model_graph_filepath, viewFile=False, input_labels=object_of_study.__get_input_labels__(), param_list=param_list, full_label=True)
+              viz.plot(genotype.normal, model_graph_filepath, viewFile=False, input_labels=object_of_study.__get_input_labels__(), param_list=param_list, full_label=True,
+                       out_dim=object_of_study.__get_output_dim__(), out_fnc=utils.get_output_str(object_of_study.__get_output_type__()))
               print('Saving model graph: ' + model_graph_filepath)
               print('Saving architecture weights: ' + arch_filepath)
 
