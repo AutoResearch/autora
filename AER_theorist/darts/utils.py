@@ -130,16 +130,23 @@ def compute_BIC(output_type, model, input, target):
         n = len(target_flattened)  # number of data points
 
     elif output_type == outputTypes.PROBABILITY_SAMPLE:
-        lik_ones = np.sum(np.multiply(prediction, target), axis=1)
-        lik_zeroes = np.sum(np.multiply(1-prediction, 1-target), axis=1)
-        llik = np.sum(np.log(lik_ones)) + np.sum(np.log(lik_zeroes))  # log likelihood
-        n = len(lik_ones)  # number of data points
+        llik = 0
+        for idx in range(len(target)):
+            if target[idx] == 1:
+                lik = prediction[idx]
+            elif target[idx] == 0:
+                lik = 1-prediction[idx]
+            else:
+                raise Exception('Target must contain either zeros or ones.')
+            llik += np.log(lik)
+        n = len(target)  # number of data points
 
     else:
         raise Exception('BIC computation not implemented for output type ' + str(outputTypes.PROBABILITY) + '.')
 
     k, _, _ = model.countParameters()  # for most likely architecture
     BIC = np.log(n) * k - 2 * llik
+    BIC = BIC[0]
 
     return BIC
 

@@ -18,8 +18,8 @@ IV_labels = {'time_IV': (IV_Time, 'Time', '', 'time_IV', 's', 1, (0, 3600)),
              'word_green': (IV_In_Silico, 'Word Unit Green', None, 'word_green', 'activation', 0, (0, 1)),
              'task_color': (IV_In_Silico, 'Task Unit Color Naming', None, 'task_color', 'activation', 0, (0, 1)),
              'task_word': (IV_In_Silico, 'Task Unit Word Reading', None, 'task_word', 'activation', 0, (0, 1)),
-             'S1': (IV_In_Silico, 'Stimulus 1 Intensity', None, 'S1', 'activation', 0, (0, 1)),
-             'S2': (IV_In_Silico, 'Stimulus 2 Intensity', None, 'S2', 'activation', 0, (0, 1)),
+             'S1': (IV_In_Silico, 'Stimulus 1 Intensity', None, 'S1', 'activation', 0, (0, 5)),
+             'S2': (IV_In_Silico, 'Stimulus 2 Intensity', None, 'S2', 'activation', 0, (0, 5)),
              }
 
 DV_labels = {'time_DV': (DV_Time, 'Time', '', 'time_DV', 's', 0, (0, 3600)),

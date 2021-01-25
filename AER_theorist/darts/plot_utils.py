@@ -229,6 +229,8 @@ def plot_darts_summary(study_name, y_name, x1_name, x2_name=None, y_label=None, 
             ax.set_xlim(x_limit)
 
     sns.despine(trim=True)
+    ax.set_ylabel(y_label)
+    ax.set_xlabel(x1_label)
     plt.show()
 
 # old

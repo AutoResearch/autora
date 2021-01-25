@@ -6,44 +6,43 @@ import numpy as np
 OPS = {
   'none' : lambda C, stride, affine: Zero(stride),
   'linear' : lambda C, stride, affine: nn.Sequential(
-    # EDIT 11/04/19 SM: adapting to new SimpleNet data
-    # nn.Conv2d(C, C, kernel_size=1, padding=0, bias=True),
     nn.Linear(1, 1, bias=True)
     ),
   'relu' : lambda C, stride, affine: nn.Sequential(
-    # EDIT 11/04/19 SM: adapting to new SimpleNet data
-    # nn.Conv2d(C, C, kernel_size=1, padding=0, bias=True),
+    nn.ReLU(inplace=False),
+    ),
+  'lin_relu' : lambda C, stride, affine: nn.Sequential(
     nn.Linear(1, 1, bias=True),
     nn.ReLU(inplace=False),
     ),
   'sigmoid': lambda C, stride, affine: nn.Sequential(
-    # EDIT 11/04/19 SM: adapting to new SimpleNet data
-    # nn.Conv2d(C, C, kernel_size=1, padding=0, bias=True),
+    nn.Sigmoid(),
+   ),
+  'lin_sigmoid': lambda C, stride, affine: nn.Sequential(
     nn.Linear(1, 1, bias=True),
     nn.Sigmoid(),
-  ),
+   ),
   'add': lambda C, stride, affine: nn.Sequential(
-    # EDIT 11/04/19 SM: adapting to new SimpleNet data
-    # nn.Conv2d(C, C, kernel_size=1, padding=0, bias=True),
     Identity()
-  ),
+   ),
   'subtract': lambda C, stride, affine: nn.Sequential(
-    # EDIT 11/04/19 SM: adapting to new SimpleNet data
-    # nn.Conv2d(C, C, kernel_size=1, padding=0, bias=True),
     NegIdentity()
-  ),
+   ),
+  'mult': lambda C, stride, affine: nn.Sequential(
+    nn.Linear(1, 1, bias=False),
+   ),
   'exp': lambda C, stride, affine: nn.Sequential(
     nn.Linear(1, 1, bias=True),
     Exponential(),
-  ),
+   ),
   '1/x': lambda C, stride, affine: nn.Sequential(
     nn.Linear(1, 1, bias=False),
     MultInverse(),
-  ),
+   ),
   'ln': lambda C, stride, affine: nn.Sequential(
     nn.Linear(1, 1, bias=False),
     NatLogarithm(),
-  ),
+   ),
   # EDIT 11/04/19 SM: adapting to new SimpleNet data
   # 'skip_connect' : lambda C, stride, affine: Identity() if stride == 1 else FactorizedReduce(C, C, affine=affine),
   # 'avg_pool_3x3' : lambda C, stride, affine: nn.AvgPool2d(3, stride=stride, padding=1, count_include_pad=False),
@@ -109,10 +108,13 @@ def get_operation_label(op_name, params_org, decimals=4):
     labels = {
       'none': '',
       'linear': str(format_string.format(params[0])) + ' * x',
-      'relu': 'ReLU(' + str(format_string.format(params[0])) + ' * x)',
-      'sigmoid': '1/(1+e^(-' + str(format_string.format(params[0])) + ' * x))',
+      'relu': 'ReLU(x)',
+      'lin_relu': 'ReLU(' + str(format_string.format(params[0])) + ' * x)',
+      'sigmoid': '1/(1+e^(-x))',
+      'lin_sigmoid': '1/(1+e^(-' + str(format_string.format(params[0])) + ' * x))',
       'add': '+ x',
       'subtract': '- x',
+      'mult': str(format_string.format(params[0])) + ' * x',
       'exp': 'e^(' + str(format_string.format(params[0])) + ' * x)',
       '1/x': '1 / (' + str(format_string.format(params[0])) + ' * x)',
       'ln': 'ln(' + str(format_string.format(params[0])) + ' * x)',
@@ -122,10 +124,13 @@ def get_operation_label(op_name, params_org, decimals=4):
     labels = {
       'none': '',
       'linear': str(format_string.format(params[0])) + ' * x + ' + str(format_string.format(params[1])),
-      'relu': 'ReLU(' + str(format_string.format(params[0])) + ' * x + ' + str(format_string.format(params[1])) + ')',
-      'sigmoid': '1/(1+e^(-(' + str(format_string.format(params[0])) + ' * x + ' + str(format_string.format(params[1])) + ')))',
+      'relu': 'ReLU(x)',
+      'lin_relu': 'ReLU(' + str(format_string.format(params[0])) + ' * x + ' + str(format_string.format(params[1])) + ')',
+      'sigmoid': '1/(1+e^(-x))',
+      'lin_sigmoid': '1/(1+e^(-(' + str(format_string.format(params[0])) + ' * x + ' + str(format_string.format(params[1])) + ')))',
       'add': '+ x',
       'subtract': '- x',
+      'mult': str(format_string.format(params[0])) + ' * x',
       'exp': 'e^(' + str(format_string.format(params[0])) + ' * x + ' + str(format_string.format(params[1])) + ')',
       '1/x': '1 / (' + str(format_string.format(params[0])) + ' * x + ' + str(format_string.format(params[1])) + ')',
       'ln': 'ln(' + str(format_string.format(params[0])) + ' * x + ' + str(format_string.format(params[1])) + ')',

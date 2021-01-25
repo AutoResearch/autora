@@ -170,8 +170,8 @@ class Theorist_DARTS(Theorist, ABC):
                 best_num_graph_nodes = int(data[darts_cfg.csv_num_graph_node][min_loss_index])
 
         # load winning model
-        model_path = os.path.join(self.results_path, best_model_file + ".pt")
-        arch_path = os.path.join(self.results_path, best_arch_file + ".pt")
+        model_path = os.path.join(self.results_weights_path, best_model_file + ".pt")
+        arch_path = os.path.join(self.results_weights_path, best_arch_file + ".pt")
         model = Network(object_of_study.__get_output_dim__(),
                         self.criterion,
                         steps=best_num_graph_nodes,
@@ -243,6 +243,12 @@ class Theorist_DARTS(Theorist, ABC):
         # subsample models and retrain
         self._eval_sampled_weights = list()
 
+        if self.DARTS_type == DARTS_Type.ORIGINAL:
+            self.sample_amp = darts_cfg.sample_amp
+        elif self.DARTS_type == DARTS_Type.FAIR:
+            self.sample_amp = darts_cfg.sample_amp_fair_darts
+
+
     def init_model_evaluation(self, object_of_study):
 
         self.train_error_log = np.empty((self.eval_epochs, 1))  # log training error
@@ -282,7 +288,7 @@ class Theorist_DARTS(Theorist, ABC):
                 candidate_weights = self.model.max_alphas_normal()
                 found_weights = True
             else:
-                candidate_weights = self.model.sample_alphas_normal(sample_amp=darts_cfg.sample_amp,
+                candidate_weights = self.model.sample_alphas_normal(sample_amp=self.sample_amp,
                                                                     fair_darts_weight_threshold=darts_cfg.fair_darts_weight_threshold)
 
             arch_search_attempt = 0
@@ -295,7 +301,7 @@ class Theorist_DARTS(Theorist, ABC):
                     novel_weights = candidate_weights
                     found_weights = True
                 else:
-                    candidate_weights = self.model.sample_alphas_normal(sample_amp=darts_cfg.sample_amp,
+                    candidate_weights = self.model.sample_alphas_normal(sample_amp=self.sample_amp,
                                                                         fair_darts_weight_threshold=darts_cfg.fair_darts_weight_threshold)
                     if arch_search_attempt > darts_cfg.max_arch_search_attempts:
                         found_weights = True
@@ -975,6 +981,11 @@ class Theorist_DARTS(Theorist, ABC):
       arch_name_log = list()
       num_graph_node_log = list()
 
+      if self.DARTS_type == DARTS_Type.ORIGINAL:
+          sample_amp = darts_cfg.sample_amp
+      elif self.DARTS_type == DARTS_Type.FAIR:
+          sample_amp = darts_cfg.sample_amp_fair_darts
+
       # generate general model file name
       model_filename_gen = self.get_model_weights_filename(arch_weight_decay_df, num_graph_nodes, seed)
       summary_filename_gen = self.get_model_filename(arch_weight_decay_df, num_graph_nodes, seed)
@@ -995,7 +1006,7 @@ class Theorist_DARTS(Theorist, ABC):
               candidate_weights = model.max_alphas_normal()
               found_weights = True
           else:
-              candidate_weights = model.sample_alphas_normal(sample_amp=darts_cfg.sample_amp,
+              candidate_weights = model.sample_alphas_normal(sample_amp=sample_amp,
                                                              air_darts_weight_threshold=darts_cfg.fair_darts_weight_threshold)
 
           arch_search_attempt = 0
@@ -1008,7 +1019,7 @@ class Theorist_DARTS(Theorist, ABC):
                     novel_weights = candidate_weights
                     found_weights = True
                 else:
-                    candidate_weights = model.sample_alphas_normal(sample_amp=darts_cfg.sample_amp,
+                    candidate_weights = model.sample_alphas_normal(sample_amp=sample_amp,
                                                                    fair_darts_weight_threshold=darts_cfg.fair_darts_weight_threshold)
                     if arch_search_attempt > darts_cfg.max_arch_search_attempts:
                         found_weights = True

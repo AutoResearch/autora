@@ -45,7 +45,7 @@ def plot(genotype, filename, fileFormat='pdf', viewFile=None, full_label=False, 
       if op is not 'none':
         op_label = op
         if full_label:
-          params = param_list[k]
+          params = param_list[start+j] # note: genotype order and param list order don't align
           op_label = get_operation_label(op, params, decimals=decimals_to_display)
           g.edge(u, v, label=op_label, fillcolor="gray")
         else:

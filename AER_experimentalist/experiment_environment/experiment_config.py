@@ -7,7 +7,7 @@ session_path = "sessions/"
 
 LOCAL_HOST = '127.0.0.1'
 HOST_IP = LOCAL_HOST
-HOST_PORT = 47777
+HOST_PORT = 47778
 
 font_family = "Helvetica"
 font_size = 12

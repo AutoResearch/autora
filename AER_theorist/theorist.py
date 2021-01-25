@@ -54,6 +54,7 @@ class Theorist(ABC):
 
         self.model_search_id = 0
         self.study_name = study_name
+        self.single_job = False
         self.setup_simulation_directories()
         self.copy_scripts(scripts_to_save=glob.glob(self.simulation_files))
 
@@ -78,6 +79,30 @@ class Theorist(ABC):
                 raise Exception("Not allowed to modify model search parameter '" + str(key) + "'. Dictionary self._model_search_parameters indicates that the parameter cannot be modified.")
         else:
             raise Exception("Key '" + str(key) + "' not in dictionary self._model_search_parameters")
+
+    def search_model_job(self, object_of_study, job_id):
+
+        self.single_job = True
+
+        # initialize model search
+        self.init_meta_search(object_of_study)
+
+        self._meta_parameters_iteration = job_id
+
+        # perform architecture search for different hyper-parameters
+        self.start_search_timestamp = time.time()
+        self.init_model_search(object_of_study)
+        for epoch in range(self.model_search_epochs):
+            self.run_model_search_epoch(epoch)
+            if self.generate_plots:
+                self.log_plot_data(epoch, object_of_study)
+        self.log_model_search(object_of_study)
+        if self.generate_plots:
+            self.plot_model_search(object_of_study)
+        self.evaluate_model_search(object_of_study)
+        self.log_time_elapsed()
+
+        self.log_meta_search(object_of_study)
 
     def search_model(self, object_of_study):
         # initialize model search
@@ -356,7 +381,11 @@ class Theorist(ABC):
     def time_elapsed_to_csv(self):
 
         # timestamps to csv
-        filename_csv = self.theorist_name + '_search_' + str(self.model_search_id) + '_timestamps.csv'
+        if self.single_job:
+            meta_param_str = '_' + self._meta_parameters_to_str()
+        else:
+            meta_param_str = ''
+        filename_csv = self.theorist_name + meta_param_str + '_search_' + str(self.model_search_id) + '_timestamps.csv'
         filepath = os.path.join(self.results_path, filename_csv)
 
         # format data

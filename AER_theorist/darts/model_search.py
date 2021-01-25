@@ -230,7 +230,7 @@ class Network(nn.Module):
               above_threshold = True
               break
         if above_threshold:
-          W_soft = F.softmax(transformed_alphas_normal, dim=0)
+          W_soft = F.softmax(transformed_alphas_normal * sample_amp, dim=0)
         else:
           W_soft = Variable(torch.zeros(alphas_normal[edge].shape))
           W_soft[PRIMITIVES.index('none')] = 1

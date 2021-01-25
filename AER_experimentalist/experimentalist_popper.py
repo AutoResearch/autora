@@ -15,8 +15,8 @@ from abc import ABC, abstractmethod
 
 class Experimentalist_Popper(Experimentalist, ABC):
 
-    def __init__(self, study_name, experiment_server_host=None, experiment_server_port=None, seed_data_file=""):
-        super(Experimentalist_Popper, self).__init__(study_name, experiment_server_host, experiment_server_port, seed_data_file)
+    def __init__(self, study_name, experiment_server_host=None, experiment_server_port=None, seed_data_file="", experiment_design=None):
+        super(Experimentalist_Popper, self).__init__(study_name, experiment_server_host, experiment_server_port, seed_data_file, experiment_design)
 
         self._popper_loss_plot_name = "Loss of Popper Network"
         self._popper_pattern_plot_name = "Predicted vs. Actual Model Loss"

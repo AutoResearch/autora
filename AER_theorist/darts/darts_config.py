@@ -9,7 +9,7 @@ class InitMethod(Enum):
 max_k = 3                       # maximum number of computations (nodes) in model
 min_k = 1                       # minimum number of computations (nodes) in model
 min_seed = 1                    # minimum seed tested
-max_seed = 3                    # maximum seed tested
+max_seed = 3 #3                    # maximum seed tested
 
 # training
 epochs = 100 # 200                    # num of training epochs (30)
@@ -38,9 +38,10 @@ fair_darts_loss_weight = 1 #10        # weight of L1 loss associated with archit
 
 # evaluation
 n_architectures_sampled = 3 #5      # num of (distinct) model architectures sampled from final architecture weights
-n_initializations_sampled = 10 #10 #20            # num of model initializations searched
+n_initializations_sampled = 5 #5 #20            # num of model initializations searched
 max_arch_search_attempts = 100000
 sample_amp = 100                # amplifies architecture weight differences before passing through softmax
+sample_amp_fair_darts = 5       # amplifies architecture weight differences before passing through softmax
 reinitialize_weights = True     # whether to train sampled models on novel weights
 eval_learning_rate = 0.3
 eval_learning_rate_min = 0.01
@@ -63,7 +64,7 @@ exp_folder = 'experiments'                                     # experiment name
 graph_filename = 'model_graph'                                 # file name prefix of learned graph
 model_filename = 'model_weights'                               # file name prefix of learned model
 output_file_folder = 'results'                                 # folder for simulation results
-arch_weight_decay_list = [0, 0.25, 0.5, 0.75, 1] # 6e-4 # np.linspace(0, 6e-4, 6)               # list of architecture weight decays searched over (this decay scales with number of degrees of freedom)
+arch_weight_decay_list = [0, 0.25, 0.5, 0.75, 1.0] # 6e-4 # np.linspace(0, 6e-4, 6)               # list of architecture weight decays searched over (this decay scales with number of degrees of freedom)
 num_node_list = np.linspace(min_k, max_k, (max_k-min_k)+1)     # list of k's searched over
 seed_list = np.linspace(1, max_seed, max_seed)                 # list of seeds searched over
 csv_theorist_name = 'theorist'

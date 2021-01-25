@@ -5,12 +5,11 @@ from torch.autograd import Variable
 import random
 import numpy as np
 
-k = 1
-
 class Weber_Model(nn.Module):
-    def __init__(self, k):
+    def __init__(self, k=1, amplification=1):
         super(Weber_Model, self).__init__()
         self.k = k
+        self.amplification = amplification
 
     def forward(self, input):
 
@@ -28,7 +27,7 @@ class Weber_Model(nn.Module):
         difference = S2-S1
         JND = self.k * S1
 
-        output = difference-JND
+        output = self.amplification*(difference-JND)
 
         return output
 
@@ -43,6 +42,7 @@ class Participant_Weber(Participant_In_Silico):
         self.S2 = torch.zeros(1, 1)
 
         self.output = torch.zeros(1, 1)
+        self.output_sampled = torch.zeros(1, 1)
 
     # read value from participant
     def get_value(self, variable_name):
@@ -82,7 +82,7 @@ class Participant_Weber(Participant_In_Silico):
         else:
             self.output_sampled[0] = 0
 
-def run_exp(model, S1_list=(0, 0.4, 0.8), max_diff=0.2, num_data_points=100):
+def run_exp(model, S1_list, max_diff, num_data_points=100):
 
 
 
@@ -123,10 +123,10 @@ def run_exp(model, S1_list=(0, 0.4, 0.8), max_diff=0.2, num_data_points=100):
             output1, output2, output3)
 
 
-def plot_psychophysics(model, S1_list=(0, 0.4, 0.8), max_diff=0.2, num_data_points=100):
+def plot_psychophysics(model, S1_list=(1, 2.5, 4), max_diff=5, num_data_points=100):
 
     (diff1, diff2, diff3,
-     output1, output2, output3) = run_exp(model, S1_list=(0, 0.4, 0.8), max_diff=0.2, num_data_points=100)
+     output1, output2, output3) = run_exp(model, S1_list, max_diff, num_data_points)
 
     # collect plot data
     x1_data = diff1
@@ -136,13 +136,13 @@ def plot_psychophysics(model, S1_list=(0, 0.4, 0.8), max_diff=0.2, num_data_poin
     y2_data = output2
     y3_data = output3
 
-    x_limit = [np.min(S1_list), np.max(S1_list)]
+    x_limit = [0, max_diff]
     y_limit = [0, 1]
     x_label = "S2-S1"
     y_label = "P(Detected)"
     legend = list()
     for S1 in S1_list:
-        legend.append(str(S1))
+        legend.append('S1 = ' + str(S1))
 
     # plot
     import matplotlib.pyplot as plt
