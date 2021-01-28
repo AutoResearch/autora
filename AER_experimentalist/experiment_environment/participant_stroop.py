@@ -20,12 +20,21 @@ class Stroop_Model(nn.Module):
         self.task_hidden_word = nn.Linear(2, 2, bias=False)
 
         # assign weights
-        self.input_color_hidden_color.weight.data = torch.FloatTensor([[2.2, -2.2], [-2.2, 2.2]])
-        self.input_word_hidden_word.weight.data = torch.FloatTensor([[2.6, -2.6], [-2.6, 2.6]])
-        self.hidden_color_output.weight.data = torch.FloatTensor([[1.3, -1.3], [-1.3, 1.3]])
-        self.hidden_word_output.weight.data = torch.FloatTensor([[2.5, -2.5], [-2.5, 2.5]])
-        self.task_hidden_color.weight.data = torch.FloatTensor([[4.0, 0.0], [4.0, 0]])
-        self.task_hidden_word.weight.data = torch.FloatTensor([[0, 4.00], [0, 4.0]])
+        # self.input_color_hidden_color.weight.data = torch.FloatTensor([[2.2, -2.2], [-2.2, 2.2]])
+        # self.input_word_hidden_word.weight.data = torch.FloatTensor([[2.6, -2.6], [-2.6, 2.6]])
+        # self.hidden_color_output.weight.data = torch.FloatTensor([[1.3, -1.3], [-1.3, 1.3]])
+        # self.hidden_word_output.weight.data = torch.FloatTensor([[2.5, -2.5], [-2.5, 2.5]])
+        # self.task_hidden_color.weight.data = torch.FloatTensor([[4.0, 0.0], [4.0, 0]])
+        # self.task_hidden_word.weight.data = torch.FloatTensor([[0, 4.00], [0, 4.0]])
+
+        # assign without word reading task unit
+        self.input_color_hidden_color.weight.data = torch.FloatTensor([[1, -1], [-1, 1]]) * 2.2
+        self.input_word_hidden_word.weight.data = torch.FloatTensor([[1, -1], [-1, 1]]) * 2.6
+        self.hidden_color_output.weight.data = torch.FloatTensor([[1, -1], [-1, 1]]) * 1.3
+        self.hidden_word_output.weight.data = torch.FloatTensor([[1, -1], [-1, 1]]) * 2.5
+
+        self.task_hidden_color.weight.data = torch.FloatTensor([[1.0, 0.0], [1.0, 0]]) * 4
+        self.task_hidden_word.weight.data = torch.FloatTensor([[0, 1], [0, 1]]) * 0
 
     def forward(self, input):
 

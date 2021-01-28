@@ -20,6 +20,7 @@ class Theorist(ABC):
 
     _loss_plot_name = "Training & Validation Loss"
     _pattern_plot_name = "Target vs. Predicted Pattern"
+    simulation_files = ""
 
     def __init__(self, study_name):
 
@@ -31,7 +32,6 @@ class Theorist(ABC):
         self.results_path = ""
         self.results_plots_path = ""
         self.results_weights_path = ""
-        self.simulation_files = ""
         self.theorist_name = "theorist"
 
         self._meta_parameters = list()

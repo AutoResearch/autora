@@ -61,40 +61,48 @@ validation_object_1.add_data(validation_data)
 study_name = 'Weber'
 # y_name = 'loss'
 # y_label = 'log loss'
-y_name = 'Weber_Original'
-y_label = 'log loss (validation)'
-# y_name = 'Weber_Sampled'
-# y_label = 'BIC'
+# y_name = 'Weber_Original'
+# y_label = 'log loss (validation)'
+y_name = 'Weber_Sampled'
+y_label = 'BIC'
+# y_name = 'num_params'
+# y_label = 'num_params'
+# y_name = 'num_edges'
+# y_label = 'num_edges'
+
 # x1_name = 'num_params'
 x1_label = 'df'
 x1_name = 'arch_weight_decay'
 # x1_name = 'num_edges'
 # x1_label = 'num edges'
+
 x2_name = 'num_graph_node'
 x2_label = 'k'
 # x2_name = 'num_params'
 # x2_label = 'num params'
-x_limit = [0, 9]
-
-plot_darts_summary(study_name=study_name,
-                   y_name=y_name,
-                   x1_name=x1_name,
-                   y_label=y_label,
-                   x1_label=x1_label,
-                   metric='min',
-                   theorist_filter='fair_darts')
-
+# x2_label = 'df'
+# x2_name = 'arch_weight_decay'
+x_limit = [0, 1]
 
 # plot_darts_summary(study_name=study_name,
 #                    y_name=y_name,
 #                    x1_name=x1_name,
-#                    x2_name=x2_name,
 #                    y_label=y_label,
 #                    x1_label=x1_label,
-#                    x2_label=x2_label,
 #                    metric='min',
-#                    x_limit=x_limit,
-#                    theorist_filter='original_darts')
+#                    theorist_filter='fair_darts')
+
+
+plot_darts_summary(study_name=study_name,
+                   y_name=y_name,
+                   x1_name=x1_name,
+                   x2_name=x2_name,
+                   y_label=y_label,
+                   x1_label=x1_label,
+                   x2_label=x2_label,
+                   metric='min',
+                   x_limit=x_limit,
+                   theorist_filter='original_darts')
 
 
 # plot_darts_summary(study_name=study_name,

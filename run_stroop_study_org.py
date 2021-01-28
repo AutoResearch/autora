@@ -7,6 +7,9 @@ from AER_experimentalist.experimentalist import Experimentalist
 from AER_theorist.object_of_study import Object_Of_Study
 from AER_theorist.theorist_darts import Theorist_DARTS, DARTS_Type
 import AER_experimentalist.experiment_environment.experiment_config as exp_cfg
+from AER_theorist.theorist_GUI import Theorist_GUI
+from AER_GUI import AER_GUI
+from tkinter import *
 
 now = datetime.now()
 dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
@@ -14,15 +17,9 @@ print("date and time =", dt_string)
 
 # GENERAL PARAMETERS
 
+study_name = "Stroop Model"   # name of experiment
 host = exp_cfg.HOST_IP      # ip address of experiment server
 port = exp_cfg.HOST_PORT    # port of experiment server
-
-# SIMULATION PARAMETERS
-
-study_name = "Stroop"   # name of experiment
-study_name_sampled = "Stroop Sampled"   # name of experiment
-max_num_data_points = 5000
-max_num_data_points_sampled = 5000
 
 AER_cycles = 1
 
@@ -54,6 +51,11 @@ task_color = IV(name='task_color',
                           units="activation",
                           variable_label='Task Unit Color Naming')
 
+task_word = IV(name='task_word',
+                          value_range=(0, 1),
+                          units="activation",
+                          variable_label='Task Unit Word Reading')
+
 
 
 # specify dependent variable with type
@@ -84,7 +86,7 @@ verbal_sample = DV(name='verbal_sample',
 
 
 # list dependent and independent variables
-IVs = [color_red, color_green, word_red, word_green, task_color] # only including subset of available variables
+IVs = [color_red, color_green] # only including subset of available variables
 DVs = [verbal_red, verbal_green]
 DVs_validation = [verbal_sample]
 
@@ -93,7 +95,7 @@ study_object = Object_Of_Study(name=study_name,
                                independent_variables=IVs,
                                dependent_variables=DVs)
 
-validation_object_1 = Object_Of_Study(name=study_name_sampled,
+validation_object_1 = Object_Of_Study(name="Stroop Model Sampled",
                                independent_variables=IVs,
                                dependent_variables=DVs_validation)
 
@@ -105,7 +107,7 @@ experimentalist = Experimentalist_Popper(study_name=study_name,
                                   experiment_server_port=port,
                                          )
 
-experimentalist_validation = Experimentalist_Popper(study_name=study_name_sampled,
+experimentalist_validation = Experimentalist_Popper(study_name="Stroop Model Sampled",
                                   experiment_server_host=host,
                                   experiment_server_port=port,
                                          )
@@ -113,43 +115,37 @@ experimentalist_validation = Experimentalist_Popper(study_name=study_name_sample
 # THEORIST
 
 # initialize theorist
-theorist = Theorist_DARTS(study_name, darts_type=DARTS_Type.ORIGINAL)
+theorist = Theorist_DARTS(study_name, darts_type=DARTS_Type.FAIR)
 
 # specify plots
 plots = list()
 plots.append(theorist._loss_plot_name)
-for i in range(20):
-    plot_name = "Edge " + str(i)
-    plots.append(plot_name)
-theorist.plot(plots)
+theorist.plot()
 
 # AUTONOMOUS EMPIRICAL RESEARCH
 
 # generate first validation set
-# validation_data = experimentalist_validation.seed(validation_object_1, n=5000) # seed with new experiment
+# validation_data = experimentalist_validation.seed(validation_object_1, n=1000) # seed with new experiment
 validation_data = experimentalist_validation.seed(validation_object_1, datafile='experiment_0_data.csv') # seed with new experiment
 validation_object_1.add_data(validation_data)
 
 # seed experiment and split into training/validation set
-# seed_data = experimentalist.seed(study_object, n=5000) # seed with new experiment
+# seed_data = experimentalist.seed(study_object, n=100) # seed with new experiment
 seed_data = experimentalist.seed(study_object, datafile='experiment_0_data.csv') # seed with existing data file
 study_object.add_data(seed_data)
 validation_object_2 = study_object.split(proportion=0.5)
-validation_object_2.name = "BIC"
+validation_object_2.name = "Stroop Sampled"
 
 # add validation sets
-theorist.add_validation_set(validation_object_1, 'BIC')
-theorist.add_validation_set(validation_object_2, 'validation loss')
+theorist.add_validation_set(validation_object_1, 'Stroop_Sampled')
+theorist.add_validation_set(validation_object_2, 'Stroop_Original')
 
-# search model ORIGINAL
+# search model
 model = theorist.search_model(study_object)
 
-# search model ORIGINAL
-theorist_fair = Theorist_DARTS(study_name, darts_type=DARTS_Type.FAIR)
-theorist_fair.plot(plots)
-theorist_fair.add_validation_set(validation_object_1, 'BIC')
-theorist_fair.add_validation_set(validation_object_2, 'validation loss')
-model = theorist_fair.search_model(study_object)
+# root = Tk()
+# app = Theorist_GUI(object_of_study=study_object, theorist=theorist, root=root)
+# root.mainloop()
 
 now = datetime.now()
 dt_string = now.strftime("%d/%m/%Y %H:%M:%S")

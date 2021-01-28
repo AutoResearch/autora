@@ -96,6 +96,7 @@ plots = list()
 plots.append(theorist._loss_plot_name)
 theorist.plot()
 
+
 # AUTONOMOUS EMPIRICAL RESEARCH
 
 # generate first validation set
@@ -120,6 +121,12 @@ model = theorist.search_model(study_object)
 # root = Tk()
 # app = Theorist_GUI(object_of_study=study_object, theorist=theorist, root=root)
 # root.mainloop()
+
+theorist_fair = Theorist_DARTS(study_name, darts_type=DARTS_Type.FAIR)
+theorist_fair.plot()
+theorist_fair.add_validation_set(validation_object_1, 'Weber_Sampled')
+theorist_fair.add_validation_set(validation_object_2, 'Weber_Original')
+model = theorist_fair.search_model(study_object)
 
 now = datetime.now()
 dt_string = now.strftime("%d/%m/%Y %H:%M:%S")

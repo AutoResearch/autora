@@ -63,10 +63,19 @@ def plot_darts_summary(study_name, y_name, x1_name, x2_name=None, y_label=None, 
     for file in files:
         data = pandas.read_csv(file, header=0)
         plot_dict[darts_config.csv_arch_file_name].extend(data[darts_config.csv_arch_file_name])
-        plot_dict[y_name].extend(data[y_name])
-        plot_dict[x1_name].extend(data[x1_name])
+        if y_name in data.keys():
+            plot_dict[y_name].extend(data[y_name])
+        else:
+            raise Exception('Could not find key "' + y_name + '" in the data file.')
+        if x1_name in data.keys():
+            plot_dict[x1_name].extend(data[x1_name])
+        else:
+            raise Exception('Could not find key "' + x1_name + '" in the data file.')
         if x2_name is not None:
-            plot_dict[x2_name].extend(data[x2_name])
+            if x2_name in data.keys():
+                plot_dict[x2_name].extend(data[x2_name])
+            else:
+                raise Exception('Could not find key "' + x2_name + '" in the data file.')
 
     model_name_list = plot_dict[darts_config.csv_arch_file_name]
     x1_data = np.asarray(plot_dict[x1_name])

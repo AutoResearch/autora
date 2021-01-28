@@ -10,7 +10,8 @@ import time
 
 participant = Participant_Stroop()
 
-study_name = "Stroop Model"   # name of experiment
+study_name = "Stroop Della"   # name of experiment
+study_name_sampled = "Stroop Della Sampled"   # name of experiment
 host = exp_cfg.HOST_IP      # ip address of experiment server
 port = exp_cfg.HOST_PORT    # port of experiment server
 
@@ -65,11 +66,11 @@ verbal_sample = DV(name='verbal_sample',
 IVs = [color_red, color_green] # only including subset of available variables
 DVs_validation = [verbal_sample]
 
-validation_object_1 = Object_Of_Study(name="Stroop Model Sampled",
+validation_object_1 = Object_Of_Study(name=study_name_sampled,
                                independent_variables=IVs,
                                dependent_variables=DVs_validation)
 
-experimentalist_validation = Experimentalist_Popper(study_name="Stroop Model Sampled",
+experimentalist_validation = Experimentalist_Popper(study_name=study_name_sampled,
                                   experiment_server_host=host,
                                   experiment_server_port=port,
                                          )
@@ -77,45 +78,38 @@ experimentalist_validation = Experimentalist_Popper(study_name="Stroop Model Sam
 validation_data = experimentalist_validation.seed(validation_object_1, datafile='experiment_0_data.csv') # seed with new experiment
 validation_object_1.add_data(validation_data)
 
-BIC = participant.compute_BIC(object_of_study=validation_object_1, num_params=10)
+BIC = participant.compute_BIC(object_of_study=validation_object_1, num_params=21)
 y_reference=BIC
 y_reference_label='Data Generating Model'
 
-study_name = 'Stroop Model'
 # y_name = 'loss'
 # y_label = 'log loss'
-y_name = 'Stroop_Original'
-y_label = 'log loss (validation)'
-# y_name = 'Stroop_Sampled'
-# y_label = 'BIC'
+# y_name = 'validation loss'
+y_name = 'BIC'
+
 # x1_name = 'num_params'
-x1_label = 'df'
-x1_name = 'arch_weight_decay'
+x1_name = 'num_graph_node'
+# x1_name = 'arch_weight_decay'
 # x1_name = 'num_edges'
-# x1_label = 'num edges'
-x2_name = 'num_graph_node'
-x2_label = 'k'
+
+# x2_name = 'num_graph_node'
 # x2_name = 'num_params'
-# x2_label = 'num params'
 x_limit = [0, 1]
-
-# plot_darts_summary(study_name=study_name,
-#                    y_name=y_name,
-#                    x1_name=x1_name,
-#                    y_label=y_label,
-#                    x1_label=x1_label,
-#                    metric='min')
-
 
 plot_darts_summary(study_name=study_name,
                    y_name=y_name,
                    x1_name=x1_name,
-                   x2_name=x2_name,
-                   y_label=y_label,
-                   x1_label=x1_label,
-                   x2_label=x2_label,
                    metric='min',
-                   x_limit=x_limit)
+                   y_reference=y_reference)
+
+
+# plot_darts_summary(study_name=study_name,
+#                    y_name=y_name,
+#                    x1_name=x1_name,
+#                    x2_name=x2_name,
+#                    metric='min',
+#                    x_limit=x_limit,
+#                    theorist_filter='original_darts')
 
 
 # plot_darts_summary(study_name=study_name,

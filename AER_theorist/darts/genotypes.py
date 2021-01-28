@@ -19,12 +19,37 @@ Genotype = namedtuple('Genotype', 'normal normal_concat')
 #     'relu',
 # ]
 
+# PRIMITIVES = [    # success Weber
+#     'none',
+#     'add',
+#     'subtract',
+#     'linear',
+#     'lin_sigmoid',
+#     'mult',
+#     'lin_relu',
+# ]
+
+# PRIMITIVES = [  # partial success weber
+#     'none',
+#     'add',
+#     'subtract',
+#     'linear',
+#     'sigmoid',
+#     'lin_sigmoid',
+#     'mult',
+#     'relu',
+#     'lin_relu',
+# ]
+
 PRIMITIVES = [
     'none',
     'add',
     'subtract',
     'linear',
-    'lin_sigmoid',
+    'sigmoid',
     'mult',
+    'exp',
+    'relu',
     'lin_relu',
+    'lin_sigmoid',
 ]

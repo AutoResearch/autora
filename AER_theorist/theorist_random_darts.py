@@ -21,7 +21,7 @@ class Theorist_Random_DARTS(Theorist_DARTS, ABC):
     def load_runtimes(self, filepath):
         self.runtimes = pandas.read_csv(filepath, header=0)
 
-    def get_runtime(self):
+    def update_runtime(self):
         # get meta parameters
         [arch_weight_decay_df, num_graph_nodes, seed] = self.get_meta_parameters()
         names = self._meta_parameter_names_to_str_list()
@@ -39,6 +39,7 @@ class Theorist_Random_DARTS(Theorist_DARTS, ABC):
 
         self.model._architecture_fixed = True
         self.model.alphas_normal[:] = 1
+        self.update_runtime()
 
     def init_meta_evaluation(self, object_of_study=None):
         super(Theorist_Random_DARTS, self).init_meta_evaluation(object_of_study)
@@ -53,43 +54,52 @@ class Theorist_Random_DARTS(Theorist_DARTS, ABC):
 
     # incorporate time spent
     def evaluate_model_search(self, object_of_study):
-        # TODO: rewrite init_meta_evaluation
-        # TODO: continiously add meta params on the fly (increment arch_sample and param sample but make sure each arch_sample gets comparable amount of param samples)
 
         # initialize model search
         self.init_meta_evaluation(object_of_study)
 
-        time_elapsed = False
+        while not True:
 
-        while not time_elapsed:
-
-            stop = time.time()
-            elapsed = stop - self.start_search_timestamp
+            [arch_sample_id, param_sample_id] = self.get_eval_meta_parameters()
 
             # perform architecture search for different hyper-parameters
-            for eval_meta_params in self._eval_meta_parameters:
-                self.init_model_evaluation(object_of_study)
-                # loop over epochs
-                for epoch in range(self.eval_epochs):
-                    logging.info('epoch %d', epoch)
-                    # run single epoch
-                    self.run_eval_epoch(epoch, object_of_study)
-                    # log performance (for plotting purposes)
-                    self.log_plot_data(epoch, object_of_study)
+            self.init_model_evaluation(object_of_study)
 
-                # plot evaluation
-                if self.generate_plots:
-                    self.plot_model_eval(object_of_study)
+            # loop over epochs
+            for epoch in range(self.eval_epochs):
+                logging.info('epoch %d', epoch)
+                # run single epoch
+                self.run_eval_epoch(epoch, object_of_study)
+                # log performance (for plotting purposes)
+                self.log_plot_data(epoch, object_of_study)
 
-                # log model evaluation
-                self.log_model_evaluation(object_of_study)
-                self._eval_meta_parameters_iteration += 1
+            # plot evaluation
+            if self.generate_plots:
+                self.plot_model_eval(object_of_study)
 
+            # log model evaluation
+            self.log_model_evaluation(object_of_study)
+
+            # move to next meta parameter
+            self._eval_meta_parameters_iteration += 1
+
+            # check if reached end meta parameters explored
+            if self._eval_meta_parameters_iteration == len(self._eval_meta_parameters):
+
+                # check if exceeded runtime
+                stop = time.time()
+                elapsed = stop - self.start_search_timestamp
+                if elapsed >= self.current_runtime:
+                    break
+
+                else: # if did not exceed runtime, add more meta parameters
+                    for init_sample in range(darts_cfg.n_initializations_sampled):
+                        meta_parameters = [arch_sample_id+1, init_sample]
+                        self._eval_meta_parameters.append(meta_parameters)
 
         # sum up meta evaluation
         self.log_meta_evaluation(object_of_study)
 
-    # LAZY METHODS
 
     def run_model_search_epoch(self, epoch):
         pass

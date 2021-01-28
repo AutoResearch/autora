@@ -156,5 +156,5 @@ def plot_psychophysics(model, S1_list=(1, 2.5, 4), max_diff=5, num_data_points=1
     plt.legend(loc=2, fontsize="large")
     plt.show()
 
-model = Weber_Model()
-plot_psychophysics(model)
+# model = Weber_Model()
+# plot_psychophysics(model)

@@ -1,3 +1,7 @@
+import sys, os
+print(os.getcwd())
+sys.path.append(r'/tigress/musslick/AER/cogsci2021')
+
 from datetime import datetime
 from AER_experimentalist.experiment_environment.IV_in_silico import IV_In_Silico as IV
 from AER_experimentalist.experiment_environment.DV_in_silico import DV_In_Silico as DV
@@ -123,9 +127,12 @@ theorist.add_validation_set(validation_object_2, 'Weber_Original')
 # search model
 model = theorist.search_model_job(study_object, args.slurm_id)
 
-# root = Tk()
-# app = Theorist_GUI(object_of_study=study_object, theorist=theorist, root=root)
-# root.mainloop()
+# fair search
+theorist_fair = Theorist_DARTS(study_name, darts_type=DARTS_Type.FAIR)
+theorist_fair.plot()
+theorist_fair.add_validation_set(validation_object_1, 'Weber_Sampled')
+theorist_fair.add_validation_set(validation_object_2, 'Weber_Original')
+model = theorist_fair.search_model_job(study_object, args.slurm_id)
 
 now = datetime.now()
 dt_string = now.strftime("%d/%m/%Y %H:%M:%S")

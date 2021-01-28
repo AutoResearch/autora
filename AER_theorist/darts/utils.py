@@ -121,6 +121,8 @@ def compute_BIC(output_type, model, input, target):
     m = get_output_format(output_type)
     prediction = m(classifier_output).detach()
 
+    k, _, _ = model.countParameters()  # for most likely architecture
+
     if output_type == outputTypes.CLASS:
         target_flattened = torch.flatten(target.long())
         llik = 0
@@ -129,9 +131,19 @@ def compute_BIC(output_type, model, input, target):
             llik += np.log(lik)
         n = len(target_flattened)  # number of data points
 
+        BIC = np.log(n) * k - 2 * llik
+        BIC = BIC
+
     elif output_type == outputTypes.PROBABILITY_SAMPLE:
         llik = 0
         for idx in range(len(target)):
+
+            # fail safe if model doesn't produce probabilities
+            if prediction[idx] > 1:
+                prediction[idx] = 1
+            elif prediction[idx] < 0:
+                prediction[idx] = 0
+
             if target[idx] == 1:
                 lik = prediction[idx]
             elif target[idx] == 0:
@@ -141,12 +153,13 @@ def compute_BIC(output_type, model, input, target):
             llik += np.log(lik)
         n = len(target)  # number of data points
 
+        BIC = np.log(n) * k - 2 * llik
+        BIC = BIC[0]
+
     else:
         raise Exception('BIC computation not implemented for output type ' + str(outputTypes.PROBABILITY) + '.')
 
-    k, _, _ = model.countParameters()  # for most likely architecture
-    BIC = np.log(n) * k - 2 * llik
-    BIC = BIC[0]
+
 
     return BIC
 
