@@ -13,7 +13,25 @@ import os
 import pandas
 
 
-def plot_darts_summary(study_name, y_name, x1_name, x2_name=None, y_label=None, x1_label=None, x2_label=None, metric='min', y_reference=None, y_reference_label=None, figure_dimensions=None, title='', y_limit=None, x_limit=None, theorist_filter=None):
+def plot_darts_summary(study_name, y_name, x1_name,
+                       x2_name=None,
+                       y_label=None,
+                       x1_label=None,
+                       x2_label=None,
+                       y_sem_name=None,
+                       metric='min',
+                       y_reference=None,
+                       y_reference_label=None,
+                       figure_dimensions=None,
+                       title='',
+                       legend_loc=0,
+                       legend_font_size=8,
+                       y_limit=None,
+                       x_limit=None,
+                       theorist_filter=None,
+                       best_model_name=None,
+                       save=False,
+                       figure_name='figure'):
 
     palette = 'PuBu'
 
@@ -32,11 +50,16 @@ def plot_darts_summary(study_name, y_name, x1_name, x2_name=None, y_label=None, 
     if y_reference_label is None:
         y_reference_label = 'Data Generating Model'
 
-    # determine directory for study results
+    # determine directory for study results and figures
     results_path = aer_config.studies_folder \
                         + study_name + "/" \
                         + aer_config.models_folder \
                         + aer_config.models_results_folder
+
+    figures_path = aer_config.studies_folder \
+                   + study_name + "/" \
+                   + aer_config.models_folder \
+                   + aer_config.models_results_figures_folder
 
     # read in all csv files
     files = list()
@@ -58,6 +81,8 @@ def plot_darts_summary(study_name, y_name, x1_name, x2_name=None, y_label=None, 
     plot_dict[x1_name] = list()
     if x2_name is not None:
         plot_dict[x2_name] = list()
+    if y_sem_name is not None:
+        plot_dict[y_sem_name] = list()
 
     # load csv files into a common dictionary
     for file in files:
@@ -76,16 +101,35 @@ def plot_darts_summary(study_name, y_name, x1_name, x2_name=None, y_label=None, 
                 plot_dict[x2_name].extend(data[x2_name])
             else:
                 raise Exception('Could not find key "' + x2_name + '" in the data file.')
+        if y_sem_name is not None:
+            # extract seed number from model file name
+
+            if y_sem_name in data.keys():
+                plot_dict[y_sem_name].extend(data[y_sem_name])
+            elif y_sem_name == 'seed':
+                y_sem_list = list()
+                for file_name in data[darts_config.csv_arch_file_name]:
+                    y_sem_list.append(int(float(file_name.split("_s_", 1)[1].split("_sample", 1)[0])))
+                plot_dict[y_sem_name].extend(y_sem_list)
+
+            else:
+
+                raise Exception('Could not find key "' + y_sem_name + '" in the data file.')
+
 
     model_name_list = plot_dict[darts_config.csv_arch_file_name]
     x1_data = np.asarray(plot_dict[x1_name])
     y_data = np.asarray(plot_dict[y_name])
-    if x2_name is None: # determine for each value of x1 the lowest y
+    if x2_name is None: # determine for each value of x1 the corresponding y
         x1_data = np.asarray(plot_dict[x1_name])
         x1_unique = np.sort(np.unique(x1_data))
 
         y_plot = np.empty(x1_unique.shape)
         y_plot[:] = np.nan
+        y_sem_plot = np.empty(x1_unique.shape)
+        y_sem_plot[:] = np.nan
+        y2_plot = np.empty(x1_unique.shape)
+        y2_plot[:] = np.nan
         x1_plot = np.empty(x1_unique.shape)
         x1_plot[:] = np.nan
         for idx_unique, x1_unique_val in enumerate(x1_unique):
@@ -100,14 +144,45 @@ def plot_darts_summary(study_name, y_name, x1_name, x2_name=None, y_label=None, 
             if metric is 'min':
                 y_plot[idx_unique] = np.min(y_match)
                 idx_target = np.argmin(y_match)
+                legend_label_spec = ' (min)'
             elif metric is 'max':
                 y_plot[idx_unique] = np.max(y_match)
                 idx_target = np.argmax(y_match)
+                legend_label_spec = ' (max)'
             elif metric is 'mean':
                 y_plot[idx_unique] = np.mean(y_match)
                 idx_target = 0
+                legend_label_spec = ' (avg)'
+            elif metric is 'mean_min':
+                y_plot[idx_unique] = np.mean(y_match)
+                y2_plot[idx_unique] = np.min(y_match)
+                idx_target = np.argmin(y_match)
+                legend_label_spec = ' (avg)'
+                legend_label2_spec = ' (min)'
+            elif metric is 'mean_max':
+                y_plot[idx_unique] = np.mean(y_match)
+                y2_plot[idx_unique] = np.max(y_match)
+                idx_target = np.argmax(y_match)
+                legend_label_spec = ' (avg)'
+                legend_label2_spec = ' (max)'
             else:
-                raise Exception('Argument "metric" may either be "min", "max" or "mean".')
+                raise Exception('Argument "metric" may either be "min", "max", "mean", "mean_min" or "min_max".')
+
+            # compute standard error along given dimension
+            if y_sem_name is not None:
+                y_sem_data = np.asarray(plot_dict[y_sem_name])
+                y_sem_unique = np.sort(np.unique(y_sem_data))
+                y_sem = np.empty(y_sem_unique.shape)
+                # first average y over all other variables
+                for idx_y_sem_unique, y_sem_unique_val in enumerate(y_sem_unique):
+                    y_sem_match = list()
+                    for idx_y_sem, (y_sem_data_val, x1_data_val, y_data_val) in enumerate(zip(y_sem_data, x1_data, y_data)):
+                        if y_sem_unique_val == y_sem_data_val and x1_unique_val == x1_data_val:
+                            y_sem_match.append(y_data_val)
+                    y_sem[idx_y_sem_unique] = np.mean(y_sem_match)
+                # now compute sem
+                y_sem_plot[idx_unique] = np.nanstd(y_sem) / np.sqrt(len(y_sem))
+
 
             print(x1_label + " = " + str(x1_unique_val) + " (" + str(y_plot[idx_unique]) + "): " + model_name_match[idx_target])
 
@@ -116,6 +191,8 @@ def plot_darts_summary(study_name, y_name, x1_name, x2_name=None, y_label=None, 
         x2_unique = np.sort(np.unique(x2_data))
 
         y_plot = list()
+        y_sem_plot = list()
+        y2_plot = list()
         x1_plot = list()
         x2_plot = list()
         for idx_x2_unique, x2_unique_val in enumerate(x2_unique):
@@ -136,6 +213,10 @@ def plot_darts_summary(study_name, y_name, x1_name, x2_name=None, y_label=None, 
             x1_x2_plot[:] = np.nan
             y_x2_plot = np.empty(x1_unique.shape)
             y_x2_plot[:] = np.nan
+            y_sem_x2_plot = np.empty(x1_unique.shape)
+            y_sem_x2_plot[:] = np.nan
+            y2_x2_plot = np.empty(x1_unique.shape)
+            y2_x2_plot[:] = np.nan
             for idx_x1_unique, x1_unique_val in enumerate(x1_unique):
                 y_x2_x1_match = list()
                 model_name_x2_x1_match = list()
@@ -148,23 +229,80 @@ def plot_darts_summary(study_name, y_name, x1_name, x2_name=None, y_label=None, 
                 if metric is 'min':
                     y_x2_plot[idx_x1_unique] = np.min(y_x2_x1_match)
                     idx_target = np.argmin(y_x2_x1_match)
+                    legend_label_spec = ' (min)'
                 elif metric is 'max':
                     y_x2_plot[idx_x1_unique] = np.max(y_x2_x1_match)
                     idx_target = np.argmax(y_x2_x1_match)
+                    legend_label_spec = ' (max)'
                 elif metric is 'mean':
                     y_x2_plot[idx_x1_unique] = np.mean(y_x2_x1_match)
                     idx_target = 0
+                    legend_label_spec = ' (avg)'
+                elif metric is 'mean_min':
+                    y_x2_plot[idx_x1_unique] = np.mean(y_x2_x1_match)
+                    y2_x2_plot[idx_x1_unique] = np.min(y_x2_x1_match)
+                    idx_target = np.argmin(y_x2_x1_match)
+                    legend_label_spec = ' (avg)'
+                    legend_label2_spec = ' (min)'
+                elif metric is 'mean_max':
+                    y_x2_plot[idx_x1_unique] = np.mean(y_x2_x1_match)
+                    y2_x2_plot[idx_x1_unique] = np.max(y_x2_x1_match)
+                    idx_target = np.argmax(y_x2_x1_match)
+                    legend_label_spec = ' (avg)'
+                    legend_label2_spec = ' (max)'
                 else:
-                    raise Exception('Argument "metric" may either be "min", "max" or "mean".')
+                    raise Exception('Argument "metric" may either be "min", "max", "mean", "mean_min" or "min_max".')
+
+                # compute standard error along given dimension
+                if y_sem_name is not None:
+                    y_sem_data = np.asarray(plot_dict[y_sem_name])
+                    y_sem_unique = np.sort(np.unique(y_sem_data))
+                    y_sem = np.empty(y_sem_unique.shape)
+                    # first average y over all other variables
+                    for idx_y_sem_unique, y_sem_unique_val in enumerate(y_sem_unique):
+                        y_sem_match = list()
+                        for idx_y_sem, (y_sem_data_val, x1_data_val, x2_data_val, y_data_val) in enumerate(
+                                zip(y_sem_data, x1_data, x2_data, y_data)):
+                            if y_sem_unique_val == y_sem_data_val and x1_unique_val == x1_data_val and x2_unique_val == x2_data_val :
+                                y_sem_match.append(y_data_val)
+                        y_sem[idx_y_sem_unique] = np.nanmean(y_sem_match)
+                    # now compute sem
+                    y_sem_x2_plot[idx_x1_unique] = np.nanstd(y_sem) / np.sqrt(len(y_sem))
+
+                if metric is 'mean_min' or metric is 'mean_max':
+                    best_val_str = str(y2_x2_plot[idx_x1_unique])
+                else:
+                    best_val_str = str(y_x2_plot[idx_x1_unique])
 
                 print(x1_label + " = " + str(x1_unique_val) + ", " + \
                       x2_label + " = " + str(x2_unique_val) + " (" + \
-                    str(y_x2_plot[idx_x1_unique]) + "): " + model_name_x2_x1_match[idx_target])
+                    best_val_str + "): " + model_name_x2_x1_match[idx_target])
+
             y_plot.append(y_x2_plot)
+            y2_plot.append(y2_x2_plot)
+            y_sem_plot.append(y_sem_x2_plot)
             x1_plot.append(x1_x2_plot)
             x2_plot.append(x2_unique_val)
     # plot
     # plt.axhline
+
+    # determine best model coordinates
+    best_model_x1 = None
+    best_model_y = None
+    if best_model_name is not None:
+        theorist = best_model_name.split("weights_", 1)[1].split("_v_", 1)[0]
+        if theorist_filter is not None:
+            if theorist_filter==theorist:
+                determine_best_model = True
+            else:
+                determine_best_model = False
+        else:
+            determine_best_model = True
+
+        if determine_best_model:
+            idx = plot_dict[darts_config.csv_arch_file_name].index(best_model_name)
+            best_model_x1 = plot_dict[x1_name][idx]
+            best_model_y = plot_dict[y_name][idx]
 
 
     fig, ax = pyplot.subplots(figsize=figure_dimensions)
@@ -175,7 +313,25 @@ def plot_darts_summary(study_name, y_name, x1_name, x2_name=None, y_label=None, 
         # sns.lineplot(x=x1_label, y=y_label, data=data_plot, linewidth = 2, ax=ax)
         colors = sns.color_palette(palette, 10)
         color = colors[-1]
-        sns.lineplot(x=x1_plot, y=y_plot, marker='o', linewidth=2, ax=ax, label='Reconstructed Model', color=color)
+        full_label = 'Reconstructed Model' + legend_label_spec
+        sns.lineplot(x=x1_plot, y=y_plot, marker='o', linewidth=2, ax=ax, label=full_label, color=color)
+
+        # draw error bars
+        if y_sem_name is not None:
+            ax.errorbar(x=x1_plot, y=y_plot, yerr=y_sem_plot, color=color)
+
+        # draw second y value
+        if metric is 'mean_min' or metric is 'mean_max':
+            full_label = 'Reconstructed Model' + legend_label2_spec
+            ax.plot(x1_plot, y2_plot, '*', linewidth=2, label=full_label, color=color)
+            handles, _ = ax.get_legend_handles_labels()
+            ax.legend(handles=handles, loc=legend_loc)
+            plt.setp(ax.get_legend().get_texts(), fontsize=legend_font_size)
+
+        # draw selected model
+        if best_model_x1 is not None and best_model_y is not None:
+            ax.plot(best_model_x1, best_model_y, 'o', fillstyle='none', color='black', markersize=10)
+
         ax.set_xlabel(x1_label)
         ax.set_ylabel(y_label)
         ax.set_title(title)
@@ -194,8 +350,8 @@ def plot_darts_summary(study_name, y_name, x1_name, x2_name=None, y_label=None, 
             ax.axhline(y_reference, c='black', linestyle='dashed', label=y_reference_label)
             # generate legend
             handles, _ = ax.get_legend_handles_labels()
-            ax.legend(handles=handles)
-
+            ax.legend(handles=handles, loc=legend_loc)
+            plt.setp(ax.get_legend().get_texts(), fontsize=legend_font_size)
     else:
 
         # produce data frame:
@@ -220,16 +376,39 @@ def plot_darts_summary(study_name, y_name, x1_name, x2_name=None, y_label=None, 
 
             x1_plot_line = x1_plot[idx]
             y_plot_line = y_plot[idx]
-            label = x2_label + ' = ' + str(x2)
+            label = x2_label + '$ = ' + str(x2) + "$" + legend_label_spec
             color = colors[idx]
 
-            sns.lineplot(x=x1_plot_line, y=y_plot_line, marker='o', linewidth=2, ax=ax, label=label, color=color)
+            sns.lineplot(x=x1_plot_line, y=y_plot_line, marker='o', linewidth=2, ax=ax, label=label, color=color, alpha=1)
+
+            # draw error bars
+            if y_sem_name is not None:
+                y_sem_plot_line = y_sem_plot[idx]
+                ax.errorbar(x=x1_plot_line, y=y_plot_line, yerr=y_sem_plot_line, color=color, alpha=1)
+
+        # draw second y value on top
+        for idx, x2 in enumerate(x2_plot):
+            x1_plot_line = x1_plot[idx]
+            color = colors[idx]
+
+            if metric is 'mean_min' or metric is 'mean_max':
+                y2_plot_line = y2_plot[idx]
+                label = x2_label + '$ = ' + str(x2) + "$" + legend_label2_spec
+
+                ax.plot(x1_plot_line, y2_plot_line, '*', linewidth=2, label=label, color=color)
+                handles, _ = ax.get_legend_handles_labels()
+                ax.legend(handles=handles, loc=legend_loc)
+                plt.setp(ax.get_legend().get_texts(), fontsize=legend_font_size)
+
+        # draw selected model
+        if best_model_x1 is not None and best_model_y is not None:
+            ax.plot(best_model_x1, best_model_y, 'o', fillstyle='none', color='black', markersize=10)
 
         if y_reference is not None:
             ax.axhline(y_reference, c='black', linestyle='dashed', label=y_reference_label)
         handles, _ = ax.get_legend_handles_labels()
-        ax.legend(handles=handles)
-        plt.setp(ax.get_legend().get_texts(), fontsize='8')
+        ax.legend(handles=handles, loc=legend_loc)
+        plt.setp(ax.get_legend().get_texts(), fontsize=legend_font_size)
 
         if y_limit is not None:
             ax.set_ylim(y_limit)
@@ -241,6 +420,54 @@ def plot_darts_summary(study_name, y_name, x1_name, x2_name=None, y_label=None, 
     ax.set_ylabel(y_label)
     ax.set_xlabel(x1_label)
     plt.show()
+
+    # save plot
+    if save:
+        if not os.path.exists(figures_path):
+            os.mkdir(figures_path)
+        fig.savefig(os.path.join(figures_path, figure_name))
+
+
+
+def plot_model_graph(study_name, arch_weights_name, model_weights_name, object_of_study, figure_name='graph'):
+
+    from AER_theorist.darts.model_search import Network, DARTS_Type
+    import AER_theorist.darts.visualize as viz
+    import AER_theorist.darts.utils as utils
+    import torch
+    import os
+
+    num_output = object_of_study.__get_output_dim__()
+    num_input = object_of_study.__get_input_dim__()
+    k = int(float(arch_weights_name.split("_k_", 1)[1].split("_s_", 1)[0]))
+
+    results_weights_path = aer_config.studies_folder \
+                           + study_name + "/" \
+                           + aer_config.models_folder \
+                           + aer_config.models_results_weights_folder
+
+    figures_path = aer_config.studies_folder \
+                   + study_name + "/" \
+                   + aer_config.models_folder \
+                   + aer_config.models_results_figures_folder
+
+    model_path = os.path.join(results_weights_path, model_weights_name + ".pt")
+    arch_path = os.path.join(results_weights_path, arch_weights_name + ".pt")
+    criterion = utils.sigmid_mse
+    model = Network(num_output,
+                    criterion,
+                    steps=k,
+                    n_input_states=num_input)
+    utils.load(model, model_path)
+    alphas_normal = torch.load(arch_path)
+    model.fix_architecture(True, new_weights=alphas_normal)
+    (n_params_total, n_params_base, param_list) = model.countParameters(print_parameters=True)
+    genotype = model.genotype()
+    filepath = os.path.join(figures_path, figure_name)
+    viz.plot(genotype.normal, filepath, fileFormat='png',
+                         input_labels=object_of_study.__get_input_labels__(), full_label=True, param_list=param_list,
+                         out_dim=object_of_study.__get_output_dim__(), out_fnc=utils.get_output_str(object_of_study.__get_output_type__()), viewFile=True)
+
 
 # old
 class DebugWindow:

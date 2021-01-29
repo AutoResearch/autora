@@ -6,6 +6,12 @@ from AER_experimentalist.experimentalist_popper import Experimentalist_Popper
 from AER_theorist.object_of_study import Object_Of_Study
 from AER_theorist.theorist_darts import Theorist_DARTS, DARTS_Type
 import AER_experimentalist.experiment_environment.experiment_config as exp_cfg
+import argparse
+
+# parse arguments
+parser = argparse.ArgumentParser("parser")
+parser.add_argument('--slurm_id', type=int, default=1, help='number of slurm array')
+args = parser.parse_args()
 
 now = datetime.now()
 dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
@@ -18,7 +24,7 @@ port = exp_cfg.HOST_PORT    # port of experiment server
 
 # SIMULATION PARAMETERS
 
-study_name = "Exp Learning"   # name of experiment
+study_name = "LCA"   # name of experiment
 max_num_data_points = 500
 
 AER_cycles = 1
@@ -26,33 +32,33 @@ AER_cycles = 1
 # OBJECT OF STUDY
 
 # specify independent variables
-learning_trial = IV(name='learning_trial',
-                          value_range=(0, 1),
-                          units="trial",
-                          variable_label='Trial')
+x1 = IV(name='x1_lca',
+                          value_range=(-1, 1),
+                          units="net input",
+                          variable_label='x1')
 
-P_initial = IV(name='P_initial',
-                          value_range=(0, 0.4),
-                          units="accuracy",
-                          variable_label='Initial Performance')
+x2 = IV(name='x2_lca',
+                          value_range=(-1, 1),
+                          units="net input",
+                          variable_label='x2')
 
-P_asymptotic = IV(name='P_asymptotic',
-                          value_range=(0.5, 1),
-                          units="accuracy",
-                          variable_label='Best Performance')
+x3 = IV(name='x3_lca',
+                          value_range=(-1, 1),
+                          units="net input",
+                          variable_label='x3')
 
 
 # specify dependent variable with type
-learning_performance = DV(name='learning_performance',
+dx1_lca = DV(name='dx1_lca',
                           value_range=(0, 1),
-                          units="probability",
-                          variable_label='Accuracy',
+                          units="net input change",
+                          variable_label='dx1',
                           type=output_type.REAL) # not a probability because sum of activations may exceed 1
 
 
 # list dependent and independent variables
-IVs = [learning_trial, P_initial, P_asymptotic] # only including subset of available variables
-DVs = [learning_performance]
+IVs = [x1, x2, x3] # only including subset of available variables
+DVs = [dx1_lca]
 
 # initialize objects of study
 study_object = Object_Of_Study(name=study_name,
@@ -74,9 +80,6 @@ theorist = Theorist_DARTS(study_name, darts_type=DARTS_Type.ORIGINAL)
 # specify plots
 plots = list()
 plots.append(theorist._loss_plot_name)
-# for i in range(20):
-#     plot_name = "Edge " + str(i)
-#     plots.append(plot_name)
 theorist.plot(plot=True, plot_name_list=plots)
 
 # AUTONOMOUS EMPIRICAL RESEARCH
@@ -92,13 +95,13 @@ validation_object_2.name = "validation loss"
 theorist.add_validation_set(validation_object_2, 'validation loss')
 
 # search model ORIGINAL
-model = theorist.search_model(study_object)
+model = theorist.search_model_job(study_object, args.slurm_id)
 
-# # search model FAIR
+# search model FAIR
 # theorist_fair = Theorist_DARTS(study_name, darts_type=DARTS_Type.FAIR)
 # theorist_fair.plot(plot=True, plot_name_list=plots)
 # theorist_fair.add_validation_set(validation_object_2, 'validation loss')
-# model = theorist_fair.search_model(study_object)
+# model = theorist_fair.search_model_job(study_object, args.slurm_id)
 
 now = datetime.now()
 dt_string = now.strftime("%d/%m/%Y %H:%M:%S")

@@ -39,7 +39,7 @@ def plot(genotype, filename, fileFormat='pdf', viewFile=None, full_label=False, 
       if j < len(input_labels):
         u = input_labels[j]
       else:
-        u = str(j-2)
+        u = str(j-len(input_labels))
       v = str(i)
       params_counter = k
       if op is not 'none':

@@ -12,7 +12,7 @@ min_seed = 1                    # minimum seed tested
 max_seed = 3 #3                    # maximum seed tested
 
 # training
-epochs = 100 # 200                    # num of training epochs (30)
+epochs = 200 # 200                    # num of training epochs (30)
 arch_updates_per_epoch = 1 #20      # num of architecture updates per epoch (20)
 param_updates_per_epoch = 500 #500   # num of weight updates per epoch (20)
 batch_size = 20                 # batch size (64)

@@ -41,7 +41,7 @@ Genotype = namedtuple('Genotype', 'normal normal_concat')
 #     'lin_relu',
 # ]
 
-PRIMITIVES = [
+PRIMITIVES = [  # success LCA
     'none',
     'add',
     'subtract',

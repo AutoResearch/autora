@@ -6,6 +6,12 @@ from AER_experimentalist.experimentalist_popper import Experimentalist_Popper
 from AER_theorist.object_of_study import Object_Of_Study
 from AER_theorist.theorist_darts import Theorist_DARTS, DARTS_Type
 import AER_experimentalist.experiment_environment.experiment_config as exp_cfg
+import argparse
+
+# parse arguments
+parser = argparse.ArgumentParser("parser")
+parser.add_argument('--slurm_id', type=int, default=1, help='number of slurm array')
+args = parser.parse_args()
 
 now = datetime.now()
 dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
@@ -92,13 +98,7 @@ validation_object_2.name = "validation loss"
 theorist.add_validation_set(validation_object_2, 'validation loss')
 
 # search model ORIGINAL
-model = theorist.search_model(study_object)
-
-# # search model FAIR
-# theorist_fair = Theorist_DARTS(study_name, darts_type=DARTS_Type.FAIR)
-# theorist_fair.plot(plot=True, plot_name_list=plots)
-# theorist_fair.add_validation_set(validation_object_2, 'validation loss')
-# model = theorist_fair.search_model(study_object)
+model = theorist.search_model_job(study_object, args.slurm_id)
 
 now = datetime.now()
 dt_string = now.strftime("%d/%m/%Y %H:%M:%S")

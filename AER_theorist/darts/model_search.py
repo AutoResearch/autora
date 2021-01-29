@@ -3,6 +3,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.autograd import Variable
 import numpy as np
+import random
+import warnings
 
 from AER_theorist.darts.fan_out import Fan_Out
 from AER_theorist.darts.operations import *
@@ -238,7 +240,11 @@ class Network(nn.Module):
       else:
         raise Exception("DARTS Type " + str(self.DARTS_type) + " not implemented")
 
-      k_sample = np.random.choice(range(len(W_soft)), p=W_soft.data.numpy())
+      if torch.any(W_soft != W_soft):
+        warnings.warn('Cannot properly sample from architecture weights due to nan entries.')
+        k_sample = random.randrange(len(W_soft))
+      else:
+        k_sample = np.random.choice(range(len(W_soft)), p=W_soft.data.numpy())
       alphas_normal_sample[edge, k_sample] = 1
 
     return alphas_normal_sample

@@ -6,7 +6,7 @@ import random
 import numpy as np
 
 class Exp_Learning_Model(nn.Module):
-    def __init__(self, alpha=0.5):
+    def __init__(self, alpha):
         super(Exp_Learning_Model, self).__init__()
 
         self.alpha = alpha
@@ -33,7 +33,7 @@ class Exp_Learning_Model(nn.Module):
 class Participant_Exp_Learning(Participant_In_Silico):
 
     # initializes participant
-    def __init__(self, alpha=0.5):
+    def __init__(self, alpha=5):
         super(Participant_Exp_Learning, self).__init__()
 
         self.learning_trial = torch.ones(1, 1)
@@ -172,5 +172,6 @@ def plot_learning_curve(model, P_initial=(0, 0.25, 0.25), P_asymptotic=(1, 1, 0.
     plt.legend(loc=4, fontsize="large")
     plt.show()
 
-# model = Exp_Learning_Model()
-# plot_learning_curve(model)
+# model = Exp_Learning_Model(alpha=5)
+# learning_trials = np.linspace(0, 1, 10)
+# plot_learning_curve(model, learning_trials=learning_trials)
