@@ -169,6 +169,9 @@ class Tree():
         self.sse = self.get_sse()
         self.bic = self.get_bic()
         self.E, self.EB, self.EP = self.get_energy()
+        # Clear cache if the expression was created from string
+        if from_string != None:
+            self.fit_par = {}
         # To control formula degeneracy (i.e. different trees that
         # correspond to the same cannoninal formula), we store the
         # representative tree for each canonical formula
