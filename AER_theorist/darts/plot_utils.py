@@ -3,6 +3,7 @@ import AER_theorist.darts.darts_config as darts_config
 import matplotlib.pyplot as plt
 from matplotlib import pyplot
 import matplotlib
+import pylab
 import seaborn as sns
 from matplotlib.gridspec import GridSpec
 from mpl_toolkits import mplot3d
@@ -11,6 +12,66 @@ import time
 import numpy as np
 import os
 import pandas
+
+def generate_darts_summary_figures(figure_names,
+                                   titles,
+                                   filters,
+                                   title_suffix,
+                                   study_name,
+                                   y_name,
+                                   y_label,
+                                   y_sem_name,
+                                   x1_name,
+                                   x1_label,
+                                   x2_name,
+                                   x2_label,
+                                   x_limit,
+                                   y_limit,
+                                   best_model_name,
+                                   figure_size,
+                                   y_reference=None,
+                                   y_reference_label=None,
+                                   arch_samp_filter=None,
+                                   ):
+
+    for idx, (figure_name, title, theorist_filter) in enumerate(zip(figure_names, titles, filters)):
+
+        print('##########################: ' + figure_name)
+        title = title + title_suffix
+        if idx > 0:  # after legend
+            show_legend = False
+            figure_dimensions = figure_size
+        else:
+            show_legend = True
+            figure_dimensions = (6, 6)
+        if idx > 1:  # after original darts
+            y_label = ' ' #' '
+
+        plot_darts_summary(study_name=study_name,
+                           title=title,
+                           y_name=y_name,
+                           y_label=y_label,
+                           y_sem_name=y_sem_name,
+                           x1_name=x1_name,
+                           x1_label=x1_label,
+                           x2_name=x2_name,
+                           x2_label=x2_label,
+                           metric='mean_min',
+                           x_limit=x_limit,
+                           y_limit=y_limit,
+                           best_model_name=best_model_name,
+                           theorist_filter=theorist_filter,
+                           arch_samp_filter = arch_samp_filter,
+                           figure_name=figure_name,
+                           figure_dimensions=figure_dimensions,
+                           legend_loc=aer_config.legend_loc,
+                           legend_font_size=aer_config.legend_font_size,
+                           axis_font_size=aer_config.axis_font_size,
+                           title_font_size=aer_config.title_font_size,
+                           show_legend=show_legend,
+                           y_reference=y_reference,
+                           y_reference_label=y_reference_label,
+                           save=True)
 
 
 def plot_darts_summary(study_name, y_name, x1_name,
@@ -26,9 +87,13 @@ def plot_darts_summary(study_name, y_name, x1_name,
                        title='',
                        legend_loc=0,
                        legend_font_size=8,
+                       axis_font_size=10,
+                       title_font_size=10,
+                       show_legend=True,
                        y_limit=None,
                        x_limit=None,
                        theorist_filter=None,
+                       arch_samp_filter=None,
                        best_model_name=None,
                        save=False,
                        figure_name='figure'):
@@ -73,6 +138,7 @@ def plot_darts_summary(study_name, y_name, x1_name,
                     continue
             files.append(os.path.join(results_path, file))
 
+    print("Found " + str(len(files)) + " files.")
 
     # generate a plot dictionary
     plot_dict = dict()
@@ -87,20 +153,33 @@ def plot_darts_summary(study_name, y_name, x1_name,
     # load csv files into a common dictionary
     for file in files:
         data = pandas.read_csv(file, header=0)
-        plot_dict[darts_config.csv_arch_file_name].extend(data[darts_config.csv_arch_file_name])
+
+        valid_data = list()
+
+        # filter for arch samp
+        if arch_samp_filter is not None:
+            for idx, arch_file_name in enumerate(data[darts_config.csv_arch_file_name]):
+                arch_samp = int(float(arch_file_name.split("_sample", 1)[1].split("_", 1)[0]))
+                if arch_samp == arch_samp_filter:
+                    valid_data.append(idx)
+        else:
+            for idx in range(len(data[darts_config.csv_arch_file_name])):
+                valid_data.append(idx)
+
+        plot_dict[darts_config.csv_arch_file_name].extend(data[darts_config.csv_arch_file_name][valid_data])
         if y_name in data.keys():
-            plot_dict[y_name].extend(data[y_name])
+            plot_dict[y_name].extend(data[y_name][valid_data])
         else:
-            raise Exception('Could not find key "' + y_name + '" in the data file.')
+            raise Exception('Could not find key "' + y_name + '" in the data file: ' + str(file))
         if x1_name in data.keys():
-            plot_dict[x1_name].extend(data[x1_name])
+            plot_dict[x1_name].extend(data[x1_name][valid_data])
         else:
-            raise Exception('Could not find key "' + x1_name + '" in the data file.')
+            raise Exception('Could not find key "' + x1_name + '" in the data file: ' + str(file))
         if x2_name is not None:
             if x2_name in data.keys():
-                plot_dict[x2_name].extend(data[x2_name])
+                plot_dict[x2_name].extend(data[x2_name][valid_data])
             else:
-                raise Exception('Could not find key "' + x2_name + '" in the data file.')
+                raise Exception('Could not find key "' + x2_name + '" in the data file: ' + str(file))
         if y_sem_name is not None:
             # extract seed number from model file name
 
@@ -108,13 +187,13 @@ def plot_darts_summary(study_name, y_name, x1_name,
                 plot_dict[y_sem_name].extend(data[y_sem_name])
             elif y_sem_name == 'seed':
                 y_sem_list = list()
-                for file_name in data[darts_config.csv_arch_file_name]:
+                for file_name in data[darts_config.csv_arch_file_name][valid_data]:
                     y_sem_list.append(int(float(file_name.split("_s_", 1)[1].split("_sample", 1)[0])))
                 plot_dict[y_sem_name].extend(y_sem_list)
 
             else:
 
-                raise Exception('Could not find key "' + y_sem_name + '" in the data file.')
+                raise Exception('Could not find key "' + y_sem_name + '" in the data file: ' + str(file))
 
 
     model_name_list = plot_dict[darts_config.csv_arch_file_name]
@@ -288,6 +367,7 @@ def plot_darts_summary(study_name, y_name, x1_name,
 
     # determine best model coordinates
     best_model_x1 = None
+    best_model_x2 = None
     best_model_y = None
     if best_model_name is not None:
         theorist = best_model_name.split("weights_", 1)[1].split("_v_", 1)[0]
@@ -302,6 +382,7 @@ def plot_darts_summary(study_name, y_name, x1_name,
         if determine_best_model:
             idx = plot_dict[darts_config.csv_arch_file_name].index(best_model_name)
             best_model_x1 = plot_dict[x1_name][idx]
+            best_model_x2 = plot_dict[x2_name][idx]
             best_model_y = plot_dict[y_name][idx]
 
 
@@ -321,20 +402,22 @@ def plot_darts_summary(study_name, y_name, x1_name,
             ax.errorbar(x=x1_plot, y=y_plot, yerr=y_sem_plot, color=color)
 
         # draw second y value
-        if metric is 'mean_min' or metric is 'mean_max':
+        if (metric is 'mean_min' or metric is 'mean_max'):
             full_label = 'Reconstructed Model' + legend_label2_spec
             ax.plot(x1_plot, y2_plot, '*', linewidth=2, label=full_label, color=color)
-            handles, _ = ax.get_legend_handles_labels()
-            ax.legend(handles=handles, loc=legend_loc)
-            plt.setp(ax.get_legend().get_texts(), fontsize=legend_font_size)
+
+            if show_legend:
+                handles, _ = ax.get_legend_handles_labels()
+                ax.legend(handles=handles, loc=legend_loc)
+                plt.setp(ax.get_legend().get_texts(), fontsize=legend_font_size)
 
         # draw selected model
         if best_model_x1 is not None and best_model_y is not None:
             ax.plot(best_model_x1, best_model_y, 'o', fillstyle='none', color='black', markersize=10)
 
-        ax.set_xlabel(x1_label)
-        ax.set_ylabel(y_label)
-        ax.set_title(title)
+        ax.set_xlabel(x1_label, fontsize=axis_font_size)
+        ax.set_ylabel(y_label, fontsize=axis_font_size)
+        ax.set_title(title, fontsize=title_font_size)
 
         if y_limit is not None:
             ax.set_ylim(y_limit)
@@ -348,10 +431,12 @@ def plot_darts_summary(study_name, y_name, x1_name,
         # g._legend.remove()
         if y_reference is not None:
             ax.axhline(y_reference, c='black', linestyle='dashed', label=y_reference_label)
-            # generate legend
-            handles, _ = ax.get_legend_handles_labels()
-            ax.legend(handles=handles, loc=legend_loc)
-            plt.setp(ax.get_legend().get_texts(), fontsize=legend_font_size)
+
+            if show_legend:
+                # generate legend
+                handles, _ = ax.get_legend_handles_labels()
+                ax.legend(handles=handles, loc=legend_loc)
+                plt.setp(ax.get_legend().get_texts(), fontsize=legend_font_size)
     else:
 
         # produce data frame:
@@ -386,29 +471,35 @@ def plot_darts_summary(study_name, y_name, x1_name,
                 y_sem_plot_line = y_sem_plot[idx]
                 ax.errorbar(x=x1_plot_line, y=y_plot_line, yerr=y_sem_plot_line, color=color, alpha=1)
 
-        # draw second y value on top
-        for idx, x2 in enumerate(x2_plot):
-            x1_plot_line = x1_plot[idx]
-            color = colors[idx]
+        # # draw second y value on top
+        # for idx, x2 in enumerate(x2_plot):
+        #     x1_plot_line = x1_plot[idx]
+        #     color = colors[idx]
+        #
+        #     if metric is 'mean_min' or metric is 'mean_max':
+        #         y2_plot_line = y2_plot[idx]
+        #         label = x2_label + '$ = ' + str(x2) + "$" + legend_label2_spec
+        #         ax.plot(x1_plot_line, y2_plot_line, '*', linewidth=2, label=label, color=color)
 
-            if metric is 'mean_min' or metric is 'mean_max':
-                y2_plot_line = y2_plot[idx]
-                label = x2_label + '$ = ' + str(x2) + "$" + legend_label2_spec
-
-                ax.plot(x1_plot_line, y2_plot_line, '*', linewidth=2, label=label, color=color)
-                handles, _ = ax.get_legend_handles_labels()
-                ax.legend(handles=handles, loc=legend_loc)
-                plt.setp(ax.get_legend().get_texts(), fontsize=legend_font_size)
 
         # draw selected model
         if best_model_x1 is not None and best_model_y is not None:
             ax.plot(best_model_x1, best_model_y, 'o', fillstyle='none', color='black', markersize=10)
 
+            for idx, x2 in enumerate(x2_plot):
+                if best_model_x2 == x2:
+                    color = colors[idx]
+            ax.plot(best_model_x1, best_model_y, '*', linewidth=2, label='Best Model', color=color)
+
         if y_reference is not None:
             ax.axhline(y_reference, c='black', linestyle='dashed', label=y_reference_label)
+
         handles, _ = ax.get_legend_handles_labels()
-        ax.legend(handles=handles, loc=legend_loc)
+        leg = ax.legend(handles=handles, loc=legend_loc, bbox_to_anchor=(1.05, 1)) # , title='Legend'
         plt.setp(ax.get_legend().get_texts(), fontsize=legend_font_size)
+
+        if not show_legend:
+            leg.remove()
 
         if y_limit is not None:
             ax.set_ylim(y_limit)
@@ -417,8 +508,9 @@ def plot_darts_summary(study_name, y_name, x1_name,
             ax.set_xlim(x_limit)
 
     sns.despine(trim=True)
-    ax.set_ylabel(y_label)
-    ax.set_xlabel(x1_label)
+    ax.set_ylabel(y_label, fontsize=axis_font_size)
+    ax.set_xlabel(x1_label, fontsize=axis_font_size)
+    ax.set_title(title, fontsize=title_font_size)
     plt.show()
 
     # save plot
@@ -431,8 +523,31 @@ def plot_darts_summary(study_name, y_name, x1_name,
 
 def plot_model_graph(study_name, arch_weights_name, model_weights_name, object_of_study, figure_name='graph'):
 
-    from AER_theorist.darts.model_search import Network, DARTS_Type
     import AER_theorist.darts.visualize as viz
+    import AER_theorist.darts.utils as utils
+    import os
+
+    figures_path = aer_config.studies_folder \
+                   + study_name + "/" \
+                   + aer_config.models_folder \
+                   + aer_config.models_results_figures_folder
+
+    model = load_model(study_name, model_weights_name, arch_weights_name, object_of_study)
+
+    (n_params_total, n_params_base, param_list) = model.countParameters(print_parameters=True)
+    genotype = model.genotype()
+    filepath = os.path.join(figures_path, figure_name)
+    viz.plot(genotype.normal, filepath, fileFormat='png',
+                         input_labels=object_of_study.__get_input_labels__(), full_label=True, param_list=param_list,
+                         out_dim=object_of_study.__get_output_dim__(), out_fnc=utils.get_output_str(object_of_study.__get_output_type__()), viewFile=True)
+
+
+# old
+
+
+def load_model(study_name, model_weights_name, arch_weights_name, object_of_study):
+
+    from AER_theorist.darts.model_search import Network
     import AER_theorist.darts.utils as utils
     import torch
     import os
@@ -446,11 +561,6 @@ def plot_model_graph(study_name, arch_weights_name, model_weights_name, object_o
                            + aer_config.models_folder \
                            + aer_config.models_results_weights_folder
 
-    figures_path = aer_config.studies_folder \
-                   + study_name + "/" \
-                   + aer_config.models_folder \
-                   + aer_config.models_results_figures_folder
-
     model_path = os.path.join(results_weights_path, model_weights_name + ".pt")
     arch_path = os.path.join(results_weights_path, arch_weights_name + ".pt")
     criterion = utils.sigmid_mse
@@ -461,15 +571,9 @@ def plot_model_graph(study_name, arch_weights_name, model_weights_name, object_o
     utils.load(model, model_path)
     alphas_normal = torch.load(arch_path)
     model.fix_architecture(True, new_weights=alphas_normal)
-    (n_params_total, n_params_base, param_list) = model.countParameters(print_parameters=True)
-    genotype = model.genotype()
-    filepath = os.path.join(figures_path, figure_name)
-    viz.plot(genotype.normal, filepath, fileFormat='png',
-                         input_labels=object_of_study.__get_input_labels__(), full_label=True, param_list=param_list,
-                         out_dim=object_of_study.__get_output_dim__(), out_fnc=utils.get_output_str(object_of_study.__get_output_type__()), viewFile=True)
 
+    return model
 
-# old
 class DebugWindow:
 
     def __init__(self, num_epochs, numArchEdges=1, numArchOps=1, ArchOpsLabels=(), fitPlot3D = False, show_arch_weights=True):

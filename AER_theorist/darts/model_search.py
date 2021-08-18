@@ -225,10 +225,10 @@ class Network(nn.Module):
       if self.DARTS_type == DARTS_Type.ORIGINAL:
         W_soft = F.softmax(alphas_normal[edge] * sample_amp, dim=0)
       elif self.DARTS_type == DARTS_Type.FAIR:
-        transformed_alphas_normal = torch.sigmoid(alphas_normal[edge])
+        transformed_alphas_normal = alphas_normal[edge]
         above_threshold = False
         for idx in range(len(transformed_alphas_normal.data)):
-            if transformed_alphas_normal.data[idx] > fair_darts_weight_threshold:
+            if torch.sigmoid(transformed_alphas_normal).data[idx] > fair_darts_weight_threshold:
               above_threshold = True
               break
         if above_threshold:

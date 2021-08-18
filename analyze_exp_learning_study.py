@@ -1,48 +1,50 @@
 from AER_theorist.darts.plot_utils import generate_darts_summary_figures, plot_model_graph, load_model
-from AER_experimentalist.experiment_environment.participant_lca import Participant_LCA
+from AER_experimentalist.experiment_environment.participant_exp_learning import Participant_Exp_Learning
+from AER_experimentalist.experimentalist_popper import Experimentalist_Popper
 from AER_experimentalist.experiment_environment.IV_in_silico import IV_In_Silico as IV
 from AER_experimentalist.experiment_environment.DV_in_silico import DV_In_Silico as DV
 from AER_experimentalist.experiment_environment.variable import outputTypes as output_type
 import AER_experimentalist.experiment_environment.experiment_config as exp_cfg
 import AER_config as aer_cfg
 from AER_theorist.object_of_study import Object_Of_Study
+import numpy as np
 
-participant = Participant_LCA()
+participant = Participant_Exp_Learning()
 
-study_name = "LCA ICML" # "LCA Final"   # name of experiment: LCA Della
+study_name = "Exp Learning ICML" #"Exp Learning 3"   # name of experiment: Exp Learning Della
 host = exp_cfg.HOST_IP      # ip address of experiment server
 port = exp_cfg.HOST_PORT    # port of experiment server
 
 # OBJECT OF STUDY
 
 # specify independent variables
-x1 = IV(name='x1_lca',
-                          value_range=(-1, 1),
-                          units="net input",
-                          variable_label='x_1')
+learning_trial = IV(name='learning_trial',
+                          value_range=(0, 1),
+                          units="trial",
+                          variable_label='t')
 
-x2 = IV(name='x2_lca',
-                          value_range=(-1, 1),
-                          units="net input",
-                          variable_label='x_2')
+P_initial = IV(name='P_initial',
+                          value_range=(0, 0.4),
+                          units="accuracy",
+                          variable_label='P_0')
 
-x3 = IV(name='x3_lca',
-                          value_range=(-1, 1),
-                          units="net input",
-                          variable_label='x_3')
+P_asymptotic = IV(name='P_asymptotic',
+                          value_range=(0.5, 1),
+                          units="accuracy",
+                          variable_label='P_inf')
 
 
 # specify dependent variable with type
-dx1_lca = DV(name='dx1_lca',
+learning_performance = DV(name='learning_performance',
                           value_range=(0, 1),
-                          units="net input change",
-                          variable_label='dx_1',
-                          type=output_type.REAL) # not a probability because sum of activations may exceed 1
+                          units="probability",
+                          variable_label='Accuracy',
+                          type=output_type.REAL)
 
 
 # list dependent and independent variables
-IVs = [x1, x2, x3] # only including subset of available variables
-DVs = [dx1_lca]
+IVs = [learning_trial, P_initial, P_asymptotic]
+DVs = [learning_performance]
 
 study_object = Object_Of_Study(name=study_name,
                                independent_variables=IVs,
@@ -52,7 +54,7 @@ study_object = Object_Of_Study(name=study_name,
 
 figure_names = ('legend', 'model_search_original', 'model_search_fair', 'model_search_random')
 titles = (aer_cfg.darts_original_label, aer_cfg.darts_original_label, aer_cfg.darts_fair_label, aer_cfg.darts_random_label)
-title_suffix = " (LCA)"
+title_suffix = " (Learning)"
 filters = ('original_darts', 'original_darts', 'fair_darts', 'random_darts')
 figure_size = aer_cfg.figure_size
 y_name = 'validation loss'
@@ -65,45 +67,37 @@ x2_name = 'num_graph_node'
 # x2_name = 'num_edges'
 x2_label = aer_cfg.num_graph_nodes_label
 x_limit = [-0.005, 0.105]
-y_limit = [-0.005, 0.085]
-arch_samp_filter = 0
+y_limit = [0, 0.065]
 
+y_reference=None
+y_reference_label=None
 
 # y_name = 'num_params'
 # y_label = 'Params'
 # y_limit = [0, 12]
 
-# for non-BIC models: choose model with best fit and num_params<=num params of original model
+# for non-BIC models: choose model with best fit and num_params<=num params of original model. If not available choose best model for num_params+1
+# arch_weights_name = "architecture_weights_fair_darts_v_1_wd_0_k_2_s_10.0_sample2_3"
+# model_weights_name = "model_weights_fair_darts_v_1_wd_0_k_2_s_10.0_sample2_3"
 
-# arch_weights_name = "architecture_weights_original_darts_v_1_wd_0.25_k_2_s_8.0_sample2_1"
-# model_weights_name = "model_weights_original_darts_v_1_wd_0.25_k_2_s_8.0_sample2_1"
-
-# best log loss with num params (3) < num original params (4)
-arch_weights_name = "architecture_weights_original_darts_v_1_wd_0.75_k_2_s_9.0_sample0_1"
-model_weights_name = "model_weights_original_darts_v_1_wd_0.75_k_2_s_9.0_sample0_1"
-
-# model with lowest log loss
 ##### DELLA
-arch_weights_name = "architecture_weights_original_darts_v_1_wd_0_k_1_s_9.0_sample0_4"
-model_weights_name = "model_weights_original_darts_v_1_wd_0_k_1_s_9.0_sample0_4"
+arch_weights_name = "architecture_weights_original_darts_v_1_wd_0_k_1_s_9.0_sample2_3"
+model_weights_name = "model_weights_original_darts_v_1_wd_0_k_1_s_9.0_sample2_3"
 
-##### FINAL (k=1)
-arch_weights_name = "architecture_weights_original_darts_v_1_wd_0_k_1_s_9.0_sample0_4"
-model_weights_name = "model_weights_original_darts_v_1_wd_0_k_1_s_9.0_sample0_4"
+##### FINAL
+arch_weights_name = "architecture_weights_original_darts_v_1_wd_0.025_k_3_s_4.0_sample0_0"
+model_weights_name = "model_weights_original_darts_v_1_wd_0.025_k_3_s_4.0_sample0_0"
 
-#### FINAL (k=3)
-# arch_weights_name = "architecture_weights_original_darts_v_1_wd_1.0_k_3_s_8.0_sample0_4"
-# model_weights_name = "model_weights_original_darts_v_1_wd_1.0_k_3_s_8.0_sample0_4"
+##### FINAL 2
+# arch_weights_name = "architecture_weights_original_darts_v_1_wd_0.25_k_1_s_3.0_sample0_1"
+# model_weights_name = "model_weights_original_darts_v_1_wd_0.25_k_1_s_3.0_sample0_1"
 
 ##### ICML
-# arch_weights_name = "architecture_weights_original_darts_v_1_wd_0.1_k_3_s_7.0_sample0_0"
-# model_weights_name = "model_weights_original_darts_v_1_wd_0.1_k_3_s_7.0_sample0_0"
+arch_weights_name = "architecture_weights_original_darts_v_1_wd_0.025_k_3_s_4.0_sample0_0"
+model_weights_name = "model_weights_original_darts_v_1_wd_0.025_k_3_s_4.0_sample0_0"
 
-#### ICML Final
-arch_weights_name = "architecture_weights_original_darts_v_1_wd_0.1_k_1_s_2.0_sample0_4"
-model_weights_name = "model_weights_original_darts_v_1_wd_0.1_k_1_s_2.0_sample0_4"
 
-best_model_name = arch_weights_name
+best_model_name = arch_weights_name #arch_weights_name # arch_weights_name
 
 generate_darts_summary_figures(figure_names,
                                titles,
@@ -121,7 +115,9 @@ generate_darts_summary_figures(figure_names,
                                y_limit,
                                best_model_name,
                                figure_size,
-                               arch_samp_filter=arch_samp_filter)
+                               y_reference,
+                               y_reference_label,
+                               )
 
 ### PLOT MODEL SEARCH RESULTS
 
@@ -138,14 +134,13 @@ figures_path = aer_cfg.studies_folder \
                    + aer_cfg.models_results_figures_folder
 
 participant.figure_plot(model,
-                        x1=0.4, # 0.3
-                        x2=0.6, # 0.6
-                        x3=-0.2, # -0.2
-                        n_trials=20,
+                        P_initial=(0, 0.25, 0.25),
+                        P_asymptotic=(1, 1, 0.75),
+                        learning_trials=np.linspace(0, 1, 10),
                         figures_path=figures_path,
                         figure_name=aer_cfg.figure_name_model_plot,
                         figure_dimensions=aer_cfg.figure_size_model_plot,
-                        y_limit=(-0.55, 1.2),
                         axis_font_size=aer_cfg.axis_font_size,
                         title_font_size=aer_cfg.title_font_size,
+                        y_limit=(-0.3, 1.2),
                         legend_font_size=aer_cfg.legend_font_size)

@@ -24,10 +24,10 @@ port = exp_cfg.HOST_PORT    # port of experiment server
 
 # SIMULATION PARAMETERS
 
-study_name = "Control Final" #"Control Della 2"   # name of experiment
-study_name_sampled = "Control Final Sampled" # "Control Della Sampled 2"   # name of experiment
-max_num_data_points = 550
-max_num_data_points_sampled = 550
+study_name = "Control Test"   # name of experiment
+study_name_sampled = "Control Test Sampled"   # name of experiment
+max_num_data_points = 500
+max_num_data_points_sampled = 500
 
 AER_cycles = 1
 
@@ -113,11 +113,11 @@ theorist = Theorist_DARTS(study_name, darts_type=DARTS_Type.ORIGINAL)
 # specify plots
 plots = list()
 plots.append(theorist._loss_plot_name)
-# for i in range(20):
-#     plot_name = "Edge " + str(i)
-#     plots.append(plot_name)
-#
-# theorist.plot(plot_name_list=plots)
+for i in range(20):
+    plot_name = "Edge " + str(i)
+    plots.append(plot_name)
+
+theorist.plot(plot_name_list=plots)
 
 # AUTONOMOUS EMPIRICAL RESEARCH
 
@@ -138,7 +138,7 @@ theorist.add_validation_set(validation_object_1, 'BIC')
 theorist.add_validation_set(validation_object_2, 'validation loss')
 
 # search model ORIGINAL
-model = theorist.search_model_job(study_object, args.slurm_id)
+model = theorist.search_model(study_object)
 
 now = datetime.now()
 dt_string = now.strftime("%d/%m/%Y %H:%M:%S")

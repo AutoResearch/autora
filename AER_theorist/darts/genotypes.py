@@ -40,8 +40,21 @@ Genotype = namedtuple('Genotype', 'normal normal_concat')
 #     'relu',
 #     'lin_relu',
 # ]
+#
+# PRIMITIVES = [  # STANDARD ANALYSIS
+#     'none',
+#     'add',
+#     'subtract',
+#     'linear',
+#     'sigmoid',
+#     'mult',
+#     'exp',
+#     'relu',
+#     'lin_relu',
+#     'lin_sigmoid',
+# ]
 
-PRIMITIVES = [  # success LCA
+PRIMITIVES = [  # SIMPLIFIED ANALYSIS
     'none',
     'add',
     'subtract',
@@ -50,6 +63,4 @@ PRIMITIVES = [  # success LCA
     'mult',
     'exp',
     'relu',
-    'lin_relu',
-    'lin_sigmoid',
 ]

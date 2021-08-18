@@ -126,6 +126,73 @@ class Participant_Exp_Learning(Participant_In_Silico):
     def graph_simple(self, filepath):
         raise Exception("Not implemented")
 
+    def figure_plot(self, comparison_model,
+                    P_initial=(0, 0.25, 0.25),
+                    P_asymptotic=(1, 1, 0.75),
+                    learning_trials=np.linspace(0, 1, 10),
+                    num_data_points=100,
+                    figures_path=None,
+                    figure_name=None,
+                    figure_dimensions=(4, 3),
+                    y_limit=None,
+                    legend_font_size=8,
+                    axis_font_size=10,
+                    title_font_size=10):
+
+        ground_truth = self.model
+        approximation = comparison_model
+
+        output_truth = run_exp(ground_truth, P_initial, P_asymptotic, learning_trials)
+        output_approx = run_exp(approximation, P_initial, P_asymptotic, learning_trials)
+
+        # collect plot data
+        x_data = learning_trials
+        y1_truth_data = output_truth[0]
+        y2_truth_data = output_truth[1]
+        y3_truth_data = output_truth[2]
+        y1_approx_data = output_approx[0]
+        y2_approx_data = output_approx[1]
+        y3_approx_data = output_approx[2]
+
+        x_limit = [0, np.max(learning_trials)]
+        y_limit = [0, 1]
+        x_label = "Trial $t$"
+        y_label = "$P_n$"
+        legend = list()
+        for P_init, P_asymp in zip(P_initial, P_asymptotic):
+            legend.append('$P_0 = ' + str(P_init) + ', P_{inf} = ' + str(P_asymp) + '$ (Orig.)') # (Gr. Truth)
+        for P_init, P_asymp in zip(P_initial, P_asymptotic):
+            legend.append('$P_0 = ' + str(P_init) + ', P_{inf} = ' + str(P_asymp) + '$ (Recov.)') # (Recov.)
+
+        # plot
+        import matplotlib.pyplot as plt
+        import seaborn as sns
+        from matplotlib import pyplot
+        import os
+
+        fig, ax = pyplot.subplots(figsize=figure_dimensions)
+
+        ax.plot(x_data, y1_truth_data, '-', label=legend[0], color='#CC6677')
+        ax.plot(x_data, y2_truth_data, '-', label=legend[1], color='#44AA99')
+        ax.plot(x_data, y3_truth_data, '-', label=legend[2], color='#332288')
+        ax.plot(x_data, y1_approx_data, '--', label=legend[3], color='#CC6677')
+        ax.plot(x_data, y2_approx_data, '--', label=legend[4], color='#44AA99')
+        ax.plot(x_data, y3_approx_data, '--', label=legend[5], color='#332288')
+        ax.set_xlim(x_limit)
+        ax.set_ylim(y_limit)
+        ax.set_xlabel(x_label, fontsize=axis_font_size)
+        ax.set_ylabel(y_label, fontsize=axis_font_size)
+        ax.set_title('Learning Curve', fontsize=title_font_size)
+        ax.legend(fontsize=legend_font_size, loc= 0, bbox_to_anchor=(1.05, 1)) # loc= 0, bbox_to_anchor=(1.05, 1) # loc="lower center", bbox_to_anchor=(0.5, -0.6)
+        sns.despine(trim=True)
+        fig.subplots_adjust(bottom=0.25)
+        plt.show()
+
+        if figure_name is not None and figures_path is not None:
+            if not os.path.exists(figures_path):
+                os.mkdir(figures_path)
+            fig.savefig(os.path.join(figures_path, figure_name))
+
 
 def run_exp(model, P_initial_list, P_asymptotic_list, learning_trials_list):
     output = list()
@@ -133,14 +200,17 @@ def run_exp(model, P_initial_list, P_asymptotic_list, learning_trials_list):
     for P_initial, P_asymptotic in zip(P_initial_list, P_asymptotic_list):
         output.append(list())
         for trial in learning_trials_list:
-            input = [trial, P_initial, P_asymptotic]
+            input = torch.zeros(1, 3)
+            input[0, 0] = trial
+            input[0, 1] = P_initial
+            input[0, 2] = P_asymptotic
             output[-1].append(model(input))
 
 
     return output
 
 
-def plot_learning_curve(model, P_initial=(0, 0.25, 0.25), P_asymptotic=(1, 1, 0.75), learning_trials=range(10)):
+def plot_learning_curve(model, P_initial=(0, 0.25, 0.25), P_asymptotic=(1, 1, 0.75), learning_trials=np.linspace(0, 1, 10)):
 
     output = run_exp(model, P_initial, P_asymptotic, learning_trials)
 
@@ -154,11 +224,11 @@ def plot_learning_curve(model, P_initial=(0, 0.25, 0.25), P_asymptotic=(1, 1, 0.
 
     x_limit = [0, np.max(learning_trials)]
     y_limit = [0, 1]
-    x_label = "Trial"
-    y_label = "P(correct)"
+    x_label = "Trial $t$"
+    y_label = "$P_n$"
     legend = list()
     for P_init, P_asymp in zip(P_initial, P_asymptotic):
-        legend.append('P_0 = ' + str(P_init) + ', P_inf = ' + str(P_asymp))
+        legend.append('$P_0 =$ ' + str(P_init) + ', $P_\infty =$ ' + str(P_asymp))
 
     # plot
     import matplotlib.pyplot as plt
@@ -172,6 +242,6 @@ def plot_learning_curve(model, P_initial=(0, 0.25, 0.25), P_asymptotic=(1, 1, 0.
     plt.legend(loc=4, fontsize="large")
     plt.show()
 
-# model = Exp_Learning_Model(alpha=5)
-# learning_trials = np.linspace(0, 1, 10)
+model = Exp_Learning_Model(alpha=5)
+learning_trials = np.linspace(0, 1, 20)
 # plot_learning_curve(model, learning_trials=learning_trials)

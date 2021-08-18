@@ -10,7 +10,7 @@ import argparse
 
 # parse arguments
 parser = argparse.ArgumentParser("parser")
-parser.add_argument('--slurm_id', type=int, default=1, help='number of slurm array')
+parser.add_argument('--slurm_id', type=int, default=0, help='number of slurm array')
 args = parser.parse_args()
 
 now = datetime.now()
@@ -24,7 +24,7 @@ port = exp_cfg.HOST_PORT    # port of experiment server
 
 # SIMULATION PARAMETERS
 
-study_name = "LCA"   # name of experiment
+study_name = "LCA ICML" # LCA  # name of experiment
 max_num_data_points = 500
 
 AER_cycles = 1
@@ -75,12 +75,15 @@ experimentalist = Experimentalist_Popper(study_name=study_name,
 # THEORIST
 
 # initialize theorist
-theorist = Theorist_DARTS(study_name, darts_type=DARTS_Type.ORIGINAL)
+theorist = Theorist_DARTS(study_name, darts_type=DARTS_Type.FAIR)
 
 # specify plots
 plots = list()
-plots.append(theorist._loss_plot_name)
-theorist.plot(plot=True, plot_name_list=plots)
+# plots.append(theorist._loss_plot_name)
+# for i in range(20):
+#     plot_name = "Edge " + str(i)
+#     plots.append(plot_name)
+theorist.plot(plot=False, plot_name_list=plots)
 
 # AUTONOMOUS EMPIRICAL RESEARCH
 
@@ -96,12 +99,6 @@ theorist.add_validation_set(validation_object_2, 'validation loss')
 
 # search model ORIGINAL
 model = theorist.search_model_job(study_object, args.slurm_id)
-
-# search model FAIR
-# theorist_fair = Theorist_DARTS(study_name, darts_type=DARTS_Type.FAIR)
-# theorist_fair.plot(plot=True, plot_name_list=plots)
-# theorist_fair.add_validation_set(validation_object_2, 'validation loss')
-# model = theorist_fair.search_model_job(study_object, args.slurm_id)
 
 now = datetime.now()
 dt_string = now.strftime("%d/%m/%Y %H:%M:%S")

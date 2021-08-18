@@ -31,6 +31,9 @@ OPS = {
   'mult': lambda C, stride, affine: nn.Sequential(
     nn.Linear(1, 1, bias=False),
    ),
+  # 'exp': lambda C, stride, affine: nn.Sequential(
+  #   Exponential(),
+  #  ),
   'exp': lambda C, stride, affine: nn.Sequential(
     nn.Linear(1, 1, bias=True),
     Exponential(),
@@ -110,12 +113,15 @@ def get_operation_label(op_name, params_org, decimals=4):
       'linear': str(format_string.format(params[0])) + ' * x',
       'relu': 'ReLU(x)',
       'lin_relu': 'ReLU(' + str(format_string.format(params[0])) + ' * x)',
-      'sigmoid': '1/(1+e^(-x))',
-      'lin_sigmoid': '1/(1+e^(-' + str(format_string.format(params[0])) + ' * x))',
+      # 'sigmoid': '1/(1+e^(-x))',
+      'sigmoid': 'logistic(x)',
+      # 'lin_sigmoid': '1/(1+e^(-' + str(format_string.format(params[0])) + ' * x))',
+      'lin_sigmoid': 'logistic(' + str(format_string.format(params[0])) + ' * x)',
       'add': '+ x',
       'subtract': '- x',
       'mult': str(format_string.format(params[0])) + ' * x',
-      'exp': 'e^(' + str(format_string.format(params[0])) + ' * x)',
+      # 'exp': 'e^(' + str(format_string.format(params[0])) + ' * x)',
+      'exp': 'exp(' + str(format_string.format(params[0])) + ' * x)',
       '1/x': '1 / (' + str(format_string.format(params[0])) + ' * x)',
       'ln': 'ln(' + str(format_string.format(params[0])) + ' * x)',
       'classifier': classifier_str
@@ -126,12 +132,16 @@ def get_operation_label(op_name, params_org, decimals=4):
       'linear': str(format_string.format(params[0])) + ' * x + ' + str(format_string.format(params[1])),
       'relu': 'ReLU(x)',
       'lin_relu': 'ReLU(' + str(format_string.format(params[0])) + ' * x + ' + str(format_string.format(params[1])) + ')',
-      'sigmoid': '1/(1+e^(-x))',
-      'lin_sigmoid': '1/(1+e^(-(' + str(format_string.format(params[0])) + ' * x + ' + str(format_string.format(params[1])) + ')))',
+      # 'sigmoid': '1/(1+e^(-x))',
+      'sigmoid': 'logistic(x)',
+      # 'lin_sigmoid': '1/(1+e^(-(' + str(format_string.format(params[0])) + ' * x + ' + str(format_string.format(params[1])) + ')))',
+      'lin_sigmoid': 'logistic(' + str(format_string.format(params[0])) + ' * x + ' + str(
+        format_string.format(params[1])) + ')',
       'add': '+ x',
       'subtract': '- x',
       'mult': str(format_string.format(params[0])) + ' * x',
-      'exp': 'e^(' + str(format_string.format(params[0])) + ' * x + ' + str(format_string.format(params[1])) + ')',
+      # 'exp': 'e^(' + str(format_string.format(params[0])) + ' * x + ' + str(format_string.format(params[1])) + ')',
+      'exp': 'exp(' + str(format_string.format(params[0])) + ' * x + ' + str(format_string.format(params[1])) + ')',
       '1/x': '1 / (' + str(format_string.format(params[0])) + ' * x + ' + str(format_string.format(params[1])) + ')',
       'ln': 'ln(' + str(format_string.format(params[0])) + ' * x + ' + str(format_string.format(params[1])) + ')',
       'classifier': classifier_str

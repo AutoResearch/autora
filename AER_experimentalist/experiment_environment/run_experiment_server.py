@@ -8,8 +8,8 @@ import AER_experimentalist.experiment_environment.experiment_config as cfg
 
 
 # define Stroop participant
-participant = Participant_Stroop() # the Cohen et al. (1990) Stroop Model
-# participant = Participant_Weber() # Weber contrast
+# participant = Participant_Stroop() # the Cohen et al. (1990) Stroop Model
+participant = Participant_Weber() # Weber contrast
 # participant = Participant_Exp_Learning() # Exponential Learning Equation (Hull, 1943)
 # participant = Participant_LCA() # Leaky Competitive Accumulator from Usher & McClelland (2001)
 

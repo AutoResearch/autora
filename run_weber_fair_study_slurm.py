@@ -20,7 +20,7 @@ print("date and time =", dt_string)
 
 # GENERAL PARAMETERS
 
-study_name = "Weber"   # name of experiment
+study_name = "Weber ICML" # Weber  # name of experiment
 study_name_sampled = "Weber Sampled"
 host = exp_cfg.HOST_IP      # ip address of experiment server
 port = exp_cfg.HOST_PORT    # port of experiment server
@@ -96,8 +96,11 @@ theorist = Theorist_DARTS(study_name, darts_type=DARTS_Type.FAIR)
 
 # specify plots
 plots = list()
-plots.append(theorist._loss_plot_name)
-theorist.plot(plot=True, plot_name_list=plots)
+# plots.append(theorist._loss_plot_name)
+# for i in range(20):
+#     plot_name = "Edge " + str(i)
+#     plots.append(plot_name)
+theorist.plot(plot=False, plot_name_list=plots)
 
 # AUTONOMOUS EMPIRICAL RESEARCH
 

@@ -69,9 +69,16 @@ def plot(genotype, filename, fileFormat='pdf', viewFile=None, full_label=False, 
       out_str = ''
       # specify node ID
       if out_fnc is not None:
-        out_str = out_str + out_fnc + '(x_' + str(idx)
+        out_str = out_str + out_fnc + '(r_' + str(idx)
       else:
-        out_str = '(x_' + str(idx)
+        out_str = '(r_' + str(idx)
+
+      if out_dim == 1:
+        if out_fnc is not None:
+          out_str = 'P(detected) = ' + out_fnc + '(x'
+        else:
+          # out_str = 'dx_1 = (x'
+          out_str = 'P_n = (x'
 
       # if available, add bias
       if biases is not None:

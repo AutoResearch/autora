@@ -24,10 +24,10 @@ port = exp_cfg.HOST_PORT    # port of experiment server
 
 # SIMULATION PARAMETERS
 
-study_name = "Control"   # name of experiment
-study_name_sampled = "Control Sampled"   # name of experiment
-max_num_data_points = 500
-max_num_data_points_sampled = 500
+study_name = "Control Della 2"   # name of experiment
+study_name_sampled = "Control Della Sampled 2"   # name of experiment
+max_num_data_points = 5000
+max_num_data_points_sampled = 5000
 
 AER_cycles = 1
 
@@ -117,18 +117,18 @@ plots.append(theorist._loss_plot_name)
 #     plot_name = "Edge " + str(i)
 #     plots.append(plot_name)
 #
-theorist.plot(plot_name_list=plots)
+# theorist.plot(plot_name_list=plots)
 
 # AUTONOMOUS EMPIRICAL RESEARCH
 
 # generate first validation set
-validation_data = experimentalist_validation.seed(validation_object_1, n=max_num_data_points_sampled) # seed with new experiment
-# validation_data = experimentalist_validation.seed(validation_object_1, datafile='experiment_0_data.csv') # seed with new experiment
+# validation_data = experimentalist_validation.seed(validation_object_1, n=max_num_data_points_sampled) # seed with new experiment
+validation_data = experimentalist_validation.seed(validation_object_1, datafile='experiment_0_data.csv') # seed with new experiment
 validation_object_1.add_data(validation_data)
 
 # seed experiment and split into training/validation set
-seed_data = experimentalist.seed(study_object, n=max_num_data_points) # seed with new experiment
-# seed_data = experimentalist.seed(study_object, datafile='experiment_0_data.csv') # seed with existing data file
+# seed_data = experimentalist.seed(study_object, n=max_num_data_points) # seed with new experiment
+seed_data = experimentalist.seed(study_object, datafile='experiment_0_data.csv') # seed with existing data file
 study_object.add_data(seed_data)
 validation_object_2 = study_object.split(proportion=0.5)
 validation_object_2.name = "BIC"

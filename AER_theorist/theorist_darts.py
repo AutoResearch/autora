@@ -340,7 +340,7 @@ class Theorist_DARTS(Theorist, ABC):
 
         # Set the learning rate of each parameter group using a cosine annealing schedule (model optimization)
         self._eval_scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
-            self._eval_optimizer, float(darts_cfg.eval_epochs), eta_min=darts_cfg.learning_rate_min)
+            self._eval_optimizer, float(darts_cfg.eval_epochs), eta_min=darts_cfg.eval_learning_rate_min)
 
         self._eval_model.train()  # Sets the module in training mode
 

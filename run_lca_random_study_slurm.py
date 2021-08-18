@@ -4,7 +4,7 @@ from AER_experimentalist.experiment_environment.DV_in_silico import DV_In_Silico
 from AER_experimentalist.experiment_environment.variable import outputTypes as output_type
 from AER_experimentalist.experimentalist_popper import Experimentalist_Popper
 from AER_theorist.object_of_study import Object_Of_Study
-from AER_theorist.theorist_darts import Theorist_DARTS, DARTS_Type
+from AER_theorist.theorist_random_darts import Theorist_Random_DARTS
 import AER_experimentalist.experiment_environment.experiment_config as exp_cfg
 import argparse
 
@@ -24,7 +24,7 @@ port = exp_cfg.HOST_PORT    # port of experiment server
 
 # SIMULATION PARAMETERS
 
-study_name = "LCA"   # name of experiment
+study_name = "LCA ICML"   # name of experiment
 max_num_data_points = 500
 
 AER_cycles = 1
@@ -75,12 +75,12 @@ experimentalist = Experimentalist_Popper(study_name=study_name,
 # THEORIST
 
 # initialize theorist
-theorist = Theorist_DARTS(study_name, darts_type=DARTS_Type.FAIR)
+theorist = Theorist_Random_DARTS(study_name, theorist_filter='darts')
 
 # specify plots
 plots = list()
 plots.append(theorist._loss_plot_name)
-theorist.plot(plot=True, plot_name_list=plots)
+# theorist.plot(plot=True, plot_name_list=plots)
 
 # AUTONOMOUS EMPIRICAL RESEARCH
 

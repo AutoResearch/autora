@@ -1,15 +1,13 @@
 from AER_experimentalist.experiment_environment.participant_in_silico import Participant_In_Silico
 import torch
 import torch.nn as nn
+import numpy as np
 from torch.autograd import Variable
 from graphviz import Digraph
 
 class Stroop_Model(nn.Module):
     def __init__(self):
         super(Stroop_Model, self).__init__()
-
-        # define non-learnable bias for hidden and output layers
-        self.bias = Variable(torch.ones(1) * -4, requires_grad=False)
 
         # define affine transformations
         self.input_color_hidden_color = nn.Linear(2, 2, bias=False)
@@ -20,6 +18,7 @@ class Stroop_Model(nn.Module):
         self.task_hidden_word = nn.Linear(2, 2, bias=False)
 
         # assign weights
+        # self.bias = Variable(torch.ones(1) * -4, requires_grad=False)
         # self.input_color_hidden_color.weight.data = torch.FloatTensor([[2.2, -2.2], [-2.2, 2.2]])
         # self.input_word_hidden_word.weight.data = torch.FloatTensor([[2.6, -2.6], [-2.6, 2.6]])
         # self.hidden_color_output.weight.data = torch.FloatTensor([[1.3, -1.3], [-1.3, 1.3]])
@@ -27,10 +26,22 @@ class Stroop_Model(nn.Module):
         # self.task_hidden_color.weight.data = torch.FloatTensor([[4.0, 0.0], [4.0, 0]])
         # self.task_hidden_word.weight.data = torch.FloatTensor([[0, 4.00], [0, 4.0]])
 
+        # CONTROL STUDY
         # assign without word reading task unit
-        self.input_color_hidden_color.weight.data = torch.FloatTensor([[1, -1], [-1, 1]]) * 2.2
+        # self.bias = Variable(torch.ones(1) * -4, requires_grad=False)
+        # self.input_color_hidden_color.weight.data = torch.FloatTensor([[1, -1], [-1, 1]]) * 2.2
+        # self.input_word_hidden_word.weight.data = torch.FloatTensor([[1, -1], [-1, 1]]) * 2.6
+        # self.hidden_color_output.weight.data = torch.FloatTensor([[1, -1], [-1, 1]]) * 1.3
+        # self.hidden_word_output.weight.data = torch.FloatTensor([[1, -1], [-1, 1]]) * 2.5
+        #
+        # self.task_hidden_color.weight.data = torch.FloatTensor([[1.0, 0.0], [1.0, 0]]) * 4
+        # self.task_hidden_word.weight.data = torch.FloatTensor([[0, 1], [0, 1]]) * 0
+
+        self.bias = Variable(torch.ones(1) * -4, requires_grad=False)
+        self.input_color_hidden_color.weight.data = torch.FloatTensor([[1, -1], [-1, 1]]) * 2.5
+        self.hidden_color_output.weight.data = torch.FloatTensor([[1, -1], [-1, 1]]) * 2.5
+
         self.input_word_hidden_word.weight.data = torch.FloatTensor([[1, -1], [-1, 1]]) * 2.6
-        self.hidden_color_output.weight.data = torch.FloatTensor([[1, -1], [-1, 1]]) * 1.3
         self.hidden_word_output.weight.data = torch.FloatTensor([[1, -1], [-1, 1]]) * 2.5
 
         self.task_hidden_color.weight.data = torch.FloatTensor([[1.0, 0.0], [1.0, 0]]) * 4
@@ -242,6 +253,95 @@ class Participant_Stroop(Participant_In_Silico):
 
         # save graph
         g.render(filepath, view=False)
+
+    def figure_control_plot(self, comparison_model,
+                    color_green_list=(0, 0, 1),
+                    task_color_list=(0, 1, 1),
+                    num_data_points=100,
+                    figures_path=None,
+                    figure_name=None,
+                    figure_dimensions=(4, 3),
+                    y_limit=[0, 1],
+                    legend_font_size=8,
+                    axis_font_size=10,
+                    title_font_size=10):
+
+        ground_truth = self.model
+        approximation = comparison_model
+
+        output_truth = run_control_exp(ground_truth, color_green_list, task_color_list, num_data_points)
+
+        output_approx = run_control_exp(approximation, color_green_list, task_color_list, num_data_points, input_dim=3)
+
+        # collect plot data
+        x_data = np.linspace(0, 1, num_data_points)
+        y1_truth_data = output_truth[0]
+        y2_truth_data = output_truth[1]
+        y3_truth_data = output_truth[2]
+        y1_approx_data = output_approx[0]
+        y2_approx_data = output_approx[1]
+        y3_approx_data = output_approx[2]
+
+        x_limit = [0, 1]
+        x_label = "Red Input"
+        y_label = 'Red Response'
+        legend = list()
+        for color_green, task_color in zip(color_green_list, task_color_list):
+            legend.append('$act_{green}$ = ' + str(color_green) + ', $act_{task}$ = ' + str(task_color) + ' (GT)')
+        for color_green, task_color in zip(color_green_list, task_color_list):
+            legend.append('$act_{green}$ = ' + str(color_green) + ', $act_{task}$ = ' + str(task_color) + ' (R)')
+
+        # plot
+        import matplotlib.pyplot as plt
+        import seaborn as sns
+        from matplotlib import pyplot
+        import os
+
+        fig, ax = pyplot.subplots(figsize=figure_dimensions)
+
+        ax.plot(x_data, y1_truth_data, '-', label=legend[0], color='#CC6677')
+        ax.plot(x_data, y2_truth_data, '-', label=legend[1], color='#44AA99')
+        ax.plot(x_data, y3_truth_data, '-', label=legend[2], color='#332288')
+        ax.plot(x_data, y1_approx_data, '--', label=legend[3], color='#CC6677')
+        ax.plot(x_data, y2_approx_data, '--', label=legend[4], color='#44AA99')
+        ax.plot(x_data, y3_approx_data, '--', label=legend[5], color='#332288')
+        ax.set_xlim(x_limit)
+        ax.set_ylim(y_limit)
+        ax.set_xlabel(x_label, fontsize=axis_font_size)
+        ax.set_ylabel(y_label, fontsize=axis_font_size)
+        ax.set_title('Response Function', fontsize=title_font_size)
+        ax.legend(loc=0, fontsize=legend_font_size, bbox_to_anchor=(1.05, 1))
+        # sns.despine(trim=True)
+        plt.show()
+
+        if figure_name is not None and figures_path is not None:
+            if not os.path.exists(figures_path):
+                os.mkdir(figures_path)
+            fig.savefig(os.path.join(figures_path, figure_name))
+
+def run_control_exp(model, color_green_list, color_task_list, num_data_points, input_dim=None):
+
+    output_list = list()
+
+    for color_green, color_task in zip(color_green_list, color_task_list):
+        output_list.append(list())
+
+        color_red_list = np.linspace(0, 1, num_data_points)
+        for color_red in color_red_list:
+            if input_dim is None:
+                input = torch.zeros(1, 6)
+                input[0, 0] = color_red
+                input[0, 1] = color_green
+                input[0, 4] = color_task
+            else:
+                input = torch.zeros(1, 3)
+                input[0, 0] = color_red
+                input[0, 1] = color_green
+                input[0, 2] = color_task
+            output = torch.sigmoid(model(input)).detach().numpy().flatten()[0]
+            output_list[-1].append(output)
+
+    return output_list
 
 
 def run_exp(model):

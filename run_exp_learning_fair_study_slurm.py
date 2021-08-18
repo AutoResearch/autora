@@ -10,7 +10,7 @@ import argparse
 
 # parse arguments
 parser = argparse.ArgumentParser("parser")
-parser.add_argument('--slurm_id', type=int, default=1, help='number of slurm array')
+parser.add_argument('--slurm_id', type=int, default=0, help='number of slurm array')
 args = parser.parse_args()
 
 now = datetime.now()
@@ -24,7 +24,7 @@ port = exp_cfg.HOST_PORT    # port of experiment server
 
 # SIMULATION PARAMETERS
 
-study_name = "Exp Learning"   # name of experiment
+study_name = "Exp Learning ICML" #"Exp Learning Final"   # name of experiment
 max_num_data_points = 500
 
 AER_cycles = 1
@@ -79,11 +79,11 @@ theorist = Theorist_DARTS(study_name, darts_type=DARTS_Type.FAIR)
 
 # specify plots
 plots = list()
-plots.append(theorist._loss_plot_name)
+# plots.append(theorist._loss_plot_name)
 # for i in range(20):
 #     plot_name = "Edge " + str(i)
 #     plots.append(plot_name)
-theorist.plot(plot=True, plot_name_list=plots)
+theorist.plot(plot=False, plot_name_list=plots)
 
 # AUTONOMOUS EMPIRICAL RESEARCH
 

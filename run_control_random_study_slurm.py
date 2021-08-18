@@ -4,7 +4,7 @@ from AER_experimentalist.experiment_environment.DV_in_silico import DV_In_Silico
 from AER_experimentalist.experiment_environment.variable import outputTypes as output_type
 from AER_experimentalist.experimentalist_popper import Experimentalist_Popper
 from AER_theorist.object_of_study import Object_Of_Study
-from AER_theorist.theorist_darts import Theorist_DARTS, DARTS_Type
+from AER_theorist.theorist_random_darts import Theorist_Random_DARTS
 import AER_experimentalist.experiment_environment.experiment_config as exp_cfg
 import argparse
 
@@ -24,10 +24,10 @@ port = exp_cfg.HOST_PORT    # port of experiment server
 
 # SIMULATION PARAMETERS
 
-study_name = "Control Final" #"Control Della 2"   # name of experiment
-study_name_sampled = "Control Final Sampled" # "Control Della Sampled 2"   # name of experiment
-max_num_data_points = 550
-max_num_data_points_sampled = 550
+study_name = "Control"   # name of experiment
+study_name_sampled = "Control Sampled"   # name of experiment
+max_num_data_points = 500
+max_num_data_points_sampled = 500
 
 AER_cycles = 1
 
@@ -108,7 +108,7 @@ experimentalist_validation = Experimentalist_Popper(study_name=study_name_sample
 # THEORIST
 
 # initialize theorist
-theorist = Theorist_DARTS(study_name, darts_type=DARTS_Type.ORIGINAL)
+theorist = Theorist_Random_DARTS(study_name, theorist_filter='darts')
 
 # specify plots
 plots = list()
