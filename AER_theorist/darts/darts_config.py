@@ -6,13 +6,13 @@ class InitMethod(Enum):
     NORMAL = 2
 
 # meta-search
-max_k = 3                       # maximum number of computations (nodes) in model
-min_k = 1                       # minimum number of computations (nodes) in model
+max_k = 2                       # maximum number of computations (nodes) in model
+min_k = 2                       # minimum number of computations (nodes) in model
 min_seed = 1                    # minimum seed tested
-max_seed = 10 #3                    # maximum seed tested
+max_seed = 1 #3                    # maximum seed tested
 
 # training
-epochs = 300 # #400 (good) 200                    # num of training epochs (30)
+epochs = 100 # #400 (good) 200                    # num of training epochs (30)
 arch_updates_per_epoch = 1 #20      # num of architecture updates per epoch (20)
 param_updates_per_epoch = 500 #500   # num of weight updates per epoch (20)
 batch_size = 20                 # batch size (64)
@@ -64,7 +64,7 @@ exp_folder = 'experiments'                                     # experiment name
 graph_filename = 'model_graph'                                 # file name prefix of learned graph
 model_filename = 'model_weights'                               # file name prefix of learned model
 output_file_folder = 'results'                                 # folder for simulation results
-arch_weight_decay_list = [0, 0.025, 0.05, 0.075, 0.1] # 6e-4 # np.linspace(0, 6e-4, 6)               # list of architecture weight decays searched over (this decay scales with number of degrees of freedom)
+arch_weight_decay_list = [0] # 0, 0.025, 0.05, 0.075, 0.1 # np.linspace(0, 6e-4, 6)               # list of architecture weight decays searched over (this decay scales with number of degrees of freedom)
 num_node_list = np.linspace(min_k, max_k, (max_k-min_k)+1)     # list of k's searched over
 seed_list = np.linspace(1, max_seed, max_seed)                 # list of seeds searched over
 csv_theorist_name = 'theorist'

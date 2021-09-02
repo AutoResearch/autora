@@ -100,13 +100,13 @@ theorist.plot()
 # AUTONOMOUS EMPIRICAL RESEARCH
 
 # generate first validation set
-# validation_data = experimentalist_validation.seed(validation_object_1) # seed with new experiment
-validation_data = experimentalist_validation.seed(validation_object_1, datafile='experiment_0_data.csv') # seed with new experiment
+validation_data = experimentalist_validation.seed(validation_object_1) # seed with new experiment
+# validation_data = experimentalist_validation.seed(validation_object_1, datafile='experiment_0_data.csv') # seed with new experiment
 validation_object_1.add_data(validation_data)
 
 # seed experiment and split into training/validation set
-# seed_data = experimentalist.seed(study_object) # seed with new experiment
-seed_data = experimentalist.seed(study_object, datafile='experiment_0_data.csv') # seed with existing data file
+seed_data = experimentalist.seed(study_object) # seed with new experiment
+# seed_data = experimentalist.seed(study_object, datafile='experiment_0_data.csv') # seed with existing data file
 study_object.add_data(seed_data)
 validation_object_2 = study_object.split(proportion=0.5)
 validation_object_2.name = "Weber Sampled"
