@@ -54,127 +54,14 @@ x, y = raw_data[XLABS], np.log(raw_data['rec'])
 x.head()
 ```
 
-
-
-
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>eff</th>
-      <th>D_max</th>
-      <th>D_apr</th>
-      <th>D_may</th>
-      <th>D_jun</th>
-      <th>ET_apr</th>
-      <th>ET_may</th>
-      <th>ET_jun</th>
-      <th>PT_apr</th>
-      <th>PT_may</th>
-      <th>PT_jun</th>
-      <th>PT_jul</th>
-      <th>PDO_win</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>0.004697</td>
-      <td>12500</td>
-      <td>952</td>
-      <td>4160</td>
-      <td>8880</td>
-      <td>7.8</td>
-      <td>10.6</td>
-      <td>14.5</td>
-      <td>6.7</td>
-      <td>7.3</td>
-      <td>8.6</td>
-      <td>9.7</td>
-      <td>-1.544</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>0.011504</td>
-      <td>8040</td>
-      <td>1650</td>
-      <td>6040</td>
-      <td>6020</td>
-      <td>9.1</td>
-      <td>12.4</td>
-      <td>14.5</td>
-      <td>7.2</td>
-      <td>8.2</td>
-      <td>8.9</td>
-      <td>9.8</td>
-      <td>-1.012</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>0.002780</td>
-      <td>8330</td>
-      <td>1700</td>
-      <td>5670</td>
-      <td>6790</td>
-      <td>8.4</td>
-      <td>11.4</td>
-      <td>13.5</td>
-      <td>7.1</td>
-      <td>8.0</td>
-      <td>8.6</td>
-      <td>9.3</td>
-      <td>-0.496</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>0.002907</td>
-      <td>7220</td>
-      <td>920</td>
-      <td>4960</td>
-      <td>6020</td>
-      <td>9.1</td>
-      <td>12.2</td>
-      <td>14.4</td>
-      <td>7.6</td>
-      <td>8.5</td>
-      <td>9.1</td>
-      <td>9.9</td>
-      <td>-0.682</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>0.012463</td>
-      <td>9060</td>
-      <td>796</td>
-      <td>4100</td>
-      <td>7600</td>
-      <td>8.4</td>
-      <td>12.3</td>
-      <td>13.2</td>
-      <td>7.5</td>
-      <td>8.3</td>
-      <td>8.8</td>
-      <td>9.2</td>
-      <td>-0.472</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
+ 
+|       | eff      | D_max | D_apr | D_may | D_jun | ET_apr | ET_may | ET_jun | PT_apr | PT_may | PT_jun | PT_jul | PDO_win |
+| --|----------|-------|-------|-------|-------|--------|--------|--------|--------|--------|--------|--------|---------|
+| 0 | 0.004697 | 12500 | 952   | 4160  | 8880  | 7.8    | 10.6   | 14.5   | 6.7    | 7.3    | 8.6    | 9.7    | -1.544  |
+| 1 | 0.011504 | 8040  | 1650  | 6040  | 6020  | 9.1    | 12.4   | 14.5   | 7.2    | 8.2    | 8.9    | 9.8    | -1.012  |
+| 2 | 0.002780 | 8330  | 1700  | 5670  | 6790  | 8.4    | 11.4   | 13.5   | 7.1    | 8.0    | 8.6    | 9.3    | -0.496  |
+| 3 | 0.002907 | 7220  | 920   | 4960  | 6020  | 9.1    | 12.2   | 14.4   | 7.6    | 8.5    | 9.1    | 9.9    | -0.682  |
+| 4 | 0.012463 | 9060  | 796   | 4100  | 7600  | 8.4    | 12.3   | 13.2   | 7.5    | 8.3    | 8.8    | 9.2    | -0.472  |                         
 
 
 ## Initializing the Bayesian machine scienstist 
@@ -286,7 +173,7 @@ plt.show()
 
 
     
-![png](output_18_0.png)
+![png](https://bitbucket.org/rguimera/machine-scientist/raw/15fee6e33181e1f2e39c60919c1a111b086001ac/Images/output_18_0.png)
     
 
 
@@ -306,14 +193,15 @@ plt.show()
 
 
     
-![png](output_21_0.png)
+![png](https://bitbucket.org/rguimera/machine-scientist/raw/15fee6e33181e1f2e39c60919c1a111b086001ac/Images/output_21_0.png)
     
 
 
 ## Further refinements 
 
 The examples above are only intended to illustrate how a basic MCMC would be implemented. In practice, there are other considerations that we kept in mind in all the experiments reported in the manuscriot, and that anyone using the code should too:
-- **Equilibration**: One should not start sampling until the MCMC has converged to the stationary distribution. Although determining when a sample is in equilibrium, a necessary condition is that the description length is not increasing or, more typically, decreasing. The trace of the description length should be flat (except for fluctuations) before we start collecting samples.
-- **Thinning**: MCMC samples should be thinned, so only one in, say, 100 samples are kept for the trace. Otherwise, one is getting highly correlated samples, which may lead to, for example, erroneous estimates of confidence intervals.
-- **Getting trapped**: Despite the parallel tempering, the MCMC can get trapped in local minima of the description length. For this, we typically keep track of the number of steps since the last `tree_swap()` move was accepted for each temperature. If a particular temperature has *not* accepted swaps in a long time, then we anneal the whole system, that is, we increase all temperatures and decrease them slowly back to equilibrium so as to escape the local minima. Using several restarts of the MCMC and comparing the results is also a convenient check.
-- **Memory issues**: By default, the machine scientist keeps a cache of all visited models, so as to avoid duplicates of previously considered models, as well as to speed up the process of obtaining the maximum likelihood estimators of the model parameters. For long MCMC chains this becomes memory intensive, so it may be convenient to periodically clean this cache (or, at least, old models in this cache) by reinitializing the `fit_pat` and `representative` attributes of the `Parallel` instance.
+
+* **Equilibration**: One should not start sampling until the MCMC has converged to the stationary distribution. Although determining when a sample is in equilibrium, a necessary condition is that the description length is not increasing or, more typically, decreasing. The trace of the description length should be flat (except for fluctuations) before we start collecting samples.
+* **Thinning**: MCMC samples should be thinned, so only one in, say, 100 samples are kept for the trace. Otherwise, one is getting highly correlated samples, which may lead to, for example, erroneous estimates of confidence intervals.
+* **Getting trapped**: Despite the parallel tempering, the MCMC can get trapped in local minima of the description length. For this, we typically keep track of the number of steps since the last `tree_swap()` move was accepted for each temperature. If a particular temperature has *not* accepted swaps in a long time, then we anneal the whole system, that is, we increase all temperatures and decrease them slowly back to equilibrium so as to escape the local minima. Using several restarts of the MCMC and comparing the results is also a convenient check.
+* **Memory issues**: By default, the machine scientist keeps a cache of all visited models, so as to avoid duplicates of previously considered models, as well as to speed up the process of obtaining the maximum likelihood estimators of the model parameters. For long MCMC chains this becomes memory intensive, so it may be convenient to periodically clean this cache (or, at least, old models in this cache) by reinitializing the `fit_pat` and `representative` attributes of the `Parallel` instance.
