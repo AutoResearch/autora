@@ -173,7 +173,7 @@ plt.show()
 
 
     
-![png](https://bitbucket.org/rguimera/machine-scientist/raw/15fee6e33181e1f2e39c60919c1a111b086001ac/Images/output_18_0.png)
+![png](https://bitbucket.org/rguimera/machine-scientist/raw/6dbf8519c47197ae183c72dfee2dff371882b5d6/Images/output_18_0.png)
     
 
 
@@ -193,7 +193,7 @@ plt.show()
 
 
     
-![png](https://bitbucket.org/rguimera/machine-scientist/raw/15fee6e33181e1f2e39c60919c1a111b086001ac/Images/output_21_0.png)
+![png](https://bitbucket.org/rguimera/machine-scientist/raw/6dbf8519c47197ae183c72dfee2dff371882b5d6/Images/output_21_0.png)
     
 
 
