@@ -1,0 +1,2461 @@
+2021-09-20 12:17:09,032 gpu device: 0
+2021-09-20 12:17:09,032 configuration = <module 'AER_theorist.darts.darts_config' from 'C:\\Users\\Admin\\PycharmProjects\\neuro\\AER\\AER_theorist\\darts\\darts_config.py'>
+2021-09-20 12:17:09,110 param size: 0.000028MB
+2021-09-20 12:17:09,672 genotype: Genotype(normal=[('sigmoid', 1), ('none', 0), ('relu', 0), ('mult', 2), ('relu', 1)], normal_concat=range(3, 4))
+2021-09-20 12:17:15,625 architecture step (loss): 000 (4.067277e-02)
+2021-09-20 12:17:15,625 training accuracy: 0.040673
+2021-09-20 12:17:15,625 architecture step (accuracy): 000 (9.172134e-03)
+2021-09-20 12:17:15,688 validation accuracy: 0.009204
+2021-09-20 12:17:15,704 epoch: 0
+2021-09-20 12:18:47,304 gpu device: 0
+2021-09-20 12:18:47,304 configuration = <module 'AER_theorist.darts.darts_config' from 'C:\\Users\\Admin\\PycharmProjects\\neuro\\AER\\AER_theorist\\darts\\darts_config.py'>
+2021-09-20 12:18:47,320 param size: 0.000028MB
+2021-09-20 12:18:47,320 genotype: Genotype(normal=[('sigmoid', 1), ('none', 0), ('relu', 0), ('mult', 2), ('relu', 1)], normal_concat=range(3, 4))
+2021-09-20 12:18:51,370 architecture step (loss): 000 (4.067088e-02)
+2021-09-20 12:18:51,370 training accuracy: 0.040671
+2021-09-20 12:18:51,370 architecture step (accuracy): 000 (5.818911e-03)
+2021-09-20 12:18:51,385 validation accuracy: 0.006214
+2021-09-20 12:18:51,385 epoch: 0
+2021-09-20 12:18:51,385 genotype: Genotype(normal=[('sigmoid', 1), ('none', 0), ('none', 2), ('none', 1), ('mult', 0)], normal_concat=range(3, 4))
+2021-09-20 12:18:55,541 architecture step (loss): 000 (6.218068e-03)
+2021-09-20 12:18:55,541 training accuracy: 0.006218
+2021-09-20 12:18:55,557 architecture step (accuracy): 000 (5.528559e-03)
+2021-09-20 12:18:55,557 validation accuracy: 0.006057
+2021-09-20 12:18:55,557 epoch: 1
+2021-09-20 12:18:55,557 genotype: Genotype(normal=[('sigmoid', 1), ('none', 0), ('none', 2), ('mult', 0), ('none', 1)], normal_concat=range(3, 4))
+2021-09-20 12:18:59,588 architecture step (loss): 000 (5.018904e-03)
+2021-09-20 12:18:59,588 training accuracy: 0.005019
+2021-09-20 12:18:59,588 architecture step (accuracy): 000 (6.133684e-03)
+2021-09-20 12:18:59,604 validation accuracy: 0.005859
+2021-09-20 12:18:59,604 epoch: 2
+2021-09-20 12:18:59,604 genotype: Genotype(normal=[('sigmoid', 1), ('none', 0), ('none', 2), ('mult', 0), ('none', 1)], normal_concat=range(3, 4))
+2021-09-20 12:19:04,073 architecture step (loss): 000 (4.176548e-03)
+2021-09-20 12:19:04,073 training accuracy: 0.004177
+2021-09-20 12:19:04,073 architecture step (accuracy): 000 (5.708687e-03)
+2021-09-20 12:19:04,088 validation accuracy: 0.005564
+2021-09-20 12:19:04,088 epoch: 3
+2021-09-20 12:19:04,088 genotype: Genotype(normal=[('none', 0), ('subtract', 1), ('mult', 0), ('none', 2), ('none', 1)], normal_concat=range(3, 4))
+2021-09-20 12:19:08,338 architecture step (loss): 000 (3.607950e-03)
+2021-09-20 12:19:08,338 training accuracy: 0.003608
+2021-09-20 12:19:08,338 architecture step (accuracy): 000 (5.875255e-03)
+2021-09-20 12:19:08,338 validation accuracy: 0.005613
+2021-09-20 12:19:08,338 epoch: 4
+2021-09-20 12:19:08,354 genotype: Genotype(normal=[('none', 0), ('subtract', 1), ('mult', 0), ('none', 2), ('mult', 1)], normal_concat=range(3, 4))
+2021-09-20 12:19:12,463 architecture step (loss): 000 (3.126832e-03)
+2021-09-20 12:19:12,463 training accuracy: 0.003127
+2021-09-20 12:19:12,463 architecture step (accuracy): 000 (5.284394e-03)
+2021-09-20 12:19:12,463 validation accuracy: 0.005245
+2021-09-20 12:19:12,463 epoch: 5
+2021-09-20 12:19:12,479 genotype: Genotype(normal=[('none', 0), ('subtract', 1), ('mult', 0), ('none', 2), ('mult', 1)], normal_concat=range(3, 4))
+2021-09-20 12:19:16,666 architecture step (loss): 000 (2.852761e-03)
+2021-09-20 12:19:16,666 training accuracy: 0.002853
+2021-09-20 12:19:16,666 architecture step (accuracy): 000 (4.426316e-03)
+2021-09-20 12:19:16,682 validation accuracy: 0.004833
+2021-09-20 12:19:16,682 epoch: 6
+2021-09-20 12:19:16,682 genotype: Genotype(normal=[('sigmoid', 0), ('subtract', 1), ('mult', 0), ('none', 2), ('mult', 1)], normal_concat=range(3, 4))
+2021-09-20 12:19:20,707 architecture step (loss): 000 (2.632857e-03)
+2021-09-20 12:19:20,707 training accuracy: 0.002633
+2021-09-20 12:19:20,707 architecture step (accuracy): 000 (4.580838e-03)
+2021-09-20 12:19:20,707 validation accuracy: 0.004702
+2021-09-20 12:19:20,707 epoch: 7
+2021-09-20 12:19:20,722 genotype: Genotype(normal=[('sigmoid', 0), ('subtract', 1), ('mult', 0), ('none', 2), ('mult', 1)], normal_concat=range(3, 4))
+2021-09-20 12:19:24,769 architecture step (loss): 000 (2.422346e-03)
+2021-09-20 12:19:24,769 training accuracy: 0.002422
+2021-09-20 12:19:24,769 architecture step (accuracy): 000 (4.591741e-03)
+2021-09-20 12:19:24,769 validation accuracy: 0.004379
+2021-09-20 12:19:24,769 epoch: 8
+2021-09-20 12:19:24,785 genotype: Genotype(normal=[('sigmoid', 0), ('subtract', 1), ('mult', 0), ('none', 2), ('mult', 1)], normal_concat=range(3, 4))
+2021-09-20 12:19:28,738 architecture step (loss): 000 (2.301954e-03)
+2021-09-20 12:19:28,738 training accuracy: 0.002302
+2021-09-20 12:19:28,754 architecture step (accuracy): 000 (4.160249e-03)
+2021-09-20 12:19:28,754 validation accuracy: 0.004308
+2021-09-20 12:19:28,754 epoch: 9
+2021-09-20 12:19:28,754 genotype: Genotype(normal=[('sigmoid', 0), ('subtract', 1), ('mult', 0), ('linear', 2), ('mult', 1)], normal_concat=range(3, 4))
+2021-09-20 12:19:32,785 architecture step (loss): 000 (2.159592e-03)
+2021-09-20 12:19:32,785 training accuracy: 0.002160
+2021-09-20 12:19:32,785 architecture step (accuracy): 000 (4.562266e-03)
+2021-09-20 12:19:32,785 validation accuracy: 0.004755
+2021-09-20 12:19:32,785 epoch: 10
+2021-09-20 12:19:32,801 genotype: Genotype(normal=[('sigmoid', 0), ('subtract', 1), ('mult', 0), ('linear', 2), ('mult', 1)], normal_concat=range(3, 4))
+2021-09-20 12:19:36,769 architecture step (loss): 000 (2.037439e-03)
+2021-09-20 12:19:36,769 training accuracy: 0.002037
+2021-09-20 12:19:36,769 architecture step (accuracy): 000 (4.480388e-03)
+2021-09-20 12:19:36,769 validation accuracy: 0.004604
+2021-09-20 12:19:36,769 epoch: 11
+2021-09-20 12:19:36,785 genotype: Genotype(normal=[('sigmoid', 0), ('exp', 1), ('mult', 0), ('linear', 2), ('mult', 1)], normal_concat=range(3, 4))
+2021-09-20 12:19:40,774 architecture step (loss): 000 (1.959781e-03)
+2021-09-20 12:19:40,774 training accuracy: 0.001960
+2021-09-20 12:19:40,774 architecture step (accuracy): 000 (4.579806e-03)
+2021-09-20 12:19:40,774 validation accuracy: 0.004404
+2021-09-20 12:19:40,774 epoch: 12
+2021-09-20 12:19:40,790 genotype: Genotype(normal=[('sigmoid', 0), ('exp', 1), ('mult', 0), ('linear', 2), ('mult', 1)], normal_concat=range(3, 4))
+2021-09-20 12:19:44,837 architecture step (loss): 000 (1.900977e-03)
+2021-09-20 12:19:44,837 training accuracy: 0.001901
+2021-09-20 12:19:44,837 architecture step (accuracy): 000 (3.992724e-03)
+2021-09-20 12:19:44,852 validation accuracy: 0.004133
+2021-09-20 12:19:44,852 epoch: 13
+2021-09-20 12:19:44,852 genotype: Genotype(normal=[('sigmoid', 0), ('exp', 1), ('mult', 0), ('linear', 2), ('mult', 1)], normal_concat=range(3, 4))
+2021-09-20 12:19:48,884 architecture step (loss): 000 (1.878367e-03)
+2021-09-20 12:19:48,884 training accuracy: 0.001878
+2021-09-20 12:19:48,884 architecture step (accuracy): 000 (4.399872e-03)
+2021-09-20 12:19:48,884 validation accuracy: 0.004304
+2021-09-20 12:19:48,884 epoch: 14
+2021-09-20 12:19:48,899 genotype: Genotype(normal=[('sigmoid', 0), ('exp', 1), ('mult', 0), ('linear', 2), ('mult', 1)], normal_concat=range(3, 4))
+2021-09-20 12:19:52,899 architecture step (loss): 000 (1.781703e-03)
+2021-09-20 12:19:52,899 training accuracy: 0.001782
+2021-09-20 12:19:52,899 architecture step (accuracy): 000 (3.947103e-03)
+2021-09-20 12:19:52,899 validation accuracy: 0.004042
+2021-09-20 12:19:52,899 epoch: 15
+2021-09-20 12:19:52,915 genotype: Genotype(normal=[('sigmoid', 0), ('exp', 1), ('mult', 0), ('linear', 2), ('mult', 1)], normal_concat=range(3, 4))
+2021-09-20 12:19:56,884 architecture step (loss): 000 (1.733024e-03)
+2021-09-20 12:19:56,884 training accuracy: 0.001733
+2021-09-20 12:19:56,884 architecture step (accuracy): 000 (4.367460e-03)
+2021-09-20 12:19:56,884 validation accuracy: 0.004343
+2021-09-20 12:19:56,884 epoch: 16
+2021-09-20 12:19:56,899 genotype: Genotype(normal=[('sigmoid', 0), ('exp', 1), ('mult', 0), ('linear', 2), ('mult', 1)], normal_concat=range(3, 4))
+2021-09-20 12:20:00,993 architecture step (loss): 000 (1.735690e-03)
+2021-09-20 12:20:00,993 training accuracy: 0.001736
+2021-09-20 12:20:00,993 architecture step (accuracy): 000 (3.988565e-03)
+2021-09-20 12:20:00,993 validation accuracy: 0.003907
+2021-09-20 12:20:00,993 epoch: 17
+2021-09-20 12:20:01,009 genotype: Genotype(normal=[('sigmoid', 0), ('exp', 1), ('mult', 0), ('linear', 2), ('mult', 1)], normal_concat=range(3, 4))
+2021-09-20 12:20:05,165 architecture step (loss): 000 (1.713341e-03)
+2021-09-20 12:20:05,165 training accuracy: 0.001713
+2021-09-20 12:20:05,165 architecture step (accuracy): 000 (4.178200e-03)
+2021-09-20 12:20:05,165 validation accuracy: 0.004108
+2021-09-20 12:20:05,165 epoch: 18
+2021-09-20 12:20:05,180 genotype: Genotype(normal=[('sigmoid', 0), ('exp', 1), ('mult', 0), ('linear', 2), ('linear', 1)], normal_concat=range(3, 4))
+2021-09-20 12:20:09,587 architecture step (loss): 000 (1.662014e-03)
+2021-09-20 12:20:09,587 training accuracy: 0.001662
+2021-09-20 12:20:09,602 architecture step (accuracy): 000 (4.473251e-03)
+2021-09-20 12:20:09,602 validation accuracy: 0.004329
+2021-09-20 12:20:09,602 epoch: 19
+2021-09-20 12:20:09,602 genotype: Genotype(normal=[('sigmoid', 0), ('exp', 1), ('sigmoid', 0), ('linear', 2), ('linear', 1)], normal_concat=range(3, 4))
+2021-09-20 12:20:14,102 architecture step (loss): 000 (1.664888e-03)
+2021-09-20 12:20:14,102 training accuracy: 0.001665
+2021-09-20 12:20:14,102 architecture step (accuracy): 000 (4.243030e-03)
+2021-09-20 12:20:14,102 validation accuracy: 0.004086
+2021-09-20 12:20:14,102 epoch: 20
+2021-09-20 12:20:14,118 genotype: Genotype(normal=[('exp', 1), ('sigmoid', 0), ('sigmoid', 0), ('linear', 2), ('linear', 1)], normal_concat=range(3, 4))
+2021-09-20 12:20:18,509 architecture step (loss): 000 (1.626186e-03)
+2021-09-20 12:20:18,509 training accuracy: 0.001626
+2021-09-20 12:20:18,509 architecture step (accuracy): 000 (4.423950e-03)
+2021-09-20 12:20:18,509 validation accuracy: 0.004282
+2021-09-20 12:20:18,509 epoch: 21
+2021-09-20 12:20:18,524 genotype: Genotype(normal=[('exp', 1), ('sigmoid', 0), ('sigmoid', 0), ('linear', 2), ('linear', 1)], normal_concat=range(3, 4))
+2021-09-20 12:20:22,862 architecture step (loss): 000 (1.597947e-03)
+2021-09-20 12:20:22,862 training accuracy: 0.001598
+2021-09-20 12:20:22,862 architecture step (accuracy): 000 (4.024138e-03)
+2021-09-20 12:20:22,877 validation accuracy: 0.003899
+2021-09-20 12:20:22,877 epoch: 22
+2021-09-20 12:20:22,877 genotype: Genotype(normal=[('exp', 1), ('sigmoid', 0), ('sigmoid', 0), ('linear', 2), ('linear', 1)], normal_concat=range(3, 4))
+2021-09-20 12:20:27,081 architecture step (loss): 000 (1.586484e-03)
+2021-09-20 12:20:27,081 training accuracy: 0.001586
+2021-09-20 12:20:27,096 architecture step (accuracy): 000 (3.795605e-03)
+2021-09-20 12:20:27,096 validation accuracy: 0.004230
+2021-09-20 12:20:27,096 epoch: 23
+2021-09-20 12:20:27,096 genotype: Genotype(normal=[('exp', 1), ('sigmoid', 0), ('linear', 2), ('sigmoid', 0), ('linear', 1)], normal_concat=range(3, 4))
+2021-09-20 12:20:31,518 architecture step (loss): 000 (1.576031e-03)
+2021-09-20 12:20:31,518 training accuracy: 0.001576
+2021-09-20 12:20:31,518 architecture step (accuracy): 000 (4.299580e-03)
+2021-09-20 12:20:31,534 validation accuracy: 0.004206
+2021-09-20 12:20:31,534 epoch: 24
+2021-09-20 12:20:31,534 genotype: Genotype(normal=[('exp', 1), ('sigmoid', 0), ('linear', 2), ('sigmoid', 0), ('linear', 1)], normal_concat=range(3, 4))
+2021-09-20 12:20:36,502 architecture step (loss): 000 (1.530339e-03)
+2021-09-20 12:20:36,502 training accuracy: 0.001530
+2021-09-20 12:20:36,502 architecture step (accuracy): 000 (4.125746e-03)
+2021-09-20 12:20:36,502 validation accuracy: 0.004271
+2021-09-20 12:20:36,502 epoch: 25
+2021-09-20 12:20:36,518 genotype: Genotype(normal=[('exp', 1), ('sigmoid', 0), ('linear', 2), ('sigmoid', 0), ('linear', 1)], normal_concat=range(3, 4))
+2021-09-20 12:20:40,903 architecture step (loss): 000 (1.499055e-03)
+2021-09-20 12:20:40,903 training accuracy: 0.001499
+2021-09-20 12:20:40,903 architecture step (accuracy): 000 (3.551799e-03)
+2021-09-20 12:20:40,903 validation accuracy: 0.003883
+2021-09-20 12:20:40,903 epoch: 26
+2021-09-20 12:20:40,919 genotype: Genotype(normal=[('exp', 1), ('sigmoid', 0), ('linear', 2), ('linear', 1), ('sigmoid', 0)], normal_concat=range(3, 4))
+2021-09-20 12:20:45,356 architecture step (loss): 000 (1.514092e-03)
+2021-09-20 12:20:45,356 training accuracy: 0.001514
+2021-09-20 12:20:45,356 architecture step (accuracy): 000 (4.151599e-03)
+2021-09-20 12:20:45,356 validation accuracy: 0.004239
+2021-09-20 12:20:45,356 epoch: 27
+2021-09-20 12:20:45,372 genotype: Genotype(normal=[('exp', 1), ('sigmoid', 0), ('linear', 1), ('linear', 2), ('sigmoid', 0)], normal_concat=range(3, 4))
+2021-09-20 12:20:50,184 architecture step (loss): 000 (1.491333e-03)
+2021-09-20 12:20:50,184 training accuracy: 0.001491
+2021-09-20 12:20:50,200 architecture step (accuracy): 000 (3.851548e-03)
+2021-09-20 12:20:50,200 validation accuracy: 0.004325
+2021-09-20 12:20:50,200 epoch: 28
+2021-09-20 12:20:50,200 genotype: Genotype(normal=[('exp', 1), ('sigmoid', 0), ('linear', 1), ('linear', 2), ('sigmoid', 0)], normal_concat=range(3, 4))
+2021-09-20 12:20:54,934 architecture step (loss): 000 (1.453551e-03)
+2021-09-20 12:20:54,934 training accuracy: 0.001454
+2021-09-20 12:20:54,950 architecture step (accuracy): 000 (3.692413e-03)
+2021-09-20 12:20:54,950 validation accuracy: 0.004009
+2021-09-20 12:20:54,950 epoch: 29
+2021-09-20 12:20:54,950 genotype: Genotype(normal=[('exp', 1), ('sigmoid', 0), ('linear', 1), ('linear', 2), ('sigmoid', 0)], normal_concat=range(3, 4))
+2021-09-20 12:20:59,559 architecture step (loss): 000 (1.446808e-03)
+2021-09-20 12:20:59,559 training accuracy: 0.001447
+2021-09-20 12:20:59,559 architecture step (accuracy): 000 (3.498957e-03)
+2021-09-20 12:20:59,559 validation accuracy: 0.003649
+2021-09-20 12:20:59,559 epoch: 30
+2021-09-20 12:20:59,575 genotype: Genotype(normal=[('exp', 1), ('sigmoid', 0), ('linear', 1), ('linear', 2), ('sigmoid', 0)], normal_concat=range(3, 4))
+2021-09-20 12:21:03,845 architecture step (loss): 000 (1.460455e-03)
+2021-09-20 12:21:03,845 training accuracy: 0.001460
+2021-09-20 12:21:03,861 architecture step (accuracy): 000 (4.049239e-03)
+2021-09-20 12:21:03,861 validation accuracy: 0.003901
+2021-09-20 12:21:03,861 epoch: 31
+2021-09-20 12:21:03,876 genotype: Genotype(normal=[('exp', 1), ('sigmoid', 0), ('linear', 1), ('linear', 2), ('sigmoid', 0)], normal_concat=range(3, 4))
+2021-09-20 12:21:08,361 architecture step (loss): 000 (1.399863e-03)
+2021-09-20 12:21:08,361 training accuracy: 0.001400
+2021-09-20 12:21:08,361 architecture step (accuracy): 000 (3.643984e-03)
+2021-09-20 12:21:08,361 validation accuracy: 0.003789
+2021-09-20 12:21:08,361 epoch: 32
+2021-09-20 12:21:08,376 genotype: Genotype(normal=[('exp', 1), ('sigmoid', 0), ('linear', 1), ('linear', 2), ('sigmoid', 0)], normal_concat=range(3, 4))
+2021-09-20 12:21:12,783 architecture step (loss): 000 (1.408038e-03)
+2021-09-20 12:21:12,783 training accuracy: 0.001408
+2021-09-20 12:21:12,783 architecture step (accuracy): 000 (3.347076e-03)
+2021-09-20 12:21:12,783 validation accuracy: 0.003625
+2021-09-20 12:21:12,783 epoch: 33
+2021-09-20 12:21:12,798 genotype: Genotype(normal=[('exp', 1), ('sigmoid', 0), ('linear', 1), ('linear', 2), ('sigmoid', 0)], normal_concat=range(3, 4))
+2021-09-20 12:21:17,158 architecture step (loss): 000 (1.395204e-03)
+2021-09-20 12:21:17,158 training accuracy: 0.001395
+2021-09-20 12:21:17,158 architecture step (accuracy): 000 (4.309025e-03)
+2021-09-20 12:21:17,158 validation accuracy: 0.004110
+2021-09-20 12:21:17,158 epoch: 34
+2021-09-20 12:21:17,173 genotype: Genotype(normal=[('exp', 1), ('sigmoid', 0), ('linear', 1), ('linear', 2), ('sigmoid', 0)], normal_concat=range(3, 4))
+2021-09-20 12:21:21,517 architecture step (loss): 000 (1.412054e-03)
+2021-09-20 12:21:21,533 training accuracy: 0.001412
+2021-09-20 12:21:21,533 architecture step (accuracy): 000 (3.731655e-03)
+2021-09-20 12:21:21,533 validation accuracy: 0.003837
+2021-09-20 12:21:21,533 epoch: 35
+2021-09-20 12:21:21,548 genotype: Genotype(normal=[('exp', 1), ('sigmoid', 0), ('linear', 1), ('linear', 2), ('sigmoid', 0)], normal_concat=range(3, 4))
+2021-09-20 12:21:25,829 architecture step (loss): 000 (1.369175e-03)
+2021-09-20 12:21:25,829 training accuracy: 0.001369
+2021-09-20 12:21:25,829 architecture step (accuracy): 000 (3.896418e-03)
+2021-09-20 12:21:25,829 validation accuracy: 0.003987
+2021-09-20 12:21:25,829 epoch: 36
+2021-09-20 12:21:25,845 genotype: Genotype(normal=[('exp', 1), ('sigmoid', 0), ('linear', 1), ('linear', 2), ('sigmoid', 0)], normal_concat=range(3, 4))
+2021-09-20 12:21:30,283 architecture step (loss): 000 (1.374660e-03)
+2021-09-20 12:21:30,283 training accuracy: 0.001375
+2021-09-20 12:21:30,298 architecture step (accuracy): 000 (3.784505e-03)
+2021-09-20 12:21:30,298 validation accuracy: 0.003773
+2021-09-20 12:21:30,298 epoch: 37
+2021-09-20 12:21:30,298 genotype: Genotype(normal=[('exp', 1), ('sigmoid', 0), ('linear', 1), ('linear', 2), ('sigmoid', 0)], normal_concat=range(3, 4))
+2021-09-20 12:21:34,783 architecture step (loss): 000 (1.375408e-03)
+2021-09-20 12:21:34,783 training accuracy: 0.001375
+2021-09-20 12:21:34,783 architecture step (accuracy): 000 (4.028154e-03)
+2021-09-20 12:21:34,783 validation accuracy: 0.003846
+2021-09-20 12:21:34,783 epoch: 38
+2021-09-20 12:21:34,798 genotype: Genotype(normal=[('exp', 1), ('sigmoid', 0), ('linear', 1), ('linear', 2), ('sigmoid', 0)], normal_concat=range(3, 4))
+2021-09-20 12:21:39,214 architecture step (loss): 000 (1.349963e-03)
+2021-09-20 12:21:39,214 training accuracy: 0.001350
+2021-09-20 12:21:39,214 architecture step (accuracy): 000 (3.603119e-03)
+2021-09-20 12:21:39,214 validation accuracy: 0.003470
+2021-09-20 12:21:39,214 epoch: 39
+2021-09-20 12:21:39,230 genotype: Genotype(normal=[('exp', 1), ('sigmoid', 0), ('linear', 1), ('linear', 2), ('sigmoid', 0)], normal_concat=range(3, 4))
+2021-09-20 12:21:43,636 architecture step (loss): 000 (1.353850e-03)
+2021-09-20 12:21:43,636 training accuracy: 0.001354
+2021-09-20 12:21:43,636 architecture step (accuracy): 000 (4.139911e-03)
+2021-09-20 12:21:43,652 validation accuracy: 0.003960
+2021-09-20 12:21:43,652 epoch: 40
+2021-09-20 12:21:43,667 genotype: Genotype(normal=[('exp', 1), ('sigmoid', 0), ('linear', 1), ('linear', 2), ('sigmoid', 0)], normal_concat=range(3, 4))
+2021-09-20 12:21:47,995 architecture step (loss): 000 (1.316805e-03)
+2021-09-20 12:21:47,995 training accuracy: 0.001317
+2021-09-20 12:21:48,011 architecture step (accuracy): 000 (3.456918e-03)
+2021-09-20 12:21:48,011 validation accuracy: 0.003747
+2021-09-20 12:21:48,011 epoch: 41
+2021-09-20 12:21:48,011 genotype: Genotype(normal=[('exp', 1), ('sigmoid', 0), ('linear', 1), ('linear', 2), ('sigmoid', 0)], normal_concat=range(3, 4))
+2021-09-20 12:21:52,105 architecture step (loss): 000 (1.326645e-03)
+2021-09-20 12:21:52,105 training accuracy: 0.001327
+2021-09-20 12:21:52,120 architecture step (accuracy): 000 (3.981915e-03)
+2021-09-20 12:21:52,120 validation accuracy: 0.003798
+2021-09-20 12:21:52,120 epoch: 42
+2021-09-20 12:21:52,120 genotype: Genotype(normal=[('exp', 1), ('sigmoid', 0), ('linear', 1), ('linear', 2), ('sigmoid', 0)], normal_concat=range(3, 4))
+2021-09-20 12:21:56,167 architecture step (loss): 000 (1.304377e-03)
+2021-09-20 12:21:56,167 training accuracy: 0.001304
+2021-09-20 12:21:56,183 architecture step (accuracy): 000 (3.976164e-03)
+2021-09-20 12:21:56,183 validation accuracy: 0.003892
+2021-09-20 12:21:56,183 epoch: 43
+2021-09-20 12:21:56,183 genotype: Genotype(normal=[('exp', 1), ('sigmoid', 0), ('linear', 1), ('linear', 2), ('sigmoid', 0)], normal_concat=range(3, 4))
+2021-09-20 12:22:00,754 architecture step (loss): 000 (1.293849e-03)
+2021-09-20 12:22:00,754 training accuracy: 0.001294
+2021-09-20 12:22:00,770 architecture step (accuracy): 000 (3.393917e-03)
+2021-09-20 12:22:00,770 validation accuracy: 0.003956
+2021-09-20 12:22:00,770 epoch: 44
+2021-09-20 12:22:00,770 genotype: Genotype(normal=[('exp', 1), ('sigmoid', 0), ('linear', 1), ('linear', 2), ('sigmoid', 0)], normal_concat=range(3, 4))
+2021-09-20 12:22:04,989 architecture step (loss): 000 (1.295991e-03)
+2021-09-20 12:22:04,989 training accuracy: 0.001296
+2021-09-20 12:22:05,004 architecture step (accuracy): 000 (3.789691e-03)
+2021-09-20 12:22:05,004 validation accuracy: 0.003657
+2021-09-20 12:22:05,004 epoch: 45
+2021-09-20 12:22:05,020 genotype: Genotype(normal=[('exp', 1), ('sigmoid', 0), ('linear', 1), ('linear', 2), ('sigmoid', 0)], normal_concat=range(3, 4))
+2021-09-20 12:22:09,239 architecture step (loss): 000 (1.310279e-03)
+2021-09-20 12:22:09,239 training accuracy: 0.001310
+2021-09-20 12:22:09,254 architecture step (accuracy): 000 (4.080308e-03)
+2021-09-20 12:22:09,254 validation accuracy: 0.003892
+2021-09-20 12:22:09,254 epoch: 46
+2021-09-20 12:22:09,254 genotype: Genotype(normal=[('exp', 1), ('sigmoid', 0), ('linear', 1), ('linear', 2), ('sigmoid', 0)], normal_concat=range(3, 4))
+2021-09-20 12:22:13,207 architecture step (loss): 000 (1.260248e-03)
+2021-09-20 12:22:13,207 training accuracy: 0.001260
+2021-09-20 12:22:13,223 architecture step (accuracy): 000 (3.981221e-03)
+2021-09-20 12:22:13,223 validation accuracy: 0.003798
+2021-09-20 12:22:13,223 epoch: 47
+2021-09-20 12:22:13,223 genotype: Genotype(normal=[('exp', 1), ('sigmoid', 0), ('linear', 1), ('linear', 2), ('sigmoid', 0)], normal_concat=range(3, 4))
+2021-09-20 12:22:17,634 architecture step (loss): 000 (1.259609e-03)
+2021-09-20 12:22:17,634 training accuracy: 0.001260
+2021-09-20 12:22:17,649 architecture step (accuracy): 000 (3.571603e-03)
+2021-09-20 12:22:17,649 validation accuracy: 0.003824
+2021-09-20 12:22:17,649 epoch: 48
+2021-09-20 12:22:17,649 genotype: Genotype(normal=[('exp', 1), ('sigmoid', 0), ('linear', 1), ('linear', 2), ('sigmoid', 0)], normal_concat=range(3, 4))
+2021-09-20 12:22:21,618 architecture step (loss): 000 (1.249773e-03)
+2021-09-20 12:22:21,618 training accuracy: 0.001250
+2021-09-20 12:22:21,618 architecture step (accuracy): 000 (3.981766e-03)
+2021-09-20 12:22:21,618 validation accuracy: 0.003831
+2021-09-20 12:22:21,618 epoch: 49
+2021-09-20 12:22:21,634 genotype: Genotype(normal=[('exp', 1), ('sigmoid', 0), ('linear', 1), ('linear', 2), ('sigmoid', 0)], normal_concat=range(3, 4))
+2021-09-20 12:22:25,681 architecture step (loss): 000 (1.248621e-03)
+2021-09-20 12:22:25,681 training accuracy: 0.001249
+2021-09-20 12:22:25,681 architecture step (accuracy): 000 (3.479033e-03)
+2021-09-20 12:22:25,696 validation accuracy: 0.003731
+2021-09-20 12:22:25,696 epoch: 50
+2021-09-20 12:22:25,696 genotype: Genotype(normal=[('exp', 1), ('sigmoid', 0), ('linear', 1), ('linear', 2), ('sigmoid', 0)], normal_concat=range(3, 4))
+2021-09-20 12:22:30,259 architecture step (loss): 000 (1.227479e-03)
+2021-09-20 12:22:30,259 training accuracy: 0.001227
+2021-09-20 12:22:30,259 architecture step (accuracy): 000 (3.648651e-03)
+2021-09-20 12:22:30,274 validation accuracy: 0.004063
+2021-09-20 12:22:30,274 epoch: 51
+2021-09-20 12:22:30,274 genotype: Genotype(normal=[('exp', 1), ('sigmoid', 0), ('linear', 1), ('linear', 2), ('sigmoid', 0)], normal_concat=range(3, 4))
+2021-09-20 12:22:34,649 architecture step (loss): 000 (1.242130e-03)
+2021-09-20 12:22:34,649 training accuracy: 0.001242
+2021-09-20 12:22:34,649 architecture step (accuracy): 000 (3.898817e-03)
+2021-09-20 12:22:34,649 validation accuracy: 0.003740
+2021-09-20 12:22:34,665 epoch: 52
+2021-09-20 12:22:34,665 genotype: Genotype(normal=[('exp', 1), ('sigmoid', 0), ('linear', 1), ('linear', 2), ('sigmoid', 0)], normal_concat=range(3, 4))
+2021-09-20 12:22:38,884 architecture step (loss): 000 (1.248273e-03)
+2021-09-20 12:22:38,884 training accuracy: 0.001248
+2021-09-20 12:22:38,899 architecture step (accuracy): 000 (4.017060e-03)
+2021-09-20 12:22:38,899 validation accuracy: 0.003836
+2021-09-20 12:22:38,899 epoch: 53
+2021-09-20 12:22:38,899 genotype: Genotype(normal=[('exp', 1), ('sigmoid', 0), ('linear', 1), ('linear', 2), ('sigmoid', 0)], normal_concat=range(3, 4))
+2021-09-20 12:22:43,009 architecture step (loss): 000 (1.235834e-03)
+2021-09-20 12:22:43,009 training accuracy: 0.001236
+2021-09-20 12:22:43,009 architecture step (accuracy): 000 (3.583378e-03)
+2021-09-20 12:22:43,024 validation accuracy: 0.003886
+2021-09-20 12:22:43,024 epoch: 54
+2021-09-20 12:22:43,024 genotype: Genotype(normal=[('exp', 1), ('sigmoid', 0), ('linear', 1), ('linear', 2), ('sigmoid', 0)], normal_concat=range(3, 4))
+2021-09-20 12:23:17,722 gpu device: 0
+2021-09-20 12:23:17,722 configuration = <module 'AER_theorist.darts.darts_config' from 'C:\\Users\\Admin\\PycharmProjects\\neuro\\AER\\AER_theorist\\darts\\darts_config.py'>
+2021-09-20 12:23:17,738 param size: 0.000028MB
+2021-09-20 12:23:18,034 genotype: Genotype(normal=[('sigmoid', 1), ('none', 0), ('relu', 0), ('mult', 2), ('relu', 1)], normal_concat=range(3, 4))
+2021-09-20 12:23:22,988 architecture step (loss): 000 (3.982430e-02)
+2021-09-20 12:23:22,988 training accuracy: 0.039824
+2021-09-20 12:23:22,988 architecture step (accuracy): 000 (1.056647e-02)
+2021-09-20 12:23:22,988 validation accuracy: 0.010951
+2021-09-20 12:23:23,003 epoch: 0
+2021-09-20 12:30:05,146 gpu device: 0
+2021-09-20 12:30:05,146 configuration = <module 'AER_theorist.darts.darts_config' from 'C:\\Users\\Admin\\PycharmProjects\\neuro\\AER\\AER_theorist\\darts\\darts_config.py'>
+2021-09-20 12:30:05,162 param size: 0.000028MB
+2021-09-20 12:30:05,459 genotype: Genotype(normal=[('sigmoid', 1), ('none', 0), ('relu', 0), ('mult', 2), ('relu', 1)], normal_concat=range(3, 4))
+2021-09-20 12:30:09,825 architecture step (loss): 000 (4.240786e-02)
+2021-09-20 12:30:09,825 training accuracy: 0.042408
+2021-09-20 12:30:09,825 architecture step (accuracy): 000 (1.147554e-02)
+2021-09-20 12:30:09,825 validation accuracy: 0.011390
+2021-09-20 12:30:09,825 epoch: 0
+2021-09-20 12:33:21,209 gpu device: 0
+2021-09-20 12:33:21,209 configuration = <module 'AER_theorist.darts.darts_config' from 'C:\\Users\\Admin\\PycharmProjects\\neuro\\AER\\AER_theorist\\darts\\darts_config.py'>
+2021-09-20 12:33:22,643 param size: 0.000028MB
+2021-09-20 12:33:23,017 genotype: Genotype(normal=[('sigmoid', 1), ('none', 0), ('relu', 0), ('mult', 2), ('relu', 1)], normal_concat=range(3, 4))
+2021-09-20 12:33:27,184 architecture step (loss): 000 (4.087048e-02)
+2021-09-20 12:33:27,184 training accuracy: 0.040870
+2021-09-20 12:33:27,200 architecture step (accuracy): 000 (1.541709e-02)
+2021-09-20 12:33:27,200 validation accuracy: 0.015383
+2021-09-20 12:33:27,200 epoch: 0
+2021-09-20 12:33:29,582 genotype: Genotype(normal=[('sigmoid', 1), ('none', 0), ('none', 2), ('none', 1), ('mult', 0)], normal_concat=range(3, 4))
+2021-09-20 12:33:33,911 architecture step (loss): 000 (5.872184e-03)
+2021-09-20 12:33:33,911 training accuracy: 0.005872
+2021-09-20 12:33:33,927 architecture step (accuracy): 000 (1.401543e-02)
+2021-09-20 12:33:33,927 validation accuracy: 0.014606
+2021-09-20 12:33:33,927 epoch: 1
+2021-09-20 12:33:34,521 genotype: Genotype(normal=[('sigmoid', 1), ('none', 0), ('none', 2), ('mult', 0), ('none', 1)], normal_concat=range(3, 4))
+2021-09-20 12:33:38,657 architecture step (loss): 000 (4.847198e-03)
+2021-09-20 12:33:38,657 training accuracy: 0.004847
+2021-09-20 12:33:38,657 architecture step (accuracy): 000 (1.413717e-02)
+2021-09-20 12:33:38,657 validation accuracy: 0.013470
+2021-09-20 12:33:38,657 epoch: 2
+2021-09-20 12:33:39,260 genotype: Genotype(normal=[('sigmoid', 1), ('none', 0), ('none', 2), ('mult', 0), ('none', 1)], normal_concat=range(3, 4))
+2021-09-20 12:33:44,482 architecture step (loss): 000 (4.124541e-03)
+2021-09-20 12:33:44,482 training accuracy: 0.004125
+2021-09-20 12:33:44,482 architecture step (accuracy): 000 (1.246831e-02)
+2021-09-20 12:33:44,482 validation accuracy: 0.012171
+2021-09-20 12:33:44,482 epoch: 3
+2021-09-20 12:33:45,462 genotype: Genotype(normal=[('sigmoid', 1), ('none', 0), ('none', 2), ('mult', 0), ('mult', 1)], normal_concat=range(3, 4))
+2021-09-20 12:33:49,560 architecture step (loss): 000 (3.623652e-03)
+2021-09-20 12:33:49,560 training accuracy: 0.003624
+2021-09-20 12:33:49,560 architecture step (accuracy): 000 (1.325888e-02)
+2021-09-20 12:33:49,560 validation accuracy: 0.012634
+2021-09-20 12:33:49,560 epoch: 4
+2021-09-20 12:33:50,163 genotype: Genotype(normal=[('sigmoid', 1), ('none', 0), ('none', 2), ('mult', 0), ('mult', 1)], normal_concat=range(3, 4))
+2021-09-20 12:33:54,205 architecture step (loss): 000 (3.143883e-03)
+2021-09-20 12:33:54,205 training accuracy: 0.003144
+2021-09-20 12:33:54,205 architecture step (accuracy): 000 (1.181528e-02)
+2021-09-20 12:33:54,205 validation accuracy: 0.011454
+2021-09-20 12:33:54,205 epoch: 5
+2021-09-20 12:33:54,799 genotype: Genotype(normal=[('sigmoid', 1), ('none', 0), ('none', 2), ('mult', 0), ('mult', 1)], normal_concat=range(3, 4))
+2021-09-20 12:33:58,895 architecture step (loss): 000 (2.923786e-03)
+2021-09-20 12:33:58,910 training accuracy: 0.002924
+2021-09-20 12:33:58,910 architecture step (accuracy): 000 (1.072842e-02)
+2021-09-20 12:33:58,910 validation accuracy: 0.011076
+2021-09-20 12:33:58,910 epoch: 6
+2021-09-20 12:33:59,520 genotype: Genotype(normal=[('sigmoid', 1), ('none', 0), ('none', 2), ('mult', 0), ('mult', 1)], normal_concat=range(3, 4))
+2021-09-20 12:34:03,886 architecture step (loss): 000 (2.691725e-03)
+2021-09-20 12:34:03,886 training accuracy: 0.002692
+2021-09-20 12:34:03,886 architecture step (accuracy): 000 (9.985293e-03)
+2021-09-20 12:34:03,886 validation accuracy: 0.010012
+2021-09-20 12:34:03,886 epoch: 7
+2021-09-20 12:34:04,512 genotype: Genotype(normal=[('sigmoid', 1), ('none', 0), ('none', 2), ('mult', 0), ('mult', 1)], normal_concat=range(3, 4))
+2021-09-20 12:34:08,697 architecture step (loss): 000 (2.498608e-03)
+2021-09-20 12:34:08,697 training accuracy: 0.002499
+2021-09-20 12:34:08,713 architecture step (accuracy): 000 (9.674402e-03)
+2021-09-20 12:34:08,713 validation accuracy: 0.009293
+2021-09-20 12:34:08,713 epoch: 8
+2021-09-20 12:34:09,325 genotype: Genotype(normal=[('sigmoid', 1), ('sigmoid', 0), ('none', 2), ('mult', 1), ('mult', 0)], normal_concat=range(3, 4))
+2021-09-20 12:34:13,571 architecture step (loss): 000 (2.382676e-03)
+2021-09-20 12:34:13,571 training accuracy: 0.002383
+2021-09-20 12:34:13,587 architecture step (accuracy): 000 (8.982107e-03)
+2021-09-20 12:34:13,587 validation accuracy: 0.008904
+2021-09-20 12:34:13,587 epoch: 9
+2021-09-20 12:34:14,197 genotype: Genotype(normal=[('sigmoid', 1), ('sigmoid', 0), ('none', 2), ('mult', 1), ('mult', 0)], normal_concat=range(3, 4))
+2021-09-20 12:34:18,420 architecture step (loss): 000 (2.269830e-03)
+2021-09-20 12:34:18,420 training accuracy: 0.002270
+2021-09-20 12:34:18,420 architecture step (accuracy): 000 (1.002093e-02)
+2021-09-20 12:34:18,420 validation accuracy: 0.009943
+2021-09-20 12:34:18,420 epoch: 10
+2021-09-20 12:34:19,085 genotype: Genotype(normal=[('sigmoid', 0), ('sigmoid', 1), ('none', 2), ('mult', 1), ('mult', 0)], normal_concat=range(3, 4))
+2021-09-20 12:34:23,417 architecture step (loss): 000 (2.159619e-03)
+2021-09-20 12:34:23,417 training accuracy: 0.002160
+2021-09-20 12:34:23,432 architecture step (accuracy): 000 (9.234275e-03)
+2021-09-20 12:34:23,432 validation accuracy: 0.009279
+2021-09-20 12:34:23,432 epoch: 11
+2021-09-20 12:34:24,057 genotype: Genotype(normal=[('sigmoid', 0), ('sigmoid', 1), ('none', 2), ('mult', 1), ('mult', 0)], normal_concat=range(3, 4))
+2021-09-20 12:34:28,111 architecture step (loss): 000 (2.061483e-03)
+2021-09-20 12:34:28,111 training accuracy: 0.002061
+2021-09-20 12:34:28,111 architecture step (accuracy): 000 (8.032225e-03)
+2021-09-20 12:34:28,126 validation accuracy: 0.009563
+2021-09-20 12:34:28,126 epoch: 12
+2021-09-20 12:34:28,741 genotype: Genotype(normal=[('sigmoid', 0), ('sigmoid', 1), ('none', 2), ('mult', 1), ('mult', 0)], normal_concat=range(3, 4))
+2021-09-20 12:34:32,823 architecture step (loss): 000 (2.028774e-03)
+2021-09-20 12:34:32,823 training accuracy: 0.002029
+2021-09-20 12:34:32,823 architecture step (accuracy): 000 (8.187949e-03)
+2021-09-20 12:34:32,838 validation accuracy: 0.008263
+2021-09-20 12:34:32,838 epoch: 13
+2021-09-20 12:34:33,479 genotype: Genotype(normal=[('sigmoid', 0), ('linear', 1), ('linear', 2), ('mult', 1), ('mult', 0)], normal_concat=range(3, 4))
+2021-09-20 12:34:37,748 architecture step (loss): 000 (1.964212e-03)
+2021-09-20 12:34:37,748 training accuracy: 0.001964
+2021-09-20 12:34:37,748 architecture step (accuracy): 000 (8.986983e-03)
+2021-09-20 12:34:37,748 validation accuracy: 0.008793
+2021-09-20 12:34:37,748 epoch: 14
+2021-09-20 12:34:38,414 genotype: Genotype(normal=[('sigmoid', 0), ('linear', 1), ('linear', 2), ('mult', 1), ('mult', 0)], normal_concat=range(3, 4))
+2021-09-20 12:34:42,664 architecture step (loss): 000 (1.902111e-03)
+2021-09-20 12:34:42,664 training accuracy: 0.001902
+2021-09-20 12:34:42,664 architecture step (accuracy): 000 (7.885540e-03)
+2021-09-20 12:34:42,664 validation accuracy: 0.008028
+2021-09-20 12:34:42,664 epoch: 15
+2021-09-20 12:34:43,289 genotype: Genotype(normal=[('sigmoid', 0), ('linear', 1), ('linear', 2), ('mult', 1), ('mult', 0)], normal_concat=range(3, 4))
+2021-09-20 12:34:47,390 architecture step (loss): 000 (1.838473e-03)
+2021-09-20 12:34:47,390 training accuracy: 0.001838
+2021-09-20 12:34:47,390 architecture step (accuracy): 000 (8.109694e-03)
+2021-09-20 12:34:47,390 validation accuracy: 0.008067
+2021-09-20 12:34:47,390 epoch: 16
+2021-09-20 12:34:48,013 genotype: Genotype(normal=[('sigmoid', 0), ('linear', 1), ('linear', 2), ('mult', 1), ('mult', 0)], normal_concat=range(3, 4))
+2021-09-20 12:34:52,105 architecture step (loss): 000 (1.818473e-03)
+2021-09-20 12:34:52,105 training accuracy: 0.001818
+2021-09-20 12:34:52,105 architecture step (accuracy): 000 (8.249445e-03)
+2021-09-20 12:34:52,105 validation accuracy: 0.008079
+2021-09-20 12:34:52,121 epoch: 17
+2021-09-20 12:34:52,918 genotype: Genotype(normal=[('sigmoid', 0), ('exp', 1), ('linear', 2), ('mult', 1), ('mult', 0)], normal_concat=range(3, 4))
+2021-09-20 12:34:57,099 architecture step (loss): 000 (1.803598e-03)
+2021-09-20 12:34:57,099 training accuracy: 0.001804
+2021-09-20 12:34:57,099 architecture step (accuracy): 000 (8.640594e-03)
+2021-09-20 12:34:57,099 validation accuracy: 0.008432
+2021-09-20 12:34:57,099 epoch: 18
+2021-09-20 12:34:57,791 genotype: Genotype(normal=[('sigmoid', 0), ('exp', 1), ('linear', 2), ('linear', 1), ('mult', 0)], normal_concat=range(3, 4))
+2021-09-20 12:35:02,077 architecture step (loss): 000 (1.749923e-03)
+2021-09-20 12:35:02,077 training accuracy: 0.001750
+2021-09-20 12:35:02,077 architecture step (accuracy): 000 (9.161113e-03)
+2021-09-20 12:35:02,092 validation accuracy: 0.008872
+2021-09-20 12:35:02,092 epoch: 19
+2021-09-20 12:35:02,842 genotype: Genotype(normal=[('sigmoid', 0), ('exp', 1), ('linear', 1), ('linear', 2), ('mult', 0)], normal_concat=range(3, 4))
+2021-09-20 12:35:07,169 architecture step (loss): 000 (1.756480e-03)
+2021-09-20 12:35:07,169 training accuracy: 0.001756
+2021-09-20 12:35:07,169 architecture step (accuracy): 000 (8.345285e-03)
+2021-09-20 12:35:07,169 validation accuracy: 0.008015
+2021-09-20 12:35:07,169 epoch: 20
+2021-09-20 12:35:07,995 genotype: Genotype(normal=[('sigmoid', 0), ('exp', 1), ('linear', 1), ('linear', 2), ('mult', 0)], normal_concat=range(3, 4))
+2021-09-20 12:35:12,232 architecture step (loss): 000 (1.701611e-03)
+2021-09-20 12:35:12,232 training accuracy: 0.001702
+2021-09-20 12:35:12,232 architecture step (accuracy): 000 (8.482506e-03)
+2021-09-20 12:35:12,232 validation accuracy: 0.008223
+2021-09-20 12:35:12,232 epoch: 21
+2021-09-20 12:35:12,890 genotype: Genotype(normal=[('sigmoid', 0), ('exp', 1), ('linear', 1), ('linear', 2), ('none', 0)], normal_concat=range(3, 4))
+2021-09-20 12:35:16,992 architecture step (loss): 000 (1.680069e-03)
+2021-09-20 12:35:16,992 training accuracy: 0.001680
+2021-09-20 12:35:16,992 architecture step (accuracy): 000 (7.559788e-03)
+2021-09-20 12:35:16,992 validation accuracy: 0.007333
+2021-09-20 12:35:16,992 epoch: 22
+2021-09-20 12:35:17,602 genotype: Genotype(normal=[('sigmoid', 0), ('exp', 1), ('linear', 1), ('linear', 2), ('none', 0)], normal_concat=range(3, 4))
+2021-09-20 12:35:21,705 architecture step (loss): 000 (1.667477e-03)
+2021-09-20 12:35:21,705 training accuracy: 0.001667
+2021-09-20 12:35:21,705 architecture step (accuracy): 000 (7.391361e-03)
+2021-09-20 12:35:21,721 validation accuracy: 0.007423
+2021-09-20 12:35:21,721 epoch: 23
+2021-09-20 12:35:22,330 genotype: Genotype(normal=[('sigmoid', 0), ('exp', 1), ('linear', 1), ('linear', 2), ('none', 0)], normal_concat=range(3, 4))
+2021-09-20 12:35:26,514 architecture step (loss): 000 (1.658460e-03)
+2021-09-20 12:35:26,514 training accuracy: 0.001658
+2021-09-20 12:35:26,514 architecture step (accuracy): 000 (8.318329e-03)
+2021-09-20 12:35:26,514 validation accuracy: 0.008144
+2021-09-20 12:35:26,514 epoch: 24
+2021-09-20 12:35:27,101 genotype: Genotype(normal=[('sigmoid', 0), ('exp', 1), ('linear', 1), ('linear', 2), ('none', 0)], normal_concat=range(3, 4))
+2021-09-20 12:35:31,188 architecture step (loss): 000 (1.619197e-03)
+2021-09-20 12:35:31,188 training accuracy: 0.001619
+2021-09-20 12:35:31,188 architecture step (accuracy): 000 (8.471040e-03)
+2021-09-20 12:35:31,188 validation accuracy: 0.008402
+2021-09-20 12:35:31,188 epoch: 25
+2021-09-20 12:35:31,922 genotype: Genotype(normal=[('sigmoid', 0), ('exp', 1), ('linear', 1), ('linear', 2), ('none', 0)], normal_concat=range(3, 4))
+2021-09-20 12:35:36,119 architecture step (loss): 000 (1.586319e-03)
+2021-09-20 12:35:36,119 training accuracy: 0.001586
+2021-09-20 12:35:36,119 architecture step (accuracy): 000 (7.664019e-03)
+2021-09-20 12:35:36,127 validation accuracy: 0.007715
+2021-09-20 12:35:36,127 epoch: 26
+2021-09-20 12:35:36,744 genotype: Genotype(normal=[('sigmoid', 0), ('exp', 1), ('linear', 1), ('linear', 2), ('none', 0)], normal_concat=range(3, 4))
+2021-09-20 12:35:40,922 architecture step (loss): 000 (1.588695e-03)
+2021-09-20 12:35:40,922 training accuracy: 0.001589
+2021-09-20 12:35:40,922 architecture step (accuracy): 000 (8.094264e-03)
+2021-09-20 12:35:40,922 validation accuracy: 0.008232
+2021-09-20 12:35:40,922 epoch: 27
+2021-09-20 12:35:41,531 genotype: Genotype(normal=[('sigmoid', 0), ('exp', 1), ('linear', 1), ('linear', 2), ('none', 0)], normal_concat=range(3, 4))
+2021-09-20 12:35:45,768 architecture step (loss): 000 (1.597436e-03)
+2021-09-20 12:35:45,768 training accuracy: 0.001597
+2021-09-20 12:35:45,768 architecture step (accuracy): 000 (8.068437e-03)
+2021-09-20 12:35:45,783 validation accuracy: 0.008121
+2021-09-20 12:35:45,783 epoch: 28
+2021-09-20 12:35:46,382 genotype: Genotype(normal=[('sigmoid', 0), ('exp', 1), ('linear', 1), ('linear', 2), ('none', 0)], normal_concat=range(3, 4))
+2021-09-20 12:35:50,447 architecture step (loss): 000 (1.538146e-03)
+2021-09-20 12:35:50,447 training accuracy: 0.001538
+2021-09-20 12:35:50,447 architecture step (accuracy): 000 (7.437094e-03)
+2021-09-20 12:35:50,447 validation accuracy: 0.007655
+2021-09-20 12:35:50,447 epoch: 29
+2021-09-20 12:35:51,081 genotype: Genotype(normal=[('sigmoid', 0), ('exp', 1), ('linear', 1), ('linear', 2), ('none', 0)], normal_concat=range(3, 4))
+2021-09-20 12:35:55,303 architecture step (loss): 000 (1.522457e-03)
+2021-09-20 12:35:55,303 training accuracy: 0.001522
+2021-09-20 12:35:55,318 architecture step (accuracy): 000 (7.209460e-03)
+2021-09-20 12:35:55,318 validation accuracy: 0.007302
+2021-09-20 12:35:55,318 epoch: 30
+2021-09-20 12:35:55,943 genotype: Genotype(normal=[('sigmoid', 0), ('exp', 1), ('linear', 1), ('linear', 2), ('none', 0)], normal_concat=range(3, 4))
+2021-09-20 12:36:00,209 architecture step (loss): 000 (1.550362e-03)
+2021-09-20 12:36:00,209 training accuracy: 0.001550
+2021-09-20 12:36:00,209 architecture step (accuracy): 000 (7.242893e-03)
+2021-09-20 12:36:00,225 validation accuracy: 0.006962
+2021-09-20 12:36:00,225 epoch: 31
+2021-09-20 12:36:00,834 genotype: Genotype(normal=[('sigmoid', 0), ('exp', 1), ('linear', 1), ('linear', 2), ('none', 0)], normal_concat=range(3, 4))
+2021-09-20 12:36:05,062 architecture step (loss): 000 (1.509040e-03)
+2021-09-20 12:36:05,062 training accuracy: 0.001509
+2021-09-20 12:36:05,062 architecture step (accuracy): 000 (7.218484e-03)
+2021-09-20 12:36:05,077 validation accuracy: 0.007311
+2021-09-20 12:36:05,077 epoch: 32
+2021-09-20 12:36:05,671 genotype: Genotype(normal=[('sigmoid', 0), ('exp', 1), ('linear', 1), ('linear', 2), ('none', 0)], normal_concat=range(3, 4))
+2021-09-20 12:36:10,030 architecture step (loss): 000 (1.483591e-03)
+2021-09-20 12:36:10,030 training accuracy: 0.001484
+2021-09-20 12:36:10,030 architecture step (accuracy): 000 (7.323897e-03)
+2021-09-20 12:36:10,046 validation accuracy: 0.007531
+2021-09-20 12:36:10,046 epoch: 33
+2021-09-20 12:36:10,655 genotype: Genotype(normal=[('sigmoid', 0), ('exp', 1), ('linear', 1), ('linear', 2), ('none', 0)], normal_concat=range(3, 4))
+2021-09-20 12:36:15,019 architecture step (loss): 000 (1.494733e-03)
+2021-09-20 12:36:15,019 training accuracy: 0.001495
+2021-09-20 12:36:15,019 architecture step (accuracy): 000 (7.892456e-03)
+2021-09-20 12:36:15,019 validation accuracy: 0.007594
+2021-09-20 12:36:15,019 epoch: 34
+2021-09-20 12:36:15,675 genotype: Genotype(normal=[('sigmoid', 0), ('exp', 1), ('linear', 1), ('linear', 2), ('none', 0)], normal_concat=range(3, 4))
+2021-09-20 12:36:20,030 architecture step (loss): 000 (1.467980e-03)
+2021-09-20 12:36:20,030 training accuracy: 0.001468
+2021-09-20 12:36:20,046 architecture step (accuracy): 000 (7.376797e-03)
+2021-09-20 12:36:20,046 validation accuracy: 0.007306
+2021-09-20 12:36:20,046 epoch: 35
+2021-09-20 12:36:20,657 genotype: Genotype(normal=[('sigmoid', 0), ('exp', 1), ('linear', 1), ('linear', 2), ('none', 0)], normal_concat=range(3, 4))
+2021-09-20 12:36:24,851 architecture step (loss): 000 (1.457438e-03)
+2021-09-20 12:36:24,851 training accuracy: 0.001457
+2021-09-20 12:36:24,851 architecture step (accuracy): 000 (7.312884e-03)
+2021-09-20 12:36:24,867 validation accuracy: 0.007453
+2021-09-20 12:36:24,867 epoch: 36
+2021-09-20 12:36:25,460 genotype: Genotype(normal=[('sigmoid', 0), ('exp', 1), ('linear', 1), ('linear', 2), ('none', 0)], normal_concat=range(3, 4))
+2021-09-20 12:36:29,768 architecture step (loss): 000 (1.482358e-03)
+2021-09-20 12:36:29,768 training accuracy: 0.001482
+2021-09-20 12:36:29,784 architecture step (accuracy): 000 (7.220780e-03)
+2021-09-20 12:36:29,784 validation accuracy: 0.007188
+2021-09-20 12:36:29,784 epoch: 37
+2021-09-20 12:36:30,471 genotype: Genotype(normal=[('sigmoid', 0), ('exp', 1), ('linear', 1), ('linear', 2), ('none', 0)], normal_concat=range(3, 4))
+2021-09-20 12:36:34,745 architecture step (loss): 000 (1.461886e-03)
+2021-09-20 12:36:34,745 training accuracy: 0.001462
+2021-09-20 12:36:34,745 architecture step (accuracy): 000 (7.474256e-03)
+2021-09-20 12:36:34,745 validation accuracy: 0.007146
+2021-09-20 12:36:34,745 epoch: 38
+2021-09-20 12:36:35,370 genotype: Genotype(normal=[('sigmoid', 0), ('exp', 1), ('linear', 1), ('linear', 2), ('none', 0)], normal_concat=range(3, 4))
+2021-09-20 12:36:39,465 architecture step (loss): 000 (1.428445e-03)
+2021-09-20 12:36:39,465 training accuracy: 0.001428
+2021-09-20 12:36:39,480 architecture step (accuracy): 000 (5.260582e-03)
+2021-09-20 12:36:39,480 validation accuracy: 0.005917
+2021-09-20 12:36:39,480 epoch: 39
+2021-09-20 12:36:40,156 genotype: Genotype(normal=[('sigmoid', 0), ('exp', 1), ('linear', 1), ('linear', 2), ('none', 0)], normal_concat=range(3, 4))
+2021-09-20 12:36:44,359 architecture step (loss): 000 (1.437888e-03)
+2021-09-20 12:36:44,359 training accuracy: 0.001438
+2021-09-20 12:36:44,359 architecture step (accuracy): 000 (7.253482e-03)
+2021-09-20 12:36:44,375 validation accuracy: 0.006914
+2021-09-20 12:36:44,375 epoch: 40
+2021-09-20 12:36:44,984 genotype: Genotype(normal=[('sigmoid', 0), ('exp', 1), ('linear', 1), ('linear', 2), ('none', 0)], normal_concat=range(3, 4))
+2021-09-20 12:36:49,211 architecture step (loss): 000 (1.360799e-03)
+2021-09-20 12:36:49,227 training accuracy: 0.001361
+2021-09-20 12:36:49,227 architecture step (accuracy): 000 (6.754487e-03)
+2021-09-20 12:36:49,227 validation accuracy: 0.006921
+2021-09-20 12:36:49,227 epoch: 41
+2021-09-20 12:36:50,119 genotype: Genotype(normal=[('sigmoid', 0), ('exp', 1), ('linear', 1), ('linear', 2), ('none', 0)], normal_concat=range(3, 4))
+2021-09-20 12:36:54,424 architecture step (loss): 000 (1.388271e-03)
+2021-09-20 12:36:54,424 training accuracy: 0.001388
+2021-09-20 12:36:54,440 architecture step (accuracy): 000 (6.992535e-03)
+2021-09-20 12:36:54,440 validation accuracy: 0.006737
+2021-09-20 12:36:54,440 epoch: 42
+2021-09-20 12:36:55,065 genotype: Genotype(normal=[('sigmoid', 0), ('exp', 1), ('linear', 1), ('linear', 2), ('none', 0)], normal_concat=range(3, 4))
+2021-09-20 12:36:59,436 architecture step (loss): 000 (1.359462e-03)
+2021-09-20 12:36:59,436 training accuracy: 0.001359
+2021-09-20 12:36:59,444 architecture step (accuracy): 000 (7.095634e-03)
+2021-09-20 12:36:59,444 validation accuracy: 0.006955
+2021-09-20 12:36:59,444 epoch: 43
+2021-09-20 12:37:00,188 genotype: Genotype(normal=[('sigmoid', 0), ('exp', 1), ('linear', 1), ('linear', 2), ('none', 0)], normal_concat=range(3, 4))
+2021-09-20 12:37:04,403 architecture step (loss): 000 (1.373244e-03)
+2021-09-20 12:37:04,403 training accuracy: 0.001373
+2021-09-20 12:37:04,403 architecture step (accuracy): 000 (6.656551e-03)
+2021-09-20 12:37:04,403 validation accuracy: 0.007084
+2021-09-20 12:37:04,403 epoch: 44
+2021-09-20 12:37:05,215 genotype: Genotype(normal=[('sigmoid', 0), ('exp', 1), ('linear', 1), ('linear', 2), ('none', 0)], normal_concat=range(3, 4))
+2021-09-20 12:37:09,553 architecture step (loss): 000 (1.372091e-03)
+2021-09-20 12:37:09,553 training accuracy: 0.001372
+2021-09-20 12:37:09,553 architecture step (accuracy): 000 (6.978671e-03)
+2021-09-20 12:37:09,553 validation accuracy: 0.006693
+2021-09-20 12:37:09,553 epoch: 45
+2021-09-20 12:37:10,348 genotype: Genotype(normal=[('sigmoid', 0), ('exp', 1), ('linear', 1), ('linear', 2), ('none', 0)], normal_concat=range(3, 4))
+2021-09-20 12:37:14,678 architecture step (loss): 000 (1.384434e-03)
+2021-09-20 12:37:14,678 training accuracy: 0.001384
+2021-09-20 12:37:14,678 architecture step (accuracy): 000 (7.123146e-03)
+2021-09-20 12:37:14,678 validation accuracy: 0.006861
+2021-09-20 12:37:14,678 epoch: 46
+2021-09-20 12:37:15,287 genotype: Genotype(normal=[('sigmoid', 0), ('exp', 1), ('linear', 1), ('linear', 2), ('none', 0)], normal_concat=range(3, 4))
+2021-09-20 12:37:19,456 architecture step (loss): 000 (1.329324e-03)
+2021-09-20 12:37:19,456 training accuracy: 0.001329
+2021-09-20 12:37:19,456 architecture step (accuracy): 000 (7.203608e-03)
+2021-09-20 12:37:19,456 validation accuracy: 0.006938
+2021-09-20 12:37:19,456 epoch: 47
+2021-09-20 12:37:20,095 genotype: Genotype(normal=[('sigmoid', 0), ('exp', 1), ('linear', 1), ('linear', 2), ('none', 0)], normal_concat=range(3, 4))
+2021-09-20 12:37:24,371 architecture step (loss): 000 (1.347348e-03)
+2021-09-20 12:37:24,371 training accuracy: 0.001347
+2021-09-20 12:37:24,371 architecture step (accuracy): 000 (6.316262e-03)
+2021-09-20 12:37:24,371 validation accuracy: 0.006695
+2021-09-20 12:37:24,371 epoch: 48
+2021-09-20 12:37:24,996 genotype: Genotype(normal=[('sigmoid', 0), ('exp', 1), ('linear', 1), ('linear', 2), ('none', 0)], normal_concat=range(3, 4))
+2021-09-20 12:37:29,361 architecture step (loss): 000 (1.354266e-03)
+2021-09-20 12:37:29,361 training accuracy: 0.001354
+2021-09-20 12:37:29,377 architecture step (accuracy): 000 (5.719396e-03)
+2021-09-20 12:37:29,377 validation accuracy: 0.006530
+2021-09-20 12:37:29,377 epoch: 49
+2021-09-20 12:37:30,002 genotype: Genotype(normal=[('sigmoid', 0), ('exp', 1), ('linear', 1), ('mult', 2), ('none', 0)], normal_concat=range(3, 4))
+2021-09-20 12:37:34,300 architecture step (loss): 000 (1.351314e-03)
+2021-09-20 12:37:34,300 training accuracy: 0.001351
+2021-09-20 12:37:34,316 architecture step (accuracy): 000 (6.200093e-03)
+2021-09-20 12:37:34,316 validation accuracy: 0.006576
+2021-09-20 12:37:34,316 epoch: 50
+2021-09-20 12:37:35,003 genotype: Genotype(normal=[('sigmoid', 0), ('exp', 1), ('linear', 1), ('mult', 2), ('none', 0)], normal_concat=range(3, 4))
+2021-09-20 12:37:39,299 architecture step (loss): 000 (1.289883e-03)
+2021-09-20 12:37:39,299 training accuracy: 0.001290
+2021-09-20 12:37:39,299 architecture step (accuracy): 000 (7.421875e-03)
+2021-09-20 12:37:39,299 validation accuracy: 0.007482
+2021-09-20 12:37:39,299 epoch: 51
+2021-09-20 12:37:39,922 genotype: Genotype(normal=[('sigmoid', 0), ('exp', 1), ('linear', 1), ('mult', 2), ('none', 0)], normal_concat=range(3, 4))
+2021-09-20 12:37:44,038 architecture step (loss): 000 (1.316590e-03)
+2021-09-20 12:37:44,038 training accuracy: 0.001317
+2021-09-20 12:37:44,038 architecture step (accuracy): 000 (6.124699e-03)
+2021-09-20 12:37:44,038 validation accuracy: 0.006956
+2021-09-20 12:37:44,038 epoch: 52
+2021-09-20 12:37:44,680 genotype: Genotype(normal=[('sigmoid', 0), ('exp', 1), ('linear', 1), ('mult', 2), ('none', 0)], normal_concat=range(3, 4))
+2021-09-20 12:37:48,800 architecture step (loss): 000 (1.301681e-03)
+2021-09-20 12:37:48,800 training accuracy: 0.001302
+2021-09-20 12:37:48,816 architecture step (accuracy): 000 (7.328690e-03)
+2021-09-20 12:37:48,816 validation accuracy: 0.007008
+2021-09-20 12:37:48,816 epoch: 53
+2021-09-20 12:37:49,675 genotype: Genotype(normal=[('sigmoid', 0), ('exp', 1), ('linear', 1), ('mult', 2), ('none', 0)], normal_concat=range(3, 4))
+2021-09-20 12:37:53,938 architecture step (loss): 000 (1.334471e-03)
+2021-09-20 12:37:53,938 training accuracy: 0.001334
+2021-09-20 12:37:53,954 architecture step (accuracy): 000 (6.543817e-03)
+2021-09-20 12:37:53,954 validation accuracy: 0.006729
+2021-09-20 12:37:53,954 epoch: 54
+2021-09-20 12:37:54,579 genotype: Genotype(normal=[('sigmoid', 0), ('exp', 1), ('linear', 1), ('mult', 2), ('none', 0)], normal_concat=range(3, 4))
+2021-09-20 12:37:58,892 architecture step (loss): 000 (1.259281e-03)
+2021-09-20 12:37:58,892 training accuracy: 0.001259
+2021-09-20 12:37:58,892 architecture step (accuracy): 000 (7.053231e-03)
+2021-09-20 12:37:58,892 validation accuracy: 0.006780
+2021-09-20 12:37:58,892 epoch: 55
+2021-09-20 12:37:59,517 genotype: Genotype(normal=[('sigmoid', 0), ('exp', 1), ('linear', 1), ('mult', 2), ('none', 0)], normal_concat=range(3, 4))
+2021-09-20 12:38:03,859 architecture step (loss): 000 (1.281171e-03)
+2021-09-20 12:38:03,859 training accuracy: 0.001281
+2021-09-20 12:38:03,874 architecture step (accuracy): 000 (7.450986e-03)
+2021-09-20 12:38:03,874 validation accuracy: 0.007296
+2021-09-20 12:38:03,874 epoch: 56
+2021-09-20 12:38:04,501 genotype: Genotype(normal=[('exp', 1), ('sigmoid', 0), ('linear', 1), ('mult', 2), ('none', 0)], normal_concat=range(3, 4))
+2021-09-20 12:38:08,699 architecture step (loss): 000 (1.258035e-03)
+2021-09-20 12:38:08,699 training accuracy: 0.001258
+2021-09-20 12:38:08,714 architecture step (accuracy): 000 (6.332253e-03)
+2021-09-20 12:38:08,714 validation accuracy: 0.006033
+2021-09-20 12:38:08,714 epoch: 57
+2021-09-20 12:38:09,320 genotype: Genotype(normal=[('exp', 1), ('sigmoid', 0), ('linear', 1), ('mult', 2), ('none', 0)], normal_concat=range(3, 4))
+2021-09-20 12:38:13,705 architecture step (loss): 000 (1.292483e-03)
+2021-09-20 12:38:13,705 training accuracy: 0.001292
+2021-09-20 12:38:13,721 architecture step (accuracy): 000 (5.844980e-03)
+2021-09-20 12:38:13,721 validation accuracy: 0.006663
+2021-09-20 12:38:13,721 epoch: 58
+2021-09-20 12:38:14,395 genotype: Genotype(normal=[('exp', 1), ('sigmoid', 0), ('linear', 1), ('mult', 2), ('none', 0)], normal_concat=range(3, 4))
+2021-09-20 12:38:18,735 architecture step (loss): 000 (1.269009e-03)
+2021-09-20 12:38:18,735 training accuracy: 0.001269
+2021-09-20 12:38:18,751 architecture step (accuracy): 000 (6.609883e-03)
+2021-09-20 12:38:18,751 validation accuracy: 0.006299
+2021-09-20 12:38:18,751 epoch: 59
+2021-09-20 12:38:19,414 genotype: Genotype(normal=[('exp', 1), ('sigmoid', 0), ('linear', 1), ('mult', 2), ('none', 0)], normal_concat=range(3, 4))
+2021-09-20 12:38:23,751 architecture step (loss): 000 (1.251141e-03)
+2021-09-20 12:38:23,751 training accuracy: 0.001251
+2021-09-20 12:38:23,751 architecture step (accuracy): 000 (6.714809e-03)
+2021-09-20 12:38:23,751 validation accuracy: 0.006645
+2021-09-20 12:38:23,751 epoch: 60
+2021-09-20 12:38:24,382 genotype: Genotype(normal=[('exp', 1), ('sigmoid', 0), ('linear', 1), ('mult', 2), ('none', 0)], normal_concat=range(3, 4))
+2021-09-20 12:38:28,581 architecture step (loss): 000 (1.248814e-03)
+2021-09-20 12:38:28,581 training accuracy: 0.001249
+2021-09-20 12:38:28,597 architecture step (accuracy): 000 (7.136716e-03)
+2021-09-20 12:38:28,597 validation accuracy: 0.006874
+2021-09-20 12:38:28,597 epoch: 61
+2021-09-20 12:38:29,222 genotype: Genotype(normal=[('exp', 1), ('sigmoid', 0), ('linear', 1), ('mult', 2), ('none', 0)], normal_concat=range(3, 4))
+2021-09-20 12:38:33,472 architecture step (loss): 000 (1.271588e-03)
+2021-09-20 12:38:33,472 training accuracy: 0.001272
+2021-09-20 12:38:33,472 architecture step (accuracy): 000 (6.111033e-03)
+2021-09-20 12:38:33,487 validation accuracy: 0.005822
+2021-09-20 12:38:33,487 epoch: 62
+2021-09-20 12:38:34,081 genotype: Genotype(normal=[('exp', 1), ('sigmoid', 0), ('linear', 1), ('mult', 2), ('none', 0)], normal_concat=range(3, 4))
+2021-09-20 12:38:38,149 architecture step (loss): 000 (1.238238e-03)
+2021-09-20 12:38:38,149 training accuracy: 0.001238
+2021-09-20 12:38:38,149 architecture step (accuracy): 000 (6.227500e-03)
+2021-09-20 12:38:38,149 validation accuracy: 0.006336
+2021-09-20 12:38:38,149 epoch: 63
+2021-09-20 12:38:38,774 genotype: Genotype(normal=[('exp', 1), ('sigmoid', 0), ('linear', 1), ('mult', 2), ('none', 0)], normal_concat=range(3, 4))
+2021-09-20 12:38:43,010 architecture step (loss): 000 (1.242930e-03)
+2021-09-20 12:38:43,010 training accuracy: 0.001243
+2021-09-20 12:38:43,010 architecture step (accuracy): 000 (6.969430e-03)
+2021-09-20 12:38:43,010 validation accuracy: 0.006644
+2021-09-20 12:38:43,010 epoch: 64
+2021-09-20 12:38:43,635 genotype: Genotype(normal=[('exp', 1), ('sigmoid', 0), ('linear', 1), ('mult', 2), ('none', 0)], normal_concat=range(3, 4))
+2021-09-20 12:38:47,888 architecture step (loss): 000 (1.239547e-03)
+2021-09-20 12:38:47,888 training accuracy: 0.001240
+2021-09-20 12:38:47,888 architecture step (accuracy): 000 (6.658125e-03)
+2021-09-20 12:38:47,888 validation accuracy: 0.006418
+2021-09-20 12:38:47,888 epoch: 65
+2021-09-20 12:38:48,513 genotype: Genotype(normal=[('exp', 1), ('sigmoid', 0), ('linear', 1), ('mult', 2), ('none', 0)], normal_concat=range(3, 4))
+2021-09-20 12:38:52,645 architecture step (loss): 000 (1.234961e-03)
+2021-09-20 12:38:52,645 training accuracy: 0.001235
+2021-09-20 12:38:52,660 architecture step (accuracy): 000 (7.029496e-03)
+2021-09-20 12:38:52,660 validation accuracy: 0.006859
+2021-09-20 12:38:52,660 epoch: 66
+2021-09-20 12:38:53,475 genotype: Genotype(normal=[('exp', 1), ('sigmoid', 0), ('linear', 1), ('mult', 2), ('none', 0)], normal_concat=range(3, 4))
+2021-09-20 12:38:57,617 architecture step (loss): 000 (1.224265e-03)
+2021-09-20 12:38:57,617 training accuracy: 0.001224
+2021-09-20 12:38:57,617 architecture step (accuracy): 000 (5.368094e-03)
+2021-09-20 12:38:57,632 validation accuracy: 0.006110
+2021-09-20 12:38:57,632 epoch: 67
+2021-09-20 12:38:58,261 genotype: Genotype(normal=[('exp', 1), ('sigmoid', 0), ('linear', 1), ('mult', 2), ('none', 0)], normal_concat=range(3, 4))
+2021-09-20 12:39:02,370 architecture step (loss): 000 (1.218323e-03)
+2021-09-20 12:39:02,370 training accuracy: 0.001218
+2021-09-20 12:39:02,370 architecture step (accuracy): 000 (6.735902e-03)
+2021-09-20 12:39:02,385 validation accuracy: 0.006461
+2021-09-20 12:39:02,385 epoch: 68
+2021-09-20 12:39:03,184 genotype: Genotype(normal=[('exp', 1), ('sigmoid', 0), ('linear', 1), ('mult', 2), ('none', 0)], normal_concat=range(3, 4))
+2021-09-20 12:39:07,277 architecture step (loss): 000 (1.219399e-03)
+2021-09-20 12:39:07,277 training accuracy: 0.001219
+2021-09-20 12:39:07,277 architecture step (accuracy): 000 (6.467356e-03)
+2021-09-20 12:39:07,277 validation accuracy: 0.006319
+2021-09-20 12:39:07,277 epoch: 69
+2021-09-20 12:39:07,890 genotype: Genotype(normal=[('exp', 1), ('sigmoid', 0), ('linear', 1), ('mult', 2), ('none', 0)], normal_concat=range(3, 4))
+2021-09-20 12:39:11,964 architecture step (loss): 000 (1.239761e-03)
+2021-09-20 12:39:11,964 training accuracy: 0.001240
+2021-09-20 12:39:11,980 architecture step (accuracy): 000 (6.929244e-03)
+2021-09-20 12:39:11,980 validation accuracy: 0.006627
+2021-09-20 12:39:11,980 epoch: 70
+2021-09-20 12:39:12,589 genotype: Genotype(normal=[('exp', 1), ('sigmoid', 0), ('linear', 1), ('mult', 2), ('none', 0)], normal_concat=range(3, 4))
+2021-09-20 12:39:16,639 architecture step (loss): 000 (1.198606e-03)
+2021-09-20 12:39:16,639 training accuracy: 0.001199
+2021-09-20 12:39:16,639 architecture step (accuracy): 000 (7.081001e-03)
+2021-09-20 12:39:16,654 validation accuracy: 0.006750
+2021-09-20 12:39:16,654 epoch: 71
+2021-09-20 12:39:17,248 genotype: Genotype(normal=[('exp', 1), ('sigmoid', 0), ('linear', 1), ('mult', 2), ('none', 0)], normal_concat=range(3, 4))
+2021-09-20 12:39:21,255 architecture step (loss): 000 (1.193891e-03)
+2021-09-20 12:39:21,255 training accuracy: 0.001194
+2021-09-20 12:39:21,255 architecture step (accuracy): 000 (6.822060e-03)
+2021-09-20 12:39:21,271 validation accuracy: 0.007039
+2021-09-20 12:39:21,271 epoch: 72
+2021-09-20 12:39:21,868 genotype: Genotype(normal=[('exp', 1), ('sigmoid', 0), ('linear', 1), ('mult', 2), ('none', 0)], normal_concat=range(3, 4))
+2021-09-20 12:39:25,893 architecture step (loss): 000 (1.204581e-03)
+2021-09-20 12:39:25,893 training accuracy: 0.001205
+2021-09-20 12:39:25,908 architecture step (accuracy): 000 (6.326229e-03)
+2021-09-20 12:39:25,908 validation accuracy: 0.006183
+2021-09-20 12:39:25,908 epoch: 73
+2021-09-20 12:39:26,518 genotype: Genotype(normal=[('exp', 1), ('sigmoid', 0), ('linear', 1), ('mult', 2), ('none', 0)], normal_concat=range(3, 4))
+2021-09-20 12:39:30,557 architecture step (loss): 000 (1.200909e-03)
+2021-09-20 12:39:30,557 training accuracy: 0.001201
+2021-09-20 12:39:30,557 architecture step (accuracy): 000 (6.932051e-03)
+2021-09-20 12:39:30,557 validation accuracy: 0.006794
+2021-09-20 12:39:30,557 epoch: 74
+2021-09-20 12:39:31,163 genotype: Genotype(normal=[('exp', 1), ('sigmoid', 0), ('linear', 1), ('mult', 2), ('none', 0)], normal_concat=range(3, 4))
+2021-09-20 12:39:35,230 architecture step (loss): 000 (1.175192e-03)
+2021-09-20 12:39:35,230 training accuracy: 0.001175
+2021-09-20 12:39:35,230 architecture step (accuracy): 000 (6.356833e-03)
+2021-09-20 12:39:35,230 validation accuracy: 0.006130
+2021-09-20 12:39:35,230 epoch: 75
+2021-09-20 12:39:35,840 genotype: Genotype(normal=[('exp', 1), ('sigmoid', 0), ('linear', 1), ('mult', 2), ('none', 0)], normal_concat=range(3, 4))
+2021-09-20 12:39:39,871 architecture step (loss): 000 (1.177646e-03)
+2021-09-20 12:39:39,871 training accuracy: 0.001178
+2021-09-20 12:39:39,871 architecture step (accuracy): 000 (6.475855e-03)
+2021-09-20 12:39:39,886 validation accuracy: 0.006578
+2021-09-20 12:39:39,886 epoch: 76
+2021-09-20 12:39:40,496 genotype: Genotype(normal=[('exp', 1), ('sigmoid', 0), ('linear', 1), ('mult', 2), ('none', 0)], normal_concat=range(3, 4))
+2021-09-20 12:39:44,532 architecture step (loss): 000 (1.196758e-03)
+2021-09-20 12:39:44,532 training accuracy: 0.001197
+2021-09-20 12:39:44,532 architecture step (accuracy): 000 (6.349379e-03)
+2021-09-20 12:39:44,547 validation accuracy: 0.006455
+2021-09-20 12:39:44,547 epoch: 77
+2021-09-20 12:39:45,204 genotype: Genotype(normal=[('exp', 1), ('sigmoid', 0), ('linear', 1), ('mult', 2), ('none', 0)], normal_concat=range(3, 4))
+2021-09-20 12:39:49,220 architecture step (loss): 000 (1.169668e-03)
+2021-09-20 12:39:49,220 training accuracy: 0.001170
+2021-09-20 12:39:49,220 architecture step (accuracy): 000 (6.039098e-03)
+2021-09-20 12:39:49,220 validation accuracy: 0.006885
+2021-09-20 12:39:49,220 epoch: 78
+2021-09-20 12:39:49,816 genotype: Genotype(normal=[('exp', 1), ('sigmoid', 0), ('linear', 1), ('mult', 2), ('none', 0)], normal_concat=range(3, 4))
+2021-09-20 12:39:53,841 architecture step (loss): 000 (1.173879e-03)
+2021-09-20 12:39:53,841 training accuracy: 0.001174
+2021-09-20 12:39:53,841 architecture step (accuracy): 000 (5.640054e-03)
+2021-09-20 12:39:53,841 validation accuracy: 0.005574
+2021-09-20 12:39:53,841 epoch: 79
+2021-09-20 12:39:54,426 genotype: Genotype(normal=[('exp', 1), ('sigmoid', 0), ('linear', 1), ('mult', 2), ('none', 0)], normal_concat=range(3, 4))
+2021-09-20 12:39:58,464 architecture step (loss): 000 (1.160087e-03)
+2021-09-20 12:39:58,464 training accuracy: 0.001160
+2021-09-20 12:39:58,464 architecture step (accuracy): 000 (6.209419e-03)
+2021-09-20 12:39:58,480 validation accuracy: 0.006393
+2021-09-20 12:39:58,480 epoch: 80
+2021-09-20 12:39:59,074 genotype: Genotype(normal=[('exp', 1), ('sigmoid', 0), ('linear', 1), ('mult', 2), ('none', 0)], normal_concat=range(3, 4))
+2021-09-20 12:40:03,118 architecture step (loss): 000 (1.166543e-03)
+2021-09-20 12:40:03,118 training accuracy: 0.001167
+2021-09-20 12:40:03,118 architecture step (accuracy): 000 (6.113310e-03)
+2021-09-20 12:40:03,118 validation accuracy: 0.005977
+2021-09-20 12:40:03,118 epoch: 81
+2021-09-20 12:40:03,714 genotype: Genotype(normal=[('exp', 1), ('sigmoid', 0), ('linear', 1), ('mult', 2), ('none', 0)], normal_concat=range(3, 4))
+2021-09-20 12:40:07,763 architecture step (loss): 000 (1.138941e-03)
+2021-09-20 12:40:07,763 training accuracy: 0.001139
+2021-09-20 12:40:07,778 architecture step (accuracy): 000 (5.773752e-03)
+2021-09-20 12:40:07,778 validation accuracy: 0.006544
+2021-09-20 12:40:07,778 epoch: 82
+2021-09-20 12:40:08,372 genotype: Genotype(normal=[('exp', 1), ('sigmoid', 0), ('linear', 1), ('mult', 2), ('none', 0)], normal_concat=range(3, 4))
+2021-09-20 12:40:12,393 architecture step (loss): 000 (1.175610e-03)
+2021-09-20 12:40:12,393 training accuracy: 0.001176
+2021-09-20 12:40:12,409 architecture step (accuracy): 000 (6.815498e-03)
+2021-09-20 12:40:12,409 validation accuracy: 0.006679
+2021-09-20 12:40:12,409 epoch: 83
+2021-09-20 12:40:12,990 genotype: Genotype(normal=[('exp', 1), ('sigmoid', 0), ('linear', 1), ('mult', 2), ('none', 0)], normal_concat=range(3, 4))
+2021-09-20 12:40:17,024 architecture step (loss): 000 (1.142931e-03)
+2021-09-20 12:40:17,024 training accuracy: 0.001143
+2021-09-20 12:40:17,024 architecture step (accuracy): 000 (5.925100e-03)
+2021-09-20 12:40:17,024 validation accuracy: 0.005815
+2021-09-20 12:40:17,024 epoch: 84
+2021-09-20 12:40:17,617 genotype: Genotype(normal=[('exp', 1), ('sigmoid', 0), ('linear', 1), ('mult', 2), ('none', 0)], normal_concat=range(3, 4))
+2021-09-20 12:40:21,633 architecture step (loss): 000 (1.143300e-03)
+2021-09-20 12:40:21,633 training accuracy: 0.001143
+2021-09-20 12:40:21,633 architecture step (accuracy): 000 (6.253690e-03)
+2021-09-20 12:40:21,633 validation accuracy: 0.006015
+2021-09-20 12:40:21,633 epoch: 85
+2021-09-20 12:40:22,228 genotype: Genotype(normal=[('exp', 1), ('sigmoid', 0), ('linear', 1), ('mult', 2), ('none', 0)], normal_concat=range(3, 4))
+2021-09-20 12:40:26,305 architecture step (loss): 000 (1.130647e-03)
+2021-09-20 12:40:26,305 training accuracy: 0.001131
+2021-09-20 12:40:26,305 architecture step (accuracy): 000 (6.667966e-03)
+2021-09-20 12:40:26,320 validation accuracy: 0.006356
+2021-09-20 12:40:26,320 epoch: 86
+2021-09-20 12:40:26,914 genotype: Genotype(normal=[('exp', 1), ('sigmoid', 0), ('linear', 1), ('mult', 2), ('none', 0)], normal_concat=range(3, 4))
+2021-09-20 12:40:30,973 architecture step (loss): 000 (1.131846e-03)
+2021-09-20 12:40:30,973 training accuracy: 0.001132
+2021-09-20 12:40:30,973 architecture step (accuracy): 000 (6.239505e-03)
+2021-09-20 12:40:30,973 validation accuracy: 0.006219
+2021-09-20 12:40:30,989 epoch: 87
+2021-09-20 12:40:31,570 genotype: Genotype(normal=[('exp', 1), ('sigmoid', 0), ('linear', 1), ('mult', 2), ('none', 0)], normal_concat=range(3, 4))
+2021-09-20 12:40:35,571 architecture step (loss): 000 (1.148693e-03)
+2021-09-20 12:40:35,571 training accuracy: 0.001149
+2021-09-20 12:40:35,571 architecture step (accuracy): 000 (6.173173e-03)
+2021-09-20 12:40:35,587 validation accuracy: 0.006034
+2021-09-20 12:40:35,587 epoch: 88
+2021-09-20 12:40:36,337 genotype: Genotype(normal=[('exp', 1), ('sigmoid', 0), ('linear', 1), ('mult', 2), ('none', 0)], normal_concat=range(3, 4))
+2021-09-20 12:40:40,393 architecture step (loss): 000 (1.123740e-03)
+2021-09-20 12:40:40,393 training accuracy: 0.001124
+2021-09-20 12:40:40,393 architecture step (accuracy): 000 (6.460278e-03)
+2021-09-20 12:40:40,401 validation accuracy: 0.006334
+2021-09-20 12:40:40,401 epoch: 89
+2021-09-20 12:40:41,021 genotype: Genotype(normal=[('exp', 1), ('sigmoid', 0), ('linear', 1), ('mult', 2), ('none', 0)], normal_concat=range(3, 4))
+2021-09-20 12:40:45,202 architecture step (loss): 000 (1.121154e-03)
+2021-09-20 12:40:45,202 training accuracy: 0.001121
+2021-09-20 12:40:45,202 architecture step (accuracy): 000 (6.807669e-03)
+2021-09-20 12:40:45,202 validation accuracy: 0.006487
+2021-09-20 12:40:45,202 epoch: 90
+2021-09-20 12:42:57,473 genotype: Genotype(normal=[('exp', 1), ('sigmoid', 0), ('linear', 1), ('mult', 2), ('none', 0)], normal_concat=range(3, 4))
+2021-09-20 12:43:01,588 architecture step (loss): 000 (1.147693e-03)
+2021-09-20 12:43:01,588 training accuracy: 0.001148
+2021-09-20 12:43:01,604 architecture step (accuracy): 000 (6.366879e-03)
+2021-09-20 12:43:01,604 validation accuracy: 0.006109
+2021-09-20 12:43:01,604 epoch: 91
+2021-09-20 12:43:02,218 genotype: Genotype(normal=[('exp', 1), ('sigmoid', 0), ('linear', 1), ('mult', 2), ('none', 0)], normal_concat=range(3, 4))
+2021-09-20 12:43:06,524 architecture step (loss): 000 (1.146757e-03)
+2021-09-20 12:43:06,524 training accuracy: 0.001147
+2021-09-20 12:43:06,540 architecture step (accuracy): 000 (5.556358e-03)
+2021-09-20 12:43:06,540 validation accuracy: 0.006327
+2021-09-20 12:43:06,540 epoch: 92
+2021-09-20 12:43:07,179 genotype: Genotype(normal=[('exp', 1), ('sigmoid', 0), ('linear', 1), ('mult', 2), ('none', 0)], normal_concat=range(3, 4))
+2021-09-20 12:43:11,339 architecture step (loss): 000 (1.147481e-03)
+2021-09-20 12:43:11,339 training accuracy: 0.001147
+2021-09-20 12:43:11,339 architecture step (accuracy): 000 (6.288697e-03)
+2021-09-20 12:43:11,339 validation accuracy: 0.006017
+2021-09-20 12:43:11,339 epoch: 93
+2021-09-20 12:43:11,949 genotype: Genotype(normal=[('exp', 1), ('sigmoid', 0), ('linear', 1), ('mult', 2), ('none', 0)], normal_concat=range(3, 4))
+2021-09-20 12:43:16,183 architecture step (loss): 000 (1.129246e-03)
+2021-09-20 12:43:16,183 training accuracy: 0.001129
+2021-09-20 12:43:16,183 architecture step (accuracy): 000 (6.043075e-03)
+2021-09-20 12:43:16,183 validation accuracy: 0.005813
+2021-09-20 12:43:16,183 epoch: 94
+2021-09-20 12:43:16,855 genotype: Genotype(normal=[('exp', 1), ('sigmoid', 0), ('linear', 1), ('mult', 2), ('none', 0)], normal_concat=range(3, 4))
+2021-09-20 12:43:20,917 architecture step (loss): 000 (1.117463e-03)
+2021-09-20 12:43:20,917 training accuracy: 0.001117
+2021-09-20 12:43:20,917 architecture step (accuracy): 000 (6.357605e-03)
+2021-09-20 12:43:20,933 validation accuracy: 0.006284
+2021-09-20 12:43:20,933 epoch: 95
+2021-09-20 12:43:21,558 genotype: Genotype(normal=[('exp', 1), ('sigmoid', 0), ('linear', 1), ('mult', 2), ('none', 0)], normal_concat=range(3, 4))
+2021-09-20 12:43:25,810 architecture step (loss): 000 (1.146082e-03)
+2021-09-20 12:43:25,810 training accuracy: 0.001146
+2021-09-20 12:43:25,810 architecture step (accuracy): 000 (6.128173e-03)
+2021-09-20 12:43:25,826 validation accuracy: 0.006107
+2021-09-20 12:43:25,826 epoch: 96
+2021-09-20 12:43:26,435 genotype: Genotype(normal=[('exp', 1), ('sigmoid', 0), ('linear', 1), ('mult', 2), ('none', 0)], normal_concat=range(3, 4))
+2021-09-20 12:43:30,496 architecture step (loss): 000 (1.130187e-03)
+2021-09-20 12:43:30,496 training accuracy: 0.001130
+2021-09-20 12:43:30,496 architecture step (accuracy): 000 (6.233572e-03)
+2021-09-20 12:43:30,496 validation accuracy: 0.006407
+2021-09-20 12:43:30,496 epoch: 97
+2021-09-20 12:43:31,109 genotype: Genotype(normal=[('exp', 1), ('sigmoid', 0), ('linear', 1), ('mult', 2), ('none', 0)], normal_concat=range(3, 4))
+2021-09-20 12:43:35,174 architecture step (loss): 000 (1.137234e-03)
+2021-09-20 12:43:35,174 training accuracy: 0.001137
+2021-09-20 12:43:35,174 architecture step (accuracy): 000 (5.782776e-03)
+2021-09-20 12:43:35,174 validation accuracy: 0.006648
+2021-09-20 12:43:35,174 epoch: 98
+2021-09-20 12:43:35,784 genotype: Genotype(normal=[('sigmoid', 0), ('exp', 1), ('linear', 1), ('mult', 2), ('none', 0)], normal_concat=range(3, 4))
+2021-09-20 12:43:39,824 architecture step (loss): 000 (1.150297e-03)
+2021-09-20 12:43:39,824 training accuracy: 0.001150
+2021-09-20 12:43:39,824 architecture step (accuracy): 000 (5.319307e-03)
+2021-09-20 12:43:39,839 validation accuracy: 0.005141
+2021-09-20 12:43:39,839 epoch: 99
+2021-09-20 12:43:43,218 architecture evaluation for sampled model: 1 / 5
+2021-09-20 12:43:43,249 criterion loss 0.076561
+2021-09-20 12:43:43,734 criterion loss 0.110067
+2021-09-20 12:43:44,109 criterion loss 0.112985
+2021-09-20 12:43:44,468 criterion loss 0.108920
+2021-09-20 12:43:44,843 criterion loss 0.071356
+2021-09-20 12:43:45,338 criterion loss 0.089537
+2021-09-20 12:43:45,713 criterion loss 0.096671
+2021-09-20 12:43:46,088 criterion loss 0.098655
+2021-09-20 12:43:46,463 criterion loss 0.051420
+2021-09-20 12:43:46,838 criterion loss 0.122467
+2021-09-20 12:43:47,213 criterion loss 0.077403
+2021-09-20 12:43:47,599 criterion loss 0.130198
+2021-09-20 12:43:47,977 criterion loss 0.105745
+2021-09-20 12:43:48,353 criterion loss 0.106275
+2021-09-20 12:43:48,730 criterion loss 0.110949
+2021-09-20 12:43:49,107 criterion loss 0.079105
+2021-09-20 12:43:49,484 criterion loss 0.076608
+2021-09-20 12:43:49,859 criterion loss 0.070250
+2021-09-20 12:43:50,249 criterion loss 0.067658
+2021-09-20 12:43:50,610 criterion loss 0.086818
+2021-09-20 12:43:51,001 criterion loss 0.069062
+2021-09-20 12:43:51,376 criterion loss 0.081228
+2021-09-20 12:43:51,751 criterion loss 0.069326
+2021-09-20 12:43:52,127 criterion loss 0.118250
+2021-09-20 12:43:52,502 criterion loss 0.103206
+2021-09-20 12:43:52,877 criterion loss 0.097532
+2021-09-20 12:43:53,252 criterion loss 0.118275
+2021-09-20 12:43:53,627 criterion loss 0.068990
+2021-09-20 12:43:54,017 criterion loss 0.060957
+2021-09-20 12:43:54,392 criterion loss 0.087831
+2021-09-20 12:43:54,767 criterion loss 0.080619
+2021-09-20 12:43:55,128 criterion loss 0.108050
+2021-09-20 12:43:55,503 criterion loss 0.059644
+2021-09-20 12:43:55,878 criterion loss 0.084244
+2021-09-20 12:43:56,269 criterion loss 0.093778
+2021-09-20 12:43:56,644 criterion loss 0.059135
+2021-09-20 12:43:57,019 criterion loss 0.082969
+2021-09-20 12:43:57,394 criterion loss 0.045438
+2021-09-20 12:43:57,769 criterion loss 0.067544
+2021-09-20 12:43:58,144 criterion loss 0.070594
+2021-09-20 12:43:58,519 criterion loss 0.100451
+2021-09-20 12:43:58,894 criterion loss 0.086079
+2021-09-20 12:43:59,269 criterion loss 0.073471
+2021-09-20 12:43:59,644 criterion loss 0.110994
+2021-09-20 12:44:00,019 criterion loss 0.062637
+2021-09-20 12:44:00,394 criterion loss 0.078446
+2021-09-20 12:44:00,769 criterion loss 0.081550
+2021-09-20 12:44:01,161 criterion loss 0.060869
+2021-09-20 12:44:01,537 criterion loss 0.063521
+2021-09-20 12:44:01,912 criterion loss 0.085130
+2021-09-20 12:44:02,292 criterion loss 0.094026
+2021-09-20 12:44:02,675 criterion loss 0.092169
+2021-09-20 12:44:03,050 criterion loss 0.092842
+2021-09-20 12:44:03,425 criterion loss 0.097681
+2021-09-20 12:44:03,800 criterion loss 0.102496
+2021-09-20 12:44:04,175 criterion loss 0.097778
+2021-09-20 12:44:04,565 criterion loss 0.098731
+2021-09-20 12:44:04,940 criterion loss 0.067438
+2021-09-20 12:44:05,315 criterion loss 0.092717
+2021-09-20 12:44:05,695 criterion loss 0.065124
+2021-09-20 12:44:06,070 criterion loss 0.062364
+2021-09-20 12:44:06,445 criterion loss 0.077196
+2021-09-20 12:44:06,836 criterion loss 0.085706
+2021-09-20 12:44:07,218 criterion loss 0.056971
+2021-09-20 12:44:07,603 criterion loss 0.096442
+2021-09-20 12:44:07,979 criterion loss 0.084637
+2021-09-20 12:44:08,356 criterion loss 0.070907
+2021-09-20 12:44:08,732 criterion loss 0.052341
+2021-09-20 12:44:09,109 criterion loss 0.104499
+2021-09-20 12:44:09,484 criterion loss 0.084912
+2021-09-20 12:44:09,860 criterion loss 0.055130
+2021-09-20 12:44:10,267 criterion loss 0.110686
+2021-09-20 12:44:10,657 criterion loss 0.076681
+2021-09-20 12:44:11,057 criterion loss 0.091293
+2021-09-20 12:44:11,433 criterion loss 0.055818
+2021-09-20 12:44:11,808 criterion loss 0.063148
+2021-09-20 12:44:12,198 criterion loss 0.078494
+2021-09-20 12:44:12,573 criterion loss 0.091237
+2021-09-20 12:44:12,948 criterion loss 0.080946
+2021-09-20 12:44:13,323 criterion loss 0.068409
+2021-09-20 12:44:13,714 criterion loss 0.056277
+2021-09-20 12:44:14,089 criterion loss 0.054130
+2021-09-20 12:44:14,464 criterion loss 0.065986
+2021-09-20 12:44:14,840 criterion loss 0.101156
+2021-09-20 12:44:15,215 criterion loss 0.087520
+2021-09-20 12:44:15,590 criterion loss 0.076532
+2021-09-20 12:44:15,997 criterion loss 0.060959
+2021-09-20 12:44:16,387 criterion loss 0.060059
+2021-09-20 12:44:16,762 criterion loss 0.060821
+2021-09-20 12:44:17,137 criterion loss 0.044474
+2021-09-20 12:44:17,512 criterion loss 0.065879
+2021-09-20 12:44:17,887 criterion loss 0.075341
+2021-09-20 12:44:18,262 criterion loss 0.086192
+2021-09-20 12:44:18,637 criterion loss 0.044712
+2021-09-20 12:44:19,012 criterion loss 0.061675
+2021-09-20 12:44:19,387 criterion loss 0.060411
+2021-09-20 12:44:19,762 criterion loss 0.077292
+2021-09-20 12:44:20,158 criterion loss 0.082497
+2021-09-20 12:44:20,533 criterion loss 0.065727
+2021-09-20 12:44:20,923 criterion loss 0.100517
+2021-09-20 12:44:21,300 criterion loss 0.066293
+2021-09-20 12:44:21,675 criterion loss 0.133858
+2021-09-20 12:44:22,050 criterion loss 0.074228
+2021-09-20 12:44:22,425 criterion loss 0.089011
+2021-09-20 12:44:22,800 criterion loss 0.076708
+2021-09-20 12:44:23,191 criterion loss 0.085699
+2021-09-20 12:44:23,566 criterion loss 0.069793
+2021-09-20 12:44:23,941 criterion loss 0.060749
+2021-09-20 12:44:24,316 criterion loss 0.068937
+2021-09-20 12:44:24,691 criterion loss 0.049062
+2021-09-20 12:44:25,066 criterion loss 0.071108
+2021-09-20 12:44:25,441 criterion loss 0.098215
+2021-09-20 12:44:25,816 criterion loss 0.054759
+2021-09-20 12:44:26,206 criterion loss 0.043348
+2021-09-20 12:44:26,581 criterion loss 0.068004
+2021-09-20 12:44:26,961 criterion loss 0.064597
+2021-09-20 12:44:27,336 criterion loss 0.073023
+2021-09-20 12:44:27,711 criterion loss 0.087448
+2021-09-20 12:44:28,095 criterion loss 0.061873
+2021-09-20 12:44:28,470 criterion loss 0.065045
+2021-09-20 12:44:28,845 criterion loss 0.073802
+2021-09-20 12:44:29,220 criterion loss 0.083598
+2021-09-20 12:44:29,611 criterion loss 0.062978
+2021-09-20 12:44:29,995 criterion loss 0.033449
+2021-09-20 12:44:30,370 criterion loss 0.079428
+2021-09-20 12:44:30,761 criterion loss 0.065500
+2021-09-20 12:44:31,136 criterion loss 0.072779
+2021-09-20 12:44:31,511 criterion loss 0.057270
+2021-09-20 12:44:31,886 criterion loss 0.061386
+2021-09-20 12:44:32,261 criterion loss 0.079441
+2021-09-20 12:44:32,651 criterion loss 0.060210
+2021-09-20 12:44:33,028 criterion loss 0.059778
+2021-09-20 12:44:33,403 criterion loss 0.071794
+2021-09-20 12:44:33,778 criterion loss 0.083673
+2021-09-20 12:44:34,153 criterion loss 0.076216
+2021-09-20 12:44:34,528 criterion loss 0.062747
+2021-09-20 12:44:34,911 criterion loss 0.064278
+2021-09-20 12:44:35,286 criterion loss 0.054561
+2021-09-20 12:44:35,661 criterion loss 0.067774
+2021-09-20 12:44:36,052 criterion loss 0.067199
+2021-09-20 12:44:36,443 criterion loss 0.078350
+2021-09-20 12:44:36,818 criterion loss 0.080948
+2021-09-20 12:44:37,193 criterion loss 0.077685
+2021-09-20 12:44:37,568 criterion loss 0.069904
+2021-09-20 12:44:37,958 criterion loss 0.061339
+2021-09-20 12:44:38,333 criterion loss 0.083715
+2021-09-20 12:44:38,711 criterion loss 0.059595
+2021-09-20 12:44:39,086 criterion loss 0.068857
+2021-09-20 12:44:39,461 criterion loss 0.062708
+2021-09-20 12:44:39,852 criterion loss 0.056070
+2021-09-20 12:44:40,227 criterion loss 0.067236
+2021-09-20 12:44:40,617 criterion loss 0.067971
+2021-09-20 12:44:40,992 criterion loss 0.069536
+2021-09-20 12:44:41,367 criterion loss 0.059055
+2021-09-20 12:44:41,742 criterion loss 0.052396
+2021-09-20 12:44:42,117 criterion loss 0.056507
+2021-09-20 12:44:42,492 criterion loss 0.060656
+2021-09-20 12:44:42,867 criterion loss 0.063562
+2021-09-20 12:44:43,242 criterion loss 0.046642
+2021-09-20 12:44:43,617 criterion loss 0.088216
+2021-09-20 12:44:44,039 criterion loss 0.073385
+2021-09-20 12:44:44,430 criterion loss 0.067839
+2021-09-20 12:44:44,805 criterion loss 0.077372
+2021-09-20 12:44:45,180 criterion loss 0.061170
+2021-09-20 12:44:45,555 criterion loss 0.069180
+2021-09-20 12:44:45,930 criterion loss 0.071462
+2021-09-20 12:44:46,305 criterion loss 0.035561
+2021-09-20 12:44:46,680 criterion loss 0.068311
+2021-09-20 12:44:47,055 criterion loss 0.046899
+2021-09-20 12:44:47,430 criterion loss 0.107841
+2021-09-20 12:44:47,805 criterion loss 0.060677
+2021-09-20 12:44:48,180 criterion loss 0.086095
+2021-09-20 12:44:48,555 criterion loss 0.083929
+2021-09-20 12:44:48,943 criterion loss 0.084972
+2021-09-20 12:44:49,318 criterion loss 0.062484
+2021-09-20 12:44:49,693 criterion loss 0.063030
+2021-09-20 12:44:50,068 criterion loss 0.061579
+2021-09-20 12:44:50,443 criterion loss 0.044180
+2021-09-20 12:44:50,818 criterion loss 0.069421
+2021-09-20 12:44:51,193 criterion loss 0.098143
+2021-09-20 12:44:51,568 criterion loss 0.067790
+2021-09-20 12:44:51,958 criterion loss 0.074371
+2021-09-20 12:44:52,333 criterion loss 0.056737
+2021-09-20 12:44:52,708 criterion loss 0.067256
+2021-09-20 12:44:53,106 criterion loss 0.038768
+2021-09-20 12:44:53,496 criterion loss 0.073031
+2021-09-20 12:44:53,887 criterion loss 0.054833
+2021-09-20 12:44:54,278 criterion loss 0.071548
+2021-09-20 12:44:54,679 criterion loss 0.081595
+2021-09-20 12:44:55,069 criterion loss 0.060832
+2021-09-20 12:44:55,439 criterion loss 0.050950
+2021-09-20 12:44:55,814 criterion loss 0.061932
+2021-09-20 12:44:56,189 criterion loss 0.070670
+2021-09-20 12:44:56,564 criterion loss 0.048671
+2021-09-20 12:44:56,971 criterion loss 0.070657
+2021-09-20 12:44:57,346 criterion loss 0.064647
+2021-09-20 12:44:57,721 criterion loss 0.066708
+2021-09-20 12:44:58,111 criterion loss 0.067246
+2021-09-20 12:44:58,502 criterion loss 0.062460
+2021-09-20 12:44:58,908 criterion loss 0.069838
+2021-09-20 12:44:59,299 criterion loss 0.079474
+2021-09-20 12:44:59,701 criterion loss 0.037914
+2021-09-20 12:45:00,092 criterion loss 0.054702
+2021-09-20 12:45:00,467 criterion loss 0.051428
+2021-09-20 12:45:00,842 criterion loss 0.059643
+2021-09-20 12:45:01,217 criterion loss 0.081862
+2021-09-20 12:45:01,592 criterion loss 0.051662
+2021-09-20 12:45:01,967 criterion loss 0.049008
+2021-09-20 12:45:02,342 criterion loss 0.075200
+2021-09-20 12:45:02,717 criterion loss 0.040878
+2021-09-20 12:45:03,117 criterion loss 0.070773
+2021-09-20 12:45:03,492 criterion loss 0.036566
+2021-09-20 12:45:03,867 criterion loss 0.046264
+2021-09-20 12:45:04,245 criterion loss 0.061514
+2021-09-20 12:45:04,620 criterion loss 0.074968
+2021-09-20 12:45:04,995 criterion loss 0.080935
+2021-09-20 12:45:05,370 criterion loss 0.048394
+2021-09-20 12:45:05,745 criterion loss 0.087518
+2021-09-20 12:45:06,120 criterion loss 0.090377
+2021-09-20 12:45:06,495 criterion loss 0.053211
+2021-09-20 12:45:06,870 criterion loss 0.071369
+2021-09-20 12:45:07,245 criterion loss 0.072050
+2021-09-20 12:45:07,620 criterion loss 0.065254
+2021-09-20 12:45:08,004 criterion loss 0.059990
+2021-09-20 12:45:08,379 criterion loss 0.069297
+2021-09-20 12:45:08,817 criterion loss 0.041453
+2021-09-20 12:45:09,192 criterion loss 0.055239
+2021-09-20 12:45:09,567 criterion loss 0.074598
+2021-09-20 12:45:09,945 criterion loss 0.056112
+2021-09-20 12:45:10,320 criterion loss 0.040430
+2021-09-20 12:45:10,711 criterion loss 0.078030
+2021-09-20 12:45:11,070 criterion loss 0.067151
+2021-09-20 12:45:11,461 criterion loss 0.070418
+2021-09-20 12:45:11,836 criterion loss 0.056155
+2021-09-20 12:45:12,211 criterion loss 0.048239
+2021-09-20 12:45:12,586 criterion loss 0.064652
+2021-09-20 12:45:13,008 criterion loss 0.062636
+2021-09-20 12:45:13,430 criterion loss 0.062705
+2021-09-20 12:45:13,820 criterion loss 0.041140
+2021-09-20 12:45:14,211 criterion loss 0.051505
+2021-09-20 12:45:14,617 criterion loss 0.076669
+2021-09-20 12:45:15,008 criterion loss 0.074202
+2021-09-20 12:45:15,398 criterion loss 0.071920
+2021-09-20 12:45:15,805 criterion loss 0.055082
+2021-09-20 12:45:16,211 criterion loss 0.073396
+2021-09-20 12:45:16,611 criterion loss 0.080628
+2021-09-20 12:45:17,017 criterion loss 0.063161
+2021-09-20 12:45:17,407 criterion loss 0.070703
+2021-09-20 12:45:17,798 criterion loss 0.082152
+2021-09-20 12:45:18,173 criterion loss 0.062490
+2021-09-20 12:45:18,548 criterion loss 0.060404
+2021-09-20 12:45:18,954 criterion loss 0.068376
+2021-09-20 12:45:19,345 criterion loss 0.073338
+2021-09-20 12:45:19,720 criterion loss 0.062383
+2021-09-20 12:45:20,095 criterion loss 0.077116
+2021-09-20 12:45:20,470 criterion loss 0.047729
+2021-09-20 12:45:20,845 criterion loss 0.069624
+2021-09-20 12:45:21,220 criterion loss 0.079083
+2021-09-20 12:45:21,595 criterion loss 0.053570
+2021-09-20 12:45:21,970 criterion loss 0.046065
+2021-09-20 12:45:22,345 criterion loss 0.079519
+2021-09-20 12:45:22,720 criterion loss 0.051854
+2021-09-20 12:45:23,096 criterion loss 0.079211
+2021-09-20 12:45:23,471 criterion loss 0.049513
+2021-09-20 12:45:23,854 criterion loss 0.057886
+2021-09-20 12:45:24,229 criterion loss 0.066689
+2021-09-20 12:45:24,603 criterion loss 0.049950
+2021-09-20 12:45:25,049 criterion loss 0.048664
+2021-09-20 12:45:25,440 criterion loss 0.077730
+2021-09-20 12:45:25,815 criterion loss 0.071587
+2021-09-20 12:45:26,190 criterion loss 0.039427
+2021-09-20 12:45:26,565 criterion loss 0.045047
+2021-09-20 12:45:26,956 criterion loss 0.062606
+2021-09-20 12:45:27,332 criterion loss 0.079430
+2021-09-20 12:45:27,707 criterion loss 0.062979
+2021-09-20 12:45:28,082 criterion loss 0.054987
+2021-09-20 12:45:28,457 criterion loss 0.049782
+2021-09-20 12:45:28,832 criterion loss 0.066105
+2021-09-20 12:45:29,218 criterion loss 0.059905
+2021-09-20 12:45:29,593 criterion loss 0.041713
+2021-09-20 12:45:29,968 criterion loss 0.043832
+2021-09-20 12:45:30,337 criterion loss 0.075061
+2021-09-20 12:45:30,712 criterion loss 0.056632
+2021-09-20 12:45:31,087 criterion loss 0.052141
+2021-09-20 12:45:31,462 criterion loss 0.061141
+2021-09-20 12:45:31,837 criterion loss 0.049792
+2021-09-20 12:45:32,212 criterion loss 0.054265
+2021-09-20 12:45:32,587 criterion loss 0.073342
+2021-09-20 12:45:32,962 criterion loss 0.045193
+2021-09-20 12:45:33,337 criterion loss 0.045262
+2021-09-20 12:45:33,712 criterion loss 0.039623
+2021-09-20 12:45:34,087 criterion loss 0.048784
+2021-09-20 12:45:34,494 criterion loss 0.082599
+2021-09-20 12:45:34,869 criterion loss 0.059749
+2021-09-20 12:45:35,344 criterion loss 0.062732
+2021-09-20 12:45:35,844 criterion loss 0.050136
+2021-09-20 12:45:36,219 criterion loss 0.063855
+2021-09-20 12:45:36,594 criterion loss 0.058559
+2021-09-20 12:45:36,969 criterion loss 0.037374
+2021-09-20 12:45:37,391 criterion loss 0.047830
+2021-09-20 12:45:37,783 criterion loss 0.052151
+2021-09-20 12:45:38,171 criterion loss 0.037597
+2021-09-20 12:45:38,546 criterion loss 0.072941
+2021-09-20 12:45:38,921 criterion loss 0.050411
+2021-09-20 12:45:39,296 criterion loss 0.083355
+2021-09-20 12:45:39,671 criterion loss 0.075450
+2021-09-20 12:45:40,055 criterion loss 0.042425
+2021-09-20 12:45:40,430 criterion loss 0.050615
+2021-09-20 12:45:40,821 criterion loss 0.067879
+2021-09-20 12:45:41,196 criterion loss 0.040872
+2021-09-20 12:45:41,618 criterion loss 0.051656
+2021-09-20 12:45:41,993 criterion loss 0.040601
+2021-09-20 12:45:42,383 criterion loss 0.078973
+2021-09-20 12:45:42,758 criterion loss 0.061246
+2021-09-20 12:45:43,133 criterion loss 0.076543
+2021-09-20 12:45:43,524 criterion loss 0.052009
+2021-09-20 12:45:43,915 criterion loss 0.071117
+2021-09-20 12:45:44,291 criterion loss 0.051083
+2021-09-20 12:45:44,666 criterion loss 0.066253
+2021-09-20 12:45:45,041 criterion loss 0.054587
+2021-09-20 12:45:45,416 criterion loss 0.074451
+2021-09-20 12:45:45,838 criterion loss 0.046080
+2021-09-20 12:45:46,275 criterion loss 0.057511
+2021-09-20 12:45:46,666 criterion loss 0.046241
+2021-09-20 12:45:47,041 criterion loss 0.075910
+2021-09-20 12:45:47,416 criterion loss 0.067402
+2021-09-20 12:45:47,791 criterion loss 0.100591
+2021-09-20 12:45:48,166 criterion loss 0.036919
+2021-09-20 12:45:48,541 criterion loss 0.079253
+2021-09-20 12:45:48,916 criterion loss 0.058434
+2021-09-20 12:45:49,300 criterion loss 0.043319
+2021-09-20 12:45:49,675 criterion loss 0.069356
+2021-09-20 12:45:50,050 criterion loss 0.074326
+2021-09-20 12:45:50,425 criterion loss 0.054479
+2021-09-20 12:45:50,785 criterion loss 0.065118
+2021-09-20 12:45:51,160 criterion loss 0.049578
+2021-09-20 12:45:51,538 criterion loss 0.069021
+2021-09-20 12:45:51,929 criterion loss 0.060990
+2021-09-20 12:45:52,288 criterion loss 0.063252
+2021-09-20 12:45:52,663 criterion loss 0.039859
+2021-09-20 12:45:53,055 criterion loss 0.049165
+2021-09-20 12:45:53,431 criterion loss 0.061453
+2021-09-20 12:45:53,806 criterion loss 0.058152
+2021-09-20 12:45:54,181 criterion loss 0.051331
+2021-09-20 12:45:54,556 criterion loss 0.082659
+2021-09-20 12:45:54,933 criterion loss 0.060909
+2021-09-20 12:45:55,308 criterion loss 0.051152
+2021-09-20 12:45:55,683 criterion loss 0.083823
+2021-09-20 12:45:56,062 criterion loss 0.052260
+2021-09-20 12:45:56,531 criterion loss 0.077628
+2021-09-20 12:45:56,906 criterion loss 0.047240
+2021-09-20 12:45:57,312 criterion loss 0.060976
+2021-09-20 12:45:57,687 criterion loss 0.059938
+2021-09-20 12:45:58,071 criterion loss 0.059633
+2021-09-20 12:45:58,439 criterion loss 0.062542
+2021-09-20 12:45:58,814 criterion loss 0.061265
+2021-09-20 12:45:59,189 criterion loss 0.051954
+2021-09-20 12:45:59,579 criterion loss 0.072357
+2021-09-20 12:45:59,954 criterion loss 0.063068
+2021-09-20 12:46:00,329 criterion loss 0.046798
+2021-09-20 12:46:00,704 criterion loss 0.051262
+2021-09-20 12:46:01,079 criterion loss 0.055487
+2021-09-20 12:46:01,454 criterion loss 0.057321
+2021-09-20 12:46:01,845 criterion loss 0.059459
+2021-09-20 12:46:02,220 criterion loss 0.051240
+2021-09-20 12:46:02,595 criterion loss 0.053777
+2021-09-20 12:46:02,970 criterion loss 0.055982
+2021-09-20 12:46:03,345 criterion loss 0.046323
+2021-09-20 12:46:03,720 criterion loss 0.059331
+2021-09-20 12:46:04,095 criterion loss 0.061235
+2021-09-20 12:46:04,470 criterion loss 0.062707
+2021-09-20 12:46:04,845 criterion loss 0.063191
+2021-09-20 12:46:05,236 criterion loss 0.052794
+2021-09-20 12:46:05,611 criterion loss 0.048743
+2021-09-20 12:46:05,991 criterion loss 0.056741
+2021-09-20 12:46:06,366 criterion loss 0.051641
+2021-09-20 12:46:06,835 criterion loss 0.060464
+2021-09-20 12:46:07,257 criterion loss 0.081051
+2021-09-20 12:46:07,710 criterion loss 0.081162
+2021-09-20 12:46:08,133 criterion loss 0.038878
+2021-09-20 12:46:08,511 criterion loss 0.057349
+2021-09-20 12:46:08,886 criterion loss 0.054252
+2021-09-20 12:46:09,261 criterion loss 0.057945
+2021-09-20 12:46:09,683 criterion loss 0.071391
+2021-09-20 12:46:10,058 criterion loss 0.075456
+2021-09-20 12:46:10,433 criterion loss 0.057883
+2021-09-20 12:46:10,808 criterion loss 0.059558
+2021-09-20 12:46:11,183 criterion loss 0.055533
+2021-09-20 12:46:11,575 criterion loss 0.055483
+2021-09-20 12:46:11,950 criterion loss 0.073678
+2021-09-20 12:46:12,325 criterion loss 0.084057
+2021-09-20 12:46:12,702 criterion loss 0.048855
+2021-09-20 12:46:13,085 criterion loss 0.063559
+2021-09-20 12:46:13,453 criterion loss 0.063115
+2021-09-20 12:46:13,828 criterion loss 0.049492
+2021-09-20 12:46:14,220 criterion loss 0.069855
+2021-09-20 12:46:14,595 criterion loss 0.055854
+2021-09-20 12:46:15,002 criterion loss 0.063600
+2021-09-20 12:46:15,377 criterion loss 0.064240
+2021-09-20 12:46:15,753 criterion loss 0.054477
+2021-09-20 12:46:16,128 criterion loss 0.046986
+2021-09-20 12:46:16,503 criterion loss 0.063578
+2021-09-20 12:46:16,909 criterion loss 0.057870
+2021-09-20 12:46:17,288 criterion loss 0.060093
+2021-09-20 12:46:17,663 criterion loss 0.047622
+2021-09-20 12:46:18,038 criterion loss 0.063427
+2021-09-20 12:46:18,413 criterion loss 0.054313
+2021-09-20 12:46:18,789 criterion loss 0.062176
+2021-09-20 12:46:19,164 criterion loss 0.044252
+2021-09-20 12:46:19,539 criterion loss 0.061168
+2021-09-20 12:46:19,914 criterion loss 0.052063
+2021-09-20 12:46:20,289 criterion loss 0.063844
+2021-09-20 12:46:20,664 criterion loss 0.055902
+2021-09-20 12:46:21,102 criterion loss 0.055783
+2021-09-20 12:46:21,695 criterion loss 0.053645
+2021-09-20 12:46:22,070 criterion loss 0.041403
+2021-09-20 12:46:22,445 criterion loss 0.051661
+2021-09-20 12:46:22,820 criterion loss 0.045983
+2021-09-20 12:46:23,195 criterion loss 0.077705
+2021-09-20 12:46:23,570 criterion loss 0.058649
+2021-09-20 12:46:23,945 criterion loss 0.049255
+2021-09-20 12:46:24,320 criterion loss 0.042880
+2021-09-20 12:46:24,695 criterion loss 0.044127
+2021-09-20 12:46:25,070 criterion loss 0.057102
+2021-09-20 12:46:25,447 criterion loss 0.050925
+2021-09-20 12:46:25,822 criterion loss 0.039667
+2021-09-20 12:46:26,212 criterion loss 0.043371
+2021-09-20 12:46:26,572 criterion loss 0.053175
+2021-09-20 12:46:26,953 criterion loss 0.053726
+2021-09-20 12:46:27,343 criterion loss 0.052206
+2021-09-20 12:46:27,718 criterion loss 0.060854
+2021-09-20 12:46:28,093 criterion loss 0.068088
+2021-09-20 12:46:28,473 criterion loss 0.068036
+2021-09-20 12:46:28,848 criterion loss 0.036218
+2021-09-20 12:46:29,239 criterion loss 0.063220
+2021-09-20 12:46:29,614 criterion loss 0.067022
+2021-09-20 12:46:29,994 criterion loss 0.062280
+2021-09-20 12:46:30,369 criterion loss 0.077177
+2021-09-20 12:46:30,744 criterion loss 0.057810
+2021-09-20 12:46:31,119 criterion loss 0.049773
+2021-09-20 12:46:31,483 criterion loss 0.062624
+2021-09-20 12:46:31,875 criterion loss 0.040795
+2021-09-20 12:46:32,237 criterion loss 0.076239
+2021-09-20 12:46:32,615 criterion loss 0.057490
+2021-09-20 12:46:32,991 criterion loss 0.054710
+2021-09-20 12:46:33,366 criterion loss 0.062031
+2021-09-20 12:46:33,741 criterion loss 0.043911
+2021-09-20 12:46:34,117 criterion loss 0.061798
+2021-09-20 12:46:34,492 criterion loss 0.062689
+2021-09-20 12:46:34,867 criterion loss 0.055820
+2021-09-20 12:46:35,258 criterion loss 0.044535
+2021-09-20 12:46:35,619 criterion loss 0.057311
+2021-09-20 12:46:36,009 criterion loss 0.056535
+2021-09-20 12:46:36,384 criterion loss 0.038593
+2021-09-20 12:46:36,759 criterion loss 0.072664
+2021-09-20 12:46:37,138 criterion loss 0.056862
+2021-09-20 12:46:37,513 criterion loss 0.085838
+2021-09-20 12:46:37,888 criterion loss 0.059141
+2021-09-20 12:46:38,263 criterion loss 0.062272
+2021-09-20 12:46:38,640 criterion loss 0.076550
+2021-09-20 12:46:39,077 criterion loss 0.037024
+2021-09-20 12:46:39,452 criterion loss 0.040173
+2021-09-20 12:46:39,827 criterion loss 0.068209
+2021-09-20 12:46:40,202 criterion loss 0.051050
+2021-09-20 12:46:40,593 criterion loss 0.063908
+2021-09-20 12:46:40,968 criterion loss 0.064695
+2021-09-20 12:46:41,343 criterion loss 0.063583
+2021-09-20 12:46:41,718 criterion loss 0.053018
+2021-09-20 12:46:42,093 criterion loss 0.053973
+2021-09-20 12:46:42,468 criterion loss 0.060797
+2021-09-20 12:46:42,843 criterion loss 0.077110
+2021-09-20 12:46:43,233 criterion loss 0.061419
+2021-09-20 12:46:43,608 criterion loss 0.034827
+2021-09-20 12:46:43,983 criterion loss 0.069457
+2021-09-20 12:46:44,358 criterion loss 0.067215
+2021-09-20 12:46:44,733 criterion loss 0.070614
+2021-09-20 12:46:45,132 criterion loss 0.072413
+2021-09-20 12:46:45,507 criterion loss 0.068883
+2021-09-20 12:46:45,882 criterion loss 0.051703
+2021-09-20 12:46:46,257 criterion loss 0.073727
+2021-09-20 12:46:46,632 criterion loss 0.067171
+2021-09-20 12:46:47,007 criterion loss 0.053692
+2021-09-20 12:46:47,382 criterion loss 0.059745
+2021-09-20 12:46:47,757 criterion loss 0.052730
+2021-09-20 12:46:48,148 criterion loss 0.046846
+2021-09-20 12:46:48,507 criterion loss 0.058310
+2021-09-20 12:46:48,882 criterion loss 0.061820
+2021-09-20 12:46:49,257 criterion loss 0.066206
+2021-09-20 12:46:49,632 criterion loss 0.043705
+2021-09-20 12:46:50,007 criterion loss 0.051038
+2021-09-20 12:46:50,382 criterion loss 0.050161
+2021-09-20 12:46:50,773 criterion loss 0.048658
+2021-09-20 12:46:51,148 criterion loss 0.054195
+2021-09-20 12:46:51,523 criterion loss 0.062757
+2021-09-20 12:46:51,898 criterion loss 0.064534
+2021-09-20 12:46:52,267 criterion loss 0.076099
+2021-09-20 12:46:52,643 criterion loss 0.052840
+2021-09-20 12:46:53,021 criterion loss 0.072779
+2021-09-20 12:46:53,398 criterion loss 0.055732
+2021-09-20 12:46:53,776 criterion loss 0.035820
+2021-09-20 12:46:54,152 criterion loss 0.046587
+2021-09-20 12:46:54,534 criterion loss 0.070469
+2021-09-20 12:46:54,909 criterion loss 0.035199
+2021-09-20 12:46:55,285 criterion loss 0.046570
+2021-09-20 12:46:55,660 criterion loss 0.032675
+2021-09-20 12:46:56,035 criterion loss 0.055074
+2021-09-20 12:46:56,410 criterion loss 0.067845
+2021-09-20 12:46:56,787 criterion loss 0.040437
+2021-09-20 12:46:57,171 criterion loss 0.047318
+2021-09-20 12:46:57,546 criterion loss 0.076764
+2021-09-20 12:46:57,937 criterion loss 0.053933
+2021-09-20 12:46:58,312 criterion loss 0.040477
+2021-09-20 12:46:58,687 criterion loss 0.065793
+2021-09-20 12:46:59,077 criterion loss 0.056997
+2021-09-20 12:46:59,452 criterion loss 0.049949
+2021-09-20 12:46:59,837 criterion loss 0.041881
+2021-09-20 12:47:00,244 criterion loss 0.053449
+2021-09-20 12:47:00,709 criterion loss 0.037189
+2021-09-20 12:47:01,100 criterion loss 0.049987
+2021-09-20 12:47:01,459 criterion loss 0.046871
+2021-09-20 12:47:01,850 criterion loss 0.058724
+2021-09-20 12:47:02,209 criterion loss 0.028937
+2021-09-20 12:47:02,584 criterion loss 0.063525
+2021-09-20 12:47:02,959 criterion loss 0.057140
+2021-09-20 12:47:03,350 criterion loss 0.064597
+2021-09-20 12:47:03,725 criterion loss 0.067420
+2021-09-20 12:47:04,102 criterion loss 0.035266
+2021-09-20 12:47:04,477 criterion loss 0.047829
+2021-09-20 12:47:04,852 criterion loss 0.052504
+2021-09-20 12:47:05,227 criterion loss 0.063547
+2021-09-20 12:47:05,602 criterion loss 0.041995
+2021-09-20 12:47:05,975 criterion loss 0.059570
+2021-09-20 12:47:06,350 criterion loss 0.044746
+2021-09-20 12:47:06,725 criterion loss 0.057674
+2021-09-20 12:47:07,116 criterion loss 0.042111
+2021-09-20 12:47:07,491 criterion loss 0.067227
+2021-09-20 12:47:07,866 criterion loss 0.061859
+2021-09-20 12:47:08,248 criterion loss 0.065558
+2021-09-20 12:47:08,625 criterion loss 0.046541
+2021-09-20 12:47:09,000 criterion loss 0.057063
+2021-09-20 12:47:09,375 criterion loss 0.061783
+2021-09-20 12:47:09,750 criterion loss 0.054156
+2021-09-20 12:47:10,125 criterion loss 0.054537
+2021-09-20 12:47:10,515 criterion loss 0.062749
+2021-09-20 12:47:10,890 criterion loss 0.055108
+2021-09-20 12:47:11,265 criterion loss 0.054446
+2021-09-20 12:47:11,640 criterion loss 0.046052
+2021-09-20 12:47:12,025 criterion loss 0.041410
+2021-09-20 12:47:12,404 criterion loss 0.035428
+2021-09-20 12:47:12,779 criterion loss 0.061714
+2021-09-20 12:47:13,185 criterion loss 0.058980
+2021-09-20 12:47:13,560 criterion loss 0.054005
+2021-09-20 12:47:13,935 criterion loss 0.045504
+2021-09-20 12:47:14,388 criterion loss 0.071234
+2021-09-20 12:47:14,763 criterion loss 0.052874
+2021-09-20 12:47:15,138 criterion loss 0.053814
+2021-09-20 12:47:15,513 criterion loss 0.045479
+2021-09-20 12:47:15,888 criterion loss 0.050776
+2021-09-20 12:47:16,279 criterion loss 0.073897
+2021-09-20 12:47:16,654 criterion loss 0.060885
+2021-09-20 12:47:17,038 criterion loss 0.051849
+2021-09-20 12:47:17,413 criterion loss 0.064119
+2021-09-20 12:47:17,803 criterion loss 0.053726
+2021-09-20 12:47:18,178 criterion loss 0.070127
+2021-09-20 12:47:18,553 criterion loss 0.068222
+2021-09-20 12:47:18,928 criterion loss 0.059026
+2021-09-20 12:47:19,303 criterion loss 0.066322
+2021-09-20 12:47:19,678 criterion loss 0.047126
+2021-09-20 12:47:20,053 criterion loss 0.040999
+2021-09-20 12:47:20,422 criterion loss 0.054179
+2021-09-20 12:47:20,812 criterion loss 0.068233
+2021-09-20 12:47:21,187 criterion loss 0.057961
+2021-09-20 12:47:21,562 criterion loss 0.045710
+2021-09-20 12:47:21,937 criterion loss 0.054122
+2021-09-20 12:47:22,312 criterion loss 0.054961
+2021-09-20 12:47:22,687 criterion loss 0.045484
+2021-09-20 12:47:23,062 criterion loss 0.047703
+2021-09-20 12:47:23,439 criterion loss 0.043380
+2021-09-20 12:47:23,829 criterion loss 0.065988
+2021-09-20 12:47:24,204 criterion loss 0.032679
+2021-09-20 12:47:24,579 criterion loss 0.047839
+2021-09-20 12:47:24,954 criterion loss 0.057464
+2021-09-20 12:47:25,329 criterion loss 0.058849
+2021-09-20 12:47:25,704 criterion loss 0.044914
+2021-09-20 12:47:26,079 criterion loss 0.046240
+2021-09-20 12:47:26,454 criterion loss 0.043172
+2021-09-20 12:47:26,829 criterion loss 0.054344
+2021-09-20 12:47:27,229 criterion loss 0.045188
+2021-09-20 12:47:27,604 criterion loss 0.044610
+2021-09-20 12:47:27,995 criterion loss 0.038285
+2021-09-20 12:47:28,370 criterion loss 0.045176
+2021-09-20 12:47:28,729 criterion loss 0.064897
+2021-09-20 12:47:29,116 criterion loss 0.056431
+2021-09-20 12:47:29,491 criterion loss 0.067229
+2021-09-20 12:47:29,866 criterion loss 0.040326
+2021-09-20 12:47:30,256 criterion loss 0.042841
+2021-09-20 12:47:30,631 criterion loss 0.054284
+2021-09-20 12:47:31,006 criterion loss 0.058446
+2021-09-20 12:47:31,381 criterion loss 0.054808
+2021-09-20 12:47:31,756 criterion loss 0.055001
+2021-09-20 12:47:32,131 criterion loss 0.062910
+2021-09-20 12:47:32,518 criterion loss 0.034955
+2021-09-20 12:47:32,893 criterion loss 0.054471
+2021-09-20 12:47:33,268 criterion loss 0.069416
+2021-09-20 12:47:33,644 criterion loss 0.028364
+2021-09-20 12:47:34,021 criterion loss 0.048731
+2021-09-20 12:47:34,397 criterion loss 0.036818
+2021-09-20 12:47:34,772 criterion loss 0.046769
+2021-09-20 12:47:35,148 criterion loss 0.048961
+2021-09-20 12:47:35,523 criterion loss 0.051147
+2021-09-20 12:47:35,945 criterion loss 0.048459
+2021-09-20 12:47:36,320 criterion loss 0.037589
+2021-09-20 12:47:36,712 criterion loss 0.063736
+2021-09-20 12:47:37,094 criterion loss 0.056645
+2021-09-20 12:47:37,469 criterion loss 0.045821
+2021-09-20 12:47:37,844 criterion loss 0.040641
+2021-09-20 12:47:38,281 criterion loss 0.050044
+2021-09-20 12:47:38,667 criterion loss 0.048460
+2021-09-20 12:47:39,051 criterion loss 0.062351
+2021-09-20 12:47:39,426 criterion loss 0.034589
+2021-09-20 12:47:39,801 criterion loss 0.036003
+2021-09-20 12:47:40,177 criterion loss 0.046642
+2021-09-20 12:47:40,546 criterion loss 0.047383
+2021-09-20 12:47:40,946 criterion loss 0.052001
+2021-09-20 12:47:41,321 criterion loss 0.042976
+2021-09-20 12:47:41,696 criterion loss 0.051431
+2021-09-20 12:47:42,071 criterion loss 0.041217
+2021-09-20 12:47:42,446 criterion loss 0.067837
+2021-09-20 12:47:42,821 criterion loss 0.075191
+2021-09-20 12:47:43,196 criterion loss 0.054084
+2021-09-20 12:47:43,587 criterion loss 0.059198
+2021-09-20 12:47:43,962 criterion loss 0.053362
+2021-09-20 12:47:44,337 criterion loss 0.056268
+2021-09-20 12:47:44,712 criterion loss 0.084189
+2021-09-20 12:47:45,087 criterion loss 0.061514
+2021-09-20 12:47:45,462 criterion loss 0.066571
+2021-09-20 12:47:45,846 criterion loss 0.033952
+2021-09-20 12:47:46,226 criterion loss 0.041805
+2021-09-20 12:47:46,602 criterion loss 0.062918
+2021-09-20 12:47:46,995 criterion loss 0.038056
+2021-09-20 12:47:47,372 criterion loss 0.047692
+2021-09-20 12:47:47,748 criterion loss 0.058596
+2021-09-20 12:47:48,123 criterion loss 0.059893
+2021-09-20 12:47:48,499 criterion loss 0.061761
+2021-09-20 12:47:48,875 criterion loss 0.039478
+2021-09-20 12:47:49,250 criterion loss 0.052693
+2021-09-20 12:47:49,625 criterion loss 0.070820
+2021-09-20 12:47:50,000 criterion loss 0.039361
+2021-09-20 12:47:50,376 criterion loss 0.048718
+2021-09-20 12:47:50,751 criterion loss 0.041765
+2021-09-20 12:47:51,126 criterion loss 0.065639
+2021-09-20 12:47:51,501 criterion loss 0.049540
+2021-09-20 12:47:51,876 criterion loss 0.044889
+2021-09-20 12:47:52,251 criterion loss 0.056392
+2021-09-20 12:47:52,626 criterion loss 0.067816
+2021-09-20 12:47:53,001 criterion loss 0.041714
+2021-09-20 12:47:53,377 criterion loss 0.038648
+2021-09-20 12:47:53,754 criterion loss 0.046684
+2021-09-20 12:47:54,129 criterion loss 0.051114
+2021-09-20 12:47:54,504 criterion loss 0.067720
+2021-09-20 12:47:54,879 criterion loss 0.053714
+2021-09-20 12:47:55,269 criterion loss 0.049530
+2021-09-20 12:47:55,629 criterion loss 0.049663
+2021-09-20 12:47:56,019 criterion loss 0.047981
+2021-09-20 12:47:56,379 criterion loss 0.053010
+2021-09-20 12:47:56,754 criterion loss 0.037244
+2021-09-20 12:47:57,129 criterion loss 0.044249
+2021-09-20 12:47:57,504 criterion loss 0.048681
+2021-09-20 12:47:57,879 criterion loss 0.037038
+2021-09-20 12:47:58,269 criterion loss 0.050879
+2021-09-20 12:47:58,644 criterion loss 0.052737
+2021-09-20 12:47:59,019 criterion loss 0.065800
+2021-09-20 12:47:59,394 criterion loss 0.054323
+2021-09-20 12:47:59,771 criterion loss 0.070566
+2021-09-20 12:48:00,146 criterion loss 0.041266
+2021-09-20 12:48:00,521 criterion loss 0.040855
+2021-09-20 12:48:00,911 criterion loss 0.041782
+2021-09-20 12:48:01,286 criterion loss 0.044067
+2021-09-20 12:48:01,661 criterion loss 0.051269
+2021-09-20 12:48:02,021 criterion loss 0.050712
+2021-09-20 12:48:02,411 criterion loss 0.062756
+2021-09-20 12:48:02,802 criterion loss 0.041301
+2021-09-20 12:48:03,177 criterion loss 0.041827
+2021-09-20 12:48:03,552 criterion loss 0.052145
+2021-09-20 12:48:03,927 criterion loss 0.060159
+2021-09-20 12:48:04,302 criterion loss 0.059588
+2021-09-20 12:48:04,677 criterion loss 0.035405
+2021-09-20 12:48:05,052 criterion loss 0.053557
+2021-09-20 12:48:05,443 criterion loss 0.039357
+2021-09-20 12:48:05,818 criterion loss 0.056710
+2021-09-20 12:48:06,191 criterion loss 0.036062
+2021-09-20 12:48:06,567 criterion loss 0.037078
+2021-09-20 12:48:06,956 criterion loss 0.074092
+2021-09-20 12:48:07,327 criterion loss 0.058914
+2021-09-20 12:48:07,719 criterion loss 0.044045
+2021-09-20 12:48:08,095 criterion loss 0.043807
+2021-09-20 12:48:08,478 criterion loss 0.059541
+2021-09-20 12:48:08,854 criterion loss 0.041030
+2021-09-20 12:48:09,229 criterion loss 0.045947
+2021-09-20 12:48:09,598 criterion loss 0.039008
+2021-09-20 12:48:09,984 criterion loss 0.066512
+2021-09-20 12:48:10,375 criterion loss 0.045536
+2021-09-20 12:48:10,750 criterion loss 0.055610
+2021-09-20 12:48:11,141 criterion loss 0.049291
+2021-09-20 12:48:11,532 criterion loss 0.044058
+2021-09-20 12:48:11,907 criterion loss 0.035156
+2021-09-20 12:48:12,282 criterion loss 0.070557
+2021-09-20 12:48:12,657 criterion loss 0.052142
+2021-09-20 12:48:13,047 criterion loss 0.037221
+2021-09-20 12:48:13,422 criterion loss 0.053902
+2021-09-20 12:48:13,814 criterion loss 0.052028
+2021-09-20 12:48:14,205 criterion loss 0.061113
+2021-09-20 12:48:14,595 criterion loss 0.044013
+2021-09-20 12:48:15,033 criterion loss 0.054266
+2021-09-20 12:48:15,455 criterion loss 0.055006
+2021-09-20 12:48:15,845 criterion loss 0.043245
+2021-09-20 12:48:16,243 criterion loss 0.044505
+2021-09-20 12:48:16,634 criterion loss 0.068960
+2021-09-20 12:48:17,024 criterion loss 0.067457
+2021-09-20 12:48:17,430 criterion loss 0.056978
+2021-09-20 12:48:17,821 criterion loss 0.056176
+2021-09-20 12:48:18,227 criterion loss 0.053749
+2021-09-20 12:48:18,626 criterion loss 0.049298
+2021-09-20 12:48:19,016 criterion loss 0.071850
+2021-09-20 12:48:19,407 criterion loss 0.038906
+2021-09-20 12:48:19,797 criterion loss 0.065724
+2021-09-20 12:48:20,191 criterion loss 0.043005
+2021-09-20 12:48:20,582 criterion loss 0.053529
+2021-09-20 12:48:20,988 criterion loss 0.049057
+2021-09-20 12:48:21,363 criterion loss 0.044730
+2021-09-20 12:48:21,738 criterion loss 0.042463
+2021-09-20 12:48:22,113 criterion loss 0.044530
+2021-09-20 12:48:22,488 criterion loss 0.057848
+2021-09-20 12:48:22,863 criterion loss 0.039685
+2021-09-20 12:48:23,238 criterion loss 0.053379
+2021-09-20 12:48:23,629 criterion loss 0.054245
+2021-09-20 12:48:24,004 criterion loss 0.049483
+2021-09-20 12:48:24,379 criterion loss 0.048037
+2021-09-20 12:48:24,754 criterion loss 0.062507
+2021-09-20 12:48:25,129 criterion loss 0.049538
+2021-09-20 12:48:25,504 criterion loss 0.056006
+2021-09-20 12:48:25,879 criterion loss 0.054949
+2021-09-20 12:48:26,266 criterion loss 0.086433
+2021-09-20 12:48:26,641 criterion loss 0.076549
+2021-09-20 12:48:27,033 criterion loss 0.046934
+2021-09-20 12:48:27,410 criterion loss 0.059752
+2021-09-20 12:48:27,786 criterion loss 0.056629
+2021-09-20 12:48:28,179 criterion loss 0.051647
+2021-09-20 12:48:28,540 criterion loss 0.056316
+2021-09-20 12:48:28,915 criterion loss 0.054276
+2021-09-20 12:48:29,291 criterion loss 0.053365
+2021-09-20 12:48:29,666 criterion loss 0.077122
+2021-09-20 12:48:30,051 criterion loss 0.059931
+2021-09-20 12:48:30,426 criterion loss 0.058124
+2021-09-20 12:48:30,801 criterion loss 0.064430
+2021-09-20 12:48:31,177 criterion loss 0.056613
+2021-09-20 12:48:31,552 criterion loss 0.050081
+2021-09-20 12:48:31,927 criterion loss 0.057393
+2021-09-20 12:48:32,302 criterion loss 0.052951
+2021-09-20 12:48:32,693 criterion loss 0.053307
+2021-09-20 12:48:33,115 criterion loss 0.061395
+2021-09-20 12:48:33,490 criterion loss 0.046563
+2021-09-20 12:48:33,865 criterion loss 0.052413
+2021-09-20 12:48:34,242 criterion loss 0.039422
+2021-09-20 12:48:34,617 criterion loss 0.049656
+2021-09-20 12:48:35,007 criterion loss 0.039184
+2021-09-20 12:48:35,377 criterion loss 0.045099
+2021-09-20 12:48:35,752 criterion loss 0.044596
+2021-09-20 12:48:36,127 criterion loss 0.041104
+2021-09-20 12:48:36,502 criterion loss 0.046471
+2021-09-20 12:48:36,877 criterion loss 0.055666
+2021-09-20 12:48:37,267 criterion loss 0.042838
+2021-09-20 12:48:37,642 criterion loss 0.064966
+2021-09-20 12:48:38,017 criterion loss 0.048020
+2021-09-20 12:48:38,393 criterion loss 0.068133
+2021-09-20 12:48:38,768 criterion loss 0.070324
+2021-09-20 12:48:39,143 criterion loss 0.042763
+2021-09-20 12:48:39,518 criterion loss 0.038697
+2021-09-20 12:48:39,893 criterion loss 0.054166
+2021-09-20 12:48:40,268 criterion loss 0.036700
+2021-09-20 12:48:40,645 criterion loss 0.064304
+2021-09-20 12:48:41,022 criterion loss 0.064802
+2021-09-20 12:48:41,397 criterion loss 0.048205
+2021-09-20 12:48:41,772 criterion loss 0.059920
+2021-09-20 12:48:42,147 criterion loss 0.059645
+2021-09-20 12:48:42,522 criterion loss 0.033813
+2021-09-20 12:48:42,897 criterion loss 0.049107
+2021-09-20 12:48:43,288 criterion loss 0.059320
+2021-09-20 12:48:43,663 criterion loss 0.063364
+2021-09-20 12:48:44,038 criterion loss 0.044272
+2021-09-20 12:48:44,413 criterion loss 0.059775
+2021-09-20 12:48:44,804 criterion loss 0.075139
+2021-09-20 12:48:45,241 criterion loss 0.059980
+2021-09-20 12:48:45,616 criterion loss 0.054869
+2021-09-20 12:48:45,991 criterion loss 0.057003
+2021-09-20 12:48:46,366 criterion loss 0.057370
+2021-09-20 12:48:46,741 criterion loss 0.059354
+2021-09-20 12:48:47,116 criterion loss 0.054892
+2021-09-20 12:48:47,510 criterion loss 0.052214
+2021-09-20 12:48:47,888 criterion loss 0.047926
+2021-09-20 12:48:48,281 criterion loss 0.059335
+2021-09-20 12:48:48,658 criterion loss 0.064531
+2021-09-20 12:48:49,099 criterion loss 0.046722
+2021-09-20 12:48:49,545 criterion loss 0.062104
+2021-09-20 12:48:49,915 criterion loss 0.053018
+2021-09-20 12:48:50,300 criterion loss 0.054933
+2021-09-20 12:48:50,685 criterion loss 0.042897
+2021-09-20 12:48:51,060 criterion loss 0.068454
+2021-09-20 12:48:51,435 criterion loss 0.042641
+2021-09-20 12:48:51,810 criterion loss 0.078347
+2021-09-20 12:48:52,191 criterion loss 0.037818
+2021-09-20 12:48:52,566 criterion loss 0.046343
+2021-09-20 12:48:52,941 criterion loss 0.053408
+2021-09-20 12:48:53,316 criterion loss 0.062031
+2021-09-20 12:48:53,691 criterion loss 0.047588
+2021-09-20 12:48:54,081 criterion loss 0.048989
+2021-09-20 12:48:54,472 criterion loss 0.054475
+2021-09-20 12:48:54,847 criterion loss 0.048467
+2021-09-20 12:48:55,223 criterion loss 0.041446
+2021-09-20 12:48:55,598 criterion loss 0.027520
+2021-09-20 12:48:55,973 criterion loss 0.044461
+2021-09-20 12:48:56,348 criterion loss 0.038803
+2021-09-20 12:48:56,723 criterion loss 0.048691
+2021-09-20 12:48:57,098 criterion loss 0.054985
+2021-09-20 12:48:57,473 criterion loss 0.060015
+2021-09-20 12:48:57,848 criterion loss 0.072270
+2021-09-20 12:48:58,239 criterion loss 0.038000
+2021-09-20 12:48:58,614 criterion loss 0.032010
+2021-09-20 12:48:58,989 criterion loss 0.061618
+2021-09-20 12:48:59,364 criterion loss 0.052881
+2021-09-20 12:48:59,734 criterion loss 0.069994
+2021-09-20 12:49:00,125 criterion loss 0.056441
+2021-09-20 12:49:00,511 criterion loss 0.057155
+2021-09-20 12:49:00,886 criterion loss 0.050048
+2021-09-20 12:49:01,261 criterion loss 0.065457
+2021-09-20 12:49:01,637 criterion loss 0.075325
+2021-09-20 12:49:02,012 criterion loss 0.045467
+2021-09-20 12:49:02,387 criterion loss 0.058385
+2021-09-20 12:49:02,778 criterion loss 0.060855
+2021-09-20 12:49:03,168 criterion loss 0.045272
+2021-09-20 12:49:03,559 criterion loss 0.045807
+2021-09-20 12:49:03,949 criterion loss 0.052585
+2021-09-20 12:49:04,324 criterion loss 0.054359
+2021-09-20 12:49:04,712 criterion loss 0.060246
+2021-09-20 12:49:05,101 criterion loss 0.076876
+2021-09-20 12:49:05,476 criterion loss 0.050946
+2021-09-20 12:49:05,866 criterion loss 0.042425
+2021-09-20 12:49:06,257 criterion loss 0.056001
+2021-09-20 12:49:06,632 criterion loss 0.054182
+2021-09-20 12:49:07,008 criterion loss 0.049607
+2021-09-20 12:49:07,399 criterion loss 0.050291
+2021-09-20 12:49:07,774 criterion loss 0.045239
+2021-09-20 12:49:08,159 criterion loss 0.072134
+2021-09-20 12:49:08,541 criterion loss 0.053393
+2021-09-20 12:49:08,919 criterion loss 0.065829
+2021-09-20 12:49:09,296 criterion loss 0.036708
+2021-09-20 12:49:09,679 criterion loss 0.062148
+2021-09-20 12:49:10,055 criterion loss 0.048556
+2021-09-20 12:49:10,430 criterion loss 0.049035
+2021-09-20 12:49:10,806 criterion loss 0.033270
+2021-09-20 12:49:11,181 criterion loss 0.058207
+2021-09-20 12:49:11,556 criterion loss 0.065218
+2021-09-20 12:49:11,936 criterion loss 0.046090
+2021-09-20 12:49:12,297 criterion loss 0.042881
+2021-09-20 12:49:12,688 criterion loss 0.072658
+2021-09-20 12:49:13,063 criterion loss 0.058236
+2021-09-20 12:49:13,422 criterion loss 0.049853
+2021-09-20 12:49:13,813 criterion loss 0.043020
+2021-09-20 12:49:14,188 criterion loss 0.043724
+2021-09-20 12:49:14,563 criterion loss 0.058173
+2021-09-20 12:49:14,954 criterion loss 0.036098
+2021-09-20 12:49:15,360 criterion loss 0.052677
+2021-09-20 12:49:15,768 criterion loss 0.058951
+2021-09-20 12:49:16,174 criterion loss 0.056821
+2021-09-20 12:49:16,596 criterion loss 0.053236
+2021-09-20 12:49:17,002 criterion loss 0.045650
+2021-09-20 12:49:17,439 criterion loss 0.050281
+2021-09-20 12:49:18,346 criterion loss 0.059390
+2021-09-20 12:49:19,111 criterion loss 0.064780
+2021-09-20 12:49:19,611 criterion loss 0.040373
+2021-09-20 12:49:20,002 criterion loss 0.058898
+2021-09-20 12:49:20,377 criterion loss 0.038878
+2021-09-20 12:49:20,752 criterion loss 0.066938
+2021-09-20 12:49:21,142 criterion loss 0.056667
+2021-09-20 12:49:21,580 criterion loss 0.058695
+2021-09-20 12:49:21,956 criterion loss 0.040761
+2021-09-20 12:49:22,363 criterion loss 0.047092
+2021-09-20 12:49:22,738 criterion loss 0.048461
+2021-09-20 12:49:23,128 criterion loss 0.043302
+2021-09-20 12:49:23,505 criterion loss 0.057148
+2021-09-20 12:49:23,895 criterion loss 0.057908
+2021-09-20 12:49:24,270 criterion loss 0.049696
+2021-09-20 12:49:24,647 criterion loss 0.054661
+2021-09-20 12:49:25,038 criterion loss 0.062481
+2021-09-20 12:49:25,413 criterion loss 0.039181
+2021-09-20 12:49:25,788 criterion loss 0.050178
+2021-09-20 12:49:26,178 criterion loss 0.056305
+2021-09-20 12:49:26,553 criterion loss 0.049066
+2021-09-20 12:49:26,941 criterion loss 0.040394
+2021-09-20 12:49:27,324 criterion loss 0.043075
+2021-09-20 12:49:27,715 criterion loss 0.055887
+2021-09-20 12:49:28,215 criterion loss 0.047163
+2021-09-20 12:49:28,598 criterion loss 0.042272
+2021-09-20 12:49:28,983 criterion loss 0.038517
+2021-09-20 12:49:29,345 criterion loss 0.053073
+2021-09-20 12:49:29,732 criterion loss 0.055075
+2021-09-20 12:49:30,116 criterion loss 0.045860
+2021-09-20 12:49:30,484 criterion loss 0.042562
+2021-09-20 12:49:30,859 criterion loss 0.058343
+2021-09-20 12:49:31,235 criterion loss 0.059843
+2021-09-20 12:49:31,689 criterion loss 0.060063
+2021-09-20 12:49:32,064 criterion loss 0.054964
+2021-09-20 12:49:32,439 criterion loss 0.037397
+2021-09-20 12:49:32,815 criterion loss 0.050584
+2021-09-20 12:49:33,190 criterion loss 0.054141
+2021-09-20 12:49:33,565 criterion loss 0.046083
+2021-09-20 12:49:33,940 criterion loss 0.052010
+2021-09-20 12:49:34,330 criterion loss 0.039201
+2021-09-20 12:49:34,705 criterion loss 0.042418
+2021-09-20 12:49:35,096 criterion loss 0.041457
+2021-09-20 12:49:35,471 criterion loss 0.042541
+2021-09-20 12:49:35,847 criterion loss 0.058048
+2021-09-20 12:49:36,240 criterion loss 0.069278
+2021-09-20 12:49:36,615 criterion loss 0.035892
+2021-09-20 12:49:36,990 criterion loss 0.033738
+2021-09-20 12:49:37,365 criterion loss 0.070218
+2021-09-20 12:49:37,740 criterion loss 0.071780
+2021-09-20 12:49:38,115 criterion loss 0.053674
+2021-09-20 12:49:38,508 criterion loss 0.073495
+2021-09-20 12:49:38,883 criterion loss 0.045978
+2021-09-20 12:49:39,258 criterion loss 0.054143
+2021-09-20 12:49:39,633 criterion loss 0.048594
+2021-09-20 12:49:40,008 criterion loss 0.070338
+2021-09-20 12:49:40,383 criterion loss 0.035508
+2021-09-20 12:49:40,758 criterion loss 0.074497
+2021-09-20 12:49:41,133 criterion loss 0.048272
+2021-09-20 12:49:41,524 criterion loss 0.035050
+2021-09-20 12:49:41,899 criterion loss 0.063190
+2021-09-20 12:49:42,275 criterion loss 0.048388
+2021-09-20 12:49:42,650 criterion loss 0.046446
+2021-09-20 12:49:43,038 criterion loss 0.049619
+2021-09-20 12:49:43,413 criterion loss 0.042990
+2021-09-20 12:49:43,803 criterion loss 0.065141
+2021-09-20 12:49:44,178 criterion loss 0.052176
+2021-09-20 12:49:44,553 criterion loss 0.052136
+2021-09-20 12:49:44,944 criterion loss 0.044920
+2021-09-20 12:49:45,319 criterion loss 0.043163
+2021-09-20 12:49:45,694 criterion loss 0.057919
+2021-09-20 12:49:46,069 criterion loss 0.068179
+2021-09-20 12:49:46,475 criterion loss 0.034449
+2021-09-20 12:49:46,850 criterion loss 0.076547
+2021-09-20 12:49:47,227 criterion loss 0.076550
+2021-09-20 12:49:47,602 criterion loss 0.055042
+2021-09-20 12:49:47,977 criterion loss 0.050329
+2021-09-20 12:49:48,367 criterion loss 0.045836
+2021-09-20 12:49:48,773 criterion loss 0.059550
+2021-09-20 12:49:49,177 criterion loss 0.048656
+2021-09-20 12:49:49,546 criterion loss 0.053673
+2021-09-20 12:49:49,939 criterion loss 0.051688
+2021-09-20 12:49:50,316 criterion loss 0.050762
+2021-09-20 12:49:50,692 criterion loss 0.049727
+2021-09-20 12:49:51,069 criterion loss 0.056373
+2021-09-20 12:49:51,459 criterion loss 0.058182
+2021-09-20 12:49:51,835 criterion loss 0.060568
+2021-09-20 12:49:52,213 criterion loss 0.045750
+2021-09-20 12:49:52,588 criterion loss 0.048479
+2021-09-20 12:49:52,963 criterion loss 0.052665
+2021-09-20 12:49:53,339 criterion loss 0.049518
+2021-09-20 12:49:53,707 criterion loss 0.056561
+2021-09-20 12:49:54,113 criterion loss 0.049933
+2021-09-20 12:49:54,488 criterion loss 0.059808
+2021-09-20 12:49:54,863 criterion loss 0.048047
+2021-09-20 12:49:55,238 criterion loss 0.052270
+2021-09-20 12:49:55,613 criterion loss 0.045921
+2021-09-20 12:49:56,004 criterion loss 0.041375
+2021-09-20 12:49:56,363 criterion loss 0.065816
+2021-09-20 12:49:56,755 criterion loss 0.052548
+2021-09-20 12:49:57,130 criterion loss 0.048914
+2021-09-20 12:49:57,505 criterion loss 0.049689
+2021-09-20 12:49:57,880 criterion loss 0.051874
+2021-09-20 12:49:58,255 criterion loss 0.054996
+2021-09-20 12:49:58,630 criterion loss 0.057174
+2021-09-20 12:49:59,021 criterion loss 0.043505
+2021-09-20 12:49:59,396 criterion loss 0.047435
+2021-09-20 12:49:59,771 criterion loss 0.033131
+2021-09-20 12:50:00,146 criterion loss 0.048286
+2021-09-20 12:50:00,521 criterion loss 0.059131
+2021-09-20 12:50:00,927 criterion loss 0.059938
+2021-09-20 12:50:01,302 criterion loss 0.058311
+2021-09-20 12:50:01,677 criterion loss 0.041597
+2021-09-20 12:50:02,052 criterion loss 0.062783
+2021-09-20 12:50:02,427 criterion loss 0.060083
+2021-09-20 12:50:02,818 criterion loss 0.048460
+2021-09-20 12:50:03,194 criterion loss 0.052881
+2021-09-20 12:50:03,569 criterion loss 0.048577
+2021-09-20 12:50:03,960 criterion loss 0.041642
+2021-09-20 12:50:04,335 criterion loss 0.054078
+2021-09-20 12:50:04,710 criterion loss 0.049998
+2021-09-20 12:50:05,085 criterion loss 0.039135
+2021-09-20 12:50:05,491 criterion loss 0.072663
+2021-09-20 12:50:08,540 architecture evaluation for sampled model: 1 / 5
+2021-09-20 12:50:08,571 criterion loss 0.109274
+2021-09-20 12:50:08,978 criterion loss 0.116004
+2021-09-20 12:50:09,353 criterion loss 0.100402
+2021-09-20 12:50:09,804 criterion loss 0.116068
+2021-09-20 12:50:10,183 criterion loss 0.079854
+2021-09-20 12:50:10,569 criterion loss 0.087360
+2021-09-20 12:50:10,973 criterion loss 0.093704
+2021-09-20 12:50:11,364 criterion loss 0.078907
+2021-09-20 12:50:11,755 criterion loss 0.107168
+2021-09-20 12:50:12,139 criterion loss 0.111873
+2021-09-20 12:50:12,522 criterion loss 0.070439
+2021-09-20 12:50:12,913 criterion loss 0.091261
+2021-09-20 12:50:13,350 criterion loss 0.075794
+2021-09-20 12:50:13,809 criterion loss 0.099506
+2021-09-20 12:50:14,214 criterion loss 0.101539
+2021-09-20 12:50:14,651 criterion loss 0.056822
+2021-09-20 12:50:15,042 criterion loss 0.077430
+2021-09-20 12:50:15,464 criterion loss 0.104618
+2021-09-20 12:50:15,854 criterion loss 0.092453
+2021-09-20 12:50:16,260 criterion loss 0.088520
+2021-09-20 12:50:16,682 criterion loss 0.081301
+2021-09-20 12:50:17,158 criterion loss 0.052942
+2021-09-20 12:50:17,823 criterion loss 0.074827
+2021-09-20 12:50:18,261 criterion loss 0.106093
+2021-09-20 12:50:18,698 criterion loss 0.104572
+2021-09-20 12:50:19,120 criterion loss 0.063504
+2021-09-20 12:50:19,511 criterion loss 0.059447
+2021-09-20 12:50:19,937 criterion loss 0.076081
+2021-09-20 12:50:20,328 criterion loss 0.066006
+2021-09-20 12:50:20,719 criterion loss 0.122245
+2021-09-20 12:50:21,125 criterion loss 0.083340
+2021-09-20 12:50:21,516 criterion loss 0.092201
+2021-09-20 12:50:21,906 criterion loss 0.093571
+2021-09-20 12:50:22,297 criterion loss 0.095133
+2021-09-20 12:50:22,688 criterion loss 0.087202
+2021-09-20 12:50:23,078 criterion loss 0.093576
+2021-09-20 12:50:23,470 criterion loss 0.102172
+2021-09-20 12:50:23,861 criterion loss 0.093404
+2021-09-20 12:50:24,252 criterion loss 0.091494
+2021-09-20 12:50:24,642 criterion loss 0.070861
+2021-09-20 12:50:25,033 criterion loss 0.090051
+2021-09-20 12:50:25,408 criterion loss 0.072371
+2021-09-20 12:50:25,798 criterion loss 0.086466
+2021-09-20 12:50:26,189 criterion loss 0.066602
+2021-09-20 12:50:26,595 criterion loss 0.094696
+2021-09-20 12:50:27,014 criterion loss 0.110714
+2021-09-20 12:50:27,405 criterion loss 0.101791
+2021-09-20 12:50:27,812 criterion loss 0.106574
+2021-09-20 12:50:28,218 criterion loss 0.112369
+2021-09-20 12:50:28,640 criterion loss 0.084257
+2021-09-20 12:50:29,058 criterion loss 0.070607
+2021-09-20 12:50:29,480 criterion loss 0.113877
+2021-09-20 12:50:29,871 criterion loss 0.061558
+2021-09-20 12:50:30,261 criterion loss 0.071161
+2021-09-20 12:50:30,647 criterion loss 0.082725
+2021-09-20 12:50:31,040 criterion loss 0.070865
+2021-09-20 12:50:31,437 criterion loss 0.088240
+2021-09-20 12:50:31,822 criterion loss 0.088724
+2021-09-20 12:50:32,206 criterion loss 0.073878
+2021-09-20 12:50:32,598 criterion loss 0.079455
+2021-09-20 12:50:32,988 criterion loss 0.079198
+2021-09-20 12:50:33,365 criterion loss 0.101220
+2021-09-20 12:50:33,755 criterion loss 0.069040
+2021-09-20 12:50:34,146 criterion loss 0.113058
+2021-09-20 12:50:34,537 criterion loss 0.047593
+2021-09-20 12:50:34,929 criterion loss 0.101488
+2021-09-20 12:50:35,304 criterion loss 0.094540
+2021-09-20 12:50:35,694 criterion loss 0.082579
+2021-09-20 12:50:36,085 criterion loss 0.070262
+2021-09-20 12:50:36,476 criterion loss 0.088004
+2021-09-20 12:50:36,866 criterion loss 0.080970
+2021-09-20 12:50:37,257 criterion loss 0.071736
+2021-09-20 12:50:37,647 criterion loss 0.050346
+2021-09-20 12:50:38,038 criterion loss 0.076657
+2021-09-20 12:50:38,425 criterion loss 0.087742
+2021-09-20 12:50:38,816 criterion loss 0.079329
+2021-09-20 12:50:39,238 criterion loss 0.075545
+2021-09-20 12:50:39,628 criterion loss 0.101601
+2021-09-20 12:50:40,019 criterion loss 0.081374
+2021-09-20 12:50:40,472 criterion loss 0.084215
+2021-09-20 12:50:40,878 criterion loss 0.066653
+2021-09-20 12:50:41,269 criterion loss 0.057917
+2021-09-20 12:50:41,659 criterion loss 0.080061
+2021-09-20 12:50:42,045 criterion loss 0.039219
+2021-09-20 12:50:42,435 criterion loss 0.073211
+2021-09-20 12:50:42,826 criterion loss 0.080103
+2021-09-20 12:50:43,216 criterion loss 0.078982
+2021-09-20 12:50:43,591 criterion loss 0.085445
+2021-09-20 12:50:43,982 criterion loss 0.096739
+2021-09-20 12:50:44,373 criterion loss 0.091025
+2021-09-20 12:50:44,764 criterion loss 0.085894
+2021-09-20 12:50:45,159 criterion loss 0.069802
+2021-09-20 12:50:45,549 criterion loss 0.080482
+2021-09-20 12:50:45,940 criterion loss 0.092710
+2021-09-20 12:50:46,315 criterion loss 0.079532
+2021-09-20 12:50:46,705 criterion loss 0.060149
+2021-09-20 12:50:47,096 criterion loss 0.086036
+2021-09-20 12:50:47,493 criterion loss 0.096523
+2021-09-20 12:50:47,883 criterion loss 0.079511
+2021-09-20 12:50:48,274 criterion loss 0.089699
+2021-09-20 12:50:48,665 criterion loss 0.076870
+2021-09-20 12:50:49,055 criterion loss 0.077634
+2021-09-20 12:50:49,446 criterion loss 0.058505
+2021-09-20 12:50:49,837 criterion loss 0.075044
+2021-09-20 12:50:50,227 criterion loss 0.090280
+2021-09-20 12:50:50,618 criterion loss 0.103551
+2021-09-20 12:50:51,015 criterion loss 0.066634
+2021-09-20 12:50:51,392 criterion loss 0.074431
+2021-09-20 12:50:51,786 criterion loss 0.084266
+2021-09-20 12:50:52,179 criterion loss 0.074065
+2021-09-20 12:50:52,562 criterion loss 0.083735
+2021-09-20 12:50:52,945 criterion loss 0.088822
+2021-09-20 12:50:53,336 criterion loss 0.095632
+2021-09-20 12:50:53,729 criterion loss 0.071383
+2021-09-20 12:50:54,120 criterion loss 0.079345
+2021-09-20 12:50:54,511 criterion loss 0.079990
+2021-09-20 12:50:54,932 criterion loss 0.066765
+2021-09-20 12:50:55,324 criterion loss 0.060867
+2021-09-20 12:50:55,762 criterion loss 0.097402
+2021-09-20 12:50:56,152 criterion loss 0.077683
+2021-09-20 12:50:56,527 criterion loss 0.077757
+2021-09-20 12:50:56,918 criterion loss 0.067939
+2021-09-20 12:50:57,309 criterion loss 0.085787
+2021-09-20 12:50:57,699 criterion loss 0.064377
+2021-09-20 12:50:58,090 criterion loss 0.095159
+2021-09-20 12:50:58,482 criterion loss 0.038634
+2021-09-20 12:50:58,872 criterion loss 0.065812
+2021-09-20 12:50:59,263 criterion loss 0.048830
+2021-09-20 12:50:59,649 criterion loss 0.058849
+2021-09-20 12:51:00,039 criterion loss 0.071031
+2021-09-20 12:51:00,430 criterion loss 0.077622
+2021-09-20 12:51:00,820 criterion loss 0.068267
+2021-09-20 12:51:01,211 criterion loss 0.088769
+2021-09-20 12:51:01,586 criterion loss 0.079951
+2021-09-20 12:51:01,977 criterion loss 0.073504
+2021-09-20 12:51:02,367 criterion loss 0.077530
+2021-09-20 12:51:02,758 criterion loss 0.090307
+2021-09-20 12:51:03,149 criterion loss 0.065386
+2021-09-20 12:51:03,539 criterion loss 0.043103
+2021-09-20 12:51:03,926 criterion loss 0.101007
+2021-09-20 12:51:04,314 criterion loss 0.061733
+2021-09-20 12:51:04,690 criterion loss 0.050738
+2021-09-20 12:51:05,080 criterion loss 0.097980
+2021-09-20 12:51:05,502 criterion loss 0.090161
+2021-09-20 12:51:05,951 criterion loss 0.064711
+2021-09-20 12:51:06,327 criterion loss 0.065001
+2021-09-20 12:51:06,718 criterion loss 0.046376
+2021-09-20 12:51:07,109 criterion loss 0.058844
+2021-09-20 12:51:07,499 criterion loss 0.044070
+2021-09-20 12:51:07,890 criterion loss 0.071406
+2021-09-20 12:51:08,280 criterion loss 0.070398
+2021-09-20 12:51:08,670 criterion loss 0.038624
+2021-09-20 12:51:09,055 criterion loss 0.080310
+2021-09-20 12:51:09,445 criterion loss 0.079568
+2021-09-20 12:51:09,820 criterion loss 0.061846
+2021-09-20 12:51:10,211 criterion loss 0.065454
+2021-09-20 12:51:10,601 criterion loss 0.059558
+2021-09-20 12:51:11,039 criterion loss 0.065080
+2021-09-20 12:51:11,461 criterion loss 0.091963
+2021-09-20 12:51:11,846 criterion loss 0.074467
+2021-09-20 12:51:12,239 criterion loss 0.060392
+2021-09-20 12:51:12,616 criterion loss 0.079925
+2021-09-20 12:51:13,008 criterion loss 0.048918
+2021-09-20 12:51:13,400 criterion loss 0.065428
+2021-09-20 12:51:13,775 criterion loss 0.076494
+2021-09-20 12:51:14,167 criterion loss 0.078983
+2021-09-20 12:51:14,557 criterion loss 0.087454
+2021-09-20 12:51:14,948 criterion loss 0.073199
+2021-09-20 12:51:15,339 criterion loss 0.078639
+2021-09-20 12:51:15,731 criterion loss 0.053153
+2021-09-20 12:51:16,120 criterion loss 0.065758
+2021-09-20 12:51:16,511 criterion loss 0.085155
+2021-09-20 12:51:16,901 criterion loss 0.065431
+2021-09-20 12:51:17,292 criterion loss 0.058706
+2021-09-20 12:51:17,682 criterion loss 0.066968
+2021-09-20 12:51:18,089 criterion loss 0.076902
+2021-09-20 12:51:18,479 criterion loss 0.075054
+2021-09-20 12:51:18,863 criterion loss 0.048302
+2021-09-20 12:51:19,246 criterion loss 0.068352
+2021-09-20 12:51:19,637 criterion loss 0.080583
+2021-09-20 12:51:20,028 criterion loss 0.072507
+2021-09-20 12:51:20,437 criterion loss 0.052772
+2021-09-20 12:51:20,827 criterion loss 0.067250
+2021-09-20 12:51:21,202 criterion loss 0.055036
+2021-09-20 12:51:21,593 criterion loss 0.089682
+2021-09-20 12:51:21,984 criterion loss 0.073114
+2021-09-20 12:51:22,374 criterion loss 0.073203
+2021-09-20 12:51:22,765 criterion loss 0.069811
+2021-09-20 12:51:23,156 criterion loss 0.095214
+2021-09-20 12:51:23,546 criterion loss 0.052473
+2021-09-20 12:51:23,938 criterion loss 0.094189
+2021-09-20 12:51:24,313 criterion loss 0.095813
+2021-09-20 12:51:24,704 criterion loss 0.061399
+2021-09-20 12:51:25,094 criterion loss 0.066255
+2021-09-20 12:51:25,486 criterion loss 0.056258
+2021-09-20 12:51:25,877 criterion loss 0.079574
+2021-09-20 12:51:26,252 criterion loss 0.059470
+2021-09-20 12:51:26,643 criterion loss 0.090695
+2021-09-20 12:51:27,041 criterion loss 0.059139
+2021-09-20 12:51:27,431 criterion loss 0.059446
+2021-09-20 12:51:27,822 criterion loss 0.074562
+2021-09-20 12:51:28,213 criterion loss 0.038530
+2021-09-20 12:51:28,603 criterion loss 0.059448
+2021-09-20 12:51:28,978 criterion loss 0.077042
+2021-09-20 12:51:29,369 criterion loss 0.084561
+2021-09-20 12:51:29,760 criterion loss 0.063494
+2021-09-20 12:51:30,150 criterion loss 0.063660
+2021-09-20 12:51:30,541 criterion loss 0.071897
+2021-09-20 12:51:30,947 criterion loss 0.048852
+2021-09-20 12:51:31,338 criterion loss 0.046122
+2021-09-20 12:51:31,726 criterion loss 0.046568
+2021-09-20 12:51:32,117 criterion loss 0.066916
+2021-09-20 12:51:32,510 criterion loss 0.065150
+2021-09-20 12:51:32,903 criterion loss 0.091665
+2021-09-20 12:51:33,279 criterion loss 0.069094
+2021-09-20 12:51:33,671 criterion loss 0.087249
+2021-09-20 12:51:34,062 criterion loss 0.046556
+2021-09-20 12:51:34,438 criterion loss 0.065900
+2021-09-20 12:51:34,829 criterion loss 0.086388
+2021-09-20 12:51:35,220 criterion loss 0.081584
+2021-09-20 12:51:35,610 criterion loss 0.086616
+2021-09-20 12:51:36,002 criterion loss 0.045252
+2021-09-20 12:51:36,393 criterion loss 0.070371
+2021-09-20 12:51:36,784 criterion loss 0.072327
+2021-09-20 12:51:37,174 criterion loss 0.062403
+2021-09-20 12:51:37,549 criterion loss 0.106405
+2021-09-20 12:51:37,952 criterion loss 0.081807
+2021-09-20 12:51:38,336 criterion loss 0.058213
+2021-09-20 12:51:38,727 criterion loss 0.048145
+2021-09-20 12:51:39,113 criterion loss 0.056733
+2021-09-20 12:51:39,597 criterion loss 0.072685
+2021-09-20 12:51:40,019 criterion loss 0.078361
+2021-09-20 12:51:40,457 criterion loss 0.039589
+2021-09-20 12:51:40,847 criterion loss 0.055287
+2021-09-20 12:51:41,238 criterion loss 0.061617
+2021-09-20 12:51:41,628 criterion loss 0.052932
+2021-09-20 12:51:42,003 criterion loss 0.054205
+2021-09-20 12:51:42,394 criterion loss 0.072214
+2021-09-20 12:51:42,785 criterion loss 0.070396
+2021-09-20 12:51:43,177 criterion loss 0.053563
+2021-09-20 12:51:43,568 criterion loss 0.052566
+2021-09-20 12:51:43,958 criterion loss 0.044173
+2021-09-20 12:51:44,333 criterion loss 0.062056
+2021-09-20 12:51:44,724 criterion loss 0.080024
+2021-09-20 12:51:45,115 criterion loss 0.068357
+2021-09-20 12:51:45,506 criterion loss 0.053813
+2021-09-20 12:51:45,897 criterion loss 0.052189
+2021-09-20 12:51:46,288 criterion loss 0.090897
+2021-09-20 12:51:46,663 criterion loss 0.091899
+2021-09-20 12:51:47,057 criterion loss 0.070492
+2021-09-20 12:51:47,448 criterion loss 0.055902
+2021-09-20 12:51:47,838 criterion loss 0.073340
+2021-09-20 12:51:48,229 criterion loss 0.053524
+2021-09-20 12:51:48,619 criterion loss 0.059369
+2021-09-20 12:51:49,010 criterion loss 0.041397
+2021-09-20 12:51:49,401 criterion loss 0.058676
+2021-09-20 12:51:49,791 criterion loss 0.071510
+2021-09-20 12:51:50,182 criterion loss 0.059451
+2021-09-20 12:51:50,573 criterion loss 0.087055
+2021-09-20 12:51:50,948 criterion loss 0.065377
+2021-09-20 12:51:51,348 criterion loss 0.053668
+2021-09-20 12:51:51,723 criterion loss 0.047936
+2021-09-20 12:51:52,136 criterion loss 0.082454
+2021-09-20 12:51:52,514 criterion loss 0.041362
+2021-09-20 12:51:52,905 criterion loss 0.056431
+2021-09-20 12:51:53,313 criterion loss 0.073844
+2021-09-20 12:51:53,688 criterion loss 0.087656
+2021-09-20 12:51:54,078 criterion loss 0.068761
+2021-09-20 12:51:54,484 criterion loss 0.091029
+2021-09-20 12:51:54,875 criterion loss 0.071399
+2021-09-20 12:51:55,266 criterion loss 0.058868
+2021-09-20 12:51:55,641 criterion loss 0.079523
+2021-09-20 12:51:56,047 criterion loss 0.054552
+2021-09-20 12:51:56,422 criterion loss 0.065901
+2021-09-20 12:51:56,828 criterion loss 0.054187
+2021-09-20 12:51:57,219 criterion loss 0.076136
+2021-09-20 12:51:57,609 criterion loss 0.062798
+2021-09-20 12:51:58,000 criterion loss 0.048984
+2021-09-20 12:51:58,391 criterion loss 0.058593
+2021-09-20 12:51:58,781 criterion loss 0.061314
+2021-09-20 12:51:59,172 criterion loss 0.050728
+2021-09-20 12:51:59,563 criterion loss 0.060287
+2021-09-20 12:51:59,938 criterion loss 0.057793
+2021-09-20 12:52:00,328 criterion loss 0.072805
+2021-09-20 12:52:00,734 criterion loss 0.061034
+2021-09-20 12:52:01,109 criterion loss 0.051331
+2021-09-20 12:52:01,500 criterion loss 0.054716
+2021-09-20 12:52:01,891 criterion loss 0.062176
+2021-09-20 12:52:02,281 criterion loss 0.048971
+2021-09-20 12:52:02,672 criterion loss 0.051878
+2021-09-20 12:52:03,063 criterion loss 0.070538
+2021-09-20 12:52:03,438 criterion loss 0.074288
+2021-09-20 12:52:03,828 criterion loss 0.071254
+2021-09-20 12:52:04,219 criterion loss 0.085333
+2021-09-20 12:52:04,609 criterion loss 0.064246
+2021-09-20 12:52:05,000 criterion loss 0.079962
+2021-09-20 12:52:05,391 criterion loss 0.058513
+2021-09-20 12:52:05,781 criterion loss 0.074717
+2021-09-20 12:52:06,172 criterion loss 0.057255
+2021-09-20 12:52:06,547 criterion loss 0.072825
+2021-09-20 12:52:06,938 criterion loss 0.068316
+2021-09-20 12:52:07,328 criterion loss 0.061808
+2021-09-20 12:52:07,719 criterion loss 0.053181
+2021-09-20 12:52:08,120 criterion loss 0.044457
+2021-09-20 12:52:08,510 criterion loss 0.074769
+2021-09-20 12:52:08,908 criterion loss 0.051829
+2021-09-20 12:52:09,299 criterion loss 0.069260
+2021-09-20 12:52:09,705 criterion loss 0.071856
+2021-09-20 12:52:10,158 criterion loss 0.060045
+2021-09-20 12:52:10,549 criterion loss 0.064283
+2021-09-20 12:52:10,924 criterion loss 0.053758
+2021-09-20 12:52:11,315 criterion loss 0.081057
+2021-09-20 12:52:11,705 criterion loss 0.057086
+2021-09-20 12:52:12,089 criterion loss 0.069266
+2021-09-20 12:52:12,482 criterion loss 0.101624
+2021-09-20 12:52:12,872 criterion loss 0.060651
+2021-09-20 12:52:13,263 criterion loss 0.051304
+2021-09-20 12:52:13,654 criterion loss 0.083518
+2021-09-20 12:52:14,029 criterion loss 0.067907
+2021-09-20 12:52:14,419 criterion loss 0.067538
+2021-09-20 12:52:14,810 criterion loss 0.061515
+2021-09-20 12:52:15,201 criterion loss 0.078069
+2021-09-20 12:52:15,591 criterion loss 0.063216
+2021-09-20 12:52:15,973 criterion loss 0.053849
+2021-09-20 12:52:16,364 criterion loss 0.081740
+2021-09-20 12:52:16,754 criterion loss 0.066626
+2021-09-20 12:52:17,145 criterion loss 0.053136
+2021-09-20 12:52:17,536 criterion loss 0.081832
+2021-09-20 12:52:17,926 criterion loss 0.098298
+2021-09-20 12:52:18,313 criterion loss 0.060608
+2021-09-20 12:52:18,688 criterion loss 0.083512
+2021-09-20 12:52:19,078 criterion loss 0.059752
+2021-09-20 12:52:19,469 criterion loss 0.072418
+2021-09-20 12:52:19,859 criterion loss 0.056646
+2021-09-20 12:52:20,250 criterion loss 0.077190
+2021-09-20 12:52:20,641 criterion loss 0.068750
+2021-09-20 12:52:21,031 criterion loss 0.081891
+2021-09-20 12:52:21,406 criterion loss 0.059569
+2021-09-20 12:52:21,797 criterion loss 0.040240
+2021-09-20 12:52:22,188 criterion loss 0.069640
+2021-09-20 12:52:22,578 criterion loss 0.074748
+2021-09-20 12:52:22,970 criterion loss 0.083998
+2021-09-20 12:52:23,361 criterion loss 0.054619
+2021-09-20 12:52:23,752 criterion loss 0.066457
+2021-09-20 12:52:24,127 criterion loss 0.064644
+2021-09-20 12:52:24,533 criterion loss 0.084042
+2021-09-20 12:52:24,908 criterion loss 0.061273
+2021-09-20 12:52:25,298 criterion loss 0.059787
+2021-09-20 12:52:25,689 criterion loss 0.036218
+2021-09-20 12:52:26,080 criterion loss 0.069215
+2021-09-20 12:52:26,470 criterion loss 0.051518
+2021-09-20 12:52:26,861 criterion loss 0.063908
+2021-09-20 12:52:27,271 criterion loss 0.055268
+2021-09-20 12:52:27,646 criterion loss 0.040987
+2021-09-20 12:52:28,036 criterion loss 0.072801
+2021-09-20 12:52:28,427 criterion loss 0.047817
+2021-09-20 12:52:28,817 criterion loss 0.083170
+2021-09-20 12:52:29,205 criterion loss 0.034118
+2021-09-20 12:52:29,596 criterion loss 0.039877
+2021-09-20 12:52:29,987 criterion loss 0.059151
+2021-09-20 12:52:30,377 criterion loss 0.093154
+2021-09-20 12:52:30,768 criterion loss 0.072627
+2021-09-20 12:52:31,158 criterion loss 0.070891
+2021-09-20 12:52:31,549 criterion loss 0.044955
+2021-09-20 12:52:31,940 criterion loss 0.064140
+2021-09-20 12:52:32,324 criterion loss 0.036483
+2021-09-20 12:52:32,724 criterion loss 0.068571
+2021-09-20 12:52:33,099 criterion loss 0.065935
+2021-09-20 12:52:33,505 criterion loss 0.051990
+2021-09-20 12:52:33,880 criterion loss 0.061541
+2021-09-20 12:52:34,271 criterion loss 0.076752
+2021-09-20 12:52:34,662 criterion loss 0.049174
+2021-09-20 12:52:35,037 criterion loss 0.055560
+2021-09-20 12:52:35,492 criterion loss 0.059065
+2021-09-20 12:52:35,882 criterion loss 0.062350
+2021-09-20 12:52:36,273 criterion loss 0.048838
+2021-09-20 12:52:36,664 criterion loss 0.083029
+2021-09-20 12:52:37,048 criterion loss 0.060215
+2021-09-20 12:52:37,439 criterion loss 0.054953
+2021-09-20 12:52:37,829 criterion loss 0.074583
+2021-09-20 12:52:38,220 criterion loss 0.063204
+2021-09-20 12:52:38,611 criterion loss 0.066653
+2021-09-20 12:52:38,996 criterion loss 0.063745
+2021-09-20 12:52:39,387 criterion loss 0.063609
+2021-09-20 12:52:39,778 criterion loss 0.070668
+2021-09-20 12:52:40,168 criterion loss 0.092739
+2021-09-20 12:52:40,559 criterion loss 0.077021
+2021-09-20 12:52:40,950 criterion loss 0.052826
+2021-09-20 12:52:41,340 criterion loss 0.071702
+2021-09-20 12:52:41,715 criterion loss 0.066447
+2021-09-20 12:52:42,110 criterion loss 0.060083
+2021-09-20 12:52:42,500 criterion loss 0.057677
+2021-09-20 12:52:42,891 criterion loss 0.064295
+2021-09-20 12:52:43,282 criterion loss 0.046265
+2021-09-20 12:52:43,672 criterion loss 0.055636
+2021-09-20 12:52:44,063 criterion loss 0.064309
+2021-09-20 12:52:44,454 criterion loss 0.063890
+2021-09-20 12:52:44,844 criterion loss 0.080421
+2021-09-20 12:52:45,266 criterion loss 0.068861
+2021-09-20 12:52:45,657 criterion loss 0.065523
+2021-09-20 12:52:46,047 criterion loss 0.054860
+2021-09-20 12:52:46,438 criterion loss 0.073191
+2021-09-20 12:52:46,813 criterion loss 0.041902
+2021-09-20 12:52:47,204 criterion loss 0.077630
+2021-09-20 12:52:47,594 criterion loss 0.071941
+2021-09-20 12:52:47,985 criterion loss 0.048008
+2021-09-20 12:52:48,375 criterion loss 0.057452
+2021-09-20 12:52:48,750 criterion loss 0.052103
+2021-09-20 12:52:49,153 criterion loss 0.041797
+2021-09-20 12:52:49,544 criterion loss 0.070714
+2021-09-20 12:52:49,935 criterion loss 0.058923
+2021-09-20 12:52:50,310 criterion loss 0.058109
+2021-09-20 12:52:50,700 criterion loss 0.064889
+2021-09-20 12:52:51,091 criterion loss 0.051032
+2021-09-20 12:52:51,481 criterion loss 0.058513
+2021-09-20 12:52:51,872 criterion loss 0.053874
+2021-09-20 12:52:52,263 criterion loss 0.063832
+2021-09-20 12:52:52,662 criterion loss 0.050711
+2021-09-20 12:52:53,063 criterion loss 0.067188
+2021-09-20 12:52:53,440 criterion loss 0.067031
+2021-09-20 12:52:53,833 criterion loss 0.043736
+2021-09-20 12:52:54,225 criterion loss 0.058058
+2021-09-20 12:52:54,616 criterion loss 0.070211
+2021-09-20 12:52:54,999 criterion loss 0.044606
+2021-09-20 12:52:55,383 criterion loss 0.078131
+2021-09-20 12:52:55,774 criterion loss 0.048196
+2021-09-20 12:52:56,164 criterion loss 0.061005
+2021-09-20 12:52:56,539 criterion loss 0.087365
+2021-09-20 12:52:56,940 criterion loss 0.076273
+2021-09-20 12:52:57,323 criterion loss 0.073452
+2021-09-20 12:52:57,714 criterion loss 0.056265
+2021-09-20 12:52:58,104 criterion loss 0.078298
+2021-09-20 12:52:58,479 criterion loss 0.047998
+2021-09-20 12:52:58,870 criterion loss 0.057034
+2021-09-20 12:52:59,261 criterion loss 0.083136
+2021-09-20 12:52:59,646 criterion loss 0.062687
+2021-09-20 12:53:00,038 criterion loss 0.076248
+2021-09-20 12:53:00,428 criterion loss 0.087495
+2021-09-20 12:53:00,819 criterion loss 0.061916
+2021-09-20 12:53:01,223 criterion loss 0.040814
+2021-09-20 12:53:01,598 criterion loss 0.061068
+2021-09-20 12:53:01,988 criterion loss 0.072153
+2021-09-20 12:53:02,379 criterion loss 0.049314
+2021-09-20 12:53:02,770 criterion loss 0.049354
+2021-09-20 12:53:03,160 criterion loss 0.068171
+2021-09-20 12:53:03,551 criterion loss 0.035962
+2021-09-20 12:53:03,942 criterion loss 0.069396
+2021-09-20 12:53:04,332 criterion loss 0.090154
+2021-09-20 12:53:04,723 criterion loss 0.053971
+2021-09-20 12:53:05,113 criterion loss 0.058486
+2021-09-20 12:53:05,504 criterion loss 0.049605
+2021-09-20 12:53:05,895 criterion loss 0.074166
+2021-09-20 12:53:06,285 criterion loss 0.053526
+2021-09-20 12:53:06,676 criterion loss 0.062271
+2021-09-20 12:53:07,078 criterion loss 0.047062
+2021-09-20 12:53:07,468 criterion loss 0.066561
+2021-09-20 12:53:07,859 criterion loss 0.091737
+2021-09-20 12:53:08,250 criterion loss 0.053666
+2021-09-20 12:53:08,640 criterion loss 0.057409
+2021-09-20 12:53:09,043 criterion loss 0.076476
+2021-09-20 12:53:09,434 criterion loss 0.058837
+2021-09-20 12:53:09,887 criterion loss 0.066810
+2021-09-20 12:53:10,277 criterion loss 0.062739
+2021-09-20 12:53:10,652 criterion loss 0.055892
+2021-09-20 12:53:11,043 criterion loss 0.092674
+2021-09-20 12:53:11,434 criterion loss 0.033790
+2021-09-20 12:53:11,824 criterion loss 0.057999
+2021-09-20 12:53:12,215 criterion loss 0.071779
+2021-09-20 12:53:12,605 criterion loss 0.041930
+2021-09-20 12:53:12,996 criterion loss 0.063266
+2021-09-20 12:53:13,371 criterion loss 0.044700
+2021-09-20 12:53:13,754 criterion loss 0.102851
+2021-09-20 12:53:14,144 criterion loss 0.039012
+2021-09-20 12:53:14,535 criterion loss 0.049349
+2021-09-20 12:53:14,925 criterion loss 0.056525
+2021-09-20 12:53:15,316 criterion loss 0.077734
+2021-09-20 12:53:15,738 criterion loss 0.058152
+2021-09-20 12:53:16,129 criterion loss 0.065054
+2021-09-20 12:53:16,519 criterion loss 0.053129
+2021-09-20 12:53:16,910 criterion loss 0.052100
+2021-09-20 12:53:17,300 criterion loss 0.065781
+2021-09-20 12:53:17,691 criterion loss 0.028213
+2021-09-20 12:53:18,066 criterion loss 0.068126
+2021-09-20 12:53:18,457 criterion loss 0.079765
+2021-09-20 12:53:18,847 criterion loss 0.066726
+2021-09-20 12:53:19,238 criterion loss 0.060621
+2021-09-20 12:53:19,629 criterion loss 0.084631
+2021-09-20 12:53:20,016 criterion loss 0.050339
+2021-09-20 12:53:20,401 criterion loss 0.074937
+2021-09-20 12:53:20,791 criterion loss 0.055314
+2021-09-20 12:53:21,182 criterion loss 0.070941
+2021-09-20 12:53:21,573 criterion loss 0.042739
+2021-09-20 12:53:21,979 criterion loss 0.070176
+2021-09-20 12:53:22,385 criterion loss 0.078779
+2021-09-20 12:53:22,791 criterion loss 0.062702

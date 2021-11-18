@@ -1,0 +1,16 @@
+digraph {
+	node [align=center fontname=times fontsize=20 height=0.5 penwidth=2 shape=rect style=filled width=0.5]
+	edge [fontname=times fontsize=20]
+rankdir=LR
+	"Stimulus 1 Intensity" [fillcolor="#F1EDB9"]
+	"Stimulus 2 Intensity" [fillcolor="#F1EDB9"]
+	0 [fillcolor="#BBCCF9"]
+	1 [fillcolor="#BBCCF9"]
+	"Stimulus 1 Intensity" -> 0 [label="(0) sigmoid" fillcolor=gray]
+	"Stimulus 2 Intensity" -> 0 [label="(1) exp" fillcolor=gray]
+	"Stimulus 2 Intensity" -> 1 [label="(3) linear" fillcolor=gray]
+	0 -> 1 [label="(4) mult" fillcolor=gray]
+	"P(detected) = Sigmoid(x)" [fillcolor="#CBE7C7"]
+	0 -> "P(detected) = Sigmoid(x)" [label=linear fillcolor=gray]
+	1 -> "P(detected) = Sigmoid(x)" [label=linear fillcolor=gray]
+}

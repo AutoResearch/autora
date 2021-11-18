@@ -11,6 +11,9 @@ from AER_theorist.theorist_GUI import Theorist_GUI
 from AER_GUI import AER_GUI
 from tkinter import *
 
+import os
+os.environ["PATH"] += os.pathsep + 'C:/Program Files/Graphviz/bin'
+
 now = datetime.now()
 dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
 print("date and time =", dt_string)
@@ -116,7 +119,7 @@ theorist.add_validation_set(validation_object_1, 'Weber_Sampled')
 theorist.add_validation_set(validation_object_2, 'Weber_Original')
 
 # search model
-# model = theorist.search_model(study_object)
+#model = theorist.search_model(study_object)
 
 root = Tk()
 app = Theorist_GUI(object_of_study=study_object, theorist=theorist, root=root)
