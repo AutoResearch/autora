@@ -1,15 +1,20 @@
 from datetime import datetime
-from AER_experimentalist.experiment_environment.IV_in_silico import IV_In_Silico as IV
-from AER_experimentalist.experiment_environment.DV_in_silico import DV_In_Silico as DV
-from AER_experimentalist.experiment_environment.variable import outputTypes as output_type
-from AER_experimentalist.experimentalist_popper import Experimentalist_Popper
-from AER_experimentalist.experiment_design_synthetic_weber import Experiment_Design_Synthetic_Weber
-from AER_theorist.object_of_study import Object_Of_Study
-from AER_theorist.theorist_darts import Theorist_DARTS, DARTS_Type
-import AER_experimentalist.experiment_environment.experiment_config as exp_cfg
-from AER_theorist.theorist_GUI import Theorist_GUI
-from AER_GUI import AER_GUI
 from tkinter import *
+
+import AER_experimentalist.experiment_environment.experiment_config as exp_cfg
+from AER_experimentalist.experiment_design_synthetic_weber import \
+    Experiment_Design_Synthetic_Weber
+from AER_experimentalist.experiment_environment.DV_in_silico import \
+    DV_In_Silico as DV
+from AER_experimentalist.experiment_environment.IV_in_silico import \
+    IV_In_Silico as IV
+from AER_experimentalist.experiment_environment.variable import \
+    outputTypes as output_type
+from AER_experimentalist.experimentalist_popper import Experimentalist_Popper
+from AER_GUI import AER_GUI
+from AER_theorist.object_of_study import Object_Of_Study
+from AER_theorist.theorist_darts import DARTS_Type, Theorist_DARTS
+from AER_theorist.theorist_GUI import Theorist_GUI
 
 now = datetime.now()
 dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
@@ -57,10 +62,10 @@ IVs = [S1, S2] # only including subset of available variables
 DVs = [diff_detected]
 DVs_validation = [diff_detected_sample]
 
-# initialize objects of study
 study_object = Object_Of_Study(name=study_name,
                                independent_variables=IVs,
                                dependent_variables=DVs)
+# initialize objects of study
 
 validation_object_1 = Object_Of_Study(name=study_name_sampled,
                                independent_variables=IVs,
@@ -121,6 +126,10 @@ theorist.add_validation_set(validation_object_2, 'Weber_Original')
 root = Tk()
 app = Theorist_GUI(object_of_study=study_object, theorist=theorist, root=root)
 root.mainloop()
+
+# root = Tk()
+# app = AER_GUI(object_of_study=study_object, theorist=theorist, experimentalist=experimentalist, root=root)
+# root.mainloop()
 
 # theorist_fair = Theorist_DARTS(study_name, darts_type=DARTS_Type.FAIR)
 # theorist_fair.plot()
