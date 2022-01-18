@@ -63,4 +63,6 @@ PRIMITIVES = [  # SIMPLIFIED ANALYSIS
     'mult',
     'exp',
     'relu',
+    'softplus',
+    'softminus'
 ]
