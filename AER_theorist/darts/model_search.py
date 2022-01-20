@@ -18,6 +18,8 @@ class DARTS_Type(Enum):
     FAIR = 2            # Chu, Zhou, Zhang & Li (2020). Fair darts: Eliminating unfair advantages in differentiable architecture search
 
 # for 2 input nodes, 1 output node and 4 intermediate nodes, there are 14 possible edges (x 8 operations)
+# Let input nodes be 1, 2 intermediate nodes 3, 4, 5, 6, and output node 7
+# The edges are 3-1, 3-2; 4-1, 4-2, 4-3; 5-1, 5-2, 5-3, 5-4; 6-1, 6-2, 6-3, 6-4, 6-5; 2 + 3 + 4 + 5 = 14 edges
 
 class MixedOp(nn.Module):
 
@@ -43,7 +45,7 @@ class MixedOp(nn.Module):
     # there are 8 weights for all the eight primitives. then it returns the weighted sum of all operations performed on a given input
     return sum(w * op(x) for w, op in zip(weights, self._ops))
 
-
+# Let a cell be a DAG(directed acyclic graph) containing N nodes (2 input nodes 1 output node?)
 class Cell(nn.Module):
 
   def __init__(self, steps, n_input_states, C):
@@ -52,8 +54,8 @@ class Cell(nn.Module):
     super(Cell, self).__init__()
 
     # set parameters
-    self._steps = steps
-    self._n_input_states = n_input_states
+    self._steps = steps # hidden nodes
+    self._n_input_states = n_input_states # input nodes
 
     # EDIT 11/04/19 SM: adapting to new SimpleNet data (changed from multiplier to steps)
     self._multiplier = steps
@@ -61,7 +63,8 @@ class Cell(nn.Module):
     # set operations according to number of modules (empty)
     self._ops = nn.ModuleList()
     self._bns = nn.ModuleList()
-    for i in range(self._steps):
+    # iterate over edges: edges between each hidden node and input nodes + prev hidden nodes
+    for i in range(self._steps): # hidden nodes
       for j in range(self._n_input_states+i): # 2 refers to the 2 input nodes
         # defines the stride for link between cells
         stride = 1
@@ -81,8 +84,9 @@ class Cell(nn.Module):
       states.append(input)
 
     offset = 0
-    # this computes the states from intermediate nodes and adds them to the list of states
-    for i in range(self._steps): # compute the state from each node
+    # this computes the states from intermediate nodes and adds them to the list of states (values of nodes)
+    # for each hidden node, compute edge between existing states (input nodes / previous hidden) nodes and current node
+    for i in range(self._steps): # compute the state for each hidden node, first hidden node is sum of input nodes, second is sum of input and first hidden
       s = sum(self._ops[offset+j](h, weights[offset+j]) for j, h in enumerate(states))
       offset += len(states)
       states.append(s)
@@ -116,6 +120,8 @@ class Network(nn.Module):
     #   nn.Conv2d(3, C_curr, 3, padding=1, bias=False), # 2d convolution with 3 input channels (image colors) and 3*16 output channels (16 feature maps per channel)
     #   nn.BatchNorm2d(C_curr) #  normalizes 4D input (a mini-batch of 2D inputs with additional channel dimension)
     # )
+
+    # input nodes
     self.stem = nn.Sequential(
       Fan_Out(self._n_input_states)
     )
@@ -182,7 +188,8 @@ class Network(nn.Module):
     # out = self.global_pooling(cell_output)
 
     # compute logits
-    logits = self.classifier(cell_output.view(cell_output.size(0),-1)) # just gets output to have only 2 dimensions (batch_size x num units in output layer)
+    logits = self.classifier(cell_output.view(cell_output.size(0),-1))
+    # just gets output to have only 2 dimensions (batch_size x num units in output layer)
 
     return logits
 
@@ -190,6 +197,7 @@ class Network(nn.Module):
     logits = self(input)
     return self._criterion(logits, target) # returns cross entropy
 
+  # regularization
   def apply_weight_decay_to_classifier(self, lr):
     # weight decay proportional to degrees of freedom
     for p in self.classifier.parameters():
@@ -200,7 +208,7 @@ class Network(nn.Module):
     # number of available primitive operations (8 different types for a conv net)
     num_ops = len(PRIMITIVES)
 
-    # generate 14 (umber of available edges) by 8 (operations) weight matrix for normal alphas of the architecture
+    # generate 14 (number of available edges) by 8 (operations) weight matrix for normal alphas of the architecture
     self.alphas_normal = Variable(1e-3*torch.randn(k, num_ops), requires_grad=True)
     # those are all the parameters of the architecture
     self._arch_parameters = [self.alphas_normal]
