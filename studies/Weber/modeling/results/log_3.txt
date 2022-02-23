@@ -1,0 +1,9 @@
+2022-02-23 15:38:07,770 gpu device: 0
+2022-02-23 15:38:07,770 configuration = <module 'AER_theorist.darts.darts_config' from '/Users/brianji/Desktop/MyProjects/AER/AER_theorist/darts/darts_config.py'>
+2022-02-23 15:38:07,775 param size: 0.000048MB
+2022-02-23 15:38:07,881 genotype: Genotype(normal=[('add', 1), ('none', 0), ('softminus', 0), ('sigmoid', 1), ('exp', 2)], normal_concat=range(3, 4))
+2022-02-23 15:38:10,104 architecture step (loss): 000 (3.254417e-02)
+2022-02-23 15:38:10,104 training accuracy: 0.032544
+2022-02-23 15:38:10,107 architecture step (accuracy): 000 (1.459201e-02)
+2022-02-23 15:38:10,108 validation accuracy: 0.014100
+2022-02-23 15:38:10,108 epoch: 0
