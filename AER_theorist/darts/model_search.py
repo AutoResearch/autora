@@ -5,6 +5,7 @@ from torch.autograd import Variable
 import numpy as np
 import random
 import warnings
+from more_itertools import powerset
 
 from AER_theorist.darts.fan_out import Fan_Out
 from AER_theorist.darts.operations import *
@@ -94,9 +95,28 @@ class Cell(nn.Module):
     # this computes the states from intermediate nodes and adds them to the list of states (values of nodes)
     # for each hidden node, compute edge between existing states (input nodes / previous hidden) nodes and current node
     for i in range(self._steps): # compute the state for each hidden node, first hidden node is sum of input nodes, second is sum of input and first hidden
-      s = sum(self._ops[offset+j](h, weights[offset+j]) for j, h in enumerate(states))
+      # TODO whats the paranthesis (h, weights[offset+j]) - channel size + stride??? not CNN??
+      # s = sum(self._ops[offset+j](h, weights[offset+j]) for j, h in enumerate(states))
+      s = 0
+      # print("i", i)
+      # print(states)
+      set = np.arange(len(states))
+      subsets = powerset(set)
+      prod = 1
+      for subset in subsets:
+        if len(subset) > 0:
+          for j in subset:
+            h = states[j]
+            # print(len(weights))
+            # print(offset+j)
+            prod *= self._ops[offset+j](h, weights[offset+j])
+          s += prod
+      # for j, h in enumerate(states):
+      #   s += self._ops[offset+j](h, weights[offset+j])
       offset += len(states)
       states.append(s)
+
+    # print("end forward")
 
     # concatenates the states of the last n (self._multiplier) intermediate nodes to get the output of a cell
     result = torch.cat(states[-self._multiplier:], dim=1)
@@ -157,6 +177,7 @@ class Network(nn.Module):
 
     # initializes weights of the architecture
     self._initialize_alphas()
+    self._initialize_betas()
 
   # function for copying the network
   def new(self):
@@ -180,10 +201,11 @@ class Network(nn.Module):
       weights = self.alphas_normal
     else:
       if self.DARTS_type==DARTS_Type.ORIGINAL:
-        weights = F.softmax(self.alphas_normal, dim=-1)
+        # weights = F.softmax(self.alphas_normal, dim=-1)
+        weights = F.softmax(self.betas, dim=-1)
       elif self.DARTS_type==DARTS_Type.FAIR:
-        weights = torch.sigmoid(self.alphas_normal)
-        # TODO weights = torch.sigmoid(self.betas)
+        # weights = torch.sigmoid(self.alphas_normal)
+        weights = torch.sigmoid(self.betas)
       else:
         raise Exception("DARTS Type " + str(self.DARTS_type) + " not implemented")
 
@@ -221,16 +243,16 @@ class Network(nn.Module):
     # those are all the parameters of the architecture
     self._arch_parameters = [self.alphas_normal]
 
-  # TODO initialize betas
   def _initialize_betas(self):
     k = 0
     num_ops = len(PRIMITIVES)
 
     for i in range(self._steps):
-      set_size = self._n_input_states + i - 1
+      set_size = self._n_input_states + i # -1 ???
       k += 2 ** set_size - 1
 
     self.betas = Variable(1e-3*torch.randn(k, num_ops), requires_grad=True)
+    self._arch_parameters = [self.betas]
 
   # provide back the architecture as a parameter
   def arch_parameters(self):
