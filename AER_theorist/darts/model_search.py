@@ -41,9 +41,16 @@ class MixedOp(nn.Module):
       #   op[0].weight.data.fill_(1.0)
       #   op[0].bias.data.fill_(0.001)
 
+      # TODO understand / write op between pairs of nodes op[i][j] = op on edge i-j
+
   def forward(self, x, weights):
     # there are 8 weights for all the eight primitives. then it returns the weighted sum of all operations performed on a given input
     return sum(w * op(x) for w, op in zip(weights, self._ops))
+
+  # def forward_multiplication(self, x, weights):
+  #   # iterate over subsets of A = set of previous node
+  #   prod = math.prod(op(x) for w, op in zip(weights, self._ops))
+
 
 # Let a cell be a DAG(directed acyclic graph) containing N nodes (2 input nodes 1 output node?)
 class Cell(nn.Module):
@@ -72,7 +79,7 @@ class Cell(nn.Module):
         # for 4 intermediate nodes, a total of 14 connections (MixedOps) is added
         op = MixedOp(C, stride)
         # appends cell with mixed operation
-        self._ops.append(op)
+        self._ops.append(op)  # edge j -> i
 
   def forward(self, input_states, weights):
 
@@ -176,6 +183,7 @@ class Network(nn.Module):
         weights = F.softmax(self.alphas_normal, dim=-1)
       elif self.DARTS_type==DARTS_Type.FAIR:
         weights = torch.sigmoid(self.alphas_normal)
+        # TODO weights = torch.sigmoid(self.betas)
       else:
         raise Exception("DARTS Type " + str(self.DARTS_type) + " not implemented")
 
@@ -212,6 +220,17 @@ class Network(nn.Module):
     self.alphas_normal = Variable(1e-3*torch.randn(k, num_ops), requires_grad=True)
     # those are all the parameters of the architecture
     self._arch_parameters = [self.alphas_normal]
+
+  # TODO initialize betas
+  def _initialize_betas(self):
+    k = 0
+    num_ops = len(PRIMITIVES)
+
+    for i in range(self._steps):
+      set_size = self._n_input_states + i - 1
+      k += 2 ** set_size - 1
+
+    self.betas = Variable(1e-3*torch.randn(k, num_ops), requires_grad=True)
 
   # provide back the architecture as a parameter
   def arch_parameters(self):
