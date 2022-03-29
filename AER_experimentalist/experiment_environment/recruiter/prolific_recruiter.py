@@ -96,7 +96,7 @@ class ProlificRecruiter():
         return study.status_code < 400
     
     def publish_study(self, study_id: str, 
-                      action: StudyAction = StudyAction.PUBLISH):
+                      action: StudyAction = StudyAction.PUBLISH) -> bool:
         """
         Performs action on specified study. Default action is to publish
         the study.
