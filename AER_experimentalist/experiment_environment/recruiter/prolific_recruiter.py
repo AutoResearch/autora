@@ -34,7 +34,7 @@ class ProlificRecruiter():
                     estimated_completion_time: int,
                     maximum_allowed_time: int = None,
                     eligibility_requirements=None,
-                    device_compatibility: List[DeviceOptions] = None,  # list[] doesn't work in python until v 3.9
+                    device_compatibility: List[DeviceOptions] = None,
                     peripheral_requirements: List[PeripheralOptions] = None,
                     internal_name: str = None) -> bool:
         """
@@ -59,16 +59,6 @@ class ProlificRecruiter():
         Returns:
             bool: Whether the request was successful or not
         """
-        # Don't use mutables as default arguments since they might change everytime you call the function
-        # in this case they don't get changed in the function but it might be a cause of future bugs
-        # Example to show the problem:
-        # def test(test_1 = []):
-        #     test_1.append('1')
-        #     l = locals()
-        #     print(l)
-        #
-        # test()
-        # test()
         if eligibility_requirements is None:
             eligibility_requirements = []
         if device_compatibility is None:
@@ -79,7 +69,7 @@ class ProlificRecruiter():
         # packages function parameters into dictionary
         data = locals()
         # removes self variable
-        del data['self'] # I think you want to remove from data, also removing from locals doesn't work since it is a function removing from
+        del data['self']
 
         # removes optional parameters that aren't specified
         if maximum_allowed_time is None:
@@ -136,7 +126,7 @@ class ProlificRecruiter():
         submissions = requests.get(f'{self.BASE_URL}submissions/', headers=self.HEADERS, params=query)
         return submissions.json()
 
-    def approve_participants(self, study_id: str, prolific_ids: Iterable[str]) -> bool:
+    def approve_participants(self, study_id: str, prolific_ids: List[str]) -> bool:
         """
         Bulk approve study submissions to pay participants after they have completed
         your survey or experiment.
@@ -145,8 +135,6 @@ class ProlificRecruiter():
             study_id (str): study id
             prolific_ids (Iterable[str]): list (or list-like object) of prolific ids.
         """
-        data = {"study_id": study_id,
-                "participant_ids": list(prolific_ids)}
-        approve = requests.post(f'{self.BASE_URL}studies/{study_id}/transition/',headers=self.HEADERS, json=data)
+        data = {"study_id": study_id, "participant_ids": prolific_ids}
+        approve = requests.post(f'{self.BASE_URL}submissions/bulk-approve/', headers=self.HEADERS, json=data)
         return approve.status_code < 400
-
