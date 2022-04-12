@@ -133,7 +133,7 @@ class ProlificRecruiter():
 
         Args:
             study_id (str): study id
-            prolific_ids (Iterable[str]): list (or list-like object) of prolific ids.
+            prolific_ids (List[str]): list of prolific ids.
         """
         data = {"study_id": study_id, "participant_ids": prolific_ids}
         approve = requests.post(f'{self.BASE_URL}submissions/bulk-approve/', headers=self.HEADERS, json=data)
