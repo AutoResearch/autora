@@ -1,0 +1,12 @@
+run-experiment:
+  - */run*
+
+aer_theorist:
+  - */AER_theorist
+ 
+aer_experimentalist:
+  - */AER_experimentalist
+  
+documentation:
+  - */.md
+  - */docs/*
