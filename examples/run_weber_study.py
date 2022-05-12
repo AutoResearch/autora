@@ -1,6 +1,6 @@
 from datetime import datetime
 from tkinter import *
-
+from AER_utils import print_current_time
 import AER_experimentalist.experiment_environment.experiment_config as exp_cfg
 from AER_experimentalist.experiment_design_synthetic_weber import \
     Experiment_Design_Synthetic_Weber
@@ -16,9 +16,7 @@ from AER_theorist.object_of_study import Object_Of_Study
 from AER_theorist.theorist_darts import DARTS_Type, Theorist_DARTS
 from AER_theorist.theorist_GUI import Theorist_GUI
 
-now = datetime.now()
-dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
-print("date and time =", dt_string)
+print_current_time()
 
 # GENERAL PARAMETERS
 
@@ -137,6 +135,4 @@ root.mainloop()
 # theorist_fair.add_validation_set(validation_object_2, 'Weber_Original')
 # model = theorist_fair.search_model(study_object)
 
-now = datetime.now()
-dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
-print("date and time =", dt_string)
+print_current_time()

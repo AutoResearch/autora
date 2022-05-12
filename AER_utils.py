@@ -1,3 +1,4 @@
+from datetime import datetime
 from enum import Enum
 
 class Plot_Types(Enum):
@@ -7,3 +8,10 @@ class Plot_Types(Enum):
     SURFACE_SCATTER = 4
     MULTI_LINE = 5
     MODEL = 6
+
+
+def print_current_time():
+    now = datetime.now()
+    dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
+    print("date and time =", dt_string)
+    return
