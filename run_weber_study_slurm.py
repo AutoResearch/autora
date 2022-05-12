@@ -21,9 +21,13 @@ parser = argparse.ArgumentParser("parser")
 parser.add_argument('--slurm_id', type=int, default=1, help='number of slurm array')
 args = parser.parse_args()
 
-now = datetime.now()
-dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
-print("date and time =", dt_string)
+def print_current_time():
+    now = datetime.now()
+    dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
+    print("date and time =", dt_string)
+    return
+
+print_current_time()
 
 # GENERAL PARAMETERS
 
@@ -134,6 +138,5 @@ theorist_fair.add_validation_set(validation_object_1, 'Weber_Sampled')
 theorist_fair.add_validation_set(validation_object_2, 'Weber_Original')
 model = theorist_fair.search_model_job(study_object, args.slurm_id)
 
-now = datetime.now()
-dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
-print("date and time =", dt_string)
+
+print_current_time()
