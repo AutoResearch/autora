@@ -1,4 +1,3 @@
-from datetime import datetime
 from tkinter import *
 from AER_utils import print_current_time
 import AER_experimentalist.experiment_environment.experiment_config as exp_cfg
@@ -11,7 +10,6 @@ from AER_experimentalist.experiment_environment.IV_in_silico import \
 from AER_experimentalist.experiment_environment.variable import \
     outputTypes as output_type
 from AER_experimentalist.experimentalist_popper import Experimentalist_Popper
-from AER_GUI import AER_GUI
 from AER_theorist.object_of_study import Object_Of_Study
 from AER_theorist.theorist_darts import DARTS_Type, Theorist_DARTS
 from AER_theorist.theorist_GUI import Theorist_GUI
