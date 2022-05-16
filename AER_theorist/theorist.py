@@ -14,7 +14,7 @@ from matplotlib.figure import Figure
 
 
 from abc import ABC, abstractmethod
-from AER_theorist.object_of_study import Object_Of_Study
+
 
 class Theorist(ABC):
 
@@ -199,7 +199,7 @@ class Theorist(ABC):
         for key in plot_list.keys():
             plot_dict = plot_list[key]
 
-            type = plot_dict[aer_config.plot_key_type]
+            type = plot_dict[AER_config.plot_key_type]
 
             plot_fig = Figure(figsize=(7, 7), dpi=100)
 
@@ -214,28 +214,28 @@ class Theorist(ABC):
             if type == Plot_Types.LINE:
 
                 # get relevant data
-                x_data = plot_dict[aer_config.plot_key_x_data]
-                y_data = plot_dict[aer_config.plot_key_y_data]
-                x_limit = plot_dict[aer_config.plot_key_x_limit]
-                y_limit = plot_dict[aer_config.plot_key_y_limit]
-                x_label = plot_dict[aer_config.plot_key_x_label]
-                y_label = plot_dict[aer_config.plot_key_y_label]
-                legend = plot_dict[aer_config.plot_key_legend]
+                x_data = plot_dict[AER_config.plot_key_x_data]
+                y_data = plot_dict[AER_config.plot_key_y_data]
+                x_limit = plot_dict[AER_config.plot_key_x_limit]
+                y_limit = plot_dict[AER_config.plot_key_y_limit]
+                x_label = plot_dict[AER_config.plot_key_x_label]
+                y_label = plot_dict[AER_config.plot_key_y_label]
+                legend = plot_dict[AER_config.plot_key_legend]
 
                 # generate plots
                 plot_axis.cla()
                 del plot_axis.lines[:]  # remove previous lines
                 plots = list()
                 for idx, (x, y, leg) in enumerate(zip(x_data, y_data, legend)):
-                    plots.append(plot_axis.plot(x, y, aer_config.plot_colors[idx], label=leg))
+                    plots.append(plot_axis.plot(x, y, AER_config.plot_colors[idx], label=leg))
 
                 # adjust axes
                 plot_axis.set_xlim(x_limit[0], x_limit[1])
                 plot_axis.set_ylim(y_limit[0], y_limit[1])
 
                 # set labels
-                plot_axis.set_xlabel(x_label, fontsize=aer_config.font_size)
-                plot_axis.set_ylabel(y_label, fontsize=aer_config.font_size)
+                plot_axis.set_xlabel(x_label, fontsize=AER_config.font_size)
+                plot_axis.set_ylabel(y_label, fontsize=AER_config.font_size)
 
                 plot_axis.legend(loc=2, fontsize="small")
 
@@ -243,11 +243,11 @@ class Theorist(ABC):
             elif type == Plot_Types.IMAGE:
 
                 # get relevant data
-                image = plot_dict[aer_config.plot_key_image]
-                x_data = plot_dict[aer_config.plot_key_x_data]
-                y_data = plot_dict[aer_config.plot_key_y_data]
-                x_label = plot_dict[aer_config.plot_key_x_label]
-                y_label = plot_dict[aer_config.plot_key_y_label]
+                image = plot_dict[AER_config.plot_key_image]
+                x_data = plot_dict[AER_config.plot_key_x_data]
+                y_data = plot_dict[AER_config.plot_key_y_data]
+                x_label = plot_dict[AER_config.plot_key_x_label]
+                y_label = plot_dict[AER_config.plot_key_y_label]
 
                 # generate image
                 plot_axis.cla()
@@ -257,21 +257,21 @@ class Theorist(ABC):
                 plot_axis.plot(x, y, color='red')
 
                 # set labels
-                plot_axis.set_xlabel(x_label, fontsize=aer_config.font_size)
-                plot_axis.set_ylabel(y_label, fontsize=aer_config.font_size)
+                plot_axis.set_xlabel(x_label, fontsize=AER_config.font_size)
+                plot_axis.set_ylabel(y_label, fontsize=AER_config.font_size)
 
             elif type == Plot_Types.LINE_SCATTER:
 
                 # get relevant data
-                x_data = plot_dict[aer_config.plot_key_x_data]
-                y_data = plot_dict[aer_config.plot_key_y_data]
-                x_model = plot_dict[aer_config.plot_key_x_model]
-                y_model = plot_dict[aer_config.plot_key_y_model]
-                x_limit = plot_dict[aer_config.plot_key_x_limit]
-                y_limit = plot_dict[aer_config.plot_key_y_limit]
-                x_label = plot_dict[aer_config.plot_key_x_label]
-                y_label = plot_dict[aer_config.plot_key_y_label]
-                legend = plot_dict[aer_config.plot_key_legend]
+                x_data = plot_dict[AER_config.plot_key_x_data]
+                y_data = plot_dict[AER_config.plot_key_y_data]
+                x_model = plot_dict[AER_config.plot_key_x_model]
+                y_model = plot_dict[AER_config.plot_key_y_model]
+                x_limit = plot_dict[AER_config.plot_key_x_limit]
+                y_limit = plot_dict[AER_config.plot_key_y_limit]
+                x_label = plot_dict[AER_config.plot_key_x_label]
+                y_label = plot_dict[AER_config.plot_key_y_label]
+                legend = plot_dict[AER_config.plot_key_legend]
 
                 # generate plots
                 plot_axis.cla()
@@ -288,23 +288,23 @@ class Theorist(ABC):
                 plot_axis.set_ylim(y_limit[0], y_limit[1])
 
                 # set labels
-                plot_axis.set_xlabel(x_label, fontsize=aer_config.font_size)
-                plot_axis.set_ylabel(y_label, fontsize=aer_config.font_size)
+                plot_axis.set_xlabel(x_label, fontsize=AER_config.font_size)
+                plot_axis.set_ylabel(y_label, fontsize=AER_config.font_size)
 
                 plot_axis.legend(loc=2, fontsize="small")
 
             elif type == Plot_Types.SURFACE_SCATTER:
 
                 # get relevant data
-                (x1_data, x2_data) = plot_dict[aer_config.plot_key_x_data]
-                y_data = plot_dict[aer_config.plot_key_y_data]
-                (x1_model, x2_model) = plot_dict[aer_config.plot_key_x_model]
-                y_model = plot_dict[aer_config.plot_key_y_model]
-                (x1_limit, x2_limit) = plot_dict[aer_config.plot_key_x_limit]
-                y_limit = plot_dict[aer_config.plot_key_y_limit]
-                (x1_label, x2_label) = plot_dict[aer_config.plot_key_x_label]
-                y_label = plot_dict[aer_config.plot_key_y_label]
-                legend = plot_dict[aer_config.plot_key_legend]
+                (x1_data, x2_data) = plot_dict[AER_config.plot_key_x_data]
+                y_data = plot_dict[AER_config.plot_key_y_data]
+                (x1_model, x2_model) = plot_dict[AER_config.plot_key_x_model]
+                y_model = plot_dict[AER_config.plot_key_y_model]
+                (x1_limit, x2_limit) = plot_dict[AER_config.plot_key_x_limit]
+                y_limit = plot_dict[AER_config.plot_key_y_limit]
+                (x1_label, x2_label) = plot_dict[AER_config.plot_key_x_label]
+                y_label = plot_dict[AER_config.plot_key_y_label]
+                legend = plot_dict[AER_config.plot_key_legend]
 
                 # generate plots
                 plot_axis.cla()
@@ -322,12 +322,12 @@ class Theorist(ABC):
                 plot_axis.set_zlim(y_limit[0], y_limit[1])
 
                 # set labels
-                plot_axis.set_xlabel(x1_label, fontsize=aer_config.font_size)
-                plot_axis.set_ylabel(x2_label, fontsize=aer_config.font_size)
-                plot_axis.set_zlabel(y_label, fontsize=aer_config.font_size)
+                plot_axis.set_xlabel(x1_label, fontsize=AER_config.font_size)
+                plot_axis.set_ylabel(x2_label, fontsize=AER_config.font_size)
+                plot_axis.set_zlabel(y_label, fontsize=AER_config.font_size)
 
             # finalize performance plot
-            plot_axis.set_title(key, fontsize=aer_config.font_size)
+            plot_axis.set_title(key, fontsize=AER_config.font_size)
 
             plot_filepath = os.path.join(self.results_plots_path, 'plot_' + plot_label + '_' + key + '.png')
             plot_fig.savefig(plot_filepath)
@@ -341,7 +341,7 @@ class Theorist(ABC):
 
         for name, value in zip(meta_param_names, meta_param_values):
             self.time_elapsed_log[name].append(value)
-        self.time_elapsed_log[aer_config.log_key_timestamp].append(str(elapsed))
+        self.time_elapsed_log[AER_config.log_key_timestamp].append(str(elapsed))
 
 
     def clear_validation_sets(self):
@@ -371,7 +371,7 @@ class Theorist(ABC):
         names = self._meta_parameter_names_to_str_list()
         for name in names:
             self.time_elapsed_log[name] = list()
-        self.time_elapsed_log[aer_config.log_key_timestamp] = list()
+        self.time_elapsed_log[AER_config.log_key_timestamp] = list()
 
     @abstractmethod
     def log_meta_search(self, object_of_study):
@@ -482,36 +482,36 @@ class Theorist(ABC):
     def setup_simulation_directories(self):
 
         # study directory
-        self.study_path = aer_config.studies_folder \
+        self.study_path = AER_config.studies_folder \
                           + self.study_name + "/"
 
         if not os.path.exists(self.study_path):
             os.mkdir(self.study_path)
 
         # scripts directory
-        self.scripts_path = aer_config.studies_folder\
-                            + self.study_name + "/"\
-                            + aer_config.models_folder\
-                            + aer_config.models_scripts_folder
+        self.scripts_path = AER_config.studies_folder \
+                            + self.study_name + "/" \
+                            + AER_config.models_folder \
+                            + AER_config.models_scripts_folder
 
         if not os.path.exists(self.scripts_path):
             os.mkdir(self.scripts_path)
 
         # results directory
-        self.results_path = aer_config.studies_folder\
-                            + self.study_name + "/"\
-                            + aer_config.models_folder \
-                            + aer_config.models_results_folder
+        self.results_path = AER_config.studies_folder \
+                            + self.study_name + "/" \
+                            + AER_config.models_folder \
+                            + AER_config.models_results_folder
 
-        self.results_plots_path = aer_config.studies_folder\
-                            + self.study_name + "/"\
-                            + aer_config.models_folder \
-                            + aer_config.models_results_plots_folder
-
-        self.results_weights_path = aer_config.studies_folder \
+        self.results_plots_path = AER_config.studies_folder \
                                   + self.study_name + "/" \
-                                  + aer_config.models_folder \
-                                  + aer_config.models_results_weights_folder
+                                  + AER_config.models_folder \
+                                  + AER_config.models_results_plots_folder
+
+        self.results_weights_path = AER_config.studies_folder \
+                                    + self.study_name + "/" \
+                                    + AER_config.models_folder \
+                                    + AER_config.models_results_weights_folder
 
         if not os.path.exists(self.results_path):
             os.mkdir(self.results_path)
@@ -552,28 +552,28 @@ class Theorist(ABC):
     def _generate_plot_dict(self, type, x, y, x_limit=None, y_limit=None, x_label=None, y_label=None, legend=None, image=None, x_model=None, y_model=None, x_highlighted=None, y_highlighted=None):
         # generate plot dictionary
         plot_dict = dict()
-        plot_dict[aer_config.plot_key_type] = type
-        plot_dict[aer_config.plot_key_x_data] = x
-        plot_dict[aer_config.plot_key_y_data] = y
+        plot_dict[AER_config.plot_key_type] = type
+        plot_dict[AER_config.plot_key_x_data] = x
+        plot_dict[AER_config.plot_key_y_data] = y
         if x_limit is not None:
-            plot_dict[aer_config.plot_key_x_limit] = x_limit
+            plot_dict[AER_config.plot_key_x_limit] = x_limit
         if y_limit is not None:
-            plot_dict[aer_config.plot_key_y_limit] = y_limit
+            plot_dict[AER_config.plot_key_y_limit] = y_limit
         if x_label is not None:
-            plot_dict[aer_config.plot_key_x_label] = x_label
+            plot_dict[AER_config.plot_key_x_label] = x_label
         if y_label is not None:
-            plot_dict[aer_config.plot_key_y_label] = y_label
+            plot_dict[AER_config.plot_key_y_label] = y_label
         if legend is not None:
-            plot_dict[aer_config.plot_key_legend] = legend
+            plot_dict[AER_config.plot_key_legend] = legend
         if image is not None:
-            plot_dict[aer_config.plot_key_image] = image
+            plot_dict[AER_config.plot_key_image] = image
         if x_model is not None:
-            plot_dict[aer_config.plot_key_x_model] = x_model
+            plot_dict[AER_config.plot_key_x_model] = x_model
         if y_model is not None:
-            plot_dict[aer_config.plot_key_y_model] = y_model
+            plot_dict[AER_config.plot_key_y_model] = y_model
         if x_highlighted is not None:
-            plot_dict[aer_config.plot_key_x_highlighted_data] = x_highlighted
+            plot_dict[AER_config.plot_key_x_highlighted_data] = x_highlighted
         if y_highlighted is not None:
-            plot_dict[aer_config.plot_key_y_highlighted_data] = y_highlighted
+            plot_dict[AER_config.plot_key_y_highlighted_data] = y_highlighted
 
         return plot_dict
