@@ -22,5 +22,5 @@ nav:
 - index.md
 # rest of the navigation...
 # defer to gen-files + literate-nav
-#- Code Reference: reference/  #
+- Code Reference: reference/  #
 # rest of the navigation...
