@@ -1,4 +1,4 @@
-from aer.variable.variable import Variable
+from .variable import Variable
 
 class Tinkerforge_Variable(Variable):
 
