@@ -1,8 +1,8 @@
-from typing import Any
+from typing import Any, List
 import requests
 from dotenv import load_dotenv
 import os
-from .study_options import *
+from .study_options import DeviceOptions, PeripheralOptions, ProlificIdOptions, CompletionOptions, StudyAction
 
 class ProlificRecruiter():
     """
@@ -17,7 +17,10 @@ class ProlificRecruiter():
     
     # currently, they only require an Authorization header
     # referer header is optional
-    HEADERS = {'Authorization': f'Token {os.environ["API_TOKEN"]}'}
+    if "API_TOKEN" in os.environ:
+        HEADERS = {'Authorization': f'Token {os.environ["API_TOKEN"]}'}
+    else:
+        HEADERS = {}
     
     def list_studies(self) -> Any:
         """
@@ -26,15 +29,18 @@ class ProlificRecruiter():
         studies = requests.get(f'{self.BASE_URL}studies/', headers=self.HEADERS)
         return studies.json()
     
-    def draft_study(self, name: str, description: str, external_study_url: str,
+    def draft_study(self,
+                    name: str,
+                    description: str,
+                    external_study_url: str,
                     prolific_id_option: ProlificIdOptions,
                     completion_code: str, completion_option: CompletionOptions,
                     total_available_places: int, reward: int,
                     estimated_completion_time: int, 
                     maximum_allowed_time: int = None,
                     eligibility_requirements=[], 
-                    device_compatibility: list[DeviceOptions] = [], 
-                    peripheral_requirements: list[PeripheralOptions] = [], 
+                    device_compatibility: List[DeviceOptions] = [],
+                    peripheral_requirements: List[PeripheralOptions] = [],
                     internal_name: str = None) -> bool:
         """
         Allows for a study to be drafted given the following parameters.
