@@ -1,6 +1,6 @@
 # AER Specific ignores
-studies/*/modeling/results
-studies/*/modeling/scripts
+examples/studies/*/modeling/results
+examples/studies/*/modeling/scripts
 
 
 # Python ignores, from https://github.com/github/gitignore/blob/main/Python.gitignore
