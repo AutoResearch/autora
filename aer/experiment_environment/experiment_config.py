@@ -1,5 +1,5 @@
-server_path = "server data/"
-client_path = "experimentalist/experiment_environment/client data/"
+server_path = "examples/server data/"
+client_path = "examples/client data/"
 experiments_path = "experiments/"
 sequences_path = "experiments/sequences/"
 data_path = "experiments/data/"
