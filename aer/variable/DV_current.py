@@ -1,4 +1,4 @@
-from DV import DV
+from .DV import DV
 from tinkerforge.ip_connection import IPConnection
 from tinkerforge.bricklet_industrial_dual_0_20ma_v2 import BrickletIndustrialDual020mAV2
 
