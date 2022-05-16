@@ -12,9 +12,6 @@ from AER_theorist.object_of_study import Object_Of_Study
 from AER_theorist.theorist_darts import Theorist_DARTS, DARTS_Type
 import AER_experimentalist.experiment_environment.experiment_config as exp_cfg
 import argparse
-from AER_theorist.theorist_GUI import Theorist_GUI
-from AER_GUI import AER_GUI
-from tkinter import *
 
 # parse arguments
 parser = argparse.ArgumentParser("parser")
