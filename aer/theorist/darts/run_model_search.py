@@ -1,6 +1,5 @@
 import os
 import sys
-import time
 import glob
 import copy
 import csv
@@ -98,9 +97,9 @@ args.show_arch_weights = cfg.show_arch_weights
 
 # assign slurm instance
 (args.arch_weight_decay_df, args.num_graph_nodes, args.seed) = utils.assign_slurm_instance(slurm_id=args.slurm_id,
-                                                                             arch_weight_decay_list=cfg.arch_weight_decay_list,
-                                                                             num_node_list=cfg.num_node_list,
-                                                                             seed_list=cfg.seed_list)
+                                                                                           arch_weight_decay_list=cfg.arch_weight_decay_list,
+                                                                                           num_node_list=cfg.num_node_list,
+                                                                                           seed_list=cfg.seed_list)
 
 
 ################ LOGGING ################
@@ -223,10 +222,10 @@ def main():
 
 
     graph_filename = utils.create_output_file_name(file_prefix=args.graph_filename,
-                                                 log_version = args.log_version,
-                                                 weight_decay=args.arch_weight_decay_df,
-                                                 k=args.num_graph_nodes,
-                                                 seed=args.seed)
+                                                   log_version = args.log_version,
+                                                   weight_decay=args.arch_weight_decay_df,
+                                                   k=args.num_graph_nodes,
+                                                   seed=args.seed)
     graph_filepath = os.path.join(args.exp_folder, args.save, args.output_file_folder, graph_filename)
 
     # plot window
@@ -356,10 +355,10 @@ def evaluate_architectures(train_data, train_queue, valid_queue, bic_valid_queue
                                                      seed=args.seed)
 
   arch_filename_gen = utils.create_output_file_name(file_prefix='arch_weights',
-                                                     log_version=args.log_version,
-                                                     weight_decay=args.arch_weight_decay_df,
-                                                     k=args.num_graph_nodes,
-                                                     seed=args.seed)
+                                                    log_version=args.log_version,
+                                                    weight_decay=args.arch_weight_decay_df,
+                                                    k=args.num_graph_nodes,
+                                                    seed=args.seed)
 
   # generate test set for computing BIC and AIC
   input_full, target_full = next(iter(bic_valid_queue))

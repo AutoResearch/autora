@@ -1,7 +1,7 @@
 import sys
 from graphviz import Digraph
 
-from AER_theorist.darts.operations import *
+from aer.theorist.darts.operations import get_operation_label
 
 def plot(genotype, filename, fileFormat='pdf', viewFile=None, full_label=False, param_list=(), input_labels=(), out_dim=None, out_fnc=None):
 

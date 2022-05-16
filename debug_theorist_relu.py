@@ -1,7 +1,7 @@
 from AER_experimentalist.experiment_environment.variable import Variable as Var
 from AER_experimentalist.experimentalist_popper import Experimentalist_Popper
-from AER_theorist.object_of_study import Object_Of_Study
-from AER_theorist.theorist_darts import Theorist_DARTS
+from aer.theorist.object_of_study import Object_Of_Study
+from aer.theorist.theorist_darts import Theorist_DARTS
 import numpy as np
 from torch import nn
 import torch.optim as optim

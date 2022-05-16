@@ -4,8 +4,8 @@ from AER_experimentalist.experiment_environment.DV_in_silico import DV_In_Silico
 from AER_experimentalist.experiment_environment.variable import outputTypes as output_type
 from AER_experimentalist.experimentalist_popper import Experimentalist_Popper
 from AER_experimentalist.experiment_design_synthetic_weber import Experiment_Design_Synthetic_Weber
-from AER_theorist.object_of_study import Object_Of_Study
-from AER_theorist.theorist_darts import Theorist_DARTS, DARTS_Type
+from aer.theorist.object_of_study import Object_Of_Study
+from aer.theorist.theorist_darts import Theorist_DARTS, DARTS_Type
 import AER_experimentalist.experiment_environment.experiment_config as exp_cfg
 import argparse
 

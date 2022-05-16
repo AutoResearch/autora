@@ -6,10 +6,9 @@ import numpy as np
 import random
 import warnings
 
-from AER_theorist.darts.fan_out import Fan_Out
-from AER_theorist.darts.operations import *
-from AER_theorist.darts.genotypes import PRIMITIVES
-from AER_theorist.darts.genotypes import Genotype
+from aer.theorist.darts.fan_out import Fan_Out
+from aer.theorist.darts.genotypes import PRIMITIVES
+from aer.theorist.darts.genotypes import Genotype
 
 from enum import Enum
 

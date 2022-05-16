@@ -1,20 +1,8 @@
 import os
-import sys
-import time
-import glob
-import copy
-import csv
-import numpy as np
-import torch
-import logging
 import argparse
 import re
 import torch.nn as nn
 import torch.utils
-import torch.nn.functional as F
-import torchvision.datasets as dset
-import torch.backends.cudnn as cudnn
-from torchvision import transforms
 
 from torch.autograd import Variable
 

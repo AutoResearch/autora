@@ -1,9 +1,9 @@
 from abc import ABC
-from AER_theorist.theorist import Theorist
+from aer.theorist.theorist import Theorist
 from aer.utils import Plot_Types
-from AER_theorist.darts.model_search import Network, DARTS_Type
-from AER_theorist.darts.architect import Architect
-from AER_theorist.darts.genotypes import PRIMITIVES
+from aer.theorist.darts.model_search import Network, DARTS_Type
+from aer.theorist.darts.architect import Architect
+from aer.theorist.darts.genotypes import PRIMITIVES
 from torch.autograd import Variable
 from AER_experimentalist.experiment_environment.variable import outputTypes as output_types
 
@@ -13,10 +13,10 @@ import torch.nn.functional as F
 import pandas
 import logging
 import numpy as np
-import AER_theorist.darts.darts_config as darts_cfg
+import aer.theorist.darts.darts_config as darts_cfg
 from aer import config as aer_config
-import AER_theorist.darts.utils as utils
-import AER_theorist.darts.visualize as viz
+import aer.theorist.darts.utils as utils
+import aer.theorist.darts.visualize as viz
 import copy
 import os
 import csv
@@ -24,7 +24,7 @@ import csv
 
 class Theorist_DARTS(Theorist, ABC):
 
-    simulation_files = 'AER_theorist/darts/*.py'
+    simulation_files = 'theorist/darts/*.py'
 
     _lr_plot_name = "Learning Rates"
 
@@ -658,7 +658,7 @@ class Theorist_DARTS(Theorist, ABC):
 
             # save model plot with parameters
             viz.plot(genotype.normal, self.graph_filepath, fileFormat='png',
-                         input_labels=object_of_study.__get_input_labels__(), param_list=param_list, full_label=full_label,
+                     input_labels=object_of_study.__get_input_labels__(), param_list=param_list, full_label=full_label,
                      out_dim=object_of_study.__get_output_dim__(), out_fnc=utils.get_output_str(object_of_study.__get_output_type__()))
 
         else:
@@ -948,29 +948,29 @@ class Theorist_DARTS(Theorist, ABC):
 
     def get_model_filename(self, arch_weight_decay_df, num_graph_nodes, seed):
         filename = utils.create_output_file_name(file_prefix='model',
-                                                         theorist=self.theorist_name,
-                                                         log_version=self.model_search_id,
-                                                         weight_decay=arch_weight_decay_df,
-                                                         k=num_graph_nodes,
-                                                         seed=seed)
+                                                 theorist=self.theorist_name,
+                                                 log_version=self.model_search_id,
+                                                 weight_decay=arch_weight_decay_df,
+                                                 k=num_graph_nodes,
+                                                 seed=seed)
         return filename
 
     def get_model_weights_filename(self, arch_weight_decay_df, num_graph_nodes, seed):
         filename = utils.create_output_file_name(file_prefix='model_weights',
-                                                         theorist=self.theorist_name,
-                                                         log_version=self.model_search_id,
-                                                         weight_decay=arch_weight_decay_df,
-                                                         k=num_graph_nodes,
-                                                         seed=seed)
+                                                 theorist=self.theorist_name,
+                                                 log_version=self.model_search_id,
+                                                 weight_decay=arch_weight_decay_df,
+                                                 k=num_graph_nodes,
+                                                 seed=seed)
         return filename
 
     def get_architecture_filename(self, arch_weight_decay_df, num_graph_nodes, seed):
         filename = utils.create_output_file_name(file_prefix='architecture_weights',
-                                                         theorist=self.theorist_name,
-                                                         log_version=self.model_search_id,
-                                                         weight_decay=arch_weight_decay_df,
-                                                         k=num_graph_nodes,
-                                                         seed=seed)
+                                                 theorist=self.theorist_name,
+                                                 log_version=self.model_search_id,
+                                                 weight_decay=arch_weight_decay_df,
+                                                 k=num_graph_nodes,
+                                                 seed=seed)
         return filename
 
     def evaluate_architectures(self, object_of_study, train_queue, valid_queue, model, arch_weight_decay_df, num_graph_nodes, seed):

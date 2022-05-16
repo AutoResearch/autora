@@ -1,12 +1,11 @@
-from AER_theorist.darts.plot_utils import plot_darts_summary
+from aer.theorist.darts.plot_utils import plot_darts_summary
 from AER_experimentalist.experiment_environment.participant_weber import Participant_Weber
 from AER_experimentalist.experiment_environment.IV_in_silico import IV_In_Silico as IV
 from AER_experimentalist.experiment_environment.DV_in_silico import DV_In_Silico as DV
 from AER_experimentalist.experiment_environment.variable import outputTypes as output_type
 from AER_experimentalist.experimentalist_popper import Experimentalist_Popper
 import AER_experimentalist.experiment_environment.experiment_config as exp_cfg
-from AER_theorist.object_of_study import Object_Of_Study
-import time
+from aer.theorist.object_of_study import Object_Of_Study
 
 participant = Participant_Weber()
 
@@ -121,9 +120,9 @@ plot_darts_summary(study_name=study_name,
 # best_arch_file = 'architecture_weights_fair_darts_v_1_wd_1.0_k_2_s_1.0_sample1_1'
 
 # load winning model
-# from AER_theorist.darts.model_search import Network, DARTS_Type
-# import AER_theorist.darts.visualize as viz
-# import AER_theorist.darts.utils as utils
+# from theorist.darts.model_search import Network, DARTS_Type
+# import theorist.darts.visualize as viz
+# import theorist.darts.utils as utils
 # import torch
 # import os
 #

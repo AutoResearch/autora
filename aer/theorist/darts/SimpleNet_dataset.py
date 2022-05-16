@@ -4,8 +4,8 @@ import numpy as np
 from torch.utils.data import Dataset
 from torch.autograd import Variable
 
-from AER_theorist.darts.SimpleNet import SimpleNet
-from AER_theorist.object_of_study import Object_Of_Study, outputTypes
+from aer.theorist.darts.SimpleNet import SimpleNet
+from aer.theorist.object_of_study import Object_Of_Study, outputTypes
 
 from torchvision import transforms
 

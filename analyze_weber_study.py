@@ -1,4 +1,4 @@
-from AER_theorist.darts.plot_utils import generate_darts_summary_figures, plot_model_graph, load_model
+from aer.theorist.darts.plot_utils import generate_darts_summary_figures, plot_model_graph, load_model
 from AER_experimentalist.experiment_environment.participant_weber import Participant_Weber
 from AER_experimentalist.experimentalist_popper import Experimentalist_Popper
 from AER_experimentalist.experiment_environment.IV_in_silico import IV_In_Silico as IV
@@ -6,7 +6,7 @@ from AER_experimentalist.experiment_environment.DV_in_silico import DV_In_Silico
 from AER_experimentalist.experiment_environment.variable import outputTypes as output_type
 import AER_experimentalist.experiment_environment.experiment_config as exp_cfg
 from aer import config as aer_cfg
-from AER_theorist.object_of_study import Object_Of_Study
+from aer.theorist.object_of_study import Object_Of_Study
 
 participant = Participant_Weber()
 

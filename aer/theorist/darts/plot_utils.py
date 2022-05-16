@@ -1,4 +1,4 @@
-import AER_theorist.darts.darts_config as darts_config
+import aer.theorist.darts.darts_config as darts_config
 from aer import config as AER_config
 import matplotlib.pyplot as plt
 from matplotlib import pyplot
@@ -520,8 +520,8 @@ def plot_darts_summary(study_name, y_name, x1_name,
 
 def plot_model_graph(study_name, arch_weights_name, model_weights_name, object_of_study, figure_name='graph'):
 
-    import AER_theorist.darts.visualize as viz
-    import AER_theorist.darts.utils as utils
+    import aer.theorist.darts.visualize as viz
+    import aer.theorist.darts.utils as utils
     import os
 
     figures_path = AER_config.studies_folder \
@@ -535,8 +535,8 @@ def plot_model_graph(study_name, arch_weights_name, model_weights_name, object_o
     genotype = model.genotype()
     filepath = os.path.join(figures_path, figure_name)
     viz.plot(genotype.normal, filepath, fileFormat='png',
-                         input_labels=object_of_study.__get_input_labels__(), full_label=True, param_list=param_list,
-                         out_dim=object_of_study.__get_output_dim__(), out_fnc=utils.get_output_str(object_of_study.__get_output_type__()), viewFile=True)
+             input_labels=object_of_study.__get_input_labels__(), full_label=True, param_list=param_list,
+             out_dim=object_of_study.__get_output_dim__(), out_fnc=utils.get_output_str(object_of_study.__get_output_type__()), viewFile=True)
 
 
 # old
@@ -544,8 +544,8 @@ def plot_model_graph(study_name, arch_weights_name, model_weights_name, object_o
 
 def load_model(study_name, model_weights_name, arch_weights_name, object_of_study):
 
-    from AER_theorist.darts.model_search import Network
-    import AER_theorist.darts.utils as utils
+    from aer.theorist.darts.model_search import Network
+    import aer.theorist.darts.utils as utils
     import torch
     import os
 

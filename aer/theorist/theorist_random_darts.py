@@ -1,8 +1,8 @@
 from abc import ABC
-from AER_theorist.theorist_darts import Theorist_DARTS
+from aer.theorist.theorist_darts import Theorist_DARTS
 
 from aer import config as aer_config
-import AER_theorist.darts.darts_config as darts_cfg
+import aer.theorist.darts.darts_config as darts_cfg
 import warnings
 import logging
 import pandas
