@@ -1,5 +1,5 @@
 from torch.utils.data import Dataset
-from aer.variable import *
+from ..variable.variable import Variable
 from .. import config as AER_cfg
 from typing import List, Dict
 import torch
