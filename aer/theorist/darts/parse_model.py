@@ -18,15 +18,15 @@ try:
     from cnnsimple.SimpleNet_dataset import SimpleNetDataset
     import cnnsimple.SimpleNet_dataset as SimpleNet_dataset
 except:
-    import utils as utils
-    import visualize as viz
-    import plot_utils as plotutils
-    import genotypes
-    from model_search import Network
-    from architect import Architect
-    import model_search_config as cfg
-    from object_of_study import outputTypes
-    from SimpleNet_dataset import SimpleNetDataset
+    from aer.theorist.darts import utils
+    from aer.theorist.darts import visualize as viz
+    from aer.theorist.darts import plot_utils as plotutils
+    from aer.theorist.darts import genotypes
+    from aer.theorist.darts.model_search import Network
+    from aer.theorist.darts.architect import Architect
+    from aer.theorist.darts import model_search_config as cfg
+    from aer.theorist.darts.SimpleNet_dataset import SimpleNetDataset
+    from aer.variable.variable import outputTypes
 
 # PARSE ARGUMENTS
 
