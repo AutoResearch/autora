@@ -1,15 +1,11 @@
-import AER_config as aer_config
 import AER_theorist.darts.darts_config as darts_config
 from aer import config as AER_config
 import matplotlib.pyplot as plt
 from matplotlib import pyplot
 import matplotlib
-import pylab
 import seaborn as sns
 from matplotlib.gridspec import GridSpec
-from mpl_toolkits import mplot3d
 import imageio
-import time
 import numpy as np
 import os
 import pandas
@@ -65,10 +61,10 @@ def generate_darts_summary_figures(figure_names,
                            arch_samp_filter = arch_samp_filter,
                            figure_name=figure_name,
                            figure_dimensions=figure_dimensions,
-                           legend_loc=aer_config.legend_loc,
-                           legend_font_size=aer_config.legend_font_size,
-                           axis_font_size=aer_config.axis_font_size,
-                           title_font_size=aer_config.title_font_size,
+                           legend_loc=AER_config.legend_loc,
+                           legend_font_size=AER_config.legend_font_size,
+                           axis_font_size=AER_config.axis_font_size,
+                           title_font_size=AER_config.title_font_size,
                            show_legend=show_legend,
                            y_reference=y_reference,
                            y_reference_label=y_reference_label,
@@ -117,15 +113,15 @@ def plot_darts_summary(study_name, y_name, x1_name,
         y_reference_label = 'Data Generating Model'
 
     # determine directory for study results and figures
-    results_path = aer_config.studies_folder \
-                        + study_name + "/" \
-                        + aer_config.models_folder \
-                        + aer_config.models_results_folder
-
-    figures_path = aer_config.studies_folder \
+    results_path = AER_config.studies_folder \
                    + study_name + "/" \
-                   + aer_config.models_folder \
-                   + aer_config.models_results_figures_folder
+                   + AER_config.models_folder \
+                   + AER_config.models_results_folder
+
+    figures_path = AER_config.studies_folder \
+                   + study_name + "/" \
+                   + AER_config.models_folder \
+                   + AER_config.models_results_figures_folder
 
     # read in all csv files
     files = list()
@@ -528,10 +524,10 @@ def plot_model_graph(study_name, arch_weights_name, model_weights_name, object_o
     import AER_theorist.darts.utils as utils
     import os
 
-    figures_path = aer_config.studies_folder \
+    figures_path = AER_config.studies_folder \
                    + study_name + "/" \
-                   + aer_config.models_folder \
-                   + aer_config.models_results_figures_folder
+                   + AER_config.models_folder \
+                   + AER_config.models_results_figures_folder
 
     model = load_model(study_name, model_weights_name, arch_weights_name, object_of_study)
 
@@ -557,10 +553,10 @@ def load_model(study_name, model_weights_name, arch_weights_name, object_of_stud
     num_input = object_of_study.__get_input_dim__()
     k = int(float(arch_weights_name.split("_k_", 1)[1].split("_s_", 1)[0]))
 
-    results_weights_path = aer_config.studies_folder \
+    results_weights_path = AER_config.studies_folder \
                            + study_name + "/" \
-                           + aer_config.models_folder \
-                           + aer_config.models_results_weights_folder
+                           + AER_config.models_folder \
+                           + AER_config.models_results_weights_folder
 
     model_path = os.path.join(results_weights_path, model_weights_name + ".pt")
     arch_path = os.path.join(results_weights_path, arch_weights_name + ".pt")
