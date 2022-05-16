@@ -20,4 +20,5 @@ mkdocstrings
 mkdocs_gen_files
 mkdocs-literate-nav
 mkdocs-section-index
-
+python-dotenv==0.19.2
+requests==2.27.1
