@@ -1,7 +1,7 @@
 from tkinter import *
 from tkinter import ttk
 from .experiment import Experiment
-from .OLED_output import OLED_Output
+from ..variable.OLED_output import OLED_Output
 from .experiment_table_GUI import Experiment_Table_GUI
 from .experiment_plot_GUI import Experiment_Plot_GUI
 from . import experiment_config as config

@@ -1,12 +1,12 @@
 from datetime import datetime
-from aer.experimentalist.experiment_environment.IV_in_silico import IV_In_Silico as IV
-from aer.experimentalist.experiment_environment.DV_in_silico import DV_In_Silico as DV
-from aer.experimentalist.experiment_environment.variable import outputTypes as output_type
+from aer.variable.IV_in_silico import IV_In_Silico as IV
+from aer.variable.DV_in_silico import DV_In_Silico as DV
+from aer.variable.variable import outputTypes as output_type
 from aer.experimentalist.experimentalist_popper import Experimentalist_Popper
 from aer.experimentalist.experiment_design_synthetic_weber import Experiment_Design_Synthetic_Weber
 from aer.theorist.object_of_study import Object_Of_Study
 from aer.theorist.theorist_darts import Theorist_DARTS, DARTS_Type
-from aer.experimentalist.experiment_environment import experiment_config as exp_cfg
+from aer.experiment_environment import experiment_config as exp_cfg
 import argparse
 
 # parse arguments

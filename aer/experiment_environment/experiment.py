@@ -1,12 +1,12 @@
-from .variable_labels import IV_labels, DV_labels
-from .IV_trial import IV_Trial
-from .IV_time import IV_Time
-from .DV_time import DV_Time
+from ..variable.variable_labels import IV_labels, DV_labels
+from ..variable.IV_trial import IV_Trial
+from ..variable.IV_time import IV_Time
+from ..variable.DV_time import DV_Time
 import time
 import pandas
 
 from . import experiment_config as config
-from .. import experimentalist_config as exp_config
+from ..experimentalist import experimentalist_config as exp_config
 
 
 class Experiment():

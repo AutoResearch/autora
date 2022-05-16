@@ -5,7 +5,7 @@ import pandas
 import numpy as np
 from .. import config as AER_cfg
 from . import experimentalist_config as exp_cfg
-from .experiment_environment.experiment_client import Experiment_Client
+from ..experiment_environment.experiment_client import Experiment_Client
 from sweetpea.primitives import Factor
 from sweetpea import fully_cross_block, synthesize_trials_non_uniform
 from enum import Enum
