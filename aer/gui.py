@@ -2,7 +2,7 @@ from tkinter import *
 from tkinter import ttk
 from tkinter import simpledialog
 from aer import config as config
-from AER_utils import Plot_Types
+from utils import Plot_Types
 import os
 import numpy as np
 

@@ -1,6 +1,6 @@
 from abc import ABC
 from AER_theorist.theorist import Theorist
-from AER_utils import Plot_Types
+from aer.utils import Plot_Types
 from AER_theorist.darts.model_search import Network, DARTS_Type
 from AER_theorist.darts.architect import Architect
 from AER_theorist.darts.genotypes import PRIMITIVES

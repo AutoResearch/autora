@@ -9,7 +9,7 @@ from AER_experimentalist.experiment_environment.experiment_client import Experim
 from sweetpea.primitives import Factor
 from sweetpea import fully_cross_block, synthesize_trials_non_uniform
 from enum import Enum
-from AER_utils import Plot_Types
+from aer.utils import Plot_Types
 from abc import ABC, abstractmethod
 
 class seed_strategy(Enum):

@@ -1,5 +1,5 @@
 from tkinter import *
-from AER_utils import print_current_time
+from aer.utils import print_current_time
 import AER_experimentalist.experiment_environment.experiment_config as exp_cfg
 from AER_experimentalist.experiment_design_synthetic_weber import \
     Experiment_Design_Synthetic_Weber

@@ -7,7 +7,7 @@ from aer import config as AER_config
 import time
 import csv
 
-from AER_utils import Plot_Types
+from aer.utils import Plot_Types
 from AER_theorist.theorist_GUI import Theorist_GUI
 from tkinter import *
 from matplotlib.figure import Figure

@@ -4,7 +4,7 @@ import torch
 import torch.optim as optim
 from torch.autograd import Variable
 import AER_experimentalist.experimentalist_popper_config as popper_config
-from AER_utils import Plot_Types
+from aer.utils import Plot_Types
 
 from AER_experimentalist.experimentalist import Experimentalist
 
