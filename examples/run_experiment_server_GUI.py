@@ -1,4 +1,4 @@
-from .experiment_server_GUI import Experiment_Server_GUI
+from aer.experiment_environment.experiment_server_GUI import Experiment_Server_GUI
 from tkinter import *
 from aer.experiment_environment.utils import *
 

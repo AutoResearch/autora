@@ -3,7 +3,7 @@
 # path = 'experiments/experiment0.exp'
 # file = Experiment(path)
 
-from .experiment_GUI import Experiment_GUI
+from aer.experiment_environment.experiment_GUI import Experiment_GUI
 from tkinter import *
 
 # init_epaper()
