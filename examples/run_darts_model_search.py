@@ -23,14 +23,14 @@ try:
     import cnnsimple.model_search_config as cfg
     from cnnsimple.object_of_study import outputTypes
 except:
-    import utils as utils
-    import visualize as viz
-    import plot_utils as plotutils
-    import genotypes
-    from model_search import Network
-    from architect import Architect
-    import model_search_config as cfg
-    from object_of_study import outputTypes
+    import aer.theorist.darts.utils as utils
+    import aer.theorist.darts.visualize as viz
+    import aer.theorist.darts.plot_utils as plotutils
+    import aer.theorist.darts.genotypes
+    from aer.theorist.darts.model_search import Network
+    from aer.theorist.darts.architect import Architect
+    import aer.theorist.darts.model_search_config as cfg
+    from aer.variable.variable import outputTypes
 
 
 
