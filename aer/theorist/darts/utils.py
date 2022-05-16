@@ -6,7 +6,7 @@ import shutil
 import csv
 import glob
 from torch.autograd import Variable
-from AER_experimentalist.experiment_environment.variable import outputTypes
+from aer.experimentalist.experiment_environment.variable import outputTypes
 
 # new
 

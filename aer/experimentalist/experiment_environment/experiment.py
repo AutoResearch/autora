@@ -1,11 +1,11 @@
-from AER_experimentalist.experiment_environment.variable_labels import IV_labels, DV_labels
-from AER_experimentalist.experiment_environment.IV_trial import IV_Trial
-from AER_experimentalist.experiment_environment.IV_time import IV_Time
-from AER_experimentalist.experiment_environment.DV_time import DV_Time
-import AER_experimentalist.experiment_environment.experiment_config as config
+from aer.experimentalist.experiment_environment.variable_labels import IV_labels, DV_labels
+from aer.experimentalist.experiment_environment.IV_trial import IV_Trial
+from aer.experimentalist.experiment_environment.IV_time import IV_Time
+from aer.experimentalist.experiment_environment.DV_time import DV_Time
+from aer import experimentalist as config, experimentalist as cfg
 import time
 import pandas
-import AER_experimentalist.experimentalist_config as cfg
+
 
 class Experiment():
 

@@ -1,7 +1,6 @@
-from AER_experimentalist.experiment_environment.participant_in_silico import Participant_In_Silico
+from aer.experimentalist.experiment_environment.participant_in_silico import Participant_In_Silico
 import torch
 import torch.nn as nn
-from graphviz import Digraph
 import random
 import numpy as np
 

@@ -1,8 +1,9 @@
 from tkinter import *
 from tkinter import ttk
-from AER_experimentalist.experiment_environment.utils import *
-from AER_experimentalist.experiment_environment.experimentalist_GUI import Experimentalist_GUI
-import AER_experimentalist.experiment_environment.experiment_config as config
+from aer.experimentalist.experiment_environment.utils import *
+from aer.experimentalist.experiment_environment.experimentalist_GUI import Experimentalist_GUI
+import aer.experimentalist.experiment_environment.experiment_config as config
+
 
 class Experiment_GUI(Experimentalist_GUI):
 

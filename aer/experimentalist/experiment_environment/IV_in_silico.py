@@ -1,4 +1,4 @@
-from AER_experimentalist.experiment_environment.variable import Variable
+from aer.experimentalist.experiment_environment.variable import Variable
 
 class IV_In_Silico(Variable):
 

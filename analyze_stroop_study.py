@@ -1,10 +1,10 @@
 from aer.theorist.darts.plot_utils import plot_darts_summary
-from AER_experimentalist.experiment_environment.participant_stroop import Participant_Stroop
-from AER_experimentalist.experiment_environment.IV_in_silico import IV_In_Silico as IV
-from AER_experimentalist.experiment_environment.DV_in_silico import DV_In_Silico as DV
-from AER_experimentalist.experiment_environment.variable import outputTypes as output_type
-from AER_experimentalist.experimentalist_popper import Experimentalist_Popper
-import AER_experimentalist.experiment_environment.experiment_config as exp_cfg
+from aer.experimentalist.experiment_environment.participant_stroop import Participant_Stroop
+from aer.experimentalist.experiment_environment.IV_in_silico import IV_In_Silico as IV
+from aer.experimentalist.experiment_environment.DV_in_silico import DV_In_Silico as DV
+from aer.experimentalist.experiment_environment.variable import outputTypes as output_type
+from aer.experimentalist.experimentalist_popper import Experimentalist_Popper
+from aer.experimentalist.experiment_environment import experiment_config as exp_cfg
 from aer.theorist.object_of_study import Object_Of_Study
 
 participant = Participant_Stroop()

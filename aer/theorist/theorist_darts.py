@@ -5,7 +5,7 @@ from aer.theorist.darts.model_search import Network, DARTS_Type
 from aer.theorist.darts.architect import Architect
 from aer.theorist.darts.genotypes import PRIMITIVES
 from torch.autograd import Variable
-from AER_experimentalist.experiment_environment.variable import outputTypes as output_types
+from aer.experimentalist.experiment_environment.variable import outputTypes as output_types
 
 import torch
 import torch.nn as nn

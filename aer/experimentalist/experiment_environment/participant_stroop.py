@@ -1,4 +1,4 @@
-from AER_experimentalist.experiment_environment.participant_in_silico import Participant_In_Silico
+from aer.experimentalist.experiment_environment.participant_in_silico import Participant_In_Silico
 import torch
 import torch.nn as nn
 import numpy as np
@@ -293,7 +293,6 @@ class Participant_Stroop(Participant_In_Silico):
 
         # plot
         import matplotlib.pyplot as plt
-        import seaborn as sns
         from matplotlib import pyplot
         import os
 

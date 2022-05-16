@@ -1,9 +1,7 @@
-from AER_experimentalist.experiment_environment.participant_in_silico import Participant_In_Silico
+from aer.experimentalist.experiment_environment.participant_in_silico import Participant_In_Silico
 import torch
 import torch.nn as nn
-from graphviz import Digraph
-import random
-import numpy as np
+
 
 class LCA_Model(nn.Module):
     def __init__(self, input=0, gamma=0.4, alpha=0.2, beta=0.2, dt_tau=1):
