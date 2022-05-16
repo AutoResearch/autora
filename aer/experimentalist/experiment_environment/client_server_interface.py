@@ -1,6 +1,6 @@
 import os.path
-import aer.experimentalist.experiment_environment.experiment_config as config
-import aer.experimentalist.experiment_environment.client_server_protocol as protocol
+from . import experiment_config as config
+from . import client_server_protocol as protocol
 
 import time
 

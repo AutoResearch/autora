@@ -1,4 +1,4 @@
-from IV import IV
+from .IV import IV
 import time
 
 class IV_Trial(IV):

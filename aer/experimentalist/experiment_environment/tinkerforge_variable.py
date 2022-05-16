@@ -1,4 +1,4 @@
-from aer.experimentalist.experiment_environment.variable import Variable
+from .variable import Variable
 
 class Tinkerforge_Variable(Variable):
 

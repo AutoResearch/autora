@@ -3,12 +3,13 @@ import sys
 import glob
 import shutil
 import logging
-from aer import config as AER_config
 import time
 import csv
 
-from aer.utils import Plot_Types
-from aer.theorist.theorist_GUI import Theorist_GUI
+from .. import config as AER_config
+from ..utils import Plot_Types
+from .theorist_GUI import Theorist_GUI
+
 from tkinter import *
 from matplotlib.figure import Figure
 

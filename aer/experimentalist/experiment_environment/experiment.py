@@ -1,10 +1,12 @@
-from aer.experimentalist.experiment_environment.variable_labels import IV_labels, DV_labels
-from aer.experimentalist.experiment_environment.IV_trial import IV_Trial
-from aer.experimentalist.experiment_environment.IV_time import IV_Time
-from aer.experimentalist.experiment_environment.DV_time import DV_Time
-from aer import experimentalist as config, experimentalist as cfg
+from .variable_labels import IV_labels, DV_labels
+from .IV_trial import IV_Trial
+from .IV_time import IV_Time
+from .DV_time import DV_Time
 import time
 import pandas
+
+from . import experiment_config as config
+from .. import experimentalist_config as exp_config
 
 
 class Experiment():
@@ -73,8 +75,8 @@ class Experiment():
             print(line)
 
             # read independent variables from line
-            if(string.find(cfg.exp_file_IV_label) != -1):
-                string = string.replace(cfg.exp_file_IV_label, '')
+            if(string.find(exp_config.exp_file_IV_label) != -1):
+                string = string.replace(exp_config.exp_file_IV_label, '')
                 labels = string.split(',')
                 for idx, label in enumerate(labels):
                     if (label in IV_labels) is False:
@@ -90,15 +92,15 @@ class Experiment():
                         self.IVs.append(IV_class(variable_label=variable_label, UID=UID, name=name, units=units, priority=priority, value_range=value_range))
 
             # read dependent variables and covariates from line
-            elif(string.find(cfg.exp_file_DV_label) != -1 or string.find(cfg.exp_file_CV_label) != -1):
+            elif(string.find(exp_config.exp_file_DV_label) != -1 or string.find(exp_config.exp_file_CV_label) != -1):
 
                 # determine whether this is a covariate (CV) or a dependent variable (DV)
                 covariate = False
-                if(string.find(cfg.exp_file_CV_label) != -1):
+                if(string.find(exp_config.exp_file_CV_label) != -1):
                     covariate = True
-                    string = string.replace(cfg.exp_file_CV_label, '')
+                    string = string.replace(exp_config.exp_file_CV_label, '')
                 else:
-                    string = string.replace(cfg.exp_file_DV_label, '')
+                    string = string.replace(exp_config.exp_file_DV_label, '')
 
                 # read in variables
                 labels = string.split(',')
@@ -125,14 +127,14 @@ class Experiment():
                             self.DVs.append(V_class(variable_label=variable_label, UID=UID, name=name, units=units, priority=priority, value_range=value_range))
 
             # read sequence file
-            if (string.find(cfg.exp_file_sequence_label) != -1):
-                string = string.replace(cfg.exp_file_sequence_label, '')
+            if (string.find(exp_config.exp_file_sequence_label) != -1):
+                string = string.replace(exp_config.exp_file_sequence_label, '')
                 csv_path = self._sequences_folder + string
                 self.read_csv(self._main_dir + csv_path)
 
             # read data file path
-            if (string.find(cfg.exp_file_data_label) != -1):
-                string = string.replace(cfg.exp_file_data_label, '')
+            if (string.find(exp_config.exp_file_data_label) != -1):
+                string = string.replace(exp_config.exp_file_data_label, '')
                 self._data_path = self._data_folder + string
 
         # initialize experiment

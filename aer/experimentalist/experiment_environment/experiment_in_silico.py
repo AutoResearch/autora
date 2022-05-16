@@ -1,4 +1,4 @@
-from aer.experimentalist.experiment_environment.experiment import Experiment
+from .experiment import Experiment
 
 class Experiment_In_Silico(Experiment):
 

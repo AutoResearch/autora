@@ -1,5 +1,5 @@
 from tkinter import *
-from aer.experimentalist.experiment_environment.experiment_toplevel_GUI import Experiment_Toplevel_GUI
+from .experiment_toplevel_GUI import Experiment_Toplevel_GUI
 
 import matplotlib
 matplotlib.use("TkAgg")

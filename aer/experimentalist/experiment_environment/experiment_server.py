@@ -1,9 +1,9 @@
 
 import socket
 import os.path
-from aer import experimentalist as config, experimentalist as protocol
-from aer.experimentalist.experiment_environment.client_server_interface import Client_Server_Interface
-# from experiment_server_GUI import Experiment_Server_GUI
+from . import experiment_config as config
+from . import client_server_protocol as protocol
+from .client_server_interface import Client_Server_Interface
 
 class Experiment_Server(Client_Server_Interface):
 

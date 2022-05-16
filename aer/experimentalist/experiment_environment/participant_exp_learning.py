@@ -1,4 +1,4 @@
-from aer.experimentalist.experiment_environment.participant_in_silico import Participant_In_Silico
+from .participant_in_silico import Participant_In_Silico
 import torch
 import torch.nn as nn
 import random

@@ -1,8 +1,8 @@
 from tkinter import *
 from tkinter import ttk
-from aer.experimentalist.experiment_environment.experiment_toplevel_GUI import Experiment_Toplevel_GUI
-from aer.experimentalist.experiment_environment.utils import *
-from aer.experimentalist.experiment_environment.experiment import Experiment
+from .experiment_toplevel_GUI import Experiment_Toplevel_GUI
+from .utils import *
+from .experiment import Experiment
 
 class Experiment_Table_GUI(Experiment_Toplevel_GUI):
 

@@ -1,6 +1,7 @@
 import socket
-from aer import experimentalist as config, experimentalist as protocol
-from aer.experimentalist.experiment_environment.client_server_interface import Client_Server_Interface
+from . import experiment_config as config
+from . import client_server_protocol as protocol
+from .client_server_interface import Client_Server_Interface
 from os import path
 
 class Experiment_Client(Client_Server_Interface):

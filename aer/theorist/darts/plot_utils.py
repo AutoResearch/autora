@@ -1,5 +1,5 @@
-import aer.theorist.darts.darts_config as darts_config
-from aer import config as AER_config
+from . import darts_config
+from ... import config as AER_config
 import matplotlib.pyplot as plt
 from matplotlib import pyplot
 import matplotlib

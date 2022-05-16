@@ -3,8 +3,8 @@ from torch import nn
 import torch
 import torch.optim as optim
 from torch.autograd import Variable
-import aer.experimentalist.experimentalist_popper_config as popper_config
-from aer.utils import Plot_Types
+from . import experimentalist_popper_config as popper_config
+from ..utils import Plot_Types
 
 from aer.experimentalist.experimentalist import Experimentalist
 

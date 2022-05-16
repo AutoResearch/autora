@@ -3,13 +3,13 @@ import shutil
 import csv
 import pandas
 import numpy as np
-import aer.config as AER_cfg
-import aer.experimentalist.experimentalist_config as exp_cfg
-from aer.experimentalist.experiment_environment.experiment_client import Experiment_Client
+from .. import config as AER_cfg
+from . import experimentalist_config as exp_cfg
+from .experiment_environment.experiment_client import Experiment_Client
 from sweetpea.primitives import Factor
 from sweetpea import fully_cross_block, synthesize_trials_non_uniform
 from enum import Enum
-from aer.utils import Plot_Types
+from ..utils import Plot_Types
 from abc import ABC, abstractmethod
 
 class seed_strategy(Enum):

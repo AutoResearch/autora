@@ -2,8 +2,8 @@ from tkinter import *
 from tkinter import ttk
 from tkinter import simpledialog, messagebox
 from PIL import Image, ImageTk
-from aer import config as config
-from aer.utils import Plot_Types
+from .. import config as config
+from ..utils import Plot_Types
 import os
 import numpy as np
 

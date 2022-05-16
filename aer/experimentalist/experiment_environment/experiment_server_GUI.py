@@ -1,9 +1,9 @@
 from tkinter import *
 from tkinter import ttk
-from aer.experimentalist.experiment_environment.utils import *
-from aer.experimentalist.experiment_environment.experimentalist_GUI import Experimentalist_GUI
-import aer.experimentalist.experiment_environment.experiment_config as config
-from aer.experimentalist.experiment_environment.experiment_server import Experiment_Server
+from .utils import *
+from .experimentalist_GUI import Experimentalist_GUI
+from . import experiment_config as config
+from .experiment_server import Experiment_Server
 import threading, queue
 import os
 

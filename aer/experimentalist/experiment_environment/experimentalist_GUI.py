@@ -1,10 +1,10 @@
 from tkinter import *
 from tkinter import ttk
-from aer.experimentalist.experiment_environment.experiment import Experiment
-from aer.experimentalist.experiment_environment.OLED_output import OLED_Output
-from aer.experimentalist.experiment_environment.experiment_table_GUI import Experiment_Table_GUI
-from aer.experimentalist.experiment_environment.experiment_plot_GUI import Experiment_Plot_GUI
-import aer.experimentalist.experiment_environment.experiment_config as config
+from .experiment import Experiment
+from .OLED_output import OLED_Output
+from .experiment_table_GUI import Experiment_Table_GUI
+from .experiment_plot_GUI import Experiment_Plot_GUI
+from . import experiment_config as config
 import os
 
 
