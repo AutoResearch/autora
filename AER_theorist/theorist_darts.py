@@ -14,7 +14,7 @@ import pandas
 import logging
 import numpy as np
 import AER_theorist.darts.darts_config as darts_cfg
-import AER_config as aer_config
+from aer import config as aer_config
 import AER_theorist.darts.utils as utils
 import AER_theorist.darts.visualize as viz
 import copy
@@ -776,7 +776,7 @@ class Theorist_DARTS(Theorist, ABC):
 
             # generate model prediction
             n_variables = len(object_of_study.independent_variables)
-            resolution = int(np.round(aer_config.max_data_points_simulated**(1/float(n_variables))))
+            resolution = int(np.round(aer_config.max_data_points_simulated ** (1 / float(n_variables))))
 
             counterbalanced_input = object_of_study.get_counterbalanced_input(resolution)
             #y_prediction = self.model(counterbalanced_input).detach().numpy()

@@ -5,7 +5,7 @@ from AER_experimentalist.experiment_environment.IV_in_silico import IV_In_Silico
 from AER_experimentalist.experiment_environment.DV_in_silico import DV_In_Silico as DV
 from AER_experimentalist.experiment_environment.variable import outputTypes as output_type
 import AER_experimentalist.experiment_environment.experiment_config as exp_cfg
-import AER_config as aer_cfg
+from aer import config as aer_cfg
 from AER_theorist.object_of_study import Object_Of_Study
 
 participant = Participant_Weber()

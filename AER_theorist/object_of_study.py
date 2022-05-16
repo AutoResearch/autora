@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from torch.utils.data import Dataset
 from enum import Enum
 from AER_experimentalist.experiment_environment.variable import *
-import AER_config as AER_cfg
+from aer import config as AER_cfg
 from typing import List, Dict
 import torch
 import numpy as np

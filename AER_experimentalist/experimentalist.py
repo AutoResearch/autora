@@ -1,4 +1,4 @@
-import AER_config as AER_cfg
+from aer import config as AER_cfg
 import os
 import shutil
 import csv

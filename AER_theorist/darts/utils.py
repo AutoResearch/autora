@@ -9,8 +9,6 @@ from torch.autograd import Variable
 from AER_experimentalist.experiment_environment.variable import outputTypes
 
 # new
-import AER_theorist.darts.darts_config as darts_cfg
-import AER_config as AER_cfg
 
 # old
 from AER_theorist.darts.SimpleNet_dataset import SimpleNetDataset

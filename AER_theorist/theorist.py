@@ -3,7 +3,7 @@ import sys
 import glob
 import shutil
 import logging
-import AER_config as aer_config
+from aer import config as AER_config
 import time
 import csv
 

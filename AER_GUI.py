@@ -1,12 +1,10 @@
 from tkinter import *
 from tkinter import ttk
-from tkinter import simpledialog, messagebox
-from PIL import Image, ImageTk
-import AER_config as config
+from tkinter import simpledialog
+from aer import config as config
 from AER_utils import Plot_Types
 import os
 import numpy as np
-import time
 
 import matplotlib
 matplotlib.use("TkAgg")

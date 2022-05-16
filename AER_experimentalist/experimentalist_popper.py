@@ -1,6 +1,4 @@
-import AER_config as AER_cfg
 import numpy as np
-import AER_experimentalist.experimentalist_config as exp_cfg
 from torch import nn
 import torch
 import torch.optim as optim
@@ -11,7 +9,8 @@ from AER_utils import Plot_Types
 from AER_experimentalist.experimentalist import Experimentalist
 
 
-from abc import ABC, abstractmethod
+from abc import ABC
+
 
 class Experimentalist_Popper(Experimentalist, ABC):
 
