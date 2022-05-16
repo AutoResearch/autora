@@ -2,7 +2,7 @@ from typing import Any
 import requests
 from dotenv import load_dotenv
 import os
-from study_options import *
+from .study_options import *
 
 class ProlificRecruiter():
     """
