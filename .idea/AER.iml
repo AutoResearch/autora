@@ -7,6 +7,7 @@
       <excludeFolder url="file://$MODULE_DIR$/examples/studies/Weber Sampled/modeling" />
       <excludeFolder url="file://$MODULE_DIR$/examples/studies/Stroop Model Sampled/modeling" />
       <excludeFolder url="file://$MODULE_DIR$/docs/reference" />
+      <excludeFolder url="file://$MODULE_DIR$/site" />
     </content>
     <orderEntry type="jdk" jdkName="Python 3.7 (AER)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
