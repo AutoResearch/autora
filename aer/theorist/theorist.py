@@ -374,8 +374,9 @@ class Theorist(ABC):
                         update_parameter_list_callback=do_nothing_callback,
                         update_performance_plot_list_callback=do_nothing_callback,
                         update_supplementary_plot_list_callback=do_nothing_callback,
-                        check_paused_callback=lambda x: False,
-                        on_paused_callback=do_nothing_callback()
+                        check_paused_callback=lambda: False,
+                        on_paused_callback=do_nothing_callback(),
+                        check_stopped_callback=lambda: False,
                         ):
         # perform architecture search for different hyper-parameters
         for idx, meta_params in enumerate(self._meta_parameters):
@@ -409,7 +410,7 @@ class Theorist(ABC):
                         continue
 
                 # check if still running
-                if gui._running is False:
+                if check_stopped_callback():
                     break
 
                 # check if paused

@@ -674,6 +674,9 @@ class Theorist_GUI(Frame):
             self._root.update()
             return
 
+        def check_stopped_callback():
+            return self._running is False
+
         self.theorist.run_meta_search(object_of_study=self.object_of_study, resume=resume, last_epoch=self._last_epoch, gui=self,
                                       Plot_Windows=Plot_Windows,
                                       last_meta_param_idx=self._last_meta_param_idx,
@@ -681,7 +684,8 @@ class Theorist_GUI(Frame):
                                       update_performance_plot_list_callback=self.update_performance_plot_list,
                                       update_supplementary_plot_list_callback=self.update_supplementary_plot_list,
                                       check_paused_callback=check_paused_callback,
-                                      on_paused_callback=on_paused_callback
+                                      on_paused_callback=on_paused_callback,
+                                      check_stopped_callback=check_stopped_callback
                                       )
 
         if self._running is True:
