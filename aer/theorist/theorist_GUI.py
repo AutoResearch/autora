@@ -674,8 +674,11 @@ class Theorist_GUI(Frame):
             self._root.update()
             return
 
-        def check_stopped_callback():
+        def check_not_running_callback():
             return self._running is False
+
+        def check_running_callback():
+            return self._running is True
 
         def pre_model_search_callback(epoch, model_search_epochs, idx, num_meta_idx, **kwargs):
             self.update_run_button(epoch=epoch + 1,
@@ -686,6 +689,18 @@ class Theorist_GUI(Frame):
         def post_model_search_callback(**kwargs):
             self.update_model_plot()
 
+        def save_performance_plots_callback(performance_plots, meta_param_str):
+            for item in range(self.listbox_performance.size()):
+                self.set_listbox_selection(self.listbox_performance, item)
+                plot_str = meta_param_str + "_search"
+                self.update_plot(Plot_Windows.PERFORMANCE, performance_plots, save=True, plot_name=plot_str)
+
+        def save_supplementary_plots_callback(supplementary_plots, meta_param_str):
+            for item in range(self.listbox_supplementary.size()):
+                self.set_listbox_selection(self.listbox_supplementary, item)
+                self.update_plot(Plot_Windows.SUPPLEMENTARY, supplementary_plots, save=True,
+                                plot_name=meta_param_str)
+
         self.theorist.run_meta_search(object_of_study=self.object_of_study, resume=resume, last_epoch=self._last_epoch,
                                       gui=self,
                                       Plot_Windows=Plot_Windows,
@@ -695,9 +710,11 @@ class Theorist_GUI(Frame):
                                       update_supplementary_plot_list_callback=self.update_supplementary_plot_list,
                                       check_paused_callback=check_paused_callback,
                                       on_paused_callback=on_paused_callback,
-                                      check_stopped_callback=check_stopped_callback,
+                                      check_not_running_callback=check_not_running_callback,
                                       pre_model_search_callback=pre_model_search_callback,
-                                      post_model_search_callback=post_model_search_callback
+                                      post_model_search_callback=post_model_search_callback,
+                                      save_performance_plots_callback=save_performance_plots_callback,
+                                      save_supplementary_plots_callback=save_supplementary_plots_callback
                                       )
 
         if self._running is True:

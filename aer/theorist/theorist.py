@@ -377,9 +377,12 @@ class Theorist(ABC):
                         update_supplementary_plot_list_callback: Callable = do_nothing_callback,
                         check_paused_callback: Callable = lambda: False,
                         on_paused_callback: Callable = do_nothing_callback,
-                        check_stopped_callback: Callable = lambda: False,
+                        check_running_callback: Callable = lambda: True,
+                        check_not_running_callback: Callable = lambda: False,
                         pre_model_search_callback: Callable = do_nothing_callback,
-                        post_model_search_callback: Callable = do_nothing_callback
+                        post_model_search_callback: Callable = do_nothing_callback,
+                        save_performance_plots_callback: Callable = do_nothing_callback,
+                        save_supplementary_plots_callback: Callable = do_nothing_callback
                         ):
         # perform architecture search for different hyper-parameters
         for idx, meta_params in enumerate(self._meta_parameters):
@@ -407,7 +410,6 @@ class Theorist(ABC):
                 update_supplementary_plot_list_callback(supplementary_plots)
 
             model_search_epochs = self.model_search_epochs
-
             for epoch in range(model_search_epochs):
 
                 if resume is True:
@@ -415,7 +417,7 @@ class Theorist(ABC):
                         continue
 
                 # check if still running
-                if check_stopped_callback():
+                if check_not_running_callback():
                     break
 
                 # check if paused
@@ -436,8 +438,10 @@ class Theorist(ABC):
                 # update parameter list
                 model_search_parameters = self.get_model_search_parameters()
 
-                # update performance plot
+                # Log plot data
                 self.log_plot_data(epoch, object_of_study)
+
+                # update performance plot
                 performance_plots = self.get_performance_plots(object_of_study)
                 gui.update_plot(Plot_Windows.PERFORMANCE, performance_plots)
 
@@ -447,21 +451,16 @@ class Theorist(ABC):
 
                 gui.update_parameter_list(model_search_parameters)
 
-            if gui._running is True:
+            if check_running_callback():
                 self.log_model_search(object_of_study)
 
                 # save all performance plots
                 performance_plots = self.get_performance_plots(object_of_study)
-                for item in range(gui.listbox_performance.size()):
-                    gui.set_listbox_selection(gui.listbox_performance, item)
-                    plot_str = meta_param_str + "_search"
-                    gui.update_plot(Plot_Windows.PERFORMANCE, performance_plots, save=True, plot_name=plot_str)
+                save_performance_plots_callback(performance_plots, meta_param_str)
+
                 # save all supplementary plots
                 supplementary_plots = self.get_supplementary_plots(object_of_study)
-                for item in range(gui.listbox_supplementary.size()):
-                    gui.set_listbox_selection(gui.listbox_supplementary, item)
-                    gui.update_plot(Plot_Windows.SUPPLEMENTARY, supplementary_plots, save=True,
-                                    plot_name=meta_param_str)
+                save_supplementary_plots_callback(supplementary_plots, meta_param_str)
 
                 # Theorist: evaluate model architecture
 
@@ -483,6 +482,7 @@ class Theorist(ABC):
                         # log performance (for plotting purposes)
                         self.log_plot_data(epoch, object_of_study)
                         performance_plots = self.get_performance_plots(object_of_study)
+
                         gui.update_plot(Plot_Windows.PERFORMANCE, performance_plots)
                         gui._root.update()
                         gui.update_run_button(epoch=epoch + 1, num_epochs=self.eval_epochs,
