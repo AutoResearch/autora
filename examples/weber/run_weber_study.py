@@ -114,8 +114,11 @@ validation_object_2.name = "Weber Sampled"
 theorist.add_validation_set(validation_object_1, 'Weber_Sampled')
 theorist.add_validation_set(validation_object_2, 'Weber_Original')
 
-root = Tk()
-app = Theorist_GUI(object_of_study=study_object, theorist=theorist, root=root)
-root.mainloop()
+theorist.init_meta_search(object_of_study=study_object)
+theorist.run_meta_search(object_of_study=study_object)
+
+# root = Tk()
+# app = Theorist_GUI(object_of_study=study_object, theorist=theorist, root=root)
+# root.mainloop()
 
 print_current_time()

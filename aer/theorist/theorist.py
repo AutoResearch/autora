@@ -362,7 +362,10 @@ class Theorist(ABC):
         self.time_elapsed_log[AER_config.log_key_timestamp] = list()
 
     @abstractmethod
-    def run_meta_search(self, object_of_study, resume, last_epoch, last_meta_param_idx,
+    def run_meta_search(self,
+                        object_of_study,
+                        resume=False,
+                        last_meta_param_idx=0,
                         update_parameter_list_callback: Callable = do_nothing_callback,
                         update_performance_plot_list_callback: Callable = do_nothing_callback,
                         update_supplementary_plot_list_callback: Callable = do_nothing_callback,
