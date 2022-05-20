@@ -14,12 +14,13 @@ from matplotlib.figure import Figure
 
 from enum import Enum
 
+
 class Plot_Windows(Enum):
     PERFORMANCE = 1
     SUPPLEMENTARY = 2
 
-class Theorist_GUI(Frame):
 
+class Theorist_GUI(Frame):
     # GUI settings
     _title = "Theorist"
 
@@ -81,18 +82,17 @@ class Theorist_GUI(Frame):
 
         self.up_down_button_style = ttk.Style()
         self.up_down_button_style.configure("UpDown.TButton", foreground="black", background=self._up_down_bgcolor,
-                                   font=(self._font_family, self._font_size_button))
+                                            font=(self._font_family, self._font_size_button))
 
         self.run_button_style = ttk.Style()
         self.run_button_style.configure("Run.TButton", foreground="black",
-                                            background=self._run_bgcolor,
-                                            font=(self._font_family, self._font_size_button))
+                                        background=self._run_bgcolor,
+                                        font=(self._font_family, self._font_size_button))
 
         self.stop_button_style = ttk.Style()
         self.stop_button_style.configure("Stop.TButton", foreground="black",
-                                            background=self._stop_bgcolor,
-                                            font=(self._font_family, self._font_size_button))
-
+                                         background=self._stop_bgcolor,
+                                         font=(self._font_family, self._font_size_button))
 
         # configure grid
         for row in range(3):
@@ -112,15 +112,14 @@ class Theorist_GUI(Frame):
 
         # main panel
         self.button_run = ttk.Button(self._root,
-                                      text=self._default_run_text,
-                                      command=self.run_meta_search,
-                                      style="Viz.TButton")
-
-        self.button_stop = ttk.Button(self._root,
-                                     text=self._default_stop_text,
-                                     command=self.stop_meta_search,
+                                     text=self._default_run_text,
+                                     command=self.run_meta_search,
                                      style="Viz.TButton")
 
+        self.button_stop = ttk.Button(self._root,
+                                      text=self._default_stop_text,
+                                      command=self.stop_meta_search,
+                                      style="Viz.TButton")
 
         # self.model_plot_canvas = Canvas(self._root, width=280, height=250)
         self.model_plot_canvas = Label(self._root)
@@ -129,41 +128,41 @@ class Theorist_GUI(Frame):
         # parameter control
 
         self.listbox_parameters = Listbox(self._root, selectmode=SINGLE, font=(self._font_family, self._font_size),
-                                          bg = self._listbox_bgcolor)
+                                          bg=self._listbox_bgcolor)
         self.listbox_parameters.bind('<Double-Button>', self.modify_parameter)
 
         self.button_parameters_selection_up = ttk.Button(self._root,
-                                             text="  /\\  ",
-                                             command=self.parameters_selection_up,
-                                             style="UpDown.TButton")
+                                                         text="  /\\  ",
+                                                         command=self.parameters_selection_up,
+                                                         style="UpDown.TButton")
 
         self.button_parameters_selection_down = ttk.Button(self._root,
-                                               text="  \\/  ",
-                                               command=self.parameters_selection_down,
-                                               style="UpDown.TButton")
+                                                           text="  \\/  ",
+                                                           command=self.parameters_selection_down,
+                                                           style="UpDown.TButton")
 
         # performance plot
 
         self.listbox_performance = Listbox(self._root, selectmode=SINGLE, font=(self._font_family, self._font_size),
-                                          bg=self._listbox_bgcolor)
+                                           bg=self._listbox_bgcolor)
         self.listbox_performance.bind('<<ListboxSelect>>', self.update_plot(plot_type=Plot_Windows.PERFORMANCE))
 
         self.button_performance_selection_up = ttk.Button(self._root,
-                                                         text="  /\\  ",
-                                                         command=self.performance_selection_up,
-                                                         style="UpDown.TButton")
+                                                          text="  /\\  ",
+                                                          command=self.performance_selection_up,
+                                                          style="UpDown.TButton")
 
         self.button_performance_selection_down = ttk.Button(self._root,
-                                                           text="  \\/  ",
-                                                           command=self.performance_selection_down,
-                                                           style="UpDown.TButton")
+                                                            text="  \\/  ",
+                                                            command=self.performance_selection_down,
+                                                            style="UpDown.TButton")
 
         self._fig_performance = Figure(figsize=(1, 1), dpi=100)
         self._axis_performance_line = self._fig_performance.add_subplot(111)
         self._axis_performance_line_3d = self._fig_performance.add_subplot(111)
         self._fig_performance.subplots_adjust(bottom=0.2)
         self._fig_performance.subplots_adjust(left=0.35)
-        self._axis_performance_line.plot([0],[0])
+        self._axis_performance_line.plot([0], [0])
         # self._axis_performance.scatter([0], [0], s=self._scatter_area, facecolors='none', edgecolors=self._scatter_color)
         self._axis_performance_line.set_xlabel('Ordinate', fontsize=self._font_size)
         self._axis_performance_line.set_ylabel('Epochs', fontsize=self._font_size)
@@ -171,24 +170,23 @@ class Theorist_GUI(Frame):
         self._axis_performance_line.grid()
         self._canvas_performance = FigureCanvasTkAgg(self._fig_performance, self._root)
 
-
         # supplementary plot
 
         self.listbox_supplementary = Listbox(self._root, selectmode=SINGLE, font=(self._font_family, self._font_size),
-                                           bg=self._listbox_bgcolor)
+                                             bg=self._listbox_bgcolor)
         self.listbox_supplementary.bind('<<ListboxSelect>>', self.update_plot(plot_type=Plot_Windows.SUPPLEMENTARY))
 
         self.button_supplementary_selection_up = ttk.Button(self._root,
-                                                          text="  /\\  ",
-                                                          command=self.supplementary_selection_up,
-                                                          style="UpDown.TButton")
-
-        self.button_supplementary_selection_down = ttk.Button(self._root,
-                                                            text="  \\/  ",
-                                                            command=self.supplementary_selection_down,
+                                                            text="  /\\  ",
+                                                            command=self.supplementary_selection_up,
                                                             style="UpDown.TButton")
 
-        self._fig_supplementary= Figure(figsize=(1, 1), dpi=100)
+        self.button_supplementary_selection_down = ttk.Button(self._root,
+                                                              text="  \\/  ",
+                                                              command=self.supplementary_selection_down,
+                                                              style="UpDown.TButton")
+
+        self._fig_supplementary = Figure(figsize=(1, 1), dpi=100)
         self._axis_supplementary_line = self._fig_supplementary.add_subplot(111)
         self._fig_supplementary.subplots_adjust(bottom=0.2)
         self._fig_supplementary.subplots_adjust(left=0.35)
@@ -273,7 +271,6 @@ class Theorist_GUI(Frame):
         self.move_listbox_selection(self.listbox_supplementary, +1)
         self.set_DV_name()
 
-
     def set_DV_name(self, name=None):
         pass
 
@@ -296,7 +293,7 @@ class Theorist_GUI(Frame):
         if len(selection) > 0:
             current_value = selection[0]
             max_value = listbox.size()
-            new_value = max(min(current_value + movement, max_value-1), 0)
+            new_value = max(min(current_value + movement, max_value - 1), 0)
 
             listbox.selection_clear(0, END)
             listbox.select_set(new_value)
@@ -311,7 +308,6 @@ class Theorist_GUI(Frame):
         listbox.selection_clear(0, END)
         listbox.select_set(position)
         listbox.activate(position)
-
 
     def update_run_button(self, epoch=0, num_epochs=1, meta_idx=0, num_meta_idx=0):
         if self._running is True:
@@ -347,8 +343,8 @@ class Theorist_GUI(Frame):
 
         # resize image
         width, height = image.size
-        resized_width = width * (self._model_plot_height/height)
-        resized_height = height * (self._model_plot_width/width)
+        resized_width = width * (self._model_plot_height / height)
+        resized_height = height * (self._model_plot_width / width)
         if resized_width > self._model_plot_width:
             width = self._model_plot_width
             height = resized_height
@@ -362,7 +358,7 @@ class Theorist_GUI(Frame):
 
         # draw image
         img = ImageTk.PhotoImage(image)
-        self.model_plot_canvas.config(image = img)
+        self.model_plot_canvas.config(image=img)
 
         # needed here, otherwise canvas doesn't update
         self._root.update()
@@ -395,7 +391,7 @@ class Theorist_GUI(Frame):
 
         model_search_parameters = self.theorist.get_model_search_parameters()
         if key in model_search_parameters.keys():
-            if model_search_parameters[key][1] is True: # parameter is modifiable
+            if model_search_parameters[key][1] is True:  # parameter is modifiable
                 new_param_value = simpledialog.askstring(key, "Please enter new value:",
                                                          parent=self._root)
                 if new_param_value is not None:
@@ -470,7 +466,6 @@ class Theorist_GUI(Frame):
                 if hasattr(self, '_canvas_supplementary'):
                     plot_canvas = self._canvas_supplementary
 
-
             if type == Plot_Types.LINE:
 
                 # get relevant data
@@ -484,7 +479,7 @@ class Theorist_GUI(Frame):
 
                 # generate plots
                 plot_axis.cla()
-                del plot_axis.lines[:]    # remove previous lines
+                del plot_axis.lines[:]  # remove previous lines
                 plots = list()
                 for idx, (x, y, leg) in enumerate(zip(x_data, y_data, legend)):
                     plots.append(plot_axis.plot(x, y, self._plot_colors[idx], label=leg))
@@ -572,7 +567,7 @@ class Theorist_GUI(Frame):
                 plots = list()
 
                 # plot data
-                plots.append(plot_axis.scatter(x1_data, x2_data, y_data, color = (1, 0, 0, 0.5), label=legend[0]))
+                plots.append(plot_axis.scatter(x1_data, x2_data, y_data, color=(1, 0, 0, 0.5), label=legend[0]))
                 # plot model prediction
                 plots.append(plot_axis.plot_trisurf(x1_model, x2_model, y_model, color=(0, 0, 0, 0.5), label=legend[1]))
 
@@ -591,7 +586,8 @@ class Theorist_GUI(Frame):
             plot_canvas.draw()
             if save is True:
                 if plot_name is not "":
-                    plot_filepath = os.path.join(self.theorist.results_plots_path, 'plot_' + plot_name + '_' + key + '.png')
+                    plot_filepath = os.path.join(self.theorist.results_plots_path,
+                                                 'plot_' + plot_name + '_' + key + '.png')
                 else:
                     plot_filepath = os.path.join(self.theorist.results_plots_path, 'plot_' + key + '.png')
                 if plot_type == Plot_Windows.PERFORMANCE:
@@ -660,7 +656,8 @@ class Theorist_GUI(Frame):
             # initialize meta-parameter search
             self.theorist.init_meta_search(self.object_of_study)
 
-        self.theorist.run_meta_search(resume=resume, gui=self, Plot_Windows=Plot_Windows, last_meta_param_idx=self._last_meta_param_idx)
+        self.theorist.run_meta_search(resume=resume, gui=self, Plot_Windows=Plot_Windows,
+                                      last_meta_param_idx=self._last_meta_param_idx)
 
         if self._running is True:
             best_model = self.theorist.get_best_model(self.object_of_study, plot_model=True)
@@ -670,7 +667,6 @@ class Theorist_GUI(Frame):
             self.reset_gui()
 
         self._running = False
-
 
     def reset_gui(self):
         self.update_run_button()
