@@ -13,12 +13,10 @@ from .theorist_GUI import Theorist_GUI
 from tkinter import *
 from matplotlib.figure import Figure
 
-
 from abc import ABC, abstractmethod
 
 
 class Theorist(ABC):
-
     _loss_plot_name = "Training & Validation Loss"
     _pattern_plot_name = "Target vs. Predicted Pattern"
     simulation_files = ""
@@ -59,7 +57,6 @@ class Theorist(ABC):
         self.setup_simulation_directories()
         self.copy_scripts(scripts_to_save=glob.glob(self.simulation_files))
 
-
     def GUI(self, object_of_study):
         root = Tk()
 
@@ -77,7 +74,8 @@ class Theorist(ABC):
                 self._model_search_parameters[key][0] = self._model_search_parameters[key][2](str_value)
                 self.assign_model_search_parameters()
             else:
-                raise Exception("Not allowed to modify model search parameter '" + str(key) + "'. Dictionary self._model_search_parameters indicates that the parameter cannot be modified.")
+                raise Exception("Not allowed to modify model search parameter '" + str(
+                    key) + "'. Dictionary self._model_search_parameters indicates that the parameter cannot be modified.")
         else:
             raise Exception("Key '" + str(key) + "' not in dictionary self._model_search_parameters")
 
@@ -152,7 +150,6 @@ class Theorist(ABC):
             self.log_model_evaluation(object_of_study)
             self._eval_meta_parameters_iteration += 1
 
-
         # sum up meta evaluation
         self.log_meta_evaluation(object_of_study)
 
@@ -193,7 +190,6 @@ class Theorist(ABC):
         self.generate_plots = plot
         if plot_name_list is not None:
             self.plot_name_list = plot_name_list
-
 
     def save_plots(self, plot_list, plot_label):
 
@@ -344,7 +340,6 @@ class Theorist(ABC):
             self.time_elapsed_log[name].append(value)
         self.time_elapsed_log[AER_config.log_key_timestamp].append(str(elapsed))
 
-
     def clear_validation_sets(self):
         self._validation_sets = dict()
 
@@ -353,7 +348,7 @@ class Theorist(ABC):
             name = object_of_study.get_name() + "_" + str(len(self._validation_sets.keys()))
 
         self._validation_sets[name] = object_of_study
-        
+
     @abstractmethod
     def assign_model_search_parameters(self):
         pass
@@ -375,7 +370,10 @@ class Theorist(ABC):
         self.time_elapsed_log[AER_config.log_key_timestamp] = list()
 
     @abstractmethod
-    def run_meta_search(self, object_of_study, resume, gui, Plot_Windows, last_meta_param_idx, update_parameter_list_callback=do_nothing_callback, update_performance_plot_list_callback=do_nothing_callback, update_supplementary_plot_list_callback=do_nothing_callback):
+    def run_meta_search(self, object_of_study, resume, gui, Plot_Windows, last_meta_param_idx,
+                        update_parameter_list_callback=do_nothing_callback,
+                        update_performance_plot_list_callback=do_nothing_callback,
+                        update_supplementary_plot_list_callback=do_nothing_callback):
         # perform architecture search for different hyper-parameters
         for idx, meta_params in enumerate(self._meta_parameters):
 
@@ -659,7 +657,6 @@ class Theorist(ABC):
                 dst_file = os.path.join(self.scripts_path, os.path.basename(script))
                 shutil.copyfile(script, dst_file)
 
-
     def setup_logging(self):
 
         # determine the format for logging: event time and message
@@ -678,7 +675,8 @@ class Theorist(ABC):
         # adds file name to logger
         logging.getLogger().addHandler(fh)
 
-    def _generate_plot_dict(self, type, x, y, x_limit=None, y_limit=None, x_label=None, y_label=None, legend=None, image=None, x_model=None, y_model=None, x_highlighted=None, y_highlighted=None):
+    def _generate_plot_dict(self, type, x, y, x_limit=None, y_limit=None, x_label=None, y_label=None, legend=None,
+                            image=None, x_model=None, y_model=None, x_highlighted=None, y_highlighted=None):
         # generate plot dictionary
         plot_dict = dict()
         plot_dict[AER_config.plot_key_type] = type
