@@ -9,9 +9,7 @@ from typing import Callable
 
 from .. import config as AER_config
 from ..utils import Plot_Types, do_nothing_callback
-from .theorist_GUI import Theorist_GUI
 
-from tkinter import *
 from matplotlib.figure import Figure
 
 from abc import ABC, abstractmethod
@@ -57,13 +55,6 @@ class Theorist(ABC):
         self.single_job = False
         self.setup_simulation_directories()
         self.copy_scripts(scripts_to_save=glob.glob(self.simulation_files))
-
-    def GUI(self, object_of_study):
-        root = Tk()
-
-        app = Theorist_GUI(theorist=self, object_of_study=object_of_study, root=root)
-
-        root.mainloop()
 
     @abstractmethod
     def get_model_search_parameters(self):
@@ -371,7 +362,7 @@ class Theorist(ABC):
         self.time_elapsed_log[AER_config.log_key_timestamp] = list()
 
     @abstractmethod
-    def run_meta_search(self, object_of_study, resume, last_epoch, gui, Plot_Windows, last_meta_param_idx,
+    def run_meta_search(self, object_of_study, resume, last_epoch, last_meta_param_idx,
                         update_parameter_list_callback: Callable = do_nothing_callback,
                         update_performance_plot_list_callback: Callable = do_nothing_callback,
                         update_supplementary_plot_list_callback: Callable = do_nothing_callback,

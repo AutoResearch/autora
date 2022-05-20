@@ -719,9 +719,9 @@ class Theorist_GUI(Frame):
                 plot_str = meta_param_str + "_eval_" + eval_param_str
                 self.update_plot(Plot_Windows.PERFORMANCE, performance_plots, save=True, plot_name=plot_str)
 
-        self.theorist.run_meta_search(object_of_study=self.object_of_study, resume=resume, last_epoch=self._last_epoch,
-                                      gui=self,
-                                      Plot_Windows=Plot_Windows,
+        self.theorist.run_meta_search(object_of_study=self.object_of_study,
+                                      resume=resume,
+                                      last_epoch=self._last_epoch,
                                       last_meta_param_idx=self._last_meta_param_idx,
                                       update_parameter_list_callback=self.update_parameter_list,
                                       update_performance_plot_list_callback=self.update_performance_plot_list,
