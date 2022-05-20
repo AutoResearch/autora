@@ -370,10 +370,13 @@ class Theorist(ABC):
         self.time_elapsed_log[AER_config.log_key_timestamp] = list()
 
     @abstractmethod
-    def run_meta_search(self, object_of_study, resume, gui, Plot_Windows, last_meta_param_idx,
+    def run_meta_search(self, object_of_study, resume, last_epoch, gui, Plot_Windows, last_meta_param_idx,
                         update_parameter_list_callback=do_nothing_callback,
                         update_performance_plot_list_callback=do_nothing_callback,
-                        update_supplementary_plot_list_callback=do_nothing_callback):
+                        update_supplementary_plot_list_callback=do_nothing_callback,
+                        check_paused_callback=lambda x: False,
+                        on_paused_callback=do_nothing_callback()
+                        ):
         # perform architecture search for different hyper-parameters
         for idx, meta_params in enumerate(self._meta_parameters):
 
@@ -402,7 +405,7 @@ class Theorist(ABC):
             for epoch in range(self.model_search_epochs):
 
                 if resume is True:
-                    if epoch < gui._last_epoch:
+                    if epoch < last_epoch:
                         continue
 
                 # check if still running
@@ -410,11 +413,8 @@ class Theorist(ABC):
                     break
 
                 # check if paused
-                if gui._paused is True:
-                    last_meta_param_idx = idx
-                    gui._last_epoch = epoch
-                    gui.update_run_button(meta_idx=idx + 1, num_meta_idx=len(self._meta_parameters))
-                    gui._root.update()
+                if check_paused_callback():
+                    on_paused_callback(last_epoch, meta_idx=idx+1, num_meta_idx=len(self._meta_parameters))
                     return
 
                 # update run button

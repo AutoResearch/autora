@@ -645,6 +645,15 @@ class Theorist_GUI(Frame):
         self._paused = False
         self.run_meta_search(resume=True)
 
+    def check_paused_callback(self):
+        return self._paused
+
+    def on_paused_callback(self, epoch, meta_idx, num_meta_idx):
+        self._last_epoch = epoch
+        self.update_run_button(meta_idx=meta_idx, num_meta_idx=num_meta_idx)
+        self._root.update()
+        return
+
     def run_meta_search(self, resume=False):
 
         if resume is False:
@@ -656,12 +665,24 @@ class Theorist_GUI(Frame):
             # initialize meta-parameter search
             self.theorist.init_meta_search(self.object_of_study)
 
-        self.theorist.run_meta_search(object_of_study=self.object_of_study, resume=resume, gui=self,
+        def check_paused_callback():
+            return self._paused
+
+        def on_paused_callback(epoch, meta_idx, num_meta_idx):
+            self._last_epoch = epoch
+            self.update_run_button(meta_idx=meta_idx, num_meta_idx=num_meta_idx)
+            self._root.update()
+            return
+
+        self.theorist.run_meta_search(object_of_study=self.object_of_study, resume=resume, last_epoch=self._last_epoch, gui=self,
                                       Plot_Windows=Plot_Windows,
                                       last_meta_param_idx=self._last_meta_param_idx,
                                       update_parameter_list_callback=self.update_parameter_list,
                                       update_performance_plot_list_callback=self.update_performance_plot_list,
-                                      update_supplementary_plot_list_callback=self.update_supplementary_plot_list)
+                                      update_supplementary_plot_list_callback=self.update_supplementary_plot_list,
+                                      check_paused_callback=check_paused_callback,
+                                      on_paused_callback=on_paused_callback
+                                      )
 
         if self._running is True:
             best_model = self.theorist.get_best_model(self.object_of_study, plot_model=True)
