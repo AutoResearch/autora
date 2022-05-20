@@ -701,6 +701,15 @@ class Theorist_GUI(Frame):
                 self.update_plot(Plot_Windows.SUPPLEMENTARY, supplementary_plots, save=True,
                                 plot_name=meta_param_str)
 
+        def pre_model_eval_callback(idx, num_meta_idx, **kwargs):
+            self.update_run_button(meta_idx=idx + 1, num_meta_idx=num_meta_idx)
+
+        def post_model_eval_callback(performance_plots, epoch, idx, num_eval_epochs, num_meta_idx, **kwargs):
+            self.update_plot(Plot_Windows.PERFORMANCE, performance_plots)
+            self._root.update()
+            self.update_run_button(epoch=epoch + 1, num_epochs=num_eval_epochs,
+                                  meta_idx=idx + 1, num_meta_idx=num_meta_idx)
+
         self.theorist.run_meta_search(object_of_study=self.object_of_study, resume=resume, last_epoch=self._last_epoch,
                                       gui=self,
                                       Plot_Windows=Plot_Windows,
@@ -714,7 +723,9 @@ class Theorist_GUI(Frame):
                                       pre_model_search_callback=pre_model_search_callback,
                                       post_model_search_callback=post_model_search_callback,
                                       save_performance_plots_callback=save_performance_plots_callback,
-                                      save_supplementary_plots_callback=save_supplementary_plots_callback
+                                      save_supplementary_plots_callback=save_supplementary_plots_callback,
+                                      pre_model_eval_callback=pre_model_eval_callback,
+                                      post_model_eval_callback=post_model_eval_callback,
                                       )
 
         if self._running is True:

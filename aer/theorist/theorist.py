@@ -382,9 +382,16 @@ class Theorist(ABC):
                         pre_model_search_callback: Callable = do_nothing_callback,
                         post_model_search_callback: Callable = do_nothing_callback,
                         save_performance_plots_callback: Callable = do_nothing_callback,
-                        save_supplementary_plots_callback: Callable = do_nothing_callback
+                        save_supplementary_plots_callback: Callable = do_nothing_callback,
+                        pre_model_eval_callback: Callable = do_nothing_callback,
+                        post_model_eval_callback: Callable = do_nothing_callback,
                         ):
         # perform architecture search for different hyper-parameters
+
+        model_search_epochs = self.model_search_epochs
+        num_meta_idx = len(self._meta_parameters)
+        num_eval_epochs = self.eval_epochs
+
         for idx, meta_params in enumerate(self._meta_parameters):
 
             if resume is True:
@@ -409,7 +416,7 @@ class Theorist(ABC):
                 supplementary_plots = self.get_supplementary_plots(object_of_study)
                 update_supplementary_plot_list_callback(supplementary_plots)
 
-            model_search_epochs = self.model_search_epochs
+
             for epoch in range(model_search_epochs):
 
                 if resume is True:
@@ -421,7 +428,6 @@ class Theorist(ABC):
                     break
 
                 # check if paused
-                num_meta_idx = len(self._meta_parameters)
                 if check_paused_callback():
                     on_paused_callback(**locals())
                     return
@@ -472,21 +478,19 @@ class Theorist(ABC):
 
                     eval_param_str = self._eval_meta_parameters_to_str()
 
-                    gui.update_run_button(meta_idx=idx + 1, num_meta_idx=len(self._eval_meta_parameters))
+                    pre_model_eval_callback(**locals())
 
                     self.init_model_evaluation(object_of_study)
+
                     # loop over epochs
                     for epoch in range(self.eval_epochs):
                         # run single epoch
                         self.run_eval_epoch(epoch, object_of_study)
                         # log performance (for plotting purposes)
                         self.log_plot_data(epoch, object_of_study)
-                        performance_plots = self.get_performance_plots(object_of_study)
 
-                        gui.update_plot(Plot_Windows.PERFORMANCE, performance_plots)
-                        gui._root.update()
-                        gui.update_run_button(epoch=epoch + 1, num_epochs=self.eval_epochs,
-                                              meta_idx=idx + 1, num_meta_idx=len(self._eval_meta_parameters))
+                        performance_plots = self.get_performance_plots(object_of_study)
+                        post_model_eval_callback(**locals())
 
                     # save all performance plots
                     performance_plots = self.get_performance_plots(object_of_study)
