@@ -375,12 +375,12 @@ class Theorist(ABC):
         self.time_elapsed_log[AER_config.log_key_timestamp] = list()
 
     @abstractmethod
-    def run_meta_search(self, resume, gui, Plot_Windows):
+    def run_meta_search(self, resume, gui, Plot_Windows, last_meta_param_idx):
         # perform architecture search for different hyper-parameters
         for idx, meta_params in enumerate(self._meta_parameters):
 
             if resume is True:
-                if idx < gui._last_meta_param_idx:
+                if idx < last_meta_param_idx:
                     continue
             else:
 
@@ -413,7 +413,7 @@ class Theorist(ABC):
 
                 # check if paused
                 if gui._paused is True:
-                    gui._last_meta_param_idx = idx
+                    last_meta_param_idx = idx
                     gui._last_epoch = epoch
                     gui.update_run_button(meta_idx=idx + 1, num_meta_idx=len(self._meta_parameters))
                     gui._root.update()
