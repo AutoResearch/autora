@@ -668,16 +668,26 @@ class Theorist_GUI(Frame):
         def check_paused_callback():
             return self._paused
 
-        def on_paused_callback(epoch, meta_idx, num_meta_idx):
+        def on_paused_callback(epoch, idx, num_meta_idx, **kwargs):
             self._last_epoch = epoch
-            self.update_run_button(meta_idx=meta_idx, num_meta_idx=num_meta_idx)
+            self.update_run_button(meta_idx=idx+1, num_meta_idx=num_meta_idx)
             self._root.update()
             return
 
         def check_stopped_callback():
             return self._running is False
 
-        self.theorist.run_meta_search(object_of_study=self.object_of_study, resume=resume, last_epoch=self._last_epoch, gui=self,
+        def pre_model_search_callback(epoch, model_search_epochs, idx, num_meta_idx, **kwargs):
+            self.update_run_button(epoch=epoch + 1,
+                                   num_epochs=model_search_epochs,
+                                   meta_idx=idx + 1,
+                                   num_meta_idx=num_meta_idx)
+
+        def post_model_search_callback(**kwargs):
+            self.update_model_plot()
+
+        self.theorist.run_meta_search(object_of_study=self.object_of_study, resume=resume, last_epoch=self._last_epoch,
+                                      gui=self,
                                       Plot_Windows=Plot_Windows,
                                       last_meta_param_idx=self._last_meta_param_idx,
                                       update_parameter_list_callback=self.update_parameter_list,
@@ -685,7 +695,9 @@ class Theorist_GUI(Frame):
                                       update_supplementary_plot_list_callback=self.update_supplementary_plot_list,
                                       check_paused_callback=check_paused_callback,
                                       on_paused_callback=on_paused_callback,
-                                      check_stopped_callback=check_stopped_callback
+                                      check_stopped_callback=check_stopped_callback,
+                                      pre_model_search_callback=pre_model_search_callback,
+                                      post_model_search_callback=post_model_search_callback
                                       )
 
         if self._running is True:

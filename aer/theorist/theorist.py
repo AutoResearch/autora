@@ -5,6 +5,7 @@ import shutil
 import logging
 import time
 import csv
+from typing import Callable
 
 from .. import config as AER_config
 from ..utils import Plot_Types, do_nothing_callback
@@ -371,12 +372,14 @@ class Theorist(ABC):
 
     @abstractmethod
     def run_meta_search(self, object_of_study, resume, last_epoch, gui, Plot_Windows, last_meta_param_idx,
-                        update_parameter_list_callback=do_nothing_callback,
-                        update_performance_plot_list_callback=do_nothing_callback,
-                        update_supplementary_plot_list_callback=do_nothing_callback,
-                        check_paused_callback=lambda: False,
-                        on_paused_callback=do_nothing_callback(),
-                        check_stopped_callback=lambda: False,
+                        update_parameter_list_callback: Callable = do_nothing_callback,
+                        update_performance_plot_list_callback: Callable = do_nothing_callback,
+                        update_supplementary_plot_list_callback: Callable = do_nothing_callback,
+                        check_paused_callback: Callable = lambda: False,
+                        on_paused_callback: Callable = do_nothing_callback,
+                        check_stopped_callback: Callable = lambda: False,
+                        pre_model_search_callback: Callable = do_nothing_callback,
+                        post_model_search_callback: Callable = do_nothing_callback
                         ):
         # perform architecture search for different hyper-parameters
         for idx, meta_params in enumerate(self._meta_parameters):
@@ -403,7 +406,9 @@ class Theorist(ABC):
                 supplementary_plots = self.get_supplementary_plots(object_of_study)
                 update_supplementary_plot_list_callback(supplementary_plots)
 
-            for epoch in range(self.model_search_epochs):
+            model_search_epochs = self.model_search_epochs
+
+            for epoch in range(model_search_epochs):
 
                 if resume is True:
                     if epoch < last_epoch:
@@ -414,19 +419,19 @@ class Theorist(ABC):
                     break
 
                 # check if paused
+                num_meta_idx = len(self._meta_parameters)
                 if check_paused_callback():
-                    on_paused_callback(last_epoch, meta_idx=idx+1, num_meta_idx=len(self._meta_parameters))
+                    on_paused_callback(**locals())
                     return
 
                 # update run button
-                gui.update_run_button(epoch=epoch + 1, num_epochs=self.model_search_epochs, meta_idx=idx + 1,
-                                      num_meta_idx=len(self._meta_parameters))
+                pre_model_search_callback(**locals())
+
                 #### Key function call
                 self.run_model_search_epoch(epoch)
                 ####
 
-                # update model plot
-                gui.update_model_plot()
+                post_model_search_callback(**locals())
 
                 # update parameter list
                 model_search_parameters = self.get_model_search_parameters()
