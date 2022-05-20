@@ -656,7 +656,7 @@ class Theorist_GUI(Frame):
             # initialize meta-parameter search
             self.theorist.init_meta_search(self.object_of_study)
 
-        self.theorist.run_meta_search(resume=resume, gui=self, Plot_Windows=Plot_Windows,
+        self.theorist.run_meta_search(object_of_study=self.object_of_study, resume=resume, gui=self, Plot_Windows=Plot_Windows,
                                       last_meta_param_idx=self._last_meta_param_idx)
 
         if self._running is True:
