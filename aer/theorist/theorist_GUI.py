@@ -8,7 +8,7 @@ import os
 import numpy as np
 
 import matplotlib
-matplotlib.use("TkAgg")
+
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
 
@@ -63,6 +63,7 @@ class Theorist_GUI(Frame):
 
     # Initialize GUI.
     def __init__(self, object_of_study, theorist, root=None):
+        matplotlib.use("TkAgg")
 
         # set up window
         if root is not None:
