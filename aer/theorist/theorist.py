@@ -421,8 +421,9 @@ class Theorist(ABC):
                 # update run button
                 gui.update_run_button(epoch=epoch + 1, num_epochs=self.model_search_epochs, meta_idx=idx + 1,
                                       num_meta_idx=len(self._meta_parameters))
-
+                #### Key function call
                 self.run_model_search_epoch(epoch)
+                ####
 
                 # update model plot
                 gui.update_model_plot()
