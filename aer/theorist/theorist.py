@@ -375,7 +375,7 @@ class Theorist(ABC):
         self.time_elapsed_log[AER_config.log_key_timestamp] = list()
 
     @abstractmethod
-    def run_meta_search(self, object_of_study, resume, gui, Plot_Windows, last_meta_param_idx, update_parameter_list_callback=do_nothing_callback):
+    def run_meta_search(self, object_of_study, resume, gui, Plot_Windows, last_meta_param_idx, update_parameter_list_callback=do_nothing_callback, update_performance_plot_list_callback=do_nothing_callback):
         # perform architecture search for different hyper-parameters
         for idx, meta_params in enumerate(self._meta_parameters):
 
@@ -395,7 +395,7 @@ class Theorist(ABC):
 
                 # update performance plot list
                 performance_plots = self.get_performance_plots(object_of_study)
-                gui.update_performance_plot_list(performance_plots)
+                update_performance_plot_list_callback(performance_plots)
 
                 # update supplementary plot list
                 supplementary_plots = self.get_supplementary_plots(object_of_study)
