@@ -1,6 +1,6 @@
 from torch.utils.data import Dataset
-from ..variable.variable import Variable
-from .. import config as AER_cfg
+from aer.variable.variable import Variable
+from aer import config as AER_cfg
 from typing import List, Dict
 import torch
 import numpy as np
