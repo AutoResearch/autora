@@ -375,6 +375,134 @@ class Theorist(ABC):
         self.time_elapsed_log[AER_config.log_key_timestamp] = list()
 
     @abstractmethod
+    def run_meta_search(self, resume, gui, Plot_Windows):
+        # perform architecture search for different hyper-parameters
+        for idx, meta_params in enumerate(self._meta_parameters):
+
+            if resume is True:
+                if idx < gui._last_meta_param_idx:
+                    continue
+            else:
+
+                [arch_weight_decay_df, num_graph_nodes, seed] = meta_params
+                self.init_model_search(gui.object_of_study)
+
+                meta_param_str = self._meta_parameters_to_str()
+
+                # update model parameters
+                model_search_parameters = self.get_model_search_parameters()
+                gui.update_parameter_list(model_search_parameters)
+
+                # update performance plot list
+                performance_plots = self.get_performance_plots(gui.object_of_study)
+                gui.update_performance_plot_list(performance_plots)
+
+                # update supplementary plot list
+                supplementary_plots = self.get_supplementary_plots(gui.object_of_study)
+                gui.update_supplementary_plot_list(supplementary_plots)
+
+            for epoch in range(self.model_search_epochs):
+
+                if resume is True:
+                    if epoch < gui._last_epoch:
+                        continue
+
+                # check if still running
+                if gui._running is False:
+                    break
+
+                # check if paused
+                if gui._paused is True:
+                    gui._last_meta_param_idx = idx
+                    gui._last_epoch = epoch
+                    gui.update_run_button(meta_idx=idx + 1, num_meta_idx=len(self._meta_parameters))
+                    gui._root.update()
+                    return
+
+                # update run button
+                gui.update_run_button(epoch=epoch + 1, num_epochs=self.model_search_epochs, meta_idx=idx + 1,
+                                      num_meta_idx=len(self._meta_parameters))
+
+                self.run_model_search_epoch(epoch)
+
+                # update model plot
+                gui.update_model_plot()
+
+                # update parameter list
+                model_search_parameters = self.get_model_search_parameters()
+
+                # update performance plot
+                self.log_plot_data(epoch, gui.object_of_study)
+                performance_plots = self.get_performance_plots(gui.object_of_study)
+                gui.update_plot(Plot_Windows.PERFORMANCE, performance_plots)
+
+                # update supplementary plot
+                supplementary_plots = self.get_supplementary_plots(gui.object_of_study)
+                gui.update_plot(Plot_Windows.SUPPLEMENTARY, supplementary_plots)
+
+                gui.update_parameter_list(model_search_parameters)
+
+            if gui._running is True:
+                self.log_model_search(gui.object_of_study)
+
+                # save all performance plots
+                performance_plots = self.get_performance_plots(gui.object_of_study)
+                for item in range(gui.listbox_performance.size()):
+                    gui.set_listbox_selection(gui.listbox_performance, item)
+                    plot_str = meta_param_str + "_search"
+                    gui.update_plot(Plot_Windows.PERFORMANCE, performance_plots, save=True, plot_name=plot_str)
+                # save all supplementary plots
+                supplementary_plots = self.get_supplementary_plots(gui.object_of_study)
+                for item in range(gui.listbox_supplementary.size()):
+                    gui.set_listbox_selection(gui.listbox_supplementary, item)
+                    gui.update_plot(Plot_Windows.SUPPLEMENTARY, supplementary_plots, save=True,
+                                    plot_name=meta_param_str)
+
+                # Theorist: evaluate model architecture
+
+                # initialize meta evaluation
+                self.init_meta_evaluation(gui.object_of_study)
+
+                # perform architecture search for different hyper-parameters
+                for eval_meta_params in self._eval_meta_parameters:
+
+                    eval_param_str = self._eval_meta_parameters_to_str()
+
+                    gui.update_run_button(meta_idx=idx + 1, num_meta_idx=len(self._eval_meta_parameters))
+
+                    self.init_model_evaluation(gui.object_of_study)
+                    # loop over epochs
+                    for epoch in range(self.eval_epochs):
+                        # run single epoch
+                        self.run_eval_epoch(epoch, gui.object_of_study)
+                        # log performance (for plotting purposes)
+                        self.log_plot_data(epoch, gui.object_of_study)
+                        performance_plots = self.get_performance_plots(gui.object_of_study)
+                        gui.update_plot(Plot_Windows.PERFORMANCE, performance_plots)
+                        gui._root.update()
+                        gui.update_run_button(epoch=epoch + 1, num_epochs=self.eval_epochs,
+                                              meta_idx=idx + 1, num_meta_idx=len(self._eval_meta_parameters))
+
+                    # save all performance plots
+                    performance_plots = self.get_performance_plots(gui.object_of_study)
+                    for item in range(gui.listbox_performance.size()):
+                        gui.set_listbox_selection(gui.listbox_performance, item)
+                        plot_str = meta_param_str + "_eval_" + eval_param_str
+                        gui.update_plot(Plot_Windows.PERFORMANCE, performance_plots, save=True, plot_name=plot_str)
+
+                    # log model evaluation
+                    self.log_model_evaluation(gui.object_of_study)
+
+                # sum up meta evaluation
+                self.log_meta_evaluation(gui.object_of_study)
+
+                self._meta_parameters_iteration += 1
+
+        best_model = self.get_best_model(gui.object_of_study, plot_model=True)
+
+        return best_model
+
+    @abstractmethod
     def log_meta_search(self, object_of_study):
         # write time elapsed for each meta parameter condition to csv
         self.time_elapsed_to_csv()

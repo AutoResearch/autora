@@ -128,6 +128,9 @@ class Theorist_DARTS(Theorist, ABC):
                     meta_parameters = [arch_weight_decay_df, int(num_graph_nodes), seed]
                     self._meta_parameters.append(meta_parameters)
 
+    def run_meta_search(self, resume, gui, Plot_Windows):
+        super(Theorist_DARTS, self).run_meta_search(resume, gui, Plot_Windows)
+
     def get_meta_parameters(self, iteration = None):
         if iteration is None:
             iteration = self._meta_parameters_iteration
