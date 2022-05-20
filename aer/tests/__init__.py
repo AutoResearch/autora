@@ -115,7 +115,10 @@ class TestWeberComplete(unittest.TestCase):
         theorist.add_validation_set(validation_object_1, 'Weber_Sampled')
         theorist.add_validation_set(validation_object_2, 'Weber_Original')
 
-        theorist.init_model_search(object_of_study=study_object)
+        theorist.init_meta_search(object_of_study=study_object)
+        theorist.eval_epochs = 2
+        theorist.model_search_epochs = 2
+        theorist.run_meta_search(object_of_study=study_object)
 
 if __name__ == '__main__':
     unittest.main()
