@@ -439,24 +439,17 @@ class Theorist(ABC):
                 #### Key function call
                 self.run_model_search_epoch(epoch)
                 ####
+                # update parameter list
+                model_search_parameters = self.get_model_search_parameters()
+                # Log plot data
+                self.log_plot_data(epoch, object_of_study)
+                # update performance plot
+                performance_plots = self.get_performance_plots(object_of_study)
+                # update supplementary plot
+                supplementary_plots = self.get_supplementary_plots(object_of_study)
 
                 post_model_search_callback(**locals())
 
-                # update parameter list
-                model_search_parameters = self.get_model_search_parameters()
-
-                # Log plot data
-                self.log_plot_data(epoch, object_of_study)
-
-                # update performance plot
-                performance_plots = self.get_performance_plots(object_of_study)
-                gui.update_plot(Plot_Windows.PERFORMANCE, performance_plots)
-
-                # update supplementary plot
-                supplementary_plots = self.get_supplementary_plots(object_of_study)
-                gui.update_plot(Plot_Windows.SUPPLEMENTARY, supplementary_plots)
-
-                gui.update_parameter_list(model_search_parameters)
 
             if check_running_callback():
                 self.log_model_search(object_of_study)

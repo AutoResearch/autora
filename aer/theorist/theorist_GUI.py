@@ -686,8 +686,11 @@ class Theorist_GUI(Frame):
                                    meta_idx=idx + 1,
                                    num_meta_idx=num_meta_idx)
 
-        def post_model_search_callback(**kwargs):
+        def post_model_search_callback(performance_plots, supplementary_plots, model_search_parameters, **kwargs):
             self.update_model_plot()
+            self.update_plot(Plot_Windows.PERFORMANCE, performance_plots)
+            self.update_plot(Plot_Windows.SUPPLEMENTARY, supplementary_plots)
+            self.update_parameter_list(model_search_parameters)
 
         def save_performance_plots_callback(performance_plots, meta_param_str):
             for item in range(self.listbox_performance.size()):
