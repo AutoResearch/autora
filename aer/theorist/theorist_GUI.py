@@ -710,6 +710,12 @@ class Theorist_GUI(Frame):
             self.update_run_button(epoch=epoch + 1, num_epochs=num_eval_epochs,
                                   meta_idx=idx + 1, num_meta_idx=num_meta_idx)
 
+        def post_model_eval_performance_plots_callback(performance_plots, meta_param_str, eval_param_str):
+            for item in range(self.listbox_performance.size()):
+                self.set_listbox_selection(self.listbox_performance, item)
+                plot_str = meta_param_str + "_eval_" + eval_param_str
+                self.update_plot(Plot_Windows.PERFORMANCE, performance_plots, save=True, plot_name=plot_str)
+
         self.theorist.run_meta_search(object_of_study=self.object_of_study, resume=resume, last_epoch=self._last_epoch,
                                       gui=self,
                                       Plot_Windows=Plot_Windows,
@@ -726,6 +732,7 @@ class Theorist_GUI(Frame):
                                       save_supplementary_plots_callback=save_supplementary_plots_callback,
                                       pre_model_eval_callback=pre_model_eval_callback,
                                       post_model_eval_callback=post_model_eval_callback,
+                                      post_model_eval_performance_plots_callback=post_model_eval_performance_plots_callback,
                                       )
 
         if self._running is True:

@@ -385,6 +385,7 @@ class Theorist(ABC):
                         save_supplementary_plots_callback: Callable = do_nothing_callback,
                         pre_model_eval_callback: Callable = do_nothing_callback,
                         post_model_eval_callback: Callable = do_nothing_callback,
+                        post_model_eval_performance_plots_callback: Callable = do_nothing_callback,
                         ):
         # perform architecture search for different hyper-parameters
 
@@ -494,10 +495,7 @@ class Theorist(ABC):
 
                     # save all performance plots
                     performance_plots = self.get_performance_plots(object_of_study)
-                    for item in range(gui.listbox_performance.size()):
-                        gui.set_listbox_selection(gui.listbox_performance, item)
-                        plot_str = meta_param_str + "_eval_" + eval_param_str
-                        gui.update_plot(Plot_Windows.PERFORMANCE, performance_plots, save=True, plot_name=plot_str)
+                    post_model_eval_performance_plots_callback(**locals())
 
                     # log model evaluation
                     self.log_model_evaluation(object_of_study)
