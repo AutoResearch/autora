@@ -7,7 +7,7 @@ import time
 import csv
 
 from .. import config as AER_config
-from ..utils import Plot_Types
+from ..utils import Plot_Types, do_nothing_callback
 from .theorist_GUI import Theorist_GUI
 
 from tkinter import *
@@ -375,7 +375,7 @@ class Theorist(ABC):
         self.time_elapsed_log[AER_config.log_key_timestamp] = list()
 
     @abstractmethod
-    def run_meta_search(self, object_of_study, resume, gui, Plot_Windows, last_meta_param_idx):
+    def run_meta_search(self, object_of_study, resume, gui, Plot_Windows, last_meta_param_idx, update_parameter_list_callback=do_nothing_callback):
         # perform architecture search for different hyper-parameters
         for idx, meta_params in enumerate(self._meta_parameters):
 
@@ -391,7 +391,7 @@ class Theorist(ABC):
 
                 # update model parameters
                 model_search_parameters = self.get_model_search_parameters()
-                gui.update_parameter_list(model_search_parameters)
+                update_parameter_list_callback(model_search_parameters)
 
                 # update performance plot list
                 performance_plots = self.get_performance_plots(object_of_study)

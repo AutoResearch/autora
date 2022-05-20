@@ -1,6 +1,7 @@
 from datetime import datetime
 from enum import Enum
 
+
 class Plot_Types(Enum):
     LINE = 1
     IMAGE = 2
@@ -15,3 +16,7 @@ def print_current_time():
     dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
     print("date and time =", dt_string)
     return
+
+
+def do_nothing_callback(*args, **kwargs):
+    pass
