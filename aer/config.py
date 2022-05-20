@@ -1,6 +1,6 @@
 """Config for AER."""
 
-studies_folder = 'studies/'
+studies_folder = 'examples/studies/'
 experiment_folder = 'experimentation/'
 models_folder = 'modeling/'
 models_results_folder = 'results/'
