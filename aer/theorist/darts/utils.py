@@ -11,9 +11,9 @@ from aer.variable.variable import outputTypes
 # new
 
 # old
-from aer.theorist.darts.SimpleNet_dataset import SimpleNetDataset
+from aer.dataset.SimpleNet_dataset import SimpleNetDataset
 # from theorist.darts.object_of_study import outputTypes
-import aer.theorist.darts.SimpleNet_dataset as SimpleNetDatasetFile
+import aer.dataset.SimpleNet_dataset as SimpleNetDatasetFile
 
 def create_output_file_name(file_prefix, log_version = None, weight_decay = None, k = None, seed = None, theorist=None):
 

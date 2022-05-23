@@ -25,7 +25,7 @@ except:
     from aer.theorist.darts.model_search import Network
     from aer.theorist.darts.architect import Architect
     from aer.theorist.darts import model_search_config as cfg
-    from aer.theorist.darts.SimpleNet_dataset import SimpleNetDataset
+    from aer.dataset.SimpleNet_dataset import SimpleNetDataset
     from aer.variable.variable import outputTypes
 
 # PARSE ARGUMENTS
