@@ -1,7 +1,7 @@
 from aer.variable.variable import Variable as Var
 from aer.experimentalist.experimentalist_popper import Experimentalist_Popper
 from aer.object_of_study import Object_Of_Study
-from aer.theorist.theorist_darts import Theorist_DARTS
+from aer.theorist.darts.theorist import Theorist_DARTS
 from aer.gui import AER_GUI
 from tkinter import *
 

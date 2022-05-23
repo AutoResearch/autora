@@ -1,9 +1,9 @@
 from abc import ABC
-from .theorist import Theorist
-from ..utils import Plot_Types
-from .darts.model_search import Network, DARTS_Type
-from .darts.architect import Architect
-from .darts.genotypes import PRIMITIVES
+from aer.theorist.theorist import Theorist
+from aer.utils import Plot_Types
+from aer.theorist.darts.model_search import Network, DARTS_Type
+from aer.theorist.darts.architect import Architect
+from aer.theorist.darts.genotypes import PRIMITIVES
 from torch.autograd import Variable
 from aer.variable.variable import outputTypes as output_types
 
@@ -13,10 +13,10 @@ import torch.nn.functional as F
 import pandas
 import logging
 import numpy as np
-from .. import config as aer_config
-from .darts import darts_config as darts_cfg
-from .darts import utils as utils
-from .darts import visualize as viz
+from aer import config as aer_config
+from aer.theorist.darts import darts_config as darts_cfg
+from aer.theorist.darts import utils as utils
+from aer.theorist.darts import visualize as viz
 import copy
 import os
 import csv

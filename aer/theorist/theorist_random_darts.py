@@ -1,6 +1,6 @@
 from abc import ABC
 
-from .theorist_darts import Theorist_DARTS
+from aer.theorist.darts.theorist import Theorist_DARTS
 from .. import config as aer_config
 from .darts import darts_config as darts_cfg
 

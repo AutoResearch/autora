@@ -1,4 +1,3 @@
-from tkinter import *
 from aer.utils import print_current_time
 from aer.experiment_environment import experiment_config as exp_cfg
 from aer.experimentalist.experiment_design_synthetic_weber import \
@@ -11,8 +10,7 @@ from aer.variable.variable import \
     outputTypes as output_type
 from aer.experimentalist.experimentalist_popper import Experimentalist_Popper
 from aer.object_of_study import Object_Of_Study
-from aer.theorist.theorist_darts import DARTS_Type, Theorist_DARTS
-from aer.theorist.theorist_GUI import Theorist_GUI
+from aer.theorist.darts.theorist import DARTS_Type, Theorist_DARTS
 
 print_current_time()
 
