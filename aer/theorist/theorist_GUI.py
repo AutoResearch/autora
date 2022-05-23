@@ -721,6 +721,7 @@ class Theorist_GUI(Frame):
 
         self.theorist.run_meta_search(object_of_study=self.object_of_study,
                                       resume=resume,
+                                      last_epoch = self._last_epoch,
                                       last_meta_param_idx=self._last_meta_param_idx,
                                       update_parameter_list_callback=self.update_parameter_list,
                                       update_performance_plot_list_callback=self.update_performance_plot_list,

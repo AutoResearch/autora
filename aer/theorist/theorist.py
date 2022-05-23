@@ -366,13 +366,18 @@ class Theorist(ABC):
                         object_of_study,
                         resume=False,
                         last_meta_param_idx=0,
+                        last_epoch=0,
+
+                        # Branching callbacks which can change the program flow
+                        check_paused_callback: Callable = lambda: False,
+                        check_running_callback: Callable = lambda: True,
+                        check_not_running_callback: Callable = lambda: False,
+
+                        # Callbacks which have no effect on program flow unless they crash
                         update_parameter_list_callback: Callable = do_nothing_callback,
                         update_performance_plot_list_callback: Callable = do_nothing_callback,
                         update_supplementary_plot_list_callback: Callable = do_nothing_callback,
-                        check_paused_callback: Callable = lambda: False,
                         on_paused_callback: Callable = do_nothing_callback,
-                        check_running_callback: Callable = lambda: True,
-                        check_not_running_callback: Callable = lambda: False,
                         pre_model_search_callback: Callable = do_nothing_callback,
                         post_model_search_callback: Callable = do_nothing_callback,
                         save_performance_plots_callback: Callable = do_nothing_callback,
