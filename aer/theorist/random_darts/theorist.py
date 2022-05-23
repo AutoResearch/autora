@@ -1,8 +1,8 @@
 from abc import ABC
 
 from aer.theorist.darts.theorist import Theorist_DARTS
-from .. import config as aer_config
-from .darts import darts_config as darts_cfg
+from aer import config as aer_config
+from aer.theorist.darts import darts_config as darts_cfg
 
 import warnings
 import logging
