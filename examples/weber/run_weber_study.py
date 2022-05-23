@@ -11,6 +11,8 @@ from aer.variable.variable import \
 from aer.experimentalist.experimentalist_popper import Experimentalist_Popper
 from aer.object_of_study import Object_Of_Study
 from aer.theorist.darts.theorist import DARTS_Type, Theorist_DARTS
+from tkinter import Tk
+from aer.theorist.theorist_GUI import Theorist_GUI
 
 print_current_time()
 
@@ -112,11 +114,11 @@ validation_object_2.name = "Weber Sampled"
 theorist.add_validation_set(validation_object_1, 'Weber_Sampled')
 theorist.add_validation_set(validation_object_2, 'Weber_Original')
 
-theorist.init_meta_search(object_of_study=study_object)
-theorist.run_meta_search(object_of_study=study_object)
+# theorist.init_meta_search(object_of_study=study_object)
+# theorist.run_meta_search(object_of_study=study_object)
 
-# root = Tk()
-# app = Theorist_GUI(object_of_study=study_object, theorist=theorist, root=root)
-# root.mainloop()
+root = Tk()
+app = Theorist_GUI(object_of_study=study_object, theorist=theorist, root=root)
+root.mainloop()
 
 print_current_time()
