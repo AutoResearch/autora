@@ -12,7 +12,7 @@ from aer.experimentalist.experimentalist_popper import Experimentalist_Popper
 from aer.object_of_study import Object_Of_Study
 from aer.theorist.darts.theorist import DARTS_Type, Theorist_DARTS
 from tkinter import Tk
-from aer.theorist.theorist_GUI import Theorist_GUI
+from aer.gui.theorist import Theorist_GUI
 
 print_current_time()
 
