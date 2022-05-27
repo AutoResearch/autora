@@ -13,10 +13,20 @@ from aer.object_of_study import Object_Of_Study
 from aer.theorist.darts.theorist import DARTS_Type, Theorist_DARTS
 from tkinter import Tk
 from aer.gui.theorist import Theorist_GUI
+import argparse
 
 print_current_time()
 
 # GENERAL PARAMETERS
+
+parser = argparse.ArgumentParser()
+
+parser.add_argument('--gui', action='store_true')
+parser.add_argument('--no-gui', dest='gui', action='store_false')
+parser.set_defaults(gui=False)
+
+args = parser.parse_args()
+
 
 study_name = "Weber"   # name of experiment
 study_name_sampled = "Weber Sampled"
@@ -114,11 +124,13 @@ validation_object_2.name = "Weber Sampled"
 theorist.add_validation_set(validation_object_1, 'Weber_Sampled')
 theorist.add_validation_set(validation_object_2, 'Weber_Original')
 
-# theorist.init_meta_search(object_of_study=study_object)
-# theorist.run_meta_search(object_of_study=study_object)
+if args.gui:
+    root = Tk()
+    app = Theorist_GUI(object_of_study=study_object, theorist=theorist, root=root)
+    root.mainloop()
+else:
+    theorist.init_meta_search(object_of_study=study_object)
+    theorist.run_meta_search(object_of_study=study_object)
 
-root = Tk()
-app = Theorist_GUI(object_of_study=study_object, theorist=theorist, root=root)
-root.mainloop()
 
 print_current_time()
