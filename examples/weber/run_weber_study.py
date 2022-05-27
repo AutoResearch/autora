@@ -31,7 +31,6 @@ def main(study_name="Weber",
          study_name_sampled="Weber Sampled",
          host=exp_cfg.HOST_IP,
          port=exp_cfg.HOST_PORT,
-         AER_cycles=1,
          gui=False,
          ):
     # GENERAL PARAMETERS
