@@ -645,9 +645,6 @@ class Theorist_GUI(Frame):
         self._paused = False
         self.run_meta_search(resume=True)
 
-    def check_paused_callback(self):
-        return self._paused
-
     def run_meta_search(self, resume=False):
         """ Implments a GUI for the Theorist.run_meta_search method.
 
@@ -660,40 +657,40 @@ class Theorist_GUI(Frame):
         # Callback definitions
         ################################
 
-        def check_paused_callback():
+        def check_paused():
             return self._paused
 
-        def on_paused_model_search_callback(epoch, idx, num_meta_idx, **kwargs):
+        def on_paused_model_search(epoch, idx, num_meta_idx, **kwargs):
             self._last_epoch = epoch
             self.update_run_button(meta_idx=idx + 1, num_meta_idx=num_meta_idx)
             self._root.update()
             return
 
-        def check_not_running_callback():
+        def check_not_running():
             return self._running is False
 
-        def check_running_callback():
+        def check_running():
             return self._running is True
 
-        def post_meta_search_callback(model_search_parameters, performance_plots, supplementary_plots, **kwargs):
+        def post_meta_search(model_search_parameters, performance_plots, supplementary_plots, **kwargs):
             self.update_parameter_list(model_search_parameters)
             self.update_performance_plot_list(performance_plots)
             self.update_supplementary_plot_list(supplementary_plots)
             return
 
-        def pre_model_search_callback(epoch, model_search_epochs, idx, num_meta_idx, **kwargs):
+        def pre_model_search(epoch, model_search_epochs, idx, num_meta_idx, **kwargs):
             self.update_run_button(epoch=epoch + 1,
                                    num_epochs=model_search_epochs,
                                    meta_idx=idx + 1,
                                    num_meta_idx=num_meta_idx)
 
-        def post_model_search_callback(performance_plots, supplementary_plots, model_search_parameters, **kwargs):
+        def post_model_search(performance_plots, supplementary_plots, model_search_parameters, **kwargs):
             self.update_model_plot()
             self.update_plot(Plot_Windows.PERFORMANCE, performance_plots)
             self.update_plot(Plot_Windows.SUPPLEMENTARY, supplementary_plots)
             self.update_parameter_list(model_search_parameters)
 
-        def pre_meta_evaluation_callback(performance_plots, supplementary_plots, meta_param_str, **kwargs):
+        def pre_meta_evaluation(performance_plots, supplementary_plots, meta_param_str, **kwargs):
             for item in range(self.listbox_performance.size()):
                 self.set_listbox_selection(self.listbox_performance, item)
                 plot_str = meta_param_str + "_search"
@@ -703,16 +700,16 @@ class Theorist_GUI(Frame):
                 self.update_plot(Plot_Windows.SUPPLEMENTARY, supplementary_plots, save=True,
                                  plot_name=meta_param_str)
 
-        def pre_model_eval_callback(idx, num_meta_idx, **kwargs):
+        def pre_model_eval(idx, num_meta_idx, **kwargs):
             self.update_run_button(meta_idx=idx + 1, num_meta_idx=num_meta_idx)
 
-        def post_model_eval_epoch_callback(performance_plots, epoch, idx, num_eval_epochs, num_meta_idx, **kwargs):
+        def post_model_eval_epoch(performance_plots, epoch, idx, num_eval_epochs, num_meta_idx, **kwargs):
             self.update_plot(Plot_Windows.PERFORMANCE, performance_plots)
             self._root.update()
             self.update_run_button(epoch=epoch + 1, num_epochs=num_eval_epochs,
                                    meta_idx=idx + 1, num_meta_idx=num_meta_idx)
 
-        def post_model_eval_callback(performance_plots, meta_param_str, eval_param_str):
+        def post_model_eval(performance_plots, meta_param_str, eval_param_str):
             for item in range(self.listbox_performance.size()):
                 self.set_listbox_selection(self.listbox_performance, item)
                 plot_str = meta_param_str + "_eval_" + eval_param_str
@@ -736,18 +733,18 @@ class Theorist_GUI(Frame):
                                       last_epoch=self._last_epoch,
                                       last_meta_param_idx=self._last_meta_param_idx,
 
-                                      check_paused_callback=check_paused_callback,
-                                      check_running_callback=check_running_callback,
-                                      check_not_running_callback=check_not_running_callback,
+                                      check_paused=check_paused,
+                                      check_running=check_running,
+                                      check_not_running=check_not_running,
 
-                                      post_meta_search_callback=post_meta_search_callback,
-                                      on_paused_model_search_callback=on_paused_model_search_callback,
-                                      pre_model_search_callback=pre_model_search_callback,
-                                      post_model_search_callback=post_model_search_callback,
-                                      pre_meta_evaluation_callback=pre_meta_evaluation_callback,
-                                      pre_model_eval_callback=pre_model_eval_callback,
-                                      post_model_eval_epoch_callback=post_model_eval_epoch_callback,
-                                      post_model_eval_callback=post_model_eval_callback,
+                                      post_meta_search=post_meta_search,
+                                      on_paused_model_search=on_paused_model_search,
+                                      pre_model_search=pre_model_search,
+                                      post_model_search=post_model_search,
+                                      pre_meta_evaluation=pre_meta_evaluation,
+                                      pre_model_eval=pre_model_eval,
+                                      post_model_eval_epoch=post_model_eval_epoch,
+                                      post_model_eval=post_model_eval,
                                       )
 
         if self._running is True:

@@ -8,7 +8,7 @@ import csv
 from typing import Callable
 
 from .. import config as AER_config
-from ..utils import Plot_Types, do_nothing_callback
+from ..utils import Plot_Types, do_nothing
 
 from matplotlib.figure import Figure
 
@@ -372,21 +372,21 @@ class Theorist(ABC):
                         last_epoch=0,
 
                         # Callbacks which can interrupt the program
-                        check_paused_callback: InterruptCallable = lambda: False,
-                        check_running_callback: InterruptCallable = lambda: True,
-                        check_not_running_callback: InterruptCallable = lambda: False,
+                        check_paused: InterruptCallable = lambda: False,
+                        check_running: InterruptCallable = lambda: True,
+                        check_not_running: InterruptCallable = lambda: False,
 
                         # Callbacks which access local variables
-                        post_meta_search_callback: AccessLocalsCallable = do_nothing_callback,
-                        on_paused_model_search_callback: AccessLocalsCallable = do_nothing_callback,
-                        pre_model_search_callback: AccessLocalsCallable = do_nothing_callback,
-                        post_model_search_callback: AccessLocalsCallable = do_nothing_callback,
-                        pre_meta_evaluation_callback: AccessLocalsCallable = do_nothing_callback,
-                        save_performance_plots_callback: AccessLocalsCallable = do_nothing_callback,
-                        save_supplementary_plots_callback: AccessLocalsCallable = do_nothing_callback,
-                        pre_model_eval_callback: AccessLocalsCallable = do_nothing_callback,
-                        post_model_eval_epoch_callback: AccessLocalsCallable = do_nothing_callback,
-                        post_model_eval_callback: AccessLocalsCallable = do_nothing_callback,
+                        post_meta_search: AccessLocalsCallable = do_nothing,
+                        on_paused_model_search: AccessLocalsCallable = do_nothing,
+                        pre_model_search: AccessLocalsCallable = do_nothing,
+                        post_model_search: AccessLocalsCallable = do_nothing,
+                        pre_meta_evaluation: AccessLocalsCallable = do_nothing,
+                        save_performance_plots: AccessLocalsCallable = do_nothing,
+                        save_supplementary_plots: AccessLocalsCallable = do_nothing,
+                        pre_model_eval: AccessLocalsCallable = do_nothing,
+                        post_model_eval_epoch: AccessLocalsCallable = do_nothing,
+                        post_model_eval: AccessLocalsCallable = do_nothing,
                         ):
         """ Run architecture search for different hyper-parameters.
 
@@ -425,7 +425,7 @@ class Theorist(ABC):
                 performance_plots = self.get_performance_plots(object_of_study)
                 supplementary_plots = self.get_supplementary_plots(object_of_study)
 
-                post_meta_search_callback(**locals())
+                post_meta_search(**locals())
 
             for epoch in range(model_search_epochs):
 
@@ -434,16 +434,16 @@ class Theorist(ABC):
                         continue
 
                 # check if still running
-                if check_not_running_callback():
+                if check_not_running():
                     break
 
                 # check if paused
-                if check_paused_callback():
-                    on_paused_model_search_callback(**locals())
+                if check_paused():
+                    on_paused_model_search(**locals())
                     return
 
                 # update run button
-                pre_model_search_callback(**locals())
+                pre_model_search(**locals())
 
                 #### Key function call
                 self.run_model_search_epoch(epoch)
@@ -457,9 +457,9 @@ class Theorist(ABC):
                 # update supplementary plot
                 supplementary_plots = self.get_supplementary_plots(object_of_study)
 
-                post_model_search_callback(**locals())
+                post_model_search(**locals())
 
-            if check_running_callback():
+            if check_running():
                 self.log_model_search(object_of_study)
 
                 # save all performance plots
@@ -468,7 +468,7 @@ class Theorist(ABC):
                 # save all supplementary plots
                 supplementary_plots = self.get_supplementary_plots(object_of_study)
 
-                pre_meta_evaluation_callback(**locals())
+                pre_meta_evaluation(**locals())
 
                 # Theorist: evaluate model architecture
 
@@ -480,7 +480,7 @@ class Theorist(ABC):
 
                     eval_param_str = self._eval_meta_parameters_to_str()
 
-                    pre_model_eval_callback(**locals())
+                    pre_model_eval(**locals())
 
                     self.init_model_evaluation(object_of_study)
 
@@ -492,11 +492,11 @@ class Theorist(ABC):
                         self.log_plot_data(epoch, object_of_study)
 
                         performance_plots = self.get_performance_plots(object_of_study)
-                        post_model_eval_epoch_callback(**locals())
+                        post_model_eval_epoch(**locals())
 
                     # save all performance plots
                     performance_plots = self.get_performance_plots(object_of_study)
-                    post_model_eval_callback(**locals())
+                    post_model_eval(**locals())
 
                     # log model evaluation
                     self.log_model_evaluation(object_of_study)

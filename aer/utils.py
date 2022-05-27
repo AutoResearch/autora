@@ -18,5 +18,5 @@ def print_current_time():
     return
 
 
-def do_nothing_callback(*args, **kwargs):
+def do_nothing(*args, **kwargs):
     pass
