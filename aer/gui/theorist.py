@@ -680,6 +680,13 @@ class Theorist_GUI(Frame):
         def check_running_callback():
             return self._running is True
 
+        def post_meta_search_callback(model_search_parameters, performance_plots, supplementary_plots, **kwargs):
+            self.update_parameter_list(model_search_parameters)
+            self.update_performance_plot_list(performance_plots)
+            self.update_supplementary_plot_list(supplementary_plots)
+            return
+
+
         def pre_model_search_callback(epoch, model_search_epochs, idx, num_meta_idx, **kwargs):
             self.update_run_button(epoch=epoch + 1,
                                    num_epochs=model_search_epochs,
@@ -723,9 +730,7 @@ class Theorist_GUI(Frame):
                                       resume=resume,
                                       last_epoch = self._last_epoch,
                                       last_meta_param_idx=self._last_meta_param_idx,
-                                      update_parameter_list_callback=self.update_parameter_list,
-                                      update_performance_plot_list_callback=self.update_performance_plot_list,
-                                      update_supplementary_plot_list_callback=self.update_supplementary_plot_list,
+                                      post_meta_search_callback=post_meta_search_callback,
                                       check_paused_callback=check_paused_callback,
                                       on_paused_callback=on_paused_callback,
                                       check_not_running_callback=check_not_running_callback,

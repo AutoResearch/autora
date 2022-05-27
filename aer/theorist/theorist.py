@@ -373,10 +373,8 @@ class Theorist(ABC):
                         check_running_callback: Callable = lambda: True,
                         check_not_running_callback: Callable = lambda: False,
 
-                        # Callbacks which have no effect on program flow unless they crash
-                        update_parameter_list_callback: Callable = do_nothing_callback,
-                        update_performance_plot_list_callback: Callable = do_nothing_callback,
-                        update_supplementary_plot_list_callback: Callable = do_nothing_callback,
+                        # Callbacks for updating external interfaces (GUI, CLI, loggers, etc.)
+                        post_meta_search_callback: Callable = do_nothing_callback,
                         on_paused_callback: Callable = do_nothing_callback,
                         pre_model_search_callback: Callable = do_nothing_callback,
                         post_model_search_callback: Callable = do_nothing_callback,
@@ -404,18 +402,11 @@ class Theorist(ABC):
 
                 meta_param_str = self._meta_parameters_to_str()
 
-                # update model parameters
                 model_search_parameters = self.get_model_search_parameters()
-                update_parameter_list_callback(model_search_parameters)
-
-                # update performance plot list
                 performance_plots = self.get_performance_plots(object_of_study)
-                update_performance_plot_list_callback(performance_plots)
-
-                # update supplementary plot list
                 supplementary_plots = self.get_supplementary_plots(object_of_study)
-                update_supplementary_plot_list_callback(supplementary_plots)
 
+                post_meta_search_callback(**locals())
 
             for epoch in range(model_search_epochs):
 
