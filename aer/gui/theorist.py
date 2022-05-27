@@ -728,24 +728,23 @@ class Theorist_GUI(Frame):
             # initialize meta-parameter search
             self.theorist.init_meta_search(self.object_of_study)
 
-        self.theorist.run_meta_search(object_of_study=self.object_of_study,
-                                      resume=resume,
-                                      last_epoch=self._last_epoch,
-                                      last_meta_param_idx=self._last_meta_param_idx,
-
-                                      check_paused=check_paused,
-                                      check_running=check_running,
-                                      check_not_running=check_not_running,
-
-                                      post_meta_search=post_meta_search,
-                                      on_paused_model_search=on_paused_model_search,
-                                      pre_model_search=pre_model_search,
-                                      post_model_search=post_model_search,
-                                      pre_meta_evaluation=pre_meta_evaluation,
-                                      pre_model_eval=pre_model_eval,
-                                      post_model_eval_epoch=post_model_eval_epoch,
-                                      post_model_eval=post_model_eval,
-                                      )
+        self.theorist.run_meta_search(
+            object_of_study=self.object_of_study,
+            resume=resume,
+            last_epoch=self._last_epoch,
+            last_meta_param_idx=self._last_meta_param_idx,
+            check_paused=check_paused,
+            check_running=check_running,
+            check_not_running=check_not_running,
+            post_meta_search=post_meta_search,
+            on_paused_model_search=on_paused_model_search,
+            pre_model_search=pre_model_search,
+            post_model_search=post_model_search,
+            pre_meta_evaluation=pre_meta_evaluation,
+            pre_model_eval=pre_model_eval,
+            post_model_eval_epoch=post_model_eval_epoch,
+            post_model_eval=post_model_eval,
+        )
 
         if self._running is True:
             best_model = self.theorist.get_best_model(self.object_of_study, plot_model=True)
