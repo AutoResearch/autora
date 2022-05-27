@@ -361,6 +361,9 @@ class Theorist(ABC):
             self.time_elapsed_log[name] = list()
         self.time_elapsed_log[AER_config.log_key_timestamp] = list()
 
+    InterruptCallable = Callable[[], bool]
+    AccessLocalsCallable = Callable[..., None]
+
     @abstractmethod
     def run_meta_search(self,
                         object_of_study,
@@ -368,22 +371,22 @@ class Theorist(ABC):
                         last_meta_param_idx=0,
                         last_epoch=0,
 
-                        # Branching callbacks which can change the program flow
-                        check_paused_callback: Callable = lambda: False,
-                        check_running_callback: Callable = lambda: True,
-                        check_not_running_callback: Callable = lambda: False,
+                        # Callbacks which can interrupt the program
+                        check_paused_callback: InterruptCallable = lambda: False,
+                        check_running_callback: InterruptCallable = lambda: True,
+                        check_not_running_callback: InterruptCallable = lambda: False,
 
-                        # Callbacks for updating external interfaces (GUI, CLI, loggers, etc.)
-                        post_meta_search_callback: Callable = do_nothing_callback,
-                        on_paused_model_search_callback: Callable = do_nothing_callback,
-                        pre_model_search_callback: Callable = do_nothing_callback,
-                        post_model_search_callback: Callable = do_nothing_callback,
-                        pre_meta_evaluation_callback: Callable = do_nothing_callback,
-                        save_performance_plots_callback: Callable = do_nothing_callback,
-                        save_supplementary_plots_callback: Callable = do_nothing_callback,
-                        pre_model_eval_callback: Callable = do_nothing_callback,
-                        post_model_eval_epoch_callback: Callable = do_nothing_callback,
-                        post_model_eval_callback: Callable = do_nothing_callback,
+                        # Callbacks which access local variables
+                        post_meta_search_callback: AccessLocalsCallable = do_nothing_callback,
+                        on_paused_model_search_callback: AccessLocalsCallable = do_nothing_callback,
+                        pre_model_search_callback: AccessLocalsCallable = do_nothing_callback,
+                        post_model_search_callback: AccessLocalsCallable = do_nothing_callback,
+                        pre_meta_evaluation_callback: AccessLocalsCallable = do_nothing_callback,
+                        save_performance_plots_callback: AccessLocalsCallable = do_nothing_callback,
+                        save_supplementary_plots_callback: AccessLocalsCallable = do_nothing_callback,
+                        pre_model_eval_callback: AccessLocalsCallable = do_nothing_callback,
+                        post_model_eval_epoch_callback: AccessLocalsCallable = do_nothing_callback,
+                        post_model_eval_callback: AccessLocalsCallable = do_nothing_callback,
                         ):
         # perform architecture search for different hyper-parameters
 
