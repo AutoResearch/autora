@@ -733,12 +733,15 @@ class Theorist_GUI(Frame):
 
         self.theorist.run_meta_search(object_of_study=self.object_of_study,
                                       resume=resume,
-                                      last_epoch = self._last_epoch,
+                                      last_epoch=self._last_epoch,
                                       last_meta_param_idx=self._last_meta_param_idx,
-                                      post_meta_search_callback=post_meta_search_callback,
+
                                       check_paused_callback=check_paused_callback,
-                                      on_paused_model_search_callback=on_paused_model_search_callback,
+                                      check_running_callback=check_running_callback,
                                       check_not_running_callback=check_not_running_callback,
+
+                                      post_meta_search_callback=post_meta_search_callback,
+                                      on_paused_model_search_callback=on_paused_model_search_callback,
                                       pre_model_search_callback=pre_model_search_callback,
                                       post_model_search_callback=post_model_search_callback,
                                       pre_meta_evaluation_callback=pre_meta_evaluation_callback,
