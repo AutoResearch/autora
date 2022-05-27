@@ -378,6 +378,7 @@ class Theorist(ABC):
                         on_paused_model_search_callback: Callable = do_nothing_callback,
                         pre_model_search_callback: Callable = do_nothing_callback,
                         post_model_search_callback: Callable = do_nothing_callback,
+                        pre_meta_evaluation_callback: Callable = do_nothing_callback,
                         save_performance_plots_callback: Callable = do_nothing_callback,
                         save_supplementary_plots_callback: Callable = do_nothing_callback,
                         pre_model_eval_callback: Callable = do_nothing_callback,
@@ -446,11 +447,11 @@ class Theorist(ABC):
 
                 # save all performance plots
                 performance_plots = self.get_performance_plots(object_of_study)
-                save_performance_plots_callback(performance_plots, meta_param_str)
 
                 # save all supplementary plots
                 supplementary_plots = self.get_supplementary_plots(object_of_study)
-                save_supplementary_plots_callback(supplementary_plots, meta_param_str)
+
+                pre_meta_evaluation_callback(**locals())
 
                 # Theorist: evaluate model architecture
 

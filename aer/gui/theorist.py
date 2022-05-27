@@ -693,13 +693,11 @@ class Theorist_GUI(Frame):
             self.update_plot(Plot_Windows.SUPPLEMENTARY, supplementary_plots)
             self.update_parameter_list(model_search_parameters)
 
-        def save_performance_plots_callback(performance_plots, meta_param_str):
+        def pre_meta_evaluation_callback(performance_plots, supplementary_plots, meta_param_str, **kwargs):
             for item in range(self.listbox_performance.size()):
                 self.set_listbox_selection(self.listbox_performance, item)
                 plot_str = meta_param_str + "_search"
                 self.update_plot(Plot_Windows.PERFORMANCE, performance_plots, save=True, plot_name=plot_str)
-
-        def save_supplementary_plots_callback(supplementary_plots, meta_param_str):
             for item in range(self.listbox_supplementary.size()):
                 self.set_listbox_selection(self.listbox_supplementary, item)
                 self.update_plot(Plot_Windows.SUPPLEMENTARY, supplementary_plots, save=True,
@@ -730,8 +728,7 @@ class Theorist_GUI(Frame):
                                       check_not_running_callback=check_not_running_callback,
                                       pre_model_search_callback=pre_model_search_callback,
                                       post_model_search_callback=post_model_search_callback,
-                                      save_performance_plots_callback=save_performance_plots_callback,
-                                      save_supplementary_plots_callback=save_supplementary_plots_callback,
+                                      pre_meta_evaluation_callback=pre_meta_evaluation_callback,
                                       pre_model_eval_callback=pre_model_eval_callback,
                                       post_model_eval_callback=post_model_eval_callback,
                                       post_model_eval_performance_plots_callback=post_model_eval_performance_plots_callback,
