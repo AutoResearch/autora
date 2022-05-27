@@ -706,13 +706,13 @@ class Theorist_GUI(Frame):
         def pre_model_eval_callback(idx, num_meta_idx, **kwargs):
             self.update_run_button(meta_idx=idx + 1, num_meta_idx=num_meta_idx)
 
-        def post_model_eval_callback(performance_plots, epoch, idx, num_eval_epochs, num_meta_idx, **kwargs):
+        def post_model_eval_epoch_callback(performance_plots, epoch, idx, num_eval_epochs, num_meta_idx, **kwargs):
             self.update_plot(Plot_Windows.PERFORMANCE, performance_plots)
             self._root.update()
             self.update_run_button(epoch=epoch + 1, num_epochs=num_eval_epochs,
                                   meta_idx=idx + 1, num_meta_idx=num_meta_idx)
 
-        def post_model_eval_performance_plots_callback(performance_plots, meta_param_str, eval_param_str):
+        def post_model_eval_callback(performance_plots, meta_param_str, eval_param_str):
             for item in range(self.listbox_performance.size()):
                 self.set_listbox_selection(self.listbox_performance, item)
                 plot_str = meta_param_str + "_eval_" + eval_param_str
@@ -730,8 +730,8 @@ class Theorist_GUI(Frame):
                                       post_model_search_callback=post_model_search_callback,
                                       pre_meta_evaluation_callback=pre_meta_evaluation_callback,
                                       pre_model_eval_callback=pre_model_eval_callback,
+                                      post_model_eval_epoch_callback=post_model_eval_epoch_callback,
                                       post_model_eval_callback=post_model_eval_callback,
-                                      post_model_eval_performance_plots_callback=post_model_eval_performance_plots_callback,
                                       )
 
         if self._running is True:

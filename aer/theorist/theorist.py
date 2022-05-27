@@ -382,8 +382,8 @@ class Theorist(ABC):
                         save_performance_plots_callback: Callable = do_nothing_callback,
                         save_supplementary_plots_callback: Callable = do_nothing_callback,
                         pre_model_eval_callback: Callable = do_nothing_callback,
+                        post_model_eval_epoch_callback: Callable = do_nothing_callback,
                         post_model_eval_callback: Callable = do_nothing_callback,
-                        post_model_eval_performance_plots_callback: Callable = do_nothing_callback,
                         ):
         # perform architecture search for different hyper-parameters
 
@@ -475,11 +475,11 @@ class Theorist(ABC):
                         self.log_plot_data(epoch, object_of_study)
 
                         performance_plots = self.get_performance_plots(object_of_study)
-                        post_model_eval_callback(**locals())
+                        post_model_eval_epoch_callback(**locals())
 
                     # save all performance plots
                     performance_plots = self.get_performance_plots(object_of_study)
-                    post_model_eval_performance_plots_callback(**locals())
+                    post_model_eval_callback(**locals())
 
                     # log model evaluation
                     self.log_model_evaluation(object_of_study)
