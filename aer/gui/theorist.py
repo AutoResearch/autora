@@ -648,12 +648,6 @@ class Theorist_GUI(Frame):
     def check_paused_callback(self):
         return self._paused
 
-    def on_paused_callback(self, epoch, meta_idx, num_meta_idx):
-        self._last_epoch = epoch
-        self.update_run_button(meta_idx=meta_idx, num_meta_idx=num_meta_idx)
-        self._root.update()
-        return
-
     def run_meta_search(self, resume=False):
 
         if resume is False:
@@ -668,7 +662,7 @@ class Theorist_GUI(Frame):
         def check_paused_callback():
             return self._paused
 
-        def on_paused_callback(epoch, idx, num_meta_idx, **kwargs):
+        def on_paused_model_search_callback(epoch, idx, num_meta_idx, **kwargs):
             self._last_epoch = epoch
             self.update_run_button(meta_idx=idx+1, num_meta_idx=num_meta_idx)
             self._root.update()
@@ -732,7 +726,7 @@ class Theorist_GUI(Frame):
                                       last_meta_param_idx=self._last_meta_param_idx,
                                       post_meta_search_callback=post_meta_search_callback,
                                       check_paused_callback=check_paused_callback,
-                                      on_paused_callback=on_paused_callback,
+                                      on_paused_model_search_callback=on_paused_model_search_callback,
                                       check_not_running_callback=check_not_running_callback,
                                       pre_model_search_callback=pre_model_search_callback,
                                       post_model_search_callback=post_model_search_callback,

@@ -375,7 +375,7 @@ class Theorist(ABC):
 
                         # Callbacks for updating external interfaces (GUI, CLI, loggers, etc.)
                         post_meta_search_callback: Callable = do_nothing_callback,
-                        on_paused_callback: Callable = do_nothing_callback,
+                        on_paused_model_search_callback: Callable = do_nothing_callback,
                         pre_model_search_callback: Callable = do_nothing_callback,
                         post_model_search_callback: Callable = do_nothing_callback,
                         save_performance_plots_callback: Callable = do_nothing_callback,
@@ -420,7 +420,7 @@ class Theorist(ABC):
 
                 # check if paused
                 if check_paused_callback():
-                    on_paused_callback(**locals())
+                    on_paused_model_search_callback(**locals())
                     return
 
                 # update run button
@@ -430,8 +430,8 @@ class Theorist(ABC):
                 self.run_model_search_epoch(epoch)
                 ####
                 # update parameter list
-                model_search_parameters = self.get_model_search_parameters()
                 # Log plot data
+                model_search_parameters = self.get_model_search_parameters()
                 self.log_plot_data(epoch, object_of_study)
                 # update performance plot
                 performance_plots = self.get_performance_plots(object_of_study)
