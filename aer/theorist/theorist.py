@@ -395,6 +395,8 @@ class Theorist(ABC):
                 Usually defined with a signature like follows: foo_callback(local_1, local_2, **kwargs)
 
         """
+        def emit_event(label: str, data: dict):
+            event_handler(label, data)
 
         model_search_epochs = self.model_search_epochs
         num_meta_idx = len(self._meta_parameters)
@@ -416,7 +418,7 @@ class Theorist(ABC):
                 performance_plots = self.get_performance_plots(object_of_study)
                 supplementary_plots = self.get_supplementary_plots(object_of_study)
 
-                event_handler('post-meta-search', locals())
+                emit_event('post-meta-search', locals())
 
             for epoch in range(model_search_epochs):
 
@@ -430,11 +432,11 @@ class Theorist(ABC):
 
                 # check if paused
                 if check_paused():
-                    event_handler('paused-model-search', locals())
+                    emit_event('paused-model-search', locals())
                     return
 
                 # update run button
-                event_handler('pre-model-search', locals())
+                emit_event('pre-model-search', locals())
 
 
                 #### Key function call
@@ -448,7 +450,7 @@ class Theorist(ABC):
                 performance_plots = self.get_performance_plots(object_of_study)
                 # update supplementary plot
                 supplementary_plots = self.get_supplementary_plots(object_of_study)
-                event_handler('post-model-search', locals())
+                emit_event('post-model-search', locals())
 
             if check_running():
                 self.log_model_search(object_of_study)
@@ -459,7 +461,7 @@ class Theorist(ABC):
                 # save all supplementary plots
                 supplementary_plots = self.get_supplementary_plots(object_of_study)
 
-                event_handler('pre-meta-evaluation', locals())
+                emit_event('pre-meta-evaluation', locals())
 
                 # Theorist: evaluate model architecture
 
@@ -471,7 +473,7 @@ class Theorist(ABC):
 
                     eval_param_str = self._eval_meta_parameters_to_str()
 
-                    event_handler('pre-model-eval', locals())
+                    emit_event('pre-model-eval', locals())
 
                     self.init_model_evaluation(object_of_study)
 
@@ -483,11 +485,11 @@ class Theorist(ABC):
                         self.log_plot_data(epoch, object_of_study)
 
                         performance_plots = self.get_performance_plots(object_of_study)
-                        event_handler('post-model-eval-epoch', locals())
+                        emit_event('post-model-eval-epoch', locals())
 
                     # save all performance plots
                     performance_plots = self.get_performance_plots(object_of_study)
-                    event_handler('post-model-eval', locals())
+                    emit_event('post-model-eval', locals())
 
                     # log model evaluation
                     self.log_model_evaluation(object_of_study)
