@@ -388,7 +388,22 @@ class Theorist(ABC):
                         post_model_eval_epoch_callback: AccessLocalsCallable = do_nothing_callback,
                         post_model_eval_callback: AccessLocalsCallable = do_nothing_callback,
                         ):
-        # perform architecture search for different hyper-parameters
+        """ Run architecture search for different hyper-parameters.
+
+        This method offers a series of callbacks, which are of two types:
+         - InterruptCallable: can be used to interrupt (pause, stop) the execution
+             - Default: allow the program to continue
+             - Implementation: Callable of no arguments which returns a boolean.
+
+         - AccessLocalsCallable: can be used to access local variables from outside the evaluation.
+            These can be used for updating external interfaces, like a CLI, GUI, message queue,
+            or to write current results to file.
+             - Default: do nothing.
+             - These are called within the method like foo_callback(**locals())
+             - Implementation: Callable must accept all locals() from the run_meta_search.
+                Usually defined with a signature like follows: foo_callback(local_1, local_2, **kwargs)
+
+        """
 
         model_search_epochs = self.model_search_epochs
         num_meta_idx = len(self._meta_parameters)
@@ -443,7 +458,6 @@ class Theorist(ABC):
                 supplementary_plots = self.get_supplementary_plots(object_of_study)
 
                 post_model_search_callback(**locals())
-
 
             if check_running_callback():
                 self.log_model_search(object_of_study)
