@@ -501,6 +501,8 @@ class Theorist(ABC):
 
         best_model = self.get_best_model(object_of_study, plot_model=True)
 
+        emit_event('best-model-found', locals())
+
         return best_model
 
     @abstractmethod
