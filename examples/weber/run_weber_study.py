@@ -32,7 +32,7 @@ def main(study_name="Weber",
          host=exp_cfg.HOST_IP,
          port=exp_cfg.HOST_PORT,
          AER_cycles=1,
-         args=argparse.Namespace(),
+         gui=False,
          ):
     # GENERAL PARAMETERS
 
@@ -123,7 +123,7 @@ def main(study_name="Weber",
     theorist.add_validation_set(validation_object_1, 'Weber_Sampled')
     theorist.add_validation_set(validation_object_2, 'Weber_Original')
 
-    if args.gui:
+    if gui:
         root = Tk()
         app = Theorist_GUI(object_of_study=study_object, theorist=theorist, root=root)
         root.mainloop()
@@ -136,4 +136,4 @@ def main(study_name="Weber",
 
 if __name__ == "__main__":
     args = parse_arguments()
-    main(args=args)
+    main(**vars(args))
