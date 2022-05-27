@@ -715,6 +715,22 @@ class Theorist_GUI(Frame):
                 plot_str = meta_param_str + "_eval_" + eval_param_str
                 self.update_plot(Plot_Windows.PERFORMANCE, performance_plots, save=True, plot_name=plot_str)
 
+        def event_handler(label, locals_dict):
+            registered_handlers = {
+                "post-meta-search": post_meta_search,
+                "paused-model-search": on_paused_model_search,
+                "pre-model-search": pre_model_search,
+                "post-model-search": post_model_search,
+                "pre-meta-evaluation": pre_meta_evaluation,
+                "pre-model-eval": pre_model_eval,
+                "post-model-eval-epoch": post_model_eval_epoch,
+                "post-model-eval": post_model_eval,
+            }
+            if label in registered_handlers:
+                handler = registered_handlers[label]
+                handler(**locals_dict)
+            return
+
         ################################
         # Execution
         ################################

@@ -362,7 +362,7 @@ class Theorist(ABC):
         self.time_elapsed_log[AER_config.log_key_timestamp] = list()
 
     InterruptCallable = Callable[[], bool]
-    AccessLocalsCallable = Callable[..., None]
+    EventCallable = Callable[[str, dict], None]
 
     @abstractmethod
     def run_meta_search(self,
@@ -377,16 +377,7 @@ class Theorist(ABC):
                         check_not_running: InterruptCallable = lambda: False,
 
                         # Callbacks which access local variables
-                        post_meta_search: AccessLocalsCallable = do_nothing,
-                        on_paused_model_search: AccessLocalsCallable = do_nothing,
-                        pre_model_search: AccessLocalsCallable = do_nothing,
-                        post_model_search: AccessLocalsCallable = do_nothing,
-                        pre_meta_evaluation: AccessLocalsCallable = do_nothing,
-                        save_performance_plots: AccessLocalsCallable = do_nothing,
-                        save_supplementary_plots: AccessLocalsCallable = do_nothing,
-                        pre_model_eval: AccessLocalsCallable = do_nothing,
-                        post_model_eval_epoch: AccessLocalsCallable = do_nothing,
-                        post_model_eval: AccessLocalsCallable = do_nothing,
+                        event_handler: EventCallable = do_nothing,
                         ):
         """ Run architecture search for different hyper-parameters.
 
@@ -425,7 +416,7 @@ class Theorist(ABC):
                 performance_plots = self.get_performance_plots(object_of_study)
                 supplementary_plots = self.get_supplementary_plots(object_of_study)
 
-                post_meta_search(**locals())
+                event_handler('post-meta-search', locals())
 
             for epoch in range(model_search_epochs):
 
@@ -439,11 +430,12 @@ class Theorist(ABC):
 
                 # check if paused
                 if check_paused():
-                    on_paused_model_search(**locals())
+                    event_handler('paused-model-search', locals())
                     return
 
                 # update run button
-                pre_model_search(**locals())
+                event_handler('pre-model-search', locals())
+
 
                 #### Key function call
                 self.run_model_search_epoch(epoch)
@@ -456,8 +448,7 @@ class Theorist(ABC):
                 performance_plots = self.get_performance_plots(object_of_study)
                 # update supplementary plot
                 supplementary_plots = self.get_supplementary_plots(object_of_study)
-
-                post_model_search(**locals())
+                event_handler('post-model-search', locals())
 
             if check_running():
                 self.log_model_search(object_of_study)
@@ -468,7 +459,7 @@ class Theorist(ABC):
                 # save all supplementary plots
                 supplementary_plots = self.get_supplementary_plots(object_of_study)
 
-                pre_meta_evaluation(**locals())
+                event_handler('pre-meta-evaluation', locals())
 
                 # Theorist: evaluate model architecture
 
@@ -480,7 +471,7 @@ class Theorist(ABC):
 
                     eval_param_str = self._eval_meta_parameters_to_str()
 
-                    pre_model_eval(**locals())
+                    event_handler('pre-model-eval', locals())
 
                     self.init_model_evaluation(object_of_study)
 
@@ -492,11 +483,11 @@ class Theorist(ABC):
                         self.log_plot_data(epoch, object_of_study)
 
                         performance_plots = self.get_performance_plots(object_of_study)
-                        post_model_eval_epoch(**locals())
+                        event_handler('post-model-eval-epoch', locals())
 
                     # save all performance plots
                     performance_plots = self.get_performance_plots(object_of_study)
-                    post_model_eval(**locals())
+                    event_handler('post-model-eval', locals())
 
                     # log model evaluation
                     self.log_model_evaluation(object_of_study)
