@@ -649,22 +649,23 @@ class Theorist_GUI(Frame):
         return self._paused
 
     def run_meta_search(self, resume=False):
+        """ Implments a GUI for the Theorist.run_meta_search method.
 
-        if resume is False:
-            self._running = True
-            self._paused = False
-            self.update_run_button()
-            self._root.update()
+        For each of the callbacks (execution flow control and plotting) offered by the Theorist.run_meta_search,
+        it implements a function to carry out the GUI-operations.
 
-            # initialize meta-parameter search
-            self.theorist.init_meta_search(self.object_of_study)
+        """
+
+        ################################
+        # Callback definitions
+        ################################
 
         def check_paused_callback():
             return self._paused
 
         def on_paused_model_search_callback(epoch, idx, num_meta_idx, **kwargs):
             self._last_epoch = epoch
-            self.update_run_button(meta_idx=idx+1, num_meta_idx=num_meta_idx)
+            self.update_run_button(meta_idx=idx + 1, num_meta_idx=num_meta_idx)
             self._root.update()
             return
 
@@ -679,7 +680,6 @@ class Theorist_GUI(Frame):
             self.update_performance_plot_list(performance_plots)
             self.update_supplementary_plot_list(supplementary_plots)
             return
-
 
         def pre_model_search_callback(epoch, model_search_epochs, idx, num_meta_idx, **kwargs):
             self.update_run_button(epoch=epoch + 1,
@@ -701,7 +701,7 @@ class Theorist_GUI(Frame):
             for item in range(self.listbox_supplementary.size()):
                 self.set_listbox_selection(self.listbox_supplementary, item)
                 self.update_plot(Plot_Windows.SUPPLEMENTARY, supplementary_plots, save=True,
-                                plot_name=meta_param_str)
+                                 plot_name=meta_param_str)
 
         def pre_model_eval_callback(idx, num_meta_idx, **kwargs):
             self.update_run_button(meta_idx=idx + 1, num_meta_idx=num_meta_idx)
@@ -710,13 +710,26 @@ class Theorist_GUI(Frame):
             self.update_plot(Plot_Windows.PERFORMANCE, performance_plots)
             self._root.update()
             self.update_run_button(epoch=epoch + 1, num_epochs=num_eval_epochs,
-                                  meta_idx=idx + 1, num_meta_idx=num_meta_idx)
+                                   meta_idx=idx + 1, num_meta_idx=num_meta_idx)
 
         def post_model_eval_callback(performance_plots, meta_param_str, eval_param_str):
             for item in range(self.listbox_performance.size()):
                 self.set_listbox_selection(self.listbox_performance, item)
                 plot_str = meta_param_str + "_eval_" + eval_param_str
                 self.update_plot(Plot_Windows.PERFORMANCE, performance_plots, save=True, plot_name=plot_str)
+
+        ################################
+        # Execution
+        ################################
+
+        if resume is False:
+            self._running = True
+            self._paused = False
+            self.update_run_button()
+            self._root.update()
+
+            # initialize meta-parameter search
+            self.theorist.init_meta_search(self.object_of_study)
 
         self.theorist.run_meta_search(object_of_study=self.object_of_study,
                                       resume=resume,
