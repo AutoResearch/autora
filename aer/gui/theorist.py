@@ -709,7 +709,7 @@ class Theorist_GUI(Frame):
             self.update_run_button(epoch=epoch + 1, num_epochs=num_eval_epochs,
                                    meta_idx=idx + 1, num_meta_idx=num_meta_idx)
 
-        def post_model_eval(performance_plots, meta_param_str, eval_param_str):
+        def post_model_eval(performance_plots, meta_param_str, eval_param_str, **kwargs):
             for item in range(self.listbox_performance.size()):
                 self.set_listbox_selection(self.listbox_performance, item)
                 plot_str = meta_param_str + "_eval_" + eval_param_str
@@ -744,28 +744,20 @@ class Theorist_GUI(Frame):
             # initialize meta-parameter search
             self.theorist.init_meta_search(self.object_of_study)
 
-        self.theorist.run_meta_search(
+        best_model = self.theorist.run_meta_search(
             object_of_study=self.object_of_study,
             resume=resume,
             last_epoch=self._last_epoch,
             last_meta_param_idx=self._last_meta_param_idx,
+
             check_paused=check_paused,
             check_running=check_running,
             check_not_running=check_not_running,
-            post_meta_search=post_meta_search,
-            on_paused_model_search=on_paused_model_search,
-            pre_model_search=pre_model_search,
-            post_model_search=post_model_search,
-            pre_meta_evaluation=pre_meta_evaluation,
-            pre_model_eval=pre_model_eval,
-            post_model_eval_epoch=post_model_eval_epoch,
-            post_model_eval=post_model_eval,
+
+            event_handler=event_handler,
         )
 
-        if self._running is True:
-            best_model = self.theorist.get_best_model(self.object_of_study, plot_model=True)
-
-        else:
+        if self._running is False:
             # reset gui elements
             self.reset_gui()
 
