@@ -1,4 +1,4 @@
-from abc import ABC, abstractmethod
+from abc import ABC
 
 import numpy as np
 import torch
@@ -6,8 +6,6 @@ import torch.optim as optim
 from torch import nn
 from torch.autograd import Variable
 
-import AER_config as AER_cfg
-import AER_experimentalist.experimentalist_config as exp_cfg
 import AER_experimentalist.experimentalist_popper_config as popper_config
 from AER_experimentalist.experimentalist import Experimentalist
 from AER_utils import Plot_Types
@@ -124,7 +122,8 @@ class Experimentalist_Popper(Experimentalist, ABC):
         for optimization_epoch in range(self.num_optimization_epochs):
             # feedforward pass on popper network
             popper_prediction = self.popper_net(popper_input)
-            # compute gradient that maximizes output of popper network (i.e. predicted loss of original model)
+            # compute gradient that maximizes output of popper network
+            # (i.e. predicted loss of original model)
             popper_loss_optim = -popper_prediction
             popper_loss_optim.backward()
             # compute new input

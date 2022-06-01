@@ -2,7 +2,7 @@ import sys
 
 from graphviz import Digraph
 
-from AER_theorist.darts.operations import *
+from AER_theorist.darts.operations import get_operation_label
 
 
 def plot(
@@ -66,7 +66,7 @@ def plot(
                 u = str(j - len(input_labels))
             v = str(i)
             params_counter = k
-            if op is not "none":
+            if op != "none":
                 op_label = op
                 if full_label:
                     params = param_list[

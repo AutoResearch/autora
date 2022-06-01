@@ -1,7 +1,3 @@
-from abc import ABC, abstractmethod
-
-import numpy as np
-
 from AER_experimentalist.experiment_environment.variable import Variable
 
 

@@ -10,7 +10,6 @@ from AER_experimentalist.experiment_environment.participant_exp_learning import 
 from AER_experimentalist.experiment_environment.variable import (
     outputTypes as output_type,
 )
-from AER_experimentalist.experimentalist_popper import Experimentalist_Popper
 from AER_theorist.darts.plot_utils import (
     generate_darts_summary_figures,
     load_model,
@@ -60,7 +59,7 @@ study_object = Object_Of_Study(
     name=study_name, independent_variables=IVs, dependent_variables=DVs
 )
 
-### PLOT MODEL SEARCH RESULTS
+# PLOT MODEL SEARCH RESULTS
 
 figure_names = (
     "legend",
@@ -96,25 +95,26 @@ y_reference_label = None
 # y_label = 'Params'
 # y_limit = [0, 12]
 
-# for non-BIC models: choose model with best fit and num_params<=num params of original model. If not available choose best model for num_params+1
+# for non-BIC models: choose model with best fit and num_params<=num params of original model.
+# If not available choose best model for num_params+1
 # arch_weights_name = "architecture_weights_fair_darts_v_1_wd_0_k_2_s_10.0_sample2_3"
 # model_weights_name = "model_weights_fair_darts_v_1_wd_0_k_2_s_10.0_sample2_3"
 
-##### DELLA
+# DELLA
 arch_weights_name = "architecture_weights_original_darts_v_1_wd_0_k_1_s_9.0_sample2_3"
 model_weights_name = "model_weights_original_darts_v_1_wd_0_k_1_s_9.0_sample2_3"
 
-##### FINAL
+# FINAL
 arch_weights_name = (
     "architecture_weights_original_darts_v_1_wd_0.025_k_3_s_4.0_sample0_0"
 )
 model_weights_name = "model_weights_original_darts_v_1_wd_0.025_k_3_s_4.0_sample0_0"
 
-##### FINAL 2
+# FINAL 2
 # arch_weights_name = "architecture_weights_original_darts_v_1_wd_0.25_k_1_s_3.0_sample0_1"
 # model_weights_name = "model_weights_original_darts_v_1_wd_0.25_k_1_s_3.0_sample0_1"
 
-##### ICML
+# ICML
 arch_weights_name = (
     "architecture_weights_original_darts_v_1_wd_0.025_k_3_s_4.0_sample0_0"
 )
@@ -144,14 +144,14 @@ generate_darts_summary_figures(
     y_reference_label,
 )
 
-### PLOT MODEL SEARCH RESULTS
+# PLOT MODEL SEARCH RESULTS
 
 figure_name = aer_cfg.figure_name_graph
 plot_model_graph(
     study_name, arch_weights_name, model_weights_name, study_object, figure_name
 )
 
-### PLOT MODEL SIMULATION
+# PLOT MODEL SIMULATION
 
 model = load_model(study_name, model_weights_name, arch_weights_name, study_object)
 

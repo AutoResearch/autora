@@ -1,5 +1,4 @@
-from tkinter import *
-from tkinter import ttk
+from tkinter import Button, E, Grid, N, S, Toplevel, W, ttk
 
 import AER_experimentalist.experiment_environment.experiment_config as config
 

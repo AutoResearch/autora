@@ -1,4 +1,4 @@
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 
 import numpy as np
 import torch
@@ -64,6 +64,7 @@ class Participant_In_Silico:
 
     def count_parameters(self):
         pytorch_total_params = sum(p.numel() for p in self.model.parameters())
+        return pytorch_total_params
 
     def figure_plot(self, comparison_model):
         raise Exception("Not implemented.")

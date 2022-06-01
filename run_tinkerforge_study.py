@@ -1,12 +1,10 @@
-from tkinter import *
+from tkinter import Tk
 
 from AER_experimentalist.experiment_environment.variable import Variable as Var
-from AER_experimentalist.experimentalist import Experimentalist
 from AER_experimentalist.experimentalist_popper import Experimentalist_Popper
 from AER_GUI import AER_GUI
 from AER_theorist.object_of_study import Object_Of_Study
 from AER_theorist.theorist_darts import Theorist_DARTS
-from AER_theorist.theorist_GUI import Theorist_GUI
 
 # GENERAL PARAMETERS
 
@@ -98,4 +96,5 @@ root.mainloop()
 #     # add new data to object of study
 #     study_object.add_data(data)
 #
-# # TODO: for AER_class, make sure to log the cycle state, so that the cycle can be reinitiated at the point it was last interrupted
+# TODO: for AER_class, make sure to log the cycle state,
+#  so that the cycle can be reinitiated at the point it was last interrupted

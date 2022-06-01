@@ -3,7 +3,13 @@ from typing import Any
 
 import requests
 from dotenv import load_dotenv
-from study_options import *
+from study_options import (
+    CompletionOptions,
+    DeviceOptions,
+    PeripheralOptions,
+    ProlificIdOptions,
+    StudyAction,
+)
 
 
 class ProlificRecruiter:
@@ -59,10 +65,14 @@ class ProlificRecruiter:
             total_available_places (int): Participant limit
             estimated_completion_time (int): How long the study takes
             reward (int): Amount of payment for completion
-            maximum_allowed_time (int, optional): Allows specification of time before submission times out.
-            eligibility_requirements (list, optional): Allows various options to filter participants. Defaults to [] (no requirements).
-            device_compatibility (list[DeviceOptions], optional): Allows selecting required devices. Defaults to [] (any device).
-            peripheral_requirements (list[PeripheralOptions], optional): Allows specifying additional requirements. Defaults to [] (no other requirements).
+            maximum_allowed_time (int, optional):
+                Allows specification of time before submission times out.
+            eligibility_requirements (list, optional):
+                Allows various options to filter participants. Defaults to [] (no requirements).
+            device_compatibility (list[DeviceOptions], optional):
+                Allows selecting required devices. Defaults to [] (any device).
+            peripheral_requirements (list[PeripheralOptions], optional):
+                Allows specifying additional requirements. Defaults to [] (no other requirements).
             internal_name (str, optional): Private name of study. Defaults to None.
 
         Returns:

@@ -35,7 +35,8 @@ classifier_weight_decay = 1e-2  # L1 weight decay applied to classifier weights
 custom_initialization = False
 init_method = (
     InitMethod.UNIFORM
-)  # method used to initialize weights during architecture evaluation (if re-initialize weights is set to True)
+)  # method used to initialize weights during architecture evaluation
+# (if re-initialize weights is set to True)
 init_uniform_interval = [-10, 10]  # interval for uniform parameter initialization
 init_normal_mean = 0  # mean for normal parameter initialization
 init_normal_std = 1  # standard deviation for normal parameter initialization
@@ -44,7 +45,8 @@ fair_darts_loss_weight = (
 )
 
 # evaluation
-n_architectures_sampled = 1  # 3      # num of (distinct) model architectures sampled from final architecture weights
+n_architectures_sampled = 1  # 3
+# num of (distinct) model architectures sampled from final architecture weights
 n_initializations_sampled = (
     5  # 5 #20            # num of model initializations searched
 )
@@ -62,7 +64,8 @@ eval_momentum = 0.9
 eval_weight_decay = 0
 eval_epochs = 1000  # 400 (good) #1000
 eval_custom_initialization = False
-fair_darts_weight_threshold = 0.05  # for a given edge, if all weights are below this threshold, sample 'none' operation
+fair_darts_weight_threshold = 0.05
+# for a given edge, if all weights are below this threshold, sample 'none' operation
 
 
 # hardware
@@ -77,9 +80,9 @@ exp_folder = "experiments"  # experiment name
 graph_filename = "model_graph"  # file name prefix of learned graph
 model_filename = "model_weights"  # file name prefix of learned model
 output_file_folder = "results"  # folder for simulation results
-arch_weight_decay_list = [
-    0
-]  # 0, 0.025, 0.05, 0.075, 0.1 # np.linspace(0, 6e-4, 6)               # list of architecture weight decays searched over (this decay scales with number of degrees of freedom)
+arch_weight_decay_list = [0]  # 0, 0.025, 0.05, 0.075, 0.1 # np.linspace(0, 6e-4, 6)
+# list of architecture weight decays searched over
+# (this decay scales with number of degrees of freedom)
 num_node_list = np.linspace(
     min_k, max_k, (max_k - min_k) + 1
 )  # list of k's searched over

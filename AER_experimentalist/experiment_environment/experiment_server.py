@@ -65,7 +65,8 @@ class Experiment_Server(Client_Server_Interface):
                             print(repr(data))
 
                         # if a connection is established, get the session ID
-                        # the protocol cannot continue without identifying the session ID between client and server
+                        # the protocol cannot continue without identifying the session ID
+                        # between client and server
 
                         if data == protocol.CLEAR_SESSIONS:
                             self._set_status(protocol.STATUS_CLEARING_SESSIONS)

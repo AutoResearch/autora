@@ -102,7 +102,7 @@ validation_data = experimentalist_validation.seed(
 )  # seed with new experiment
 study_object_validation.add_data(validation_data)
 
-### PLOT MODEL SEARCH RESULTS
+# PLOT MODEL SEARCH RESULTS
 
 figure_names = ("legend", "model_search_original", "model_search_random")
 titles = (
@@ -136,7 +136,7 @@ arch_weights_name = (
 )
 model_weights_name = "model_weights_original_darts_v_1_wd_0.75_k_3_s_1.0_sample0_0"
 
-### FINAL:
+# FINAL:
 arch_weights_name = "architecture_weights_original_darts_v_1_wd_0_k_2_s_1.0_sample0_1"
 model_weights_name = "model_weights_original_darts_v_1_wd_0_k_2_s_1.0_sample0_1"
 
@@ -163,14 +163,14 @@ generate_darts_summary_figures(
     y_reference_label,
 )
 
-### PLOT MODEL SEARCH RESULTS
+# PLOT MODEL SEARCH RESULTS
 
 figure_name = aer_cfg.figure_name_graph
 plot_model_graph(
     study_name, arch_weights_name, model_weights_name, study_object, figure_name
 )
 
-### PLOT MODEL SIMULATION
+# PLOT MODEL SIMULATION
 
 model = load_model(study_name, model_weights_name, arch_weights_name, study_object)
 

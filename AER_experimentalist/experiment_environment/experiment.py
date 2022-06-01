@@ -159,7 +159,10 @@ class Experiment:
                     if covariate:
                         if (
                             UID is None
-                        ):  # todo: resolve UID and priority argument issue. UID/priority arguments are required for tinkerforge IVs which inherit from IV but not for IV_in_silico which inherits from Variable
+                        ):  # todo: resolve UID and priority argument issue.
+                            # UID/priority arguments are required for tinkerforge IVs
+                            # which inherit from IV but not for IV_in_silico which
+                            # inherits from Variable
                             self.CVs.append(
                                 V_class(
                                     variable_label=variable_label,
@@ -339,7 +342,8 @@ class Experiment:
         for independent_variable in self.IVs:
             independent_variable.manipulate()
 
-        # if there is no control by time variables, then allow for some time for manipulation to take effect
+        # if there is no control by time variables, then
+        # allow for some time for manipulation to take effect
         if self._IV_time_idx == -1 and self._DV_time_idx == -1:
             self.delay_measurement()
 

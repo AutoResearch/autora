@@ -1,5 +1,3 @@
-import time
-
 from IV import IV
 
 

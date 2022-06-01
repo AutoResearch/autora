@@ -1,7 +1,11 @@
+import os
+
+import matplotlib.pyplot as plt
 import numpy as np
 import torch
 import torch.nn as nn
 from graphviz import Digraph
+from matplotlib import pyplot
 from torch.autograd import Variable
 
 from AER_experimentalist.experiment_environment.participant_in_silico import (
@@ -113,16 +117,16 @@ class Participant_Stroop(Participant_In_Silico):
     # read value from participant
     def get_value(self, variable_name):
 
-        if variable_name is "verbal_red":
+        if variable_name == "verbal_red":
             return self.output[0, 0].numpy()
 
-        elif variable_name is "verbal_green":
+        elif variable_name == "verbal_green":
             return self.output[0, 1].numpy()
 
-        elif variable_name is "verbal_sample":
+        elif variable_name == "verbal_sample":
             return self.output_sample.numpy()
 
-        elif variable_name is "verbal":
+        elif variable_name == "verbal":
             return self.output.numpy()
 
         raise Exception(
@@ -134,22 +138,22 @@ class Participant_Stroop(Participant_In_Silico):
     # assign value to participant
     def set_value(self, variable_name, value):
 
-        if variable_name is "color_red":
+        if variable_name == "color_red":
             self.color_red[0, 0] = value
 
-        elif variable_name is "color_green":
+        elif variable_name == "color_green":
             self.color_green[0, 0] = value
 
-        elif variable_name is "word_red":
+        elif variable_name == "word_red":
             self.word_red[0, 0] = value
 
-        elif variable_name is "word_green":
+        elif variable_name == "word_green":
             self.word_green[0, 0] = value
 
-        elif variable_name is "task_color":
+        elif variable_name == "task_color":
             self.task_color[0, 0] = value
 
-        elif variable_name is "task_word":
+        elif variable_name == "task_word":
             self.task_word[0, 0] = value
 
         else:
@@ -196,17 +200,17 @@ class Participant_Stroop(Participant_In_Silico):
 
         for idx, IV in enumerate(object_of_study.independent_variables):
             variable_name = IV.get_name()
-            if variable_name is "color_red":
+            if variable_name == "color_red":
                 input_full[:, 0] = input[:, idx]
-            if variable_name is "color_green":
+            if variable_name == "color_green":
                 input_full[:, 1] = input[:, idx]
-            if variable_name is "word_red":
+            if variable_name == "word_red":
                 input_full[:, 2] = input[:, idx]
-            if variable_name is "word_green":
+            if variable_name == "word_green":
                 input_full[:, 3] = input[:, idx]
-            if variable_name is "task_color":
+            if variable_name == "task_color":
                 input_full[:, 4] = input[:, idx]
-            if variable_name is "task_word":
+            if variable_name == "task_word":
                 input_full[:, 5] = input[:, idx]
 
         output_fnc = nn.Softmax(dim=1)
@@ -354,11 +358,6 @@ class Participant_Stroop(Participant_In_Silico):
             )
 
         # plot
-        import os
-
-        import matplotlib.pyplot as plt
-        import seaborn as sns
-        from matplotlib import pyplot
 
         fig, ax = pyplot.subplots(figsize=figure_dimensions)
 

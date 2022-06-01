@@ -8,17 +8,11 @@ import torch
 import torch.nn as nn
 from torch.autograd import Variable
 
-import AER_config as AER_cfg
-
-# new
-import AER_theorist.darts.darts_config as darts_cfg
-
-# from AER_theorist.darts.object_of_study import outputTypes
 import AER_theorist.darts.SimpleNet_dataset as SimpleNetDatasetFile
 from AER_experimentalist.experiment_environment.variable import outputTypes
-
-# old
 from AER_theorist.darts.SimpleNet_dataset import SimpleNetDataset
+
+# new
 
 
 def create_output_file_name(

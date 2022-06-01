@@ -1,4 +1,3 @@
-from abc import ABC, abstractmethod
 from enum import Enum
 
 import numpy as np
@@ -35,14 +34,16 @@ class Variable:
             self._variable_label = variable_label
         self._rescale = rescale
 
-    # Get range of variable.
-    # The variable range determines the minimum and maximum allowed value to be manipulated or measured.
     def __get_value_range__(self):
+        """Get range of variable.
+        The variable range determines the minimum and maximum allowed value
+        to be manipulated or measured."""
         return self._value_range
 
-    # Set range of variable.
-    # The variable range determines the minimum and maximum allowed value to be manipulated or measured.
     def __set_value_range__(self, value_range):
+        """Set range of variable.
+        The variable range determines the minimum and maximum allowed value
+        to be manipulated or measured."""
         self._value_range = value_range
 
     # Cap value of variable
@@ -59,8 +60,9 @@ class Variable:
     def set_value(self, value):
         self._value = self.__cap_value__(value)
 
-    # Reads and sets value of independent variable from a dictionary with variable_label being the key
     def get_value_from_dict(self, dictionary, position):
+        """Reads and sets value of independent variable from a dictionary with
+        variable_label being the key"""
 
         value_list = dictionary.get(self.get_name())  # get_variable_label()
 
@@ -98,7 +100,8 @@ class Variable:
 
         return rescaled_list
 
-    # Reads and sets value of independent variable from a dictionary with variable_label being the key
+    # Reads and sets value of independent variable from a dictionary
+    # with variable_label being the key
     def set_value_from_dict(self, dictionary, position):
 
         value_list = dictionary.get(self.get_name())

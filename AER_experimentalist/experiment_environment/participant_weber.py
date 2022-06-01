@@ -4,7 +4,6 @@ import numpy as np
 import torch
 import torch.nn as nn
 from graphviz import Digraph
-from torch.autograd import Variable
 
 from AER_experimentalist.experiment_environment.participant_in_silico import (
     Participant_In_Silico,
@@ -54,10 +53,10 @@ class Participant_Weber(Participant_In_Silico):
     # read value from participant
     def get_value(self, variable_name):
 
-        if variable_name is "difference_detected":
+        if variable_name == "difference_detected":
             return self.output[0, 0].numpy()
 
-        elif variable_name is "difference_detected_sample":
+        elif variable_name == "difference_detected_sample":
             return self.output_sampled[0, 0].numpy()
 
         raise Exception(
@@ -69,10 +68,10 @@ class Participant_Weber(Participant_In_Silico):
     # assign value to participant
     def set_value(self, variable_name, value):
 
-        if variable_name is "S1":
+        if variable_name == "S1":
             self.S1[0, 0] = value
 
-        elif variable_name is "S2":
+        elif variable_name == "S2":
             self.S2[0, 0] = value
 
         else:
@@ -107,9 +106,9 @@ class Participant_Weber(Participant_In_Silico):
 
         for idx, IV in enumerate(object_of_study.independent_variables):
             variable_name = IV.get_name()
-            if variable_name is "S1":
+            if variable_name == "S1":
                 input_full[:, 0] = input[:, idx]
-            if variable_name is "S2":
+            if variable_name == "S2":
                 input_full[:, 1] = input[:, idx]
 
         output_fnc = nn.Sigmoid()
@@ -120,8 +119,8 @@ class Participant_Weber(Participant_In_Silico):
     def graph_soft(self, filepath):
 
         # formatting
-        decimals = 2
-        format_string = "{:." + "{:.0f}".format(decimals) + "f}"
+        # decimals = 2
+        # format_string = "{:." + "{:.0f}".format(decimals) + "f}"
 
         # set up graph
         g = Digraph(
@@ -161,10 +160,10 @@ class Participant_Weber(Participant_In_Silico):
         g.node(out2, fillcolor="#CBE7C7")
 
         # add links from input to hidden
-        strength1 = "1"
-        strength2 = "2"
-        strength3 = "3"
-        strength4 = "4"
+        # strength1 = "1"
+        # strength2 = "2"
+        # strength3 = "3"
+        # strength4 = "4"
 
         # g.attr('edge', color="#000000", penwidth=strength3) # softmax
         # g.edge(input1, hidden1, fillcolor="#000000")
@@ -199,8 +198,8 @@ class Participant_Weber(Participant_In_Silico):
     def graph_simple(self, filepath):
 
         # formatting
-        decimals = 2
-        format_string = "{:." + "{:.0f}".format(decimals) + "f}"
+        # decimals = 2
+        # format_string = "{:." + "{:.0f}".format(decimals) + "f}"
 
         # set up graph
         g = Digraph(
@@ -228,13 +227,13 @@ class Participant_Weber(Participant_In_Silico):
 
         hidden1 = "x_2"
         hidden2 = "x_3"
-        hidden3 = "x_3"
+        # hidden3 = "x_3"
         g.node(hidden1, fillcolor="#BBCCF9")
         g.node(hidden2, fillcolor="#BBCCF9")
         # g.node(hidden3, fillcolor='#BBCCF9')
 
         # add output node
-        out1 = "P(detected)"
+        # out1 = "P(detected)"
         # g.node(out1, fillcolor='#CBE7C7')
 
         out2 = "r"
@@ -305,8 +304,8 @@ class Participant_Weber(Participant_In_Silico):
         y3_approx_data = output3_approx
 
         x_limit = [0, max_diff]
-        x_label = "$\Delta I$"
-        y_label = "$P($Detected$)$"
+        x_label = r"$\Delta I$"
+        y_label = r"$P($Detected$)$"
         legend = list()
         for S1 in S1_list:
             legend.append("$I_0$ = " + str(S1) + " (Orig.)")
@@ -401,7 +400,7 @@ def plot_psychophysics(model, S1_list=(1, 2.5, 4), max_diff=5, num_data_points=1
 
     x_limit = [0, max_diff]
     y_limit = [0, 1]
-    x_label = "$\Delta I = I_1 - I_0$"
+    x_label = r"$\Delta I = I_1 - I_0$"
     y_label = "P(Detected)"
     legend = list()
     for S1 in S1_list:

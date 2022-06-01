@@ -1,11 +1,10 @@
-from tkinter import *
-from tkinter import ttk
+from tkinter import END, E, N, S, W, ttk
 
 import AER_experimentalist.experiment_environment.experiment_config as config
 from AER_experimentalist.experiment_environment.experimentalist_GUI import (
     Experimentalist_GUI,
 )
-from AER_experimentalist.experiment_environment.utils import *
+from AER_experimentalist.experiment_environment.utils import get_experiment_files
 
 
 class Experiment_GUI(Experimentalist_GUI):

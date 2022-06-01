@@ -6,12 +6,11 @@ import shutil
 import sys
 import time
 from abc import ABC, abstractmethod
-from tkinter import *
+from tkinter import Tk
 
 from matplotlib.figure import Figure
 
 import AER_config as aer_config
-from AER_theorist.object_of_study import Object_Of_Study
 from AER_theorist.theorist_GUI import Theorist_GUI
 from AER_utils import Plot_Types
 
@@ -61,7 +60,7 @@ class Theorist(ABC):
     def GUI(self, object_of_study):
         root = Tk()
 
-        app = Theorist_GUI(theorist=self, object_of_study=object_of_study, root=root)
+        Theorist_GUI(theorist=self, object_of_study=object_of_study, root=root)
 
         root.mainloop()
 
@@ -80,7 +79,8 @@ class Theorist(ABC):
                 raise Exception(
                     "Not allowed to modify model search parameter '"
                     + str(key)
-                    + "'. Dictionary self._model_search_parameters indicates that the parameter cannot be modified."
+                    + "'. Dictionary self._model_search_parameters indicates "
+                    "that the parameter cannot be modified."
                 )
         else:
             raise Exception(
@@ -398,7 +398,8 @@ class Theorist(ABC):
         self.model_search_id += 1
         self.setup_logging()
 
-        # initialize dictionary for logging the time elapsed associated with each meta search condition
+        # initialize dictionary for logging the time elapsed associated
+        # with each meta search condition
         self.time_elapsed_log = dict()
         names = self._meta_parameter_names_to_str_list()
         for name in names:
@@ -585,7 +586,8 @@ class Theorist(ABC):
         log_format = "%(asctime)s %(message)s"
         # sets u a logging system in python,
         # - the stream is set to to the output console (stdout)
-        # - report events that occur during normal operation of a program (logging.INFO), i.e. not during debugging
+        # - report events that occur during normal operation of a program (logging.INFO),
+        #   i.e. not during debugging
         # - use the pre-specified log format with time and message
         # - use the corresponding date format
         logging.basicConfig(

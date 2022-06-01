@@ -5,7 +5,6 @@ import glob
 import logging
 import os
 import sys
-import time
 
 import numpy as np
 import torch
@@ -23,7 +22,7 @@ try:
     from cnnsimple.architect import Architect
     from cnnsimple.model_search import Network
     from cnnsimple.object_of_study import outputTypes
-except:
+except ImportError:
     import genotypes
     import model_search_config as cfg
     import plot_utils as plotutils
@@ -34,7 +33,7 @@ except:
     from object_of_study import outputTypes
 
 
-################ PARAMETERIZATION ################
+# ------------------ PARAMETERIZATION ------------------
 
 # parse arguments
 parser = argparse.ArgumentParser("modelSearch")
@@ -127,7 +126,7 @@ args.show_arch_weights = cfg.show_arch_weights
 )
 
 
-################ LOGGING ################
+# ------------------ LOGGING ------------------
 
 # create some identifier for log folder
 args.save = "{}-v{}".format(args.obj_of_study.__get_name__(), str(args.log_version))
@@ -144,7 +143,8 @@ if args.slurm_id == 0:
 log_format = "%(asctime)s %(message)s"
 # sets u a logging system in python,
 # - the stream is set to to the output console (stdout)
-# - report events that occur during normal operation of a program (logging.INFO), i.e. not during debugging
+# - report events that occur during normal operation of a program
+#   (logging.INFO), i.e. not during debugging
 # - use the pre-specified log format with time and message
 # - use the corresponding date format
 logging.basicConfig(
@@ -162,16 +162,7 @@ fh.setFormatter(logging.Formatter(log_format))
 # adds file name to logger
 logging.getLogger().addHandler(fh)
 
-# # create path for results file
-# output_file_name = utils.create_output_file_name(file_prefix='model_search_' + args.obj_of_study.__get_name__(),
-#                                                  log_version = args.log_version,
-#                                                  weight_decay=args.arch_weight_decay_df,
-#                                                  k=args.num_graph_nodes,
-#                                                  seed=args.seed) + '.csv'
-# output_file_path = os.path.join(args.exp_folder, args.save, args.output_file_folder, output_file_name)
-#
-
-############# MAIN LOOP (ARCHITECTURE SEARCH) ##################
+# --------------- MAIN LOOP (ARCHITECTURE SEARCH) --------------- #
 
 
 def main():
@@ -241,7 +232,8 @@ def main():
         num_workers=0,
     )
 
-    # Set the learning rate of each parameter group using a cosine annealing schedule (model optimization)
+    # Set the learning rate of each parameter group
+    # using a cosine annealing schedule (model optimization)
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
         optimizer, float(args.epochs), eta_min=args.learning_rate_min
     )
@@ -257,7 +249,7 @@ def main():
         numArchOps = model.alphas_normal.data.shape[1]  # number of operations
         try:
             ArchOpsLabels = cnnsimple.genotypes.PRIMITIVES
-        except:
+        except Exception:
             ArchOpsLabels = genotypes.PRIMITIVES
 
         # function needed to compute BIC & AIC
@@ -401,37 +393,6 @@ def main():
                 prediction=soft_prediction,
             )
 
-    # # save image of final genotype
-    # if(args.debug):
-    #   viz.plot(genotype.normal, args.num_graph_nodes, graph_filepath, input_labels=args.input_labels)
-    #
-    # # stores the model and architecture
-    # model_filename = utils.create_output_file_name(file_prefix='model_weights',
-    #                                                log_version = args.log_version,
-    #                                                weight_decay=args.arch_weight_decay_df,
-    #                                                k=args.num_graph_nodes,
-    #                                                seed=args.seed)
-    #
-    # arch_filename = utils.create_output_file_name(file_prefix='arch_weights',
-    #                                                log_version=args.log_version,
-    #                                                weight_decay=args.arch_weight_decay_df,
-    #                                                k=args.num_graph_nodes,
-    #                                                seed=args.seed)
-    #
-    # model_filepath = os.path.join(args.exp_folder, args.save, args.output_file_folder, model_filename + '.pt')
-    # arch_filepath = os.path.join(args.exp_folder, args.save, args.output_file_folder, arch_filename + '.pt')
-    #
-    # utils.save(model, model_filepath)
-    # torch.save(model.alphas_normal, arch_filepath)
-    #
-    # # generate validation set for computing BIC and AIC
-    # bic_valid_queue = torch.utils.data.DataLoader(
-    #     train_data, batch_size=args.bic_test_size,
-    #     sampler=torch.utils.data.sampler.SubsetRandomSampler(indices[:split]),
-    #     pin_memory=True, num_workers=2)
-    #
-    # evaluate_architectures(train_data, train_queue, valid_queue, bic_valid_queue, model, criterion)
-
 
 def evaluate_architectures(
     train_data, train_queue, valid_queue, bic_valid_queue, model, criterion
@@ -486,7 +447,6 @@ def evaluate_architectures(
                 if torch.eq(logged_weights, candidate_weights).all() is True:
                     weights_are_novel = False
             if weights_are_novel:
-                novel_weights = candidate_weights
                 found_weights = True
             else:
                 candidate_weights = model.sample_alphas_normal()
@@ -516,7 +476,8 @@ def evaluate_architectures(
             weight_decay=args.weight_decay,
         )
 
-        # Set the learning rate of each parameter group using a cosine annealing schedule (model optimization)
+        # Set the learning rate of each parameter group
+        # using a cosine annealing schedule (model optimization)
         scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
             optimizer, float(args.epochs), eta_min=args.learning_rate_min
         )

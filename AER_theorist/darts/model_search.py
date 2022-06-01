@@ -10,19 +10,25 @@ from torch.autograd import Variable
 
 from AER_theorist.darts.fan_out import Fan_Out
 from AER_theorist.darts.genotypes import PRIMITIVES, Genotype
-from AER_theorist.darts.operations import *
+from AER_theorist.darts.operations import OPS, get_operation_label
 
 
 class DARTS_Type(Enum):
     ORIGINAL = (
-        1  # Liu, Simonyan & Yang (2018). Darts: Differentiable architecture search
+        # Liu, Simonyan & Yang (2018). Darts: Differentiable architecture
+        # search
+        1
     )
-    FAIR = 2  # Chu, Zhou, Zhang & Li (2020). Fair darts: Eliminating unfair advantages in differentiable architecture search
+    # Chu, Zhou, Zhang & Li (2020). Fair darts: Eliminating unfair advantages
+    # in differentiable architecture search
+    FAIR = 2
 
 
-# for 2 input nodes, 1 output node and 4 intermediate nodes, there are 14 possible edges (x 8 operations)
+# for 2 input nodes, 1 output node and 4 intermediate nodes,
+# there are 14 possible edges (x 8 operations)
 # Let input nodes be 1, 2 intermediate nodes 3, 4, 5, 6, and output node 7
-# The edges are 3-1, 3-2; 4-1, 4-2, 4-3; 5-1, 5-2, 5-3, 5-4; 6-1, 6-2, 6-3, 6-4, 6-5; 2 + 3 + 4 + 5 = 14 edges
+# The edges are 3-1, 3-2; 4-1, 4-2, 4-3; 5-1, 5-2, 5-3, 5-4; 6-1, 6-2,
+# 6-3, 6-4, 6-5; 2 + 3 + 4 + 5 = 14 edges
 
 
 class MixedOp(nn.Module):
@@ -31,7 +37,9 @@ class MixedOp(nn.Module):
         self._ops = nn.ModuleList()
         # loop through all the 8 primitive operations
         for primitive in PRIMITIVES:
-            # OPS returns an nn module for a given primitive (defines as a string). each primitive is defined by the channels size and stride
+            # OPS returns an nn module for a given primitive (defines as a
+            # string). each primitive is defined by the channels size and
+            # stride
             op = OPS[primitive](C, stride, False)
 
             # EDIT 11/04/19 SM: adapting to new SimpleNet data
@@ -45,34 +53,40 @@ class MixedOp(nn.Module):
             #   op[0].bias.data.fill_(0.001)
 
     def forward(self, x, weights):
-        # there are 8 weights for all the eight primitives. then it returns the weighted sum of all operations performed on a given input
+        # there are 8 weights for all the eight primitives. then it returns the
+        # weighted sum of all operations performed on a given input
         return sum(w * op(x) for w, op in zip(weights, self._ops))
 
 
-# Let a cell be a DAG(directed acyclic graph) containing N nodes (2 input nodes 1 output node?)
+# Let a cell be a DAG(directed acyclic graph) containing N nodes (2 input
+# nodes 1 output node?)
 class Cell(nn.Module):
     def __init__(self, steps, n_input_states, C):
         # The first and second nodes of cell k are set equal to the outputs of
-        # cell k − 2 and cell k − 1, respectively, and 1 × 1 convolutions (ReLUConvBN) are inserted as necessary
+        # cell k − 2 and cell k − 1, respectively, and 1 × 1 convolutions
+        # (ReLUConvBN) are inserted as necessary
         super(Cell, self).__init__()
 
         # set parameters
         self._steps = steps  # hidden nodes
         self._n_input_states = n_input_states  # input nodes
 
-        # EDIT 11/04/19 SM: adapting to new SimpleNet data (changed from multiplier to steps)
+        # EDIT 11/04/19 SM: adapting to new SimpleNet data (changed from
+        # multiplier to steps)
         self._multiplier = steps
 
         # set operations according to number of modules (empty)
         self._ops = nn.ModuleList()
         self._bns = nn.ModuleList()
-        # iterate over edges: edges between each hidden node and input nodes + prev hidden nodes
+        # iterate over edges: edges between each hidden node and input nodes +
+        # prev hidden nodes
         for i in range(self._steps):  # hidden nodes
             for j in range(self._n_input_states + i):  # 2 refers to the 2 input nodes
                 # defines the stride for link between cells
                 stride = 1
                 # adds a mixed operation (derived from architecture parameters alpha)
-                # for 4 intermediate nodes, a total of 14 connections (MixedOps) is added
+                # for 4 intermediate nodes, a total of 14 connections
+                # (MixedOps) is added
                 op = MixedOp(C, stride)
                 # appends cell with mixed operation
                 self._ops.append(op)
@@ -87,11 +101,14 @@ class Cell(nn.Module):
             states.append(input)
 
         offset = 0
-        # this computes the states from intermediate nodes and adds them to the list of states (values of nodes)
-        # for each hidden node, compute edge between existing states (input nodes / previous hidden) nodes and current node
+        # this computes the states from intermediate nodes and adds them to the list of states
+        # (values of nodes)
+        # for each hidden node, compute edge between existing states (input
+        # nodes / previous hidden) nodes and current node
         for i in range(
             self._steps
-        ):  # compute the state for each hidden node, first hidden node is sum of input nodes, second is sum of input and first hidden
+        ):  # compute the state for each hidden node, first hidden node is
+            # sum of input nodes, second is sum of input and first hidden
             s = sum(
                 self._ops[offset + j](h, weights[offset + j])
                 for j, h in enumerate(states)
@@ -99,14 +116,16 @@ class Cell(nn.Module):
             offset += len(states)
             states.append(s)
 
-        # concatenates the states of the last n (self._multiplier) intermediate nodes to get the output of a cell
+        # concatenates the states of the last n (self._multiplier) intermediate
+        # nodes to get the output of a cell
         result = torch.cat(states[-self._multiplier :], dim=1)
         return result
 
 
 class Network(nn.Module):
 
-    # EDIT 11/04/19 SM: adapting to new SimpleNet data (changed steps from 4 to 2)
+    # EDIT 11/04/19 SM: adapting to new SimpleNet data (changed steps from 4
+    # to 2)
     def __init__(
         self,
         num_classes,
@@ -120,7 +139,9 @@ class Network(nn.Module):
         super(Network, self).__init__()
         self.DARTS_type = darts_type
         # set parameters
-        self._C = 1  # number of channels  EDIT 11/04/19 SM: adapting to new SimpleNet data (set self._C to 1 instead of C)
+        # number of channels  EDIT 11/04/19 SM: adapting to new SimpleNet data
+        # (set self._C to 1 instead of C)
+        self._C = 1
         self._num_classes = num_classes  # number of output classes
         self._criterion = criterion  # optimization criterion (e.g. softmax)
         self._steps = steps  # the number of intermediate nodes (4)
@@ -136,34 +157,41 @@ class Network(nn.Module):
         # define the stem of the model; REMOVE THIS, EMBED FANOUT HERE
         # EDIT 11/04/19 SM: adapting to new SimpleNet data
         # self.stem = nn.Sequential(
-        #   nn.Conv2d(3, C_curr, 3, padding=1, bias=False), # 2d convolution with 3 input channels (image colors) and 3*16 output channels (16 feature maps per channel)
-        #   nn.BatchNorm2d(C_curr) #  normalizes 4D input (a mini-batch of 2D inputs with additional channel dimension)
+        #   nn.Conv2d(3, C_curr, 3, padding=1, bias=False), # 2d convolution with 3 input channels
+        #   (image colors) and 3*16 output channels (16 feature maps per channel)
+        #   nn.BatchNorm2d(C_curr)
+        #  normalizes 4D input (a mini-batch of 2D inputs with additional channel dimension)
         # )
 
         # input nodes
         self.stem = nn.Sequential(Fan_Out(self._n_input_states))
 
         # EDIT 11/04/19 SM: adapting to new SimpleNet data
-        # C_prev, C_curr = C_curr, C # compute number of channels for the next layer
+        # C_prev, C_curr = C_curr, C # compute number of channels for the next
+        # layer
 
         self.cells = (
             nn.ModuleList()
         )  # get list of all current modules (should be empty)
 
         # generate a cell that undergoes architecture search
-        # EDIT 11/04/19 SM: adapting to new SimpleNet data (replaced self._multiplier with num_input states as second argument)
+        # EDIT 11/04/19 SM: adapting to new SimpleNet data (replaced
+        # self._multiplier with num_input states as second argument)
         self.cells = Cell(steps, self._n_input_states, C_curr)
 
         # compute number of input and output channels for the next layer
         # EDIT 11/04/19 SM: adapting to new SimpleNet data
         # C_prev = C_curr
 
-        # the pooling stencil size (aka kernel size) is determined to be (input_size+target_size-1) // target_size, i.e. rounded up
+        # the pooling stencil size (aka kernel size) is determined to be (input_size+target_size-1)
+        # // target_size, i.e. rounded up
         # EDIT 11/04/19 SM: adapting to new SimpleNet data
-        # self.global_pooling = nn.AdaptiveAvgPool2d(1) # replace this with a simple all to all connection (or something more constrained)
+        # self.global_pooling = nn.AdaptiveAvgPool2d(1) # replace this with a
+        # simple all to all connection (or something more constrained)
 
         # last layer is a linear classifier (e.g. with 10 CIFAR classes)
-        # EDIT 11/04/19 SM: adapting to new SimpleNet data (change input of nn layer from C_prev to self._dim_output)
+        # EDIT 11/04/19 SM: adapting to new SimpleNet data (change input of nn
+        # layer from C_prev to self._dim_output)
         self.classifier = nn.Linear(
             self._dim_output, num_classes
         )  # make this the number of input states
@@ -186,7 +214,8 @@ class Network(nn.Module):
         # compute stem first
         # EDIT 11/04/19 SM: adapting to new SimpleNet data
         # input_states = list()
-        # for i in range(self._n_input_states): # for now, it applies the same stem operation to the input n times and retrieves states for separate nodes for the cell
+        # for i in range(self._n_input_states): # for now, it applies the same stem operation to the
+        # input n times and retrieves states for separate nodes for the cell
         #   input_states.append(self.stem(input))
         input_states = self.stem(input)
 
@@ -213,7 +242,8 @@ class Network(nn.Module):
 
         # compute logits
         logits = self.classifier(cell_output.view(cell_output.size(0), -1))
-        # just gets output to have only 2 dimensions (batch_size x num units in output layer)
+        # just gets output to have only 2 dimensions (batch_size x num units in
+        # output layer)
 
         return logits
 
@@ -236,10 +266,12 @@ class Network(nn.Module):
         k = sum(
             1 for i in range(self._steps) for n in range(self._n_input_states + i)
         )  # the number of possible connections between nodes
-        # number of available primitive operations (8 different types for a conv net)
+        # number of available primitive operations (8 different types for a
+        # conv net)
         num_ops = len(PRIMITIVES)
 
-        # generate 14 (number of available edges) by 8 (operations) weight matrix for normal alphas of the architecture
+        # generate 14 (number of available edges) by 8 (operations)
+        # weight matrix for normal alphas of the architecture
         self.alphas_normal = Variable(
             1e-3 * torch.randn(k, num_ops), requires_grad=True
         )
@@ -312,7 +344,8 @@ class Network(nn.Module):
     # returns the genotype of the model
     def genotype(self, sample=False):
 
-        # this function uses the architecture weights to retrieve the operations with the highest weights
+        # this function uses the architecture weights to retrieve the
+        # operations with the highest weights
         def _parse(weights):
             gene = []
             n = (
@@ -322,7 +355,9 @@ class Network(nn.Module):
             for i in range(self._steps):
                 end = start + n
                 W = weights[start:end].copy()
-                # first get all the edges for a given node, edges are sorted according to their highest (non-none) weight, starting from the edge with the smallest heighest weight
+                # first get all the edges for a given node, edges are sorted according to their
+                # highest (non-none) weight, starting from the edge with the smallest heighest
+                # weight
                 edges = sorted(
                     range(n),
                     key=lambda x: -max(
@@ -331,7 +366,8 @@ class Network(nn.Module):
                         if k != PRIMITIVES.index("none")
                     ),
                 )
-                # for each edge, figure out which is the primitive with the highest
+                # for each edge, figure out which is the primitive with the
+                # highest
                 for (
                     j
                 ) in edges:  # looping through all the edges for the current node (i)
@@ -342,9 +378,12 @@ class Network(nn.Module):
                         )
                     else:
                         k_best = None
-                        for k in range(len(W[j])):  # looping through all the primitives
+                        # looping through all the primitives
+                        for k in range(len(W[j])):
                             # choose the primitive with the highest weight
-                            # if k != PRIMITIVES.index('none'): # EDIT SM 01/13: commented to include "none" weights in genotype
+                            # if k != PRIMITIVES.index('none'):
+                            # EDIT SM 01/13: commented to include "none"
+                            # weights in genotype
                             if k_best is None or W[j][k] > W[j][k_best]:
                                 k_best = k
                         # add gene (primitive, edge number)
@@ -368,16 +407,18 @@ class Network(nn.Module):
         return genotype
 
     def countParameters(self, print_parameters=False):
-        n_params_total = 0  # counts only parameters of operations with the highest architecture weight
+        # counts only parameters of operations with the highest architecture
+        # weight
+        n_params_total = 0
 
         # count classifier
         for parameter in self.classifier.parameters():
-            if parameter.requires_grad == True:
+            if parameter.requires_grad is True:
                 n_params_total += parameter.data.numel()
 
         # count stem
         for parameter in self.stem.parameters():
-            if parameter.requires_grad == True:
+            if parameter.requires_grad is True:
                 n_params_total += parameter.data.numel()
 
         n_params_base = (
@@ -385,7 +426,8 @@ class Network(nn.Module):
         )
 
         param_list = list()
-        # now count number of parameters for cells that have highest probability
+        # now count number of parameters for cells that have highest
+        # probability
         for idx, op in enumerate(self.cells._ops):
             # pick most operation with highest likelihood
             values = self.alphas_normal[idx, :].data.numpy()
@@ -400,7 +442,7 @@ class Network(nn.Module):
 
                     for parameter in subop.parameters():
                         tmp_param_list.append(parameter.data.numpy().squeeze())
-                        if parameter.requires_grad == True:
+                        if parameter.requires_grad is True:
                             n_params_total += parameter.data.numel()
 
             print_parameters = True
@@ -428,7 +470,8 @@ class Network(nn.Module):
             tmp_param_list.append(
                 self.classifier._parameters["weight"].data[:, edge].numpy()
             )
-            # add partial bias (bias of classifier units will be devided by number of edges)
+            # add partial bias (bias of classifier units will be devided by
+            # number of edges)
             if "bias" in self.classifier._parameters.keys() and edge == 0:
                 tmp_param_list.append(self.classifier._parameters["bias"].data.numpy())
             param_list.append(tmp_param_list)
@@ -445,7 +488,7 @@ class Network(nn.Module):
 
     def isiterable(p_object):
         try:
-            it = iter(p_object)
+            iter(p_object)
         except TypeError:
             return False
         return True

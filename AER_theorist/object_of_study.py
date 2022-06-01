@@ -1,7 +1,5 @@
 import copy
 import random
-from abc import ABC, abstractmethod
-from enum import Enum
 from typing import Dict, List
 
 import numpy as np
@@ -9,7 +7,7 @@ import torch
 from torch.utils.data import Dataset
 
 import AER_config as AER_cfg
-from AER_experimentalist.experiment_environment.variable import *
+from AER_experimentalist.experiment_environment.variable import Variable
 
 
 class Object_Of_Study(Dataset):
@@ -66,7 +64,8 @@ class Object_Of_Study(Dataset):
         for variable in dependent_variables:
             if variable.type != self.output_type:
                 Exception(
-                    "Dependent variable output types don't match. Different output types are not supported yet."
+                    "Dependent variable output types don't match. "
+                    "Different output types are not supported yet."
                 )
 
         # set up data
@@ -508,21 +507,3 @@ def unnormalize(tensor, mean, std):
     for t, m, s in zip(tensor, mean, std):
         t.mul_(s).add_(m)
     return tensor
-
-
-class unnormalize(object):
-    def __init__(self, mean, std):
-        self.mean = mean
-        self.std = std
-
-    def __call__(self, tensor):
-        """
-        Args:
-            tensor (Tensor): Tensor image of size (C, H, W) to be normalized.
-        Returns:
-            Tensor: Normalized image.
-        """
-        for t, m, s in zip(tensor, self.mean, self.std):
-            t.mul_(s).add_(m)
-            # The normalize code -> t.sub_(m).div_(s)
-        return tensor

@@ -3,10 +3,9 @@
 # path = 'experiments/experiment0.exp'
 # file = Experiment(path)
 
-from tkinter import *
+from tkinter import Tk
 
 from AER_experimentalist.experiment_environment.experiment_GUI import Experiment_GUI
-from AER_experimentalist.experiment_environment.utils import *
 
 # init_epaper()
 

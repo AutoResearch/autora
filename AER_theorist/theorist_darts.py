@@ -61,10 +61,14 @@ class Theorist_DARTS(Theorist, ABC):
             raise Exception("DARTS Type " + str(self.DARTS_type) + " not implemented")
 
     def get_model_search_parameters(self):
+        def lm_float(x):
+            return float(x)
 
-        lm_float = lambda x: float(x)
-        lm_int = lambda x: int(x)
-        lm_bool = lambda x: bool(x)
+        def lm_int(x):
+            return int(x)
+
+        def lm_bool(x):
+            return bool(x)
 
         # architecture parameters
         self._model_search_parameters["arch weight decay"] = [
@@ -267,14 +271,6 @@ class Theorist_DARTS(Theorist, ABC):
 
         return model
 
-    # def evaluate_model_search(self, object_of_study):
-    #
-    #     [arch_weight_decay_df, num_graph_nodes, seed] = self.get_meta_parameters()
-    #     model_eval_filepath = self.evaluate_architectures(object_of_study, self.train_queue, self.valid_queue,
-    #                                                       self.model,
-    #                                                       arch_weight_decay_df, num_graph_nodes, seed)
-    #     self._model_summary_list.append(model_eval_filepath)
-
     def init_meta_evaluation(self, object_of_study=None):
 
         model = self.model
@@ -387,7 +383,6 @@ class Theorist_DARTS(Theorist, ABC):
                     if torch.eq(logged_weights, candidate_weights).all():
                         weights_are_novel = False
                 if weights_are_novel:
-                    novel_weights = candidate_weights
                     found_weights = True
                 else:
                     candidate_weights = self.model.sample_alphas_normal(
@@ -434,7 +429,8 @@ class Theorist_DARTS(Theorist, ABC):
             weight_decay=darts_cfg.eval_weight_decay,
         )
 
-        # Set the learning rate of each parameter group using a cosine annealing schedule (model optimization)
+        # Set the learning rate of each parameter group
+        # using a cosine annealing schedule (model optimization)
         self._eval_scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
             self._eval_optimizer,
             float(darts_cfg.eval_epochs),
@@ -684,7 +680,8 @@ class Theorist_DARTS(Theorist, ABC):
             num_workers=0,
         )
 
-        # combine the validation set with a sampler, and provides an iterable over the validation set
+        # combine the validation set with a sampler,
+        # and provides an iterable over the validation set
         self.valid_queue = torch.utils.data.DataLoader(
             train_data,
             batch_size=darts_cfg.batch_size,
@@ -999,8 +996,6 @@ class Theorist_DARTS(Theorist, ABC):
                 .numpy()
             )
             if IV2 is None:  # prepare line plot
-                # x_prediction = object_of_study.get_IVs_from_input(counterbalanced_input, IV1).detach().numpy().flatten()
-                # y_prediction = object_of_study.average_DV_for_IVs(DV, IVs, counterbalanced_input.detach().numpy(), y_prediction)
                 x_prediction, y_prediction = object_of_study.average_DV_for_IVs(
                     DV, IVs, counterbalanced_input.detach().numpy(), y_prediction
                 )
@@ -1066,9 +1061,6 @@ class Theorist_DARTS(Theorist, ABC):
                 .flatten()
             )
 
-            # determine y limits
-            # y_limit = [np.amin([np.amin(y_data.numpy()), np.amin(y_prediction.detach().numpy()) ]),
-            #            np.amax([np.amax(y_data.numpy()), np.amax(y_prediction.detach().numpy()) ])]
             y_limit = [np.amin(y_data), np.amax(y_data)]
 
             # determine y_label
@@ -1342,7 +1334,6 @@ class Theorist_DARTS(Theorist, ABC):
                     if torch.eq(logged_weights, candidate_weights).all():
                         weights_are_novel = False
                 if weights_are_novel:
-                    novel_weights = candidate_weights
                     found_weights = True
                 else:
                     candidate_weights = model.sample_alphas_normal(
@@ -1381,7 +1372,8 @@ class Theorist_DARTS(Theorist, ABC):
 
                 new_model.fix_architecture(True, candidate_weights)
 
-                # optimizer is standard stochastic gradient decent with some momentum and weight decay
+                # optimizer is standard stochastic gradient decent
+                # with some momentum and weight decay
                 optimizer = torch.optim.SGD(
                     new_model.parameters(),
                     darts_cfg.eval_learning_rate,
@@ -1389,7 +1381,8 @@ class Theorist_DARTS(Theorist, ABC):
                     weight_decay=darts_cfg.eval_weight_decay,
                 )
 
-                # Set the learning rate of each parameter group using a cosine annealing schedule (model optimization)
+                # Set the learning rate of each parameter group
+                # using a cosine annealing schedule (model optimization)
                 scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
                     optimizer,
                     float(darts_cfg.eval_epochs),
@@ -1571,7 +1564,8 @@ def train(
             input_search, target_search, optimizer, unrolled=darts_cfg.unrolled
         )
 
-        # Set the learning rate of each parameter group using a cosine annealing schedule (model optimization)
+        # Set the learning rate of each parameter group using a
+        # cosine annealing schedule (model optimization)
         optimizer = torch.optim.SGD(
             model.parameters(),
             darts_cfg.learning_rate,
@@ -1681,119 +1675,3 @@ def init_weights(m):
                     mean=darts_cfg.init_normal_mean,
                     std=darts_cfg.init_normal_std,
                 )
-
-
-# def architecture_search(self, object_of_study, arch_weight_decay_df, num_graph_nodes, seed):
-#     # initializes the model given number of channels, output classes and the training criterion
-#     model = Network(object_of_study.__get_output_dim__(), self.criterion, steps=int(num_graph_nodes),
-#                     n_input_states=object_of_study.__get_input_dim__(),
-#                     classifier_weight_decay=darts_cfg.classifier_weight_decay)
-#
-#     # log size of parameter space
-#     logging.info("param size: %fMB", utils.count_parameters_in_MB(model))
-#
-#     # optimizer is standard stochastic gradient decent with some momentum and weight decay
-#     optimizer = torch.optim.SGD(
-#         model.parameters(),
-#         darts_cfg.learning_rate,
-#         momentum=darts_cfg.momentum,
-#         weight_decay=darts_cfg.weight_decay)
-#
-#     # determine training set
-#     train_data = object_of_study
-#     num_train = len(train_data)  # number of patterns
-#     indices = list(range(num_train))  # indices of all patterns
-#     split = int(np.floor(darts_cfg.train_portion * num_train))  # size of training set
-#
-#     # combine the training set with a sampler, and provides an iterable over the training set
-#     train_queue = torch.utils.data.DataLoader(
-#         train_data, batch_size=darts_cfg.batch_size,
-#         sampler=torch.utils.data.sampler.SubsetRandomSampler(indices[:split]),
-#         pin_memory=True, num_workers=0)
-#
-#     # combine the validation set with a sampler, and provides an iterable over the validation set
-#     valid_queue = torch.utils.data.DataLoader(
-#         train_data, batch_size=darts_cfg.batch_size,
-#         sampler=torch.utils.data.sampler.SubsetRandomSampler(indices[split:num_train]),
-#         pin_memory=True, num_workers=0)
-#
-#     # Set the learning rate of each parameter group using a cosine annealing schedule (model optimization)
-#     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
-#         optimizer, float(self.model_search_epochs), eta_min=darts_cfg.learning_rate_min)
-#
-#     # generate an architecture of the model
-#     architect = Architect(model, darts_cfg)
-#
-#     # plot variables
-#     self.num_arch_edges = model.alphas_normal.data.shape[0]  # number of architecture edges
-#     self.num_arch_ops = model.alphas_normal.data.shape[1]  # number of operations
-#     self.arch_ops_labels = PRIMITIVES  # operations
-#     self.train_error_log = np.empty((self.model_search_epochs, 1))  # log training error
-#     self.valid_error_log = np.empty((self.model_search_epochs, 1))  # log validation error
-#     self.train_error_log[:] = np.nan
-#     self.valid_error_log[:] = np.nan
-#     self.architecture_weights_log = np.empty(
-#         (self.model_search_epochs, self.num_arch_edges, self.num_arch_ops))  # log architecture weights
-#
-#     graph_filename = utils.create_output_file_name(file_prefix=darts_cfg.graph_filename,
-#                                                    log_version=self.model_search_id,
-#                                                    weight_decay=arch_weight_decay_df,
-#                                                    k=num_graph_nodes,
-#                                                    seed=seed)
-#     graph_filepath = os.path.join(self.results_path, graph_filename)
-#
-#     # architecture search loop
-#     for epoch in range(self.model_search_epochs):
-#         # get new learning rate
-#         lr = scheduler.get_last_lr()[0]
-#         # log new learning rate
-#         logging.info('epoch: %d', epoch)
-#         logging.info('learning rate: %e', lr)
-#
-#         # returns the genotype of the model
-#         genotype = model.genotype()
-#         # logs the genotype of the model
-#         logging.info('genotype: %s', genotype)
-#
-#         # prints and log weights of the normal and reduced architecture
-#         print(F.softmax(model.alphas_normal, dim=-1))
-#
-#         # training (for one epoch)
-#         train_obj = train(train_queue, valid_queue, model, architect, self.criterion, optimizer, lr,
-#                           darts_cfg.arch_updates_per_epoch, darts_cfg.param_updates_per_epoch)
-#         # log accuracy on training set
-#         logging.info('training accuracy: %f', train_obj)
-#
-#         # validation (for current epoch)
-#         valid_obj = infer(valid_queue, model, self.criterion)
-#         # log accuracy on validation set
-#         logging.info('validation accuracy: %f', valid_obj)
-#
-#         # moves the annealing scheduler forward to determine new learning rate
-#         scheduler.step()
-#
-#         # log data
-#         self.architecture_weights_log[epoch, :, :] = torch.nn.functional.softmax(model.alphas_normal,
-#                                                                                  dim=-1).data.numpy()
-#         self.train_error_log[epoch] = train_obj
-#         self.valid_error_log[epoch] = valid_obj
-#
-#     # save model plot
-#     genotype = model.genotype()
-#     viz.plot(genotype.normal, graph_filepath, fileFormat='png',
-#              input_labels=object_of_study.__get_input_labels__())
-#
-#     # stores the model and architecture
-#     model_filename = self.get_model_weights_filename(arch_weight_decay_df, num_graph_nodes, seed)
-#     arch_filename = self.get_architecture_filename(arch_weight_decay_df, num_graph_nodes, seed)
-#
-#     model_filepath = os.path.join(self.results_path, model_filename + '.pt')
-#     arch_filepath = os.path.join(self.results_path, arch_filename + '.pt')
-#
-#     utils.save(model, model_filepath)
-#     torch.save(model.alphas_normal, arch_filepath)
-#
-#     model_eval_filepath = self.evaluate_architectures(object_of_study, train_queue, valid_queue, model,
-#                                                       arch_weight_decay_df, num_graph_nodes, seed)
-#
-#     return model_eval_filepath

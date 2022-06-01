@@ -1,6 +1,5 @@
 import numpy as np
 import torch
-import torch.nn as nn
 import torch.nn.functional as F
 from torch.autograd import Variable
 
@@ -54,7 +53,7 @@ class Architect(object):
                 )
                 for subop in operation:
                     for parameter in subop.parameters():
-                        if parameter.requires_grad == True:
+                        if parameter.requires_grad is True:
                             n_params_total += parameter.data.numel()
             else:
                 n_params_total = 0  # no operation gets zero parameters
@@ -81,7 +80,7 @@ class Architect(object):
                 network_optimizer.state[v]["momentum_buffer"]
                 for v in self.model.parameters()
             ).mul_(self.network_momentum)
-        except:
+        except Exception:
             moment = torch.zeros_like(theta)
         dtheta = (
             _concat(torch.autograd.grad(loss, self.model.parameters())).data
@@ -102,12 +101,14 @@ class Architect(object):
         target_train=None,
         eta=1,
     ):
-        # input_train, target_train only needed for approximation (unrolled=True) of architecture gradient
+        # input_train, target_train only needed for approximation (unrolled=True)
+        # of architecture gradient
         # when performing a single weigh update
         #
         # initialize gradients to be zero
         self.optimizer.zero_grad()
-        # use different backward step depending on whether to use 2nd order approximation for gradient update
+        # use different backward step depending on whether to use
+        # 2nd order approximation for gradient update
         if unrolled:  # probably using eta of parameter update here
             self._backward_step_unrolled(
                 input_train,
@@ -191,7 +192,7 @@ class Architect(object):
         params, offset = {}, 0
         for k, v in self.model.named_parameters():
             v_length = np.prod(v.size())
-            params[k] = theta[offset : offset + v_length].view(v.size())
+            params[k] = theta[offset : (offset + v_length)].view(v.size())
             offset += v_length
 
         assert offset == len(theta)

@@ -3,7 +3,6 @@ import random
 import numpy as np
 import torch
 import torch.nn as nn
-from graphviz import Digraph
 
 from AER_experimentalist.experiment_environment.participant_in_silico import (
     Participant_In_Silico,
@@ -55,19 +54,19 @@ class Participant_Exp_Learning(Participant_In_Silico):
     # read value from participant
     def get_value(self, variable_name):
 
-        if variable_name is "learning_trial":
+        if variable_name == "learning_trial":
             return self.learning_trial[0, 0].numpy()
 
-        elif variable_name is "P_initial":
+        elif variable_name == "P_initial":
             return self.P_initial[0, 1].numpy()
 
-        elif variable_name is "P_asymptotic":
+        elif variable_name == "P_asymptotic":
             return self.P_initial[0, 1].numpy()
 
-        elif variable_name is "learning_performance_sample":
+        elif variable_name == "learning_performance_sample":
             return self.output_sample[0, 0].numpy()
 
-        elif variable_name is "learning_performance":
+        elif variable_name == "learning_performance":
             return self.output[0, 0].numpy()
 
         raise Exception(
@@ -79,19 +78,19 @@ class Participant_Exp_Learning(Participant_In_Silico):
     # assign value to participant
     def set_value(self, variable_name, value):
 
-        if variable_name is "learning_trial":
+        if variable_name == "learning_trial":
             self.learning_trial[0, 0] = value
 
-        elif variable_name is "P_initial":
+        elif variable_name == "P_initial":
             self.P_initial[0, 0] = value
 
-        elif variable_name is "P_asymptotic":
+        elif variable_name == "P_asymptotic":
             self.P_asymptotic[0, 0] = value
 
-        elif variable_name is "learning_performance_sample":
+        elif variable_name == "learning_performance_sample":
             self.learning_performance_sample[0, 0] = value
 
-        elif variable_name is "learning_performance":
+        elif variable_name == "learning_performance":
             self.learning_performance[0, 0] = value
 
         else:
@@ -129,11 +128,11 @@ class Participant_Exp_Learning(Participant_In_Silico):
 
         for idx, IV in enumerate(object_of_study.independent_variables):
             variable_name = IV.get_name()
-            if variable_name is "learning_trial":
+            if variable_name == "learning_trial":
                 input_full[:, 0] = input[:, idx]
-            if variable_name is "P_initial":
+            if variable_name == "P_initial":
                 input_full[:, 1] = input[:, idx]
-            if variable_name is "P_asymptotic":
+            if variable_name == "P_asymptotic":
                 input_full[:, 2] = input[:, idx]
 
         output_fnc = nn.Identity
@@ -260,7 +259,7 @@ def plot_learning_curve(
     y_label = "$P_n$"
     legend = list()
     for P_init, P_asymp in zip(P_initial, P_asymptotic):
-        legend.append("$P_0 =$ " + str(P_init) + ", $P_\infty =$ " + str(P_asymp))
+        legend.append(r"$P_0 =$ " + str(P_init) + r", $P_\infty =$ " + str(P_asymp))
 
     # plot
     import matplotlib.pyplot as plt

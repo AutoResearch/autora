@@ -2,9 +2,6 @@ import os
 
 from PIL import Image
 from tinkerforge.bricklet_e_paper_296x128 import BrickletEPaper296x128
-
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
 from tinkerforge.ip_connection import IPConnection
 
 
@@ -60,7 +57,7 @@ def init_epaper():
         epaper.draw()
 
         ipcon.disconnect()
-    except:
+    except Exception:
         pass
 
 

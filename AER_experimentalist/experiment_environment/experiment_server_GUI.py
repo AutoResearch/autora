@@ -1,8 +1,7 @@
 import os
 import queue
 import threading
-from tkinter import *
-from tkinter import ttk
+from tkinter import END, E, Grid, N, S, W, ttk
 
 import AER_experimentalist.experiment_environment.experiment_config as config
 from AER_experimentalist.experiment_environment.experiment_server import (
@@ -11,7 +10,6 @@ from AER_experimentalist.experiment_environment.experiment_server import (
 from AER_experimentalist.experiment_environment.experimentalist_GUI import (
     Experimentalist_GUI,
 )
-from AER_experimentalist.experiment_environment.utils import *
 
 
 def runloop(gui=None, run_local=False):

@@ -1,20 +1,31 @@
 import os
-import time
-from tkinter import *
-from tkinter import messagebox, simpledialog, ttk
+from enum import Enum
+from tkinter import (
+    END,
+    SINGLE,
+    E,
+    Frame,
+    Grid,
+    Label,
+    Listbox,
+    N,
+    S,
+    W,
+    messagebox,
+    simpledialog,
+    ttk,
+)
 
 import matplotlib
 import numpy as np
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from matplotlib.figure import Figure
 from PIL import Image, ImageTk
 
 import AER_config as config
 from AER_utils import Plot_Types
 
 matplotlib.use("TkAgg")
-from enum import Enum
-
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-from matplotlib.figure import Figure
 
 
 class Plot_Windows(Enum):
@@ -226,7 +237,8 @@ class Theorist_GUI(Frame):
         self._fig_performance.subplots_adjust(bottom=0.2)
         self._fig_performance.subplots_adjust(left=0.35)
         self._axis_performance_line.plot([0], [0])
-        # self._axis_performance.scatter([0], [0], s=self._scatter_area, facecolors='none', edgecolors=self._scatter_color)
+        # self._axis_performance.scatter([0], [0], s=self._scatter_area,
+        # facecolors='none', edgecolors=self._scatter_color)
         self._axis_performance_line.set_xlabel("Ordinate", fontsize=self._font_size)
         self._axis_performance_line.set_ylabel("Epochs", fontsize=self._font_size)
         self._axis_performance_line.set_title(
@@ -266,7 +278,8 @@ class Theorist_GUI(Frame):
         self._fig_supplementary.subplots_adjust(bottom=0.2)
         self._fig_supplementary.subplots_adjust(left=0.35)
         self._axis_supplementary_line.plot([0], [0])
-        # self._axis_performance.scatter([0], [0], s=self._scatter_area, facecolors='none', edgecolors=self._scatter_color)
+        # self._axis_performance.scatter([0], [0], s=self._scatter_area,
+        # facecolors='none', edgecolors=self._scatter_color)
         self._axis_supplementary_line.set_xlabel("Epochs", fontsize=self._font_size)
         self._axis_supplementary_line.set_ylabel("Ordinate", fontsize=self._font_size)
         self._axis_supplementary_line.set_title(
@@ -713,7 +726,7 @@ class Theorist_GUI(Frame):
             plot_axis.set_title(key, fontsize=self._plot_fontSize)
             plot_canvas.draw()
             if save is True:
-                if plot_name is not "":
+                if plot_name != "":
                     plot_filepath = os.path.join(
                         self.theorist.results_plots_path,
                         "plot_" + plot_name + "_" + key + ".png",
@@ -963,9 +976,7 @@ class Theorist_GUI(Frame):
                 self.theorist._meta_parameters_iteration += 1
 
         if self._running is True:
-            best_model = self.theorist.get_best_model(
-                self.object_of_study, plot_model=True
-            )
+            self.theorist.get_best_model(self.object_of_study, plot_model=True)
 
             # # save all performance plots
             # self.theorist.model = best_model
@@ -973,7 +984,8 @@ class Theorist_GUI(Frame):
             # for item in range(self.listbox_performance.size()):
             #     self.set_listbox_selection(self.listbox_performance, item)
             #     plot_str = meta_param_str + "_eval_"
-            #     self.update_plot(Plot_Windows.PERFORMANCE, performance_plots, save=True, plot_name=plot_str)
+            #     self.update_plot(Plot_Windows.PERFORMANCE,
+            #     performance_plots, save=True, plot_name=plot_str)
 
         else:
             # reset gui elements

@@ -1,9 +1,5 @@
-import random
-
-import numpy as np
 import torch
 import torch.nn as nn
-from graphviz import Digraph
 
 from AER_experimentalist.experiment_environment.participant_in_silico import (
     Participant_In_Silico,
@@ -66,16 +62,16 @@ class Participant_LCA(Participant_In_Silico):
     # read value from participant
     def get_value(self, variable_name):
 
-        if variable_name is "x1_lca":
+        if variable_name == "x1_lca":
             return self.x1_lca[0, 0].numpy()
 
-        elif variable_name is "x2_lca":
+        elif variable_name == "x2_lca":
             return self.x2_lca[0, 0].numpy()
 
-        elif variable_name is "x3_lca":
+        elif variable_name == "x3_lca":
             return self.x3_lca[0, 0].numpy()
 
-        elif variable_name is "dx1_lca":
+        elif variable_name == "dx1_lca":
             return self.output[0, 0].numpy()
 
         raise Exception(
@@ -87,16 +83,16 @@ class Participant_LCA(Participant_In_Silico):
     # assign value to participant
     def set_value(self, variable_name, value):
 
-        if variable_name is "x1_lca":
+        if variable_name == "x1_lca":
             self.x1_lca[0, 0] = value
 
-        elif variable_name is "x2_lca":
+        elif variable_name == "x2_lca":
             self.x2_lca[0, 0] = value
 
-        elif variable_name is "x3_lca":
+        elif variable_name == "x3_lca":
             self.x3_lca[0, 0] = value
 
-        elif variable_name is "dx1_lca":
+        elif variable_name == "dx1_lca":
             self.output[0, 0] = value
 
         else:
@@ -252,7 +248,7 @@ def plot_trajectory(model, x1=0.5, x2=0.1, x3=0.2, n_trials=20):
     y3_data = x3_log
 
     x_limit = [0, n_trials]
-    y_limit = [-0.5, 0.5]
+    # y_limit = [-0.5, 0.5]
     x_label = "Time Step"
     y_label = "x"
     legend = list()

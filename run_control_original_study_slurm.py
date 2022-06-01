@@ -148,7 +148,8 @@ plots.append(theorist._loss_plot_name)
 # AUTONOMOUS EMPIRICAL RESEARCH
 
 # generate first validation set
-# validation_data = experimentalist_validation.seed(validation_object_1, n=max_num_data_points_sampled) # seed with new experiment
+# validation_data = experimentalist_validation.seed(validation_object_1,
+# n=max_num_data_points_sampled) # seed with new experiment
 validation_data = experimentalist_validation.seed(
     validation_object_1, datafile="experiment_0_data.csv"
 )  # seed with new experiment

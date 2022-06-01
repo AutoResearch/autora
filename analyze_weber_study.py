@@ -72,7 +72,7 @@ validation_data = experimentalist_validation.seed(
 )  # seed with new experiment
 study_object_validation.add_data(validation_data)
 
-### PLOT MODEL SEARCH RESULTS
+# PLOT MODEL SEARCH RESULTS
 
 figure_names = (
     "legend",
@@ -111,15 +111,15 @@ BIC = participant.compute_BIC(object_of_study=study_object_validation, num_param
 y_reference = None
 y_reference_label = "Data Generating Model"
 
-##### DELLA
+# DELLA
 arch_weights_name = "architecture_weights_original_darts_v_1_wd_0_k_1_s_6.0_sample2_1"
 model_weights_name = "model_weights_original_darts_v_1_wd_0_k_1_s_6.0_sample2_1"
 
-##### FINAL
+# FINAL
 arch_weights_name = "architecture_weights_original_darts_v_1_wd_0_k_1_s_4.0_sample0_3"
 model_weights_name = "model_weights_original_darts_v_1_wd_0_k_1_s_4.0_sample0_3"
 
-##### ICML
+# ICML
 arch_weights_name = "architecture_weights_original_darts_v_1_wd_0_k_1_s_2.0_sample0_3"
 model_weights_name = "model_weights_original_darts_v_1_wd_0_k_1_s_2.0_sample0_3"
 
@@ -149,14 +149,14 @@ generate_darts_summary_figures(
 )
 
 
-### PLOT MODEL SEARCH RESULTS
+# PLOT MODEL SEARCH RESULTS
 
 figure_name = aer_cfg.figure_name_graph
 plot_model_graph(
     study_name, arch_weights_name, model_weights_name, study_object, figure_name
 )
 
-### PLOT MODEL SIMULATION
+# PLOT MODEL SIMULATION
 
 model = load_model(study_name, model_weights_name, arch_weights_name, study_object)
 

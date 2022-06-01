@@ -48,7 +48,7 @@ class Experiment_Client(Client_Server_Interface):
 
             try:
                 self._socket.connect((self.host, self.port))
-            except:
+            except Exception:
                 self._print_status(
                     protocol.STATUS_ERROR,
                     "Could not connect to " + str(self.host) + ".",

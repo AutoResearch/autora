@@ -77,7 +77,8 @@ theorist.plot(plot=True)
 seed_data = experimentalist.seed(
     study_object, n=max_num_data_points
 )  # seed with new experiment
-# seed_data = experimentalist.seed(study_object, datafile='experiment_0_data.csv') # seed with existing data file
+# seed_data = experimentalist.seed(study_object, datafile='experiment_0_data.csv')
+# seed with existing data file
 study_object.add_data(seed_data)
 
 # add validation set

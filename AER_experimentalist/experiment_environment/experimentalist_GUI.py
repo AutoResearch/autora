@@ -1,7 +1,5 @@
 import os
-import types
-from tkinter import *
-from tkinter import ttk
+from tkinter import END, SINGLE, E, Frame, Grid, Listbox, N, S, W, ttk
 
 import AER_experimentalist.experiment_environment.experiment_config as config
 from AER_experimentalist.experiment_environment.experiment import Experiment
@@ -12,7 +10,7 @@ from AER_experimentalist.experiment_environment.experiment_table_GUI import (
     Experiment_Table_GUI,
 )
 from AER_experimentalist.experiment_environment.OLED_output import OLED_Output
-from AER_experimentalist.experiment_environment.utils import *
+from AER_experimentalist.experiment_environment.utils import trial_to_list
 
 
 class Experimentalist_GUI(Frame):

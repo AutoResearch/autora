@@ -1,5 +1,5 @@
 from datetime import datetime
-from tkinter import *
+from tkinter import Tk
 
 import AER_experimentalist.experiment_environment.experiment_config as exp_cfg
 from AER_experimentalist.experiment_design_synthetic_weber import (
@@ -11,7 +11,6 @@ from AER_experimentalist.experiment_environment.variable import (
     outputTypes as output_type,
 )
 from AER_experimentalist.experimentalist_popper import Experimentalist_Popper
-from AER_GUI import AER_GUI
 from AER_theorist.object_of_study import Object_Of_Study
 from AER_theorist.theorist_darts import DARTS_Type, Theorist_DARTS
 from AER_theorist.theorist_GUI import Theorist_GUI
@@ -147,7 +146,8 @@ app = Theorist_GUI(object_of_study=study_object, theorist=theorist, root=root)
 root.mainloop()
 
 # root = Tk()
-# app = AER_GUI(object_of_study=study_object, theorist=theorist, experimentalist=experimentalist, root=root)
+# app = AER_GUI(object_of_study=study_object, theorist=theorist,
+# experimentalist=experimentalist, root=root)
 # root.mainloop()
 
 # theorist_fair = Theorist_DARTS(study_name, darts_type=DARTS_Type.FAIR)

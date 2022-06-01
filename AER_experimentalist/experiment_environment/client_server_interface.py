@@ -1,5 +1,4 @@
 import os.path
-import socket
 import time
 
 import AER_experimentalist.experiment_environment.client_server_protocol as protocol
@@ -104,7 +103,7 @@ class Client_Server_Interface:
 
                 self._socket.sendall(protocol.OK)
 
-                if file_path is "":
+                if file_path == "":
                     self._print_status(
                         protocol.STATUS_ERROR,
                         "File transfer failed: Did not receive file path.",
@@ -133,7 +132,7 @@ class Client_Server_Interface:
                         protocol.STATUS_RECEIVING_FILE_DATA, "Completed file transfer."
                     )
                     break
-                except:
+                except IOError:
                     self._print_status(
                         protocol.STATUS_ERROR,
                         "Could not write to file path: " + file_path,

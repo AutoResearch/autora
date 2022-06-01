@@ -1,5 +1,3 @@
-import time
-
 import AER_experimentalist.experiment_environment.experiment_config as exp_cfg
 from AER_experimentalist.experiment_environment.DV_in_silico import DV_In_Silico as DV
 from AER_experimentalist.experiment_environment.IV_in_silico import IV_In_Silico as IV
@@ -84,7 +82,7 @@ y_name = "num_edges"
 y_label = "Number of Edges"
 
 # x1_name = 'num_params'
-x1_label = "Parameter Complexity $\gamma$"
+x1_label = r"Parameter Complexity $\gamma$"
 x1_name = "arch_weight_decay"
 # x1_name = 'num_edges'
 # x1_label = 'num edges'
@@ -120,43 +118,3 @@ plot_darts_summary(
     y_limit=y_limit,
     theorist_filter="fair_darts",
 )
-
-
-# plot_darts_summary(study_name=study_name,
-#                    y_name='num_edges',
-#                    x1_name='arch_weight_decay',
-#                    x2_name='num_graph_node',
-#                    metric='mean',
-#                    theorist_filter='original_darts')
-
-# participant.graph_simple('test')
-
-
-# best_model_file = 'model_weights_fair_darts_v_1_wd_1.0_k_2_s_1.0_sample1_1'
-# best_arch_file = 'architecture_weights_fair_darts_v_1_wd_1.0_k_2_s_1.0_sample1_1'
-
-# load winning model
-# from AER_theorist.darts.model_search import Network, DARTS_Type
-# import AER_theorist.darts.visualize as viz
-# import AER_theorist.darts.utils as utils
-# import torch
-# import os
-#
-# results_weights_path = 'studies/Weber/modeling/results/weights'
-# model_path = os.path.join(results_weights_path, best_model_file + ".pt")
-# arch_path = os.path.join(results_weights_path, best_arch_file + ".pt")
-# criterion = utils.sigmid_mse
-# model = Network(1,
-#                 criterion,
-#                 steps=2,
-#                 n_input_states=2,
-#                 darts_type=DARTS_Type.FAIR)
-# utils.load(model, model_path)
-# alphas_normal = torch.load(arch_path)
-# model.fix_architecture(True, new_weights=alphas_normal)
-# (n_params_total, n_params_base, param_list) = model.countParameters(print_parameters=True)
-# genotype = model.genotype()
-# object_of_study = validation_object_1
-# viz.plot(genotype.normal, 'test', fileFormat='png',
-#                      input_labels=object_of_study.__get_input_labels__(), full_label=True, param_list=param_list,
-#                      out_dim=object_of_study.__get_output_dim__(), out_fnc=utils.get_output_str(object_of_study.__get_output_type__()))

@@ -1,16 +1,13 @@
 import os
-import time
 
 import imageio
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas
-import pylab
 import seaborn as sns
 from matplotlib import pyplot
 from matplotlib.gridspec import GridSpec
-from mpl_toolkits import mplot3d
 
 import AER_config as aer_config
 import AER_theorist.darts.darts_config as darts_config
@@ -51,7 +48,7 @@ def generate_darts_summary_figures(
             show_legend = True
             figure_dimensions = (6, 6)
         if idx > 1:  # after original darts
-            y_label = " "  #' '
+            y_label = " "
 
         plot_darts_summary(
             study_name=study_name,
@@ -257,25 +254,25 @@ def plot_darts_summary(
                     model_name_match.append(model_name_list[idx_data])
             x1_plot[idx_unique] = x1_unique_val
 
-            if metric is "min":
+            if metric == "min":
                 y_plot[idx_unique] = np.min(y_match)
                 idx_target = np.argmin(y_match)
                 legend_label_spec = " (min)"
-            elif metric is "max":
+            elif metric == "max":
                 y_plot[idx_unique] = np.max(y_match)
                 idx_target = np.argmax(y_match)
                 legend_label_spec = " (max)"
-            elif metric is "mean":
+            elif metric == "mean":
                 y_plot[idx_unique] = np.mean(y_match)
                 idx_target = 0
                 legend_label_spec = " (avg)"
-            elif metric is "mean_min":
+            elif metric == "mean_min":
                 y_plot[idx_unique] = np.mean(y_match)
                 y2_plot[idx_unique] = np.min(y_match)
                 idx_target = np.argmin(y_match)
                 legend_label_spec = " (avg)"
                 legend_label2_spec = " (min)"
-            elif metric is "mean_max":
+            elif metric == "mean_max":
                 y_plot[idx_unique] = np.mean(y_match)
                 y2_plot[idx_unique] = np.max(y_match)
                 idx_target = np.argmax(y_match)
@@ -358,25 +355,25 @@ def plot_darts_summary(
                         y_x2_x1_match.append(y_x2_match[idx_x1_data])
                 x1_x2_plot[idx_x1_unique] = x1_unique_val
 
-                if metric is "min":
+                if metric == "min":
                     y_x2_plot[idx_x1_unique] = np.min(y_x2_x1_match)
                     idx_target = np.argmin(y_x2_x1_match)
                     legend_label_spec = " (min)"
-                elif metric is "max":
+                elif metric == "max":
                     y_x2_plot[idx_x1_unique] = np.max(y_x2_x1_match)
                     idx_target = np.argmax(y_x2_x1_match)
                     legend_label_spec = " (max)"
-                elif metric is "mean":
+                elif metric == "mean":
                     y_x2_plot[idx_x1_unique] = np.mean(y_x2_x1_match)
                     idx_target = 0
                     legend_label_spec = " (avg)"
-                elif metric is "mean_min":
+                elif metric == "mean_min":
                     y_x2_plot[idx_x1_unique] = np.mean(y_x2_x1_match)
                     y2_x2_plot[idx_x1_unique] = np.min(y_x2_x1_match)
                     idx_target = np.argmin(y_x2_x1_match)
                     legend_label_spec = " (avg)"
                     legend_label2_spec = " (min)"
-                elif metric is "mean_max":
+                elif metric == "mean_max":
                     y_x2_plot[idx_x1_unique] = np.mean(y_x2_x1_match)
                     y2_x2_plot[idx_x1_unique] = np.max(y_x2_x1_match)
                     idx_target = np.argmax(y_x2_x1_match)
@@ -384,7 +381,8 @@ def plot_darts_summary(
                     legend_label2_spec = " (max)"
                 else:
                     raise Exception(
-                        'Argument "metric" may either be "min", "max", "mean", "mean_min" or "min_max".'
+                        'Argument "metric" may either be "min", "max", "mean", '
+                        '"mean_min" or "min_max".'
                     )
 
                 # compute standard error along given dimension
@@ -413,7 +411,7 @@ def plot_darts_summary(
                         len(y_sem)
                     )
 
-                if metric is "mean_min" or metric is "mean_max":
+                if metric == "mean_min" or metric == "mean_max":
                     best_val_str = str(y2_x2_plot[idx_x1_unique])
                 else:
                     best_val_str = str(y_x2_plot[idx_x1_unique])
@@ -464,8 +462,6 @@ def plot_darts_summary(
 
     if x2_name is None:
 
-        data_plot = pandas.DataFrame({x1_label: x1_plot, y_label: y_plot})
-        # sns.lineplot(x=x1_label, y=y_label, data=data_plot, linewidth = 2, ax=ax)
         colors = sns.color_palette(palette, 10)
         color = colors[-1]
         full_label = "Reconstructed Model" + legend_label_spec
@@ -484,7 +480,7 @@ def plot_darts_summary(
             ax.errorbar(x=x1_plot, y=y_plot, yerr=y_sem_plot, color=color)
 
         # draw second y value
-        if metric is "mean_min" or metric is "mean_max":
+        if metric == "mean_min" or metric == "mean_max":
             full_label = "Reconstructed Model" + legend_label2_spec
             ax.plot(x1_plot, y2_plot, "*", linewidth=2, label=full_label, color=color)
 
@@ -530,22 +526,6 @@ def plot_darts_summary(
                 plt.setp(ax.get_legend().get_texts(), fontsize=legend_font_size)
     else:
 
-        # produce data frame:
-        # x1_df = list()
-        # x2_df = list()
-        # y_df = list()
-        # for idx_x2, x2 in enumerate(x2_plot):
-        #     for idx_x1, x1 in enumerate(x1_plot[idx_x2]):
-        #         x1_df.append(x1)
-        #         x2_df.append(x2)
-        #         y_df.append(y_plot[idx_x2][idx_x1])
-        #
-        # data_plot = pandas.DataFrame({x1_label: x1_df, x2_label: x2_df, y_label: y_df})
-        # data_plot[x2_label] = pandas.Categorical(data_plot[x2_label], ordered=True)
-        # sns.lineplot(data=data_plot, x=x1_label, y=y_label, hue=x2_label, linewidth = 2, ax=ax)
-        # forcing markers same style:
-        # sns.lineplot(x="n_index", y="value", hue="logic", style="logic", markers=["o", "o"], data=df)
-
         colors = sns.color_palette(palette, len(x2_plot))
 
         for idx, x2 in enumerate(x2_plot):
@@ -582,7 +562,7 @@ def plot_darts_summary(
         #     x1_plot_line = x1_plot[idx]
         #     color = colors[idx]
         #
-        #     if metric is 'mean_min' or metric is 'mean_max':
+        #     if metric == 'mean_min' or metric == 'mean_max':
         #         y2_plot_line = y2_plot[idx]
         #         label = x2_label + '$ = ' + str(x2) + "$" + legend_label2_spec
         #         ax.plot(x1_plot_line, y2_plot_line, '*', linewidth=2, label=label, color=color)

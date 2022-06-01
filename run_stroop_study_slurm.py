@@ -7,7 +7,6 @@ from AER_experimentalist.experiment_environment.IV_in_silico import IV_In_Silico
 from AER_experimentalist.experiment_environment.variable import (
     outputTypes as output_type,
 )
-from AER_experimentalist.experimentalist import Experimentalist
 from AER_experimentalist.experimentalist_popper import Experimentalist_Popper
 from AER_theorist.object_of_study import Object_Of_Study
 from AER_theorist.theorist_darts import DARTS_Type, Theorist_DARTS
@@ -162,7 +161,8 @@ theorist.plot(plot_name_list=plots)
 # AUTONOMOUS EMPIRICAL RESEARCH
 
 # generate first validation set
-# validation_data = experimentalist_validation.seed(validation_object_1, n=max_num_data_points_sampled) # seed with new experiment
+# validation_data = experimentalist_validation.seed(validation_object_1,
+# n=max_num_data_points_sampled) # seed with new experiment
 validation_data = experimentalist_validation.seed(
     validation_object_1, datafile="experiment_0_data.csv"
 )  # seed with new experiment

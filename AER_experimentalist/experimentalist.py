@@ -97,7 +97,8 @@ class Experimentalist(ABC):
 
         else:
             if self._seed_strategy == seed_strategy.UNIFORM:
-                # determine number of values for each independent variable for total number of data points assuming full counterbalancing
+                # determine number of values for each independent variable for
+                # total number of data points assuming full counterbalancing
                 n_variables = len(object_of_study.independent_variables)
                 self._seed_parameters = [int(np.floor(n ** (1 / float(n_variables))))]
             else:
@@ -185,7 +186,8 @@ class Experimentalist(ABC):
                 experiment_design.append(factor)
         else:
             Exception(
-                "Chosen seed strategy not implemented. Try: set_seed_strategy(seed_strategy.UNIFORM)"
+                "Chosen seed strategy not implemented. Try: "
+                "set_seed_strategy(seed_strategy.UNIFORM)"
             )
 
         # generated crossed experiment with SweetPea
@@ -308,12 +310,14 @@ class Experimentalist(ABC):
         # check if client is configured
         if self._experiment_server_host is None:
             raise Exception(
-                "Experiment server host not configured. Please specify server host using: configure_experiment_client(experiment_server_host, experiment_server_port)"
+                "Experiment server host not configured. Please specify server host using: "
+                "configure_experiment_client(experiment_server_host, experiment_server_port)"
             )
 
         if self._experiment_server_port is None:
             raise Exception(
-                "Experiment server port not configured. Please specify server port using: configure_experiment_client(experiment_server_host, experiment_server_port)"
+                "Experiment server port not configured. Please specify server port using: "
+                "configure_experiment_client(experiment_server_host, experiment_server_port)"
             )
 
         # get exeriment file name
@@ -403,8 +407,6 @@ class Experimentalist(ABC):
 
         # for each plot
         for IV1, IV2, DV in zip(IV_list_1, IV_list_2, DV_list):
-
-            IVs = [IV1, IV2]
 
             # generate model prediction
             resolution = 100

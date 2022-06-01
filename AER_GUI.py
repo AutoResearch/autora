@@ -1,21 +1,30 @@
 import os
-import time
-from tkinter import *
-from tkinter import messagebox, simpledialog, ttk
+from enum import Enum
+from tkinter import (
+    END,
+    SINGLE,
+    E,
+    Frame,
+    Grid,
+    Label,
+    Listbox,
+    N,
+    S,
+    W,
+    simpledialog,
+    ttk,
+)
 
 import matplotlib
+import matplotlib.image as mpimg
 import numpy as np
-from PIL import Image, ImageTk
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from matplotlib.figure import Figure
 
 import AER_config as config
 from AER_utils import Plot_Types
 
 matplotlib.use("TkAgg")
-from enum import Enum
-
-import matplotlib.image as mpimg
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-from matplotlib.figure import Figure
 
 
 class Plot_Windows(Enum):
@@ -747,11 +756,6 @@ class AER_GUI(Frame):
                     x_conditions = plot_dict[config.plot_key_x_conditions]
                 else:
                     x_conditions = None
-
-                if config.plot_key_y_conditions in plot_dict:
-                    y_conditions = plot_dict[config.plot_key_y_conditions]
-                else:
-                    y_conditions = None
 
                 # generate plots
                 plot_axis.cla()

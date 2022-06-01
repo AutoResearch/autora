@@ -68,7 +68,7 @@ log_key_timestamp = "timestamp"
 max_data_points_simulated = 100
 
 # figures
-arch_weight_decay_label = "Parameter Penalty $\gamma$"
+arch_weight_decay_label = r"Parameter Penalty $\gamma$"
 num_graph_nodes_label = "$k$"
 validation_loss_label = "Test Loss"
 BIC_loss_label = "BIC"

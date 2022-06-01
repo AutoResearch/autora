@@ -48,9 +48,9 @@ exp_folder = "experiments"  # experiment name
 graph_filename = "model_graph"  # file name prefix of learned graph
 model_filename = "model_weights"  # file name prefix of learned model
 output_file_folder = "results"  # folder for simulation results
-arch_weight_decay_list = [
-    6e-4
-]  # np.linspace(0, 6e-4, 6)               # list of architecture weight decays searched over (this decay scales with number of degrees of freedom)
+arch_weight_decay_list = [6e-4]  # np.linspace(0, 6e-4, 6)
+# list of architecture weight decays searched over
+# (this decay scales with number of degrees of freedom)
 num_node_list = np.linspace(
     min_k, max_k, (max_k - min_k) + 1
 )  # list of k's searched over

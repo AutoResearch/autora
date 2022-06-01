@@ -80,9 +80,10 @@ class SimpleNetDataset(Object_Of_Study, Dataset):
 
         tmp_sampling = self._sampling
 
-        stimulus2 = torch.zeros(
-            num_patterns, 1
-        )  # since the input to hidden layer weight for this stimulus is set to 0, it should have no impact on the model's outcome
+        stimulus2 = torch.zeros(num_patterns, 1)
+        # since the input to hidden layer weight for this stimulus is set to 0,
+        # it should have no impact on the model's outcome
+
         stimulus1 = torch.linspace(0, 1, num_patterns)
         stimulus1 = stimulus1[:, None]
 

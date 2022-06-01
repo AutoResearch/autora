@@ -1,42 +1,14 @@
 import argparse
-import copy
-import csv
-import glob
-import logging
 import os
-import sys
-import time
-
-import numpy as np
-import torch
-import torch.backends.cudnn as cudnn
-import torch.nn as nn
-import torch.nn.functional as F
-import torch.utils
-import torchvision.datasets as dset
-from torch.autograd import Variable
-from torchvision import transforms
 
 try:
-    import cnnsimple.genotypes
     import cnnsimple.model_search_config as cfg
-    import cnnsimple.plot_utils as plotutils
     import cnnsimple.utils as utils
-    import cnnsimple.visualize as viz
-    from cnnsimple.architect import Architect
-    from cnnsimple.model_search import Network
-    from cnnsimple.object_of_study import outputTypes
-    from cnnsimple.SimpleNet_dataset import SimpleNetDataset
-except:
-    import genotypes
+
+
+except ImportError:
     import model_search_config as cfg
-    import plot_utils as plotutils
     import utils as utils
-    import visualize as viz
-    from architect import Architect
-    from model_search import Network
-    from object_of_study import outputTypes
-    from SimpleNet_dataset import SimpleNetDataset
 
 # PARSE ARGUMENTS
 

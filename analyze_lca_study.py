@@ -47,7 +47,7 @@ study_object = Object_Of_Study(
     name=study_name, independent_variables=IVs, dependent_variables=DVs
 )
 
-### PLOT MODEL SEARCH RESULTS
+# PLOT MODEL SEARCH RESULTS
 
 figure_names = (
     "legend",
@@ -94,23 +94,23 @@ arch_weights_name = (
 model_weights_name = "model_weights_original_darts_v_1_wd_0.75_k_2_s_9.0_sample0_1"
 
 # model with lowest log loss
-##### DELLA
+# DELLA
 arch_weights_name = "architecture_weights_original_darts_v_1_wd_0_k_1_s_9.0_sample0_4"
 model_weights_name = "model_weights_original_darts_v_1_wd_0_k_1_s_9.0_sample0_4"
 
-##### FINAL (k=1)
+# FINAL (k=1)
 arch_weights_name = "architecture_weights_original_darts_v_1_wd_0_k_1_s_9.0_sample0_4"
 model_weights_name = "model_weights_original_darts_v_1_wd_0_k_1_s_9.0_sample0_4"
 
-#### FINAL (k=3)
+# FINAL (k=3)
 # arch_weights_name = "architecture_weights_original_darts_v_1_wd_1.0_k_3_s_8.0_sample0_4"
 # model_weights_name = "model_weights_original_darts_v_1_wd_1.0_k_3_s_8.0_sample0_4"
 
-##### ICML
+# ICML
 # arch_weights_name = "architecture_weights_original_darts_v_1_wd_0.1_k_3_s_7.0_sample0_0"
 # model_weights_name = "model_weights_original_darts_v_1_wd_0.1_k_3_s_7.0_sample0_0"
 
-#### ICML Final
+# ICML Final
 arch_weights_name = "architecture_weights_original_darts_v_1_wd_0.1_k_1_s_2.0_sample0_4"
 model_weights_name = "model_weights_original_darts_v_1_wd_0.1_k_1_s_2.0_sample0_4"
 
@@ -136,14 +136,14 @@ generate_darts_summary_figures(
     arch_samp_filter=arch_samp_filter,
 )
 
-### PLOT MODEL SEARCH RESULTS
+# PLOT MODEL SEARCH RESULTS
 
 figure_name = aer_cfg.figure_name_graph
 plot_model_graph(
     study_name, arch_weights_name, model_weights_name, study_object, figure_name
 )
 
-### PLOT MODEL SIMULATION
+# PLOT MODEL SIMULATION
 
 model = load_model(study_name, model_weights_name, arch_weights_name, study_object)
 

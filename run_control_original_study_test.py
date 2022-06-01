@@ -146,14 +146,13 @@ theorist.plot(plot_name_list=plots)
 # AUTONOMOUS EMPIRICAL RESEARCH
 
 # generate first validation set
-# validation_data = experimentalist_validation.seed(validation_object_1, n=max_num_data_points_sampled) # seed with new experiment
+
 validation_data = experimentalist_validation.seed(
     validation_object_1, datafile="experiment_0_data.csv"
 )  # seed with new experiment
 validation_object_1.add_data(validation_data)
 
 # seed experiment and split into training/validation set
-# seed_data = experimentalist.seed(study_object, n=max_num_data_points) # seed with new experiment
 seed_data = experimentalist.seed(
     study_object, datafile="experiment_0_data.csv"
 )  # seed with existing data file
