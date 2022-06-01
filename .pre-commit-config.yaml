@@ -1,0 +1,7 @@
+repos:
+    - repo: https://github.com/timothycrosley/isort
+      rev: 5.10.1
+      hooks:
+        - id: isort
+default_language_version:
+    python: python3
