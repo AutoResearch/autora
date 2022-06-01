@@ -7,7 +7,7 @@ import torch
 from torch.utils.data import Dataset
 
 import aer_config as AER_cfg
-from aer_experimentalist.experiment_environment.variable import Variable
+from aer.variable import Variable
 
 
 class Object_Of_Study(Dataset):

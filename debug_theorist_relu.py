@@ -3,7 +3,7 @@ import numpy as np
 import torch.optim as optim
 from torch import nn
 
-from aer_experimentalist.experiment_environment.variable import Variable as Var
+from aer.variable import Variable as Var
 from aer_experimentalist.experimentalist_popper import Experimentalist_Popper
 from aer_theorist.object_of_study import Object_Of_Study
 from aer_theorist.theorist_darts import Theorist_DARTS
