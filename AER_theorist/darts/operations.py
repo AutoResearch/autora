@@ -6,53 +6,47 @@ import torch.nn as nn
 
 # defines all the operations. affine is turned off for cuda (optimization prposes)
 OPS = {
-    'none': lambda C, stride, affine: Zero(stride),
-    'linear': lambda C, stride, affine: nn.Sequential(
-        nn.Linear(1, 1, bias=True)
-    ),
-    'relu': lambda C, stride, affine: nn.Sequential(
+    "none": lambda C, stride, affine: Zero(stride),
+    "linear": lambda C, stride, affine: nn.Sequential(nn.Linear(1, 1, bias=True)),
+    "relu": lambda C, stride, affine: nn.Sequential(
         nn.ReLU(inplace=False),
     ),
-    'lin_relu': lambda C, stride, affine: nn.Sequential(
+    "lin_relu": lambda C, stride, affine: nn.Sequential(
         nn.Linear(1, 1, bias=True),
         nn.ReLU(inplace=False),
     ),
-    'sigmoid': lambda C, stride, affine: nn.Sequential(
+    "sigmoid": lambda C, stride, affine: nn.Sequential(
         nn.Sigmoid(),
     ),
-    'lin_sigmoid': lambda C, stride, affine: nn.Sequential(
+    "lin_sigmoid": lambda C, stride, affine: nn.Sequential(
         nn.Linear(1, 1, bias=True),
         nn.Sigmoid(),
     ),
-    'add': lambda C, stride, affine: nn.Sequential(
-        Identity()
-    ),
-    'subtract': lambda C, stride, affine: nn.Sequential(
-        NegIdentity()
-    ),
-    'mult': lambda C, stride, affine: nn.Sequential(
+    "add": lambda C, stride, affine: nn.Sequential(Identity()),
+    "subtract": lambda C, stride, affine: nn.Sequential(NegIdentity()),
+    "mult": lambda C, stride, affine: nn.Sequential(
         nn.Linear(1, 1, bias=False),
     ),
     # 'exp': lambda C, stride, affine: nn.Sequential(
     #   Exponential(),
     #  ),
-    'exp': lambda C, stride, affine: nn.Sequential(
+    "exp": lambda C, stride, affine: nn.Sequential(
         nn.Linear(1, 1, bias=True),
         Exponential(),
     ),
-    '1/x': lambda C, stride, affine: nn.Sequential(
+    "1/x": lambda C, stride, affine: nn.Sequential(
         nn.Linear(1, 1, bias=False),
         MultInverse(),
     ),
-    'ln': lambda C, stride, affine: nn.Sequential(
+    "ln": lambda C, stride, affine: nn.Sequential(
         nn.Linear(1, 1, bias=False),
         NatLogarithm(),
     ),
-    'softplus': lambda C, stride, affine: nn.Sequential(
+    "softplus": lambda C, stride, affine: nn.Sequential(
         nn.Linear(1, 1, bias=False),
         Softplus(),
     ),
-    'softminus': lambda C, stride, affine: nn.Sequential(
+    "softminus": lambda C, stride, affine: nn.Sequential(
         nn.Linear(1, 1, bias=False),
         Softminus(),
     )
@@ -87,26 +81,30 @@ def get_operation_label(op_name, params_org, decimals=4):
 
     format_string = "{:." + "{:.0f}".format(decimals) + "f}"
 
-    classifier_str = ''
-    if (op_name == 'classifier'):
+    classifier_str = ""
+    if op_name == "classifier":
         value = params[0]
-        classifier_str = format_string.format(value) + ' * x'
+        classifier_str = format_string.format(value) + " * x"
 
         return classifier_str
 
-    if (op_name == 'classifier_concat'):
-        classifier_str = 'x.*('
+    if op_name == "classifier_concat":
+        classifier_str = "x.*("
         for param_idx, param in enumerate(params):
 
             if param_idx > 0:
-                classifier_str = classifier_str + ' .+('
+                classifier_str = classifier_str + " .+("
 
             if isiterable(param.tolist()):
                 for value_idx, value in enumerate(param.tolist()):
                     if value_idx < len(param) - 1:
-                        classifier_str = classifier_str + format_string.format(value) + " + "
+                        classifier_str = (
+                            classifier_str + format_string.format(value) + " + "
+                        )
                     else:
-                        classifier_str = classifier_str + format_string.format(value) + ")"
+                        classifier_str = (
+                            classifier_str + format_string.format(value) + ")"
+                        )
 
             else:
                 classifier_str = classifier_str + format_string.format(param) + ")"
@@ -118,48 +116,66 @@ def get_operation_label(op_name, params_org, decimals=4):
 
     if num_params == 1:  # without bias
         labels = {
-            'none': '',
-            'linear': str(format_string.format(params[0])) + ' * x',
-            'relu': 'ReLU(x)',
-            'lin_relu': 'ReLU(' + str(format_string.format(params[0])) + ' * x)',
+            "none": "",
+            "linear": str(format_string.format(params[0])) + " * x",
+            "relu": "ReLU(x)",
+            "lin_relu": "ReLU(" + str(format_string.format(params[0])) + " * x)",
             # 'sigmoid': '1/(1+e^(-x))',
-            'sigmoid': 'logistic(x)',
+            "sigmoid": "logistic(x)",
             # 'lin_sigmoid': '1/(1+e^(-' + str(format_string.format(params[0])) + ' * x))',
-            'lin_sigmoid': 'logistic(' + str(format_string.format(params[0])) + ' * x)',
-            'add': '+ x',
-            'subtract': '- x',
-            'mult': str(format_string.format(params[0])) + ' * x',
+            "lin_sigmoid": "logistic(" + str(format_string.format(params[0])) + " * x)",
+            "add": "+ x",
+            "subtract": "- x",
+            "mult": str(format_string.format(params[0])) + " * x",
             # 'exp': 'e^(' + str(format_string.format(params[0])) + ' * x)',
-            'exp': 'exp(' + str(format_string.format(params[0])) + ' * x)',
-            '1/x': '1 / (' + str(format_string.format(params[0])) + ' * x)',
-            'ln': 'ln(' + str(format_string.format(params[0])) + ' * x)',
-            'classifier': classifier_str
+            "exp": "exp(" + str(format_string.format(params[0])) + " * x)",
+            "1/x": "1 / (" + str(format_string.format(params[0])) + " * x)",
+            "ln": "ln(" + str(format_string.format(params[0])) + " * x)",
+            "classifier": classifier_str,
         }
     else:  # with bias
         labels = {
-            'none': '',
-            'linear': str(format_string.format(params[0])) + ' * x + ' + str(format_string.format(params[1])),
-            'relu': 'ReLU(x)',
-            'lin_relu': 'ReLU(' + str(format_string.format(params[0])) + ' * x + ' + str(
-                format_string.format(params[1])) + ')',
+            "none": "",
+            "linear": str(format_string.format(params[0]))
+            + " * x + "
+            + str(format_string.format(params[1])),
+            "relu": "ReLU(x)",
+            "lin_relu": "ReLU("
+            + str(format_string.format(params[0]))
+            + " * x + "
+            + str(format_string.format(params[1]))
+            + ")",
             # 'sigmoid': '1/(1+e^(-x))',
-            'sigmoid': 'logistic(x)',
+            "sigmoid": "logistic(x)",
             # 'lin_sigmoid': '1/(1+e^(-(' + str(format_string.format(params[0])) + ' * x + ' + str(format_string.format(params[1])) + ')))',
-            'lin_sigmoid': 'logistic(' + str(format_string.format(params[0])) + ' * x + ' + str(
-                format_string.format(params[1])) + ')',
-            'add': '+ x',
-            'subtract': '- x',
-            'mult': str(format_string.format(params[0])) + ' * x',
+            "lin_sigmoid": "logistic("
+            + str(format_string.format(params[0]))
+            + " * x + "
+            + str(format_string.format(params[1]))
+            + ")",
+            "add": "+ x",
+            "subtract": "- x",
+            "mult": str(format_string.format(params[0])) + " * x",
             # 'exp': 'e^(' + str(format_string.format(params[0])) + ' * x + ' + str(format_string.format(params[1])) + ')',
-            'exp': 'exp(' + str(format_string.format(params[0])) + ' * x + ' + str(
-                format_string.format(params[1])) + ')',
-            '1/x': '1 / (' + str(format_string.format(params[0])) + ' * x + ' + str(
-                format_string.format(params[1])) + ')',
-            'ln': 'ln(' + str(format_string.format(params[0])) + ' * x + ' + str(format_string.format(params[1])) + ')',
-            'classifier': classifier_str
+            "exp": "exp("
+            + str(format_string.format(params[0]))
+            + " * x + "
+            + str(format_string.format(params[1]))
+            + ")",
+            "1/x": "1 / ("
+            + str(format_string.format(params[0]))
+            + " * x + "
+            + str(format_string.format(params[1]))
+            + ")",
+            "ln": "ln("
+            + str(format_string.format(params[0]))
+            + " * x + "
+            + str(format_string.format(params[1]))
+            + ")",
+            "classifier": classifier_str,
         }
 
-    return labels.get(op_name, '')
+    return labels.get(op_name, "")
 
 
 # this module links two cells
@@ -167,13 +183,14 @@ def get_operation_label(op_name, params_org, decimals=4):
 # of cell k − 2 and cell k − 1, respectively, and 1 × 1 convolutions
 # are inserted as necessary
 class ReLUConvBN(nn.Module):
-
     def __init__(self, C_in, C_out, kernel_size, stride, padding, affine=True):
         super(ReLUConvBN, self).__init__()
         self.op = nn.Sequential(
             nn.ReLU(inplace=False),
-            nn.Conv2d(C_in, C_out, kernel_size, stride=stride, padding=padding, bias=False),
-            nn.BatchNorm2d(C_out, affine=affine)
+            nn.Conv2d(
+                C_in, C_out, kernel_size, stride=stride, padding=padding, bias=False
+            ),
+            nn.BatchNorm2d(C_out, affine=affine),
         )
 
     def forward(self, x):
@@ -181,13 +198,22 @@ class ReLUConvBN(nn.Module):
 
 
 class DilConv(nn.Module):
-
-    def __init__(self, C_in, C_out, kernel_size, stride, padding, dilation, affine=True):
+    def __init__(
+        self, C_in, C_out, kernel_size, stride, padding, dilation, affine=True
+    ):
         super(DilConv, self).__init__()
         self.op = nn.Sequential(
             nn.ReLU(inplace=False),
-            nn.Conv2d(C_in, C_in, kernel_size=kernel_size, stride=stride, padding=padding, dilation=dilation,
-                      groups=C_in, bias=False),
+            nn.Conv2d(
+                C_in,
+                C_in,
+                kernel_size=kernel_size,
+                stride=stride,
+                padding=padding,
+                dilation=dilation,
+                groups=C_in,
+                bias=False,
+            ),
             nn.Conv2d(C_in, C_out, kernel_size=1, padding=0, bias=False),
             nn.BatchNorm2d(C_out, affine=affine),
         )
@@ -197,16 +223,31 @@ class DilConv(nn.Module):
 
 
 class SepConv(nn.Module):
-
     def __init__(self, C_in, C_out, kernel_size, stride, padding, affine=True):
         super(SepConv, self).__init__()
         self.op = nn.Sequential(
             nn.ReLU(inplace=False),
-            nn.Conv2d(C_in, C_in, kernel_size=kernel_size, stride=stride, padding=padding, groups=C_in, bias=False),
+            nn.Conv2d(
+                C_in,
+                C_in,
+                kernel_size=kernel_size,
+                stride=stride,
+                padding=padding,
+                groups=C_in,
+                bias=False,
+            ),
             nn.Conv2d(C_in, C_in, kernel_size=1, padding=0, bias=False),
             nn.BatchNorm2d(C_in, affine=affine),
             nn.ReLU(inplace=False),
-            nn.Conv2d(C_in, C_in, kernel_size=kernel_size, stride=1, padding=padding, groups=C_in, bias=False),
+            nn.Conv2d(
+                C_in,
+                C_in,
+                kernel_size=kernel_size,
+                stride=1,
+                padding=padding,
+                groups=C_in,
+                bias=False,
+            ),
             nn.Conv2d(C_in, C_out, kernel_size=1, padding=0, bias=False),
             nn.BatchNorm2d(C_out, affine=affine),
         )
@@ -216,7 +257,6 @@ class SepConv(nn.Module):
 
 
 class Identity(nn.Module):
-
     def __init__(self):
         super(Identity, self).__init__()
 
@@ -225,7 +265,6 @@ class Identity(nn.Module):
 
 
 class NegIdentity(nn.Module):
-
     def __init__(self):
         super(NegIdentity, self).__init__()
 
@@ -234,7 +273,6 @@ class NegIdentity(nn.Module):
 
 
 class Exponential(nn.Module):
-
     def __init__(self):
         super(Exponential, self).__init__()
 
@@ -243,7 +281,6 @@ class Exponential(nn.Module):
 
 
 class NatLogarithm(nn.Module):
-
     def __init__(self):
         super(NatLogarithm, self).__init__()
 
@@ -260,7 +297,6 @@ class NatLogarithm(nn.Module):
 
 
 class MultInverse(nn.Module):
-
     def __init__(self):
         super(MultInverse, self).__init__()
 
@@ -269,20 +305,18 @@ class MultInverse(nn.Module):
 
 
 class Zero(nn.Module):
-
     def __init__(self, stride):
         super(Zero, self).__init__()
         self.stride = stride
 
     def forward(self, x):
         if self.stride == 1:
-            return x.mul(0.)
-        return x[:, :, ::self.stride, ::self.stride].mul(0.)
+            return x.mul(0.0)
+        return x[:, :, :: self.stride, :: self.stride].mul(0.0)
 
 
 # module is used for reduction operations
 class FactorizedReduce(nn.Module):
-
     def __init__(self, C_in, C_out, affine=True):
         super(FactorizedReduce, self).__init__()
         assert C_out % 2 == 0
@@ -300,7 +334,6 @@ class FactorizedReduce(nn.Module):
 
 # Softplus(x) = 1/β∗log(1+exp(β∗x))
 class Softplus(nn.Module):
-
     def __init__(self):
         super(Softplus, self).__init__()
         # self.beta = nn.Linear(1, 1, bias=False)
@@ -314,7 +347,6 @@ class Softplus(nn.Module):
 
 
 class Softminus(nn.Module):
-
     def __init__(self):
         super(Softminus, self).__init__()
         # self.beta = nn.Linear(1, 1, bias=False)

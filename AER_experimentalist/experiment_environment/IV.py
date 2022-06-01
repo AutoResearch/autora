@@ -4,7 +4,6 @@ from tinkerforge_variable import Tinkerforge_Variable
 
 
 class IV(Tinkerforge_Variable):
-
     def __init__(self, *args, **kwargs):
         self._name = "IV"
         self._variable_label = "Independent Variable"

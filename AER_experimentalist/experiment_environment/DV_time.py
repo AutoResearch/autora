@@ -11,7 +11,7 @@ class DV_Time(DV, V_Time):
     _variable_label = "Time"
     _units = "s"
     _priority = 0
-    _value_range = (0, 604800) # don't record more than a week
+    _value_range = (0, 604800)  # don't record more than a week
     _value = 0
 
     _is_covariate = True
@@ -26,5 +26,5 @@ class DV_Time(DV, V_Time):
     # Measure number of seconds relative to reference time
     def measure(self):
 
-        value = (time.time() - self._t0)
+        value = time.time() - self._t0
         self.set_value(value)

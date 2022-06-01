@@ -1,6 +1,7 @@
 from DV import DV
-from tinkerforge.bricklet_industrial_dual_analog_in_v2 import \
-    BrickletIndustrialDualAnalogInV2
+from tinkerforge.bricklet_industrial_dual_analog_in_v2 import (
+    BrickletIndustrialDualAnalogInV2,
+)
 from tinkerforge.ip_connection import IPConnection
 
 
@@ -25,11 +26,13 @@ class DV_Voltage(DV):
         super(DV_Voltage, self).__init__(*args, **kwargs)
 
         self._ipcon = IPConnection()  # Create IP connection
-        self._idai = BrickletIndustrialDualAnalogInV2(self._UID, self._ipcon)  # Create device object
+        self._idai = BrickletIndustrialDualAnalogInV2(
+            self._UID, self._ipcon
+        )  # Create device object
 
         self._ipcon.connect(self._HOST, self._PORT)  # Connect to brickd
 
-        if(self._name == "voltage1"):
+        if self._name == "voltage1":
             self.channel = 1
         else:
             self.channel = 0
@@ -37,7 +40,6 @@ class DV_Voltage(DV):
     # Clean up measurement device.
     def __clean_up__(self):
         self._ipcon.disconnect()
-
 
     # Waits until specified time has passed relative to reference time
     def measure(self):

@@ -4,7 +4,6 @@ from tinkerforge_variable import Tinkerforge_Variable
 
 
 class DV(Tinkerforge_Variable):
-
     def __init__(self, *args, **kwargs):
         self._name = "DV"
         self._variable_label = "Dependent Variable"

@@ -1,8 +1,7 @@
 import time
 
 from IV import IV
-from tinkerforge.bricklet_industrial_analog_out_v2 import \
-    BrickletIndustrialAnalogOutV2
+from tinkerforge.bricklet_industrial_analog_out_v2 import BrickletIndustrialAnalogOutV2
 from tinkerforge.ip_connection import IPConnection
 
 
@@ -23,7 +22,9 @@ class IV_Voltage(IV):
     def __init__(self, *args, **kwargs):
 
         self._ipcon = IPConnection()  # Create IP connection
-        self._iao = BrickletIndustrialAnalogOutV2(self._UID, self._ipcon)  # Create device object
+        self._iao = BrickletIndustrialAnalogOutV2(
+            self._UID, self._ipcon
+        )  # Create device object
 
         self._ipcon.connect(self._HOST, self._PORT)  # Connect to brickd
 

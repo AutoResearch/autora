@@ -10,44 +10,49 @@ from AER_theorist.theorist_GUI import Theorist_GUI
 
 # GENERAL PARAMETERS
 
-study_name = "Simple Voltage"   # name of experiment
-host = "192.168.188.27" # exp_env_cfg.HOST_IP      # ip address of experiment server
-port = 47778 # exp_env_cfg.HOST_PORT    # port of experiment server
+study_name = "Simple Voltage"  # name of experiment
+host = "192.168.188.27"  # exp_env_cfg.HOST_IP      # ip address of experiment server
+port = 47778  # exp_env_cfg.HOST_PORT    # port of experiment server
 
 AER_cycles = 1
 
 # OBJECT OF STUDY
 
 # specify independent variable
-source_voltage = Var(name='source_voltage',
-                          value_range=(0, 4000),
-                          units="mV",
-                          rescale = 0.0001,             # need to convert to V to keep input values small
-                          variable_label='Source Voltage')
+source_voltage = Var(
+    name="source_voltage",
+    value_range=(0, 4000),
+    units="mV",
+    rescale=0.0001,  # need to convert to V to keep input values small
+    variable_label="Source Voltage",
+)
 
 # specify dependent variable
-target_voltage = Var(name='voltage0',
-                          units="mV",
-                          rescale = 0.0001,             # need to convert to V to keep input values small
-                          variable_label='Target Voltage')
+target_voltage = Var(
+    name="voltage0",
+    units="mV",
+    rescale=0.0001,  # need to convert to V to keep input values small
+    variable_label="Target Voltage",
+)
 
 # list dependent and independent variables
 IVs = [source_voltage]
 DVs = [target_voltage]
 
 # initialize object of study
-study_object = Object_Of_Study(name=study_name,
-                               independent_variables=IVs,
-                               dependent_variables=DVs)
+study_object = Object_Of_Study(
+    name=study_name, independent_variables=IVs, dependent_variables=DVs
+)
 
 # EXPERIMENTALIST
 
 # initialize experimentalist
-experimentalist = Experimentalist_Popper(study_name=study_name,
-                                  experiment_server_host=host,
-                                  experiment_server_port=port,
-                                  seed_data_file="experiment_0_data.csv"
-                                         )
+experimentalist = Experimentalist_Popper(
+    study_name=study_name,
+    experiment_server_host=host,
+    experiment_server_port=port,
+    seed_data_file="experiment_0_data.csv",
+)
 
 # THEORIST
 theorist = Theorist_DARTS(study_name)
@@ -70,7 +75,12 @@ theorist = Theorist_DARTS(study_name)
 
 
 root = Tk()
-app = AER_GUI(object_of_study=study_object, theorist=theorist, experimentalist=experimentalist, root=root)
+app = AER_GUI(
+    object_of_study=study_object,
+    theorist=theorist,
+    experimentalist=experimentalist,
+    root=root,
+)
 root.mainloop()
 
 

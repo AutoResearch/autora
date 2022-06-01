@@ -15,7 +15,7 @@ class SimpleNetDataset(Object_Of_Study, Dataset):
     inputDimensions = 2
     outputDimensions = 2
 
-    def __init__(self, num_patterns = 100, sampling = False):
+    def __init__(self, num_patterns=100, sampling=False):
         """
         Args:
             csv_file (string): Path to the csv file with annotations.
@@ -29,11 +29,16 @@ class SimpleNetDataset(Object_Of_Study, Dataset):
         self.transform = transforms.Compose([transforms.ToTensor()])
 
         # generate input stimuli
-        self.stimulus1 = torch.rand(num_patterns, 1)  # values for first stimulus are drawn from U(0,1)
-        self.stimulus2 = torch.rand(num_patterns, 1) * 0 # values for second stimulus are drawn from U(0,1)
+        self.stimulus1 = torch.rand(
+            num_patterns, 1
+        )  # values for first stimulus are drawn from U(0,1)
+        self.stimulus2 = (
+            torch.rand(num_patterns, 1) * 0
+        )  # values for second stimulus are drawn from U(0,1)
 
-        self.finalResponse = generateLabels(self.stimulus1, self.stimulus2, self._sampling)
-
+        self.finalResponse = generateLabels(
+            self.stimulus1, self.stimulus2, self._sampling
+        )
 
     def __len__(self):
         return self._num_patterns
@@ -42,7 +47,6 @@ class SimpleNetDataset(Object_Of_Study, Dataset):
 
         input = torch.cat([self.stimulus1[idx], self.stimulus2[idx]])
         category = self.finalResponse[idx].data
-
 
         # sample = {'input': input, 'category': category}
 
@@ -65,22 +69,24 @@ class SimpleNetDataset(Object_Of_Study, Dataset):
 
     def __get_input_labels__(self):
         input_labels = list()
-        input_labels.append('stim1')
-        input_labels.append('stim2')
+        input_labels.append("stim1")
+        input_labels.append("stim2")
         return input_labels
 
     def __get_name__(self):
-        return 'SimpleNet'
+        return "SimpleNet"
 
     def sample_model_fit(self, num_patterns, estimator):
 
         tmp_sampling = self._sampling
 
-        stimulus2 = torch.zeros(num_patterns, 1) # since the input to hidden layer weight for this stimulus is set to 0, it should have no impact on the model's outcome
+        stimulus2 = torch.zeros(
+            num_patterns, 1
+        )  # since the input to hidden layer weight for this stimulus is set to 0, it should have no impact on the model's outcome
         stimulus1 = torch.linspace(0, 1, num_patterns)
         stimulus1 = stimulus1[:, None]
 
-        input = torch.cat((stimulus1, stimulus2),1)
+        input = torch.cat((stimulus1, stimulus2), 1)
 
         # generate true labels
         response = self.generateLabels(stimulus1, stimulus2, self._sampling)
@@ -99,7 +105,6 @@ class SimpleNetDataset(Object_Of_Study, Dataset):
 
         return input_plot, target_plot, prediction_plot, input_var, target_var
 
-
     def sample_model_fit_2d(self, num_patterns, estimator):
 
         tmp_sampling = self._sampling
@@ -115,8 +120,12 @@ class SimpleNetDataset(Object_Of_Study, Dataset):
         prediction_plot = np.empty(shape=input1_plot.shape)
 
         # test patterns
-        input_var = Variable(torch.from_numpy(np.empty(shape=(num_patterns*num_patterns, 2))).float())
-        target_var = Variable(torch.from_numpy(np.empty(shape=(num_patterns*num_patterns, 2))).float())
+        input_var = Variable(
+            torch.from_numpy(np.empty(shape=(num_patterns * num_patterns, 2))).float()
+        )
+        target_var = Variable(
+            torch.from_numpy(np.empty(shape=(num_patterns * num_patterns, 2))).float()
+        )
 
         for col in range(num_patterns):
 
@@ -135,15 +144,26 @@ class SimpleNetDataset(Object_Of_Study, Dataset):
             # sample data from estimator
             input_var_tmp = Variable(input)
             softmax = nn.Softmax(dim=1)
-            prediction_plot[:, col] = softmax(estimator(input_var_tmp)).data.numpy()[:, 0]
+            prediction_plot[:, col] = softmax(estimator(input_var_tmp)).data.numpy()[
+                :, 0
+            ]
 
             # store pattern
-            input_var.data[(col * num_patterns):((col + 1) * num_patterns), :] = input
-            target_var.data[(col * num_patterns):((col + 1) * num_patterns), :] = response.data
+            input_var.data[(col * num_patterns) : ((col + 1) * num_patterns), :] = input
+            target_var.data[
+                (col * num_patterns) : ((col + 1) * num_patterns), :
+            ] = response.data
 
         self._sampling = tmp_sampling
 
-        return input1_plot, input2_plot, target_plot, prediction_plot, input_var, target_var
+        return (
+            input1_plot,
+            input2_plot,
+            target_plot,
+            prediction_plot,
+            input_var,
+            target_var,
+        )
 
 
 def generateLabels(stimulus1, stimulus2, sampling=False):
@@ -152,11 +172,17 @@ def generateLabels(stimulus1, stimulus2, sampling=False):
 
     # generate labels
     model = SimpleNet()  # create instance of SimpleNet
-    out = model(Variable(stimulus1), Variable(stimulus2))  # get soft-maxed response pattern
+    out = model(
+        Variable(stimulus1), Variable(stimulus2)
+    )  # get soft-maxed response pattern
     if sampling:
-        uniformSample = Variable(torch.rand(num_patterns))  # get uniform sample for each response
+        uniformSample = Variable(
+            torch.rand(num_patterns)
+        )  # get uniform sample for each response
         finalResponse = torch.zeros(num_patterns)
-        for i, (response, sample) in enumerate(zip(out, uniformSample)):  # determine final response
+        for i, (response, sample) in enumerate(
+            zip(out, uniformSample)
+        ):  # determine final response
             finalResponse[i] = 0 if (response[0] > sample).all() == 1 else 1
         finalResponse = Variable(finalResponse.long())
     else:
@@ -164,10 +190,11 @@ def generateLabels(stimulus1, stimulus2, sampling=False):
 
     return finalResponse
 
+
 def get_target(stimulus_pattern, sampled=False):
     stimulus1 = stimulus_pattern.data[:, 0]
     stimulus2 = stimulus_pattern.data[:, 1]
-    if(len(stimulus1.shape) == 1):
+    if len(stimulus1.shape) == 1:
         stimulus1 = stimulus1.unsqueeze(1)
         stimulus2 = stimulus2.unsqueeze(1)
     return generateLabels(stimulus1, stimulus2, sampling=sampled)

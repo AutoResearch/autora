@@ -4,8 +4,9 @@ import torch.nn as nn
 from graphviz import Digraph
 from torch.autograd import Variable
 
-from AER_experimentalist.experiment_environment.participant_in_silico import \
-    Participant_In_Silico
+from AER_experimentalist.experiment_environment.participant_in_silico import (
+    Participant_In_Silico,
+)
 
 
 class Stroop_Model(nn.Module):
@@ -41,13 +42,23 @@ class Stroop_Model(nn.Module):
         # self.task_hidden_word.weight.data = torch.FloatTensor([[0, 1], [0, 1]]) * 0
 
         self.bias = Variable(torch.ones(1) * -4, requires_grad=False)
-        self.input_color_hidden_color.weight.data = torch.FloatTensor([[1, -1], [-1, 1]]) * 2.5
-        self.hidden_color_output.weight.data = torch.FloatTensor([[1, -1], [-1, 1]]) * 2.5
+        self.input_color_hidden_color.weight.data = (
+            torch.FloatTensor([[1, -1], [-1, 1]]) * 2.5
+        )
+        self.hidden_color_output.weight.data = (
+            torch.FloatTensor([[1, -1], [-1, 1]]) * 2.5
+        )
 
-        self.input_word_hidden_word.weight.data = torch.FloatTensor([[1, -1], [-1, 1]]) * 2.6
-        self.hidden_word_output.weight.data = torch.FloatTensor([[1, -1], [-1, 1]]) * 2.5
+        self.input_word_hidden_word.weight.data = (
+            torch.FloatTensor([[1, -1], [-1, 1]]) * 2.6
+        )
+        self.hidden_word_output.weight.data = (
+            torch.FloatTensor([[1, -1], [-1, 1]]) * 2.5
+        )
 
-        self.task_hidden_color.weight.data = torch.FloatTensor([[1.0, 0.0], [1.0, 0]]) * 4
+        self.task_hidden_color.weight.data = (
+            torch.FloatTensor([[1.0, 0.0], [1.0, 0]]) * 4
+        )
         self.task_hidden_word.weight.data = torch.FloatTensor([[0, 1], [0, 1]]) * 0
 
     def forward(self, input):
@@ -65,18 +76,22 @@ class Stroop_Model(nn.Module):
         word[:, 0:2] = input[:, 2:4]
         task[:, 0:2] = input[:, 4:6]
 
-        color_hidden = torch.sigmoid(self.input_color_hidden_color(color) +
-                                     self.task_hidden_color(task) +
-                                     self.bias)
+        color_hidden = torch.sigmoid(
+            self.input_color_hidden_color(color)
+            + self.task_hidden_color(task)
+            + self.bias
+        )
 
-        word_hidden = torch.sigmoid(self.input_word_hidden_word(word) +
-                                    self.task_hidden_word(task) +
-                                    self.bias)
+        word_hidden = torch.sigmoid(
+            self.input_word_hidden_word(word) + self.task_hidden_word(task) + self.bias
+        )
 
-        output = self.hidden_color_output(color_hidden) + \
-                 self.hidden_word_output(word_hidden)
+        output = self.hidden_color_output(color_hidden) + self.hidden_word_output(
+            word_hidden
+        )
 
         return output
+
 
 class Participant_Stroop(Participant_In_Silico):
 
@@ -110,7 +125,11 @@ class Participant_Stroop(Participant_In_Silico):
         elif variable_name is "verbal":
             return self.output.numpy()
 
-        raise Exception('Could not get value from Stroop Participant. Variable name "' + variable_name + '" not found.')
+        raise Exception(
+            'Could not get value from Stroop Participant. Variable name "'
+            + variable_name
+            + '" not found.'
+        )
 
     # assign value to participant
     def set_value(self, variable_name, value):
@@ -134,7 +153,11 @@ class Participant_Stroop(Participant_In_Silico):
             self.task_word[0, 0] = value
 
         else:
-            raise Exception('Could not set value for Stroop Participant. Variable name "' + variable_name + '" not found.')
+            raise Exception(
+                'Could not set value for Stroop Participant. Variable name "'
+                + variable_name
+                + '" not found.'
+            )
 
     def execute(self):
 
@@ -153,11 +176,13 @@ class Participant_Stroop(Participant_In_Silico):
         # compute sample from softmax
         probabilities = torch.exp(output_net) / torch.sum(torch.exp(output_net))
         probabilities_transformed = torch.flatten(torch.transpose(probabilities, 0, 1))
-        transform_category = torch.distributions.categorical.Categorical(probabilities_transformed)
+        transform_category = torch.distributions.categorical.Categorical(
+            probabilities_transformed
+        )
         index = transform_category.sample()
         self.output_sample = index
 
-    def compute_BIC(self, object_of_study, num_params = None):
+    def compute_BIC(self, object_of_study, num_params=None):
 
         (input, target) = object_of_study.get_dataset()
 
@@ -185,7 +210,9 @@ class Participant_Stroop(Participant_In_Silico):
                 input_full[:, 5] = input[:, idx]
 
         output_fnc = nn.Softmax(dim=1)
-        return super(Participant_Stroop, self).compute_BIC(input_full, target, output_fnc, num_params)
+        return super(Participant_Stroop, self).compute_BIC(
+            input_full, target, output_fnc, num_params
+        )
 
     def graph_simple(self, filepath):
 
@@ -195,30 +222,39 @@ class Participant_Stroop(Participant_In_Silico):
 
         # set up graph
         g = Digraph(
-            format='pdf',
-            edge_attr=dict(fontsize='20', fontname="times"),
-            node_attr=dict(style='filled', shape='rect', align='center', fontsize='20', height='0.5', width='0.5',
-                           penwidth='2', fontname="times"),
-            engine='dot')
-        g.body.extend(['rankdir=LR'])
+            format="pdf",
+            edge_attr=dict(fontsize="20", fontname="times"),
+            node_attr=dict(
+                style="filled",
+                shape="rect",
+                align="center",
+                fontsize="20",
+                height="0.5",
+                width="0.5",
+                penwidth="2",
+                fontname="times",
+            ),
+            engine="dot",
+        )
+        g.body.extend(["rankdir=LR"])
 
         # add input nodes
-        red = 'Color Red'
-        green = 'Color Green'
-        g.node('Color Red', fillcolor='#F1EDB9')
-        g.node('Color Green', fillcolor='#F1EDB9')
+        red = "Color Red"
+        green = "Color Green"
+        g.node("Color Red", fillcolor="#F1EDB9")
+        g.node("Color Green", fillcolor="#F1EDB9")
 
         # add hidden nodes
-        hidden1 = '0'
-        hidden2 = '1'
-        g.node('0', fillcolor='#BBCCF9')
-        g.node('1', fillcolor='#BBCCF9')
+        hidden1 = "0"
+        hidden2 = "1"
+        g.node("0", fillcolor="#BBCCF9")
+        g.node("1", fillcolor="#BBCCF9")
 
         # add output node
-        out1 = 'Logistic(x1)'
-        out2 = 'Logistic(x2)'
-        g.node(out1, fillcolor='#CBE7C7')
-        g.node(out2, fillcolor='#CBE7C7')
+        out1 = "Logistic(x1)"
+        out2 = "Logistic(x2)"
+        g.node(out1, fillcolor="#CBE7C7")
+        g.node(out2, fillcolor="#CBE7C7")
 
         # add links from input to hidden
         value = self.model.input_color_hidden_color.weight.data[0, 0]
@@ -257,24 +293,35 @@ class Participant_Stroop(Participant_In_Silico):
         # save graph
         g.render(filepath, view=False)
 
-    def figure_control_plot(self, comparison_model,
-                    color_green_list=(0, 0, 1),
-                    task_color_list=(0, 1, 1),
-                    num_data_points=100,
-                    figures_path=None,
-                    figure_name=None,
-                    figure_dimensions=(4, 3),
-                    y_limit=[0, 1],
-                    legend_font_size=8,
-                    axis_font_size=10,
-                    title_font_size=10):
+    def figure_control_plot(
+        self,
+        comparison_model,
+        color_green_list=(0, 0, 1),
+        task_color_list=(0, 1, 1),
+        num_data_points=100,
+        figures_path=None,
+        figure_name=None,
+        figure_dimensions=(4, 3),
+        y_limit=[0, 1],
+        legend_font_size=8,
+        axis_font_size=10,
+        title_font_size=10,
+    ):
 
         ground_truth = self.model
         approximation = comparison_model
 
-        output_truth = run_control_exp(ground_truth, color_green_list, task_color_list, num_data_points)
+        output_truth = run_control_exp(
+            ground_truth, color_green_list, task_color_list, num_data_points
+        )
 
-        output_approx = run_control_exp(approximation, color_green_list, task_color_list, num_data_points, input_dim=3)
+        output_approx = run_control_exp(
+            approximation,
+            color_green_list,
+            task_color_list,
+            num_data_points,
+            input_dim=3,
+        )
 
         # collect plot data
         x_data = np.linspace(0, 1, num_data_points)
@@ -287,12 +334,24 @@ class Participant_Stroop(Participant_In_Silico):
 
         x_limit = [0, 1]
         x_label = "Red Input"
-        y_label = 'Red Response'
+        y_label = "Red Response"
         legend = list()
         for color_green, task_color in zip(color_green_list, task_color_list):
-            legend.append('$act_{green}$ = ' + str(color_green) + ', $act_{task}$ = ' + str(task_color) + ' (GT)')
+            legend.append(
+                "$act_{green}$ = "
+                + str(color_green)
+                + ", $act_{task}$ = "
+                + str(task_color)
+                + " (GT)"
+            )
         for color_green, task_color in zip(color_green_list, task_color_list):
-            legend.append('$act_{green}$ = ' + str(color_green) + ', $act_{task}$ = ' + str(task_color) + ' (R)')
+            legend.append(
+                "$act_{green}$ = "
+                + str(color_green)
+                + ", $act_{task}$ = "
+                + str(task_color)
+                + " (R)"
+            )
 
         # plot
         import os
@@ -303,17 +362,17 @@ class Participant_Stroop(Participant_In_Silico):
 
         fig, ax = pyplot.subplots(figsize=figure_dimensions)
 
-        ax.plot(x_data, y1_truth_data, '-', label=legend[0], color='#CC6677')
-        ax.plot(x_data, y2_truth_data, '-', label=legend[1], color='#44AA99')
-        ax.plot(x_data, y3_truth_data, '-', label=legend[2], color='#332288')
-        ax.plot(x_data, y1_approx_data, '--', label=legend[3], color='#CC6677')
-        ax.plot(x_data, y2_approx_data, '--', label=legend[4], color='#44AA99')
-        ax.plot(x_data, y3_approx_data, '--', label=legend[5], color='#332288')
+        ax.plot(x_data, y1_truth_data, "-", label=legend[0], color="#CC6677")
+        ax.plot(x_data, y2_truth_data, "-", label=legend[1], color="#44AA99")
+        ax.plot(x_data, y3_truth_data, "-", label=legend[2], color="#332288")
+        ax.plot(x_data, y1_approx_data, "--", label=legend[3], color="#CC6677")
+        ax.plot(x_data, y2_approx_data, "--", label=legend[4], color="#44AA99")
+        ax.plot(x_data, y3_approx_data, "--", label=legend[5], color="#332288")
         ax.set_xlim(x_limit)
         ax.set_ylim(y_limit)
         ax.set_xlabel(x_label, fontsize=axis_font_size)
         ax.set_ylabel(y_label, fontsize=axis_font_size)
-        ax.set_title('Response Function', fontsize=title_font_size)
+        ax.set_title("Response Function", fontsize=title_font_size)
         ax.legend(loc=0, fontsize=legend_font_size, bbox_to_anchor=(1.05, 1))
         # sns.despine(trim=True)
         plt.show()
@@ -323,7 +382,10 @@ class Participant_Stroop(Participant_In_Silico):
                 os.mkdir(figures_path)
             fig.savefig(os.path.join(figures_path, figure_name))
 
-def run_control_exp(model, color_green_list, color_task_list, num_data_points, input_dim=None):
+
+def run_control_exp(
+    model, color_green_list, color_task_list, num_data_points, input_dim=None
+):
 
     output_list = list()
 
@@ -410,26 +472,49 @@ def run_exp(model):
     input = [color_red, color_green, word_red, word_green, task_color, task_word]
     output_wrd_control = torch.sigmoid(model(input))
 
-
-    return (output_col_cong, output_col_incong, output_col_control,
-            output_wrd_cong, output_wrd_incong, output_wrd_control)
+    return (
+        output_col_cong,
+        output_col_incong,
+        output_col_control,
+        output_wrd_cong,
+        output_wrd_incong,
+        output_wrd_control,
+    )
 
 
 def plot_demand_effect(model):
 
     # run Stroop experiment
-    (output_col_cong, output_col_incong, output_col_control,
-     output_wrd_cong, output_wrd_incong, output_wrd_control) = run_exp(model)
+    (
+        output_col_cong,
+        output_col_incong,
+        output_col_control,
+        output_wrd_cong,
+        output_wrd_incong,
+        output_wrd_control,
+    ) = run_exp(model)
 
     beta = 2
 
     # compute accuracies
-    acc_col_cong = torch.exp(output_col_cong[0, 0] * beta) / torch.sum(torch.exp(output_col_cong * beta))
-    acc_col_incong = torch.exp(output_col_incong[0, 0] * beta) / torch.sum(torch.exp(output_col_incong * beta))
-    acc_col_control = torch.exp(output_col_control[0, 0] * beta) / torch.sum(torch.exp(output_col_control * beta))
-    acc_wrd_cong = torch.exp(output_wrd_cong[0, 0] * beta) / torch.sum(torch.exp(output_wrd_cong * beta))
-    acc_wrd_incong = torch.exp(output_wrd_incong[0, 0] * beta) / torch.sum(torch.exp(output_wrd_incong * beta))
-    acc_wrd_control = torch.exp(output_wrd_control[0, 0] * beta) / torch.sum(torch.exp(output_wrd_control * beta))
+    acc_col_cong = torch.exp(output_col_cong[0, 0] * beta) / torch.sum(
+        torch.exp(output_col_cong * beta)
+    )
+    acc_col_incong = torch.exp(output_col_incong[0, 0] * beta) / torch.sum(
+        torch.exp(output_col_incong * beta)
+    )
+    acc_col_control = torch.exp(output_col_control[0, 0] * beta) / torch.sum(
+        torch.exp(output_col_control * beta)
+    )
+    acc_wrd_cong = torch.exp(output_wrd_cong[0, 0] * beta) / torch.sum(
+        torch.exp(output_wrd_cong * beta)
+    )
+    acc_wrd_incong = torch.exp(output_wrd_incong[0, 0] * beta) / torch.sum(
+        torch.exp(output_wrd_incong * beta)
+    )
+    acc_wrd_control = torch.exp(output_wrd_control[0, 0] * beta) / torch.sum(
+        torch.exp(output_wrd_control * beta)
+    )
 
     err_col_cong = 1 - acc_col_cong
     err_col_incong = 1 - acc_col_incong
@@ -440,24 +525,34 @@ def plot_demand_effect(model):
 
     # collect plot data
     x_data = [0, 1, 2]
-    y_data_col = [err_col_control.detach().numpy() * 100, err_col_incong.detach().numpy() * 100, err_col_cong.detach().numpy() * 100]
-    y_data_wrd = [err_wrd_control.detach().numpy() * 100, err_wrd_incong.detach().numpy() * 100, err_wrd_cong.detach().numpy() * 100]
+    y_data_col = [
+        err_col_control.detach().numpy() * 100,
+        err_col_incong.detach().numpy() * 100,
+        err_col_cong.detach().numpy() * 100,
+    ]
+    y_data_wrd = [
+        err_wrd_control.detach().numpy() * 100,
+        err_wrd_incong.detach().numpy() * 100,
+        err_wrd_cong.detach().numpy() * 100,
+    ]
     x_limit = [-0.5, 2.5]
     y_limit = [0, 100]
     x_label = "Condition"
     y_label = "Error Rate (%)"
-    legend = ('color naming', 'word reading')
+    legend = ("color naming", "word reading")
 
     # plot
     import matplotlib.pyplot as plt
+
     plt.plot(x_data, y_data_col, label=legend[0])
-    plt.plot(x_data, y_data_wrd, '--', label=legend[1])
+    plt.plot(x_data, y_data_wrd, "--", label=legend[1])
     plt.xlim(x_limit)
     plt.ylim(y_limit)
     plt.xlabel(x_label, fontsize="large")
     plt.ylabel(y_label, fontsize="large")
     plt.legend(loc=2, fontsize="large")
     plt.show()
+
 
 # model = Stroop_Model()
 # plot_demand_effect(model)

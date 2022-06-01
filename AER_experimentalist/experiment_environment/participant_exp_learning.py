@@ -5,8 +5,9 @@ import torch
 import torch.nn as nn
 from graphviz import Digraph
 
-from AER_experimentalist.experiment_environment.participant_in_silico import \
-    Participant_In_Silico
+from AER_experimentalist.experiment_environment.participant_in_silico import (
+    Participant_In_Silico,
+)
 
 
 class Exp_Learning_Model(nn.Module):
@@ -30,9 +31,12 @@ class Exp_Learning_Model(nn.Module):
         P_initial[:, 0] = input[:, 1]
         P_asymptotic[:, 0] = input[:, 2]
 
-        output = P_asymptotic - (P_asymptotic - P_initial) * torch.exp(- self.alpha * learning_trial)
+        output = P_asymptotic - (P_asymptotic - P_initial) * torch.exp(
+            -self.alpha * learning_trial
+        )
 
         return output
+
 
 class Participant_Exp_Learning(Participant_In_Silico):
 
@@ -66,7 +70,11 @@ class Participant_Exp_Learning(Participant_In_Silico):
         elif variable_name is "learning_performance":
             return self.output[0, 0].numpy()
 
-        raise Exception('Could not get value from Exponential Learning Participant. Variable name "' + variable_name + '" not found.')
+        raise Exception(
+            'Could not get value from Exponential Learning Participant. Variable name "'
+            + variable_name
+            + '" not found.'
+        )
 
     # assign value to participant
     def set_value(self, variable_name, value):
@@ -87,7 +95,11 @@ class Participant_Exp_Learning(Participant_In_Silico):
             self.learning_performance[0, 0] = value
 
         else:
-            raise Exception('Could not set value for Exponential Learning Participant. Variable name "' + variable_name + '" not found.')
+            raise Exception(
+                'Could not set value for Exponential Learning Participant. Variable name "'
+                + variable_name
+                + '" not found.'
+            )
 
     def execute(self):
 
@@ -106,7 +118,7 @@ class Participant_Exp_Learning(Participant_In_Silico):
         else:
             self.output_sampled[0] = 0
 
-    def compute_BIC(self, object_of_study, num_params = None):
+    def compute_BIC(self, object_of_study, num_params=None):
 
         (input, target) = object_of_study.get_dataset()
 
@@ -125,23 +137,28 @@ class Participant_Exp_Learning(Participant_In_Silico):
                 input_full[:, 2] = input[:, idx]
 
         output_fnc = nn.Identity
-        return super(Participant_Exp_Learning, self).compute_BIC(input_full, target, output_fnc, num_params)
+        return super(Participant_Exp_Learning, self).compute_BIC(
+            input_full, target, output_fnc, num_params
+        )
 
     def graph_simple(self, filepath):
         raise Exception("Not implemented")
 
-    def figure_plot(self, comparison_model,
-                    P_initial=(0, 0.25, 0.25),
-                    P_asymptotic=(1, 1, 0.75),
-                    learning_trials=np.linspace(0, 1, 10),
-                    num_data_points=100,
-                    figures_path=None,
-                    figure_name=None,
-                    figure_dimensions=(4, 3),
-                    y_limit=None,
-                    legend_font_size=8,
-                    axis_font_size=10,
-                    title_font_size=10):
+    def figure_plot(
+        self,
+        comparison_model,
+        P_initial=(0, 0.25, 0.25),
+        P_asymptotic=(1, 1, 0.75),
+        learning_trials=np.linspace(0, 1, 10),
+        num_data_points=100,
+        figures_path=None,
+        figure_name=None,
+        figure_dimensions=(4, 3),
+        y_limit=None,
+        legend_font_size=8,
+        axis_font_size=10,
+        title_font_size=10,
+    ):
 
         ground_truth = self.model
         approximation = comparison_model
@@ -164,9 +181,13 @@ class Participant_Exp_Learning(Participant_In_Silico):
         y_label = "$P_n$"
         legend = list()
         for P_init, P_asymp in zip(P_initial, P_asymptotic):
-            legend.append('$P_0 = ' + str(P_init) + ', P_{inf} = ' + str(P_asymp) + '$ (Orig.)') # (Gr. Truth)
+            legend.append(
+                "$P_0 = " + str(P_init) + ", P_{inf} = " + str(P_asymp) + "$ (Orig.)"
+            )  # (Gr. Truth)
         for P_init, P_asymp in zip(P_initial, P_asymptotic):
-            legend.append('$P_0 = ' + str(P_init) + ', P_{inf} = ' + str(P_asymp) + '$ (Recov.)') # (Recov.)
+            legend.append(
+                "$P_0 = " + str(P_init) + ", P_{inf} = " + str(P_asymp) + "$ (Recov.)"
+            )  # (Recov.)
 
         # plot
         import os
@@ -177,18 +198,20 @@ class Participant_Exp_Learning(Participant_In_Silico):
 
         fig, ax = pyplot.subplots(figsize=figure_dimensions)
 
-        ax.plot(x_data, y1_truth_data, '-', label=legend[0], color='#CC6677')
-        ax.plot(x_data, y2_truth_data, '-', label=legend[1], color='#44AA99')
-        ax.plot(x_data, y3_truth_data, '-', label=legend[2], color='#332288')
-        ax.plot(x_data, y1_approx_data, '--', label=legend[3], color='#CC6677')
-        ax.plot(x_data, y2_approx_data, '--', label=legend[4], color='#44AA99')
-        ax.plot(x_data, y3_approx_data, '--', label=legend[5], color='#332288')
+        ax.plot(x_data, y1_truth_data, "-", label=legend[0], color="#CC6677")
+        ax.plot(x_data, y2_truth_data, "-", label=legend[1], color="#44AA99")
+        ax.plot(x_data, y3_truth_data, "-", label=legend[2], color="#332288")
+        ax.plot(x_data, y1_approx_data, "--", label=legend[3], color="#CC6677")
+        ax.plot(x_data, y2_approx_data, "--", label=legend[4], color="#44AA99")
+        ax.plot(x_data, y3_approx_data, "--", label=legend[5], color="#332288")
         ax.set_xlim(x_limit)
         ax.set_ylim(y_limit)
         ax.set_xlabel(x_label, fontsize=axis_font_size)
         ax.set_ylabel(y_label, fontsize=axis_font_size)
-        ax.set_title('Learning Curve', fontsize=title_font_size)
-        ax.legend(fontsize=legend_font_size, loc= 0, bbox_to_anchor=(1.05, 1)) # loc= 0, bbox_to_anchor=(1.05, 1) # loc="lower center", bbox_to_anchor=(0.5, -0.6)
+        ax.set_title("Learning Curve", fontsize=title_font_size)
+        ax.legend(
+            fontsize=legend_font_size, loc=0, bbox_to_anchor=(1.05, 1)
+        )  # loc= 0, bbox_to_anchor=(1.05, 1) # loc="lower center", bbox_to_anchor=(0.5, -0.6)
         sns.despine(trim=True)
         fig.subplots_adjust(bottom=0.25)
         plt.show()
@@ -211,11 +234,15 @@ def run_exp(model, P_initial_list, P_asymptotic_list, learning_trials_list):
             input[0, 2] = P_asymptotic
             output[-1].append(model(input))
 
-
     return output
 
 
-def plot_learning_curve(model, P_initial=(0, 0.25, 0.25), P_asymptotic=(1, 1, 0.75), learning_trials=np.linspace(0, 1, 10)):
+def plot_learning_curve(
+    model,
+    P_initial=(0, 0.25, 0.25),
+    P_asymptotic=(1, 1, 0.75),
+    learning_trials=np.linspace(0, 1, 10),
+):
 
     output = run_exp(model, P_initial, P_asymptotic, learning_trials)
 
@@ -233,19 +260,21 @@ def plot_learning_curve(model, P_initial=(0, 0.25, 0.25), P_asymptotic=(1, 1, 0.
     y_label = "$P_n$"
     legend = list()
     for P_init, P_asymp in zip(P_initial, P_asymptotic):
-        legend.append('$P_0 =$ ' + str(P_init) + ', $P_\infty =$ ' + str(P_asymp))
+        legend.append("$P_0 =$ " + str(P_init) + ", $P_\infty =$ " + str(P_asymp))
 
     # plot
     import matplotlib.pyplot as plt
-    plt.plot(x1_data, y1_data, '.-', label=legend[0])
-    plt.plot(x2_data, y2_data, '.-', label=legend[1])
-    plt.plot(x3_data, y3_data, '.-', label=legend[2])
+
+    plt.plot(x1_data, y1_data, ".-", label=legend[0])
+    plt.plot(x2_data, y2_data, ".-", label=legend[1])
+    plt.plot(x3_data, y3_data, ".-", label=legend[2])
     plt.xlim(x_limit)
     plt.ylim(y_limit)
     plt.xlabel(x_label, fontsize="large")
     plt.ylabel(y_label, fontsize="large")
     plt.legend(loc=4, fontsize="large")
     plt.show()
+
 
 model = Exp_Learning_Model(alpha=5)
 learning_trials = np.linspace(0, 1, 20)

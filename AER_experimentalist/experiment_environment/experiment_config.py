@@ -5,7 +5,7 @@ sequences_path = "experiments/sequences/"
 data_path = "experiments/data/"
 session_path = "sessions/"
 
-LOCAL_HOST = '127.0.0.1'
+LOCAL_HOST = "127.0.0.1"
 HOST_IP = LOCAL_HOST
 HOST_PORT = 47777
 

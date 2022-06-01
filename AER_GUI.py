@@ -22,6 +22,7 @@ class Plot_Windows(Enum):
     THEORIST = 1
     EXPERIMENTALIST = 2
 
+
 class AER_GUI(Frame):
 
     AER_cycles = 5
@@ -65,9 +66,29 @@ class AER_GUI(Frame):
     _plot_fontSize = 10
     _scatter_area = 50
     _scatter_color = "#FF0000"
-    _plot_colors = ['r', 'g', 'b', 'c', 'm', 'y', 'k',
-                    'r--', 'g--', 'b--', 'c--', 'm--', 'y--', 'k--',
-                    'r:', 'g:', 'b:', 'c:', 'm:', 'y:', 'k:']
+    _plot_colors = [
+        "r",
+        "g",
+        "b",
+        "c",
+        "m",
+        "y",
+        "k",
+        "r--",
+        "g--",
+        "b--",
+        "c--",
+        "m--",
+        "y--",
+        "k--",
+        "r:",
+        "g:",
+        "b:",
+        "c:",
+        "m:",
+        "y:",
+        "k:",
+    ]
 
     # Initialize GUI.
     def __init__(self, object_of_study, theorist, experimentalist, root=None):
@@ -84,27 +105,46 @@ class AER_GUI(Frame):
 
         # define styles
         self.label_style = ttk.Style()
-        self.label_style.configure("Default.TLabel", foreground="black", background=self._label_bgcolor,
-                                   font=(self._font_family, self._title_font_size), anchor="center")
+        self.label_style.configure(
+            "Default.TLabel",
+            foreground="black",
+            background=self._label_bgcolor,
+            font=(self._font_family, self._title_font_size),
+            anchor="center",
+        )
 
         self.active_label_style = ttk.Style()
-        self.active_label_style.configure("Active.TLabel", foreground="red", background=self._label_bgcolor,
-                                   font=(self._font_family, self._title_font_size), anchor="center")
+        self.active_label_style.configure(
+            "Active.TLabel",
+            foreground="red",
+            background=self._label_bgcolor,
+            font=(self._font_family, self._title_font_size),
+            anchor="center",
+        )
 
         self.up_down_button_style = ttk.Style()
-        self.up_down_button_style.configure("UpDown.TButton", foreground="black", background=self._up_down_bgcolor,
-                                   font=(self._font_family, self._font_size_button))
+        self.up_down_button_style.configure(
+            "UpDown.TButton",
+            foreground="black",
+            background=self._up_down_bgcolor,
+            font=(self._font_family, self._font_size_button),
+        )
 
         self.run_button_style = ttk.Style()
-        self.run_button_style.configure("Run.TButton", foreground="black",
-                                            background=self._run_bgcolor,
-                                            font=(self._font_family, self._font_size_button))
+        self.run_button_style.configure(
+            "Run.TButton",
+            foreground="black",
+            background=self._run_bgcolor,
+            font=(self._font_family, self._font_size_button),
+        )
 
         self.stop_button_style = ttk.Style()
-        self.stop_button_style.configure("Stop.TButton", foreground="black",
-                                            background=self._stop_bgcolor,
-                                            font=(self._font_family, self._font_size_button))
-
+        self.stop_button_style.configure(
+            "Stop.TButton",
+            foreground="black",
+            background=self._stop_bgcolor,
+            font=(self._font_family, self._font_size_button),
+        )
 
         # configure grid
         for row in range(4):
@@ -123,26 +163,36 @@ class AER_GUI(Frame):
 
         # AER control panel
 
-        self.label_aer = ttk.Label(self._root, text='AER Status', style='Default.TLabel')
+        self.label_aer = ttk.Label(
+            self._root, text="AER Status", style="Default.TLabel"
+        )
 
-        self.listbox_status = Listbox(self._root, selectmode=SINGLE, font=(self._font_family, self._font_size),
-                                          bg=self._listbox_bgcolor)
+        self.listbox_status = Listbox(
+            self._root,
+            selectmode=SINGLE,
+            font=(self._font_family, self._font_size),
+            bg=self._listbox_bgcolor,
+        )
 
-        self.button_run = ttk.Button(self._root,
-                                      text=self._default_run_text,
-                                      command=self.run_study,
-                                      style="Run.TButton")
+        self.button_run = ttk.Button(
+            self._root,
+            text=self._default_run_text,
+            command=self.run_study,
+            style="Run.TButton",
+        )
 
-        self.button_stop = ttk.Button(self._root,
-                                     text=self._default_stop_text,
-                                     command=self.stop_study,
-                                     style="Stop.TButton")
-
-
+        self.button_stop = ttk.Button(
+            self._root,
+            text=self._default_stop_text,
+            command=self.stop_study,
+            style="Stop.TButton",
+        )
 
         # theorist
 
-        self.label_theorist = ttk.Label(self._root, text='Theorist', style='Default.TLabel')
+        self.label_theorist = ttk.Label(
+            self._root, text="Theorist", style="Default.TLabel"
+        )
 
         self.model_plot_canvas = Label(self._root)
 
@@ -150,59 +200,88 @@ class AER_GUI(Frame):
         self._axis_theorist = self._fig_theorist.add_subplot(111)
         self._fig_theorist.subplots_adjust(bottom=0.2)
         self._fig_theorist.subplots_adjust(left=0.35)
-        self._axis_theorist.plot([0],[0])
-        self._axis_theorist.set_xlabel('Ordinate', fontsize=self._font_size)
-        self._axis_theorist.set_ylabel('Epochs', fontsize=self._font_size)
-        self._axis_theorist.set_title('No Data Available', fontsize=self._font_size)
+        self._axis_theorist.plot([0], [0])
+        self._axis_theorist.set_xlabel("Ordinate", fontsize=self._font_size)
+        self._axis_theorist.set_ylabel("Epochs", fontsize=self._font_size)
+        self._axis_theorist.set_title("No Data Available", fontsize=self._font_size)
         self._axis_theorist.grid()
         self._canvas_theorist = FigureCanvasTkAgg(self._fig_theorist, self._root)
 
         # self.model_plot_canvas = Label(self._root)
-        self._theorist_canvas_width = self._theorist_plot_width + self._theorist_button_width
+        self._theorist_canvas_width = (
+            self._theorist_plot_width + self._theorist_button_width
+        )
 
-        self.listbox_theorist = Listbox(self._root, selectmode=SINGLE, font=(self._font_family, self._font_size),
-                                          bg=self._listbox_bgcolor, exportselection=False)
-        self.listbox_theorist.bind('<<ListboxSelect>>', self.update_theorist_plot)
+        self.listbox_theorist = Listbox(
+            self._root,
+            selectmode=SINGLE,
+            font=(self._font_family, self._font_size),
+            bg=self._listbox_bgcolor,
+            exportselection=False,
+        )
+        self.listbox_theorist.bind("<<ListboxSelect>>", self.update_theorist_plot)
 
-        self.button_theorist_selection_up = ttk.Button(self._root,
-                                                         text="  /\\  ",
-                                                         command=self.theorist_selection_up,
-                                                         style="UpDown.TButton")
+        self.button_theorist_selection_up = ttk.Button(
+            self._root,
+            text="  /\\  ",
+            command=self.theorist_selection_up,
+            style="UpDown.TButton",
+        )
 
-        self.button_theorist_selection_down = ttk.Button(self._root,
-                                                           text="  \\/  ",
-                                                           command=self.theorist_selection_down,
-                                                           style="UpDown.TButton")
+        self.button_theorist_selection_down = ttk.Button(
+            self._root,
+            text="  \\/  ",
+            command=self.theorist_selection_down,
+            style="UpDown.TButton",
+        )
 
         # experimentalist
 
-        self.label_experimentalist = ttk.Label(self._root, text='Experimentalist', style='Default.TLabel')
-        
+        self.label_experimentalist = ttk.Label(
+            self._root, text="Experimentalist", style="Default.TLabel"
+        )
 
-        self.listbox_experimentalist = Listbox(self._root, selectmode=SINGLE, font=(self._font_family, self._font_size),
-                                           bg=self._listbox_bgcolor, exportselection=False)
-        self.listbox_experimentalist.bind('<<ListboxSelect>>', self.update_experimentalist_plot)
+        self.listbox_experimentalist = Listbox(
+            self._root,
+            selectmode=SINGLE,
+            font=(self._font_family, self._font_size),
+            bg=self._listbox_bgcolor,
+            exportselection=False,
+        )
+        self.listbox_experimentalist.bind(
+            "<<ListboxSelect>>", self.update_experimentalist_plot
+        )
 
-        self.button_experimentalist_up = ttk.Button(self._root,
-                                                          text="  /\\  ",
-                                                          command=self.experimentalist_selection_up,
-                                                          style="UpDown.TButton")
+        self.button_experimentalist_up = ttk.Button(
+            self._root,
+            text="  /\\  ",
+            command=self.experimentalist_selection_up,
+            style="UpDown.TButton",
+        )
 
-        self.button_experimentalist_down = ttk.Button(self._root,
-                                                            text="  \\/  ",
-                                                            command=self.experimentalist_selection_down,
-                                                            style="UpDown.TButton")
+        self.button_experimentalist_down = ttk.Button(
+            self._root,
+            text="  \\/  ",
+            command=self.experimentalist_selection_down,
+            style="UpDown.TButton",
+        )
 
         self._fig_experimentalist = Figure(figsize=(1, 1), dpi=100)
         self._axis_experimentalist = self._fig_experimentalist.add_subplot(111)
         self._fig_experimentalist.subplots_adjust(bottom=0.2)
         self._fig_experimentalist.subplots_adjust(left=0.35)
         self._axis_experimentalist.plot([0], [0])
-        self._axis_experimentalist.set_xlabel('Independent Var', fontsize=self._font_size)
-        self._axis_experimentalist.set_ylabel('Dependent Var', fontsize=self._font_size)
-        self._axis_experimentalist.set_title('No Data Available', fontsize=self._font_size)
+        self._axis_experimentalist.set_xlabel(
+            "Independent Var", fontsize=self._font_size
+        )
+        self._axis_experimentalist.set_ylabel("Dependent Var", fontsize=self._font_size)
+        self._axis_experimentalist.set_title(
+            "No Data Available", fontsize=self._font_size
+        )
         self._axis_experimentalist.grid()
-        self._canvas_experimentalist = FigureCanvasTkAgg(self._fig_experimentalist, self._root)
+        self._canvas_experimentalist = FigureCanvasTkAgg(
+            self._fig_experimentalist, self._root
+        )
 
         self.init_window()
 
@@ -217,35 +296,44 @@ class AER_GUI(Frame):
         self.button_stop.grid(row=2, column=0, sticky=N + S + E + W)
         self.button_run.grid(row=3, column=0, sticky=N + S + E + W)
 
-
         # theorist
         self.label_theorist.grid(row=0, column=1, columnspan=2, sticky=N + S + E + W)
 
         self.model_plot_canvas.grid(row=1, column=1, columnspan=2, sticky=N + S + E + W)
-        self._canvas_theorist.get_tk_widget().grid(row=1, column=1, columnspan=2, sticky=N + S + E + W)
+        self._canvas_theorist.get_tk_widget().grid(
+            row=1, column=1, columnspan=2, sticky=N + S + E + W
+        )
 
         self.listbox_theorist.grid(row=2, rowspan=2, column=1, sticky=N + S + E + W)
         self.button_theorist_selection_up.grid(row=2, column=2, sticky=N + S + E + W)
         self.button_theorist_selection_down.grid(row=3, column=2, sticky=N + S + E + W)
 
-
         # experimentalist
-        self.label_experimentalist.grid(row=0, column=3, columnspan=2, sticky=N + S + E + W)
+        self.label_experimentalist.grid(
+            row=0, column=3, columnspan=2, sticky=N + S + E + W
+        )
 
-        self._canvas_experimentalist.get_tk_widget().grid(row=1, column=3, columnspan=2, sticky=N + S + E + W)
+        self._canvas_experimentalist.get_tk_widget().grid(
+            row=1, column=3, columnspan=2, sticky=N + S + E + W
+        )
 
-        self.listbox_experimentalist.grid(row=2, rowspan=2, column=3, columnspan=2, sticky=N + S + E + W)
+        self.listbox_experimentalist.grid(
+            row=2, rowspan=2, column=3, columnspan=2, sticky=N + S + E + W
+        )
         self.button_experimentalist_up.grid(row=2, column=4, sticky=N + S + E + W)
         self.button_experimentalist_down.grid(row=3, column=4, sticky=N + S + E + W)
-
 
         # resize
         hpad = 67
         wpad = 3
-        self._geom = '800x400+0+0'
-        self._root.geometry("{0}x{1}+0+0".format(
-            self._root.winfo_screenwidth() - wpad, self._root.winfo_screenheight() - hpad))
-        self._root.bind('<Escape>', self.toggle_geom)
+        self._geom = "800x400+0+0"
+        self._root.geometry(
+            "{0}x{1}+0+0".format(
+                self._root.winfo_screenwidth() - wpad,
+                self._root.winfo_screenheight() - hpad,
+            )
+        )
+        self._root.bind("<Escape>", self.toggle_geom)
 
     def toggle_geom(self, event):
         geom = self._root.winfo_geometry()
@@ -276,7 +364,7 @@ class AER_GUI(Frame):
         if len(selection) > 0:
             current_value = selection[0]
             max_value = listbox.size()
-            new_value = max(min(current_value + movement, max_value-1), 0)
+            new_value = max(min(current_value + movement, max_value - 1), 0)
 
             listbox.selection_clear(0, END)
             listbox.select_set(new_value)
@@ -329,12 +417,12 @@ class AER_GUI(Frame):
         self.update_status(msg)
 
     def activate_theorist(self):
-        self.label_theorist.config(style = "Active.TLabel")
-        self.label_experimentalist.config(style = "Default.TLabel")
+        self.label_theorist.config(style="Active.TLabel")
+        self.label_experimentalist.config(style="Default.TLabel")
 
     def activate_experimentalist(self):
-        self.label_experimentalist.config(style = "Active.TLabel")
-        self.label_theorist.config(style = "Default.TLabel")
+        self.label_experimentalist.config(style="Active.TLabel")
+        self.label_theorist.config(style="Default.TLabel")
 
     def update_run_button(self, epoch=0, num_epochs=1, meta_idx=0, num_meta_idx=0):
         if self._running is True:
@@ -349,17 +437,27 @@ class AER_GUI(Frame):
                 str_percent = "" + str(percent)
 
             if self._paused is True:
-                self.button_run.config(text="RESUME\n"
-                                            + str(meta_idx)
-                                            + " (" + str_percent + "%)"
-                                            + " / "
-                                            + str(num_meta_idx), command=self.resume_study)
+                self.button_run.config(
+                    text="RESUME\n"
+                    + str(meta_idx)
+                    + " ("
+                    + str_percent
+                    + "%)"
+                    + " / "
+                    + str(num_meta_idx),
+                    command=self.resume_study,
+                )
             else:
-                self.button_run.config(text="PAUSE\n"
-                                            + str(meta_idx)
-                                            + " (" + str_percent + "%)"
-                                            + " / "
-                                            + str(num_meta_idx), command=self.pause_study)
+                self.button_run.config(
+                    text="PAUSE\n"
+                    + str(meta_idx)
+                    + " ("
+                    + str_percent
+                    + "%)"
+                    + " / "
+                    + str(num_meta_idx),
+                    command=self.pause_study,
+                )
         else:
             self.button_run.config(text=self._default_run_text, command=self.run_study)
 
@@ -381,7 +479,9 @@ class AER_GUI(Frame):
         # collect performance plots
         performance_plots = self.theorist.get_performance_plots(self.object_of_study)
         # collect supplementary plots
-        supplementary_plots = self.theorist.get_supplementary_plots(self.object_of_study)
+        supplementary_plots = self.theorist.get_supplementary_plots(
+            self.object_of_study
+        )
 
         theorist_plots = {**performance_plots, **supplementary_plots}
 
@@ -393,18 +493,20 @@ class AER_GUI(Frame):
         return theorist_plots
 
     def update_theorist_plot_list(self, theorist_plots):
-        self.listbox_theorist.delete(0, 'end')
+        self.listbox_theorist.delete(0, "end")
         keys = theorist_plots.keys()
         for key in keys:
             param_label = key
             self.listbox_theorist.insert(END, param_label)
 
     def get_experimentalist_plots(self):
-        experimentalist_plots = self.experimentalist.get_plots(self.best_model, self.object_of_study)
+        experimentalist_plots = self.experimentalist.get_plots(
+            self.best_model, self.object_of_study
+        )
         return experimentalist_plots
 
     def update_experimentalist_plot_list(self, experimentalist_plots):
-        self.listbox_experimentalist.delete(0, 'end')
+        self.listbox_experimentalist.delete(0, "end")
         keys = experimentalist_plots.keys()
         for key in keys:
             param_label = key
@@ -416,13 +518,17 @@ class AER_GUI(Frame):
 
     def update_experimentalist_plot(self, event):
         plots = self.get_experimentalist_plots()
-        plot_name = self.update_plot(plots=plots, plot_type=Plot_Windows.EXPERIMENTALIST)
+        plot_name = self.update_plot(
+            plots=plots, plot_type=Plot_Windows.EXPERIMENTALIST
+        )
         success = self.set_listbox_selection_to_value(self.listbox_theorist, plot_name)
         if success:
             plots = self.get_theorist_plots()
             self.update_plot(plots=plots, plot_type=Plot_Windows.THEORIST)
 
-    def update_plot(self, plots=None, plot_type=Plot_Windows.THEORIST, save=False, AER_step=1):
+    def update_plot(
+        self, plots=None, plot_type=Plot_Windows.THEORIST, save=False, AER_step=1
+    ):
 
         if plot_type == Plot_Windows.THEORIST:
 
@@ -431,30 +537,29 @@ class AER_GUI(Frame):
             if isinstance(plots, dict) is False:
                 plots = self.get_theorist_plots()
 
-            if hasattr(self, '_axis_theorist'):
+            if hasattr(self, "_axis_theorist"):
                 plot_axis = self._axis_theorist
 
-            if hasattr(self, '_canvas_theorist'):
+            if hasattr(self, "_canvas_theorist"):
                 plot_canvas = self._canvas_theorist
 
         elif plot_type == Plot_Windows.EXPERIMENTALIST:
             relevant_listbox = self.listbox_experimentalist
 
             if isinstance(plots, dict) is False:
-                if hasattr(self, 'best_model'):
+                if hasattr(self, "best_model"):
                     plots = self.get_experimentalist_plots()
                 else:
                     return
 
-            if hasattr(self, '_axis_theorist'):
+            if hasattr(self, "_axis_theorist"):
                 plot_axis = self._axis_experimentalist
 
-            if hasattr(self, '_canvas_theorist'):
+            if hasattr(self, "_canvas_theorist"):
                 plot_canvas = self._canvas_experimentalist
 
         else:
             return
-
 
         listbox_selection = relevant_listbox.curselection()
         if len(listbox_selection) == 0:
@@ -462,12 +567,11 @@ class AER_GUI(Frame):
         key = str(relevant_listbox.get(listbox_selection[0]))
 
         # during initial call, key is empty
-        if key == '':
+        if key == "":
             return key
 
         if key in plots.keys():
             plot_dict = plots[key]
-
 
             if self._reset_theorist_plot:
                 self._fig_theorist = Figure(figsize=(1, 1), dpi=100)
@@ -475,12 +579,18 @@ class AER_GUI(Frame):
                 self._fig_theorist.subplots_adjust(bottom=0.2)
                 self._fig_theorist.subplots_adjust(left=0.35)
                 self._axis_theorist.plot([0], [0])
-                self._axis_theorist.set_xlabel('Ordinate', fontsize=self._font_size)
-                self._axis_theorist.set_ylabel('Epochs', fontsize=self._font_size)
-                self._axis_theorist.set_title('No Data Available', fontsize=self._font_size)
+                self._axis_theorist.set_xlabel("Ordinate", fontsize=self._font_size)
+                self._axis_theorist.set_ylabel("Epochs", fontsize=self._font_size)
+                self._axis_theorist.set_title(
+                    "No Data Available", fontsize=self._font_size
+                )
                 self._axis_theorist.grid()
-                self._canvas_theorist = FigureCanvasTkAgg(self._fig_theorist, self._root)
-                self._canvas_theorist.get_tk_widget().grid(row=1, column=1, columnspan=2, sticky=N + S + E + W)
+                self._canvas_theorist = FigureCanvasTkAgg(
+                    self._fig_theorist, self._root
+                )
+                self._canvas_theorist.get_tk_widget().grid(
+                    row=1, column=1, columnspan=2, sticky=N + S + E + W
+                )
                 self._reset_theorist_plot = False
 
             type = plot_dict[config.plot_key_type]
@@ -497,13 +607,19 @@ class AER_GUI(Frame):
 
                 # generate plots
                 plot_axis.cla()
-                del plot_axis.lines[:]    # remove previous lines
+                del plot_axis.lines[:]  # remove previous lines
                 plots = list()
                 if isinstance(x_data, tuple) or isinstance(x_data, list):
                     for idx, (x, y, leg) in enumerate(zip(x_data, y_data, legend)):
-                        plots.append(plot_axis.plot(x, y, self._plot_colors[idx], label=leg))
+                        plots.append(
+                            plot_axis.plot(x, y, self._plot_colors[idx], label=leg)
+                        )
                 else:
-                    plots.append(plot_axis.plot(x_data, y_data, self._plot_colors[0], label=legend))
+                    plots.append(
+                        plot_axis.plot(
+                            x_data, y_data, self._plot_colors[0], label=legend
+                        )
+                    )
 
                 # adjust axes
                 plot_axis.set_xlim(x_limit[0], x_limit[1])
@@ -532,10 +648,10 @@ class AER_GUI(Frame):
 
                 # generate image
                 plot_axis.cla()
-                plot_axis.imshow(image, interpolation='nearest', aspect='auto')
+                plot_axis.imshow(image, interpolation="nearest", aspect="auto")
                 x = x_data
                 y = y_data
-                plot_axis.plot(x, y, color='red')
+                plot_axis.plot(x, y, color="red")
 
                 # set labels
                 plot_axis.set_xlabel(x_label, fontsize=self._plot_fontSize)
@@ -564,10 +680,14 @@ class AER_GUI(Frame):
                 del plot_axis.lines[:]  # remove previous lines
                 plots = list()
                 # plot data
-                plots.append(plot_axis.scatter(x_data, y_data, marker='.', c='k', label=legend[0]))
+                plots.append(
+                    plot_axis.scatter(
+                        x_data, y_data, marker=".", c="k", label=legend[0]
+                    )
+                )
 
                 # plot model prediction
-                plots.append(plot_axis.plot(x_model, y_model, 'k', label=legend[1]))
+                plots.append(plot_axis.plot(x_model, y_model, "k", label=legend[1]))
 
                 legend_idx = 1
 
@@ -576,7 +696,15 @@ class AER_GUI(Frame):
                     legend_idx += 1
                     x_highlighted = plot_dict[config.plot_key_x_highlighted_data]
                     y_highlighted = plot_dict[config.plot_key_y_highlighted_data]
-                    plots.append(plot_axis.scatter(x_highlighted, y_highlighted, marker='.', c='r', label=legend[legend_idx]))
+                    plots.append(
+                        plot_axis.scatter(
+                            x_highlighted,
+                            y_highlighted,
+                            marker=".",
+                            c="r",
+                            label=legend[legend_idx],
+                        )
+                    )
 
                 # plot conditions
                 if config.plot_key_x_conditions in plot_dict.keys():
@@ -586,9 +714,11 @@ class AER_GUI(Frame):
                         x = [condition, condition]
                         y = [y_limit[0], y_limit[1]]
                         if idx == 0:
-                            plots.append(plot_axis.plot(x, y, 'b', label=legend[legend_idx]))
+                            plots.append(
+                                plot_axis.plot(x, y, "b", label=legend[legend_idx])
+                            )
                         else:
-                            plots.append(plot_axis.plot(x, y, 'b'))
+                            plots.append(plot_axis.plot(x, y, "b"))
 
                 # adjust axes
                 plot_axis.set_xlim(x_limit[0], x_limit[1])
@@ -628,19 +758,41 @@ class AER_GUI(Frame):
                 plots = list()
 
                 # plot data
-                plots.append(plot_axis.scatter(x1_data, x2_data, y_data, color = (0, 0, 0, 0), label=legend[0]))
+                plots.append(
+                    plot_axis.scatter(
+                        x1_data, x2_data, y_data, color=(0, 0, 0, 0), label=legend[0]
+                    )
+                )
 
                 # plot model prediction
-                plots.append(plot_axis.plot_surface(x1_model, x2_model, y_model, color=(0, 0, 0, 0.5), label=legend[1]))
+                plots.append(
+                    plot_axis.plot_surface(
+                        x1_model,
+                        x2_model,
+                        y_model,
+                        color=(0, 0, 0, 0.5),
+                        label=legend[1],
+                    )
+                )
 
                 legend_idx = 1
 
                 # plot highlighted data
                 if config.plot_key_x_highlighted_data in plot_dict.keys():
                     legend_idx += 1
-                    (x1_highlighted, x2_highlighted) = plot_dict[config.plot_key_x_highlighted_data]
+                    (x1_highlighted, x2_highlighted) = plot_dict[
+                        config.plot_key_x_highlighted_data
+                    ]
                     y_highlighted = plot_dict[config.plot_key_y_highlighted_data]
-                    plots.append(plot_axis.scatter(x1_highlighted, x2_highlighted, y_highlighted, color=(1, 0, 0, 0.5), label=legend[2]))
+                    plots.append(
+                        plot_axis.scatter(
+                            x1_highlighted,
+                            x2_highlighted,
+                            y_highlighted,
+                            color=(1, 0, 0, 0.5),
+                            label=legend[2],
+                        )
+                    )
 
                 # plot conditions
                 for idx, x1_x2_condition in enumerate(x_conditions):
@@ -650,9 +802,11 @@ class AER_GUI(Frame):
                     x2 = [x1_x2_condition[1], x1_x2_condition[1]]
                     y = [y_limit[0], y_limit[1]]
                     if idx == 0:
-                        plots.append(plot_axis.plot(x1, x2, y, 'r', label=legend[legend_idx]))
+                        plots.append(
+                            plot_axis.plot(x1, x2, y, "r", label=legend[legend_idx])
+                        )
                     else:
-                        plots.append(plot_axis.plot(x1, x2, y, 'r'))
+                        plots.append(plot_axis.plot(x1, x2, y, "r"))
 
                 # adjust axes
                 plot_axis.set_xlim(x1_limit[0], x1_limit[1])
@@ -674,19 +828,29 @@ class AER_GUI(Frame):
             if save is True:
                 self._root.update()
                 if plot_type == Plot_Windows.THEORIST:
-                    plot_filepath = os.path.join(self.theorist.results_path, 'plot_AER_step_' + str(AER_step) + '_theorist_' + key + '.png')
+                    plot_filepath = os.path.join(
+                        self.theorist.results_path,
+                        "plot_AER_step_" + str(AER_step) + "_theorist_" + key + ".png",
+                    )
                     self._fig_theorist.savefig(plot_filepath)
                 elif plot_type == Plot_Windows.EXPERIMENTALIST:
-                    plot_filepath = os.path.join(self.theorist.results_path,
-                                                 'plot_AER_step_' + str(AER_step) + '_experimentalist_' + key + '.png')
+                    plot_filepath = os.path.join(
+                        self.theorist.results_path,
+                        "plot_AER_step_"
+                        + str(AER_step)
+                        + "_experimentalist_"
+                        + key
+                        + ".png",
+                    )
                     self._fig_experimentalist.savefig(plot_filepath)
 
             return key
             # plot_canvas.get_tk_widget().lift()
 
-
         else:
-            raise Exception("Key '" + str(key) + "' not found in dictionary performance_plots.")
+            raise Exception(
+                "Key '" + str(key) + "' not found in dictionary performance_plots."
+            )
 
     def stop_study(self):
         self.update_status("Aborting study...")
@@ -713,8 +877,11 @@ class AER_GUI(Frame):
             self.update_run_button()
             self._root.update()
 
-            new_param_value = simpledialog.askstring("AER Cycles", "Please enter number of autonomous research cycles:",
-                                                     parent=self._root)
+            new_param_value = simpledialog.askstring(
+                "AER Cycles",
+                "Please enter number of autonomous research cycles:",
+                parent=self._root,
+            )
             if new_param_value is not None:
                 self.AER_cycles = int(new_param_value)
 
@@ -723,7 +890,7 @@ class AER_GUI(Frame):
 
             status_msg = "------------------"
             self.update_status(status_msg)
-            status_msg = "AER CYCLE " + str(AER_cycle+1) + "/" + str(self.AER_cycles)
+            status_msg = "AER CYCLE " + str(AER_cycle + 1) + "/" + str(self.AER_cycles)
             self.update_status(status_msg)
             status_msg = "------------------"
             self.update_status(status_msg)
@@ -745,60 +912,95 @@ class AER_GUI(Frame):
                 # Experimenter: update experimentalist plot based on best-fitting model
                 status_msg = "Looking at best-fitting model..."
                 self.update_status_experimentalist(status_msg)
-                experimentalist_plots = self.experimentalist.get_plots(self.best_model, self.object_of_study)
+                experimentalist_plots = self.experimentalist.get_plots(
+                    self.best_model, self.object_of_study
+                )
                 self.update_experimentalist_plot_list(experimentalist_plots)
-                self.update_plot(plots=experimentalist_plots, plot_type=Plot_Windows.EXPERIMENTALIST)
+                self.update_plot(
+                    plots=experimentalist_plots, plot_type=Plot_Windows.EXPERIMENTALIST
+                )
                 self._root.update()
 
                 # Experimenter: initiating experiment search
                 status_msg = "Initiating experiment search..."
                 self.update_status_experimentalist(status_msg)
                 self._root.update()
-                self.experimentalist.init_experiment_search(self.best_model, self.object_of_study)
-                experimentalist_plots = self.experimentalist.get_plots(self.best_model, self.object_of_study)
+                self.experimentalist.init_experiment_search(
+                    self.best_model, self.object_of_study
+                )
+                experimentalist_plots = self.experimentalist.get_plots(
+                    self.best_model, self.object_of_study
+                )
                 self.update_experimentalist_plot_list(experimentalist_plots)
-                self.update_plot(plots=experimentalist_plots, plot_type=Plot_Windows.EXPERIMENTALIST)
+                self.update_plot(
+                    plots=experimentalist_plots, plot_type=Plot_Windows.EXPERIMENTALIST
+                )
 
                 # Experimenter: identifying novel experiment conditions
-                status_msg = "Identifying " + str(self.experimentalist.conditions_per_experiment) \
-                             + " experiment conditions..."
+                status_msg = (
+                    "Identifying "
+                    + str(self.experimentalist.conditions_per_experiment)
+                    + " experiment conditions..."
+                )
                 self.update_status_experimentalist(status_msg)
                 self._root.update()
                 for condition in range(self.experimentalist.conditions_per_experiment):
-                    self.experimentalist.sample_experiment_condition(self.best_model, self.object_of_study, condition)
+                    self.experimentalist.sample_experiment_condition(
+                        self.best_model, self.object_of_study, condition
+                    )
 
                 # plot new experiment conditions
-                experimentalist_plots = self.experimentalist.get_plots(self.best_model, self.object_of_study)
+                experimentalist_plots = self.experimentalist.get_plots(
+                    self.best_model, self.object_of_study
+                )
                 self.update_experimentalist_plot_list(experimentalist_plots)
-                self.update_plot(plots=experimentalist_plots, plot_type=Plot_Windows.EXPERIMENTALIST)
+                self.update_plot(
+                    plots=experimentalist_plots, plot_type=Plot_Windows.EXPERIMENTALIST
+                )
                 self._root.update()
 
                 # write novel experiment
                 status_msg = "Writing experiment..."
                 self.update_status_experimentalist(status_msg)
                 self._root.update()
-                experiment_file_path = self.experimentalist._write_experiment(self.object_of_study, self.experimentalist._experiment_sequence)
+                experiment_file_path = self.experimentalist._write_experiment(
+                    self.object_of_study, self.experimentalist._experiment_sequence
+                )
 
                 # collect data from experiment
                 status_msg = "Commissioning experiment..."
                 self.update_status_experimentalist(status_msg)
                 self._root.update()
-                data = self.experimentalist.commission_experiment(object_of_study=self.object_of_study, experiment_file_path=experiment_file_path)
+                data = self.experimentalist.commission_experiment(
+                    object_of_study=self.object_of_study,
+                    experiment_file_path=experiment_file_path,
+                )
 
                 # add new data to object of study
                 status_msg = "Adding collected data..."
                 self.update_status_experimentalist(status_msg)
                 self.object_of_study.add_data(data)
-                experimentalist_plots = self.experimentalist.get_plots(self.best_model, self.object_of_study)
+                experimentalist_plots = self.experimentalist.get_plots(
+                    self.best_model, self.object_of_study
+                )
                 self.update_experimentalist_plot_list(experimentalist_plots)
-                self.update_plot(plots=experimentalist_plots, plot_type=Plot_Windows.EXPERIMENTALIST)
+                self.update_plot(
+                    plots=experimentalist_plots, plot_type=Plot_Windows.EXPERIMENTALIST
+                )
                 self._root.update()
 
                 # save all experimentalist plots
-                experimentalist_plots = self.experimentalist.get_plots(self.best_model, self.object_of_study)
+                experimentalist_plots = self.experimentalist.get_plots(
+                    self.best_model, self.object_of_study
+                )
                 for item in range(self.listbox_experimentalist.size()):
                     self.set_listbox_selection(self.listbox_experimentalist, item)
-                    self.update_plot(plot_type=Plot_Windows.EXPERIMENTALIST, plots=experimentalist_plots, save=True, AER_step=(AER_cycle + 1))
+                    self.update_plot(
+                        plot_type=Plot_Windows.EXPERIMENTALIST,
+                        plots=experimentalist_plots,
+                        save=True,
+                        AER_step=(AER_cycle + 1),
+                    )
 
             # Theorist: initialize meta-parameter search
             self.activate_theorist()
@@ -813,7 +1015,12 @@ class AER_GUI(Frame):
                     if idx < self._last_meta_param_idx:
                         continue
                 else:
-                    status_msg = "Model search " + str(idx+1) + "/" + str(len(self.theorist._meta_parameters))
+                    status_msg = (
+                        "Model search "
+                        + str(idx + 1)
+                        + "/"
+                        + str(len(self.theorist._meta_parameters))
+                    )
                     self.update_status_theorist(status_msg)
                     [arch_weight_decay_df, num_graph_nodes, seed] = meta_params
                     self.theorist.init_model_search(self.object_of_study)
@@ -836,12 +1043,20 @@ class AER_GUI(Frame):
                     if self._paused is True:
                         self._last_meta_param_idx = idx
                         self._last_epoch = epoch
-                        self.update_run_button(meta_idx=idx+1, num_meta_idx=len(self.theorist._meta_parameters))
+                        self.update_run_button(
+                            meta_idx=idx + 1,
+                            num_meta_idx=len(self.theorist._meta_parameters),
+                        )
                         self._root.update()
                         return
 
                     # update run button
-                    self.update_run_button(epoch=epoch+1, num_epochs=self.theorist.model_search_epochs, meta_idx=idx+1, num_meta_idx=len(self.theorist._meta_parameters))
+                    self.update_run_button(
+                        epoch=epoch + 1,
+                        num_epochs=self.theorist.model_search_epochs,
+                        meta_idx=idx + 1,
+                        num_meta_idx=len(self.theorist._meta_parameters),
+                    )
 
                     self.theorist.run_model_search_epoch(epoch)
 
@@ -851,7 +1066,9 @@ class AER_GUI(Frame):
                     # update performance plot
                     self.theorist.log_plot_data(epoch, self.object_of_study)
                     theorist_plots = self.get_theorist_plots()
-                    self.update_plot(plots=theorist_plots, plot_type=Plot_Windows.THEORIST)
+                    self.update_plot(
+                        plots=theorist_plots, plot_type=Plot_Windows.THEORIST
+                    )
 
                 if self._running is True:
 
@@ -859,8 +1076,12 @@ class AER_GUI(Frame):
                     theorist_plots = self.get_theorist_plots()
                     for item in range(self.listbox_theorist.size()):
                         self.set_listbox_selection(self.listbox_theorist, item)
-                        self.update_plot(plot_type=Plot_Windows.THEORIST, plots=theorist_plots, save=True,
-                                         AER_step=(AER_cycle + 1))
+                        self.update_plot(
+                            plot_type=Plot_Windows.THEORIST,
+                            plots=theorist_plots,
+                            save=True,
+                            AER_step=(AER_cycle + 1),
+                        )
 
                     status_msg = "Evaluating architecture..."
                     self.update_status_theorist(status_msg)
@@ -877,7 +1098,12 @@ class AER_GUI(Frame):
                     # perform architecture search for different hyper-parameters
                     for eval_meta_params in self.theorist._eval_meta_parameters:
 
-                        status_msg = "Evaluation " + str(idx + 1) + "/" + str(len(self.theorist._eval_meta_parameters))
+                        status_msg = (
+                            "Evaluation "
+                            + str(idx + 1)
+                            + "/"
+                            + str(len(self.theorist._eval_meta_parameters))
+                        )
                         self.update_status_theorist(status_msg)
 
                         self.theorist.init_model_evaluation(self.object_of_study)
@@ -888,7 +1114,9 @@ class AER_GUI(Frame):
                             # log performance (for plotting purposes)
                             self.theorist.log_plot_data(epoch, self.object_of_study)
                             theorist_plots = self.get_theorist_plots()
-                            self.update_plot(plots=theorist_plots, plot_type=Plot_Windows.THEORIST)
+                            self.update_plot(
+                                plots=theorist_plots, plot_type=Plot_Windows.THEORIST
+                            )
                             self._root.update()
 
                         # log model evaluation
@@ -907,9 +1135,6 @@ class AER_GUI(Frame):
                 self.best_model = self.theorist.get_best_model(self.object_of_study)
                 self.theorist.model = self.best_model
 
-
-
-
         if self._running is not True:
             # reset gui elements
             # self.reset_gui()
@@ -919,9 +1144,8 @@ class AER_GUI(Frame):
         status_msg = "DONE"
         self.update_status(status_msg)
 
-
     def reset_gui(self):
         self.update_run_button()
-        self.listbox_theorist.delete(0, 'end')
-        self.listbox_experimentalist.delete(0, 'end')
+        self.listbox_theorist.delete(0, "end")
+        self.listbox_experimentalist.delete(0, "end")
         self._root.update()

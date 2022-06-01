@@ -14,11 +14,18 @@ from AER_experimentalist.experiment_environment.variable import *
 
 class Object_Of_Study(Dataset):
 
+    key_experiment_id = "AER_Experiment"
 
-    key_experiment_id = 'AER_Experiment'
-
-
-    def __init__(self, name, independent_variables: List[Variable], dependent_variables: List[Variable], covariates=list(), input_dimensions=None, output_dimensions=None, output_type=None):
+    def __init__(
+        self,
+        name,
+        independent_variables: List[Variable],
+        dependent_variables: List[Variable],
+        covariates=list(),
+        input_dimensions=None,
+        output_dimensions=None,
+        output_type=None,
+    ):
 
         self.name = name
 
@@ -48,7 +55,9 @@ class Object_Of_Study(Dataset):
 
         # set number of input dimensions
         if input_dimensions is None:
-            self.input_dimensions = len(self.independent_variables) + len(self.covariates)
+            self.input_dimensions = len(self.independent_variables) + len(
+                self.covariates
+            )
         else:
             self.input_dimensions = input_dimensions
 
@@ -56,7 +65,9 @@ class Object_Of_Study(Dataset):
         self.output_type = self.dependent_variables[0].type
         for variable in dependent_variables:
             if variable.type != self.output_type:
-                Exception("Dependent variable output types don't match. Different output types are not supported yet.")
+                Exception(
+                    "Dependent variable output types don't match. Different output types are not supported yet."
+                )
 
         # set up data
         for var in self.dependent_variables:
@@ -106,13 +117,17 @@ class Object_Of_Study(Dataset):
         input_data = list()
 
         for var in self.independent_variables:
-            sample = np.random.uniform(var.__get_value_range__()[0] * var._rescale,
-                                       var.__get_value_range__()[1] * var._rescale)
+            sample = np.random.uniform(
+                var.__get_value_range__()[0] * var._rescale,
+                var.__get_value_range__()[1] * var._rescale,
+            )
             input_data.append(sample)
 
         for var in self.covariates:
-            sample = np.random.uniform(var.__get_value_range__()[0] * var._rescale,
-                                       var.__get_value_range__()[1] * var._rescale)
+            sample = np.random.uniform(
+                var.__get_value_range__()[0] * var._rescale,
+                var.__get_value_range__()[1] * var._rescale,
+            )
             input_data.append(sample)
 
         input = torch.tensor(input_data).float()
@@ -138,7 +153,11 @@ class Object_Of_Study(Dataset):
         return np.max(self.data[self.key_experiment_id])
 
     def get_experiment_indices(self, experiment_id):
-        indices = [i for i, x in enumerate(self.data[self.key_experiment_id]) if x == experiment_id]
+        indices = [
+            i
+            for i, x in enumerate(self.data[self.key_experiment_id])
+            if x == experiment_id
+        ]
         return indices
 
     # potentially redundant with: get_all_data
@@ -151,13 +170,17 @@ class Object_Of_Study(Dataset):
             num_data_points = self.__len__(experiment_id)
 
         # create an empty tensor
-        input_dataset = torch.empty(num_data_points, self.__get_input_length__()).float()
-        output_dataset = torch.empty(num_data_points, self.__get_output_length__()).float()
+        input_dataset = torch.empty(
+            num_data_points, self.__get_input_length__()
+        ).float()
+        output_dataset = torch.empty(
+            num_data_points, self.__get_output_length__()
+        ).float()
 
         if experiment_id is None:
             for idx in range(len(self)):
                 (input, output) = self.__getitem__(idx)
-                input_dataset[idx,:] = input
+                input_dataset[idx, :] = input
                 output_dataset[idx, :] = output
         else:
             experiment_indices = self.get_experiment_indices(experiment_id)
@@ -176,12 +199,16 @@ class Object_Of_Study(Dataset):
         factor_levels = list()
         independent_variables = self.independent_variables + self.covariates
         for var in independent_variables:
-            var_levels = np.linspace(var.__get_value_range__()[0] * var._rescale,
-                                     var.__get_value_range__()[1] * var._rescale,
-                                     resolution)
+            var_levels = np.linspace(
+                var.__get_value_range__()[0] * var._rescale,
+                var.__get_value_range__()[1] * var._rescale,
+                resolution,
+            )
             factor_levels.append(var_levels)
 
-        input_np = np.array(np.meshgrid(*factor_levels)).T.reshape(-1,len(independent_variables))
+        input_np = np.array(np.meshgrid(*factor_levels)).T.reshape(
+            -1, len(independent_variables)
+        )
 
         input = torch.tensor(input_np).float()
 
@@ -195,7 +222,7 @@ class Object_Of_Study(Dataset):
 
         if IV2 is None:
             IV1_idx = self.get_IV_idx(IV1)
-            unique_IV_values = np.unique(input[:,IV1_idx])
+            unique_IV_values = np.unique(input[:, IV1_idx])
             DV_values = np.empty(unique_IV_values.shape)
             for row, element in enumerate(unique_IV_values):
                 value_log = list()
@@ -304,7 +331,10 @@ class Object_Of_Study(Dataset):
             raise Exception("Index exceeds number of dependent variables.")
 
     def get_variable_limits(self, var):
-        limits = [var.__get_value_range__()[0] * var._rescale, var.__get_value_range__()[1] * var._rescale]
+        limits = [
+            var.__get_value_range__()[0] * var._rescale,
+            var.__get_value_range__()[1] * var._rescale,
+        ]
         return limits
 
     def rescale_experiment_sequence(self, sequence):
@@ -418,7 +448,7 @@ class Object_Of_Study(Dataset):
         # determine indices to be split
         num_data_points = self.__len__()
         indices = range(num_data_points)
-        num_samples = round(proportion*num_data_points)
+        num_samples = round(proportion * num_data_points)
         samples = random.sample(indices, num_samples)
 
         split_copy.data = dict()
@@ -445,8 +475,12 @@ class Object_Of_Study(Dataset):
         if num_patterns > 0:
             input_tensor, output_tensor = self.__getitem__(0)
         else:
-            input_tensor = torch.Variable(np.empty((0, self.input_dimensions), dtype=np.float32))
-            output_tensor = torch.Variable(np.empty((0, self.output_dimensions), dtype=np.float32))
+            input_tensor = torch.Variable(
+                np.empty((0, self.input_dimensions), dtype=np.float32)
+            )
+            output_tensor = torch.Variable(
+                np.empty((0, self.output_dimensions), dtype=np.float32)
+            )
 
         for idx in range(1, num_patterns):
             tmp_input_tensor, tmp_output_tensor = self.__getitem__(idx)
@@ -459,7 +493,9 @@ class Object_Of_Study(Dataset):
                 for value in new_data[key]:
                     self.data[key].append(value)
             else:
-                raise Exception("Could not find key '" + key + "' in the new data dictionary.")
+                raise Exception(
+                    "Could not find key '" + key + "' in the new data dictionary."
+                )
 
 
 def normalize(tensor, mean, std):
@@ -467,10 +503,12 @@ def normalize(tensor, mean, std):
         t.sub_(m).div_(s)
     return tensor
 
-def unnormalize( tensor, mean, std):
+
+def unnormalize(tensor, mean, std):
     for t, m, s in zip(tensor, mean, std):
         t.mul_(s).add_(m)
     return tensor
+
 
 class unnormalize(object):
     def __init__(self, mean, std):
