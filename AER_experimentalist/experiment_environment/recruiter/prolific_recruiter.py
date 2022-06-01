@@ -1,5 +1,5 @@
 import os
-from typing import Any
+from typing import Any, List
 
 import requests
 from dotenv import load_dotenv
@@ -48,8 +48,8 @@ class ProlificRecruiter:
         estimated_completion_time: int,
         maximum_allowed_time: int = None,
         eligibility_requirements=[],
-        device_compatibility: list[DeviceOptions] = [],
-        peripheral_requirements: list[PeripheralOptions] = [],
+        device_compatibility: List[DeviceOptions] = [],
+        peripheral_requirements: List[PeripheralOptions] = [],
         internal_name: str = None,
     ) -> bool:
         """
@@ -81,13 +81,13 @@ class ProlificRecruiter:
         # packages function parameters into dictionary
         data = locals()
         # removes self variable
-        del locals["self"]
+        del data["self"]
 
         # removes optional parameters that aren't specified
         if maximum_allowed_time is None:
-            del locals["maximum_allowed_time"]
+            del data["maximum_allowed_time"]
         if internal_name is None:
-            del locals["internal_name"]
+            del data["internal_name"]
 
         study = requests.post(
             f"{self.BASE_URL}studies/", headers=self.HEADERS, json=data

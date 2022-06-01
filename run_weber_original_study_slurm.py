@@ -1,5 +1,6 @@
 import argparse
 from datetime import datetime
+from typing import List
 
 import AER_experimentalist.experiment_environment.experiment_config as exp_cfg
 from AER_experimentalist.experiment_design_synthetic_weber import (
@@ -115,7 +116,7 @@ experimentalist_validation = Experimentalist_Popper(
 theorist = Theorist_DARTS(study_name, darts_type=DARTS_Type.ORIGINAL)
 
 # specify plots
-plots = list()
+plots: List[str] = list()
 # plots.append(theorist._loss_plot_name)
 # for i in range(20):
 #     plot_name = "Edge " + str(i)

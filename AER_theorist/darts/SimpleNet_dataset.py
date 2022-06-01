@@ -5,8 +5,9 @@ from torch.autograd import Variable
 from torch.utils.data import Dataset
 from torchvision import transforms
 
+from AER_experimentalist.experiment_environment.variable import outputTypes
 from AER_theorist.darts.SimpleNet import SimpleNet
-from AER_theorist.object_of_study import Object_Of_Study, outputTypes
+from AER_theorist.object_of_study import Object_Of_Study
 
 
 class SimpleNetDataset(Object_Of_Study, Dataset):

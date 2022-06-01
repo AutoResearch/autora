@@ -14,7 +14,7 @@ try:
 
 except ImportError:
     import model_search_config as cfg
-    import utils as utils
+    import utils as utils  # type: ignore
     import visualize as viz
     from model_search import Network
 
@@ -76,10 +76,15 @@ arch_path = os.path.join(
 # LOAD MODEL
 
 # determine number of nodes from model name
-try:
-    found = re.search("k_(.+?)_s", args.model_name).group(1)
-except AttributeError:
+
+search_result = re.search("k_(.+?)_s", args.model_name)
+
+if search_result is not None:
+    found = search_result.group(1)
+
+else:
     found = ""
+
 
 args.num_graph_nodes = int(found)
 

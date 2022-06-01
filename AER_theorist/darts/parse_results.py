@@ -8,7 +8,7 @@ try:
 
 except ImportError:
     import model_search_config as cfg
-    import utils as utils
+    import utils  # type: ignore
 
 # PARSE ARGUMENTS
 

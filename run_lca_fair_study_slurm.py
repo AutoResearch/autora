@@ -1,5 +1,6 @@
 import argparse
 from datetime import datetime
+from typing import List
 
 import AER_experimentalist.experiment_environment.experiment_config as exp_cfg
 from AER_experimentalist.experiment_environment.DV_in_silico import DV_In_Silico as DV
@@ -75,7 +76,7 @@ experimentalist = Experimentalist_Popper(
 theorist = Theorist_DARTS(study_name, darts_type=DARTS_Type.FAIR)
 
 # specify plots
-plots = list()
+plots: List[str] = list()
 # plots.append(theorist._loss_plot_name)
 # for i in range(20):
 #     plot_name = "Edge " + str(i)

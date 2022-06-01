@@ -26,7 +26,7 @@ except ImportError:
     import genotypes
     import model_search_config as cfg
     import plot_utils as plotutils
-    import utils as utils
+    import utils as utils  # type: ignore
     import visualize as viz
     from architect import Architect
     from model_search import Network

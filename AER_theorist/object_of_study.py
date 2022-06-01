@@ -1,6 +1,6 @@
 import copy
 import random
-from typing import Dict, List
+from typing import Any, Dict, List
 
 import numpy as np
 import torch
@@ -30,7 +30,7 @@ class Object_Of_Study(Dataset):
         self.independent_variables = list()
         self.dependent_variables = list()
         self.covariates = list()
-        self.data = dict()
+        self.data: Dict[Any, Any] = dict()
         self._normalize_input = False
         self._normalize_output = False
 
