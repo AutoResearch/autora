@@ -1,7 +1,10 @@
-from IV import IV
-from tinkerforge.ip_connection import IPConnection
-from tinkerforge.bricklet_industrial_analog_out_v2 import BrickletIndustrialAnalogOutV2
 import time
+
+from IV import IV
+from tinkerforge.bricklet_industrial_analog_out_v2 import \
+    BrickletIndustrialAnalogOutV2
+from tinkerforge.ip_connection import IPConnection
+
 
 class IV_Voltage(IV):
 

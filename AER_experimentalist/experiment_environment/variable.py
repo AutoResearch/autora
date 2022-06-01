@@ -1,6 +1,8 @@
 from abc import ABC, abstractmethod
-import numpy as np
 from enum import Enum
+
+import numpy as np
+
 
 class outputTypes(Enum):
     REAL = 1

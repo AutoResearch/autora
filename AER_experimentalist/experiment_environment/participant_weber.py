@@ -1,10 +1,14 @@
-from AER_experimentalist.experiment_environment.participant_in_silico import Participant_In_Silico
+import random
+
+import numpy as np
 import torch
 import torch.nn as nn
-from torch.autograd import Variable
-import random
-import numpy as np
 from graphviz import Digraph
+from torch.autograd import Variable
+
+from AER_experimentalist.experiment_environment.participant_in_silico import \
+    Participant_In_Silico
+
 
 class Weber_Model(nn.Module):
     def __init__(self, k=1, amplification=1):
@@ -276,10 +280,11 @@ class Participant_Weber(Participant_In_Silico):
             legend.append('$I_0$ = ' + str(S1)+ ' (Recov.)')
 
         # plot
+        import os
+
         import matplotlib.pyplot as plt
         import seaborn as sns
         from matplotlib import pyplot
-        import os
 
         fig, ax = pyplot.subplots(figsize=figure_dimensions)
 

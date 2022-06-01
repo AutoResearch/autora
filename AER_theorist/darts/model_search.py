@@ -1,17 +1,17 @@
+import random
+import warnings
+from enum import Enum
+
+import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.autograd import Variable
-import numpy as np
-import random
-import warnings
 
 from AER_theorist.darts.fan_out import Fan_Out
+from AER_theorist.darts.genotypes import PRIMITIVES, Genotype
 from AER_theorist.darts.operations import *
-from AER_theorist.darts.genotypes import PRIMITIVES
-from AER_theorist.darts.genotypes import Genotype
 
-from enum import Enum
 
 class DARTS_Type(Enum):
     ORIGINAL = 1        # Liu, Simonyan & Yang (2018). Darts: Differentiable architecture search

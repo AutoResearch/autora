@@ -1,13 +1,16 @@
 from tkinter import *
 from tkinter import ttk
-from AER_experimentalist.experiment_environment.experiment_toplevel_GUI import Experiment_Toplevel_GUI
 
 import matplotlib
+
+from AER_experimentalist.experiment_environment.experiment_toplevel_GUI import \
+    Experiment_Toplevel_GUI
+
 matplotlib.use("TkAgg")
+from experiment import Experiment
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
 
-from experiment import Experiment
 
 class Experiment_Plot_GUI(Experiment_Toplevel_GUI):
 

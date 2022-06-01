@@ -1,17 +1,17 @@
-import AER_config as AER_cfg
+from abc import ABC, abstractmethod
+
 import numpy as np
-import AER_experimentalist.experimentalist_config as exp_cfg
-from torch import nn
 import torch
 import torch.optim as optim
+from torch import nn
 from torch.autograd import Variable
+
+import AER_config as AER_cfg
+import AER_experimentalist.experimentalist_config as exp_cfg
 import AER_experimentalist.experimentalist_popper_config as popper_config
+from AER_experimentalist.experimentalist import Experimentalist
 from AER_utils import Plot_Types
 
-from AER_experimentalist.experimentalist import Experimentalist
-
-
-from abc import ABC, abstractmethod
 
 class Experimentalist_Popper(Experimentalist, ABC):
 

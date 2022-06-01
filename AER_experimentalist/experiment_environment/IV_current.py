@@ -1,6 +1,8 @@
 from IV import IV
+from tinkerforge.bricklet_industrial_analog_out_v2 import \
+    BrickletIndustrialAnalogOutV2
 from tinkerforge.ip_connection import IPConnection
-from tinkerforge.bricklet_industrial_analog_out_v2 import BrickletIndustrialAnalogOutV2
+
 
 class IV_Current(IV):
 

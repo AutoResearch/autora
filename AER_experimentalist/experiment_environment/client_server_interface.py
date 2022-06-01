@@ -1,8 +1,10 @@
-import socket
 import os.path
-import AER_experimentalist.experiment_environment.experiment_config as config
-import AER_experimentalist.experiment_environment.client_server_protocol as protocol
+import socket
 import time
+
+import AER_experimentalist.experiment_environment.client_server_protocol as protocol
+import AER_experimentalist.experiment_environment.experiment_config as config
+
 
 class Client_Server_Interface():
 

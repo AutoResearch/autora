@@ -1,25 +1,27 @@
+import copy
+import csv
+import logging
+import os
 from abc import ABC
-from AER_theorist.theorist import Theorist
-from AER_utils import Plot_Types
-from AER_theorist.darts.model_search import Network, DARTS_Type
-from AER_theorist.darts.architect import Architect
-from AER_theorist.darts.genotypes import PRIMITIVES
-from torch.autograd import Variable
-from AER_experimentalist.experiment_environment.variable import outputTypes as output_types
 
+import numpy as np
+import pandas
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import pandas
-import logging
-import numpy as np
-import AER_theorist.darts.darts_config as darts_cfg
+from torch.autograd import Variable
+
 import AER_config as aer_config
+import AER_theorist.darts.darts_config as darts_cfg
 import AER_theorist.darts.utils as utils
 import AER_theorist.darts.visualize as viz
-import copy
-import os
-import csv
+from AER_experimentalist.experiment_environment.variable import \
+    outputTypes as output_types
+from AER_theorist.darts.architect import Architect
+from AER_theorist.darts.genotypes import PRIMITIVES
+from AER_theorist.darts.model_search import DARTS_Type, Network
+from AER_theorist.theorist import Theorist
+from AER_utils import Plot_Types
 
 
 class Theorist_DARTS(Theorist, ABC):

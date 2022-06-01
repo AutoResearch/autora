@@ -1,6 +1,8 @@
 from abc import ABC, abstractmethod
-import torch
+
 import numpy as np
+import torch
+
 
 class Participant_In_Silico:
 

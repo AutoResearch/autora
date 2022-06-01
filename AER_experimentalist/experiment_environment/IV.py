@@ -1,5 +1,7 @@
 from abc import ABC, abstractmethod
+
 from tinkerforge_variable import Tinkerforge_Variable
+
 
 class IV(Tinkerforge_Variable):
 

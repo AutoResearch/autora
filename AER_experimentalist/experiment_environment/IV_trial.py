@@ -1,5 +1,7 @@
-from IV import IV
 import time
+
+from IV import IV
+
 
 class IV_Trial(IV):
 

@@ -1,42 +1,42 @@
-import os
-import sys
-import time
-import glob
+import argparse
 import copy
 import csv
+import glob
+import logging
+import os
+import re
+import sys
+import time
+
 import numpy as np
 import torch
-import logging
-import argparse
-import re
-import torch.nn as nn
-import torch.utils
-import torch.nn.functional as F
-import torchvision.datasets as dset
 import torch.backends.cudnn as cudnn
+import torch.nn as nn
+import torch.nn.functional as F
+import torch.utils
+import torchvision.datasets as dset
+from torch.autograd import Variable
 from torchvision import transforms
 
-from torch.autograd import Variable
-
 try:
+    import cnnsimple.genotypes
+    import cnnsimple.model_search_config as cfg
+    import cnnsimple.plot_utils as plotutils
+    import cnnsimple.SimpleNet_dataset as SimpleNet_dataset
     import cnnsimple.utils as utils
     import cnnsimple.visualize as viz
-    import cnnsimple.plot_utils as plotutils
-    import cnnsimple.genotypes
-    from cnnsimple.model_search import Network
     from cnnsimple.architect import Architect
-    import cnnsimple.model_search_config as cfg
+    from cnnsimple.model_search import Network
     from cnnsimple.object_of_study import outputTypes
     from cnnsimple.SimpleNet_dataset import SimpleNetDataset
-    import cnnsimple.SimpleNet_dataset as SimpleNet_dataset
 except:
+    import genotypes
+    import model_search_config as cfg
+    import plot_utils as plotutils
     import utils as utils
     import visualize as viz
-    import plot_utils as plotutils
-    import genotypes
-    from model_search import Network
     from architect import Architect
-    import model_search_config as cfg
+    from model_search import Network
     from object_of_study import outputTypes
     from SimpleNet_dataset import SimpleNetDataset
 

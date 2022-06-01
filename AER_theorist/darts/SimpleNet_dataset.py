@@ -1,13 +1,13 @@
+import numpy as np
 import torch
 import torch.nn as nn
-import numpy as np
-from torch.utils.data import Dataset
 from torch.autograd import Variable
+from torch.utils.data import Dataset
+from torchvision import transforms
 
 from AER_theorist.darts.SimpleNet import SimpleNet
 from AER_theorist.object_of_study import Object_Of_Study, outputTypes
 
-from torchvision import transforms
 
 class SimpleNetDataset(Object_Of_Study, Dataset):
     """Stroop model data set."""

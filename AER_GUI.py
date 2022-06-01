@@ -1,20 +1,22 @@
-from tkinter import *
-from tkinter import ttk
-from tkinter import simpledialog, messagebox
-from PIL import Image, ImageTk
-import AER_config as config
-from AER_utils import Plot_Types
 import os
-import numpy as np
 import time
+from tkinter import *
+from tkinter import messagebox, simpledialog, ttk
 
 import matplotlib
+import numpy as np
+from PIL import Image, ImageTk
+
+import AER_config as config
+from AER_utils import Plot_Types
+
 matplotlib.use("TkAgg")
+from enum import Enum
+
+import matplotlib.image as mpimg
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
-import matplotlib.image as mpimg
 
-from enum import Enum
 
 class Plot_Windows(Enum):
     THEORIST = 1

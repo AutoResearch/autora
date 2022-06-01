@@ -1,9 +1,13 @@
-from AER_experimentalist.experiment_environment.participant_in_silico import Participant_In_Silico
+import random
+
+import numpy as np
 import torch
 import torch.nn as nn
 from graphviz import Digraph
-import random
-import numpy as np
+
+from AER_experimentalist.experiment_environment.participant_in_silico import \
+    Participant_In_Silico
+
 
 class LCA_Model(nn.Module):
     def __init__(self, input=0, gamma=0.4, alpha=0.2, beta=0.2, dt_tau=1):
@@ -141,10 +145,11 @@ class Participant_LCA(Participant_In_Silico):
         legend.append('$x_3$ (Recov.)')
 
         # plot
+        import os
+
         import matplotlib.pyplot as plt
         import seaborn as sns
         from matplotlib import pyplot
-        import os
 
         fig, ax = pyplot.subplots(figsize=figure_dimensions)
 

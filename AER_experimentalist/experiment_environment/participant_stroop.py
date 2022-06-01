@@ -1,9 +1,12 @@
-from AER_experimentalist.experiment_environment.participant_in_silico import Participant_In_Silico
+import numpy as np
 import torch
 import torch.nn as nn
-import numpy as np
-from torch.autograd import Variable
 from graphviz import Digraph
+from torch.autograd import Variable
+
+from AER_experimentalist.experiment_environment.participant_in_silico import \
+    Participant_In_Silico
+
 
 class Stroop_Model(nn.Module):
     def __init__(self):
@@ -292,10 +295,11 @@ class Participant_Stroop(Participant_In_Silico):
             legend.append('$act_{green}$ = ' + str(color_green) + ', $act_{task}$ = ' + str(task_color) + ' (R)')
 
         # plot
+        import os
+
         import matplotlib.pyplot as plt
         import seaborn as sns
         from matplotlib import pyplot
-        import os
 
         fig, ax = pyplot.subplots(figsize=figure_dimensions)
 

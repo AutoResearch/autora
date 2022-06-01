@@ -1,6 +1,9 @@
 from abc import ABC
-from AER_experimentalist.experiment_design import Experiment_Design
+
 import numpy as np
+
+from AER_experimentalist.experiment_design import Experiment_Design
+
 
 class Experiment_Design_Synthetic_Weber(Experiment_Design, ABC):
 

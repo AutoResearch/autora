@@ -1,8 +1,8 @@
 import torch
 import torch.nn as nn
 from cnn.operations import *
-from torch.autograd import Variable
 from cnn.utils import drop_path
+from torch.autograd import Variable
 
 
 class Cell(nn.Module):

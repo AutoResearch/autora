@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class StudyAction(Enum):
     """
     Used to edit published studies.

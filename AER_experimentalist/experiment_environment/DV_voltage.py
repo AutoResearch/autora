@@ -1,6 +1,8 @@
 from DV import DV
+from tinkerforge.bricklet_industrial_dual_analog_in_v2 import \
+    BrickletIndustrialDualAnalogInV2
 from tinkerforge.ip_connection import IPConnection
-from tinkerforge.bricklet_industrial_dual_analog_in_v2 import BrickletIndustrialDualAnalogInV2
+
 
 class DV_Voltage(DV):
 

@@ -1,15 +1,18 @@
+from tkinter import *
+
+import numpy as np
+import torch
+import torch.optim as optim
+from torch import nn
+
 from AER_experimentalist.experiment_environment.variable import Variable as Var
 from AER_experimentalist.experimentalist import Experimentalist
 from AER_experimentalist.experimentalist_popper import Experimentalist_Popper
+from AER_GUI import AER_GUI
 from AER_theorist.object_of_study import Object_Of_Study
 from AER_theorist.theorist_darts import Theorist_DARTS
 from AER_theorist.theorist_GUI import Theorist_GUI
-from AER_GUI import AER_GUI
-from tkinter import *
-import numpy as np
-from torch import nn
-import torch
-import torch.optim as optim
+
 
 class copyNet(nn.Module):
     def __init__(self):
@@ -145,6 +148,7 @@ x_label = IV1.get_variable_label()
 copy_prediction = copy_model(input_org).detach().numpy()
 
 import matplotlib.pyplot as plt
+
 plt.clf()
 plt.plot(x_prediction, y_prediction, 'k', label='AER model prediction')
 plt.scatter(input, prediction, marker='.', c='k')

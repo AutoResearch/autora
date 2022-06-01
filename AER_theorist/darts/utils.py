@@ -1,21 +1,22 @@
+import csv
+import glob
 import os
+import shutil
+
 import numpy as np
 import torch
 import torch.nn as nn
-import shutil
-import csv
-import glob
 from torch.autograd import Variable
-from AER_experimentalist.experiment_environment.variable import outputTypes
 
+import AER_config as AER_cfg
 # new
 import AER_theorist.darts.darts_config as darts_cfg
-import AER_config as AER_cfg
-
-# old
-from AER_theorist.darts.SimpleNet_dataset import SimpleNetDataset
 # from AER_theorist.darts.object_of_study import outputTypes
 import AER_theorist.darts.SimpleNet_dataset as SimpleNetDatasetFile
+from AER_experimentalist.experiment_environment.variable import outputTypes
+# old
+from AER_theorist.darts.SimpleNet_dataset import SimpleNetDataset
+
 
 def create_output_file_name(file_prefix, log_version = None, weight_decay = None, k = None, seed = None, theorist=None):
 

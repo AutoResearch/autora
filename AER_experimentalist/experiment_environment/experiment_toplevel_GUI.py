@@ -1,6 +1,8 @@
 from tkinter import *
 from tkinter import ttk
+
 import AER_experimentalist.experiment_environment.experiment_config as config
+
 
 class Experiment_Toplevel_GUI():
 

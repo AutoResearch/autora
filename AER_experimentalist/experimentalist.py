@@ -1,16 +1,20 @@
-import AER_config as AER_cfg
+import csv
 import os
 import shutil
-import csv
-import pandas
-import numpy as np
-import AER_experimentalist.experimentalist_config as exp_cfg
-from AER_experimentalist.experiment_environment.experiment_client import Experiment_Client
-from sweetpea.primitives import Factor
-from sweetpea import fully_cross_block, synthesize_trials_non_uniform
-from enum import Enum
-from AER_utils import Plot_Types
 from abc import ABC, abstractmethod
+from enum import Enum
+
+import numpy as np
+import pandas
+from sweetpea import fully_cross_block, synthesize_trials_non_uniform
+from sweetpea.primitives import Factor
+
+import AER_config as AER_cfg
+import AER_experimentalist.experimentalist_config as exp_cfg
+from AER_experimentalist.experiment_environment.experiment_client import \
+    Experiment_Client
+from AER_utils import Plot_Types
+
 
 class seed_strategy(Enum):
     UNIFORM = 1

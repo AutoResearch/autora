@@ -1,6 +1,8 @@
+import time
+
 from DV import DV
 from V_time import V_Time
-import time
+
 
 class DV_Time(DV, V_Time):
 

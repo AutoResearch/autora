@@ -1,6 +1,8 @@
+import time
+
 from IV import IV
 from V_time import V_Time
-import time
+
 
 class IV_Time(IV, V_Time):
 

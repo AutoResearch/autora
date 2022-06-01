@@ -1,11 +1,16 @@
+import os
+import queue
+import threading
 from tkinter import *
 from tkinter import ttk
-from AER_experimentalist.experiment_environment.utils import *
-from AER_experimentalist.experiment_environment.experimentalist_GUI import Experimentalist_GUI
+
 import AER_experimentalist.experiment_environment.experiment_config as config
-from AER_experimentalist.experiment_environment.experiment_server import Experiment_Server
-import threading, queue
-import os
+from AER_experimentalist.experiment_environment.experiment_server import \
+    Experiment_Server
+from AER_experimentalist.experiment_environment.experimentalist_GUI import \
+    Experimentalist_GUI
+from AER_experimentalist.experiment_environment.utils import *
+
 
 def runloop(gui=None, run_local=False):
     '''

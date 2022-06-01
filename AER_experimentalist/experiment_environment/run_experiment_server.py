@@ -1,11 +1,16 @@
-from AER_experimentalist.experiment_environment.experiment_server import Experiment_Server
-from AER_experimentalist.experiment_environment.experiment_in_silico import Experiment_In_Silico
-from AER_experimentalist.experiment_environment.participant_stroop import Participant_Stroop
-from AER_experimentalist.experiment_environment.participant_weber import Participant_Weber
-from AER_experimentalist.experiment_environment.participant_exp_learning import Participant_Exp_Learning
-from AER_experimentalist.experiment_environment.participant_lca import Participant_LCA
 import AER_experimentalist.experiment_environment.experiment_config as cfg
-
+from AER_experimentalist.experiment_environment.experiment_in_silico import \
+    Experiment_In_Silico
+from AER_experimentalist.experiment_environment.experiment_server import \
+    Experiment_Server
+from AER_experimentalist.experiment_environment.participant_exp_learning import \
+    Participant_Exp_Learning
+from AER_experimentalist.experiment_environment.participant_lca import \
+    Participant_LCA
+from AER_experimentalist.experiment_environment.participant_stroop import \
+    Participant_Stroop
+from AER_experimentalist.experiment_environment.participant_weber import \
+    Participant_Weber
 
 # define Stroop participant
 # participant = Participant_Stroop() # the Cohen et al. (1990) Stroop Model

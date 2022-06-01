@@ -1,17 +1,20 @@
-import AER_config as aer_config
-import AER_theorist.darts.darts_config as darts_config
-import matplotlib.pyplot as plt
-from matplotlib import pyplot
+import os
+import time
+
+import imageio
 import matplotlib
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas
 import pylab
 import seaborn as sns
+from matplotlib import pyplot
 from matplotlib.gridspec import GridSpec
 from mpl_toolkits import mplot3d
-import imageio
-import time
-import numpy as np
-import os
-import pandas
+
+import AER_config as aer_config
+import AER_theorist.darts.darts_config as darts_config
+
 
 def generate_darts_summary_figures(figure_names,
                                    titles,
@@ -523,9 +526,10 @@ def plot_darts_summary(study_name, y_name, x1_name,
 
 def plot_model_graph(study_name, arch_weights_name, model_weights_name, object_of_study, figure_name='graph'):
 
-    import AER_theorist.darts.visualize as viz
-    import AER_theorist.darts.utils as utils
     import os
+
+    import AER_theorist.darts.utils as utils
+    import AER_theorist.darts.visualize as viz
 
     figures_path = aer_config.studies_folder \
                    + study_name + "/" \
@@ -547,10 +551,12 @@ def plot_model_graph(study_name, arch_weights_name, model_weights_name, object_o
 
 def load_model(study_name, model_weights_name, arch_weights_name, object_of_study):
 
-    from AER_theorist.darts.model_search import Network
-    import AER_theorist.darts.utils as utils
-    import torch
     import os
+
+    import torch
+
+    import AER_theorist.darts.utils as utils
+    from AER_theorist.darts.model_search import Network
 
     num_output = object_of_study.__get_output_dim__()
     num_input = object_of_study.__get_input_dim__()

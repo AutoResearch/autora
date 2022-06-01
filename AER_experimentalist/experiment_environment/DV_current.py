@@ -1,6 +1,8 @@
 from DV import DV
+from tinkerforge.bricklet_industrial_dual_0_20ma_v2 import \
+    BrickletIndustrialDual020mAV2
 from tinkerforge.ip_connection import IPConnection
-from tinkerforge.bricklet_industrial_dual_0_20ma_v2 import BrickletIndustrialDual020mAV2
+
 
 class DV_Current(DV):
 

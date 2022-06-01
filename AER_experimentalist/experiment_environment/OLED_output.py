@@ -1,5 +1,6 @@
-from tinkerforge.ip_connection import IPConnection
 from tinkerforge.bricklet_oled_128x64_v2 import BrickletOLED128x64V2
+from tinkerforge.ip_connection import IPConnection
+
 
 class OLED_Output():
 

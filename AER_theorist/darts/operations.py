@@ -1,7 +1,8 @@
+import math
+
+import numpy as np
 import torch
 import torch.nn as nn
-import math
-import numpy as np
 
 # defines all the operations. affine is turned off for cuda (optimization prposes)
 OPS = {

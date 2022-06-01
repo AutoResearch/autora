@@ -1,20 +1,20 @@
-import os
-import sys
-import glob
-import shutil
-import logging
-import AER_config as aer_config
-import time
 import csv
-
-from AER_utils import Plot_Types
-from AER_theorist.theorist_GUI import Theorist_GUI
+import glob
+import logging
+import os
+import shutil
+import sys
+import time
+from abc import ABC, abstractmethod
 from tkinter import *
+
 from matplotlib.figure import Figure
 
-
-from abc import ABC, abstractmethod
+import AER_config as aer_config
 from AER_theorist.object_of_study import Object_Of_Study
+from AER_theorist.theorist_GUI import Theorist_GUI
+from AER_utils import Plot_Types
+
 
 class Theorist(ABC):
 
