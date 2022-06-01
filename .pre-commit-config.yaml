@@ -1,7 +1,13 @@
 repos:
+  - repo: https://github.com/ambv/black
+    rev: 22.3.0
+    hooks:
+      - id: black
   - repo: https://github.com/timothycrosley/isort
     rev: 5.10.1
     hooks:
       - id: isort
+        args: ["--profile", "black"]
+
 default_language_version:
   python: python3
