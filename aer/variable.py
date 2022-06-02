@@ -159,6 +159,65 @@ class Variable:
         self._variable_label = variable_label
 
 
+class IV_In_Silico(Variable):
+
+    _variable_label = "IV"
+    _name = "independent variable"
+    _units = "activation"
+    _priority = 0
+    _value_range = (0, 1)
+    _value = 0
+    _participant = None
+
+    # Initializes Industrial Analog Out 2.0 device.
+    def __init__(self, *args, **kwargs):
+
+        super(IV_In_Silico, self).__init__(*args, **kwargs)
+
+    def assign_participant(self, participant):
+        self._participant = participant
+
+    # Waits until specified time has passed relative to reference time
+    def manipulate(self):
+        self._participant.set_value(self._name, self.get_value())
+
+    # Set whether this dependent variable is treated as covariate.
+    def set_covariate(self, is_covariate):
+        self._is_covariate = is_covariate
+
+
+class DV_In_Silico(Variable):
+
+    _variable_label = "DV"
+    _name = "dependent variable"
+    _units = "activation"
+    _priority = 0
+    _value_range = (0, 1)
+    _value = 0
+    _participant = None
+
+    # Initializes Industrial Analog Out 2.0 device.
+    def __init__(self, *args, **kwargs):
+
+        super(DV_In_Silico, self).__init__(*args, **kwargs)
+
+    def assign_participant(self, participant):
+        self._participant = participant
+
+    # Waits until specified time has passed relative to reference time
+    def measure(self):
+        measurement = self._participant.get_value(self._name)
+        self.set_value(measurement)
+
+    # Get whether this dependent variable is treated as covariate.
+    def __is_covariate__(self):
+        return self._is_covariate
+
+    # Set whether this dependent variable is treated as covariate.
+    def __set_covariate__(self, is_covariate):
+        self._is_covariate = is_covariate
+
+
 class Tinkerforge_Variable(Variable):
 
     _variable_label = ""
@@ -201,12 +260,12 @@ class Tinkerforge_Variable(Variable):
         pass
 
 
-class IV(Tinkerforge_Variable):
+class IVTF(Tinkerforge_Variable):
     def __init__(self, *args, **kwargs):
         self._name = "IV"
         self._variable_label = "Independent Variable"
 
-        super(IV, self).__init__(*args, **kwargs)
+        super(IVTF, self).__init__(*args, **kwargs)
 
     # Method for measuring dependent variable.
     @abstractmethod
@@ -219,31 +278,25 @@ class IV(Tinkerforge_Variable):
         pass
 
 
-class IV_In_Silico(Variable):
+class IV_Trial(IVTF):
 
-    _variable_label = "IV"
-    _name = "independent variable"
-    _units = "activation"
+    _name = "trial"
+    _UID = ""
+    _variable_label = "Trial"
+    _units = "trials"
     _priority = 0
-    _value_range = (0, 1)
+    _value_range = (0, 10000000)
     _value = 0
-    _participant = None
 
-    # Initializes Industrial Analog Out 2.0 device.
     def __init__(self, *args, **kwargs):
-
-        super(IV_In_Silico, self).__init__(*args, **kwargs)
-
-    def assign_participant(self, participant):
-        self._participant = participant
+        super(IV_Trial, self).__init__(*args, **kwargs)
 
     # Waits until specified time has passed relative to reference time
     def manipulate(self):
-        self._participant.set_value(self._name, self.get_value())
+        pass
 
-    # Set whether this dependent variable is treated as covariate.
-    def set_covariate(self, is_covariate):
-        self._is_covariate = is_covariate
+    def __clean_up__(self):
+        pass
 
 
 class V_Time:
@@ -258,7 +311,7 @@ class V_Time:
         self._t0 = time.time()
 
 
-class IV_Time(IV, V_Time):
+class IV_Time(IVTF, V_Time):
 
     _name = "time_IV"
     _UID = ""
@@ -286,7 +339,7 @@ class IV_Time(IV, V_Time):
         pass
 
 
-class IV_Current(IV):
+class IV_Current(IVTF):
 
     _name = "source_current"
     _UID = "MST"
@@ -331,28 +384,7 @@ class IV_Current(IV):
         self.stop()
 
 
-class IV_Trial(IV):
-
-    _name = "trial"
-    _UID = ""
-    _variable_label = "Trial"
-    _units = "trials"
-    _priority = 0
-    _value_range = (0, 10000000)
-    _value = 0
-
-    def __init__(self, *args, **kwargs):
-        super(IV_Trial, self).__init__(*args, **kwargs)
-
-    # Waits until specified time has passed relative to reference time
-    def manipulate(self):
-        pass
-
-    def __clean_up__(self):
-        pass
-
-
-class IV_Voltage(IV):
+class IV_Voltage(IVTF):
 
     _variable_label = "Source Voltage"
     _UID = "MST"
@@ -395,6 +427,220 @@ class IV_Voltage(IV):
 
     def clean_up(self):
         self.stop()
+
+
+class DVTF(Tinkerforge_Variable):
+    def __init__(self, *args, **kwargs):
+        self._name = "DV"
+        self._variable_label = "Dependent Variable"
+
+        self._is_covariate = False
+
+        super(DVTF, self).__init__(*args, **kwargs)
+
+    # Method for measuring dependent variable.
+    @abstractmethod
+    def measure(self):
+        pass
+
+    # Get whether this dependent variable is treated as covariate.
+    def __is_covariate__(self):
+        return self._is_covariate
+
+    # Set whether this dependent variable is treated as covariate.
+    def __set_covariate__(self, is_covariate):
+        self._is_covariate = is_covariate
+
+
+class DV_Time(DVTF, V_Time):
+
+    _name = "time_DV"
+    _UID = ""
+    _variable_label = "Time"
+    _units = "s"
+    _priority = 0
+    _value_range = (0, 604800)  # don't record more than a week
+    _value = 0
+
+    _is_covariate = True
+
+    # Initializes reference time.
+    # The reference time usually denotes the beginning of an experiment trial.
+    def __init__(self, *args, **kwargs):
+        print(self._variable_label)
+        super(DV_Time, self).__init__(*args, **kwargs)
+        print(self._variable_label)
+
+    # Measure number of seconds relative to reference time
+    def measure(self):
+
+        value = time.time() - self._t0
+        self.set_value(value)
+
+
+class DV_Current(DVTF):
+
+    _name = "current0"
+    _UID = "Hfg"
+    _variable_label = "Current 0"
+    _units = "mA"
+    _priority = 0
+    _value_range = (0, 2000)
+    _value = 0
+
+    _HOST = "localhost"
+    _PORT = 4223
+    channel = 0
+
+    # Initializes Industrial Analog Out 2.0 device.
+    def __init__(self, *args, **kwargs):
+
+        super(DV_Current, self).__init__(*args, **kwargs)
+
+        self._ipcon = IPConnection()  # Create IP connection
+        self._id020 = BrickletIndustrialDual020mAV2(
+            self._UID, self._ipcon
+        )  # Create device object
+
+        self._ipcon.connect(self._HOST, self._PORT)  # Connect to brickd
+
+        if self._name == "current1":
+            self.channel = 1
+        else:
+            self.channel = 0
+
+    # Clean up measurement device.
+    def __clean_up__(self):
+
+        self._ipcon.disconnect()
+
+    # Waits until specified time has passed relative to reference time
+    def measure(self):
+        current = self._id020.get_current(self.channel)
+        self.set_value(current / 1000000.0)
+
+
+class DV_Voltage(DVTF):
+
+    _name = "voltage0"
+    _UID = "MjY"
+    _variable_label = "Voltage 0"
+    _units = "mV"
+    _priority = 0
+    _value_range = (-3500, 3500)
+    _value = 0
+
+    _HOST = "localhost"
+    _PORT = 4223
+
+    channel = 0
+
+    # Initializes Industrial Analog Out 2.0 device.
+    def __init__(self, *args, **kwargs):
+
+        super(DV_Voltage, self).__init__(*args, **kwargs)
+
+        self._ipcon = IPConnection()  # Create IP connection
+        self._idai = BrickletIndustrialDualAnalogInV2(
+            self._UID, self._ipcon
+        )  # Create device object
+
+        self._ipcon.connect(self._HOST, self._PORT)  # Connect to brickd
+
+        if self._name == "voltage1":
+            self.channel = 1
+        else:
+            self.channel = 0
+
+    # Clean up measurement device.
+    def __clean_up__(self):
+        self._ipcon.disconnect()
+
+    # Waits until specified time has passed relative to reference time
+    def measure(self):
+        value = self._idai.get_voltage(self.channel)
+        self.set_value(value)
+
+
+DV_labels = {
+    "time_DV": (DV_Time, "Time", "", "time_DV", "s", 0, (0, 3600)),
+    "voltage0": (DV_Voltage, "Voltage 0", "MjY", "voltage0", "mV", 1, (-3500, 3500)),
+    "voltage1": (DV_Voltage, "Voltage 1", "MjY", "voltage1", "mV", 1, (-3500, 3500)),
+    "current0": (DV_Current, "Current 0", "Hfg", "current0", "mA", 2, (0, 20)),
+    "current1": (DV_Current, "Current 1", "Hfg", "current1", "mA", 2, (0, 20)),
+    "verbal_red": (
+        DV_In_Silico,
+        "Verbal Response Red",
+        None,
+        "verbal_red",
+        "activation",
+        0,
+        (0, 1),
+    ),
+    "verbal_green": (
+        DV_In_Silico,
+        "Verbal Response Green",
+        None,
+        "verbal_green",
+        "activation",
+        0,
+        (0, 1),
+    ),
+    "verbal_sample": (
+        DV_In_Silico,
+        "Verbal Response Sample",
+        None,
+        "verbal_sample",
+        "class",
+        0,
+        (0, 1),
+    ),
+    "difference_detected": (
+        DV_In_Silico,
+        "Difference Detected",
+        None,
+        "difference_detected",
+        "activation",
+        0,
+        (0, 1),
+    ),
+    "difference_detected_sample": (
+        DV_In_Silico,
+        "Difference Detected",
+        None,
+        "difference_detected_sample",
+        "class",
+        0,
+        (0, 1),
+    ),
+    "learning_performance": (
+        DV_In_Silico,
+        "Accuracy",
+        None,
+        "learning_performance",
+        "probability",
+        0,
+        (0, 1),
+    ),
+    "learning_performance_sample": (
+        DV_In_Silico,
+        "Accuracy Sample",
+        None,
+        "learning_performance_sample",
+        "class",
+        0,
+        (0, 1),
+    ),
+    "dx1_lca": (
+        DV_In_Silico,
+        "dx1",
+        None,
+        "dx1_lca",
+        "net input delta",
+        0,
+        (-1000, 1000),
+    ),
+}
 
 
 IV_labels = {
@@ -584,247 +830,3 @@ class OLED_Output:
         self._ipcon.disconnect()
 
 
-class DV_In_Silico(Variable):
-
-    _variable_label = "DV"
-    _name = "dependent variable"
-    _units = "activation"
-    _priority = 0
-    _value_range = (0, 1)
-    _value = 0
-    _participant = None
-
-    # Initializes Industrial Analog Out 2.0 device.
-    def __init__(self, *args, **kwargs):
-
-        super(DV_In_Silico, self).__init__(*args, **kwargs)
-
-    def assign_participant(self, participant):
-        self._participant = participant
-
-    # Waits until specified time has passed relative to reference time
-    def measure(self):
-        measurement = self._participant.get_value(self._name)
-        self.set_value(measurement)
-
-    # Get whether this dependent variable is treated as covariate.
-    def __is_covariate__(self):
-        return self._is_covariate
-
-    # Set whether this dependent variable is treated as covariate.
-    def __set_covariate__(self, is_covariate):
-        self._is_covariate = is_covariate
-
-
-class DV(Tinkerforge_Variable):
-    def __init__(self, *args, **kwargs):
-        self._name = "DV"
-        self._variable_label = "Dependent Variable"
-
-        self._is_covariate = False
-
-        super(DV, self).__init__(*args, **kwargs)
-
-    # Method for measuring dependent variable.
-    @abstractmethod
-    def measure(self):
-        pass
-
-    # Get whether this dependent variable is treated as covariate.
-    def __is_covariate__(self):
-        return self._is_covariate
-
-    # Set whether this dependent variable is treated as covariate.
-    def __set_covariate__(self, is_covariate):
-        self._is_covariate = is_covariate
-
-
-class DV_Time(DV, V_Time):
-
-    _name = "time_DV"
-    _UID = ""
-    _variable_label = "Time"
-    _units = "s"
-    _priority = 0
-    _value_range = (0, 604800)  # don't record more than a week
-    _value = 0
-
-    _is_covariate = True
-
-    # Initializes reference time.
-    # The reference time usually denotes the beginning of an experiment trial.
-    def __init__(self, *args, **kwargs):
-        print(self._variable_label)
-        super(DV_Time, self).__init__(*args, **kwargs)
-        print(self._variable_label)
-
-    # Measure number of seconds relative to reference time
-    def measure(self):
-
-        value = time.time() - self._t0
-        self.set_value(value)
-
-
-class DV_Current(DV):
-
-    _name = "current0"
-    _UID = "Hfg"
-    _variable_label = "Current 0"
-    _units = "mA"
-    _priority = 0
-    _value_range = (0, 2000)
-    _value = 0
-
-    _HOST = "localhost"
-    _PORT = 4223
-    channel = 0
-
-    # Initializes Industrial Analog Out 2.0 device.
-    def __init__(self, *args, **kwargs):
-
-        super(DV_Current, self).__init__(*args, **kwargs)
-
-        self._ipcon = IPConnection()  # Create IP connection
-        self._id020 = BrickletIndustrialDual020mAV2(
-            self._UID, self._ipcon
-        )  # Create device object
-
-        self._ipcon.connect(self._HOST, self._PORT)  # Connect to brickd
-
-        if self._name == "current1":
-            self.channel = 1
-        else:
-            self.channel = 0
-
-    # Clean up measurement device.
-    def __clean_up__(self):
-
-        self._ipcon.disconnect()
-
-    # Waits until specified time has passed relative to reference time
-    def measure(self):
-        current = self._id020.get_current(self.channel)
-        self.set_value(current / 1000000.0)
-
-
-class DV_Voltage(DV):
-
-    _name = "voltage0"
-    _UID = "MjY"
-    _variable_label = "Voltage 0"
-    _units = "mV"
-    _priority = 0
-    _value_range = (-3500, 3500)
-    _value = 0
-
-    _HOST = "localhost"
-    _PORT = 4223
-
-    channel = 0
-
-    # Initializes Industrial Analog Out 2.0 device.
-    def __init__(self, *args, **kwargs):
-
-        super(DV_Voltage, self).__init__(*args, **kwargs)
-
-        self._ipcon = IPConnection()  # Create IP connection
-        self._idai = BrickletIndustrialDualAnalogInV2(
-            self._UID, self._ipcon
-        )  # Create device object
-
-        self._ipcon.connect(self._HOST, self._PORT)  # Connect to brickd
-
-        if self._name == "voltage1":
-            self.channel = 1
-        else:
-            self.channel = 0
-
-    # Clean up measurement device.
-    def __clean_up__(self):
-        self._ipcon.disconnect()
-
-    # Waits until specified time has passed relative to reference time
-    def measure(self):
-        value = self._idai.get_voltage(self.channel)
-        self.set_value(value)
-
-
-DV_labels = {
-    "time_DV": (DV_Time, "Time", "", "time_DV", "s", 0, (0, 3600)),
-    "voltage0": (DV_Voltage, "Voltage 0", "MjY", "voltage0", "mV", 1, (-3500, 3500)),
-    "voltage1": (DV_Voltage, "Voltage 1", "MjY", "voltage1", "mV", 1, (-3500, 3500)),
-    "current0": (DV_Current, "Current 0", "Hfg", "current0", "mA", 2, (0, 20)),
-    "current1": (DV_Current, "Current 1", "Hfg", "current1", "mA", 2, (0, 20)),
-    "verbal_red": (
-        DV_In_Silico,
-        "Verbal Response Red",
-        None,
-        "verbal_red",
-        "activation",
-        0,
-        (0, 1),
-    ),
-    "verbal_green": (
-        DV_In_Silico,
-        "Verbal Response Green",
-        None,
-        "verbal_green",
-        "activation",
-        0,
-        (0, 1),
-    ),
-    "verbal_sample": (
-        DV_In_Silico,
-        "Verbal Response Sample",
-        None,
-        "verbal_sample",
-        "class",
-        0,
-        (0, 1),
-    ),
-    "difference_detected": (
-        DV_In_Silico,
-        "Difference Detected",
-        None,
-        "difference_detected",
-        "activation",
-        0,
-        (0, 1),
-    ),
-    "difference_detected_sample": (
-        DV_In_Silico,
-        "Difference Detected",
-        None,
-        "difference_detected_sample",
-        "class",
-        0,
-        (0, 1),
-    ),
-    "learning_performance": (
-        DV_In_Silico,
-        "Accuracy",
-        None,
-        "learning_performance",
-        "probability",
-        0,
-        (0, 1),
-    ),
-    "learning_performance_sample": (
-        DV_In_Silico,
-        "Accuracy Sample",
-        None,
-        "learning_performance_sample",
-        "class",
-        0,
-        (0, 1),
-    ),
-    "dx1_lca": (
-        DV_In_Silico,
-        "dx1",
-        None,
-        "dx1_lca",
-        "net input delta",
-        0,
-        (-1000, 1000),
-    ),
-}
