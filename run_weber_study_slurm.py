@@ -4,10 +4,12 @@ import sys
 from datetime import datetime
 
 import aer_experimentalist.experiment_environment.experiment_config as exp_cfg
+from aer.variable import DV_In_Silico as DV
+from aer.variable import IV_In_Silico as IV
+from aer.variable import outputTypes as output_type
 from aer_experimentalist.experiment_design_synthetic_weber import (
     Experiment_Design_Synthetic_Weber,
 )
-from aer.variable import outputTypes as output_type, IV_In_Silico as IV, DV_In_Silico as DV
 from aer_experimentalist.experimentalist_popper import Experimentalist_Popper
 from aer_theorist.object_of_study import Object_Of_Study
 from aer_theorist.theorist_darts import DARTS_Type, Theorist_DARTS
