@@ -191,7 +191,7 @@ class IVInSilico(IV):
         self._participant.set_value(self._name, self.get_value())
 
 
-class DV_In_Silico(DV):
+class DVInSilico(DV):
 
     _variable_label = "DV"
     _name = "dependent variable"
@@ -202,7 +202,7 @@ class DV_In_Silico(DV):
 
     # Initializes Industrial Analog Out 2.0 device.
     def __init__(self, *args, **kwargs):
-        super(DV_In_Silico, self).__init__(*args, **kwargs)
+        super(DVInSilico, self).__init__(*args, **kwargs)
 
     def measure(self):
         measurement = self._participant.get_value(self._name)
@@ -560,7 +560,7 @@ DV_labels = {
     "current0": (DV_Current, "Current 0", "Hfg", "current0", "mA", 2, (0, 20)),
     "current1": (DV_Current, "Current 1", "Hfg", "current1", "mA", 2, (0, 20)),
     "verbal_red": (
-        DV_In_Silico,
+        DVInSilico,
         "Verbal Response Red",
         None,
         "verbal_red",
@@ -569,7 +569,7 @@ DV_labels = {
         (0, 1),
     ),
     "verbal_green": (
-        DV_In_Silico,
+        DVInSilico,
         "Verbal Response Green",
         None,
         "verbal_green",
@@ -578,7 +578,7 @@ DV_labels = {
         (0, 1),
     ),
     "verbal_sample": (
-        DV_In_Silico,
+        DVInSilico,
         "Verbal Response Sample",
         None,
         "verbal_sample",
@@ -587,7 +587,7 @@ DV_labels = {
         (0, 1),
     ),
     "difference_detected": (
-        DV_In_Silico,
+        DVInSilico,
         "Difference Detected",
         None,
         "difference_detected",
@@ -596,7 +596,7 @@ DV_labels = {
         (0, 1),
     ),
     "difference_detected_sample": (
-        DV_In_Silico,
+        DVInSilico,
         "Difference Detected",
         None,
         "difference_detected_sample",
@@ -605,7 +605,7 @@ DV_labels = {
         (0, 1),
     ),
     "learning_performance": (
-        DV_In_Silico,
+        DVInSilico,
         "Accuracy",
         None,
         "learning_performance",
@@ -614,7 +614,7 @@ DV_labels = {
         (0, 1),
     ),
     "learning_performance_sample": (
-        DV_In_Silico,
+        DVInSilico,
         "Accuracy Sample",
         None,
         "learning_performance_sample",
@@ -623,7 +623,7 @@ DV_labels = {
         (0, 1),
     ),
     "dx1_lca": (
-        DV_In_Silico,
+        DVInSilico,
         "dx1",
         None,
         "dx1_lca",

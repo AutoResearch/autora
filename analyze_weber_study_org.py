@@ -1,5 +1,5 @@
 import aer_experimentalist.experiment_environment.experiment_config as exp_cfg
-from aer.variable import DV_In_Silico as DV
+from aer.variable import DVInSilico as DV
 from aer.variable import IVInSilico as IV
 from aer.variable import OutputTypes as output_type
 from aer_experimentalist.experiment_environment.participant_weber import (
