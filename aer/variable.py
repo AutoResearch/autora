@@ -209,7 +209,7 @@ class DVInSilico(DV):
         self.set_value(measurement)
 
 
-class Tinkerforge_Variable(Variable):
+class TinkerforgeVariable(Variable):
 
     _variable_label = ""
     _UID = ""
@@ -251,7 +251,7 @@ class Tinkerforge_Variable(Variable):
         pass
 
 
-class IVTF(Tinkerforge_Variable, IV):
+class IVTF(TinkerforgeVariable, IV):
     def __init__(self, *args, **kwargs):
         self._name = "IV"
         self._variable_label = "Independent Variable"
@@ -420,7 +420,7 @@ class IV_Voltage(IVTF):
         self.stop()
 
 
-class DVTF(Tinkerforge_Variable, DV):
+class DVTF(TinkerforgeVariable, DV):
     def __init__(self, *args, **kwargs):
         self._name = "DV"
         self._variable_label = "Dependent Variable"
