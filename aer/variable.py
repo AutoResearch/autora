@@ -553,7 +553,7 @@ class DVVoltage(DVTF):
         self.set_value(value)
 
 
-DV_labels = {
+dv_labels = {
     "time_DV": (DVTime, "Time", "", "time_DV", "s", 0, (0, 3600)),
     "voltage0": (DVVoltage, "Voltage 0", "MjY", "voltage0", "mV", 1, (-3500, 3500)),
     "voltage1": (DVVoltage, "Voltage 1", "MjY", "voltage1", "mV", 1, (-3500, 3500)),

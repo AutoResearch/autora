@@ -4,7 +4,7 @@ import pandas
 
 import aer_experimentalist.experiment_environment.experiment_config as config
 import aer_experimentalist.experimentalist_config as cfg
-from aer.variable import DV_labels, DVTime, IV_labels, IVTime, IVTrial
+from aer.variable import DVTime, IV_labels, IVTime, IVTrial, dv_labels
 
 
 class Experiment:
@@ -135,7 +135,7 @@ class Experiment:
                 for idx, label in enumerate(labels):
                     if label == "":
                         continue
-                    if (label in DV_labels) is False:
+                    if (label in dv_labels) is False:
                         raise Exception(
                             "Could not identify sequence variable: " + label
                         )
@@ -147,7 +147,7 @@ class Experiment:
                         units,
                         priority,
                         value_range,
-                    ) = DV_labels.get(label)
+                    ) = dv_labels.get(label)
                     # overwrite priority
                     priority = idx
                     if covariate:
