@@ -1,6 +1,6 @@
 import copy
 import random
-from typing import Any, Dict, List
+from typing import Any, Dict, Sequence
 
 import numpy as np
 import torch
@@ -17,9 +17,9 @@ class Object_Of_Study(Dataset):
     def __init__(
         self,
         name,
-        independent_variables: List[Variable],
-        dependent_variables: List[Variable],
-        covariates: List[Variable] = None,
+        independent_variables: Sequence[Variable],
+        dependent_variables: Sequence[Variable],
+        covariates: Sequence[Variable] = None,
         input_dimensions=None,
         output_dimensions=None,
         output_type=None,
@@ -27,9 +27,9 @@ class Object_Of_Study(Dataset):
 
         self.name = name
 
-        self.independent_variables: List[Variable] = list()
-        self.dependent_variables: List[Variable] = list()
-        self.covariates: List[Variable] = list()
+        self.independent_variables: Sequence[Variable] = list()
+        self.dependent_variables: Sequence[Variable] = list()
+        self.covariates: Sequence[Variable] = list()
         self.data: Dict[Any, Any] = dict()
         self._normalize_input = False
         self._normalize_output = False
