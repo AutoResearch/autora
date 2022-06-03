@@ -169,7 +169,7 @@ class Experimentalist_Popper(Experimentalist, ABC):
         # add condition to new experiment sequence
         for idx in range(len(input_sample)):
             IV_name = object_of_study.get_iv_name(idx)
-            IV_rescale = object_of_study.get_IV_rescale_from_name(IV_name)
+            IV_rescale = object_of_study.get_iv_rescale_from_name(IV_name)
             IV_limits = IV_limit_list[idx]
             IV_value = input_sample[idx].detach().numpy()
             # first clip value

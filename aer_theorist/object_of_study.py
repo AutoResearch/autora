@@ -318,7 +318,7 @@ class Object_Of_Study(Dataset):
                 raise Exception("Index exceeds number of independent variables.")
         return name
 
-    def get_DV_name(self, idx):
+    def get_dv_name(self, idx):
         if idx < len(self.dependent_variables):
             name = self.dependent_variables[idx].get_name()
             return name
@@ -336,13 +336,13 @@ class Object_Of_Study(Dataset):
         rescaled_sequence = dict()
         for key in sequence:
             values = sequence[key]
-            rescale = self.get_IV_rescale_from_name(key)
+            rescale = self.get_iv_rescale_from_name(key)
             values_rescaled = [val * rescale for val in values]
             rescaled_sequence[key] = values_rescaled
 
         return rescaled_sequence
 
-    def get_IV_rescale_from_name(self, iv_name):
+    def get_iv_rescale_from_name(self, iv_name):
 
         for var in self.independent_variables:
             if var.get_name() == iv_name:
