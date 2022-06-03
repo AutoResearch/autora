@@ -634,7 +634,7 @@ dv_labels = {
 }
 
 
-IV_labels = {
+iv_labels = {
     "time_IV": (IVTime, "Time", "", "time_IV", "s", 1, (0, 3600)),
     "trial": (IVTrial, "Trial", "", "trial", "trials", 0, (0, 10000000)),
     "source_voltage": (

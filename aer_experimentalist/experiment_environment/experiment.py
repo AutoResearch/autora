@@ -4,7 +4,7 @@ import pandas
 
 import aer_experimentalist.experiment_environment.experiment_config as config
 import aer_experimentalist.experimentalist_config as cfg
-from aer.variable import DVTime, IV_labels, IVTime, IVTrial, dv_labels
+from aer.variable import DVTime, IVTime, IVTrial, dv_labels, iv_labels
 
 
 class Experiment:
@@ -80,7 +80,7 @@ class Experiment:
                 string = string.replace(cfg.exp_file_IV_label, "")
                 labels = string.split(",")
                 for idx, label in enumerate(labels):
-                    if (label in IV_labels) is False:
+                    if (label in iv_labels) is False:
                         raise Exception(
                             "Could not identify sequence variable: " + label
                         )
@@ -92,7 +92,7 @@ class Experiment:
                         units,
                         priority,
                         value_range,
-                    ) = IV_labels.get(label)
+                    ) = iv_labels.get(label)
                     # overwrite priority
                     priority = idx
                     if UID is None:
