@@ -35,11 +35,8 @@ class Object_Of_Study(Dataset):
         self._normalize_output = False
 
         # set independent and dependent variables
-        if len(independent_variables) == 0:
-            Exception("No independent variables specified.")
-
-        if len(dependent_variables) == 0:
-            Exception("No dependent variables specified.")
+        self.independent_variables.extend(independent_variables)
+        self.dependent_variables.extend(dependent_variables)
 
         if covariates is not None:
             self.covariates.extend(covariates)
