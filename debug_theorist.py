@@ -133,9 +133,9 @@ resolution = 100
 input = input.numpy()
 output = output.numpy()
 counterbalanced_input = study_object.get_counterbalanced_input(resolution)
-x_prediction = study_object.get_IVs_from_input(counterbalanced_input, IV1).numpy()
+x_prediction = study_object.get_ivs_from_input(counterbalanced_input, IV1).numpy()
 y_prediction = model(counterbalanced_input).detach().numpy()
-x_data = study_object.get_IVs_from_input(input, IV1)
+x_data = study_object.get_ivs_from_input(input, IV1)
 y_data = study_object.get_DV_from_output(output, DV)
 y_limit = [
     np.amin([np.amin(y_data), np.amin(y_prediction)]),

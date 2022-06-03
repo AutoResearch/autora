@@ -277,7 +277,7 @@ class Object_Of_Study(Dataset):
         IV_data = torch.tensor(var_data).float()
         return IV_data
 
-    def get_IVs_from_input(self, input, ivs):
+    def get_ivs_from_input(self, input, ivs):
         columns = list()
         if isinstance(ivs, list):
             for iv in ivs:

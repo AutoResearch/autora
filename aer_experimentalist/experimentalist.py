@@ -414,24 +414,24 @@ class Experimentalist(ABC):
                 resolution
             )
             if IV2 is None:  # prepare line plot
-                x_prediction = object_of_study.get_IVs_from_input(
+                x_prediction = object_of_study.get_ivs_from_input(
                     counterbalanced_input, IV1
                 )
             else:
                 x_prediction = (
-                    object_of_study.get_IVs_from_input(counterbalanced_input, IV1),
-                    object_of_study.get_IVs_from_input(counterbalanced_input, IV2),
+                    object_of_study.get_ivs_from_input(counterbalanced_input, IV1),
+                    object_of_study.get_ivs_from_input(counterbalanced_input, IV2),
                 )
             y_prediction = model(counterbalanced_input)
 
             # get data points
             (input, output) = object_of_study.get_dataset()
             if IV2 is None:  # prepare line plot
-                x_data = object_of_study.get_IVs_from_input(input, IV1)
+                x_data = object_of_study.get_ivs_from_input(input, IV1)
             else:
                 x_data = (
-                    object_of_study.get_IVs_from_input(input, IV1),
-                    object_of_study.get_IVs_from_input(input, IV2),
+                    object_of_study.get_ivs_from_input(input, IV1),
+                    object_of_study.get_ivs_from_input(input, IV2),
                 )
             y_data = object_of_study.get_DV_from_output(output, DV)
 
@@ -441,13 +441,13 @@ class Experimentalist(ABC):
                 experiment_id=last_experiment_id
             )
             if IV2 is None:  # prepare line plot
-                x_data_highlighted = object_of_study.get_IVs_from_input(
+                x_data_highlighted = object_of_study.get_ivs_from_input(
                     input_highlighted, IV1
                 )
             else:
                 x_data_highlighted = (
-                    object_of_study.get_IVs_from_input(input_highlighted, IV1),
-                    object_of_study.get_IVs_from_input(input_highlighted, IV2),
+                    object_of_study.get_ivs_from_input(input_highlighted, IV1),
+                    object_of_study.get_ivs_from_input(input_highlighted, IV2),
                 )
             y_data_highlighted = object_of_study.get_DV_from_output(
                 output_highlighted, DV

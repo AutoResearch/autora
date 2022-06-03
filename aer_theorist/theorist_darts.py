@@ -1006,18 +1006,18 @@ class Theorist_DARTS(Theorist, ABC):
             (input, output) = object_of_study.get_dataset()
             if IV2 is None:  # prepare line plot
                 x_data = (
-                    object_of_study.get_IVs_from_input(input, IV1)
+                    object_of_study.get_ivs_from_input(input, IV1)
                     .detach()
                     .numpy()
                     .flatten()
                 )
             else:
                 x_data = (
-                    object_of_study.get_IVs_from_input(input, IV1)
+                    object_of_study.get_ivs_from_input(input, IV1)
                     .detach()
                     .numpy()
                     .flatten(),
-                    object_of_study.get_IVs_from_input(input, IV2)
+                    object_of_study.get_ivs_from_input(input, IV2)
                     .detach()
                     .numpy()
                     .flatten(),
@@ -1036,18 +1036,18 @@ class Theorist_DARTS(Theorist, ABC):
             )
             if IV2 is None:  # prepare line plot
                 x_data_highlighted = (
-                    object_of_study.get_IVs_from_input(input_highlighted, IV1)
+                    object_of_study.get_ivs_from_input(input_highlighted, IV1)
                     .detach()
                     .numpy()
                     .flatten()
                 )
             else:
                 x_data_highlighted = (
-                    object_of_study.get_IVs_from_input(input_highlighted, IV1)
+                    object_of_study.get_ivs_from_input(input_highlighted, IV1)
                     .detach()
                     .numpy()
                     .flatten(),
-                    object_of_study.get_IVs_from_input(input_highlighted, IV2)
+                    object_of_study.get_ivs_from_input(input_highlighted, IV2)
                     .detach()
                     .numpy()
                     .flatten(),
