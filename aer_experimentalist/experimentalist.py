@@ -433,7 +433,7 @@ class Experimentalist(ABC):
                     object_of_study.get_ivs_from_input(input, IV1),
                     object_of_study.get_ivs_from_input(input, IV2),
                 )
-            y_data = object_of_study.get_DV_from_output(output, DV)
+            y_data = object_of_study.get_dv_from_output(output, DV)
 
             # get highlighted data points from last experiment
             last_experiment_id = object_of_study.get_last_experiment_id()
@@ -449,7 +449,7 @@ class Experimentalist(ABC):
                     object_of_study.get_ivs_from_input(input_highlighted, IV1),
                     object_of_study.get_ivs_from_input(input_highlighted, IV2),
                 )
-            y_data_highlighted = object_of_study.get_DV_from_output(
+            y_data_highlighted = object_of_study.get_dv_from_output(
                 output_highlighted, DV
             )
 

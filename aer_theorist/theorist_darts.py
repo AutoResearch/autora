@@ -1023,7 +1023,7 @@ class Theorist_DARTS(Theorist, ABC):
                     .flatten(),
                 )
             y_data = (
-                object_of_study.get_DV_from_output(output, DV)
+                object_of_study.get_dv_from_output(output, DV)
                 .detach()
                 .numpy()
                 .flatten()
@@ -1053,7 +1053,7 @@ class Theorist_DARTS(Theorist, ABC):
                     .flatten(),
                 )
             y_data_highlighted = (
-                object_of_study.get_DV_from_output(output_highlighted, DV)
+                object_of_study.get_dv_from_output(output_highlighted, DV)
                 .detach()
                 .numpy()
                 .flatten()

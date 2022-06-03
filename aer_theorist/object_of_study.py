@@ -283,7 +283,7 @@ class Object_Of_Study(Dataset):
             columns.append(self.get_iv_idx(ivs))
         return input[:, columns]
 
-    def get_DV_from_output(self, output, dv):
+    def get_dv_from_output(self, output, dv):
         column = self.get_dv_idx(dv)
         return output[:, column]
 
