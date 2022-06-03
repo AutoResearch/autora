@@ -216,7 +216,7 @@ class Object_Of_Study(Dataset):
         dv_idx = self.get_DV_idx(dv)
 
         if iv2 is None:
-            iv1_idx = self.get_IV_idx(iv1)
+            iv1_idx = self.get_iv_idx(iv1)
             unique_iv_values = np.unique(input[:, iv1_idx])
             dv_values = np.empty(unique_iv_values.shape)
             for row, element in enumerate(unique_iv_values):
@@ -228,8 +228,8 @@ class Object_Of_Study(Dataset):
                 dv_values[row] = value_mean
             return unique_iv_values, dv_values
         else:
-            iv1_idx = self.get_IV_idx(iv1)
-            iv2_idx = self.get_IV_idx(iv2)
+            iv1_idx = self.get_iv_idx(iv1)
+            iv2_idx = self.get_iv_idx(iv2)
             unique_iv_rows = np.unique(input[:, [iv1_idx, iv2_idx]], axis=0)
             dv_values = np.empty((unique_iv_rows.shape[0]))
             iv1_values = np.empty((unique_iv_rows.shape[0]))
@@ -278,16 +278,16 @@ class Object_Of_Study(Dataset):
         if isinstance(ivs, list):
             for iv in ivs:
                 if iv is not None:
-                    columns.append(self.get_IV_idx(iv))
+                    columns.append(self.get_iv_idx(iv))
         else:
-            columns.append(self.get_IV_idx(ivs))
+            columns.append(self.get_iv_idx(ivs))
         return input[:, columns]
 
     def get_DV_from_output(self, output, dv):
         column = self.get_DV_idx(dv)
         return output[:, column]
 
-    def get_IV_idx(self, iv):
+    def get_iv_idx(self, iv):
         column = None
         for idx, var in enumerate(self.independent_variables):
             if var.get_name() == iv.get_name():
