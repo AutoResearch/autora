@@ -375,7 +375,7 @@ class IVCurrent(IVTF):
         self.stop()
 
 
-class IV_Voltage(IVTF):
+class IVVoltage(IVTF):
 
     _variable_label = "Source Voltage"
     _UID = "MST"
@@ -398,7 +398,7 @@ class IV_Voltage(IVTF):
 
         self._ipcon.connect(self._HOST, self._PORT)  # Connect to brickd
 
-        super(IV_Voltage, self).__init__(*args, **kwargs)
+        super(IVVoltage, self).__init__(*args, **kwargs)
 
     # Clean up measurement device.
     def __clean_up__(self):
@@ -638,7 +638,7 @@ IV_labels = {
     "time_IV": (IVTime, "Time", "", "time_IV", "s", 1, (0, 3600)),
     "trial": (IVTrial, "Trial", "", "trial", "trials", 0, (0, 10000000)),
     "source_voltage": (
-        IV_Voltage,
+        IVVoltage,
         "Source Voltage",
         "MST",
         "source_voltage",
