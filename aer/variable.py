@@ -30,6 +30,7 @@ class Variable:
         variable_label="",
         rescale=1,
         is_covariate=False,
+        participant=None,
     ):
 
         self._name = name
@@ -43,6 +44,7 @@ class Variable:
             self._variable_label = variable_label
         self._rescale = rescale
         self._is_covariate = is_covariate
+        self._participant = participant
 
     def __get_value_range__(self):
         """Get range of variable.
@@ -179,17 +181,12 @@ class IV_In_Silico(IV):
     _priority = 0
     _value_range = (0, 1)
     _value = 0
-    _participant = None
 
     # Initializes Industrial Analog Out 2.0 device.
     def __init__(self, *args, **kwargs):
 
         super(IV_In_Silico, self).__init__(*args, **kwargs)
 
-    def assign_participant(self, participant):
-        self._participant = participant
-
-    # Waits until specified time has passed relative to reference time
     def manipulate(self):
         self._participant.set_value(self._name, self.get_value())
 
@@ -202,15 +199,10 @@ class DV_In_Silico(DV):
     _priority = 0
     _value_range = (0, 1)
     _value = 0
-    _participant = None
 
     # Initializes Industrial Analog Out 2.0 device.
     def __init__(self, *args, **kwargs):
-
         super(DV_In_Silico, self).__init__(*args, **kwargs)
-
-    def assign_participant(self, participant):
-        self._participant = participant
 
     # Waits until specified time has passed relative to reference time
     def measure(self):
