@@ -19,7 +19,7 @@ class Object_Of_Study(Dataset):
         name,
         independent_variables: Sequence[Variable],
         dependent_variables: Sequence[Variable],
-        covariates=Sequence[Variable],
+        covariates: Sequence[Variable] = None,
         input_dimensions=None,
         output_dimensions=None,
         output_type=None,
@@ -41,9 +41,8 @@ class Object_Of_Study(Dataset):
         if len(dependent_variables) == 0:
             Exception("No dependent variables specified.")
 
-        self.independent_variables = independent_variables
-        self.dependent_variables = dependent_variables
-        self.covariates = covariates
+        if covariates is not None:
+            self.covariates.extend(covariates)
 
         # set number of output dimensions
         if output_dimensions is None:
