@@ -290,7 +290,7 @@ class IVTrial(IVTF):
         pass
 
 
-class V_Time:
+class VTime:
 
     _t0 = 0
 
@@ -302,7 +302,7 @@ class V_Time:
         self._t0 = time.time()
 
 
-class IV_Time(IVTF, V_Time):
+class IV_Time(IVTF, VTime):
 
     _name = "time_IV"
     _UID = ""
@@ -443,7 +443,7 @@ class DVTF(TinkerforgeVariable, DV):
         self._is_covariate = is_covariate
 
 
-class DV_Time(DVTF, V_Time):
+class DV_Time(DVTF, VTime):
 
     _name = "time_DV"
     _UID = ""
