@@ -1,13 +1,13 @@
 import copy
 import random
-from typing import Any, Dict, List
+from typing import Any, Dict, Sequence
 
 import numpy as np
 import torch
 from torch.utils.data import Dataset
 
 import aer_config as AER_cfg
-from aer.variable import Variable
+from aer.variable import DV, IV, Covariate
 
 
 class Object_Of_Study(Dataset):
@@ -17,9 +17,9 @@ class Object_Of_Study(Dataset):
     def __init__(
         self,
         name,
-        independent_variables: List[Variable],
-        dependent_variables: List[Variable],
-        covariates=list(),
+        independent_variables: Sequence[IV],
+        dependent_variables: Sequence[DV],
+        covariates=Sequence[Covariate],
         input_dimensions=None,
         output_dimensions=None,
         output_type=None,
@@ -27,9 +27,9 @@ class Object_Of_Study(Dataset):
 
         self.name = name
 
-        self.independent_variables = list()
-        self.dependent_variables = list()
-        self.covariates = list()
+        self.independent_variables: Sequence[IV] = list()
+        self.dependent_variables: Sequence[DV] = list()
+        self.covariates: Sequence[Covariate] = list()
         self.data: Dict[Any, Any] = dict()
         self._normalize_input = False
         self._normalize_output = False
@@ -63,18 +63,18 @@ class Object_Of_Study(Dataset):
         self.output_type = self.dependent_variables[0].type
         for variable in dependent_variables:
             if variable.type != self.output_type:
-                Exception(
+                AttributeError(
                     "Dependent variable output types don't match. "
                     "Different output types are not supported yet."
                 )
 
         # set up data
-        for var in self.dependent_variables:
-            self.data[var.get_name()] = list()
-        for var in self.independent_variables:
-            self.data[var.get_name()] = list()
-        for var in self.covariates:
-            self.data[var.get_name()] = list()
+        for dv in self.dependent_variables:
+            self.data[dv.get_name()] = list()
+        for iv in self.independent_variables:
+            self.data[iv.get_name()] = list()
+        for cv in self.covariates:
+            self.data[cv.get_name()] = list()
         self.data[AER_cfg.experiment_label] = list()
 
     def __len__(self, experiment_id=None):
@@ -213,11 +213,11 @@ class Object_Of_Study(Dataset):
 
         return input
 
-    def average_DV_for_IVs(self, DV, IVs, input, output):
-        IV1 = IVs[0]
-        IV2 = IVs[1]
+    def average_DV_for_IVs(self, dv, ivs, input, output):
+        IV1 = ivs[0]
+        IV2 = ivs[1]
 
-        DV_idx = self.get_DV_idx(DV)
+        DV_idx = self.get_DV_idx(dv)
 
         if IV2 is None:
             IV1_idx = self.get_IV_idx(IV1)
@@ -251,24 +251,24 @@ class Object_Of_Study(Dataset):
             return unique_IV_values, DV_values
 
     def get_plot_list(self):
-        IV_list_1 = list()
-        IV_list_2 = list()
-        DV_list = list()
+        iv_list_1 = list()
+        iv_list_2 = list()
+        dv_list = list()
 
         # combine each IV with each IV with each DV
         independent_variables_1 = self.independent_variables + self.covariates
         independent_variables_2 = [None] + self.independent_variables + self.covariates
 
-        for IV1 in independent_variables_1:
-            for IV2 in independent_variables_2:
-                for DV in self.dependent_variables:
-                    if IV1 != IV2:
-                        IV_list_1.append(IV1)
-                        IV_list_2.append(IV2)
-                        DV_list.append(DV)
+        for iv1 in independent_variables_1:
+            for iv2 in independent_variables_2:
+                for dv in self.dependent_variables:
+                    if iv1 != iv2:
+                        iv_list_1.append(iv1)
+                        iv_list_2.append(iv2)
+                        dv_list.append(dv)
 
         # combine each IV
-        return (IV_list_1, IV_list_2, DV_list)
+        return (iv_list_1, iv_list_2, dv_list)
 
     def get_variable_data(self, variable):
         var_data = list()
@@ -277,36 +277,36 @@ class Object_Of_Study(Dataset):
         IV_data = torch.tensor(var_data).float()
         return IV_data
 
-    def get_IVs_from_input(self, input, IVs):
+    def get_IVs_from_input(self, input, ivs):
         columns = list()
-        if isinstance(IVs, list):
-            for IV in IVs:
-                if IV is not None:
-                    columns.append(self.get_IV_idx(IV))
+        if isinstance(ivs, list):
+            for iv in ivs:
+                if iv is not None:
+                    columns.append(self.get_IV_idx(iv))
         else:
-            columns.append(self.get_IV_idx(IVs))
+            columns.append(self.get_IV_idx(ivs))
         return input[:, columns]
 
-    def get_DV_from_output(self, output, DV):
-        column = self.get_DV_idx(DV)
+    def get_DV_from_output(self, output, dv):
+        column = self.get_DV_idx(dv)
         return output[:, column]
 
-    def get_IV_idx(self, IV):
+    def get_IV_idx(self, iv):
         column = None
         for idx, var in enumerate(self.independent_variables):
-            if var.get_name() == IV.get_name():
+            if var.get_name() == iv.get_name():
                 column = idx
                 break
         for idx, var in enumerate(self.covariates):
-            if var.get_name() == IV.get_name():
+            if var.get_name() == iv.get_name():
                 column = idx + len(self.independent_variables)
                 break
         return column
 
-    def get_DV_idx(self, DV):
+    def get_DV_idx(self, dv):
         column = None
         for idx, var in enumerate(self.dependent_variables):
-            if var.get_name() == DV.get_name():
+            if var.get_name() == dv.get_name():
                 column = idx
                 break
         return column
@@ -346,24 +346,24 @@ class Object_Of_Study(Dataset):
 
         return rescaled_sequence
 
-    def get_IV_rescale_from_name(self, IV_name):
+    def get_IV_rescale_from_name(self, iv_name):
 
         for var in self.independent_variables:
-            if var.get_name() == IV_name:
+            if var.get_name() == iv_name:
                 return var._rescale
 
         for var in self.covariates:
-            if var.get_name() == IV_name:
+            if var.get_name() == iv_name:
                 return var._rescale
 
-    def get_IV_limits_from_name(self, IV_name):
+    def get_IV_limits_from_name(self, iv_name):
 
         for var in self.independent_variables:
-            if var.get_name() == IV_name:
+            if var.get_name() == iv_name:
                 return self.get_variable_limits(var)
 
         for var in self.covariates:
-            if var.get_name() == IV_name:
+            if var.get_name() == iv_name:
                 return self.get_variable_limits(var)
 
         return None
@@ -374,9 +374,9 @@ class Object_Of_Study(Dataset):
         means = list()
         stds = list()
         for var in variables:
-            IV_data = self.data[var.get_name()][0]
-            m = np.mean(IV_data)
-            s = np.std(IV_data)
+            iv_data = self.data[var.get_name()][0]
+            m = np.mean(iv_data)
+            s = np.std(iv_data)
             means.append(m)
             stds.append(s)
 

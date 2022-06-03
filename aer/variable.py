@@ -1,7 +1,6 @@
 import time
 from abc import abstractmethod
 from enum import Enum
-from typing import List
 
 import numpy as np
 from tinkerforge.bricklet_industrial_analog_out_v2 import BrickletIndustrialAnalogOutV2
@@ -9,7 +8,6 @@ from tinkerforge.bricklet_industrial_dual_0_20ma_v2 import BrickletIndustrialDua
 from tinkerforge.bricklet_industrial_dual_analog_in_v2 import (
     BrickletIndustrialDualAnalogInV2,
 )
-from tinkerforge.bricklet_oled_128x64_v2 import BrickletOLED128x64V2
 from tinkerforge.ip_connection import IPConnection
 
 
@@ -159,7 +157,19 @@ class Variable:
         self._variable_label = variable_label
 
 
-class IV_In_Silico(Variable):
+class IV(Variable):
+    pass
+
+
+class DV(Variable):
+    pass
+
+
+class Covariate(Variable):
+    pass
+
+
+class IV_In_Silico(IV):
 
     _variable_label = "IV"
     _name = "independent variable"
@@ -186,7 +196,7 @@ class IV_In_Silico(Variable):
         self._is_covariate = is_covariate
 
 
-class DV_In_Silico(Variable):
+class DV_In_Silico(DV):
 
     _variable_label = "DV"
     _name = "dependent variable"
@@ -260,7 +270,7 @@ class Tinkerforge_Variable(Variable):
         pass
 
 
-class IVTF(Tinkerforge_Variable):
+class IVTF(Tinkerforge_Variable, IV):
     def __init__(self, *args, **kwargs):
         self._name = "IV"
         self._variable_label = "Independent Variable"
@@ -429,7 +439,7 @@ class IV_Voltage(IVTF):
         self.stop()
 
 
-class DVTF(Tinkerforge_Variable):
+class DVTF(Tinkerforge_Variable, DV):
     def __init__(self, *args, **kwargs):
         self._name = "DV"
         self._variable_label = "Dependent Variable"
@@ -751,5 +761,3 @@ IV_labels = {
     "x2_lca": (IV_In_Silico, "x2", None, "x2_lca", "net input", 0, (-1000, 1000)),
     "x3_lca": (IV_In_Silico, "x3", None, "x3_lca", "net input", 0, (-1000, 1000)),
 }
-
-
