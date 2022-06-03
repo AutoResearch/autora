@@ -9,7 +9,7 @@ import torch.nn as nn
 from torch.autograd import Variable
 
 import aer_theorist.darts.SimpleNet_dataset as SimpleNetDatasetFile
-from aer.variable import outputTypes
+from aer.variable import OutputTypes
 from aer_theorist.darts.SimpleNet_dataset import SimpleNetDataset
 
 # new
@@ -79,12 +79,12 @@ def get_object_of_study_file(studyObject):
 def get_loss_function(outputType):
 
     dataSets = {
-        outputTypes.REAL: nn.MSELoss(),
-        outputTypes.PROBABILITY: sigmid_mse,
-        outputTypes.PROBABILITY_SAMPLE: sigmid_mse,
-        outputTypes.PROBABILITY_DISTRIBUTION: cross_entropy,
-        outputTypes.CLASS: nn.CrossEntropyLoss(),
-        outputTypes.SIGMOID: sigmid_mse,
+        OutputTypes.REAL: nn.MSELoss(),
+        OutputTypes.PROBABILITY: sigmid_mse,
+        OutputTypes.PROBABILITY_SAMPLE: sigmid_mse,
+        OutputTypes.PROBABILITY_DISTRIBUTION: cross_entropy,
+        OutputTypes.CLASS: nn.CrossEntropyLoss(),
+        OutputTypes.SIGMOID: sigmid_mse,
     }
 
     return dataSets.get(outputType, nn.MSELoss)
@@ -93,12 +93,12 @@ def get_loss_function(outputType):
 def get_output_format(outputType):
 
     dataSets = {
-        outputTypes.REAL: nn.Identity(),
-        outputTypes.PROBABILITY: nn.Sigmoid(),
-        outputTypes.PROBABILITY_SAMPLE: nn.Sigmoid(),
-        outputTypes.PROBABILITY_DISTRIBUTION: nn.Softmax(dim=1),
-        outputTypes.CLASS: nn.Softmax(dim=1),
-        outputTypes.SIGMOID: nn.Sigmoid(),
+        OutputTypes.REAL: nn.Identity(),
+        OutputTypes.PROBABILITY: nn.Sigmoid(),
+        OutputTypes.PROBABILITY_SAMPLE: nn.Sigmoid(),
+        OutputTypes.PROBABILITY_DISTRIBUTION: nn.Softmax(dim=1),
+        OutputTypes.CLASS: nn.Softmax(dim=1),
+        OutputTypes.SIGMOID: nn.Sigmoid(),
     }
 
     return dataSets.get(outputType, nn.MSELoss)
@@ -107,12 +107,12 @@ def get_output_format(outputType):
 def get_output_str(outputType):
 
     dataSets = {
-        outputTypes.REAL: None,
-        outputTypes.PROBABILITY: "Sigmoid",
-        outputTypes.PROBABILITY_SAMPLE: "Sigmoid",
-        outputTypes.PROBABILITY_DISTRIBUTION: "Softmax",
-        outputTypes.CLASS: "Softmax",
-        outputTypes.SIGMOID: "Sigmoid",
+        OutputTypes.REAL: None,
+        OutputTypes.PROBABILITY: "Sigmoid",
+        OutputTypes.PROBABILITY_SAMPLE: "Sigmoid",
+        OutputTypes.PROBABILITY_DISTRIBUTION: "Softmax",
+        OutputTypes.CLASS: "Softmax",
+        OutputTypes.SIGMOID: "Sigmoid",
     }
 
     return dataSets.get(outputType, nn.MSELoss)
@@ -136,7 +136,7 @@ def compute_BIC(output_type, model, input, target):
 
     k, _, _ = model.countParameters()  # for most likely architecture
 
-    if output_type == outputTypes.CLASS:
+    if output_type == OutputTypes.CLASS:
         target_flattened = torch.flatten(target.long())
         llik = 0
         for idx in range(len(target_flattened)):
@@ -147,7 +147,7 @@ def compute_BIC(output_type, model, input, target):
         BIC = np.log(n) * k - 2 * llik
         BIC = BIC
 
-    elif output_type == outputTypes.PROBABILITY_SAMPLE:
+    elif output_type == OutputTypes.PROBABILITY_SAMPLE:
         llik = 0
         for idx in range(len(target)):
 
@@ -172,7 +172,7 @@ def compute_BIC(output_type, model, input, target):
     else:
         raise Exception(
             "BIC computation not implemented for output type "
-            + str(outputTypes.PROBABILITY)
+            + str(OutputTypes.PROBABILITY)
             + "."
         )
 

@@ -11,7 +11,7 @@ from tinkerforge.bricklet_industrial_dual_analog_in_v2 import (
 from tinkerforge.ip_connection import IPConnection
 
 
-class outputTypes(Enum):
+class OutputTypes(Enum):
     REAL = 1
     SIGMOID = 2
     PROBABILITY = 3  # single probability
@@ -26,7 +26,7 @@ class Variable:
         name="",
         value_range=(0, 1),
         units="",
-        type=outputTypes.REAL,
+        type=OutputTypes.REAL,
         variable_label="",
         rescale=1,
         is_covariate=False,
