@@ -116,7 +116,7 @@ class Experimentalist_Popper(Experimentalist, ABC):
         IV_limit_list = list()
         for idx in range(len(input_sample)):
             IV_name = object_of_study.get_iv_name(idx)
-            IV_limit_list.append(object_of_study.get_IV_limits_from_name(IV_name))
+            IV_limit_list.append(object_of_study.get_iv_limits_from_name(IV_name))
 
         # invert the popper network to determine optimal experiment conditions
         for optimization_epoch in range(self.num_optimization_epochs):

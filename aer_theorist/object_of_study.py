@@ -352,7 +352,7 @@ class Object_Of_Study(Dataset):
             if var.get_name() == iv_name:
                 return var._rescale
 
-    def get_IV_limits_from_name(self, iv_name):
+    def get_iv_limits_from_name(self, iv_name):
 
         for var in self.independent_variables:
             if var.get_name() == iv_name:
