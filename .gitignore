@@ -1,3 +1,6 @@
+# AER-specific files
+studies/**/modeling
+
 # IDE-directories
 .idea/
 .vscode/
