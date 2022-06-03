@@ -173,7 +173,7 @@ class DV(Variable):
     pass
 
 
-class IV_In_Silico(IV):
+class IVInSilico(IV):
 
     _variable_label = "IV"
     _name = "independent variable"
@@ -185,7 +185,7 @@ class IV_In_Silico(IV):
     # Initializes Industrial Analog Out 2.0 device.
     def __init__(self, *args, **kwargs):
 
-        super(IV_In_Silico, self).__init__(*args, **kwargs)
+        super(IVInSilico, self).__init__(*args, **kwargs)
 
     def manipulate(self):
         self._participant.set_value(self._name, self.get_value())
@@ -656,7 +656,7 @@ IV_labels = {
         (0, 20000),
     ),
     "color_red": (
-        IV_In_Silico,
+        IVInSilico,
         "Color Unit Red",
         None,
         "color_red",
@@ -665,7 +665,7 @@ IV_labels = {
         (0, 1),
     ),
     "color_green": (
-        IV_In_Silico,
+        IVInSilico,
         "Color Unit Green",
         None,
         "color_green",
@@ -674,7 +674,7 @@ IV_labels = {
         (0, 1),
     ),
     "word_red": (
-        IV_In_Silico,
+        IVInSilico,
         "Word Unit Red",
         None,
         "word_red",
@@ -683,7 +683,7 @@ IV_labels = {
         (0, 1),
     ),
     "word_green": (
-        IV_In_Silico,
+        IVInSilico,
         "Word Unit Green",
         None,
         "word_green",
@@ -692,7 +692,7 @@ IV_labels = {
         (0, 1),
     ),
     "task_color": (
-        IV_In_Silico,
+        IVInSilico,
         "Task Unit Color Naming",
         None,
         "task_color",
@@ -701,7 +701,7 @@ IV_labels = {
         (0, 1),
     ),
     "task_word": (
-        IV_In_Silico,
+        IVInSilico,
         "Task Unit Word Reading",
         None,
         "task_word",
@@ -709,10 +709,10 @@ IV_labels = {
         0,
         (0, 1),
     ),
-    "S1": (IV_In_Silico, "Stimulus 1 Intensity", None, "S1", "activation", 0, (0, 5)),
-    "S2": (IV_In_Silico, "Stimulus 2 Intensity", None, "S2", "activation", 0, (0, 5)),
+    "S1": (IVInSilico, "Stimulus 1 Intensity", None, "S1", "activation", 0, (0, 5)),
+    "S2": (IVInSilico, "Stimulus 2 Intensity", None, "S2", "activation", 0, (0, 5)),
     "learning_trial": (
-        IV_In_Silico,
+        IVInSilico,
         "Trial",
         None,
         "learning_trial",
@@ -721,7 +721,7 @@ IV_labels = {
         (0, 1000),
     ),
     "P_initial": (
-        IV_In_Silico,
+        IVInSilico,
         "Initial Performance",
         None,
         "P_initial",
@@ -730,7 +730,7 @@ IV_labels = {
         (0, 1),
     ),
     "P_asymptotic": (
-        IV_In_Silico,
+        IVInSilico,
         "Best Performance",
         None,
         "P_asymptotic",
@@ -738,7 +738,7 @@ IV_labels = {
         0,
         (0, 1),
     ),
-    "x1_lca": (IV_In_Silico, "x1", None, "x1_lca", "net input", 0, (-1000, 1000)),
-    "x2_lca": (IV_In_Silico, "x2", None, "x2_lca", "net input", 0, (-1000, 1000)),
-    "x3_lca": (IV_In_Silico, "x3", None, "x3_lca", "net input", 0, (-1000, 1000)),
+    "x1_lca": (IVInSilico, "x1", None, "x1_lca", "net input", 0, (-1000, 1000)),
+    "x2_lca": (IVInSilico, "x2", None, "x2_lca", "net input", 0, (-1000, 1000)),
+    "x3_lca": (IVInSilico, "x3", None, "x3_lca", "net input", 0, (-1000, 1000)),
 }
