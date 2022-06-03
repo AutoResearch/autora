@@ -29,6 +29,7 @@ class Variable:
         type=outputTypes.REAL,
         variable_label="",
         rescale=1,
+        is_covariate=False,
     ):
 
         self._name = name
@@ -41,6 +42,7 @@ class Variable:
         else:
             self._variable_label = variable_label
         self._rescale = rescale
+        self._is_covariate = is_covariate
 
     def __get_value_range__(self):
         """Get range of variable.
@@ -156,16 +158,16 @@ class Variable:
     def set_variable_label(self, variable_label):
         self._variable_label = variable_label
 
+    def set_covariate(self, is_covariate):
+        """Set whether this dependent variable is treated as covariate."""
+        self._is_covariate = is_covariate
+
 
 class IV(Variable):
     pass
 
 
 class DV(Variable):
-    pass
-
-
-class Covariate(Variable):
     pass
 
 
@@ -191,10 +193,6 @@ class IV_In_Silico(IV):
     def manipulate(self):
         self._participant.set_value(self._name, self.get_value())
 
-    # Set whether this dependent variable is treated as covariate.
-    def set_covariate(self, is_covariate):
-        self._is_covariate = is_covariate
-
 
 class DV_In_Silico(DV):
 
@@ -218,14 +216,6 @@ class DV_In_Silico(DV):
     def measure(self):
         measurement = self._participant.get_value(self._name)
         self.set_value(measurement)
-
-    # Get whether this dependent variable is treated as covariate.
-    def __is_covariate__(self):
-        return self._is_covariate
-
-    # Set whether this dependent variable is treated as covariate.
-    def __set_covariate__(self, is_covariate):
-        self._is_covariate = is_covariate
 
 
 class Tinkerforge_Variable(Variable):
