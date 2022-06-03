@@ -330,7 +330,7 @@ class IVTime(IVTF, VTime):
         pass
 
 
-class IV_Current(IVTF):
+class IVCurrent(IVTF):
 
     _name = "source_current"
     _UID = "MST"
@@ -353,7 +353,7 @@ class IV_Current(IVTF):
 
         self._ipcon.connect(self._HOST, self._PORT)  # Connect to brickd
 
-        super(IV_Current, self).__init__(*args, **kwargs)
+        super(IVCurrent, self).__init__(*args, **kwargs)
 
     # Clean up measurement device.
     def __clean_up__(self):
@@ -647,7 +647,7 @@ IV_labels = {
         (0, 5000),
     ),
     "source_current": (
-        IV_Current,
+        IVCurrent,
         "Source Current",
         "MST",
         "source_current",
