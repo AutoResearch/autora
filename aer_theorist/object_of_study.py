@@ -307,7 +307,7 @@ class Object_Of_Study(Dataset):
                 break
         return column
 
-    def get_IV_name(self, idx):
+    def get_iv_name(self, idx):
         if idx < len(self.independent_variables):
             name = self.independent_variables[idx].get_name()
         else:
