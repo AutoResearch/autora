@@ -511,7 +511,7 @@ class DVCurrent(DVTF):
         self.set_value(current / 1000000.0)
 
 
-class DV_Voltage(DVTF):
+class DVVoltage(DVTF):
 
     _name = "voltage0"
     _UID = "MjY"
@@ -529,7 +529,7 @@ class DV_Voltage(DVTF):
     # Initializes Industrial Analog Out 2.0 device.
     def __init__(self, *args, **kwargs):
 
-        super(DV_Voltage, self).__init__(*args, **kwargs)
+        super(DVVoltage, self).__init__(*args, **kwargs)
 
         self._ipcon = IPConnection()  # Create IP connection
         self._idai = BrickletIndustrialDualAnalogInV2(
@@ -555,8 +555,8 @@ class DV_Voltage(DVTF):
 
 DV_labels = {
     "time_DV": (DVTime, "Time", "", "time_DV", "s", 0, (0, 3600)),
-    "voltage0": (DV_Voltage, "Voltage 0", "MjY", "voltage0", "mV", 1, (-3500, 3500)),
-    "voltage1": (DV_Voltage, "Voltage 1", "MjY", "voltage1", "mV", 1, (-3500, 3500)),
+    "voltage0": (DVVoltage, "Voltage 0", "MjY", "voltage0", "mV", 1, (-3500, 3500)),
+    "voltage1": (DVVoltage, "Voltage 1", "MjY", "voltage1", "mV", 1, (-3500, 3500)),
     "current0": (DVCurrent, "Current 0", "Hfg", "current0", "mA", 2, (0, 20)),
     "current1": (DVCurrent, "Current 1", "Hfg", "current1", "mA", 2, (0, 20)),
     "verbal_red": (
