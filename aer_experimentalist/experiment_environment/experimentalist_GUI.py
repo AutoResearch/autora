@@ -2,7 +2,7 @@ import os
 from tkinter import END, SINGLE, E, Frame, Grid, Listbox, N, S, W, ttk
 
 import aer_experimentalist.experiment_environment.experiment_config as config
-from aer.variable import OLED_Output
+from aer_experimentalist.experiment_environment.oled_output import OLED_Output
 from aer_experimentalist.experiment_environment.experiment import Experiment
 from aer_experimentalist.experiment_environment.experiment_plot_GUI import (
     Experiment_Plot_GUI,
