@@ -6,6 +6,15 @@ Ben Andrew, Hannah Even, Ioana Marinescu, Sebastian Musslick, Sida Li
 
 # Getting started (development)
 
+## Running the tests
+You should run the tests before you commit code to the repository, to ensure that you've not broken anything. 
+
+The unit tests can be run as follows (starting in the root directory of the repository):
+
+```zsh
+$ python -m unittest
+```
+
 ## Pre-Commit Hooks
 
 We use [pre-commit](https://pre-commit.com) to manage pre-commit hooks. 
