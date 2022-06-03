@@ -7,7 +7,7 @@ import torch
 from torch.utils.data import Dataset
 
 import aer_config as AER_cfg
-from aer.variable import DV, IV, Covariate
+from aer.variable import Variable
 
 
 class Object_Of_Study(Dataset):
@@ -17,9 +17,9 @@ class Object_Of_Study(Dataset):
     def __init__(
         self,
         name,
-        independent_variables: Sequence[IV],
-        dependent_variables: Sequence[DV],
-        covariates=Sequence[Covariate],
+        independent_variables: Sequence[Variable],
+        dependent_variables: Sequence[Variable],
+        covariates=Sequence[Variable],
         input_dimensions=None,
         output_dimensions=None,
         output_type=None,
@@ -27,9 +27,9 @@ class Object_Of_Study(Dataset):
 
         self.name = name
 
-        self.independent_variables: Sequence[IV] = list()
-        self.dependent_variables: Sequence[DV] = list()
-        self.covariates: Sequence[Covariate] = list()
+        self.independent_variables: Sequence[Variable] = list()
+        self.dependent_variables: Sequence[Variable] = list()
+        self.covariates: Sequence[Variable] = list()
         self.data: Dict[Any, Any] = dict()
         self._normalize_input = False
         self._normalize_output = False
