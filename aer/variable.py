@@ -443,7 +443,7 @@ class DVTF(TinkerforgeVariable, DV):
         self._is_covariate = is_covariate
 
 
-class DV_Time(DVTF, VTime):
+class DVTime(DVTF, VTime):
 
     _name = "time_DV"
     _UID = ""
@@ -459,7 +459,7 @@ class DV_Time(DVTF, VTime):
     # The reference time usually denotes the beginning of an experiment trial.
     def __init__(self, *args, **kwargs):
         print(self._variable_label)
-        super(DV_Time, self).__init__(*args, **kwargs)
+        super(DVTime, self).__init__(*args, **kwargs)
         print(self._variable_label)
 
     # Measure number of seconds relative to reference time
@@ -554,7 +554,7 @@ class DV_Voltage(DVTF):
 
 
 DV_labels = {
-    "time_DV": (DV_Time, "Time", "", "time_DV", "s", 0, (0, 3600)),
+    "time_DV": (DVTime, "Time", "", "time_DV", "s", 0, (0, 3600)),
     "voltage0": (DV_Voltage, "Voltage 0", "MjY", "voltage0", "mV", 1, (-3500, 3500)),
     "voltage1": (DV_Voltage, "Voltage 1", "MjY", "voltage1", "mV", 1, (-3500, 3500)),
     "current0": (DV_Current, "Current 0", "Hfg", "current0", "mA", 2, (0, 20)),

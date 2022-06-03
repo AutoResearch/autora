@@ -4,7 +4,7 @@ import pandas
 
 import aer_experimentalist.experiment_environment.experiment_config as config
 import aer_experimentalist.experimentalist_config as cfg
-from aer.variable import DV_labels, DV_Time, IV_labels, IVTime, IVTrial
+from aer.variable import DV_labels, DVTime, IV_labels, IVTime, IVTrial
 
 
 class Experiment:
@@ -246,7 +246,7 @@ class Experiment:
 
         # initialize dependent variable time
         for idx, dependent_variable in enumerate(self.DVs):
-            if isinstance(dependent_variable, DV_Time):
+            if isinstance(dependent_variable, DVTime):
                 self._DV_time_idx = idx
 
         # execute inter-trial interval
