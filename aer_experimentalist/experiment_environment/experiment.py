@@ -4,7 +4,7 @@ import pandas
 
 import aer_experimentalist.experiment_environment.experiment_config as config
 import aer_experimentalist.experimentalist_config as cfg
-from aer.variable import DV_labels, DV_Time, IV_labels, IV_Time, IVTrial
+from aer.variable import DV_labels, DV_Time, IV_labels, IVTime, IVTrial
 
 
 class Experiment:
@@ -241,7 +241,7 @@ class Experiment:
             if isinstance(independent_variable, IVTrial):
                 self._IV_trial_idx = idx
 
-            if isinstance(independent_variable, IV_Time):
+            if isinstance(independent_variable, IVTime):
                 self._IV_time_idx = idx
 
         # initialize dependent variable time

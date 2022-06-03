@@ -302,7 +302,7 @@ class VTime:
         self._t0 = time.time()
 
 
-class IV_Time(IVTF, VTime):
+class IVTime(IVTF, VTime):
 
     _name = "time_IV"
     _UID = ""
@@ -315,7 +315,7 @@ class IV_Time(IVTF, VTime):
     # Initializes reference time.
     # The reference time usually denotes the beginning of an experiment trial.
     def __init__(self, *args, **kwargs):
-        super(IV_Time, self).__init__(*args, **kwargs)
+        super(IVTime, self).__init__(*args, **kwargs)
 
     # Waits until specified time has passed relative to reference time
     def manipulate(self):
@@ -635,7 +635,7 @@ DV_labels = {
 
 
 IV_labels = {
-    "time_IV": (IV_Time, "Time", "", "time_IV", "s", 1, (0, 3600)),
+    "time_IV": (IVTime, "Time", "", "time_IV", "s", 1, (0, 3600)),
     "trial": (IVTrial, "Trial", "", "trial", "trials", 0, (0, 10000000)),
     "source_voltage": (
         IV_Voltage,
