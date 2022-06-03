@@ -269,7 +269,7 @@ class IVTF(TinkerforgeVariable, IV):
         pass
 
 
-class IV_Trial(IVTF):
+class IVTrial(IVTF):
 
     _name = "trial"
     _UID = ""
@@ -280,7 +280,7 @@ class IV_Trial(IVTF):
     _value = 0
 
     def __init__(self, *args, **kwargs):
-        super(IV_Trial, self).__init__(*args, **kwargs)
+        super(IVTrial, self).__init__(*args, **kwargs)
 
     # Waits until specified time has passed relative to reference time
     def manipulate(self):
@@ -636,7 +636,7 @@ DV_labels = {
 
 IV_labels = {
     "time_IV": (IV_Time, "Time", "", "time_IV", "s", 1, (0, 3600)),
-    "trial": (IV_Trial, "Trial", "", "trial", "trials", 0, (0, 10000000)),
+    "trial": (IVTrial, "Trial", "", "trial", "trials", 0, (0, 10000000)),
     "source_voltage": (
         IV_Voltage,
         "Source Voltage",

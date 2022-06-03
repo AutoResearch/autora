@@ -4,7 +4,7 @@ import pandas
 
 import aer_experimentalist.experiment_environment.experiment_config as config
 import aer_experimentalist.experimentalist_config as cfg
-from aer.variable import DV_labels, DV_Time, IV_labels, IV_Time, IV_Trial
+from aer.variable import DV_labels, DV_Time, IV_labels, IV_Time, IVTrial
 
 
 class Experiment:
@@ -238,7 +238,7 @@ class Experiment:
 
         # determine indices for independent variables trial and time
         for idx, independent_variable in enumerate(self.IVs):
-            if isinstance(independent_variable, IV_Trial):
+            if isinstance(independent_variable, IVTrial):
                 self._IV_trial_idx = idx
 
             if isinstance(independent_variable, IV_Time):
