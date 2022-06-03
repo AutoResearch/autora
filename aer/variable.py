@@ -204,7 +204,6 @@ class DV_In_Silico(DV):
     def __init__(self, *args, **kwargs):
         super(DV_In_Silico, self).__init__(*args, **kwargs)
 
-    # Waits until specified time has passed relative to reference time
     def measure(self):
         measurement = self._participant.get_value(self._name)
         self.set_value(measurement)
