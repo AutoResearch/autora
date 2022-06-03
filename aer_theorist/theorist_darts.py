@@ -994,11 +994,11 @@ class Theorist_DARTS(Theorist, ABC):
                 .numpy()
             )
             if IV2 is None:  # prepare line plot
-                x_prediction, y_prediction = object_of_study.average_DV_for_IVs(
+                x_prediction, y_prediction = object_of_study.average_dv_for_ivs(
                     DV, IVs, counterbalanced_input.detach().numpy(), y_prediction
                 )
             else:
-                x_prediction, y_prediction = object_of_study.average_DV_for_IVs(
+                x_prediction, y_prediction = object_of_study.average_dv_for_ivs(
                     DV, IVs, counterbalanced_input.detach().numpy(), y_prediction
                 )
 

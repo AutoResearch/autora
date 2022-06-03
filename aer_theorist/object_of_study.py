@@ -213,42 +213,42 @@ class Object_Of_Study(Dataset):
 
         return input
 
-    def average_DV_for_IVs(self, dv, ivs, input, output):
-        IV1 = ivs[0]
-        IV2 = ivs[1]
+    def average_dv_for_ivs(self, dv, ivs, input, output):
+        iv1 = ivs[0]
+        iv2 = ivs[1]
 
-        DV_idx = self.get_DV_idx(dv)
+        dv_idx = self.get_DV_idx(dv)
 
-        if IV2 is None:
-            IV1_idx = self.get_IV_idx(IV1)
-            unique_IV_values = np.unique(input[:, IV1_idx])
-            DV_values = np.empty(unique_IV_values.shape)
-            for row, element in enumerate(unique_IV_values):
+        if iv2 is None:
+            iv1_idx = self.get_IV_idx(iv1)
+            unique_iv_values = np.unique(input[:, iv1_idx])
+            dv_values = np.empty(unique_iv_values.shape)
+            for row, element in enumerate(unique_iv_values):
                 value_log = list()
                 for idx in range(output.shape[0]):
-                    if element == input[idx, IV1_idx]:
-                        value_log.append(output[idx, DV_idx])
+                    if element == input[idx, iv1_idx]:
+                        value_log.append(output[idx, dv_idx])
                 value_mean = np.mean(value_log)
-                DV_values[row] = value_mean
-            return unique_IV_values, DV_values
+                dv_values[row] = value_mean
+            return unique_iv_values, dv_values
         else:
-            IV1_idx = self.get_IV_idx(IV1)
-            IV2_idx = self.get_IV_idx(IV2)
-            unique_IV_rows = np.unique(input[:, [IV1_idx, IV2_idx]], axis=0)
-            DV_values = np.empty((unique_IV_rows.shape[0]))
-            IV1_values = np.empty((unique_IV_rows.shape[0]))
-            IV2_values = np.empty((unique_IV_rows.shape[0]))
-            for row, combination in enumerate(unique_IV_rows):
+            iv1_idx = self.get_IV_idx(iv1)
+            iv2_idx = self.get_IV_idx(iv2)
+            unique_iv_rows = np.unique(input[:, [iv1_idx, iv2_idx]], axis=0)
+            dv_values = np.empty((unique_iv_rows.shape[0]))
+            iv1_values = np.empty((unique_iv_rows.shape[0]))
+            iv2_values = np.empty((unique_iv_rows.shape[0]))
+            for row, combination in enumerate(unique_iv_rows):
                 value_log = list()
                 for idx in range(output.shape[0]):
-                    if (combination == input[idx, [IV1_idx, IV2_idx]]).all():
-                        value_log.append(output[idx, DV_idx])
+                    if (combination == input[idx, [iv1_idx, iv2_idx]]).all():
+                        value_log.append(output[idx, dv_idx])
                 value_mean = np.mean(value_log)
-                DV_values[row] = value_mean
-                IV1_values[row] = combination[0]
-                IV2_values[row] = combination[1]
-            unique_IV_values = (IV1_values, IV2_values)
-            return unique_IV_values, DV_values
+                dv_values[row] = value_mean
+                iv1_values[row] = combination[0]
+                iv2_values[row] = combination[1]
+            unique_iv_values = (iv1_values, iv2_values)
+            return unique_iv_values, dv_values
 
     def get_plot_list(self):
         iv_list_1 = list()
