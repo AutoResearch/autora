@@ -251,7 +251,7 @@ class Object_Of_Study(Dataset):
         iv_list_2 = list()
         dv_list = list()
 
-        # combine each IV with each IV with each DV
+        # combine each IV with each DV
         independent_variables_1 = self.independent_variables + self.covariates
         independent_variables_2 = [None] + self.independent_variables + self.covariates
 
