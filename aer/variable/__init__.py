@@ -3,7 +3,8 @@ from enum import Enum
 import numpy as np
 
 
-class OutputTypes(str, Enum):
+class ValueType(str, Enum):
+    """  Specifies supported value types supported by Variables. """
     REAL = 'real'
     SIGMOID = 'sigmoid'
     PROBABILITY = 'probability'  # single probability
@@ -13,13 +14,13 @@ class OutputTypes(str, Enum):
 
 
 class Variable:
-
+    """ Describes an experimental variable: name, domain (type, range, units) and value of a variable. """
     def __init__(
             self,
             name="",
             value_range=(0, 1),
             units="",
-            type=OutputTypes.REAL,
+            type=ValueType.REAL,
             variable_label="",
             rescale=1,
             is_covariate=False,

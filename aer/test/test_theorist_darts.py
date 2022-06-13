@@ -2,7 +2,7 @@ import unittest
 
 from aer.variable import DVInSilico as DV
 from aer.variable import IVInSilico as IV
-from aer.variable import OutputTypes as output_type
+from aer.variable import ValueType as output_type
 from aer_experimentalist.experiment_design_synthetic_weber import (
     Experiment_Design_Synthetic_Weber,
 )

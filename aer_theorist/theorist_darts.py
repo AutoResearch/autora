@@ -15,7 +15,7 @@ import aer_config as aer_config
 import aer_theorist.darts.darts_config as darts_cfg
 import aer_theorist.darts.utils as utils
 import aer_theorist.darts.visualize as viz
-from aer.variable import OutputTypes as output_types
+from aer.variable import ValueType as output_types
 from aer_theorist.darts.architect import Architect
 from aer_theorist.darts.genotypes import PRIMITIVES
 from aer_theorist.darts.model_search import DARTS_Type, Network
