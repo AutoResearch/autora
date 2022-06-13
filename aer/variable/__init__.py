@@ -3,7 +3,7 @@ from enum import Enum
 import numpy as np
 
 
-class OutputTypes(Enum):
+class OutputTypes(str, Enum):
     REAL = 'real'
     SIGMOID = 'sigmoid'
     PROBABILITY = 'probability'  # single probability
