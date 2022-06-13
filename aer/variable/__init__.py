@@ -66,18 +66,9 @@ class Variable:
         self._value = self.__cap_value__(value)
 
     def get_value_from_dict(self, dictionary, position):
-        """ Reads and sets value of independent variable from a dictionary with
-        variable_label being the key """
+        """ Reads value of independent variable from a dictionary. """
 
-        value_list = dictionary.get(self.get_name())  # get_variable_label()
-
-        if value_list is None:
-            print(dictionary.keys())
-            raise Exception(
-                f"Could not find value with name '"
-                f"{self.get_name()}"
-                f" in dictionary."
-            )
+        value_list = dictionary[self.get_name()]
 
         if position > len(value_list):
             raise Exception(
@@ -91,15 +82,8 @@ class Variable:
         return value_list[position] * self._rescale
 
     def get_value_list_from_dict(self, dictionary):
-        value_list = dictionary.get(self.get_name())
-
-        if value_list is None:
-            print(dictionary.keys())
-            raise Exception(
-                f"Could not find value with name '"
-                f"{self.get_name()}"
-                f"' in dictionary."
-            )
+        """ Gets the rescaled values of independent variables from a dictionary. """
+        value_list = dictionary[self.get_name()]
 
         rescaled_list = [element * self._rescale for element in value_list]
 
@@ -111,14 +95,7 @@ class Variable:
         with variable_label being the key
         """
 
-        value_list = dictionary.get(self.get_name())
-
-        if value_list is None:
-            raise Exception(
-                f"Could not find value with name '"
-                f"{self.get_name()}"
-                f"' in dictionary."
-            )
+        value_list = dictionary[self.get_name()]
 
         if position > len(value_list):
             raise Exception(
