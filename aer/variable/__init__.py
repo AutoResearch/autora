@@ -4,12 +4,12 @@ import numpy as np
 
 
 class OutputTypes(Enum):
-    REAL = 1
-    SIGMOID = 2
-    PROBABILITY = 3  # single probability
-    PROBABILITY_SAMPLE = 4  # sample from single probability
-    PROBABILITY_DISTRIBUTION = 5  # probability distribution over classes
-    CLASS = 6  # sample from probability distribution over classes
+    REAL = 'real'
+    SIGMOID = 'sigmoid'
+    PROBABILITY = 'probability'  # single probability
+    PROBABILITY_SAMPLE = 'probability_sample'  # sample from single probability
+    PROBABILITY_DISTRIBUTION = 'probability_distribution'  # probability distribution over classes
+    CLASS = 'class'  # sample from probability distribution over classes
 
 
 class Variable:
