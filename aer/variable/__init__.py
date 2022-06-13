@@ -157,15 +157,7 @@ class Variable:
         self._is_covariate = is_covariate
 
 
-class IV(Variable):
-    pass
-
-
-class DV(Variable):
-    pass
-
-
-class IVInSilico(IV):
+class IVInSilico(Variable):
     _variable_label = "IV"
     _name = "independent variable"
     _units = "activation"
@@ -181,7 +173,7 @@ class IVInSilico(IV):
         self._participant.set_value(self._name, self.get_value())
 
 
-class DVInSilico(DV):
+class DVInSilico(Variable):
     _variable_label = "DV"
     _name = "dependent variable"
     _units = "activation"

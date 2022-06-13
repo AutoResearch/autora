@@ -8,7 +8,7 @@ from tinkerforge.bricklet_industrial_dual_analog_in_v2 import (
 )
 from tinkerforge.ip_connection import IPConnection
 
-from aer.variable import Variable, IV, DV
+from aer.variable import Variable
 
 
 class TinkerforgeVariable(Variable):
@@ -53,7 +53,7 @@ class TinkerforgeVariable(Variable):
         pass
 
 
-class IVTF(TinkerforgeVariable, IV):
+class IVTF(TinkerforgeVariable):
     def __init__(self, *args, **kwargs):
         self._name = "IV"
         self._variable_label = "Independent Variable"
@@ -222,7 +222,7 @@ class IVVoltage(IVTF):
         self.stop()
 
 
-class DVTF(TinkerforgeVariable, DV):
+class DVTF(TinkerforgeVariable):
     def __init__(self, *args, **kwargs):
         self._name = "DV"
         self._variable_label = "Dependent Variable"
