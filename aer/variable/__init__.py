@@ -13,6 +13,7 @@ class OutputTypes(Enum):
 
 
 class Variable:
+
     def __init__(
             self,
             name="",
@@ -73,18 +74,18 @@ class Variable:
         if value_list is None:
             print(dictionary.keys())
             raise Exception(
-                "Could not find value with name '"
-                + self.get_name()
-                + "' in dictionary."
+                f"Could not find value with name '"
+                f"{self.get_name()}"
+                f" in dictionary."
             )
 
         if position > len(value_list):
             raise Exception(
-                "Queried position "
-                + str(position)
-                + " for variable "
-                + self.get_name()
-                + "'exceeds number of available positions for that variable in the dictionary."
+                f"Queried position "
+                f"{str(position)}"
+                f" for variable "
+                f"{self.get_name()}"
+                f"'exceeds number of available positions for that variable in the dictionary."
             )
 
         return value_list[position] * self._rescale
@@ -95,9 +96,9 @@ class Variable:
         if value_list is None:
             print(dictionary.keys())
             raise Exception(
-                "Could not find value with name '"
-                + self.get_name()
-                + "' in dictionary."
+                f"Could not find value with name '"
+                f"{self.get_name()}"
+                f"' in dictionary."
             )
 
         rescaled_list = [element * self._rescale for element in value_list]
@@ -112,18 +113,18 @@ class Variable:
 
         if value_list is None:
             raise Exception(
-                "Could not find value with name '"
-                + self.get_name()
-                + "' in dictionary."
+                f"Could not find value with name '"
+                f"{self.get_name()}"
+                f"' in dictionary."
             )
 
         if position > len(value_list):
             raise Exception(
-                "Queried position "
-                + str(position)
-                + " for variable "
-                + self.get_name()
-                + "'exceeds number of available positions for that variable in the dictionary."
+                f"Queried position "
+                f"{str(position)}"
+                f" for variable "
+                f"{self.get_name()}"
+                f" exceeds number of available positions for that variable in the dictionary."
             )
 
         self.set_value(value_list[position])
