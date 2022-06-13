@@ -51,23 +51,23 @@ class Variable:
         to be manipulated or measured."""
         self._value_range = value_range
 
-    # Cap value of variable
     def __cap_value__(self, value):
+        """ Cap value of variable. """
         minimum = self._value_range[0]
         maximum = self._value_range[1]
         return np.min([np.max([value, minimum]), maximum])
 
-    # Get value.
     def get_value(self):
+        """ Get value. """
         return self._value * self._rescale
 
-    # Set value.
     def set_value(self, value):
+        """ Set value. """
         self._value = self.__cap_value__(value)
 
     def get_value_from_dict(self, dictionary, position):
-        """Reads and sets value of independent variable from a dictionary with
-        variable_label being the key"""
+        """ Reads and sets value of independent variable from a dictionary with
+        variable_label being the key """
 
         value_list = dictionary.get(self.get_name())  # get_variable_label()
 
@@ -91,7 +91,7 @@ class Variable:
         return value_list[position] * self._rescale
 
     def get_value_list_from_dict(self, dictionary):
-        value_list = dictionary.get(self.get_name())  # get_variable_label()
+        value_list = dictionary.get(self.get_name())
 
         if value_list is None:
             print(dictionary.keys())
@@ -105,9 +105,11 @@ class Variable:
 
         return rescaled_list
 
-    # Reads and sets value of independent variable from a dictionary
-    # with variable_label being the key
     def set_value_from_dict(self, dictionary, position):
+        """
+        Reads and sets value of independent variable from a dictionary
+        with variable_label being the key
+        """
 
         value_list = dictionary.get(self.get_name())
 
@@ -129,28 +131,28 @@ class Variable:
 
         self.set_value(value_list[position])
 
-    # Get variable name.
     def get_name(self):
+        """ Get variable name. """
         return self._name
 
-    # Set variable name.
     def set_name(self, name):
+        """ Set variable name. """
         self._name = name
 
-    # Get variable units.
     def get_units(self):
+        """ Get variable units. """
         return self._units
 
-    # Set variable units.
     def set_units(self, units):
+        """ Set variable units. """
         self._units = units
 
-    # Get variable label.
     def get_variable_label(self):
+        """ Get variable label. """
         return self._variable_label
 
-    # Set variable label.
     def set_variable_label(self, variable_label):
+        """ Set variable label. """
         self._variable_label = variable_label
 
     def set_covariate(self, is_covariate):
@@ -166,7 +168,6 @@ class IVInSilico(Variable):
     _value_range = (0, 1)
     _value = 0
 
-    # Initializes Industrial Analog Out 2.0 device.
     def __init__(self, *args, **kwargs):
         super(IVInSilico, self).__init__(*args, **kwargs)
 
@@ -182,7 +183,6 @@ class DVInSilico(Variable):
     _value_range = (0, 1)
     _value = 0
 
-    # Initializes Industrial Analog Out 2.0 device.
     def __init__(self, *args, **kwargs):
         super(DVInSilico, self).__init__(*args, **kwargs)
 
