@@ -4,7 +4,8 @@ import pandas
 
 import aer_experimentalist.experiment_environment.experiment_config as config
 import aer_experimentalist.experimentalist_config as cfg
-from aer.variable import DVTime, IVTime, IVTrial, dv_labels, iv_labels
+from aer.variable.tinkerforge import DVTime, IVTime, IVTrial
+from aer.variable.label import dv_labels, iv_labels
 
 
 class Experiment:
