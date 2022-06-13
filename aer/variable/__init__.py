@@ -4,27 +4,31 @@ import numpy as np
 
 
 class ValueType(str, Enum):
-    """  Specifies supported value types supported by Variables. """
-    REAL = 'real'
-    SIGMOID = 'sigmoid'
-    PROBABILITY = 'probability'  # single probability
-    PROBABILITY_SAMPLE = 'probability_sample'  # sample from single probability
-    PROBABILITY_DISTRIBUTION = 'probability_distribution'  # probability distribution over classes
-    CLASS = 'class'  # sample from probability distribution over classes
+    """Specifies supported value types supported by Variables."""
+
+    REAL = "real"
+    SIGMOID = "sigmoid"
+    PROBABILITY = "probability"  # single probability
+    PROBABILITY_SAMPLE = "probability_sample"  # sample from single probability
+    PROBABILITY_DISTRIBUTION = (
+        "probability_distribution"  # probability distribution over classes
+    )
+    CLASS = "class"  # sample from probability distribution over classes
 
 
 class Variable:
-    """ Describes an experimental variable: name, domain (type, range, units) and value of a variable. """
+    """Describes an experimental variable: name, type, range, units, and value of a variable."""
+
     def __init__(
-            self,
-            name="",
-            value_range=(0, 1),
-            units="",
-            type=ValueType.REAL,
-            variable_label="",
-            rescale=1,
-            is_covariate=False,
-            participant=None,
+        self,
+        name="",
+        value_range=(0, 1),
+        units="",
+        type=ValueType.REAL,
+        variable_label="",
+        rescale=1,
+        is_covariate=False,
+        participant=None,
     ):
 
         self._name = name
@@ -53,21 +57,21 @@ class Variable:
         self._value_range = value_range
 
     def __cap_value__(self, value):
-        """ Cap value of variable. """
+        """Cap value of variable."""
         minimum = self._value_range[0]
         maximum = self._value_range[1]
         return np.min([np.max([value, minimum]), maximum])
 
     def get_value(self):
-        """ Get value. """
+        """Get value."""
         return self._value * self._rescale
 
     def set_value(self, value):
-        """ Set value. """
+        """Set value."""
         self._value = self.__cap_value__(value)
 
     def get_value_from_dict(self, dictionary, position):
-        """ Reads value of independent variable from a dictionary. """
+        """Reads value of independent variable from a dictionary."""
 
         value_list = dictionary[self.get_name()]
 
@@ -83,7 +87,7 @@ class Variable:
         return value_list[position] * self._rescale
 
     def get_value_list_from_dict(self, dictionary):
-        """ Gets the rescaled values of independent variables from a dictionary. """
+        """Gets the rescaled values of independent variables from a dictionary."""
         value_list = dictionary[self.get_name()]
 
         rescaled_list = [element * self._rescale for element in value_list]
@@ -110,27 +114,27 @@ class Variable:
         self.set_value(value_list[position])
 
     def get_name(self):
-        """ Get variable name. """
+        """Get variable name."""
         return self._name
 
     def set_name(self, name):
-        """ Set variable name. """
+        """Set variable name."""
         self._name = name
 
     def get_units(self):
-        """ Get variable units. """
+        """Get variable units."""
         return self._units
 
     def set_units(self, units):
-        """ Set variable units. """
+        """Set variable units."""
         self._units = units
 
     def get_variable_label(self):
-        """ Get variable label. """
+        """Get variable label."""
         return self._variable_label
 
     def set_variable_label(self, variable_label):
-        """ Set variable label. """
+        """Set variable label."""
         self._variable_label = variable_label
 
     def set_covariate(self, is_covariate):
@@ -167,5 +171,3 @@ class DVInSilico(Variable):
     def measure(self):
         measurement = self._participant.get_value(self._name)
         self.set_value(measurement)
-
-
