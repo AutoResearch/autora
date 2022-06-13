@@ -142,7 +142,7 @@ class Variable:
 
     # Set variable units.
     def set_units(self, units):
-        self._unitt = units
+        self._units = units
 
     # Get variable label.
     def get_variable_label(self):
