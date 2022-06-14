@@ -6,6 +6,144 @@ Ben Andrew, Hannah Even, Ioana Marinescu, Sebastian Musslick, Sida Li
 
 # Getting started (development)
 
+This package requires the following:
+- python and modules as described in the `pyproject.toml` file
+- the `graphviz` package (for the GUI)
+- the python command line tool `pre-commit` (for making changes to the repository)
+
+Depending on your computer, the steps to get the environment working will vary. A common setup with MacOS is described below.
+
+## Basic Setup on MacOS 
+
+For MacOS, we recommend using the following setup:
+- `homebrew` as the package manager for the system,
+- `pyenv` for managing python versions,
+- `pipx` for installing python command line utilities,
+- `poetry` for managing the python environment itself.
+
+### Install `homebrew`
+
+Visit [https://brew.sh](https://brew.sh) and run the install instructions.
+
+
+### Install other external dependencies
+
+This is a good time to check that the other external dependencies are fulfilled. You can install them as follows:
+
+```zsh
+brew install graphviz
+```
+
+### Install pyenv
+
+`pyenv` allows installing different versions of python. Install it using: 
+
+```zsh
+brew install pyenv
+```
+
+Then run the initialization script:
+```zsh
+pyenv init
+# ... then follow the instructions and add some lines to your `~/.zshrc` file.
+``` 
+
+### Install python
+
+Install the python version you want to use. 
+
+We suggest using the version listed in the file [`pyproject.toml`](./pyproject.toml), which looks like:
+
+```toml
+...
+
+[tool.poetry.dependencies]
+python = '>=3.8.13,<3.11'
+
+...
+```
+
+For instance, if you decide to use `python 3.8.13`, you would run:
+
+```zsh
+pyenv install 3.8.13
+pyenv shell 3.8.13  # this activates the version of python you just installed for the current session
+```
+
+### Install `pipx`
+
+We suggest using `pipx` to manage command line utilities like poetry. In the same session where you activated `python` run the following commands:
+
+```zsh
+python -m pip install pipx
+pipx ensurepath  # allows you to access the pipx executable
+pipx completions  # optional
+```
+
+You should check that your `~/.zshrc` includes a line like 
+
+```
+export PATH="$PATH:/Users/me/.local/bin"
+``` 
+
+... so that the pipx executables are on the `$PATH`.
+
+### Install Poetry
+
+Now you can install the `python` package manager `poetry` as follows:
+
+```zsh
+pipx install poetry
+```
+
+If all is well, then when you open a new terminal window and execute 
+```zsh
+poetry --version
+```
+
+it should return something like:
+```zsh
+Poetry version 1.1.13
+```
+
+## Set up the `python` environment
+
+You can use the `python` version already installed with the `poetry` package manager to create an isolated environment where you can run the AER code. `poetry` handles resolving dependencies between `python` modules and ensures that you are using the same package versions as other members of the development team (which is a good thing).
+
+There are two suggested options for initializing an environment:
+- On the command line using `poetry` directly,
+- Using your IDE to initialize the `poetry` environment. 
+
+*Note: For end-users, it may be more appropriate to use an environment manager like `Anaconda` or `Miniconda` instead of `poetry`, but this is not currently supported.*
+
+### Command Line `poetry` Setup
+
+From the [`AER`](./.) directory, run:
+
+```zsh
+# First tell poetry to save the environment in the AER/.venv/ directory:
+poetry config virtualenvs.in-project true  
+
+# Set up a new environment with the version of python you installed earlier
+poetry env use 3.8  # '3.8' needs to match the version of python you installed with pyenv
+
+# Update the installation utilities within the new environment
+poetry run python -m pip install --upgrade pip setuptools wheel
+
+# Use the pyproject.toml file to resolve and then install all of the dependencies
+poetry install
+```
+
+Check that the `poetry` environment is correctly set-up.
+
+- Run: 
+```zsh
+poetry run python -m unittest aer
+```
+- Activate the `poetry` environment in the current shell session.
+- If you execute `which python` it should return the path to your python executable in the .venv/ directory.
+  
+
 ## Pre-Commit Hooks
 
 We use [pre-commit](https://pre-commit.com) to manage pre-commit hooks. 
@@ -13,6 +151,8 @@ Pre-commit hooks are programs which run before each git commit and which check t
 - are correctly formatted and 
 - have no obvious coding errors. 
 Pre-commit hooks are intended to enforce coding guidelines, including the Python style-guide [PEP8](https://peps.python.org/pep-0008/). 
+
+`pre-commit` is installed by poetry as a development dependency. 
 
 The hooks and their settings are specified in [`.pre-commit-config.yaml`](./.pre-commit-config.yaml).
 
