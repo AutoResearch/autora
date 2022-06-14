@@ -60,12 +60,8 @@ Install the python version you want to use.
 We suggest using the version listed in the file [`pyproject.toml`](./pyproject.toml), which looks like:
 
 ```toml
-...
-
 [tool.poetry.dependencies]
 python = '>=3.8.13,<3.11'
-
-...
 ```
 
 For instance, if you decide to use `python 3.8.13`, you would run:
