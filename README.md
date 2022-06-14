@@ -13,6 +13,11 @@ This package requires the following:
 
 Depending on your computer, the steps to get the environment working will vary. A common setup with MacOS is described below.
 
+You should also consider using an IDE. We recommend: 
+- PyCharm (academic licenses for PyCharm pro are available for free). This is a `python`-specific integrated development environment which comes with extremely powerful tools for changing the structure of `python` code, running tests, etc. 
+- Visual Studio Code (free). This is a powerful general text editor with a large number of plugins available for different tasks. 
+
+
 ## Basic Setup on MacOS 
 
 For MacOS, we recommend using the following setup:
@@ -142,6 +147,59 @@ poetry run python -m unittest aer
 ```
 - Activate the `poetry` environment in the current shell session.
 - If you execute `which python` it should return the path to your python executable in the .venv/ directory.
+  
+
+### PyCharm `poetry` Setup
+
+- Open the project directory in PyCharm.
+- Navigate to Preferences > Project > Python Interpreter
+- Add a new interpreter. Select "Poetry environment" in the list on the left.
+
+- **If you have _not_ already initialized a `poetry` environment**, specify the following:  
+  - Python executable: select the path to an installed python version you wish to use, e.g. 
+    `~/.pyenv/versions/3.8.13/bin/python3`
+  - Select "install packages from pyproject.toml"
+  - Poetry executable: select the path to the poetry installation you have, e.g. 
+    `~/.local/pipx/venvs/poetry/bin/poetry`
+  - Click "OK" and wait while the environment builds.
+
+- **If you have already initialized a `poetry` environment**, 
+  - ... select the path to it in the "existing environment" dropdown.
+
+- Run the "Python tests for aer" Run/Debug configuration in the PyCharm interface, and check 
+  that there are no errors.
+
+### Visual Studio Code `poetry` setup
+
+Prerequisite: run the [Command Line Setup](#command-line-poetry-setup) specified above.
+
+Then:
+- Open the project directory in Visual Studio Code
+- Install the VSCode plugin recommendations suggested. These include:
+  - python
+  - python-environment-manager
+
+- **If you have _not_ already initialized a `poetry` environment**:
+  - Open a new terminal within Visual Studio Code (Menu: Terminal > New Terminal). 
+  - Carry out the [Command Line Setup](#command-line-poetry-setup) specified above.
+  - If the python-environment-manager plugin is working correctly, it will suggest adding the environment to the workspace. Do that. If it doesn't, carry out the steps specified below for if you have already initialized a `poetry` environment. 
+
+
+- **If you have already initialized a `poetry` environment**:
+  - Select the `python` option in the vertical bar on the far left of the window. Under the title "PYTHON: ENVIRONMENTS" should be a list of `python` environments. If these do not appear:
+    - Ensure the python-environment-manager is installed correctly.
+    - Ensure the python-environment-manager is activated.
+
+  - Locate the correct poetry environment. Click the "thumbs up" symbol next to the poetry environment name to "set as active workspace interpreter".
+  - Alternatively: Open the command pallete (MacOS: ⇧+⌘+P), enter "Python: Select Interpreter" then hit return. Select the python in the correct environment and hit return.
+
+- Check that the `poetry` environment is correctly set-up. 
+  - Open a new terminal within Visual Studio Code (Menu: Terminal > New Terminal). 
+  - It should execute something like `source /Users/me/Developer/AER/.venv/bin/activate` before offering you a prompt.
+  - If you execute `which python` it should return the path to your python executable in the .venv/ directory.
+    - If this does not happen, repeat the steps "If you have already initialized a `poetry` environment" above.
+    - If `which python` still does not return the path to your python executable in the .venv/ directory, reach out to someone else who uses Visual Studio Code. If you're on the AER team, post a question in the Slack channel.
+  - Run `python -m unittest aer` and ensure that there are no errors.
   
 
 ## Pre-Commit Hooks
