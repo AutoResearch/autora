@@ -198,7 +198,7 @@ Then:
   - Run `python -m unittest aer` and ensure that there are no errors.
   
 
-## Pre-Commit Hooks
+## Set up the Pre-Commit Hooks
 
 We use [`pre-commit`](https://pre-commit.com) to manage pre-commit hooks.
 
@@ -246,12 +246,12 @@ If your `git commit` fails because of the pre-commit hook, then you should:
 3. Fix any errors which are reported.
    **Important: Once you've changed the code, re-stage the files it to Git. This might mean 
    unstaging changes and then adding them again.**
-5. If you have trouble:
+4. If you have trouble:
    - Do a web-search to see if someone else had a similar error in the past.
    - Check that the tests you've written work correctly.
    - Check that there aren't any other obvious errors with the code.
    - If you've done all of that, and you still can't fix the problem, get help from someone else on the team.
-6. Repeat 1-4 until all hooks return "passed", e.g.
+5. Repeat 1-4 until all hooks return "passed", e.g.
    ```
    $ pre-commit run
    black....................................................................Passed
