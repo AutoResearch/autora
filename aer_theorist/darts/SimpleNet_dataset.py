@@ -5,12 +5,12 @@ from torch.autograd import Variable
 from torch.utils.data import Dataset
 from torchvision import transforms
 
+from aer.object_of_study import ObjectOfStudy
 from aer.variable import ValueType
 from aer_theorist.darts.SimpleNet import SimpleNet
-from aer_theorist.object_of_study import Object_Of_Study
 
 
-class SimpleNetDataset(Object_Of_Study, Dataset):
+class SimpleNetDataset(ObjectOfStudy, Dataset):
     """Stroop model data set."""
 
     inputDimensions = 2

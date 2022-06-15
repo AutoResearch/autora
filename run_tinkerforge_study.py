@@ -1,9 +1,9 @@
 from tkinter import Tk
 
+from aer.object_of_study import ObjectOfStudy
 from aer.variable import Variable as Var
 from aer_experimentalist.experimentalist_popper import Experimentalist_Popper
 from aer_gui import AER_GUI
-from aer_theorist.object_of_study import Object_Of_Study
 from aer_theorist.theorist_darts import Theorist_DARTS
 
 # GENERAL PARAMETERS
@@ -38,7 +38,7 @@ IVs = [source_voltage]
 DVs = [target_voltage]
 
 # initialize object of study
-study_object = Object_Of_Study(
+study_object = ObjectOfStudy(
     name=study_name, independent_variables=IVs, dependent_variables=DVs
 )
 

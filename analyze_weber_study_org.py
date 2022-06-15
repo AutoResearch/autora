@@ -1,4 +1,5 @@
 import aer_experimentalist.experiment_environment.experiment_config as exp_cfg
+from aer.object_of_study import ObjectOfStudy
 from aer.variable import DVInSilico as DV
 from aer.variable import IVInSilico as IV
 from aer.variable import ValueType as output_type
@@ -7,7 +8,6 @@ from aer_experimentalist.experiment_environment.participant_weber import (
 )
 from aer_experimentalist.experimentalist_popper import Experimentalist_Popper
 from aer_theorist.darts.plot_utils import plot_darts_summary
-from aer_theorist.object_of_study import Object_Of_Study
 
 participant = Participant_Weber()
 
@@ -48,7 +48,7 @@ diff_detected_sample = DV(
 IVs = [S1, S2]  # only including subset of available variables
 DVs_validation = [diff_detected_sample]
 
-validation_object_1 = Object_Of_Study(
+validation_object_1 = ObjectOfStudy(
     name="Weber Sampled", independent_variables=IVs, dependent_variables=DVs_validation
 )
 

@@ -4,6 +4,7 @@ import sys
 from datetime import datetime
 
 import aer_experimentalist.experiment_environment.experiment_config as exp_cfg
+from aer.object_of_study import ObjectOfStudy
 from aer.variable import DVInSilico as DV
 from aer.variable import IVInSilico as IV
 from aer.variable import ValueType as output_type
@@ -11,7 +12,6 @@ from aer_experimentalist.experiment_design_synthetic_weber import (
     Experiment_Design_Synthetic_Weber,
 )
 from aer_experimentalist.experimentalist_popper import Experimentalist_Popper
-from aer_theorist.object_of_study import Object_Of_Study
 from aer_theorist.theorist_darts import DARTS_Type, Theorist_DARTS
 
 print(os.getcwd())
@@ -77,11 +77,11 @@ DVs = [diff_detected]
 DVs_validation = [diff_detected_sample]
 
 # initialize objects of study
-study_object = Object_Of_Study(
+study_object = ObjectOfStudy(
     name=study_name, independent_variables=IVs, dependent_variables=DVs
 )
 
-validation_object_1 = Object_Of_Study(
+validation_object_1 = ObjectOfStudy(
     name=study_name_sampled,
     independent_variables=IVs,
     dependent_variables=DVs_validation,

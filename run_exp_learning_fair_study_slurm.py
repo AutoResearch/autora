@@ -3,11 +3,11 @@ from datetime import datetime
 from typing import List
 
 import aer_experimentalist.experiment_environment.experiment_config as exp_cfg
+from aer.object_of_study import ObjectOfStudy
 from aer.variable import DVInSilico as DV
 from aer.variable import IVInSilico as IV
 from aer.variable import ValueType as output_type
 from aer_experimentalist.experimentalist_popper import Experimentalist_Popper
-from aer_theorist.object_of_study import Object_Of_Study
 from aer_theorist.theorist_darts import DARTS_Type, Theorist_DARTS
 
 # parse arguments
@@ -72,7 +72,7 @@ IVs = [
 DVs = [learning_performance]
 
 # initialize objects of study
-study_object = Object_Of_Study(
+study_object = ObjectOfStudy(
     name=study_name, independent_variables=IVs, dependent_variables=DVs
 )
 

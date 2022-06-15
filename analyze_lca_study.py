@@ -1,5 +1,6 @@
 import aer_config as aer_cfg
 import aer_experimentalist.experiment_environment.experiment_config as exp_cfg
+from aer.object_of_study import ObjectOfStudy
 from aer.variable import DVInSilico as DV
 from aer.variable import IVInSilico as IV
 from aer.variable import ValueType as output_type
@@ -9,7 +10,6 @@ from aer_theorist.darts.plot_utils import (
     load_model,
     plot_model_graph,
 )
-from aer_theorist.object_of_study import Object_Of_Study
 
 participant = Participant_LCA()
 
@@ -41,7 +41,7 @@ dx1_lca = DV(
 IVs = [x1, x2, x3]  # only including subset of available variables
 DVs = [dx1_lca]
 
-study_object = Object_Of_Study(
+study_object = ObjectOfStudy(
     name=study_name, independent_variables=IVs, dependent_variables=DVs
 )
 
