@@ -37,7 +37,7 @@ class ObjectOfStudy(Dataset):
         dependent_variables: Sequence[Variable],
         covariates: Sequence[Variable] = [],
     ):
-        self.metadata: Metadata = Metadata(
+        self._metadata: Metadata = Metadata(
             independent_variables=independent_variables,
             dependent_variables=dependent_variables,
             covariates=covariates,
@@ -64,6 +64,10 @@ class ObjectOfStudy(Dataset):
         for cv in self.covariates:
             self.data[cv.get_name()] = list()
         self.data[AER_cfg.experiment_label] = list()
+
+    @property
+    def metadata(self):
+        return self._metadata
 
     @property
     def independent_variables(self):
