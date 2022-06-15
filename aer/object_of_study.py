@@ -418,9 +418,6 @@ class ObjectOfStudy(Dataset):
         # return normalized data
         return unnormalize(tensor, means, stds)
 
-    def __get_input_dim__(self):
-        return self.input_dimensions
-
     def __get_output_dim__(self):
         return self.output_dimensions
 

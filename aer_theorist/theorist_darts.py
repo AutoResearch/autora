@@ -240,7 +240,7 @@ class Theorist_DARTS(Theorist, ABC):
             object_of_study.__get_output_dim__(),
             self.criterion,
             steps=best_num_graph_nodes,
-            n_input_states=object_of_study.__get_input_dim__(),
+            n_input_states=object_of_study.input_dimensions,
             darts_type=self.DARTS_type,
         )
         utils.load(model, model_path)
@@ -408,7 +408,7 @@ class Theorist_DARTS(Theorist, ABC):
                 object_of_study.__get_output_dim__(),
                 self.criterion,
                 steps=int(num_graph_nodes),
-                n_input_states=object_of_study.__get_input_dim__(),
+                n_input_states=object_of_study.input_dimensions,
                 classifier_weight_decay=darts_cfg.classifier_weight_decay,
                 darts_type=self.DARTS_type,
             )
@@ -641,7 +641,7 @@ class Theorist_DARTS(Theorist, ABC):
             object_of_study.__get_output_dim__(),
             self.criterion,
             steps=int(num_graph_nodes),
-            n_input_states=object_of_study.__get_input_dim__(),
+            n_input_states=object_of_study.input_dimensions,
             classifier_weight_decay=darts_cfg.classifier_weight_decay,
             darts_type=self.DARTS_type,
         )
@@ -1359,7 +1359,7 @@ class Theorist_DARTS(Theorist, ABC):
                         object_of_study.__get_output_dim__(),
                         criterion,
                         steps=int(num_graph_nodes),
-                        n_input_states=object_of_study.__get_input_dim__(),
+                        n_input_states=object_of_study.input_dimensions,
                         classifier_weight_decay=darts_cfg.classifier_weight_decay,
                         darts_type=self.DARTS_type,
                     )

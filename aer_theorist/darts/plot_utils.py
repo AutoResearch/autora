@@ -679,7 +679,7 @@ def load_model(study_name, model_weights_name, arch_weights_name, object_of_stud
     from aer_theorist.darts.model_search import Network
 
     num_output = object_of_study.__get_output_dim__()
-    num_input = object_of_study.__get_input_dim__()
+    num_input = object_of_study.input_dimensions
     k = int(float(arch_weights_name.split("_k_", 1)[1].split("_s_", 1)[0]))
 
     results_weights_path = (

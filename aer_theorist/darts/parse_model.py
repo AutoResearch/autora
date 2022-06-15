@@ -45,7 +45,7 @@ args.obj_of_study_class = utils.get_object_of_study(args.object_of_study)
 args.obj_of_study = args.obj_of_study_class(
     num_patterns=cfg.num_data_points, sampling=cfg.draw_samples
 )
-args.inputDim = args.obj_of_study.__get_input_dim__()
+args.inputDim = args.obj_of_study.input_dimensions
 args.outputDim = args.obj_of_study.__get_output_dim__()
 args.outputType = args.obj_of_study.output_type
 args.loss = utils.get_loss_function(args.outputType)
