@@ -20,9 +20,6 @@ class ObjectOfStudy(Dataset):
         independent_variables: Sequence[Variable],
         dependent_variables: Sequence[Variable],
         covariates: Sequence[Variable] = None,
-        input_dimensions=None,
-        output_dimensions=None,
-        output_type=None,
     ):
 
         self.name = name
@@ -42,18 +39,10 @@ class ObjectOfStudy(Dataset):
             self.covariates.extend(covariates)
 
         # set number of output dimensions
-        if output_dimensions is None:
-            self.output_dimensions = len(self.dependent_variables)
-        else:
-            self.output_dimensions = output_dimensions
+        self.output_dimensions = len(self.dependent_variables)
 
         # set number of input dimensions
-        if input_dimensions is None:
-            self.input_dimensions = len(self.independent_variables) + len(
-                self.covariates
-            )
-        else:
-            self.input_dimensions = input_dimensions
+        self.input_dimensions = len(self.independent_variables) + len(self.covariates)
 
         # set output type
         self.output_type = self.dependent_variables[0].type
