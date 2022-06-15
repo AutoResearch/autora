@@ -418,14 +418,15 @@ class ObjectOfStudy(Dataset):
         # return normalized data
         return unnormalize(tensor, means, stds)
 
-    def __get_input_labels__(self):
-        input_labels = list()
+    @property
+    def input_labels(self):
+        _input_labels = list()
         for var in self.independent_variables:
-            input_labels.append(var.get_variable_label())
+            _input_labels.append(var.get_variable_label())
         for var in self.covariates:
-            input_labels.append(var.get_variable_label())
+            _input_labels.append(var.get_variable_label())
 
-        return input_labels
+        return _input_labels
 
     def __get_input_names__(self):
         input_names = list()

@@ -657,7 +657,7 @@ def plot_model_graph(
         genotype.normal,
         filepath,
         fileFormat="png",
-        input_labels=object_of_study.__get_input_labels__(),
+        input_labels=object_of_study.input_labels,
         full_label=True,
         param_list=param_list,
         out_dim=object_of_study.output_dimensions,

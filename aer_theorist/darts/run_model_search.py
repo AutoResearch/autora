@@ -81,7 +81,7 @@ args.inputDim = args.obj_of_study.input_dimensions
 args.outputDim = args.obj_of_study.output_dimensions
 args.outputType = args.obj_of_study.output_type
 args.loss = utils.get_loss_function(args.outputType)
-args.input_labels = args.obj_of_study.__get_input_labels__()
+args.input_labels = args.obj_of_study.input_labels
 
 # Assign default parameters (see model_search_config.py for parameter descriptions)
 args.batch_size = cfg.batch_size

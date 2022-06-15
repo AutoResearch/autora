@@ -68,7 +68,7 @@ class SimpleNetDataset(ObjectOfStudy, Dataset):
         else:
             return ValueType.PROBABILITY_DISTRIBUTION
 
-    def __get_input_labels__(self):
+    def input_labels(self):
         input_labels = list()
         input_labels.append("stim1")
         input_labels.append("stim2")
