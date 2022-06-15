@@ -38,7 +38,7 @@ class ObjectOfStudy(Dataset):
             covariates=covariates,
         )
 
-        self.name = name
+        self._name = name
 
         self.data: Dict[Any, Any] = dict()
         self._normalize_input = False
@@ -83,6 +83,14 @@ class ObjectOfStudy(Dataset):
     @property
     def output_type(self):
         return self.dependent_variables[0].type
+
+    @property
+    def name(self):
+        return self._name
+
+    @name.setter
+    def name(self, value):
+        self._name = value
 
     def __len__(self, experiment_id=None):
         if experiment_id is None:
@@ -402,9 +410,6 @@ class ObjectOfStudy(Dataset):
 
         # return normalized data
         return unnormalize(tensor, means, stds)
-
-    def get_name(self):
-        return self.name
 
     def __get_input_dim__(self):
         return self.input_dimensions
