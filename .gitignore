@@ -5,6 +5,9 @@
 .python-version
 .venv
 
+# AER-specific files
+studies/**/modeling
+
 # Python ignores, from https://github.com/github/gitignore/blob/main/Python.gitignore
 # Byte-compiled / optimized / DLL files
 __pycache__/

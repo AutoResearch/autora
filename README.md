@@ -197,6 +197,16 @@ Then:
     - If `which python` still does not return the path to your python executable in the .venv/ directory, reach out to someone else who uses Visual Studio Code. If you're on the AER team, post a question in the Slack channel.
   - Run `python -m unittest aer` and ensure that there are no errors.
   
+## Running the tests
+
+You should run the tests when you set up a new `python`/`poetry` environment, before you commit code to 
+the repository, and before & after you merge a branch, to ensure that you've not broken anything. 
+
+The unit tests can be run as follows (starting in the root directory of the repository):
+
+```zsh
+poetry run python -m unittest
+```
 
 ## Set up the Pre-Commit Hooks
 
