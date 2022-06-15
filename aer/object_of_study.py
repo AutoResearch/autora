@@ -270,13 +270,6 @@ class ObjectOfStudy(Dataset):
         # combine each IV
         return (iv_list_1, iv_list_2, dv_list)
 
-    def get_variable_data(self, variable):
-        var_data = list()
-        for idx in len(self):
-            var_data.append(variable.get_value_from_dict(self.data, idx))
-        iv_data = torch.tensor(var_data).float()
-        return iv_data
-
     def get_ivs_from_input(self, input, ivs):
         columns = list()
         if isinstance(ivs, list):
