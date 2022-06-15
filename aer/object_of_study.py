@@ -21,47 +21,35 @@ class Metadata:
 
 
 class ObjectOfStudy(Dataset):
+    """Collection of data."""
 
     key_experiment_id = "AER_Experiment"
 
     def __init__(
         self,
-        name,
+        name: str,
         independent_variables: Sequence[Variable],
         dependent_variables: Sequence[Variable],
-        covariates: Sequence[Variable] = None,
+        covariates: Sequence[Variable] = [],
     ):
+        self.metadata: Metadata = Metadata(
+            independent_variables=independent_variables,
+            dependent_variables=dependent_variables,
+            covariates=covariates,
+        )
 
         self.name = name
 
-        self.independent_variables: Sequence[Variable] = list()
-        self.dependent_variables: Sequence[Variable] = list()
-        self.covariates: Sequence[Variable] = list()
         self.data: Dict[Any, Any] = dict()
         self._normalize_input = False
         self._normalize_output = False
 
-        # set independent and dependent variables
-        self.independent_variables.extend(independent_variables)
-        self.dependent_variables.extend(dependent_variables)
-
-        if covariates is not None:
-            self.covariates.extend(covariates)
-
-        # set number of output dimensions
-        self.output_dimensions = len(self.dependent_variables)
-
-        # set number of input dimensions
-        self.input_dimensions = len(self.independent_variables) + len(self.covariates)
-
-        # set output type
-        self.output_type = self.dependent_variables[0].type
-        for variable in dependent_variables:
-            if variable.type != self.output_type:
-                AttributeError(
-                    "Dependent variable output types don't match. "
-                    "Different output types are not supported yet."
-                )
+        assert all(
+            dv.type == dependent_variables[0].type for dv in dependent_variables
+        ), (
+            "Dependent variable output types don't match. "
+            "Different output types are not supported yet."
+        )
 
         # set up data
         for dv in self.dependent_variables:
@@ -71,6 +59,30 @@ class ObjectOfStudy(Dataset):
         for cv in self.covariates:
             self.data[cv.get_name()] = list()
         self.data[AER_cfg.experiment_label] = list()
+
+    @property
+    def independent_variables(self):
+        return self.metadata.independent_variables
+
+    @property
+    def dependent_variables(self):
+        return self.metadata.dependent_variables
+
+    @property
+    def covariates(self):
+        return self.metadata.covariates
+
+    @property
+    def input_dimensions(self):
+        return len(self.independent_variables) + len(self.covariates)
+
+    @property
+    def output_dimensions(self):
+        return len(self.dependent_variables)
+
+    @property
+    def output_type(self):
+        return self.dependent_variables[0].type
 
     def __len__(self, experiment_id=None):
         if experiment_id is None:
