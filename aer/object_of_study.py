@@ -141,33 +141,6 @@ class ObjectOfStudy(Dataset):
 
         return input, output
 
-    def get_random_input_sample(self):
-
-        # sample input data
-        input_data = list()
-
-        for var in self.independent_variables:
-            sample = np.random.uniform(
-                var.__get_value_range__()[0] * var._rescale,
-                var.__get_value_range__()[1] * var._rescale,
-            )
-            input_data.append(sample)
-
-        for var in self.covariates:
-            sample = np.random.uniform(
-                var.__get_value_range__()[0] * var._rescale,
-                var.__get_value_range__()[1] * var._rescale,
-            )
-            input_data.append(sample)
-
-        input = torch.tensor(input_data).float()
-
-        # normalize if required
-        if self._normalize_input:
-            input = self._normalize_variables(input, self.independent_variables)
-
-        return input
-
     def new_experiment_sequence(self):
         experiment_sequence = dict()
 
