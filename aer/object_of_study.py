@@ -481,26 +481,6 @@ class ObjectOfStudy(Dataset):
 
         return split_copy
 
-    # potentially redundant with: get_dataset
-    def get_all_data(self):
-
-        num_patterns = self.__len__()
-
-        if num_patterns > 0:
-            input_tensor, output_tensor = self.__getitem__(0)
-        else:
-            input_tensor = torch.Variable(
-                np.empty((0, self.input_dimensions), dtype=np.float32)
-            )
-            output_tensor = torch.Variable(
-                np.empty((0, self.output_dimensions), dtype=np.float32)
-            )
-
-        for idx in range(1, num_patterns):
-            tmp_input_tensor, tmp_output_tensor = self.__getitem__(idx)
-            input_tensor = torch.cat((input_tensor, tmp_input_tensor), 0)
-            output_tensor = torch.cat((output_tensor, tmp_output_tensor), 0)
-
     def add_data(self, new_data: Dict):
         for key in self.data.keys():
             if key in new_data:
