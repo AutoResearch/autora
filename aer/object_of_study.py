@@ -20,6 +20,11 @@ class Metadata:
     covariates: Sequence[Variable] = field(default_factory=list)
 
 
+@dataclass(frozen=True)
+class ExperimentalData:
+    """Immutable dataset."""
+
+
 class ObjectOfStudy(Dataset):
     """Collection of data."""
 
@@ -437,15 +442,6 @@ class ObjectOfStudy(Dataset):
             _input_labels.append(var.get_variable_label())
 
         return _input_labels
-
-    def __get_input_names__(self):
-        input_names = list()
-        for var in self.independent_variables:
-            input_names.append(var.get_name())
-        for var in self.covariates:
-            input_names.append(var.get_name())
-
-        return input_names
 
     def __get_input_length__(self):
         input_data = list()
