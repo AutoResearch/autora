@@ -30,7 +30,8 @@ except ImportError:
     import visualize as viz
     from architect import Architect
     from model_search import Network
-    from object_of_study import outputTypes
+
+    from aer.variable import ValueType as outputTypes
 
 
 # ------------------ PARAMETERIZATION ------------------
