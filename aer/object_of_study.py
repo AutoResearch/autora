@@ -417,9 +417,6 @@ class ObjectOfStudy(Dataset):
     def __get_output_dim__(self):
         return self.output_dimensions
 
-    def __get_output_type__(self):
-        return self.output_type
-
     def __get_input_labels__(self):
         input_labels = list()
         for var in self.independent_variables:

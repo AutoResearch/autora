@@ -661,7 +661,7 @@ def plot_model_graph(
         full_label=True,
         param_list=param_list,
         out_dim=object_of_study.__get_output_dim__(),
-        out_fnc=utils.get_output_str(object_of_study.__get_output_type__()),
+        out_fnc=utils.get_output_str(object_of_study.output_type),
         viewFile=True,
     )
 

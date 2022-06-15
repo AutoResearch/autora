@@ -168,7 +168,7 @@ class Theorist_DARTS(Theorist, ABC):
         self._model_summary_list = list()
 
         # define loss function
-        self.criterion = utils.get_loss_function(object_of_study.__get_output_type__())
+        self.criterion = utils.get_loss_function(object_of_study.output_type)
 
         # set configuration
         self._cfg = darts_cfg
@@ -264,7 +264,7 @@ class Theorist_DARTS(Theorist, ABC):
                 full_label=True,
                 param_list=param_list,
                 out_dim=object_of_study.__get_output_dim__(),
-                out_fnc=utils.get_output_str(object_of_study.__get_output_type__()),
+                out_fnc=utils.get_output_str(object_of_study.output_type),
             )
 
         return model
@@ -491,7 +491,7 @@ class Theorist_DARTS(Theorist, ABC):
             (input, target) = object_of_study.get_dataset()
 
             # determine criterion
-            output_type = object_of_study.__get_output_type__()
+            output_type = object_of_study.output_type
             criterion = utils.get_loss_function(output_type)
 
             # compute loss
@@ -578,7 +578,7 @@ class Theorist_DARTS(Theorist, ABC):
             param_list=param_list,
             full_label=True,
             out_dim=object_of_study.__get_output_dim__(),
-            out_fnc=utils.get_output_str(object_of_study.__get_output_type__()),
+            out_fnc=utils.get_output_str(object_of_study.output_type),
         )
         print("Saving model graph: " + model_graph_filepath)
         print("Saving architecture weights: " + arch_filepath)
@@ -806,7 +806,7 @@ class Theorist_DARTS(Theorist, ABC):
             fileFormat="png",
             input_labels=object_of_study.__get_input_labels__(),
             out_dim=object_of_study.__get_output_dim__(),
-            out_fnc=utils.get_output_str(object_of_study.__get_output_type__()),
+            out_fnc=utils.get_output_str(object_of_study.output_type),
         )
 
         # stores the model and architecture
@@ -844,7 +844,7 @@ class Theorist_DARTS(Theorist, ABC):
                 param_list=param_list,
                 full_label=full_label,
                 out_dim=object_of_study.__get_output_dim__(),
-                out_fnc=utils.get_output_str(object_of_study.__get_output_type__()),
+                out_fnc=utils.get_output_str(object_of_study.output_type),
             )
 
         else:
@@ -855,7 +855,7 @@ class Theorist_DARTS(Theorist, ABC):
                 fileFormat="png",
                 input_labels=object_of_study.__get_input_labels__(),
                 out_dim=object_of_study.__get_output_dim__(),
-                out_fnc=utils.get_output_str(object_of_study.__get_output_type__()),
+                out_fnc=utils.get_output_str(object_of_study.output_type),
             )
 
         return self.graph_filepath + ".png"
@@ -1481,7 +1481,7 @@ class Theorist_DARTS(Theorist, ABC):
                     param_list=param_list,
                     full_label=True,
                     out_dim=object_of_study.__get_output_dim__(),
-                    out_fnc=utils.get_output_str(object_of_study.__get_output_type__()),
+                    out_fnc=utils.get_output_str(object_of_study.output_type),
                 )
                 print("Saving model graph: " + model_graph_filepath)
                 print("Saving architecture weights: " + arch_filepath)
@@ -1511,7 +1511,7 @@ class Theorist_DARTS(Theorist, ABC):
 
 
 def model_formatted(model, input, object_of_study):
-    m = utils.get_output_format(object_of_study.__get_output_type__())
+    m = utils.get_output_format(object_of_study.output_type)
     output = model(input)
     output_formatted = m(output)
     return output_formatted

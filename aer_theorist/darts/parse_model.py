@@ -47,7 +47,7 @@ args.obj_of_study = args.obj_of_study_class(
 )
 args.inputDim = args.obj_of_study.__get_input_dim__()
 args.outputDim = args.obj_of_study.__get_output_dim__()
-args.outputType = args.obj_of_study.__get_output_type__()
+args.outputType = args.obj_of_study.output_type
 args.loss = utils.get_loss_function(args.outputType)
 args.input_labels = args.obj_of_study.__get_input_labels__()
 
@@ -56,7 +56,7 @@ args.exp_folder = cfg.exp_folder
 args.output_file_folder = cfg.output_file_folder
 
 # define loss function
-criterion = utils.get_loss_function(args.obj_of_study.__get_output_type__())
+criterion = utils.get_loss_function(args.obj_of_study.output_type)
 
 # DETERMINE LOG FOLDER
 
