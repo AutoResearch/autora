@@ -197,9 +197,7 @@ class ObjectOfStudy(Dataset):
 
         # create an empty tensor
         input_dataset = torch.empty(num_data_points, self.input_length).float()
-        output_dataset = torch.empty(
-            num_data_points, self.__get_output_length__()
-        ).float()
+        output_dataset = torch.empty(num_data_points, self.output_length).float()
 
         if experiment_id is None:
             for idx in range(len(self)):
@@ -450,7 +448,8 @@ class ObjectOfStudy(Dataset):
             input_data.append(var.get_value_from_dict(self.data, 0))
         return len(input_data)
 
-    def __get_output_length__(self):
+    @property
+    def output_length(self):
         output_data = list()
         for var in self.dependent_variables:
             output_data.append(var.get_value_from_dict(self.data, 0))
