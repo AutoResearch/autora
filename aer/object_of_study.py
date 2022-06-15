@@ -1,6 +1,6 @@
 import copy
 import random
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Any, Dict, Sequence
 
 import numpy as np
@@ -8,16 +8,7 @@ import torch
 from torch.utils.data import Dataset
 
 import aer_config as AER_cfg
-from aer.variable import Variable
-
-
-@dataclass(frozen=True)
-class Metadata:
-    """Immutable metadata about dependent / independent variables and covariates."""
-
-    independent_variables: Sequence[Variable]
-    dependent_variables: Sequence[Variable]
-    covariates: Sequence[Variable] = field(default_factory=list)
+from aer.variable import Variable, VariableCollection
 
 
 @dataclass(frozen=True)
@@ -37,7 +28,7 @@ class ObjectOfStudy(Dataset):
         dependent_variables: Sequence[Variable],
         covariates: Sequence[Variable] = [],
     ):
-        self._metadata: Metadata = Metadata(
+        self._metadata: VariableCollection = VariableCollection(
             independent_variables=independent_variables,
             dependent_variables=dependent_variables,
             covariates=covariates,

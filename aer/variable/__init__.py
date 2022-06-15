@@ -1,4 +1,6 @@
+from dataclasses import dataclass, field
 from enum import Enum
+from typing import Sequence
 
 import numpy as np
 
@@ -171,3 +173,12 @@ class DVInSilico(Variable):
     def measure(self):
         measurement = self._participant.get_value(self._name)
         self.set_value(measurement)
+
+
+@dataclass(frozen=True)
+class VariableCollection:
+    """Immutable metadata about dependent / independent variables and covariates."""
+
+    independent_variables: Sequence[Variable]
+    dependent_variables: Sequence[Variable]
+    covariates: Sequence[Variable] = field(default_factory=list)
