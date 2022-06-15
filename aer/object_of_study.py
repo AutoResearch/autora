@@ -131,9 +131,9 @@ class ObjectOfStudy(Dataset):
 
         # normalize if required
         if self._normalize_input:
-            input = self.normalize_variables(input, self.independent_variables)
+            input = self._normalize_variables(input, self.independent_variables)
         if self._normalize_output:
-            output = self.normalize_variables(output, self.dependent_variables)
+            output = self._normalize_variables(output, self.dependent_variables)
 
         return input, output
 
@@ -160,7 +160,7 @@ class ObjectOfStudy(Dataset):
 
         # normalize if required
         if self._normalize_input:
-            input = self.normalize_variables(input, self.independent_variables)
+            input = self._normalize_variables(input, self.independent_variables)
 
         return input
 
@@ -405,7 +405,7 @@ class ObjectOfStudy(Dataset):
 
         return [means, stds]
 
-    def normalize_variables(self, tensor, variables):
+    def _normalize_variables(self, tensor, variables):
         def normalize(tensor, mean, std):
             for t, m, s in zip(tensor, mean, std):
                 t.sub_(m).div_(s)
@@ -417,7 +417,7 @@ class ObjectOfStudy(Dataset):
         # return normalized data
         return normalize(tensor, means, stds)
 
-    def unnormalize_variables(self, tensor, variables):
+    def _unnormalize_variables(self, tensor, variables):
         def unnormalize(tensor, mean, std):
             for t, m, s in zip(tensor, mean, std):
                 t.mul_(s).add_(m)
