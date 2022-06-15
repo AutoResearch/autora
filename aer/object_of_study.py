@@ -405,6 +405,11 @@ class ObjectOfStudy(Dataset):
         return [means, stds]
 
     def normalize_variables(self, tensor, variables):
+        def normalize(tensor, mean, std):
+            for t, m, s in zip(tensor, mean, std):
+                t.sub_(m).div_(s)
+            return tensor
+
         # collect means and stds
         [means, stds] = self.get_variable_summary_stats(variables)
 
@@ -412,6 +417,11 @@ class ObjectOfStudy(Dataset):
         return normalize(tensor, means, stds)
 
     def unnormalize_variables(self, tensor, variables):
+        def unnormalize(tensor, mean, std):
+            for t, m, s in zip(tensor, mean, std):
+                t.mul_(s).add_(m)
+            return tensor
+
         # collect means and stds
         [means, stds] = self.get_variable_summary_stats(variables)
 
@@ -506,15 +516,3 @@ class ObjectOfStudy(Dataset):
                 raise Exception(
                     "Could not find key '" + key + "' in the new data dictionary."
                 )
-
-
-def normalize(tensor, mean, std):
-    for t, m, s in zip(tensor, mean, std):
-        t.sub_(m).div_(s)
-    return tensor
-
-
-def unnormalize(tensor, mean, std):
-    for t, m, s in zip(tensor, mean, std):
-        t.mul_(s).add_(m)
-    return tensor
