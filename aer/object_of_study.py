@@ -62,30 +62,37 @@ class ObjectOfStudy(Dataset):
 
     @property
     def independent_variables(self):
+        """The independent variables of the dataset."""
         return self.metadata.independent_variables
 
     @property
     def dependent_variables(self):
+        """The dependent variables of the dataset."""
         return self.metadata.dependent_variables
 
     @property
     def covariates(self):
+        """The covariates of the dataset."""
         return self.metadata.covariates
 
     @property
     def input_dimensions(self):
+        """The number of independent variables and covariates."""
         return len(self.independent_variables) + len(self.covariates)
 
     @property
     def output_dimensions(self):
+        """The number of dependent variables."""
         return len(self.dependent_variables)
 
     @property
     def output_type(self):
+        """The ValueType of the first dependent variable."""
         return self.dependent_variables[0].type
 
     @property
     def name(self):
+        """The name of the ObjectOfStudy."""
         return self._name
 
     @name.setter
