@@ -217,7 +217,7 @@ class ObjectOfStudy(Dataset):
         iv1 = ivs[0]
         iv2 = ivs[1]
 
-        dv_idx = self.get_dv_idx(dv)
+        dv_idx = self._get_dv_idx(dv)
 
         if iv2 is None:
             iv1_idx = self._get_iv_idx(iv1)
@@ -281,7 +281,7 @@ class ObjectOfStudy(Dataset):
         return input[:, columns]
 
     def get_dv_from_output(self, output, dv):
-        column = self.get_dv_idx(dv)
+        column = self._get_dv_idx(dv)
         return output[:, column]
 
     def _get_iv_idx(self, iv):
@@ -296,7 +296,7 @@ class ObjectOfStudy(Dataset):
                 break
         return column
 
-    def get_dv_idx(self, dv):
+    def _get_dv_idx(self, dv):
         column = None
         for idx, var in enumerate(self.dependent_variables):
             if var.get_name() == dv.get_name():
