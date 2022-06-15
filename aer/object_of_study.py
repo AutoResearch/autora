@@ -196,9 +196,7 @@ class ObjectOfStudy(Dataset):
             num_data_points = self.__len__(experiment_id)
 
         # create an empty tensor
-        input_dataset = torch.empty(
-            num_data_points, self.__get_input_length__()
-        ).float()
+        input_dataset = torch.empty(num_data_points, self.input_length).float()
         output_dataset = torch.empty(
             num_data_points, self.__get_output_length__()
         ).float()
@@ -443,7 +441,8 @@ class ObjectOfStudy(Dataset):
 
         return _input_labels
 
-    def __get_input_length__(self):
+    @property
+    def input_length(self):
         input_data = list()
         for var in self.independent_variables:
             input_data.append(var.get_value_from_dict(self.data, 0))
