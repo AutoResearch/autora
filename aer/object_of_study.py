@@ -1,6 +1,5 @@
 import copy
 import random
-from dataclasses import dataclass
 from typing import Any, Dict, Sequence
 
 import numpy as np
@@ -9,11 +8,6 @@ from torch.utils.data import Dataset
 
 import aer_config as AER_cfg
 from aer.variable import Variable, VariableCollection
-
-
-@dataclass(frozen=True)
-class ExperimentalData:
-    """Immutable dataset."""
 
 
 class ObjectOfStudy(Dataset):

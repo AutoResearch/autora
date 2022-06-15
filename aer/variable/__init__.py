@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Sequence
+from typing import Iterator, Sequence
 
 import numpy as np
 
@@ -182,3 +182,17 @@ class VariableCollection:
     independent_variables: Sequence[Variable]
     dependent_variables: Sequence[Variable]
     covariates: Sequence[Variable] = field(default_factory=list)
+
+    @property
+    def all_variables(self) -> Iterator[Variable]:
+        for vars in (
+            self.independent_variables,
+            self.dependent_variables,
+            self.covariates,
+        ):
+            for v in vars:
+                yield v
+
+    @property
+    def variable_names(self):
+        return (v.get_name() for v in self.all_variables)
