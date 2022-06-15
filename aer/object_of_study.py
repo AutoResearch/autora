@@ -391,7 +391,7 @@ class ObjectOfStudy(Dataset):
 
         return None
 
-    def get_variable_summary_stats(self, variables):
+    def _get_variable_summary_stats(self, variables):
 
         # collect means and stds
         means = list()
@@ -412,7 +412,7 @@ class ObjectOfStudy(Dataset):
             return tensor
 
         # collect means and stds
-        [means, stds] = self.get_variable_summary_stats(variables)
+        [means, stds] = self._get_variable_summary_stats(variables)
 
         # return normalized data
         return normalize(tensor, means, stds)
@@ -424,7 +424,7 @@ class ObjectOfStudy(Dataset):
             return tensor
 
         # collect means and stds
-        [means, stds] = self.get_variable_summary_stats(variables)
+        [means, stds] = self._get_variable_summary_stats(variables)
 
         # return normalized data
         return unnormalize(tensor, means, stds)
