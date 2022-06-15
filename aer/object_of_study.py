@@ -10,7 +10,7 @@ import aer_config as AER_cfg
 from aer.variable import Variable
 
 
-class Object_Of_Study(Dataset):
+class ObjectOfStudy(Dataset):
 
     key_experiment_id = "AER_Experiment"
 
