@@ -660,7 +660,7 @@ def plot_model_graph(
         input_labels=object_of_study.__get_input_labels__(),
         full_label=True,
         param_list=param_list,
-        out_dim=object_of_study.__get_output_dim__(),
+        out_dim=object_of_study.output_dimensions,
         out_fnc=utils.get_output_str(object_of_study.output_type),
         viewFile=True,
     )
@@ -678,7 +678,7 @@ def load_model(study_name, model_weights_name, arch_weights_name, object_of_stud
     import aer_theorist.darts.utils as utils
     from aer_theorist.darts.model_search import Network
 
-    num_output = object_of_study.__get_output_dim__()
+    num_output = object_of_study.output_dimensions
     num_input = object_of_study.input_dimensions
     k = int(float(arch_weights_name.split("_k_", 1)[1].split("_s_", 1)[0]))
 

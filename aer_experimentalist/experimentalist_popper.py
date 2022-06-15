@@ -50,7 +50,7 @@ class Experimentalist_Popper(Experimentalist, ABC):
         # set up a popper network
         n_input = object_of_study.input_dimensions
         n_hidden = self.n_hidden
-        n_output = object_of_study.__get_output_dim__()
+        n_output = object_of_study.output_dimensions
         self.popper_net = PopperNet(n_input, n_hidden, n_output)
         popper_optimizer = optim.SGD(
             self.popper_net.parameters(),

@@ -237,7 +237,7 @@ class Theorist_DARTS(Theorist, ABC):
         model_path = os.path.join(self.results_weights_path, best_model_file + ".pt")
         arch_path = os.path.join(self.results_weights_path, best_arch_file + ".pt")
         model = Network(
-            object_of_study.__get_output_dim__(),
+            object_of_study.output_dimensions,
             self.criterion,
             steps=best_num_graph_nodes,
             n_input_states=object_of_study.input_dimensions,
@@ -263,7 +263,7 @@ class Theorist_DARTS(Theorist, ABC):
                 input_labels=object_of_study.__get_input_labels__(),
                 full_label=True,
                 param_list=param_list,
-                out_dim=object_of_study.__get_output_dim__(),
+                out_dim=object_of_study.output_dimensions,
                 out_fnc=utils.get_output_str(object_of_study.output_type),
             )
 
@@ -405,7 +405,7 @@ class Theorist_DARTS(Theorist, ABC):
         # reinitialize weights if desired
         if darts_cfg.reinitialize_weights:
             self._eval_model = Network(
-                object_of_study.__get_output_dim__(),
+                object_of_study.output_dimensions,
                 self.criterion,
                 steps=int(num_graph_nodes),
                 n_input_states=object_of_study.input_dimensions,
@@ -577,7 +577,7 @@ class Theorist_DARTS(Theorist, ABC):
             input_labels=object_of_study.__get_input_labels__(),
             param_list=param_list,
             full_label=True,
-            out_dim=object_of_study.__get_output_dim__(),
+            out_dim=object_of_study.output_dimensions,
             out_fnc=utils.get_output_str(object_of_study.output_type),
         )
         print("Saving model graph: " + model_graph_filepath)
@@ -638,7 +638,7 @@ class Theorist_DARTS(Theorist, ABC):
 
         # initializes the model given number of channels, output classes and the training criterion
         self.model = Network(
-            object_of_study.__get_output_dim__(),
+            object_of_study.output_dimensions,
             self.criterion,
             steps=int(num_graph_nodes),
             n_input_states=object_of_study.input_dimensions,
@@ -805,7 +805,7 @@ class Theorist_DARTS(Theorist, ABC):
             self.graph_filepath,
             fileFormat="png",
             input_labels=object_of_study.__get_input_labels__(),
-            out_dim=object_of_study.__get_output_dim__(),
+            out_dim=object_of_study.output_dimensions,
             out_fnc=utils.get_output_str(object_of_study.output_type),
         )
 
@@ -843,7 +843,7 @@ class Theorist_DARTS(Theorist, ABC):
                 input_labels=object_of_study.__get_input_labels__(),
                 param_list=param_list,
                 full_label=full_label,
-                out_dim=object_of_study.__get_output_dim__(),
+                out_dim=object_of_study.output_dimensions,
                 out_fnc=utils.get_output_str(object_of_study.output_type),
             )
 
@@ -854,7 +854,7 @@ class Theorist_DARTS(Theorist, ABC):
                 self.graph_filepath,
                 fileFormat="png",
                 input_labels=object_of_study.__get_input_labels__(),
-                out_dim=object_of_study.__get_output_dim__(),
+                out_dim=object_of_study.output_dimensions,
                 out_fnc=utils.get_output_str(object_of_study.output_type),
             )
 
@@ -1356,7 +1356,7 @@ class Theorist_DARTS(Theorist, ABC):
                 # reinitialize weights if desired
                 if darts_cfg.reinitialize_weights:
                     new_model = Network(
-                        object_of_study.__get_output_dim__(),
+                        object_of_study.output_dimensions,
                         criterion,
                         steps=int(num_graph_nodes),
                         n_input_states=object_of_study.input_dimensions,
@@ -1480,7 +1480,7 @@ class Theorist_DARTS(Theorist, ABC):
                     input_labels=object_of_study.__get_input_labels__(),
                     param_list=param_list,
                     full_label=True,
-                    out_dim=object_of_study.__get_output_dim__(),
+                    out_dim=object_of_study.output_dimensions,
                     out_fnc=utils.get_output_str(object_of_study.output_type),
                 )
                 print("Saving model graph: " + model_graph_filepath)
