@@ -11,6 +11,11 @@ class ExperimentalData:
     metadata: VariableCollection
     data: pd.DataFrame
 
+    @property
+    def dataframe(self) -> pd.DataFrame:
+        """The data as a pandas DataFrame."""
+        return self.data
+
 
 def load_experimental_data(
     filepath: str, metadata: VariableCollection
@@ -19,4 +24,17 @@ def load_experimental_data(
     for name in metadata.variable_names:
         assert name in data.columns
     e = ExperimentalData(metadata=metadata, data=data)
+    return e
+
+
+def combine_experimental_data(
+    d1: ExperimentalData, d2: ExperimentalData
+) -> ExperimentalData:
+    assert d1.metadata == d2.metadata, "Metadata on d1 and d2 must be identical"
+
+    metadata = d1.metadata
+    data = pd.concat(d1.dataframe, d2.dataframe)
+
+    e = ExperimentalData(metadata=metadata, data=data)
+
     return e
