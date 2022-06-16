@@ -25,21 +25,3 @@ def load_experimental_data(
         assert name in data.columns
     e = ExperimentalData(metadata=metadata, data=data)
     return e
-
-
-def combine_experimental_data(
-    d1: ExperimentalData, d2: ExperimentalData, *dn: ExperimentalData
-) -> ExperimentalData:
-    assert d1.metadata == d2.metadata, (
-        f"Metadata must be identical but arent: " f"{d1.metadata} != {d2.metadata} "
-    )
-
-    metadata = d1.metadata
-    data = pd.concat(d1.dataframe, d2.dataframe)
-
-    e = ExperimentalData(metadata=metadata, data=data)
-
-    if len(dn) > 0:
-        return combine_experimental_data(e, dn[0], *dn[1:])
-
-    return e
