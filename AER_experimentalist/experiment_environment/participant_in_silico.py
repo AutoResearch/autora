@@ -1,9 +1,10 @@
-from abc import ABC, abstractmethod
-import torch
+from abc import abstractmethod
+
 import numpy as np
+import torch
+
 
 class Participant_In_Silico:
-
     def __init__(self):
         pass
 
@@ -17,7 +18,7 @@ class Participant_In_Silico:
     def set_value(self, variable_label, value):
         pass
 
-    def compute_BIC(self, input, target, output_function, num_params = None):
+    def compute_BIC(self, input, target, output_function, num_params=None):
 
         # compute raw model output
         classifier_output = self.model(input)
@@ -45,7 +46,7 @@ class Participant_In_Silico:
                 elif target_flattened[idx] == 0:
                     lik = 1 - prediction[idx]
                 else:
-                    raise Exception('Target must contain either zeros or ones.')
+                    raise Exception("Target must contain either zeros or ones.")
                 llik += np.log(lik)
 
         else:
@@ -63,6 +64,7 @@ class Participant_In_Silico:
 
     def count_parameters(self):
         pytorch_total_params = sum(p.numel() for p in self.model.parameters())
+        return pytorch_total_params
 
     def figure_plot(self, comparison_model):
-        raise Exception('Not implemented.')
+        raise Exception("Not implemented.")

@@ -1,6 +1,6 @@
 from collections import namedtuple
 
-Genotype = namedtuple('Genotype', 'normal normal_concat')
+Genotype = namedtuple("Genotype", "normal normal_concat")
 
 
 # PRIMITIVES = [
@@ -55,14 +55,14 @@ Genotype = namedtuple('Genotype', 'normal normal_concat')
 # ]
 
 PRIMITIVES = [  # SIMPLIFIED ANALYSIS
-    'none',
-    'add',
-    'subtract',
-    'linear',
-    'sigmoid',
-    'mult',
-    'exp',
-    'relu',
-    'softplus',
-    'softminus'
+    "none",
+    "add",
+    "subtract",
+    "linear",
+    "sigmoid",
+    "mult",
+    "exp",
+    "relu",
+    "softplus",
+    "softminus",
 ]

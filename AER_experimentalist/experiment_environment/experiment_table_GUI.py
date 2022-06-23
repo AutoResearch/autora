@@ -1,8 +1,9 @@
-from tkinter import *
-from tkinter import ttk
-from AER_experimentalist.experiment_environment.experiment_toplevel_GUI import Experiment_Toplevel_GUI
-from AER_experimentalist.experiment_environment.utils import *
-from AER_experimentalist.experiment_environment.experiment import Experiment
+from tkinter import END, E, Grid, N, S, W, ttk
+
+from AER_experimentalist.experiment_environment.experiment_toplevel_GUI import (
+    Experiment_Toplevel_GUI,
+)
+
 
 class Experiment_Table_GUI(Experiment_Toplevel_GUI):
 
@@ -18,8 +19,12 @@ class Experiment_Table_GUI(Experiment_Toplevel_GUI):
         Experiment_Toplevel_GUI.__init__(self, num_rows, num_cols, exp)
 
         self.treeview_style = ttk.Style()
-        self.treeview_style.configure("mystyle.Treeview", font=(self._font_family, self._font_size))
-        self.treeview_style.configure("mystyle.Treeview.Heading", font=(self._font_family, self._font_size))
+        self.treeview_style.configure(
+            "mystyle.Treeview", font=(self._font_family, self._font_size)
+        )
+        self.treeview_style.configure(
+            "mystyle.Treeview.Heading", font=(self._font_family, self._font_size)
+        )
 
         # set up data for table
         self.tree = ttk.Treeview(self._root, style="mystyle.Treeview")
@@ -31,7 +36,7 @@ class Experiment_Table_GUI(Experiment_Toplevel_GUI):
 
         # set up GUI
         self._root.title(self._title)
-        self.tree.grid(row=0, column=0, sticky=N+S+E+W)
+        self.tree.grid(row=0, column=0, sticky=N + S + E + W)
 
         # set up tree view
         self.init_tree()
@@ -104,4 +109,3 @@ class Experiment_Table_GUI(Experiment_Toplevel_GUI):
                     value_list.append(str(self._exp.data[DV.get_name()][trial]))
 
                 self.tree.insert("", END, text="Step " + str(trial), values=value_list)
-

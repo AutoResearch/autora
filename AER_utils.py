@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class Plot_Types(Enum):
     LINE = 1
     IMAGE = 2

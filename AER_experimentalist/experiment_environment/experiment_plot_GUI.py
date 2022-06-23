@@ -1,13 +1,15 @@
-from tkinter import *
-from tkinter import ttk
-from AER_experimentalist.experiment_environment.experiment_toplevel_GUI import Experiment_Toplevel_GUI
+from tkinter import E, Grid, N, S, W
 
 import matplotlib
-matplotlib.use("TkAgg")
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
 
-from experiment import Experiment
+from AER_experimentalist.experiment_environment.experiment_toplevel_GUI import (
+    Experiment_Toplevel_GUI,
+)
+
+matplotlib.use("TkAgg")
+
 
 class Experiment_Plot_GUI(Experiment_Toplevel_GUI):
 
@@ -37,19 +39,24 @@ class Experiment_Plot_GUI(Experiment_Toplevel_GUI):
 
         self._fig = Figure(figsize=(3, 3), dpi=100)
         self._axis = self._fig.add_subplot(111)
-        self._axis.scatter([0], [0], s=self._scatter_area, facecolors='none', edgecolors=self._scatter_color)
-        self._axis.set_xlabel('Independent Variable', fontsize=self._font_size)
-        self._axis.set_ylabel('Dependent Variable', fontsize=self._font_size)
-        self._axis.set_title('No Data Available', fontsize=self._font_size)
+        self._axis.scatter(
+            [0],
+            [0],
+            s=self._scatter_area,
+            facecolors="none",
+            edgecolors=self._scatter_color,
+        )
+        self._axis.set_xlabel("Independent Variable", fontsize=self._font_size)
+        self._axis.set_ylabel("Dependent Variable", fontsize=self._font_size)
+        self._axis.set_title("No Data Available", fontsize=self._font_size)
         self._axis.grid()
 
         self._canvas = FigureCanvasTkAgg(self._fig, self._root)
         # canvas.show()
-        self._canvas.get_tk_widget().grid(row=0, column=0, sticky=N+S+E+W)
+        self._canvas.get_tk_widget().grid(row=0, column=0, sticky=N + S + E + W)
 
         # update plot
         self.update_plot()
-
 
     def update_plot(self):
 
@@ -62,11 +69,23 @@ class Experiment_Plot_GUI(Experiment_Toplevel_GUI):
             y = self._exp.data[self.DV.get_name()][0:current_trial]
 
             self._axis.clear()
-            self._axis.scatter(x, y, s=self._scatter_area, facecolors='none', edgecolors=self._scatter_color)
+            self._axis.scatter(
+                x,
+                y,
+                s=self._scatter_area,
+                facecolors="none",
+                edgecolors=self._scatter_color,
+            )
 
-            self._axis.set_xlabel(self.IV.get_variable_label() + ' (' + self.IV.get_units() + ')', fontsize=self._font_size)
-            self._axis.set_ylabel(self.DV.get_variable_label() + ' (' + self.DV.get_units() + ')', fontsize=self._font_size)
-            self._axis.set_title('Live Plot')
+            self._axis.set_xlabel(
+                self.IV.get_variable_label() + " (" + self.IV.get_units() + ")",
+                fontsize=self._font_size,
+            )
+            self._axis.set_ylabel(
+                self.DV.get_variable_label() + " (" + self.DV.get_units() + ")",
+                fontsize=self._font_size,
+            )
+            self._axis.set_title("Live Plot")
             self._axis.grid()
 
             self._canvas.draw()

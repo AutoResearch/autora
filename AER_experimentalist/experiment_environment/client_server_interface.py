@@ -1,12 +1,11 @@
-import socket
 import os.path
-import AER_experimentalist.experiment_environment.experiment_config as config
-import AER_experimentalist.experiment_environment.client_server_protocol as protocol
 import time
 
-class Client_Server_Interface():
+import AER_experimentalist.experiment_environment.client_server_protocol as protocol
+import AER_experimentalist.experiment_environment.experiment_config as config
 
 
+class Client_Server_Interface:
     def __init__(self, session_ID=None, host=None, port=None, gui=None):
 
         self.exp_file_path = ""  # path to experiment file
@@ -35,19 +34,25 @@ class Client_Server_Interface():
         if session_ID is not None:
             self._set_session_ID(session_ID)
 
-
     def _send_file(self, file_path):
 
         # check if file exists
         if os.path.exists(self.main_directory + file_path) is False:
-            msg = "Cannot send file. File " + self.main_directory + file_path + " does not exist."
+            msg = (
+                "Cannot send file. File "
+                + self.main_directory
+                + file_path
+                + " does not exist."
+            )
             self._print_status(protocol.STATUS_ERROR, msg)
             raise Exception(msg)
 
         # tell server to initiate file transfer
         self._send_and_confirm(protocol.INITIATE_TRANSFER)
 
-        self._print_status(protocol.STATUS_INITIATED_TRANSFER, "Initiated file transfer.")
+        self._print_status(
+            protocol.STATUS_INITIATED_TRANSFER, "Initiated file transfer."
+        )
 
         # tell server relative file path
         self._print_status(protocol.STATUS_SENDING_FILE_PATH, "Sending file path...")
@@ -57,21 +62,22 @@ class Client_Server_Interface():
         else:
             destination_file_path = file_path
         self._print_status(protocol.STATUS_SENDING_FILE_PATH, destination_file_path)
-        self._send_and_confirm(bytes(destination_file_path, 'utf-8'))
+        self._send_and_confirm(bytes(destination_file_path, "utf-8"))
 
         # send file
         self._send_and_confirm(protocol.TRANSFER_DATA)
-        file = open(self.main_directory + file_path, 'rb')
+        file = open(self.main_directory + file_path, "rb")
         line = file.read(1024)
         self._print_status(protocol.STATUS_SENDING_FILE_DATA, "Sending file...")
-        while (line):
+        while line:
             self._send_and_confirm(line)
             line = file.read(1024)
 
         self._send_and_confirm(protocol.TRANSFER_COMPLETE)
-        print('after complete')
-        self._print_status(protocol.STATUS_COMPLETED_TRANSFER, "Completed file transfer.")
-
+        print("after complete")
+        self._print_status(
+            protocol.STATUS_COMPLETED_TRANSFER, "Completed file transfer."
+        )
 
     def _receive_file(self):
 
@@ -81,27 +87,39 @@ class Client_Server_Interface():
             data = self._socket.recv(1024)
 
             if data == protocol.TRANSFER_FILEPATH:
-                self._print_status(protocol.STATUS_RECEIVING_FILE_PATH, "Receiving file path.")
+                self._print_status(
+                    protocol.STATUS_RECEIVING_FILE_PATH, "Receiving file path."
+                )
                 self._socket.sendall(protocol.OK)
 
                 file_path = self._socket.recv(1024)
-                self._print_status(protocol.STATUS_RECEIVING_FILE_PATH, file_path.decode(protocol.STRING_FORMAT))
+                self._print_status(
+                    protocol.STATUS_RECEIVING_FILE_PATH,
+                    file_path.decode(protocol.STRING_FORMAT),
+                )
                 self._socket.sendall(protocol.OK)
 
             elif data == protocol.TRANSFER_DATA:
 
                 self._socket.sendall(protocol.OK)
 
-                if file_path is "":
-                    self._print_status(protocol.STATUS_ERROR,
-                                      "File transfer failed: Did not receive file path.")
+                if file_path == "":
+                    self._print_status(
+                        protocol.STATUS_ERROR,
+                        "File transfer failed: Did not receive file path.",
+                    )
                     break
 
                 try:
-                    f = open(self.main_directory + file_path.decode(protocol.STRING_FORMAT), 'wb')
+                    f = open(
+                        self.main_directory + file_path.decode(protocol.STRING_FORMAT),
+                        "wb",
+                    )
                     data = self._socket.recv(1024)
-                    self._print_status(protocol.STATUS_RECEIVING_FILE_DATA, "Receiving file...")
-                    while True: #data != protocol.TRANSFER_COMPLETE:
+                    self._print_status(
+                        protocol.STATUS_RECEIVING_FILE_DATA, "Receiving file..."
+                    )
+                    while True:  # data != protocol.TRANSFER_COMPLETE:
                         if data == protocol.TRANSFER_COMPLETE:
                             break
                         f.write(data)
@@ -110,11 +128,15 @@ class Client_Server_Interface():
                         data = self._socket.recv(1024)
                     f.close()
                     self._socket.sendall(protocol.OK)
-                    self._print_status(protocol.STATUS_RECEIVING_FILE_DATA, "Completed file transfer.")
+                    self._print_status(
+                        protocol.STATUS_RECEIVING_FILE_DATA, "Completed file transfer."
+                    )
                     break
-                except:
-                    self._print_status(protocol.STATUS_ERROR,
-                                      "Could not write to file path: " + file_path)
+                except IOError:
+                    self._print_status(
+                        protocol.STATUS_ERROR,
+                        "Could not write to file path: " + file_path,
+                    )
                     break
 
     def _print_status(self, status, msg):
@@ -130,7 +152,9 @@ class Client_Server_Interface():
             if reply == protocol.OK:
                 break
             if (time.time() - t0) > protocol.TIMEOUT:
-                self._print_status(protocol.STATUS_ERROR, "Timed out waiting for response")
+                self._print_status(
+                    protocol.STATUS_ERROR, "Timed out waiting for response"
+                )
                 break
 
     def _send_confirmation(self):
@@ -148,20 +172,22 @@ class Client_Server_Interface():
 
     def _set_session_ID(self, session_ID):
         self.session_ID = session_ID
-        self.session_file_path = self.session_folder_path + str(self.session_ID) + '.session'
+        self.session_file_path = (
+            self.session_folder_path + str(self.session_ID) + ".session"
+        )
 
     def _save_job_status(self):
 
-        f = open(self.main_directory + self.session_file_path, 'wt')
+        f = open(self.main_directory + self.session_file_path, "wt")
 
         if self.job_status is not None:
-            f.write('Status:' + str(self.job_status) + '\n')
+            f.write("Status:" + str(self.job_status) + "\n")
         if len(self.exp_file_path) > 0:
-            f.write('ExperimentPath:' + str(self.exp_file_path) + '\n')
+            f.write("ExperimentPath:" + str(self.exp_file_path) + "\n")
         if len(self.seq_file_path) > 0:
-            f.write('SequencePath:' + str(self.seq_file_path) + '\n')
+            f.write("SequencePath:" + str(self.seq_file_path) + "\n")
         if len(self.data_file_path) > 0:
-            f.write('DataPath:' + str(self.data_file_path) + '\n')
+            f.write("DataPath:" + str(self.data_file_path) + "\n")
 
         f.close()
 
@@ -175,26 +201,26 @@ class Client_Server_Interface():
 
                 # read line of experiment file
                 string = str(line)
-                string = string.replace('\n', '')
+                string = string.replace("\n", "")
 
                 # read file status
-                if string.find('Status:') != -1:
-                    string = string.replace('Status:', '')
+                if string.find("Status:") != -1:
+                    string = string.replace("Status:", "")
                     self.job_status = int(string)
 
                 # read experiment path
-                if string.find('ExperimentPath:') != -1:
-                    string = string.replace('ExperimentPath:', '')
+                if string.find("ExperimentPath:") != -1:
+                    string = string.replace("ExperimentPath:", "")
                     self.exp_file_path = string
 
                 # read sequence path
-                if string.find('SequencePath:') != -1:
-                    string = string.replace('SequencePath:', '')
+                if string.find("SequencePath:") != -1:
+                    string = string.replace("SequencePath:", "")
                     self.seq_file_path = string
 
                 # read data path
-                if string.find('DataPath:') != -1:
-                    string = string.replace('DataPath:', '')
+                if string.find("DataPath:") != -1:
+                    string = string.replace("DataPath:", "")
                     self.data_file_path = string
 
         else:

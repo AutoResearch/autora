@@ -1,5 +1,6 @@
 from AER_experimentalist.experiment_environment.variable import Variable
 
+
 class IV_In_Silico(Variable):
 
     _variable_label = "IV"

@@ -1,6 +1,7 @@
 import time
 
-class V_Time():
+
+class V_Time:
 
     _t0 = 0
 

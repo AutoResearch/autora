@@ -1,13 +1,17 @@
-from tkinter import *
-from tkinter import ttk
-from AER_experimentalist.experiment_environment.utils import *
-from AER_experimentalist.experiment_environment.experiment import Experiment
-from AER_experimentalist.experiment_environment.OLED_output import OLED_Output
-from AER_experimentalist.experiment_environment.experiment_table_GUI import Experiment_Table_GUI
-from AER_experimentalist.experiment_environment.experiment_plot_GUI import Experiment_Plot_GUI
-import AER_experimentalist.experiment_environment.experiment_config as config
 import os
-import types
+from tkinter import END, SINGLE, E, Frame, Grid, Listbox, N, S, W, ttk
+
+import AER_experimentalist.experiment_environment.experiment_config as config
+from AER_experimentalist.experiment_environment.experiment import Experiment
+from AER_experimentalist.experiment_environment.experiment_plot_GUI import (
+    Experiment_Plot_GUI,
+)
+from AER_experimentalist.experiment_environment.experiment_table_GUI import (
+    Experiment_Table_GUI,
+)
+from AER_experimentalist.experiment_environment.OLED_output import OLED_Output
+from AER_experimentalist.experiment_environment.utils import trial_to_list
+
 
 class Experimentalist_GUI(Frame):
 
@@ -53,36 +57,63 @@ class Experimentalist_GUI(Frame):
 
         # define styles
         self.label_style = ttk.Style()
-        self.label_style.configure("Default.TLabel", foreground="black", background=self._label_bgcolor,
-                                   font=(self._font_family, self._font_size), anchor="center")
+        self.label_style.configure(
+            "Default.TLabel",
+            foreground="black",
+            background=self._label_bgcolor,
+            font=(self._font_family, self._font_size),
+            anchor="center",
+        )
 
         self.IV_label_style = ttk.Style()
-        self.IV_label_style.configure("IV.TLabel", foreground=self._IV_fgcolor, background="white",
-                                   font=(self._font_family, self._font_size_button), anchor="center")
+        self.IV_label_style.configure(
+            "IV.TLabel",
+            foreground=self._IV_fgcolor,
+            background="white",
+            font=(self._font_family, self._font_size_button),
+            anchor="center",
+        )
 
         self.DV_label_style = ttk.Style()
-        self.DV_label_style.configure("DV.TLabel", foreground=self._DV_fgcolor, background="white",
-                                      font=(self._font_family, self._font_size_button), anchor="center")
+        self.DV_label_style.configure(
+            "DV.TLabel",
+            foreground=self._DV_fgcolor,
+            background="white",
+            font=(self._font_family, self._font_size_button),
+            anchor="center",
+        )
 
         self.up_down_button_style = ttk.Style()
-        self.up_down_button_style.configure("UpDown.TButton", foreground="black", background=self._up_down_bgcolor,
-                                   font=(self._font_family, self._font_size_button))
+        self.up_down_button_style.configure(
+            "UpDown.TButton",
+            foreground="black",
+            background=self._up_down_bgcolor,
+            font=(self._font_family, self._font_size_button),
+        )
 
         self.run_exp_button_style = ttk.Style()
-        self.run_exp_button_style.configure("Run.TButton", foreground="black",
-                                            background=self._run_exp_bgcolor,
-                                            font=(self._font_family, self._font_size_button))
+        self.run_exp_button_style.configure(
+            "Run.TButton",
+            foreground="black",
+            background=self._run_exp_bgcolor,
+            font=(self._font_family, self._font_size_button),
+        )
 
         self.stop_exp_button_style = ttk.Style()
-        self.stop_exp_button_style.configure("Stop.TButton", foreground="black",
-                                            background=self._stop_exp_bgcolor,
-                                            font=(self._font_family, self._font_size_button))
+        self.stop_exp_button_style.configure(
+            "Stop.TButton",
+            foreground="black",
+            background=self._stop_exp_bgcolor,
+            font=(self._font_family, self._font_size_button),
+        )
 
         self.visualize_exp_button_style = ttk.Style()
-        self.visualize_exp_button_style.configure("Viz.TButton", foreground="black",
-                                             background=self._visualize_exp_bgcolor,
-                                             font=(self._font_family, self._font_size_button))
-
+        self.visualize_exp_button_style.configure(
+            "Viz.TButton",
+            foreground="black",
+            background=self._visualize_exp_bgcolor,
+            font=(self._font_family, self._font_size_button),
+        )
 
         # fit grid to cell
         for row in range(3):
@@ -97,56 +128,79 @@ class Experimentalist_GUI(Frame):
         Grid.columnconfigure(self._root, 6, minsize=200)
 
         # set up window components
-        self.label_status = ttk.Label(self._root, text=self._default_label_status_text, style="Default.TLabel")
-        self.listbox_status = Listbox(self._root, selectmode=SINGLE, font=(self._font_family, self._font_size))
+        self.label_status = ttk.Label(
+            self._root, text=self._default_label_status_text, style="Default.TLabel"
+        )
+        self.listbox_status = Listbox(
+            self._root, selectmode=SINGLE, font=(self._font_family, self._font_size)
+        )
 
-        self.listbox_IVs = Listbox(self._root, selectmode=SINGLE, font=(self._font_family, self._font_size),
-                                   bg=self._IV_listbox_bgcolor)
-        self.listbox_DVs = Listbox(self._root, selectmode=SINGLE, font=(self._font_family, self._font_size),
-                                   bg=self._DV_listbox_bgcolor)
-        self.listbox_output = Listbox(self._root, selectmode=SINGLE, font=(self._font_family, self._font_size))
+        self.listbox_IVs = Listbox(
+            self._root,
+            selectmode=SINGLE,
+            font=(self._font_family, self._font_size),
+            bg=self._IV_listbox_bgcolor,
+        )
+        self.listbox_DVs = Listbox(
+            self._root,
+            selectmode=SINGLE,
+            font=(self._font_family, self._font_size),
+            bg=self._DV_listbox_bgcolor,
+        )
+        self.listbox_output = Listbox(
+            self._root, selectmode=SINGLE, font=(self._font_family, self._font_size)
+        )
 
-        self.button_IV_selection_up = ttk.Button(self._root,
-                                             text="  /\\  ",
-                                             command=self.IV_selection_up,
-                                             style="UpDown.TButton")
+        self.button_IV_selection_up = ttk.Button(
+            self._root,
+            text="  /\\  ",
+            command=self.IV_selection_up,
+            style="UpDown.TButton",
+        )
 
-        self.button_IV_selection_down = ttk.Button(self._root,
-                                               text="  \\/  ",
-                                               command=self.IV_selection_down,
-                                               style="UpDown.TButton")
+        self.button_IV_selection_down = ttk.Button(
+            self._root,
+            text="  \\/  ",
+            command=self.IV_selection_down,
+            style="UpDown.TButton",
+        )
 
-        self.button_DV_selection_up = ttk.Button(self._root,
-                                             text="  /\\  ",
-                                             command=self.DV_selection_up,
-                                             style="UpDown.TButton")
+        self.button_DV_selection_up = ttk.Button(
+            self._root,
+            text="  /\\  ",
+            command=self.DV_selection_up,
+            style="UpDown.TButton",
+        )
 
-        self.button_DV_selection_down = ttk.Button(self._root,
-                                               text="  \\/  ",
-                                               command=self.DV_selection_down,
-                                               style="UpDown.TButton")
+        self.button_DV_selection_down = ttk.Button(
+            self._root,
+            text="  \\/  ",
+            command=self.DV_selection_down,
+            style="UpDown.TButton",
+        )
 
-        self.button_status_selection_up = ttk.Button(self._root,
-                                                     text="  /\\  ",
-                                                     style="UpDown.TButton")
+        self.button_status_selection_up = ttk.Button(
+            self._root, text="  /\\  ", style="UpDown.TButton"
+        )
 
-        self.button_status_selection_down = ttk.Button(self._root,
-                                                       text="  \\/  ",
-                                                       style="UpDown.TButton")
+        self.button_status_selection_down = ttk.Button(
+            self._root, text="  \\/  ", style="UpDown.TButton"
+        )
 
-        self.button_plot = ttk.Button(self._root,
-                                     text="PLOT ",
-                                     command=self.plot_experiment,
-                                     style="Viz.TButton")
+        self.button_plot = ttk.Button(
+            self._root, text="PLOT ", command=self.plot_experiment, style="Viz.TButton"
+        )
 
-        self.button_table = ttk.Button(self._root,
-                                     text="SHOW TABLE ",
-                                     command=self.table_experiment,
-                                     style="Viz.TButton")
+        self.button_table = ttk.Button(
+            self._root,
+            text="SHOW TABLE ",
+            command=self.table_experiment,
+            style="Viz.TButton",
+        )
 
         # bind events
-        self.listbox_IVs.bind('<<ListboxSelect>>', self.select_IV)
-        self.listbox_DVs.bind('<<ListboxSelect>>', self.select_DV)
+        self.listbox_IVs.bind("<<ListboxSelect>>", self.select_IV)
+        self.listbox_DVs.bind("<<ListboxSelect>>", self.select_DV)
 
         # set up experiment path
         if path is not None:
@@ -181,20 +235,20 @@ class Experimentalist_GUI(Frame):
 
         # IVs
         label = ttk.Label(self._root, text="IVs", style="IV.TLabel")
-        label.grid(row=0, column=2, sticky=N+S+E+W)
-        self.listbox_IVs.grid(rowspan=2, row=1, column=2, sticky=N+S+E+W)
+        label.grid(row=0, column=2, sticky=N + S + E + W)
+        self.listbox_IVs.grid(rowspan=2, row=1, column=2, sticky=N + S + E + W)
         self.button_IV_selection_up.grid(row=1, column=3, sticky=N + S + E + W)
         self.button_IV_selection_down.grid(row=2, column=3, sticky=N + S + E + W)
 
         # DVs
         label = ttk.Label(self._root, text="DVs", style="DV.TLabel")
-        label.grid(row=0, column=4, sticky=N+S+E+W)
-        self.listbox_DVs.grid(rowspan=2, row=1, column=4, sticky=N+S+E+W)
+        label.grid(row=0, column=4, sticky=N + S + E + W)
+        self.listbox_DVs.grid(rowspan=2, row=1, column=4, sticky=N + S + E + W)
         self.button_DV_selection_up.grid(row=1, column=5, sticky=N + S + E + W)
         self.button_DV_selection_down.grid(row=2, column=5, sticky=N + S + E + W)
 
         # Experiment output
-        self.listbox_output.grid(rowspan=2, row=1, column=6, sticky=N+S+E+W)
+        self.listbox_output.grid(rowspan=2, row=1, column=6, sticky=N + S + E + W)
 
         # Plot experiment
         self.button_plot.grid(row=3, column=2, columnspan=4, sticky=N + S + E + W)
@@ -205,10 +259,14 @@ class Experimentalist_GUI(Frame):
         # resize
         hpad = 67
         wpad = 3
-        self._geom = '800x400+0+0'
-        self._root.geometry("{0}x{1}+0+0".format(
-            self._root.winfo_screenwidth() - wpad, self._root.winfo_screenheight() - hpad))
-        self._root.bind('<Escape>', self.toggle_geom)
+        self._geom = "800x400+0+0"
+        self._root.geometry(
+            "{0}x{1}+0+0".format(
+                self._root.winfo_screenwidth() - wpad,
+                self._root.winfo_screenheight() - hpad,
+            )
+        )
+        self._root.bind("<Escape>", self.toggle_geom)
 
     def toggle_geom(self, event):
         geom = self._root.winfo_geometry()
@@ -271,7 +329,7 @@ class Experimentalist_GUI(Frame):
         if len(selection) > 0:
             current_value = selection[0]
             max_value = listbox.size()
-            new_value = max(min(current_value + movement, max_value-1), 0)
+            new_value = max(min(current_value + movement, max_value - 1), 0)
 
             listbox.selection_clear(0, END)
             listbox.select_set(new_value)
@@ -311,7 +369,6 @@ class Experimentalist_GUI(Frame):
     def select_DV(self, evt):
         self.set_DV_name()
 
-
     def load_experiment(self, experiment_name=None):
 
         if experiment_name is None:
@@ -331,8 +388,8 @@ class Experimentalist_GUI(Frame):
             CVs = self._exp.get_CV_labels()
 
             # clear list box
-            self.listbox_IVs.delete(0, 'end')
-            self.listbox_DVs.delete(0, 'end')
+            self.listbox_IVs.delete(0, "end")
+            self.listbox_DVs.delete(0, "end")
 
             # add variables to listbox
             if len(IVs) > 0:
@@ -356,8 +413,11 @@ class Experimentalist_GUI(Frame):
 
     def plot_experiment(self):
         if self._exp is not None:
-            self._plot_GUI = Experiment_Plot_GUI(exp=self._exp, IV=self._exp.get_IV(self._IV_name),
-                                             DV=self._exp.get_DV_CV(self._DV_name))
+            self._plot_GUI = Experiment_Plot_GUI(
+                exp=self._exp,
+                IV=self._exp.get_IV(self._IV_name),
+                DV=self._exp.get_DV_CV(self._DV_name),
+            )
 
         else:
             self._plot_GUI = Experiment_Plot_GUI(exp=None)
@@ -365,7 +425,6 @@ class Experimentalist_GUI(Frame):
     # show window for data table
     def table_experiment(self):
         self._table_GUI = Experiment_Table_GUI(exp=self._exp)
-
 
     def update_output(self, messages):
 
@@ -375,7 +434,7 @@ class Experimentalist_GUI(Frame):
             for msg in messages:
                 self.listbox_output.insert(END, msg)
 
-        self.set_listbox_selection(self.listbox_output, self.listbox_output.size()-1)
+        self.set_listbox_selection(self.listbox_output, self.listbox_output.size() - 1)
         self.listbox_output.yview_moveto(1)
 
     def update_OLED(self, messages):
@@ -384,7 +443,7 @@ class Experimentalist_GUI(Frame):
             self._OLED.append_and_show_message(messages)
 
     def clear_output(self):
-        self.listbox_output.delete(0, 'end')
+        self.listbox_output.delete(0, "end")
 
     def clear_OLED(self):
         if self._use_OLED:
@@ -442,13 +501,15 @@ class Experimentalist_GUI(Frame):
             self._exp.set_current_trial(trial)
 
             # update displays with IVs
-            msg = trial_to_list(trial=trial, IVList = self._exp.current_IVs_to_list())
+            msg = trial_to_list(trial=trial, IVList=self._exp.current_IVs_to_list())
 
             if self._bulk_output is False:
                 self.update_output(msg)
                 self.clear_OLED()
                 self.update_OLED(msg)
-                self.update_STOP_button((trial+1)/len(self._exp.actual_trials)*100)
+                self.update_STOP_button(
+                    (trial + 1) / len(self._exp.actual_trials) * 100
+                )
                 self._root.update()
 
             # run trial
@@ -458,7 +519,11 @@ class Experimentalist_GUI(Frame):
             if self._bulk_output is False:
                 msg = trial_to_list(DVList=self._exp.current_DVs_to_list())
             else:
-                msg = trial_to_list(trial=trial, IVList=self._exp.current_IVs_to_list(), DVList=self._exp.current_DVs_to_list())
+                msg = trial_to_list(
+                    trial=trial,
+                    IVList=self._exp.current_IVs_to_list(),
+                    DVList=self._exp.current_DVs_to_list(),
+                )
                 for message in msg:
                     bulk_message.append(message)
 
@@ -481,7 +546,9 @@ class Experimentalist_GUI(Frame):
         if self._abort is True:
             msg = "ABORTED"
         else:
-            self._exp.data_to_csv(config.server_path + self._exp._data_path) # write experiment data to csv
+            self._exp.data_to_csv(
+                config.server_path + self._exp._data_path
+            )  # write experiment data to csv
             msg = self._msg_experiment_finish
 
         if plot is True and self._table_GUI is not None:

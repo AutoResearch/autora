@@ -1,7 +1,10 @@
-from tinkerforge.ip_connection import IPConnection
-from tinkerforge.bricklet_oled_128x64_v2 import BrickletOLED128x64V2
+from typing import List
 
-class OLED_Output():
+from tinkerforge.bricklet_oled_128x64_v2 import BrickletOLED128x64V2
+from tinkerforge.ip_connection import IPConnection
+
+
+class OLED_Output:
 
     _UID = "NNa"
     _HOST = "localhost"
@@ -9,10 +12,10 @@ class OLED_Output():
 
     _MAX_LINES = 7
 
-    _messages = list()
+    _messages: List = []
 
     # Initializes OLED device.
-    def __init__(self, UID = None, HOST = None, PORT = None):
+    def __init__(self, UID=None, HOST=None, PORT=None):
 
         if UID is not None:
             self._UID = UID
@@ -32,7 +35,7 @@ class OLED_Output():
         self._oled.clear_display()
 
     # Show message on OLED display.
-    def show(self, messages = None, line = 0, position = 0):
+    def show(self, messages=None, line=0, position=0):
 
         # clear display
         self._oled.clear_display()

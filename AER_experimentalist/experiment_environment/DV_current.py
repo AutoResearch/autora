@@ -1,6 +1,7 @@
 from DV import DV
-from tinkerforge.ip_connection import IPConnection
 from tinkerforge.bricklet_industrial_dual_0_20ma_v2 import BrickletIndustrialDual020mAV2
+from tinkerforge.ip_connection import IPConnection
+
 
 class DV_Current(DV):
 
@@ -22,11 +23,13 @@ class DV_Current(DV):
         super(DV_Current, self).__init__(*args, **kwargs)
 
         self._ipcon = IPConnection()  # Create IP connection
-        self._id020 = BrickletIndustrialDual020mAV2(self._UID, self._ipcon)  # Create device object
+        self._id020 = BrickletIndustrialDual020mAV2(
+            self._UID, self._ipcon
+        )  # Create device object
 
         self._ipcon.connect(self._HOST, self._PORT)  # Connect to brickd
 
-        if (self._name == "current1"):
+        if self._name == "current1":
             self.channel = 1
         else:
             self.channel = 0
@@ -39,4 +42,4 @@ class DV_Current(DV):
     # Waits until specified time has passed relative to reference time
     def measure(self):
         current = self._id020.get_current(self.channel)
-        self.set_value(current/1000000.0)
+        self.set_value(current / 1000000.0)

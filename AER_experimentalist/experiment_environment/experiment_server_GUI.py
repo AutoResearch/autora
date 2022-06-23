@@ -1,16 +1,21 @@
-from tkinter import *
-from tkinter import ttk
-from AER_experimentalist.experiment_environment.utils import *
-from AER_experimentalist.experiment_environment.experimentalist_GUI import Experimentalist_GUI
-import AER_experimentalist.experiment_environment.experiment_config as config
-from AER_experimentalist.experiment_environment.experiment_server import Experiment_Server
-import threading, queue
 import os
+import queue
+import threading
+from tkinter import END, E, Grid, N, S, W, ttk
+
+import AER_experimentalist.experiment_environment.experiment_config as config
+from AER_experimentalist.experiment_environment.experiment_server import (
+    Experiment_Server,
+)
+from AER_experimentalist.experiment_environment.experimentalist_GUI import (
+    Experimentalist_GUI,
+)
+
 
 def runloop(gui=None, run_local=False):
-    '''
+    """
     After result is produced put it in queue
-    '''
+    """
     # result = 0
     # for i in range(10000000):
     #     # Do something with result
@@ -55,28 +60,37 @@ class Experiment_Server_GUI(Experimentalist_GUI):
         self.run_local = run_local
 
         self.start_server_button_style = ttk.Style()
-        self.start_server_button_style.configure("ServerStart.TButton", foreground="black",
-                                            background=self._start_server_bgcolor,
-                                            font=(self._font_family, self._font_size_button))
+        self.start_server_button_style.configure(
+            "ServerStart.TButton",
+            foreground="black",
+            background=self._start_server_bgcolor,
+            font=(self._font_family, self._font_size_button),
+        )
 
         self.stop_server_button_style = ttk.Style()
-        self.stop_server_button_style.configure("ServerStop.TButton", foreground="black",
-                                                 background=self._stop_server_bgcolor,
-                                                 font=(self._font_family, self._font_size_button))
-
+        self.stop_server_button_style.configure(
+            "ServerStop.TButton",
+            foreground="black",
+            background=self._stop_server_bgcolor,
+            font=(self._font_family, self._font_size_button),
+        )
 
         # set up window components
 
-        self.button_server = ttk.Button(self._root,
-                                     text=self._default_label_start_server,
-                                     command=self.toggle_server,
-                                     style="ServerStart.TButton")
+        self.button_server = ttk.Button(
+            self._root,
+            text=self._default_label_start_server,
+            command=self.toggle_server,
+            style="ServerStart.TButton",
+        )
 
-        self.button_run = ttk.Button(self._root,
-                                     text=self._default_label_experiment_status_text,
-                                     style="Run.TButton")
+        self.button_run = ttk.Button(
+            self._root,
+            text=self._default_label_experiment_status_text,
+            style="Run.TButton",
+        )
 
-        self.button_server.grid(row=3, column=0, columnspan=2, sticky=N+S+E+W)
+        self.button_server.grid(row=3, column=0, columnspan=2, sticky=N + S + E + W)
         self.button_run.grid(row=0, column=6, sticky=N + S + E + W)
 
         # experiment file label
@@ -96,39 +110,45 @@ class Experiment_Server_GUI(Experimentalist_GUI):
         self.listbox_status.yview_moveto(1)
 
     def listen_for_result(self):
-        '''
+        """
         Check if there is something in the queue
-        '''
+        """
         try:
             self.res = self.thread_queue.get(0)
-            print('loop terminated')
+            print("loop terminated")
         except queue.Empty:
             self.after(100, self.listen_for_result)
 
     def toggle_server(self):
-        '''
+        """
         Spawn a new thread for running long loops in background
-        '''
+        """
         if self.experiment_server is None and self.server_running is False:
             # clear status listbox
-            self.listbox_status.delete(0, 'end')
+            self.listbox_status.delete(0, "end")
             # launch server
             self.thread_queue = queue.Queue()
             self.new_thread = threading.Thread(
-                target=runloop,
-                kwargs={'gui':self, 'run_local':self.run_local})
+                target=runloop, kwargs={"gui": self, "run_local": self.run_local}
+            )
             self.new_thread.start()
             self.after(100, self.listen_for_result)
             # change server
-            self.button_server.config(text=self._default_label_stop_server, style="ServerStop.TButton")
+            self.button_server.config(
+                text=self._default_label_stop_server, style="ServerStop.TButton"
+            )
         else:
             self.experiment_server.abort()
             self.experiment_server = None
             self.server_running = False
-            self.button_server.config(text=self._default_label_start_server, style="ServerStart.TButton")
+            self.button_server.config(
+                text=self._default_label_start_server, style="ServerStart.TButton"
+            )
 
     def init_run(self):
-        self.button_run.configure(text=self._default_label_experiment_status_text, style="Run.TButton")
+        self.button_run.configure(
+            text=self._default_label_experiment_status_text, style="Run.TButton"
+        )
 
     def init_STOP_button(self):
         self.button_run.configure(text="RUNNING", style="Stop.TButton")
@@ -141,4 +161,6 @@ class Experiment_Server_GUI(Experimentalist_GUI):
             self.experiment_server.abort()
             self.experiment_server = None
             self.server_running = False
-            self.button_server.config(text=self._default_label_start_server, style="ServerStart.TButton")
+            self.button_server.config(
+                text=self._default_label_start_server, style="ServerStart.TButton"
+            )

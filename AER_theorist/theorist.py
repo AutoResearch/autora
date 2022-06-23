@@ -1,20 +1,19 @@
-import os
-import sys
-import glob
-import shutil
-import logging
-import AER_config as aer_config
-import time
 import csv
+import glob
+import logging
+import os
+import shutil
+import sys
+import time
+from abc import ABC, abstractmethod
+from tkinter import Tk
 
-from AER_utils import Plot_Types
-from AER_theorist.theorist_GUI import Theorist_GUI
-from tkinter import *
 from matplotlib.figure import Figure
 
+import AER_config as aer_config
+from AER_theorist.theorist_GUI import Theorist_GUI
+from AER_utils import Plot_Types
 
-from abc import ABC, abstractmethod
-from AER_theorist.object_of_study import Object_Of_Study
 
 class Theorist(ABC):
 
@@ -58,11 +57,10 @@ class Theorist(ABC):
         self.setup_simulation_directories()
         self.copy_scripts(scripts_to_save=glob.glob(self.simulation_files))
 
-
     def GUI(self, object_of_study):
         root = Tk()
 
-        app = Theorist_GUI(theorist=self, object_of_study=object_of_study, root=root)
+        Theorist_GUI(theorist=self, object_of_study=object_of_study, root=root)
 
         root.mainloop()
 
@@ -73,12 +71,21 @@ class Theorist(ABC):
     def set_model_search_parameter(self, key, str_value):
         if key in self._model_search_parameters.keys():
             if self._model_search_parameters[key][1] is True:
-                self._model_search_parameters[key][0] = self._model_search_parameters[key][2](str_value)
+                self._model_search_parameters[key][0] = self._model_search_parameters[
+                    key
+                ][2](str_value)
                 self.assign_model_search_parameters()
             else:
-                raise Exception("Not allowed to modify model search parameter '" + str(key) + "'. Dictionary self._model_search_parameters indicates that the parameter cannot be modified.")
+                raise Exception(
+                    "Not allowed to modify model search parameter '"
+                    + str(key)
+                    + "'. Dictionary self._model_search_parameters indicates "
+                    "that the parameter cannot be modified."
+                )
         else:
-            raise Exception("Key '" + str(key) + "' not in dictionary self._model_search_parameters")
+            raise Exception(
+                "Key '" + str(key) + "' not in dictionary self._model_search_parameters"
+            )
 
     def search_model_job(self, object_of_study, job_id):
 
@@ -137,7 +144,7 @@ class Theorist(ABC):
             self.init_model_evaluation(object_of_study)
             # loop over epochs
             for epoch in range(self.eval_epochs):
-                logging.info('epoch %d', epoch)
+                logging.info("epoch %d", epoch)
                 # run single epoch
                 self.run_eval_epoch(epoch, object_of_study)
                 # log performance (for plotting purposes)
@@ -150,7 +157,6 @@ class Theorist(ABC):
             # log model evaluation
             self.log_model_evaluation(object_of_study)
             self._eval_meta_parameters_iteration += 1
-
 
         # sum up meta evaluation
         self.log_meta_evaluation(object_of_study)
@@ -169,7 +175,13 @@ class Theorist(ABC):
         self.save_plots(supplementary_plots, plot_label)
 
     def plot_model_eval(self, object_of_study):
-        plot_label = self.theorist_name + "_" + self._meta_parameters_to_str() + "_" + self._eval_meta_parameters_to_str()
+        plot_label = (
+            self.theorist_name
+            + "_"
+            + self._meta_parameters_to_str()
+            + "_"
+            + self._eval_meta_parameters_to_str()
+        )
 
         # performance plots
         all_performance_plots = self.get_performance_plots(object_of_study)
@@ -193,7 +205,6 @@ class Theorist(ABC):
         if plot_name_list is not None:
             self.plot_name_list = plot_name_list
 
-
     def save_plots(self, plot_list, plot_label):
 
         for key in plot_list.keys():
@@ -204,7 +215,7 @@ class Theorist(ABC):
             plot_fig = Figure(figsize=(7, 7), dpi=100)
 
             if type == Plot_Types.SURFACE_SCATTER:
-                plot_axis = plot_fig.add_subplot(111, projection='3d')
+                plot_axis = plot_fig.add_subplot(111, projection="3d")
             else:
                 plot_axis = plot_fig.add_subplot(111)
 
@@ -227,7 +238,9 @@ class Theorist(ABC):
                 del plot_axis.lines[:]  # remove previous lines
                 plots = list()
                 for idx, (x, y, leg) in enumerate(zip(x_data, y_data, legend)):
-                    plots.append(plot_axis.plot(x, y, aer_config.plot_colors[idx], label=leg))
+                    plots.append(
+                        plot_axis.plot(x, y, aer_config.plot_colors[idx], label=leg)
+                    )
 
                 # adjust axes
                 plot_axis.set_xlim(x_limit[0], x_limit[1])
@@ -238,7 +251,6 @@ class Theorist(ABC):
                 plot_axis.set_ylabel(y_label, fontsize=aer_config.font_size)
 
                 plot_axis.legend(loc=2, fontsize="small")
-
 
             elif type == Plot_Types.IMAGE:
 
@@ -251,10 +263,10 @@ class Theorist(ABC):
 
                 # generate image
                 plot_axis.cla()
-                plot_axis.imshow(image, interpolation='nearest', aspect='auto')
+                plot_axis.imshow(image, interpolation="nearest", aspect="auto")
                 x = x_data
                 y = y_data
-                plot_axis.plot(x, y, color='red')
+                plot_axis.plot(x, y, color="red")
 
                 # set labels
                 plot_axis.set_xlabel(x_label, fontsize=aer_config.font_size)
@@ -278,10 +290,14 @@ class Theorist(ABC):
                 del plot_axis.lines[:]  # remove previous lines
                 plots = list()
                 # plot data
-                plots.append(plot_axis.scatter(x_data, y_data, marker='.', c='r', label=legend[0]))
+                plots.append(
+                    plot_axis.scatter(
+                        x_data, y_data, marker=".", c="r", label=legend[0]
+                    )
+                )
 
                 # plot model prediction
-                plots.append(plot_axis.plot(x_model, y_model, 'k', label=legend[1]))
+                plots.append(plot_axis.plot(x_model, y_model, "k", label=legend[1]))
 
                 # adjust axes
                 plot_axis.set_xlim(x_limit[0], x_limit[1])
@@ -311,10 +327,21 @@ class Theorist(ABC):
                 plots = list()
 
                 # plot data
-                plots.append(plot_axis.scatter(x1_data, x2_data, y_data, color=(1, 0, 0, 0.5), label=legend[0]))
+                plots.append(
+                    plot_axis.scatter(
+                        x1_data, x2_data, y_data, color=(1, 0, 0, 0.5), label=legend[0]
+                    )
+                )
                 # plot model prediction
                 plots.append(
-                    plot_axis.plot_trisurf(x1_model, x2_model, y_model, color=(0, 0, 0, 0.5), label=legend[1]))
+                    plot_axis.plot_trisurf(
+                        x1_model,
+                        x2_model,
+                        y_model,
+                        color=(0, 0, 0, 0.5),
+                        label=legend[1],
+                    )
+                )
 
                 # adjust axes
                 plot_axis.set_xlim(x1_limit[0], x1_limit[1])
@@ -329,7 +356,9 @@ class Theorist(ABC):
             # finalize performance plot
             plot_axis.set_title(key, fontsize=aer_config.font_size)
 
-            plot_filepath = os.path.join(self.results_plots_path, 'plot_' + plot_label + '_' + key + '.png')
+            plot_filepath = os.path.join(
+                self.results_plots_path, "plot_" + plot_label + "_" + key + ".png"
+            )
             plot_fig.savefig(plot_filepath)
 
     def log_time_elapsed(self):
@@ -343,16 +372,19 @@ class Theorist(ABC):
             self.time_elapsed_log[name].append(value)
         self.time_elapsed_log[aer_config.log_key_timestamp].append(str(elapsed))
 
-
     def clear_validation_sets(self):
         self._validation_sets = dict()
 
     def add_validation_set(self, object_of_study, name=None):
         if name is None:
-            name = object_of_study.get_name() + "_" + str(len(self._validation_sets.keys()))
+            name = (
+                object_of_study.get_name()
+                + "_"
+                + str(len(self._validation_sets.keys()))
+            )
 
         self._validation_sets[name] = object_of_study
-        
+
     @abstractmethod
     def assign_model_search_parameters(self):
         pass
@@ -366,7 +398,8 @@ class Theorist(ABC):
         self.model_search_id += 1
         self.setup_logging()
 
-        # initialize dictionary for logging the time elapsed associated with each meta search condition
+        # initialize dictionary for logging the time elapsed associated
+        # with each meta search condition
         self.time_elapsed_log = dict()
         names = self._meta_parameter_names_to_str_list()
         for name in names:
@@ -382,10 +415,16 @@ class Theorist(ABC):
 
         # timestamps to csv
         if self.single_job:
-            meta_param_str = '_' + self._meta_parameters_to_str()
+            meta_param_str = "_" + self._meta_parameters_to_str()
         else:
-            meta_param_str = ''
-        filename_csv = self.theorist_name + meta_param_str + '_search_' + str(self.model_search_id) + '_timestamps.csv'
+            meta_param_str = ""
+        filename_csv = (
+            self.theorist_name
+            + meta_param_str
+            + "_search_"
+            + str(self.model_search_id)
+            + "_timestamps.csv"
+        )
         filepath = os.path.join(self.results_path, filename_csv)
 
         # format data
@@ -482,36 +521,47 @@ class Theorist(ABC):
     def setup_simulation_directories(self):
 
         # study directory
-        self.study_path = aer_config.studies_folder \
-                          + self.study_name + "/"
+        self.study_path = aer_config.studies_folder + self.study_name + "/"
 
         if not os.path.exists(self.study_path):
             os.mkdir(self.study_path)
 
         # scripts directory
-        self.scripts_path = aer_config.studies_folder\
-                            + self.study_name + "/"\
-                            + aer_config.models_folder\
-                            + aer_config.models_scripts_folder
+        self.scripts_path = (
+            aer_config.studies_folder
+            + self.study_name
+            + "/"
+            + aer_config.models_folder
+            + aer_config.models_scripts_folder
+        )
 
         if not os.path.exists(self.scripts_path):
             os.mkdir(self.scripts_path)
 
         # results directory
-        self.results_path = aer_config.studies_folder\
-                            + self.study_name + "/"\
-                            + aer_config.models_folder \
-                            + aer_config.models_results_folder
+        self.results_path = (
+            aer_config.studies_folder
+            + self.study_name
+            + "/"
+            + aer_config.models_folder
+            + aer_config.models_results_folder
+        )
 
-        self.results_plots_path = aer_config.studies_folder\
-                            + self.study_name + "/"\
-                            + aer_config.models_folder \
-                            + aer_config.models_results_plots_folder
+        self.results_plots_path = (
+            aer_config.studies_folder
+            + self.study_name
+            + "/"
+            + aer_config.models_folder
+            + aer_config.models_results_plots_folder
+        )
 
-        self.results_weights_path = aer_config.studies_folder \
-                                  + self.study_name + "/" \
-                                  + aer_config.models_folder \
-                                  + aer_config.models_results_weights_folder
+        self.results_weights_path = (
+            aer_config.studies_folder
+            + self.study_name
+            + "/"
+            + aer_config.models_folder
+            + aer_config.models_results_weights_folder
+        )
 
         if not os.path.exists(self.results_path):
             os.mkdir(self.results_path)
@@ -530,26 +580,47 @@ class Theorist(ABC):
                 dst_file = os.path.join(self.scripts_path, os.path.basename(script))
                 shutil.copyfile(script, dst_file)
 
-
     def setup_logging(self):
 
         # determine the format for logging: event time and message
-        log_format = '%(asctime)s %(message)s'
+        log_format = "%(asctime)s %(message)s"
         # sets u a logging system in python,
         # - the stream is set to to the output console (stdout)
-        # - report events that occur during normal operation of a program (logging.INFO), i.e. not during debugging
+        # - report events that occur during normal operation of a program (logging.INFO),
+        #   i.e. not during debugging
         # - use the pre-specified log format with time and message
         # - use the corresponding date format
-        logging.basicConfig(stream=sys.stdout, level=logging.INFO,
-                            format=log_format, datefmt='%m/%d %I:%M:%S %p')
+        logging.basicConfig(
+            stream=sys.stdout,
+            level=logging.INFO,
+            format=log_format,
+            datefmt="%m/%d %I:%M:%S %p",
+        )
         # specify handle to file where logging output is stored
-        fh = logging.FileHandler(os.path.join(self.results_path, 'log_' + str(self.model_search_id) + '.txt'))
+        fh = logging.FileHandler(
+            os.path.join(self.results_path, "log_" + str(self.model_search_id) + ".txt")
+        )
         # specify format for logging
         fh.setFormatter(logging.Formatter(log_format))
         # adds file name to logger
         logging.getLogger().addHandler(fh)
 
-    def _generate_plot_dict(self, type, x, y, x_limit=None, y_limit=None, x_label=None, y_label=None, legend=None, image=None, x_model=None, y_model=None, x_highlighted=None, y_highlighted=None):
+    def _generate_plot_dict(
+        self,
+        type,
+        x,
+        y,
+        x_limit=None,
+        y_limit=None,
+        x_label=None,
+        y_label=None,
+        legend=None,
+        image=None,
+        x_model=None,
+        y_model=None,
+        x_highlighted=None,
+        y_highlighted=None,
+    ):
         # generate plot dictionary
         plot_dict = dict()
         plot_dict[aer_config.plot_key_type] = type

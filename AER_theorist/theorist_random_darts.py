@@ -1,24 +1,23 @@
+import logging
+import os
+import time
+import warnings
 from abc import ABC
-from AER_theorist.theorist_darts import Theorist_DARTS
+
+import pandas
 
 import AER_config as aer_config
 import AER_theorist.darts.darts_config as darts_cfg
-import warnings
-import logging
-import pandas
-import time
-import os
+from AER_theorist.theorist_darts import Theorist_DARTS
 
 
 class Theorist_Random_DARTS(Theorist_DARTS, ABC):
-
-    def __init__(self, study_name, theorist_filter='darts'):
+    def __init__(self, study_name, theorist_filter="darts"):
         super(Theorist_Random_DARTS, self).__init__(study_name)
 
-        self.theorist_name = 'random_darts'
+        self.theorist_name = "random_darts"
         self.model_search_epochs = 0
         self.load_runtimes(theorist_filter)
-
 
     def load_runtimes(self, theorist_filter):
 
@@ -28,7 +27,7 @@ class Theorist_Random_DARTS(Theorist_DARTS, ABC):
         files = list()
         for file in os.listdir(self.results_path):
             if file.endswith(".csv"):
-                if 'timestamps' not in file:
+                if "timestamps" not in file:
                     continue
 
                 if theorist_filter is not None:
@@ -52,12 +51,24 @@ class Theorist_Random_DARTS(Theorist_DARTS, ABC):
                 if name in data.keys():
                     all_runtimes[name].extend(data[name])
                 else:
-                    raise Exception('Could not find meta parameter' + name + '" in the data file: ' + str(file))
+                    raise Exception(
+                        "Could not find meta parameter"
+                        + name
+                        + '" in the data file: '
+                        + str(file)
+                    )
 
             if aer_config.log_key_timestamp in data.keys():
-                all_runtimes[aer_config.log_key_timestamp].extend(data[aer_config.log_key_timestamp])
+                all_runtimes[aer_config.log_key_timestamp].extend(
+                    data[aer_config.log_key_timestamp]
+                )
             else:
-                raise Exception('Could not find timestamp key' + aer_config.log_key_timestamp + '" in the data file: ' + str(file))
+                raise Exception(
+                    "Could not find timestamp key"
+                    + aer_config.log_key_timestamp
+                    + '" in the data file: '
+                    + str(file)
+                )
 
         # for each meta-parameter pick highest run time
         decay_name = meta_param_names[0]
@@ -74,13 +85,26 @@ class Theorist_Random_DARTS(Theorist_DARTS, ABC):
                         k = all_runtimes[k_name][idx]
                         s = all_runtimes[s_name][idx]
 
-                        if decay == arch_weight_decay_df and num_graph_nodes == k and seed == s:
-                            time_elapsed = all_runtimes[aer_config.log_key_timestamp][idx]
+                        if (
+                            decay == arch_weight_decay_df
+                            and num_graph_nodes == k
+                            and seed == s
+                        ):
+                            time_elapsed = all_runtimes[aer_config.log_key_timestamp][
+                                idx
+                            ]
                             if time_elapsed > max_time:
                                 max_time = time_elapsed
 
                     if max_time == 0:
-                        warnings.warn("No time elapsed found for parameter configuration: decay=" + str(arch_weight_decay_df) + ", k=" + str(num_graph_nodes) + ", seed=" + str(seed))
+                        warnings.warn(
+                            "No time elapsed found for parameter configuration: decay="
+                            + str(arch_weight_decay_df)
+                            + ", k="
+                            + str(num_graph_nodes)
+                            + ", seed="
+                            + str(seed)
+                        )
                         max_time = 1
 
                     runtimes[decay_name].append(arch_weight_decay_df)
@@ -99,9 +123,12 @@ class Theorist_Random_DARTS(Theorist_DARTS, ABC):
         seed_name = names[2]
 
         # retrieve and save current runtime
-        row = self.runtimes.loc[(self.runtimes[decay_name] == arch_weight_decay_df) & (self.runtimes[num_graph_nodes_name] == num_graph_nodes) & (self.runtimes[seed_name] == seed)]
+        row = self.runtimes.loc[
+            (self.runtimes[decay_name] == arch_weight_decay_df)
+            & (self.runtimes[num_graph_nodes_name] == num_graph_nodes)
+            & (self.runtimes[seed_name] == seed)
+        ]
         self.current_runtime = row[aer_config.log_key_timestamp].values[0]
-
 
     def init_model_search(self, object_of_study):
         super(Theorist_Random_DARTS, self).init_model_search(object_of_study)
@@ -136,7 +163,7 @@ class Theorist_Random_DARTS(Theorist_DARTS, ABC):
 
             # loop over epochs
             for epoch in range(self.eval_epochs):
-                logging.info('epoch %d', epoch)
+                logging.info("epoch %d", epoch)
                 # run single epoch
                 self.run_eval_epoch(epoch, object_of_study)
                 # log performance (for plotting purposes)
@@ -161,14 +188,13 @@ class Theorist_Random_DARTS(Theorist_DARTS, ABC):
                 if elapsed >= self.current_runtime:
                     break
 
-                else: # if did not exceed runtime, add more meta parameters
+                else:  # if did not exceed runtime, add more meta parameters
                     for init_sample in range(darts_cfg.n_initializations_sampled):
-                        meta_parameters = [arch_sample_id+1, init_sample]
+                        meta_parameters = [arch_sample_id + 1, init_sample]
                         self._eval_meta_parameters.append(meta_parameters)
 
         # sum up meta evaluation
         self.log_meta_evaluation(object_of_study)
-
 
     def run_model_search_epoch(self, epoch):
         pass

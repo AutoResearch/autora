@@ -1,6 +1,9 @@
 from abc import ABC
-from AER_experimentalist.experiment_design import Experiment_Design
+
 import numpy as np
+
+from AER_experimentalist.experiment_design import Experiment_Design
+
 
 class Experiment_Design_Synthetic_Weber(Experiment_Design, ABC):
 
@@ -14,10 +17,14 @@ class Experiment_Design_Synthetic_Weber(Experiment_Design, ABC):
 
         experiment = dict()
         IV1 = object_of_study.independent_variables[0]
-        IV2  = object_of_study.independent_variables[1]
+        IV2 = object_of_study.independent_variables[1]
 
-        S1_levels = np.linspace(IV1._value_range[0], IV1._value_range[1], self._stimulus_resolution).tolist()
-        S2_levels = np.linspace(IV1._value_range[0], IV1._value_range[1], self._stimulus_resolution).tolist()
+        S1_levels = np.linspace(
+            IV1._value_range[0], IV1._value_range[1], self._stimulus_resolution
+        ).tolist()
+        S2_levels = np.linspace(
+            IV1._value_range[0], IV1._value_range[1], self._stimulus_resolution
+        ).tolist()
 
         S1_trials = list()
         S2_trials = list()
@@ -33,7 +40,9 @@ class Experiment_Design_Synthetic_Weber(Experiment_Design, ABC):
 
         return experiment
 
-    def validate_trial(self, object_of_study, experiment_condition, experiment_sequence):
+    def validate_trial(
+        self, object_of_study, experiment_condition, experiment_sequence
+    ):
 
         IV1 = object_of_study.independent_variables[0]
         IV2 = object_of_study.independent_variables[1]
@@ -45,5 +54,3 @@ class Experiment_Design_Synthetic_Weber(Experiment_Design, ABC):
             return True
         else:
             return False
-
-
