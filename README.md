@@ -6,32 +6,29 @@ Ben Andrew, Hannah Even, Ioana Marinescu, Sebastian Musslick, Sida Li
 
 # Getting started (development)
 
-This package requires the following:
-- python and modules as described in the `pyproject.toml` file
-- the `graphviz` package (for the GUI)
-- the python command line tool `pre-commit` (for making changes to the repository)
+The following sections describe how to install and configure the supported setup recommended for developing AER, using:
+- `python` and dependencies as described in the `pyproject.toml` file,
+- `pyenv` (optional) which is used for installing different versions of `python`,
+- `poetry` (mandatory) for managing the `python` environment itself,
+- `pre-commit` (mandatory when making changes to the repository) which is used for handling git pre-commit hooks,
+- `graphviz` (mandatory) which is used for some visualizations.
 
-Depending on your computer, the steps to get the environment working will vary. A common setup with MacOS is described below.
+Depending on your computer, the steps to get AER working will vary. At present, macOS is supported. 
 
-## Basic Setup on MacOS 
+## Basic Setup on macOS 
 
-For MacOS, we recommend using the following setup:
-- `homebrew` as the package manager for the system,
-- `pyenv` for managing python versions,
-- `pipx` for installing python command line utilities,
-- `poetry` for managing the python environment itself.
+### Install dependencies
 
-### Install external dependencies
+#### Install `homebrew` (optional)
 
-#### Install `homebrew`
+For macOS we strongly recommend using `homebrew` as the package manager.
 
 Visit [https://brew.sh](https://brew.sh) and run the installation instructions.
-
 
 #### Install external tools using `homebrew`
 
 This is a good time to check that the other external dependencies are fulfilled. For developing AER you need:
-- `pyenv` and `pipx` which are required for the `python` setup,
+- `pyenv` which is required for the `python` setup,
 - `pre-commit` which is used for handling git pre-commit hooks,
 - `graphviz` which is used for some visualizations.
 
