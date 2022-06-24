@@ -195,10 +195,10 @@ If your `git commit` fails because of the pre-commit hook, then you should:
 2. Inspect the output. It might look like this:
    ```
    $ pre-commit run
-   black....................................................................Passed
-   isort....................................................................Passed
-   flake8...................................................................Passed
-   mypy.....................................................................Failed
+   black....................Passed
+   isort....................Passed
+   flake8...................Passed
+   mypy.....................Failed
    - hook id: mypy
    - exit code: 1
    
@@ -216,10 +216,10 @@ If your `git commit` fails because of the pre-commit hook, then you should:
 6. Repeat 1-4 until all hooks return "passed", e.g.
    ```
    $ pre-commit run
-   black....................................................................Passed
-   isort....................................................................Passed
-   flake8...................................................................Passed
-   mypy.....................................................................Passed
+   black....................Passed
+   isort....................Passed
+   flake8...................Passed
+   mypy.....................Passed
    ```
 
 It's easiest to solve these kinds of problems if you make small commits, often.  
