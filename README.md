@@ -62,28 +62,6 @@ After making these changes, restart your shell session by executing:
 exec "$SHELL" 
 ```
 
-#### Install Poetry
-
-Now you can install the `python` package manager `poetry` as follows:
-
-```zsh
-pipx install poetry
-```
-
-If all is well, then when you restart your terminal and execute:
-```zsh
-which poetry
-```
-... it should return something like `/Users/me/.local/bin/poetry`. 
-
-
-When you run:
-```zsh
-poetry --version
-```
-...it should return something like `Poetry version 1.1.13`
-
-
 ## Set up the `python` environment
 
 ### Install `python` version 
@@ -91,7 +69,6 @@ poetry --version
 Install a `python` version listed in the [`pyproject.toml`](./pyproject.toml) file. The entry loks like:  
 
 ```toml
-[tool.poetry.dependencies]
 python = '>=3.8.13,<3.11'
 ```
 
@@ -120,7 +97,11 @@ From the [`AER`](./.) directory, run:
 poetry config virtualenvs.in-project true  
 
 # Set up a new environment with the version of python you installed earlier
-poetry env use 3.8  # '3.8' needs to match the version of python you installed with pyenv, without the patch version number
+pyenv shell 3.8.13  # Activate the target version of python
+poetry env use $(pyenv which python)  # Set up a new poetry environment with that python version
+
+# Check that the poetry environment is in the correct place. This command should return the path to the AER/.venv/ directory:
+poetry env info --path
 
 # Update the installation utilities within the new environment
 poetry run python -m pip install --upgrade pip setuptools wheel
@@ -129,20 +110,57 @@ poetry run python -m pip install --upgrade pip setuptools wheel
 poetry install
 ```
 
-Once this runs without errors, check that the `poetry` environment is correctly set-up.
+#### Using `poetry` interactively
 
-1. Check which `python` executable is used for your `poetry` environment. Execute 
-   ```shell
-   poetry run which python
-   ``` 
-   It should return the path to your python executable in the `.venv/` directory.
+To run interactive commands, you can activate the poetry virtual environment. From the [`AER`](./.) directory, run:
 
+```shell
+% poetry shell
+```
 
-2. Run the tests. Execute:
-   ```shell
-   poetry run python -m unittest
-   ```
-   This should report something like `Ran 42 tests in 1.000s` and the last line of the output should be `OK`.
+This spawns a new shell where you have access to the poetry `python` and all of the packages installed using `poetry install`. You should see the prompt change:
+
+```shell
+% poetry shell
+Spawning shell within /Users/me/Developer/AER/.venv
+Restored session: Fri Jun 24 12:34:56 EDT 2022
+(.venv) % 
+```
+
+If you execute `python` and then `import numpy`, you should be able to see that `numpy` has been imported from the `.venv` directory :
+
+```shell
+(.venv) % python
+Python 3.8.13 (default, Jun 16 2022, 12:34:56) 
+[Clang 13.1.6 (clang-1316.0.21.2.5)] on darwin
+Type "help", "copyright", "credits" or "license" for more information.
+>>> import numpy
+>>> numpy
+<module 'numpy' from '.../AER/.venv/lib/python3.8/site-packages/numpy/__init__.py'>
+```
+
+To deactivate the `poetry` environment, `exit` the session. This should return you to your original prompt, as follows:
+```shell
+(.venv) % exit
+
+Saving session...
+...saving history...truncating history files...
+...completed.
+% 
+```
+
+#### Using `poetry` non-interactively
+
+You can run python programs using poetry without activating the poetry environment, by using `poetry run {command}`. For example, to run the tests, execute:
+
+```shell
+% poetry run python -m unittest
+.
+--------------------------------
+Ran 1 test in 0.000s
+
+OK
+```
 
 ## Pre-Commit Hooks
 
