@@ -93,15 +93,13 @@ There are two suggested options for initializing an environment:
 From the [`AER`](./.) directory, run:
 
 ```zsh
-# First tell poetry to save the environment in the AER/.venv/ directory:
-poetry config virtualenvs.in-project true  
+# Optional: configure poetry to save the environment in the AER/.venv/ directory. 
+# We'll assume you've done this in the rest of the description.
+poetry config virtualenvs.in-project true
 
 # Set up a new environment with the version of python you installed earlier
 pyenv shell 3.8.13  # Activate the target version of python
 poetry env use $(pyenv which python)  # Set up a new poetry environment with that python version
-
-# Check that the poetry environment is in the correct place. This command should return the path to the AER/.venv/ directory:
-poetry env info --path
 
 # Update the installation utilities within the new environment
 poetry run python -m pip install --upgrade pip setuptools wheel
