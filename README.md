@@ -6,37 +6,35 @@ Ben Andrew, Hannah Even, Ioana Marinescu, Sebastian Musslick, Sida Li
 
 # Getting started (development)
 
-This package requires the following:
-- python and modules as described in the `pyproject.toml` file
-- the `graphviz` package (for the GUI)
-- the python command line tool `pre-commit` (for making changes to the repository)
-
-Depending on your computer, the steps to get the environment working will vary. A common setup with MacOS is described below.
+The following sections describe how to install and configure the supported setup recommended for developing AER, using:
+- `python` and dependencies as described in the `pyproject.toml` file,
+- `pyenv` (optional) which is used for installing different versions of `python`,
+- `poetry` (mandatory) for managing the `python` environment itself,
+- `pre-commit` (mandatory when making changes to the repository) which is used for handling git pre-commit hooks,
+- `graphviz` (mandatory) which is used for some visualizations.
 
 You should also consider using an IDE. We recommend: 
 - PyCharm (academic licenses for PyCharm pro are available for free). This is a `python`-specific integrated development environment which comes with extremely powerful tools for changing the structure of `python` code, running tests, etc. 
 - Visual Studio Code (free). This is a powerful general text editor with a large number of plugins available for different tasks. 
 
+- Depending on your computer, the steps to get AER working will vary. At present, macOS is supported. 
+
+
 
 ## Basic Setup on MacOS 
 
-For MacOS, we recommend using the following setup:
-- `homebrew` as the package manager for the system,
-- `pyenv` for managing python versions,
-- `pipx` for installing python command line utilities,
-- `poetry` for managing the python environment itself.
+### Install dependencies
 
-### Install external dependencies
+#### Install `homebrew` (optional)
 
-#### Install `homebrew`
+For macOS we strongly recommend using `homebrew` as the package manager.
 
 Visit [https://brew.sh](https://brew.sh) and run the installation instructions.
-
 
 #### Install external tools using `homebrew`
 
 This is a good time to check that the other external dependencies are fulfilled. For developing AER you need:
-- `pyenv` and `pipx` which are required for the `python` setup,
+- `pyenv` which is required for the `python` setup,
 - `pre-commit` which is used for handling git pre-commit hooks,
 - `graphviz` which is used for some visualizations.
 
@@ -71,7 +69,7 @@ exec "$SHELL"
 
 ### Install `python` version 
 
-Install a `python` version listed in the [`pyproject.toml`](./pyproject.toml) file. The entry loks like:  
+Install a `python` version listed in the [`pyproject.toml`](./pyproject.toml) file. The entry looks like:  
 
 ```toml
 python = '>=3.8.13,<3.11'
@@ -83,7 +81,7 @@ In this case, you could install version 3.8.13 as follows:
 pyenv install 3.8.13
 ```
 
-### Set up the `python` environment
+### Set up the `poetry` environment
 
 You can use this `python` version with the `poetry` package manager to create an isolated environment where you can run the AER code. `poetry` handles resolving dependencies between `python` modules and ensures that you are using the same package versions as other members of the development team (which is a good thing).
 
@@ -113,7 +111,7 @@ poetry run python -m pip install --upgrade pip setuptools wheel
 poetry install
 ```
 
-#### Using `poetry` interactively
+##### Using `poetry` interactively
 
 To run interactive commands, you can activate the poetry virtual environment. From the [`AER`](./.) directory, run:
 
@@ -152,7 +150,7 @@ Saving session...
 % 
 ```
 
-#### Using `poetry` non-interactively
+##### Using `poetry` non-interactively
 
 You can run python programs using poetry without activating the poetry environment, by using `poetry run {command}`. For example, to run the tests, execute:
 
