@@ -26,90 +26,66 @@ For MacOS, we recommend using the following setup:
 - `pipx` for installing python command line utilities,
 - `poetry` for managing the python environment itself.
 
-### Install `homebrew`
+### Install external dependencies
 
-Visit [https://brew.sh](https://brew.sh) and run the install instructions.
+#### Install `homebrew`
+
+Visit [https://brew.sh](https://brew.sh) and run the installation instructions.
 
 
-### Install other external dependencies
+#### Install external tools using `homebrew`
 
-This is a good time to check that the other external dependencies are fulfilled. You can install them as follows:
+This is a good time to check that the other external dependencies are fulfilled. For developing AER you need:
+- `pyenv` and `pipx` which are required for the `python` setup,
+- `pre-commit` which is used for handling git pre-commit hooks,
+- `graphviz` which is used for some visualizations.
 
-```zsh
-brew install graphviz
+You can install them as follows:
+
+```shell
+brew bundle
 ```
 
-### Install pyenv
+This uses the [`Brewfile`](./Brewfile) to install all the packages required.
 
-`pyenv` allows installing different versions of python. Install it using: 
+#### Initialize pyenv
 
-```zsh
-brew install pyenv
-```
+`pyenv` allows installing different versions of `python`. Run the initialization script as follows:
 
-Then run the initialization script:
-```zsh
+```shell
 pyenv init
-# ... then follow the instructions and add some lines to your `~/.zshrc` file.
 ``` 
+... then follow the instructions and add some lines to your shell environment, modifying the following files:
+- If you use `zsh`, you'll modify `~/.zshrc` and `~/.zprofile`, 
+- If you use `bash`, you'll modify `~/.bash_profile`.
 
-### Install python
+#### Restart shell session
 
-Install the python version you want to use. 
+After making these changes, restart your shell session by executing:
 
-We suggest using the version listed in the file [`pyproject.toml`](./pyproject.toml), which looks like:
-
-```toml
-[tool.poetry.dependencies]
-python = '>=3.8.13,<3.11'
-```
-
-For instance, if you decide to use `python 3.8.13`, you would run:
-
-```zsh
-pyenv install 3.8.13
-pyenv shell 3.8.13  # this activates the version of python you just installed for the current session
-```
-
-### Install `pipx`
-
-We suggest using `pipx` to manage command line utilities like poetry. In the same session where you activated `python` run the following commands:
-
-```zsh
-python -m pip install pipx
-pipx ensurepath  # allows you to access the pipx executable
-pipx completions  # optional
-```
-
-You should check that your `~/.zshrc` includes a line like 
-
-```
-export PATH="$PATH:/Users/me/.local/bin"
-``` 
-
-... so that the pipx executables are on the `$PATH`.
-
-### Install Poetry
-
-Now you can install the `python` package manager `poetry` as follows:
-
-```zsh
-pipx install poetry
-```
-
-If all is well, then when you open a new terminal window and execute 
-```zsh
-poetry --version
-```
-
-it should return something like:
-```zsh
-Poetry version 1.1.13
+```shell
+exec "$SHELL" 
 ```
 
 ## Set up the `python` environment
 
-You can use the `python` version already installed with the `poetry` package manager to create an isolated environment where you can run the AER code. `poetry` handles resolving dependencies between `python` modules and ensures that you are using the same package versions as other members of the development team (which is a good thing).
+### Install `python` version 
+
+Install a `python` version listed in the [`pyproject.toml`](./pyproject.toml) file. The entry loks like:  
+
+```toml
+python = '>=3.8.13,<3.11'
+```
+
+In this case, you could install version 3.8.13 as follows:
+
+```shell
+pyenv install 3.8.13
+```
+
+### Set up the `python` environment
+
+You can use this `python` version with the `poetry` package manager to create an isolated environment where you can run the AER code. `poetry` handles resolving dependencies between `python` modules and ensures that you are using the same package versions as other members of the development team (which is a good thing).
 
 There are two suggested options for initializing an environment:
 - On the command line using `poetry` directly,
@@ -117,16 +93,18 @@ There are two suggested options for initializing an environment:
 
 *Note: For end-users, it may be more appropriate to use an environment manager like `Anaconda` or `Miniconda` instead of `poetry`, but this is not currently supported.*
 
-### Command Line `poetry` Setup
+#### Command Line `poetry` Setup
 
 From the [`AER`](./.) directory, run:
 
 ```zsh
-# First tell poetry to save the environment in the AER/.venv/ directory:
-poetry config virtualenvs.in-project true  
+# Optional: configure poetry to save the environment in the AER/.venv/ directory. 
+# We'll assume you've done this in the rest of the description.
+poetry config virtualenvs.in-project true
 
 # Set up a new environment with the version of python you installed earlier
-poetry env use 3.8  # '3.8' needs to match the version of python you installed with pyenv
+pyenv shell 3.8.13  # Activate the target version of python
+poetry env use $(pyenv which python)  # Set up a new poetry environment with that python version
 
 # Update the installation utilities within the new environment
 poetry run python -m pip install --upgrade pip setuptools wheel
@@ -135,15 +113,57 @@ poetry run python -m pip install --upgrade pip setuptools wheel
 poetry install
 ```
 
-Check that the `poetry` environment is correctly set-up.
+#### Using `poetry` interactively
 
-- Run: 
-```zsh
-poetry run python -m unittest aer
+To run interactive commands, you can activate the poetry virtual environment. From the [`AER`](./.) directory, run:
+
+```shell
+% poetry shell
 ```
-- Activate the `poetry` environment in the current shell session.
-- If you execute `which python` it should return the path to your python executable in the .venv/ directory.
-  
+
+This spawns a new shell where you have access to the poetry `python` and all of the packages installed using `poetry install`. You should see the prompt change:
+
+```shell
+% poetry shell
+Spawning shell within /Users/me/Developer/AER/.venv
+Restored session: Fri Jun 24 12:34:56 EDT 2022
+(.venv) % 
+```
+
+If you execute `python` and then `import numpy`, you should be able to see that `numpy` has been imported from the `.venv` directory :
+
+```shell
+(.venv) % python
+Python 3.8.13 (default, Jun 16 2022, 12:34:56) 
+[Clang 13.1.6 (clang-1316.0.21.2.5)] on darwin
+Type "help", "copyright", "credits" or "license" for more information.
+>>> import numpy
+>>> numpy
+<module 'numpy' from '.../AER/.venv/lib/python3.8/site-packages/numpy/__init__.py'>
+```
+
+To deactivate the `poetry` environment, `exit` the session. This should return you to your original prompt, as follows:
+```shell
+(.venv) % exit
+
+Saving session...
+...saving history...truncating history files...
+...completed.
+% 
+```
+
+#### Using `poetry` non-interactively
+
+You can run python programs using poetry without activating the poetry environment, by using `poetry run {command}`. For example, to run the tests, execute:
+
+```shell
+% poetry run python -m unittest
+.
+--------------------------------
+Ran 1 test in 0.000s
+
+OK
+```
 
 ### PyCharm `poetry` Setup
 
@@ -156,7 +176,7 @@ poetry run python -m unittest aer
     `~/.pyenv/versions/3.8.13/bin/python3`
   - Select "install packages from pyproject.toml"
   - Poetry executable: select the path to the poetry installation you have, e.g. 
-    `~/.local/pipx/venvs/poetry/bin/poetry`
+    `/opt/homebrew/bin/poetry`
   - Click "OK" and wait while the environment builds.
 
 - **If you have already initialized a `poetry` environment**, 
@@ -200,15 +220,13 @@ Then:
 
 ## Set up the Pre-Commit Hooks
 
-We use [`pre-commit`](https://pre-commit.com) to manage pre-commit hooks.
+We use [`pre-commit`](https://pre-commit.com) to manage pre-commit hooks. 
 
 Pre-commit hooks are programs which run before each git commit and which check that the files to be committed: 
 - are correctly formatted and 
 - have no obvious coding errors.
 
-Pre-commit hooks are intended to enforce coding guidelines, including the Python style-guide [PEP8](https://peps.python.org/pep-0008/). 
-
-`pre-commit` is installed by poetry as a development dependency. 
+Pre-commit hooks are intended to enforce coding guidelines, including the Python style-guide [PEP8](https://peps.python.org/pep-0008/).
 
 The hooks and their settings are specified in [`.pre-commit-config.yaml`](./.pre-commit-config.yaml).
 
@@ -233,10 +251,10 @@ If your `git commit` fails because of the pre-commit hook, then you should:
 2. Inspect the output. It might look like this:
    ```
    $ pre-commit run
-   black....................................................................Passed
-   isort....................................................................Passed
-   flake8...................................................................Passed
-   mypy.....................................................................Failed
+   black....................Passed
+   isort....................Passed
+   flake8...................Passed
+   mypy.....................Failed
    - hook id: mypy
    - exit code: 1
    
@@ -254,10 +272,10 @@ If your `git commit` fails because of the pre-commit hook, then you should:
 5. Repeat 1-4 until all hooks return "passed", e.g.
    ```
    $ pre-commit run
-   black....................................................................Passed
-   isort....................................................................Passed
-   flake8...................................................................Passed
-   mypy.....................................................................Passed
+   black....................Passed
+   isort....................Passed
+   flake8...................Passed
+   mypy.....................Passed
    ```
 
 It's easiest to solve these kinds of problems if you make small commits, often.  
