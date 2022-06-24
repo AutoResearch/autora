@@ -30,17 +30,22 @@ Visit [https://brew.sh](https://brew.sh) and run the installation instructions.
 
 #### Install external tools using `homebrew`
 
-This is a good time to check that the other external dependencies are fulfilled. You can install them as follows:
+This is a good time to check that the other external dependencies are fulfilled. For developing AER you need:
+- `pyenv` and `pipx` which are required for the `python` setup,
+- `pre-commit` which is used for handling git pre-commit hooks,
+- `graphviz` which is used for some visualizations.
+
+You can install them as follows:
 
 ```shell
 brew bundle
 ```
 
-This will install `pyenv` and `pipx` which are required for the `python` setup. It will also install external dependencies used by the `aer` package.
+This uses the [`Brewfile`](./Brewfile) to install all the packages required.
 
 #### Initialize pyenv
 
-`pyenv` allows installing different versions of `python`. Run the initialization script:
+`pyenv` allows installing different versions of `python`. Run the initialization script as follows:
 
 ```shell
 pyenv init
@@ -48,25 +53,6 @@ pyenv init
 ... then follow the instructions and add some lines to your shell environment, modifying the following files:
 - If you use `zsh`, you'll modify `~/.zshrc` and `~/.zprofile`, 
 - If you use `bash`, you'll modify `~/.bash_profile`.
-
-
-#### Initialize `pipx`
-
-We suggest using `pipx` to manage command line utilities like poetry. 
-
-```shell
-pipx ensurepath  # allows you to access the pipx executable
-pipx completions  # optional
-```
-
-You should check that your shell environment (`~/.zshrc` for `zsh` users, or `~/.bashrc` for `bash` users) includes a line like:
-
-```shell
-export PATH="$PATH:/Users/me/.local/bin"
-``` 
-
-... so that programs installed using `pipx` are on the `$PATH`.
-
 
 #### Restart shell session
 

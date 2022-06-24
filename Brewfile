@@ -1,6 +1,7 @@
 # Python environment
 brew "pyenv"
-brew "pipx"
+brew "poetry"
+brew "pre-commit"
 
 # External tools
 brew "graphviz"
