@@ -21,12 +21,14 @@ For MacOS, we recommend using the following setup:
 - `pipx` for installing python command line utilities,
 - `poetry` for managing the python environment itself.
 
-### Install `homebrew`
+### Install external dependencies
+
+#### Install `homebrew`
 
 Visit [https://brew.sh](https://brew.sh) and run the installation instructions.
 
 
-### Install external dependencies
+#### Install external tools using `homebrew`
 
 This is a good time to check that the other external dependencies are fulfilled. You can install them as follows:
 
@@ -36,7 +38,7 @@ brew bundle
 
 This will install `pyenv` and `pipx` which are required for the `python` setup. It will also install external dependencies used by the `aer` package.
 
-### Initialize pyenv
+#### Initialize pyenv
 
 `pyenv` allows installing different versions of `python`. Run the initialization script:
 
@@ -47,22 +49,7 @@ pyenv init
 - If you use `zsh`, you'll modify `~/.zshrc` 
 - If you use `bash`, you'll modify `~/.bash_profile` & `~/.bashrc` .
 
-### Install python
-
-Install a `python` version listed in the [`pyproject.toml`](./pyproject.toml) file. The entry loks like:  
-
-```toml
-[tool.poetry.dependencies]
-python = '>=3.8.13,<3.11'
-```
-
-In this case, you could install version 3.8.13 as follows:
-
-```shell
-pyenv install 3.8.13
-```
-
-### Initialize `pipx`
+#### Initialize `pipx`
 
 We suggest using `pipx` to manage command line utilities like poetry. 
 
@@ -79,7 +66,16 @@ export PATH="$PATH:/Users/me/.local/bin"
 
 ... so that programs installed using `pipx` are on the `$PATH`.
 
-### Install Poetry
+
+#### Restart shell session
+
+After making these changes, restart your shell session by executing:
+
+```shell
+exec "$SHELL" 
+```
+
+#### Install Poetry
 
 Now you can install the `python` package manager `poetry` as follows:
 
@@ -87,17 +83,38 @@ Now you can install the `python` package manager `poetry` as follows:
 pipx install poetry
 ```
 
-If all is well, then when you open a new terminal window and execute 
+If all is well, then when you restart your terminal and execute:
 ```zsh
-$ poetry --version
+which poetry
 ```
+... it should return something like `/Users/me/.local/bin/poetry`. 
 
-it should return something like `Poetry version 1.1.13`
+
+When you run:
+```zsh
+poetry --version
+```
+...it should return something like `Poetry version 1.1.13`
 
 
 ## Set up the `python` environment
 
-You can use the `python` version already installed with the `poetry` package manager to create an isolated environment where you can run the AER code. `poetry` handles resolving dependencies between `python` modules and ensures that you are using the same package versions as other members of the development team (which is a good thing).
+### Install `python` version 
+
+Install a `python` version listed in the [`pyproject.toml`](./pyproject.toml) file. The entry loks like:  
+
+```toml
+[tool.poetry.dependencies]
+python = '>=3.8.13,<3.11'
+```
+
+In this case, you could install version 3.8.13 as follows:
+
+```shell
+pyenv install 3.8.13
+```
+
+You can use this `python` version with the `poetry` package manager to create an isolated environment where you can run the AER code. `poetry` handles resolving dependencies between `python` modules and ensures that you are using the same package versions as other members of the development team (which is a good thing).
 
 There are two suggested options for initializing an environment:
 - On the command line using `poetry` directly,
@@ -105,7 +122,9 @@ There are two suggested options for initializing an environment:
 
 *Note: For end-users, it may be more appropriate to use an environment manager like `Anaconda` or `Miniconda` instead of `poetry`, but this is not currently supported.*
 
-### Command Line `poetry` Setup
+### `poetry` Setup
+
+#### Command Line `poetry` Setup
 
 From the [`AER`](./.) directory, run:
 
@@ -123,15 +142,20 @@ poetry run python -m pip install --upgrade pip setuptools wheel
 poetry install
 ```
 
-Check that the `poetry` environment is correctly set-up.
+Once this runs without errors, check that the `poetry` environment is correctly set-up.
 
-- Run: 
-```zsh
-poetry run python -m unittest aer
-```
-- Activate the `poetry` environment in the current shell session.
-- If you execute `which python` it should return the path to your python executable in the .venv/ directory.
-  
+1. Check which `python` executable is used for your `poetry` environment. Execute 
+   ```shell
+   poetry run which python
+   ``` 
+   It should return the path to your python executable in the `.venv/` directory.
+
+
+2. Run the tests. Execute:
+   ```shell
+   poetry run python -m unittest
+   ```
+   This should report something like `Ran 42 tests in 1.000s` and the last line of the output should be `OK`.
 
 ## Pre-Commit Hooks
 
