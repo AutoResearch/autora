@@ -23,70 +23,61 @@ For MacOS, we recommend using the following setup:
 
 ### Install `homebrew`
 
-Visit [https://brew.sh](https://brew.sh) and run the install instructions.
+Visit [https://brew.sh](https://brew.sh) and run the installation instructions.
 
 
-### Install other external dependencies
+### Install external dependencies
 
 This is a good time to check that the other external dependencies are fulfilled. You can install them as follows:
 
-```zsh
-brew install graphviz
+```shell
+brew bundle
 ```
 
-### Install pyenv
+This will install `pyenv` and `pipx` which are required for the `python` setup. It will also install external dependencies used by the `aer` package.
 
-`pyenv` allows installing different versions of python. Install it using: 
+### Initialize pyenv
 
-```zsh
-brew install pyenv
-```
+`pyenv` allows installing different versions of `python`. Run the initialization script:
 
-Then run the initialization script:
-```zsh
+```shell
 pyenv init
-# ... then follow the instructions and add some lines to your `~/.zshrc` file.
 ``` 
+... then follow the instructions and add some lines to your shell environment, modifying the following files:
+- If you use `zsh`, you'll modify `~/.zshrc` 
+- If you use `bash`, you'll modify `~/.bash_profile` & `~/.bashrc` .
 
 ### Install python
 
-Install the python version you want to use. 
-
-We suggest using the version listed in the file [`pyproject.toml`](./pyproject.toml), which looks like:
+Install a `python` version listed in the [`pyproject.toml`](./pyproject.toml) file. The entry loks like:  
 
 ```toml
-...
-
 [tool.poetry.dependencies]
 python = '>=3.8.13,<3.11'
-
-...
 ```
 
-For instance, if you decide to use `python 3.8.13`, you would run:
+In this case, you could install version 3.8.13 as follows:
 
-```zsh
+```shell
 pyenv install 3.8.13
-pyenv shell 3.8.13  # this activates the version of python you just installed for the current session
 ```
 
-### Install `pipx`
+### Initialize `pipx`
 
-We suggest using `pipx` to manage command line utilities like poetry. In the same session where you activated `python` run the following commands:
+We suggest using `pipx` to manage command line utilities like poetry. 
 
-```zsh
-python -m pip install pipx
+```shell
 pipx ensurepath  # allows you to access the pipx executable
 pipx completions  # optional
 ```
 
-You should check that your `~/.zshrc` includes a line like 
+You should check that your shell environment (`~/.zshrc` for `zsh` users, or `~/.bashrc` for `bash` users) includes a line like:
 
-```
+```shell
 export PATH="$PATH:/Users/me/.local/bin"
 ``` 
 
-... so that the pipx executables are on the `$PATH`.
+... so that programs installed using `pipx` are on the `$PATH`.
 
 ### Install Poetry
 
@@ -98,13 +89,11 @@ pipx install poetry
 
 If all is well, then when you open a new terminal window and execute 
 ```zsh
-poetry --version
+$ poetry --version
 ```
 
-it should return something like:
-```zsh
-Poetry version 1.1.13
-```
+it should return something like `Poetry version 1.1.13`
+
 
 ## Set up the `python` environment
 
@@ -125,7 +114,7 @@ From the [`AER`](./.) directory, run:
 poetry config virtualenvs.in-project true  
 
 # Set up a new environment with the version of python you installed earlier
-poetry env use 3.8  # '3.8' needs to match the version of python you installed with pyenv
+poetry env use 3.8  # '3.8' needs to match the version of python you installed with pyenv, without the patch version number
 
 # Update the installation utilities within the new environment
 poetry run python -m pip install --upgrade pip setuptools wheel
