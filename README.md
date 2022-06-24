@@ -46,8 +46,9 @@ This will install `pyenv` and `pipx` which are required for the `python` setup. 
 pyenv init
 ``` 
 ... then follow the instructions and add some lines to your shell environment, modifying the following files:
-- If you use `zsh`, you'll modify `~/.zshrc` 
-- If you use `bash`, you'll modify `~/.bash_profile` & `~/.bashrc` .
+- If you use `zsh`, you'll modify `~/.zshrc` and `~/.zprofile`, 
+- If you use `bash`, you'll modify `~/.bash_profile`.
+
 
 #### Initialize `pipx`
 
