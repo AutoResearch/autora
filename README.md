@@ -87,7 +87,7 @@ You can use this `python` version with the `poetry` package manager to create an
 
 There are two suggested options for initializing an environment:
 - On the command line using `poetry` directly,
-- Using your IDE to initialize the `poetry` environment. 
+- Using your IDE to initialize the `poetry` environment. For this option, see the IDE-specific sections below.
 
 *Note: For end-users, it may be more appropriate to use an environment manager like `Anaconda` or `Miniconda` instead of `poetry`, but this is not currently supported.*
 
@@ -163,59 +163,6 @@ Ran 1 test in 0.000s
 OK
 ```
 
-### PyCharm `poetry` Setup
-
-- Open the project directory in PyCharm.
-- Navigate to Preferences > Project > Python Interpreter
-- Add a new interpreter. Select "Poetry environment" in the list on the left.
-
-- **If you have _not_ already initialized a `poetry` environment**, specify the following:  
-  - Python executable: select the path to an installed python version you wish to use, e.g. 
-    `~/.pyenv/versions/3.8.13/bin/python3`
-  - Select "install packages from pyproject.toml"
-  - Poetry executable: select the path to the poetry installation you have, e.g. 
-    `/opt/homebrew/bin/poetry`
-  - Click "OK" and wait while the environment builds.
-
-- **If you have already initialized a `poetry` environment**, 
-  - ... select the path to it in the "existing environment" dropdown.
-
-- Run the "Python tests for aer" Run/Debug configuration in the PyCharm interface, and check 
-  that there are no errors.
-
-### Visual Studio Code `poetry` setup
-
-Prerequisite: run the [Command Line Setup](#command-line-poetry-setup) specified above.
-
-Then:
-- Open the project directory in Visual Studio Code
-- Install the VSCode plugin recommendations suggested. These include:
-  - python
-  - python-environment-manager
-
-- **If you have _not_ already initialized a `poetry` environment**:
-  - Open a new terminal within Visual Studio Code (Menu: Terminal > New Terminal). 
-  - Carry out the [Command Line Setup](#command-line-poetry-setup) specified above.
-  - If the python-environment-manager plugin is working correctly, it will suggest adding the environment to the workspace. Do that. If it doesn't, carry out the steps specified below for if you have already initialized a `poetry` environment. 
-
-
-- **If you have already initialized a `poetry` environment**:
-  - Select the `python` option in the vertical bar on the far left of the window. Under the title "PYTHON: ENVIRONMENTS" should be a list of `python` environments. If these do not appear:
-    - Ensure the python-environment-manager is installed correctly.
-    - Ensure the python-environment-manager is activated.
-
-  - Locate the correct poetry environment. Click the "thumbs up" symbol next to the poetry environment name to "set as active workspace interpreter".
-  - Alternatively: Open the command pallete (MacOS: ⇧+⌘+P), enter "Python: Select Interpreter" then hit return. Select the python in the correct environment and hit return.
-
-- Check that the `poetry` environment is correctly set-up. 
-  - Open a new terminal within Visual Studio Code (Menu: Terminal > New Terminal). 
-  - It should execute something like `source /Users/me/Developer/AER/.venv/bin/activate` before offering you a prompt.
-  - If you execute `which python` it should return the path to your python executable in the .venv/ directory.
-    - If this does not happen, repeat the steps "If you have already initialized a `poetry` environment" above.
-    - If `which python` still does not return the path to your python executable in the .venv/ directory, reach out to someone else who uses Visual Studio Code. If you're on the AER team, post a question in the Slack channel.
-  - Run `python -m unittest aer` and ensure that there are no errors.
-  
-
 ## Set up the Pre-Commit Hooks
 
 We use [`pre-commit`](https://pre-commit.com) to manage pre-commit hooks. 
@@ -277,3 +224,70 @@ If your `git commit` fails because of the pre-commit hook, then you should:
    ```
 
 It's easiest to solve these kinds of problems if you make small commits, often.  
+
+
+## IDE Setup
+
+### PyCharm Setup
+
+#### General configuration
+
+- You can (and should) completely hide the IDE-specific directory for `VSCode` in PyCharm by adding `.vscode` to the list of ignored folder names in Preferences > Editor > File Types > Ignored Files and Folders. PyCharm doesn't need to know about anything which happens in that directory. 
+
+#### PyCharm `poetry` Setup
+
+- Open the project directory in PyCharm.
+- Navigate to Preferences > Project > Python Interpreter
+- Add a new interpreter. Select "Poetry environment" in the list on the left.
+
+- **If you have _not_ already initialized a `poetry` environment**, specify the following:  
+  - Python executable: select the path to an installed python version you wish to use, e.g. 
+    `~/.pyenv/versions/3.8.13/bin/python3`
+  - Select "install packages from pyproject.toml"
+  - Poetry executable: select the path to the poetry installation you have, e.g. 
+    `/opt/homebrew/bin/poetry`
+  - Click "OK" and wait while the environment builds.
+
+- **If you have already initialized a `poetry` environment**, 
+  - ... select the path to it in the "existing environment" dropdown.
+
+- Run the "Python tests for aer" Run/Debug configuration in the PyCharm interface, and check 
+  that there are no errors.
+
+### Visual Studio Code Setup
+
+#### Visual Studio Code `poetry` setup
+
+Prerequisite: run the [Command Line Setup](#command-line-poetry-setup) specified above.
+
+Then:
+- Open the project directory in Visual Studio Code
+- Install the VSCode plugin recommendations suggested. These include:
+  - python
+  - python-environment-manager
+
+**If you have _not_ already initialized a `poetry` environment**:
+- Open a new terminal within Visual Studio Code (Menu: Terminal > New Terminal). 
+- Carry out the [Command Line Setup](#command-line-poetry-setup) specified above.
+- If the python-environment-manager plugin is working correctly, it will suggest adding the environment to the workspace. Do that. If it doesn't, carry out the steps specified below for if you have already initialized a `poetry` environment. 
+
+
+**If you have already initialized a `poetry` environment**:
+- Select the `python` option in the vertical bar on the far left of the window. Under the title "PYTHON: ENVIRONMENTS" should be a list of `python` environments. If these do not appear:
+  - Ensure the python-environment-manager is installed correctly.
+  - Ensure the python-environment-manager is activated.
+
+- Locate the correct poetry environment. Click the "thumbs up" symbol next to the poetry environment name to "set as active workspace interpreter".
+- Alternatively: Open the command pallete (MacOS: ⇧+⌘+P), enter "Python: Select Interpreter" then hit return. Select the python in the correct environment and hit return.
+
+- Check that the `poetry` environment is correctly set-up. 
+  - Open a new terminal within Visual Studio Code (Menu: Terminal > New Terminal). 
+  - It should execute something like `source /Users/me/Developer/AER/.venv/bin/activate` before offering you a prompt.
+  - If you execute `which python` it should return the path to your python executable in the .venv/ directory.
+    - If this does not happen, repeat the steps "If you have already initialized a `poetry` environment" above.
+    - If `which python` still does not return the path to your python executable in the .venv/ directory, reach out to someone else who uses Visual Studio Code. If you're on the AER team, post a question in the Slack channel.
+  - Ensure that there are no errors when you run: 
+    ```shell
+    python -m unittest
+    ```
+
