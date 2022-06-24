@@ -164,15 +164,13 @@ OK
 
 ## Pre-Commit Hooks
 
-We use [`pre-commit`](https://pre-commit.com) to manage pre-commit hooks.
+We use [`pre-commit`](https://pre-commit.com) to manage pre-commit hooks. 
 
 Pre-commit hooks are programs which run before each git commit and which check that the files to be committed: 
 - are correctly formatted and 
 - have no obvious coding errors.
 
-Pre-commit hooks are intended to enforce coding guidelines, including the Python style-guide [PEP8](https://peps.python.org/pep-0008/). 
-
-`pre-commit` is installed by poetry as a development dependency. 
+Pre-commit hooks are intended to enforce coding guidelines, including the Python style-guide [PEP8](https://peps.python.org/pep-0008/).
 
 The hooks and their settings are specified in [`.pre-commit-config.yaml`](./.pre-commit-config.yaml).
 
