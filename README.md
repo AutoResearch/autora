@@ -93,21 +93,25 @@ There are two suggested options for initializing an environment:
 
 #### Command Line `poetry` Setup
 
-From the [`AER`](./.) directory, run:
+From the [`AER`](./.) directory, run the following commands to Set up a new environment with the version of python you installed earlier.
 
-```zsh
-# Optional: configure poetry to save the environment in the AER/.venv/ directory. 
-# We'll assume you've done this in the rest of the description.
-poetry config virtualenvs.in-project true
+Activate the target version of `python`:
+```shell
+pyenv shell 3.8.13
+```
 
-# Set up a new environment with the version of python you installed earlier
-pyenv shell 3.8.13  # Activate the target version of python
-poetry env use $(pyenv which python)  # Set up a new poetry environment with that python version
+Set up a new poetry environment with that `python` version:
+```shell
+poetry env use $(pyenv which python) 
+```
 
-# Update the installation utilities within the new environment
+Update the installation utilities within the new environment:
+```shell
 poetry run python -m pip install --upgrade pip setuptools wheel
+```
 
-# Use the pyproject.toml file to resolve and then install all of the dependencies
+Use the pyproject.toml file to resolve and then install all the dependencies
+```shell
 poetry install
 ```
 
