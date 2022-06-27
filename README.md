@@ -4,51 +4,68 @@ Autonomous Empirical Research is an open source AI-based system for automating e
 # Contributors (Alphabetic Order)
 Ben Andrew, Hannah Even, Ioana Marinescu, Sebastian Musslick, Sida Li
 
-# Getting started (development)
+# Getting started
 
-The following sections describe how to install and configure the supported setup recommended for developing AER, using:
-- `python` and dependencies as described in the `pyproject.toml` file,
-- `pyenv` (optional) which is used for installing different versions of `python`,
-- `poetry` (mandatory) for managing the `python` environment itself,
-- `pre-commit` (mandatory when making changes to the repository) which is used for handling git pre-commit hooks,
-- `graphviz` (mandatory) which is used for some visualizations.
+To use the AER package you need:
+- `python` and packages as specified in the `pyproject.toml` file,
+- `graphviz` for some visualizations.
+
+To develop the AER package, you also need:
+- `git`, the source control tool,
+- `pre-commit` which is used for handling git pre-commit hooks.
+
+We recommend setting up your development environment using:
+- `pyenv` which is used for installing different versions of `python`,
+- `poetry`, which handles resolving dependencies between `python` modules and ensures that you are using the same package versions as other members of the development team.
 
 You should also consider using an IDE. We recommend: 
-- PyCharm (academic licenses for PyCharm pro are available for free). This is a `python`-specific integrated development environment which comes with extremely powerful tools for changing the structure of `python` code, running tests, etc. 
-- Visual Studio Code (free). This is a powerful general text editor with a large number of plugins available for different tasks. 
+- PyCharm (academic licenses for PyCharm professional edition are available for free). This is a `python`-specific integrated development environment which comes with extremely powerful tools for changing the structure of `python` code, running tests, etc. 
+- Visual Studio Code (free). This is a powerful general text editor with plugins to support `python` development. 
 
-- Depending on your computer, the steps to get AER working will vary. At present, macOS is supported. 
+The following sections describe how to install and configure the recommended setup recommended for developing AER.
+
+*Note: For end-users, it may be more appropriate to use an environment manager like `Anaconda` or `Miniconda` instead of `poetry`, but this is not currently supported.*
 
 
+## Development Setup on macOS
 
-## Basic Setup on MacOS 
+### Prerequisites
 
-### Install dependencies
-
-#### Install `homebrew` (optional)
-
-For macOS we strongly recommend using `homebrew` as the package manager.
+For macOS we strongly recommend using `homebrew` to manage packages.
 
 Visit [https://brew.sh](https://brew.sh) and run the installation instructions.
 
-#### Install external tools using `homebrew`
+### Clone Repository
 
-This is a good time to check that the other external dependencies are fulfilled. For developing AER you need:
-- `pyenv` which is required for the `python` setup,
-- `pre-commit` which is used for handling git pre-commit hooks,
-- `graphviz` which is used for some visualizations.
+We recommend using the GitHub CLI to clone the repository. Install it: 
 
-You can install them as follows:
+```shell
+brew install gh
+```
+
+Clone the repository. Run:
+```shell
+gh repo clone AutoResearch/AER
+```
+
+... and following the prompts to authenticate to GitHub. It should clone the repository to a new directory. This is referred to as the `<project directory>` in the rest of this readme.
+
+### Install Dependencies
+
+Open the repository directory in the terminal.
+
+Install the dependencies, which are listed in the [`Brewfile`](./Brewfile) by running:
 
 ```shell
 brew bundle
 ```
 
-This uses the [`Brewfile`](./Brewfile) to install all the packages required.
+### Install `python`
+
+We recommend using `pyenv` to manage `python` versions. 
 
 #### Initialize pyenv
-
-`pyenv` allows installing different versions of `python`. Run the initialization script as follows:
+Run the initialization script as follows:
 
 ```shell
 pyenv init
@@ -65,9 +82,7 @@ After making these changes, restart your shell session by executing:
 exec "$SHELL" 
 ```
 
-## Set up the `python` environment
-
-### Install `python` version 
+#### Install `python`
 
 Install a `python` version listed in the [`pyproject.toml`](./pyproject.toml) file. The entry looks like:  
 
@@ -81,21 +96,47 @@ In this case, you could install version 3.8.13 as follows:
 pyenv install 3.8.13
 ```
 
-### Set up the `poetry` environment
+### Install Pre-Commit Hooks
 
-You can use this `python` version with the `poetry` package manager to create an isolated environment where you can run the AER code. `poetry` handles resolving dependencies between `python` modules and ensures that you are using the same package versions as other members of the development team (which is a good thing).
+If you wish to commit to the repository, you should install the pre-commit hooks with the following command: 
+```shell
+pre-commit install
+```
+
+For more information on pre-commit hooks, see [Pre-Commit-Hooks](#pre-commit-hooks)
+
+### Configure your development environment
 
 There are two suggested options for initializing an environment:
-- On the command line using `poetry` directly,
-- Using your IDE to initialize the `poetry` environment. For this option, see the IDE-specific sections below.
+- _(Recommended)_ Using PyCharm,
+- _(Advanced)_ Using `poetry` from the command line.
 
-*Note: For end-users, it may be more appropriate to use an environment manager like `Anaconda` or `Miniconda` instead of `poetry`, but this is not currently supported.*
+#### PyCharm configuration
 
+Set up the Virtual environment – an isolated version of `python` and all the packages required to run AER and develop it further – as follows:
+- Open the `<project directory>` in PyCharm.
+- Navigate to PyCharm > Preferences > Project: AER > Python Interpreter
+- Next to the drop-down list of available interpreters, click the "gear" symbol and choose "Add" to initialize a new interpreter. 
+- Select "Poetry environment" in the list on the left. Specify the following:  
+  - Python executable: select the path to the installed `python` version you wish to use, e.g. 
+    `~/.pyenv/versions/3.8.13/bin/python3`
+  - Select "install packages from pyproject.toml"
+  - Poetry executable: select the path to the poetry installation you have, e.g. 
+    `/opt/homebrew/bin/poetry`
+  - Click "OK" and wait while the environment builds.
+  - Run the "Python tests for aer" Run/Debug configuration in the PyCharm interface, and check that there are no errors.
+
+Additional setup steps for PyCharm:
+
+- You can (and should) completely hide the IDE-specific directory for `VSCode` in PyCharm by adding `.vscode` to the list of ignored folder names in Preferences > Editor > File Types > Ignored Files and Folders. This only needs to be done once.
+    
 #### Command Line `poetry` Setup
 
-From the [`AER`](./.) directory, run the following commands to Set up a new environment with the version of python you installed earlier.
+If you need more control over the `poetry` environment than offered by PyCharm, then you can set up a new environment from the command line as follows: 
 
-Activate the target version of `python`:
+From the `<project directory>`, run the following commands:
+
+Activate the target version of `python` using `pyenv`:
 ```shell
 pyenv shell 3.8.13
 ```
@@ -110,7 +151,7 @@ Update the installation utilities within the new environment:
 poetry run python -m pip install --upgrade pip setuptools wheel
 ```
 
-Use the pyproject.toml file to resolve and then install all the dependencies
+Use the `pyproject.toml` file to resolve and then install all the dependencies
 ```shell
 poetry install
 ```
@@ -120,33 +161,33 @@ poetry install
 To run interactive commands, you can activate the poetry virtual environment. From the [`AER`](./.) directory, run:
 
 ```shell
-% poetry shell
+poetry shell
 ```
 
-This spawns a new shell where you have access to the poetry `python` and all of the packages installed using `poetry install`. You should see the prompt change:
+This spawns a new shell where you have access to the poetry `python` and all the packages installed using `poetry install`. You should see the prompt change:
 
-```shell
+```
 % poetry shell
-Spawning shell within /Users/me/Developer/AER/.venv
+Spawning shell within /Users/me/Library/Caches/pypoetry/virtualenvs/aer-2PgcgopX-py3.8
 Restored session: Fri Jun 24 12:34:56 EDT 2022
-(.venv) % 
+(aer-2PgcgopX-py3.8) % 
 ```
 
-If you execute `python` and then `import numpy`, you should be able to see that `numpy` has been imported from the `.venv` directory :
+If you execute `python` and then `import numpy`, you should be able to see that `numpy` has been imported from the `aer-2PgcgopX-py3.8` environment :
 
-```shell
-(.venv) % python
+```
+(aer-2PgcgopX-py3.8) % python
 Python 3.8.13 (default, Jun 16 2022, 12:34:56) 
 [Clang 13.1.6 (clang-1316.0.21.2.5)] on darwin
 Type "help", "copyright", "credits" or "license" for more information.
 >>> import numpy
 >>> numpy
-<module 'numpy' from '.../AER/.venv/lib/python3.8/site-packages/numpy/__init__.py'>
+<module 'numpy' from '/Users/me/Library/Caches/pypoetry/virtualenvs/aer-2PgcgopX-py3.8/lib/python3.8/site-packages/numpy/__init__.py'>
 ```
 
 To deactivate the `poetry` environment, `exit` the session. This should return you to your original prompt, as follows:
-```shell
-(.venv) % exit
+```
+(aer-2PgcgopX-py3.8) % exit
 
 Saving session...
 ...saving history...truncating history files...
@@ -159,6 +200,12 @@ Saving session...
 You can run python programs using poetry without activating the poetry environment, by using `poetry run {command}`. For example, to run the tests, execute:
 
 ```shell
+poetry run python -m unittest
+```
+
+It should return something like:
+
+```
 % poetry run python -m unittest
 .
 --------------------------------
@@ -167,35 +214,67 @@ Ran 1 test in 0.000s
 OK
 ```
 
-## Set up the Pre-Commit Hooks
+#### Visual Studio Code Configuration
+
+Prerequisite: run the [Command Line Setup](#command-line-poetry-setup) specified above.
+
+Then:
+- Open the `<project directory>` in Visual Studio Code
+- Install the VSCode plugin recommendations suggested. These include:
+  - python
+  - python-environment-manager
+- Run the [Command Line Setup](#command-line-poetry-setup) specified above. This can be done in the built-in terminal if desired (Menu: Terminal > New Terminal).
+- Select the `python` option in the vertical bar on the far left of the window (which appear after installing the plugins). Under the title "PYTHON: ENVIRONMENTS" should be a list of `python` environments. If these do not appear:
+  - Ensure the python-environment-manager is installed correctly.
+  - Ensure the python-environment-manager is activated.
+
+- Locate the correct `poetry` environment. Click the "thumbs up" symbol next to the poetry environment name to "set as active workspace interpreter".
+
+- Check that the `poetry` environment is correctly set-up. 
+  - Open a new terminal within Visual Studio Code (Menu: Terminal > New Terminal). 
+  - It should execute something like `source /Users/me/Library/Caches/pypoetry/virtualenvs/aer-2PgcgopX-py3.8/bin/activate` before offering you a prompt.
+  - If you execute `which python` it should return the path to your python executable in the `.../aer-2PgcgopX-py3.8/bin` directory.
+  - Ensure that there are no errors when you run: 
+    ```shell
+    python -m unittest
+    ```
+    in the built-in terminal. 
+
+## Development Setup on Windows
+
+Windows is not yet officially supported. You may be able to follow the same approach as for macOS to set up your development environment, with some modifications, e.g.:
+- Using `chocolatey` in place of `homebrew`,
+- Using the GitHub Desktop application in place of the GitHub CLI.
+
+If you successfully set up AER on Windows, please update this readme.
+
+Please update this readme 
+
+## Development Practices
+
+### Pre-Commit Hooks
 
 We use [`pre-commit`](https://pre-commit.com) to manage pre-commit hooks. 
 
-Pre-commit hooks are programs which run before each git commit and which check that the files to be committed: 
-- are correctly formatted and 
-- have no obvious coding errors.
+Pre-commit hooks are programs which run before each git commit, and can read and potentially modify the files which are to be committed. 
 
-Pre-commit hooks are intended to enforce coding guidelines, including the Python style-guide [PEP8](https://peps.python.org/pep-0008/).
+We use pre-commit hooks to:
+- enforce coding guidelines, including the `python` style-guide [PEP8](https://peps.python.org/pep-0008/) (`black` and `flake8`), 
+- to check the order of `import` statements (`isort`),
+- to check the types of `python` objects (`mypy`).
 
 The hooks and their settings are specified in [`.pre-commit-config.yaml`](./.pre-commit-config.yaml).
 
-After cloning the repository and installing the dependencies, you should run:
-```zsh
-$ pre-commit install
-```
+See the section [Install Pre-commit Hooks](#install-pre-commit-hooks) for installation instructions.
 
-to set up the pre-commit hooks.
-
-
-### Handling Pre-Commit Hook Errors
+#### Handling Pre-Commit Hook Errors
 
 If your `git commit` fails because of the pre-commit hook, then you should:
 
-1. Run the pre-commit hooks on the files which you have staged, by running the following  command in your terminal: 
+1. Run the pre-commit hooks on the files which you have staged, by running the following command in your terminal: 
     ```zsh
     $ pre-commit run
     ```
-   
 
 2. Inspect the output. It might look like this:
    ```
@@ -211,8 +290,8 @@ If your `git commit` fails because of the pre-commit hook, then you should:
    Found 1 errors in 1 files (checked 10 source files)
    ```
 3. Fix any errors which are reported.
-   **Important: Once you've changed the code, re-stage the files it to Git. This might mean 
-   unstaging changes and then adding them again.**
+   **Important: Once you've changed the code, re-stage the files it to Git. 
+   This might mean unstaging changes and then adding them again.**
 4. If you have trouble:
    - Do a web-search to see if someone else had a similar error in the past.
    - Check that the tests you've written work correctly.
@@ -230,68 +309,9 @@ If your `git commit` fails because of the pre-commit hook, then you should:
 It's easiest to solve these kinds of problems if you make small commits, often.  
 
 
-## IDE Setup
-
-### PyCharm Setup
-
-#### General configuration
-
-- You can (and should) completely hide the IDE-specific directory for `VSCode` in PyCharm by adding `.vscode` to the list of ignored folder names in Preferences > Editor > File Types > Ignored Files and Folders. PyCharm doesn't need to know about anything which happens in that directory. 
-
-#### PyCharm `poetry` Setup
-
-- Open the project directory in PyCharm.
-- Navigate to Preferences > Project > Python Interpreter
-- Add a new interpreter. Select "Poetry environment" in the list on the left.
-
-- **If you have _not_ already initialized a `poetry` environment**, specify the following:  
-  - Python executable: select the path to an installed python version you wish to use, e.g. 
-    `~/.pyenv/versions/3.8.13/bin/python3`
-  - Select "install packages from pyproject.toml"
-  - Poetry executable: select the path to the poetry installation you have, e.g. 
-    `/opt/homebrew/bin/poetry`
-  - Click "OK" and wait while the environment builds.
-
-- **If you have already initialized a `poetry` environment**, 
-  - ... select the path to it in the "existing environment" dropdown.
-
-- Run the "Python tests for aer" Run/Debug configuration in the PyCharm interface, and check 
-  that there are no errors.
-
-### Visual Studio Code Setup
-
-#### Visual Studio Code `poetry` setup
-
-Prerequisite: run the [Command Line Setup](#command-line-poetry-setup) specified above.
-
-Then:
-- Open the project directory in Visual Studio Code
-- Install the VSCode plugin recommendations suggested. These include:
-  - python
-  - python-environment-manager
-
-**If you have _not_ already initialized a `poetry` environment**:
-- Open a new terminal within Visual Studio Code (Menu: Terminal > New Terminal). 
-- Carry out the [Command Line Setup](#command-line-poetry-setup) specified above.
-- If the python-environment-manager plugin is working correctly, it will suggest adding the environment to the workspace. Do that. If it doesn't, carry out the steps specified below for if you have already initialized a `poetry` environment. 
 
 
-**If you have already initialized a `poetry` environment**:
-- Select the `python` option in the vertical bar on the far left of the window. Under the title "PYTHON: ENVIRONMENTS" should be a list of `python` environments. If these do not appear:
-  - Ensure the python-environment-manager is installed correctly.
-  - Ensure the python-environment-manager is activated.
 
-- Locate the correct poetry environment. Click the "thumbs up" symbol next to the poetry environment name to "set as active workspace interpreter".
-- Alternatively: Open the command pallete (MacOS: ⇧+⌘+P), enter "Python: Select Interpreter" then hit return. Select the python in the correct environment and hit return.
 
-- Check that the `poetry` environment is correctly set-up. 
-  - Open a new terminal within Visual Studio Code (Menu: Terminal > New Terminal). 
-  - It should execute something like `source /Users/me/Developer/AER/.venv/bin/activate` before offering you a prompt.
-  - If you execute `which python` it should return the path to your python executable in the .venv/ directory.
-    - If this does not happen, repeat the steps "If you have already initialized a `poetry` environment" above.
-    - If `which python` still does not return the path to your python executable in the .venv/ directory, reach out to someone else who uses Visual Studio Code. If you're on the AER team, post a question in the Slack channel.
-  - Ensure that there are no errors when you run: 
-    ```shell
-    python -m unittest
-    ```
+
 
