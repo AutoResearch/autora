@@ -128,7 +128,7 @@ Set up the Virtual environment – an isolated version of `python` and all the p
 
 Additional setup steps for PyCharm:
 
-- You can (and should) completely hide the IDE-specific directory for `VSCode` in PyCharm by adding `.vscode` to the list of ignored folder names in Preferences > Editor > File Types > Ignored Files and Folders. This only needs to be done once.
+- You can (and should) completely hide the IDE-specific directory for Visual Studio Code in PyCharm by adding `.vscode` to the list of ignored folder names in Preferences > Editor > File Types > Ignored Files and Folders. This only needs to be done once.
     
 #### Command Line `poetry` Setup
 
@@ -216,14 +216,13 @@ OK
 
 #### Visual Studio Code Configuration
 
-Prerequisite: run the [Command Line Setup](#command-line-poetry-setup) specified above.
+After installing Visual Studio Code and the other prerequisites, carry out the following steps:
 
-Then:
 - Open the `<project directory>` in Visual Studio Code
-- Install the VSCode plugin recommendations suggested. These include:
-  - python
-  - python-environment-manager
-- Run the [Command Line Setup](#command-line-poetry-setup) specified above. This can be done in the built-in terminal if desired (Menu: Terminal > New Terminal).
+- Install the Visual Studio Code plugin recommendations suggested with the project. These include:
+  - `python`
+  - `python-environment-manager`
+- Run the [Command Line poetry Setup](#command-line-poetry-setup) specified above. This can be done in the built-in terminal if desired (Menu: Terminal > New Terminal).
 - Select the `python` option in the vertical bar on the far left of the window (which appear after installing the plugins). Under the title "PYTHON: ENVIRONMENTS" should be a list of `python` environments. If these do not appear:
   - Ensure the python-environment-manager is installed correctly.
   - Ensure the python-environment-manager is activated.
