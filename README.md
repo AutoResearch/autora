@@ -22,7 +22,7 @@ You should also consider using an IDE. We recommend:
 - PyCharm (academic licenses for PyCharm professional edition are available for free). This is a `python`-specific integrated development environment which comes with extremely powerful tools for changing the structure of `python` code, running tests, etc. 
 - Visual Studio Code (free). This is a powerful general text editor with plugins to support `python` development. 
 
-The following sections describe how to install and configure the recommended setup recommended for developing AER.
+The following sections describe how to install and configure the recommended setup for developing AER.
 
 *Note: For end-users, it may be more appropriate to use an environment manager like `Anaconda` or `Miniconda` instead of `poetry`, but this is not currently supported.*
 
@@ -132,6 +132,7 @@ Additional setup steps for PyCharm:
     
 #### Command Line `poetry` Setup
 
+- Only option for VS Code users
 If you need more control over the `poetry` environment than offered by PyCharm, then you can set up a new environment from the command line as follows. From the `<project directory>`, run the following commands:
 
 Activate the target version of `python` using `pyenv`:
@@ -222,6 +223,7 @@ After installing Visual Studio Code and the other prerequisites, carry out the f
   - `python-environment-manager`
 - Run the [Command Line poetry Setup](#command-line-poetry-setup) specified above. This can be done in the built-in terminal if desired (Menu: Terminal > New Terminal).
 - Select the `python` option in the vertical bar on the far left of the window (which appear after installing the plugins). Under the title "PYTHON: ENVIRONMENTS" should be a list of `python` environments. If these do not appear:
+  - Refresh the window pane
   - Ensure the python-environment-manager is installed correctly.
   - Ensure the python-environment-manager is activated.
 
