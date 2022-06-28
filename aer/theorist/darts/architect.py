@@ -3,7 +3,7 @@ import torch
 import torch.nn.functional as F
 from torch.autograd import Variable
 
-from aer_theorist.darts.model_search import DARTS_Type, Network
+from aer.theorist.darts.model_search import DARTS_Type, Network
 
 
 def _concat(xs):

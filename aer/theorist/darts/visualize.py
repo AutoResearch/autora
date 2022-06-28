@@ -2,7 +2,7 @@ import sys
 
 from graphviz import Digraph
 
-from aer_theorist.darts.operations import get_operation_label
+from aer.theorist.darts.operations import get_operation_label
 
 
 def plot(

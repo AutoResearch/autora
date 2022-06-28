@@ -13,8 +13,8 @@ from aer_experimentalist.experiment_environment.variable import (
     outputTypes as output_type,
 )
 from aer_experimentalist.experimentalist_popper import Experimentalist_Popper
-from aer_theorist.object_of_study import Object_Of_Study
-from aer_theorist.theorist_darts import DARTS_Type, Theorist_DARTS
+from aer.theorist.object_of_study import Object_Of_Study
+from aer.theorist.theorist_darts import DARTS_Type, Theorist_DARTS
 
 print(os.getcwd())
 sys.path.append(r"/tigress/musslick/AER/cogsci2021")

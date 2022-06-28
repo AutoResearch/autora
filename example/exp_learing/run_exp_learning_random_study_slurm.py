@@ -8,8 +8,8 @@ from aer_experimentalist.experiment_environment.variable import (
     outputTypes as output_type,
 )
 from aer_experimentalist.experimentalist_popper import Experimentalist_Popper
-from aer_theorist.object_of_study import Object_Of_Study
-from aer_theorist.theorist_random_darts import Theorist_Random_DARTS
+from aer.theorist.object_of_study import Object_Of_Study
+from aer.theorist.theorist_random_darts import Theorist_Random_DARTS
 
 # parse arguments
 parser = argparse.ArgumentParser("parser")

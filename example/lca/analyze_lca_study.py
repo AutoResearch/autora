@@ -6,12 +6,12 @@ from aer_experimentalist.experiment_environment.participant_lca import Participa
 from aer_experimentalist.experiment_environment.variable import (
     outputTypes as output_type,
 )
-from aer_theorist.darts.plot_utils import (
+from aer.theorist.darts.plot_utils import (
     generate_darts_summary_figures,
     load_model,
     plot_model_graph,
 )
-from aer_theorist.object_of_study import Object_Of_Study
+from aer.theorist.object_of_study import Object_Of_Study
 
 participant = Participant_LCA()
 

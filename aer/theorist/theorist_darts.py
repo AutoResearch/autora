@@ -12,22 +12,22 @@ import torch.nn.functional as F
 from torch.autograd import Variable
 
 import aer.config as aer_config
-import aer_theorist.darts.darts_config as darts_cfg
-import aer_theorist.darts.utils as utils
-import aer_theorist.darts.visualize as viz
+import aer.theorist.darts.darts_config as darts_cfg
+import aer.theorist.darts.utils as utils
+import aer.theorist.darts.visualize as viz
 from aer_experimentalist.experiment_environment.variable import (
     outputTypes as output_types,
 )
-from aer_theorist.darts.architect import Architect
-from aer_theorist.darts.genotypes import PRIMITIVES
-from aer_theorist.darts.model_search import DARTS_Type, Network
-from aer_theorist.theorist import Theorist
+from aer.theorist.darts.architect import Architect
+from aer.theorist.darts.genotypes import PRIMITIVES
+from aer.theorist.darts.model_search import DARTS_Type, Network
+from aer.theorist.theorist import Theorist
 from aer.utils import Plot_Types
 
 
 class Theorist_DARTS(Theorist, ABC):
 
-    simulation_files = "aer_theorist/darts/*.py"
+    simulation_files = "aer/theorist/darts/*.py"
 
     _lr_plot_name = "Learning Rates"
 

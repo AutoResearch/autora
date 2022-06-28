@@ -10,7 +10,7 @@ from matplotlib import pyplot
 from matplotlib.gridspec import GridSpec
 
 import aer.config as aer_config
-import aer_theorist.darts.darts_config as darts_config
+import aer.theorist.darts.darts_config as darts_config
 
 
 def generate_darts_summary_figures(
@@ -633,8 +633,8 @@ def plot_model_graph(
 
     import os
 
-    import aer_theorist.darts.utils as utils
-    import aer_theorist.darts.visualize as viz
+    import aer.theorist.darts.utils as utils
+    import aer.theorist.darts.visualize as viz
 
     figures_path = (
         aer_config.studies_folder
@@ -675,8 +675,8 @@ def load_model(study_name, model_weights_name, arch_weights_name, object_of_stud
 
     import torch
 
-    import aer_theorist.darts.utils as utils
-    from aer_theorist.darts.model_search import Network
+    import aer.theorist.darts.utils as utils
+    from aer.theorist.darts.model_search import Network
 
     num_output = object_of_study.__get_output_dim__()
     num_input = object_of_study.__get_input_dim__()

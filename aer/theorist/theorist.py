@@ -11,7 +11,7 @@ from tkinter import Tk
 from matplotlib.figure import Figure
 
 import aer.config as aer_config
-from aer_theorist.theorist_GUI import Theorist_GUI
+from aer.theorist.theorist_GUI import Theorist_GUI
 from aer.utils import Plot_Types
 
 

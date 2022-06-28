@@ -7,8 +7,8 @@ from abc import ABC
 import pandas
 
 import aer.config as aer_config
-import aer_theorist.darts.darts_config as darts_cfg
-from aer_theorist.theorist_darts import Theorist_DARTS
+import aer.theorist.darts.darts_config as darts_cfg
+from aer.theorist.theorist_darts import Theorist_DARTS
 
 
 class Theorist_Random_DARTS(Theorist_DARTS, ABC):
