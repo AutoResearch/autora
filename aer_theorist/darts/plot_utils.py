@@ -9,7 +9,7 @@ import seaborn as sns
 from matplotlib import pyplot
 from matplotlib.gridspec import GridSpec
 
-import aer_config as aer_config
+import aer.config as aer_config
 import aer_theorist.darts.darts_config as darts_config
 
 

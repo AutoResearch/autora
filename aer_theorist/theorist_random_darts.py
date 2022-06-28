@@ -6,7 +6,7 @@ from abc import ABC
 
 import pandas
 
-import aer_config as aer_config
+import aer.config as aer_config
 import aer_theorist.darts.darts_config as darts_cfg
 from aer_theorist.theorist_darts import Theorist_DARTS
 

@@ -11,7 +11,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.autograd import Variable
 
-import aer_config as aer_config
+import aer.config as aer_config
 import aer_theorist.darts.darts_config as darts_cfg
 import aer_theorist.darts.utils as utils
 import aer_theorist.darts.visualize as viz

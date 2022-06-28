@@ -9,7 +9,7 @@ import pandas
 from sweetpea import fully_cross_block, synthesize_trials_non_uniform
 from sweetpea.primitives import Factor
 
-import aer_config as AER_cfg
+import aer.config as AER_cfg
 import aer_experimentalist.experimentalist_config as exp_cfg
 from aer_experimentalist.experiment_environment.experiment_client import (
     Experiment_Client,
