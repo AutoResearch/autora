@@ -9,7 +9,7 @@ import torch.nn as nn
 from torch.autograd import Variable
 
 import aer.theorist.darts.SimpleNet_dataset as SimpleNetDatasetFile
-from aer_experimentalist.experiment_environment.variable import outputTypes
+from aer.experimentalist.experiment_environment.variable import outputTypes
 from aer.theorist.darts.SimpleNet_dataset import SimpleNetDataset
 
 # new

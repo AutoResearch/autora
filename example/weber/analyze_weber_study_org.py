@@ -1,13 +1,13 @@
-import aer_experimentalist.experiment_environment.experiment_config as exp_cfg
-from aer_experimentalist.experiment_environment.DV_in_silico import DV_In_Silico as DV
-from aer_experimentalist.experiment_environment.IV_in_silico import IV_In_Silico as IV
-from aer_experimentalist.experiment_environment.participant_weber import (
+import aer.experimentalist.experiment_environment.experiment_config as exp_cfg
+from aer.experimentalist.experiment_environment.DV_in_silico import DV_In_Silico as DV
+from aer.experimentalist.experiment_environment.IV_in_silico import IV_In_Silico as IV
+from aer.experimentalist.experiment_environment.participant_weber import (
     Participant_Weber,
 )
-from aer_experimentalist.experiment_environment.variable import (
+from aer.experimentalist.experiment_environment.variable import (
     outputTypes as output_type,
 )
-from aer_experimentalist.experimentalist_popper import Experimentalist_Popper
+from aer.experimentalist.experimentalist_popper import Experimentalist_Popper
 from aer.theorist.darts.plot_utils import plot_darts_summary
 from aer.theorist.object_of_study import Object_Of_Study
 

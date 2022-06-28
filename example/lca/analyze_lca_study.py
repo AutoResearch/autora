@@ -1,9 +1,9 @@
 import aer.config as aer_cfg
-import aer_experimentalist.experiment_environment.experiment_config as exp_cfg
-from aer_experimentalist.experiment_environment.DV_in_silico import DV_In_Silico as DV
-from aer_experimentalist.experiment_environment.IV_in_silico import IV_In_Silico as IV
-from aer_experimentalist.experiment_environment.participant_lca import Participant_LCA
-from aer_experimentalist.experiment_environment.variable import (
+import aer.experimentalist.experiment_environment.experiment_config as exp_cfg
+from aer.experimentalist.experiment_environment.DV_in_silico import DV_In_Silico as DV
+from aer.experimentalist.experiment_environment.IV_in_silico import IV_In_Silico as IV
+from aer.experimentalist.experiment_environment.participant_lca import Participant_LCA
+from aer.experimentalist.experiment_environment.variable import (
     outputTypes as output_type,
 )
 from aer.theorist.darts.plot_utils import (

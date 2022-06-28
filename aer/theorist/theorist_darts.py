@@ -15,7 +15,7 @@ import aer.config as aer_config
 import aer.theorist.darts.darts_config as darts_cfg
 import aer.theorist.darts.utils as utils
 import aer.theorist.darts.visualize as viz
-from aer_experimentalist.experiment_environment.variable import (
+from aer.experimentalist.experiment_environment.variable import (
     outputTypes as output_types,
 )
 from aer.theorist.darts.architect import Architect

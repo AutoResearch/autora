@@ -4,8 +4,8 @@ import torch
 import torch.optim as optim
 from torch import nn
 
-from aer_experimentalist.experiment_environment.variable import Variable as Var
-from aer_experimentalist.experimentalist_popper import Experimentalist_Popper
+from aer.experimentalist.experiment_environment.variable import Variable as Var
+from aer.experimentalist.experimentalist_popper import Experimentalist_Popper
 from aer.theorist.object_of_study import Object_Of_Study
 from aer.theorist.theorist_darts import Theorist_DARTS
 
