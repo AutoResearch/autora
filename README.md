@@ -132,9 +132,7 @@ Additional setup steps for PyCharm:
     
 #### Command Line `poetry` Setup
 
-If you need more control over the `poetry` environment than offered by PyCharm, then you can set up a new environment from the command line as follows: 
-
-From the `<project directory>`, run the following commands:
+If you need more control over the `poetry` environment than offered by PyCharm, then you can set up a new environment from the command line as follows. From the `<project directory>`, run the following commands:
 
 Activate the target version of `python` using `pyenv`:
 ```shell
@@ -158,7 +156,7 @@ poetry install
 
 ##### Using `poetry` interactively
 
-To run interactive commands, you can activate the poetry virtual environment. From the [`AER`](./.) directory, run:
+To run interactive commands, you can activate the poetry virtual environment. From the `<project directory>` directory, run:
 
 ```shell
 poetry shell
