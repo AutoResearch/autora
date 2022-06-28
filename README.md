@@ -132,8 +132,11 @@ Additional setup steps for PyCharm:
     
 #### Command Line `poetry` Setup
 
-- Only option for VS Code users
-If you need more control over the `poetry` environment than offered by PyCharm, then you can set up a new environment from the command line as follows. From the `<project directory>`, run the following commands:
+If you need more control over the `poetry` environment, then you can set up a new environment from the command line.
+
+*Note: Setting up a `poetry` environment on the command line is the only option for VSCode users.*
+
+From the `<project directory>`, run the following commands.
 
 Activate the target version of `python` using `pyenv`:
 ```shell
