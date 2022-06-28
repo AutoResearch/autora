@@ -1,3 +1,6 @@
+# AER-specific files
+studies/**/modeling
+
 # PyCharm ignores are handled by the .idea/.gitignore file
 # VSCode ignores are handled by the .vscode/.gitignore file
 
@@ -5,8 +8,11 @@
 .python-version
 .venv
 
-# AER-specific files
-studies/**/modeling
+# Dependencies
+Brewfile.lock.json
+
+# General ignores for macOS
+.DS_Store
 
 # Python ignores, from https://github.com/github/gitignore/blob/main/Python.gitignore
 # Byte-compiled / optimized / DLL files
