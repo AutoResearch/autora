@@ -1,5 +1,4 @@
 import time
-from abc import abstractmethod
 
 from tinkerforge.bricklet_industrial_analog_out_v2 import BrickletIndustrialAnalogOutV2
 from tinkerforge.bricklet_industrial_dual_0_20ma_v2 import BrickletIndustrialDual020mAV2
@@ -8,7 +7,8 @@ from tinkerforge.bricklet_industrial_dual_analog_in_v2 import (
 )
 from tinkerforge.ip_connection import IPConnection
 
-from aer.variable import Variable
+from aer.variable import DV, IV, Variable
+from aer.variable.time import VTime
 
 
 class TinkerforgeVariable(Variable):
@@ -53,22 +53,16 @@ class TinkerforgeVariable(Variable):
         pass
 
 
-class IVTF(TinkerforgeVariable):
+class IVTF(IV, TinkerforgeVariable):
     def __init__(self, *args, **kwargs):
-        self._name = "IV"
-        self._variable_label = "Independent Variable"
+        IV.__init__(self, *args, **kwargs)
+        TinkerforgeVariable.__init__(self, *args, **kwargs)
 
-        super(IVTF, self).__init__(*args, **kwargs)
 
-    # Method for measuring dependent variable.
-    @abstractmethod
-    def manipulate(self):
-        pass
-
-    # Method for cleaning up measurement device.
-    @abstractmethod
-    def __clean_up__(self):
-        pass
+class DVTF(DV, TinkerforgeVariable):
+    def __init__(self, *args, **kwargs):
+        DV.__init__(self, *args, **kwargs)
+        TinkerforgeVariable.__init__(self, *args, **kwargs)
 
 
 class IVTrial(IVTF):
@@ -90,18 +84,6 @@ class IVTrial(IVTF):
 
     def __clean_up__(self):
         pass
-
-
-class VTime:
-
-    _t0 = 0
-
-    def __init__(self):
-        self._t0 = time.time()
-
-    # Resets reference time.
-    def reset(self):
-        self._t0 = time.time()
 
 
 class IVTime(IVTF, VTime):
@@ -220,29 +202,6 @@ class IVVoltage(IVTF):
 
     def clean_up(self):
         self.stop()
-
-
-class DVTF(TinkerforgeVariable):
-    def __init__(self, *args, **kwargs):
-        self._name = "DV"
-        self._variable_label = "Dependent Variable"
-
-        self._is_covariate = False
-
-        super(DVTF, self).__init__(*args, **kwargs)
-
-    # Method for measuring dependent variable.
-    @abstractmethod
-    def measure(self):
-        pass
-
-    # Get whether this dependent variable is treated as covariate.
-    def __is_covariate__(self):
-        return self._is_covariate
-
-    # Set whether this dependent variable is treated as covariate.
-    def __set_covariate__(self, is_covariate):
-        self._is_covariate = is_covariate
 
 
 class DVTime(DVTF, VTime):

@@ -1,3 +1,4 @@
+from abc import abstractmethod
 from enum import Enum
 
 import numpy as np
@@ -142,7 +143,48 @@ class Variable:
         self._is_covariate = is_covariate
 
 
-class IVInSilico(Variable):
+class IV(Variable):
+    def __init__(self, *args, **kwargs):
+        self._name = "IV"
+        self._variable_label = "Independent Variable"
+
+        super().__init__(*args, **kwargs)
+
+    # Method for measuring dependent variable.
+    @abstractmethod
+    def manipulate(self):
+        pass
+
+    # Method for cleaning up measurement device.
+    @abstractmethod
+    def __clean_up__(self):
+        pass
+
+
+class DV(Variable):
+    def __init__(self, *args, **kwargs):
+        self._name = "DV"
+        self._variable_label = "Dependent Variable"
+
+        self._is_covariate = False
+
+        super().__init__(*args, **kwargs)
+
+    # Method for measuring dependent variable.
+    @abstractmethod
+    def measure(self):
+        pass
+
+    # Get whether this dependent variable is treated as covariate.
+    def __is_covariate__(self):
+        return self._is_covariate
+
+    # Set whether this dependent variable is treated as covariate.
+    def __set_covariate__(self, is_covariate):
+        self._is_covariate = is_covariate
+
+
+class IVInSilico(IV):
     _variable_label = "IV"
     _name = "independent variable"
     _units = "activation"
@@ -157,7 +199,7 @@ class IVInSilico(Variable):
         self._participant.set_value(self._name, self.get_value())
 
 
-class DVInSilico(Variable):
+class DVInSilico(DV):
     _variable_label = "DV"
     _name = "dependent variable"
     _units = "activation"
