@@ -8,7 +8,7 @@ from torch.autograd import Variable
 
 import aer_experimentalist.experimentalist_popper_config as popper_config
 from aer_experimentalist.experimentalist import Experimentalist
-from aer_utils import Plot_Types
+from aer.utils import Plot_Types
 
 
 class Experimentalist_Popper(Experimentalist, ABC):

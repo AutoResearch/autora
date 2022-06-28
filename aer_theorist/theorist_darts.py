@@ -22,7 +22,7 @@ from aer_theorist.darts.architect import Architect
 from aer_theorist.darts.genotypes import PRIMITIVES
 from aer_theorist.darts.model_search import DARTS_Type, Network
 from aer_theorist.theorist import Theorist
-from aer_utils import Plot_Types
+from aer.utils import Plot_Types
 
 
 class Theorist_DARTS(Theorist, ABC):

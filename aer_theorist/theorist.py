@@ -12,7 +12,7 @@ from matplotlib.figure import Figure
 
 import aer_config as aer_config
 from aer_theorist.theorist_GUI import Theorist_GUI
-from aer_utils import Plot_Types
+from aer.utils import Plot_Types
 
 
 class Theorist(ABC):

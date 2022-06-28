@@ -22,7 +22,7 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
 
 import aer_config as config
-from aer_utils import Plot_Types
+from aer.utils import Plot_Types
 
 matplotlib.use("TkAgg")
 

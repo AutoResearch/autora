@@ -14,7 +14,7 @@ import aer_experimentalist.experimentalist_config as exp_cfg
 from aer_experimentalist.experiment_environment.experiment_client import (
     Experiment_Client,
 )
-from aer_utils import Plot_Types
+from aer.utils import Plot_Types
 
 
 class seed_strategy(Enum):

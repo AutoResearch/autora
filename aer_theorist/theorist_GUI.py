@@ -23,7 +23,7 @@ from matplotlib.figure import Figure
 from PIL import Image, ImageTk
 
 import aer_config as config
-from aer_utils import Plot_Types
+from aer.utils import Plot_Types
 
 matplotlib.use("TkAgg")
 
