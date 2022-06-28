@@ -87,9 +87,9 @@ There are two suggested options for initializing an environment:
 
 #### Command Line `poetry` Setup
 
-From the [`AER`](./.) directory, run the following commands to Set up a new environment with the version of python you installed earlier.
+From the `<project directory>`, run the following commands:
 
-Activate the target version of `python`:
+Activate the target version of `python` using `pyenv`:
 ```shell
 pyenv shell 3.8.13
 ```
@@ -104,43 +104,43 @@ Update the installation utilities within the new environment:
 poetry run python -m pip install --upgrade pip setuptools wheel
 ```
 
-Use the pyproject.toml file to resolve and then install all the dependencies
+Use the `pyproject.toml` file to resolve and then install all the dependencies
 ```shell
 poetry install
 ```
 
 #### Using `poetry` interactively
 
-To run interactive commands, you can activate the poetry virtual environment. From the [`AER`](./.) directory, run:
+To run interactive commands, you can activate the poetry virtual environment. From the `<project directory>` directory, run:
 
 ```shell
-% poetry shell
+poetry shell
 ```
 
-This spawns a new shell where you have access to the poetry `python` and all of the packages installed using `poetry install`. You should see the prompt change:
+This spawns a new shell where you have access to the poetry `python` and all the packages installed using `poetry install`. You should see the prompt change:
 
-```shell
+```
 % poetry shell
-Spawning shell within /Users/me/Developer/AER/.venv
+Spawning shell within /Users/me/Library/Caches/pypoetry/virtualenvs/aer-2PgcgopX-py3.8
 Restored session: Fri Jun 24 12:34:56 EDT 2022
-(.venv) % 
+(aer-2PgcgopX-py3.8) % 
 ```
 
-If you execute `python` and then `import numpy`, you should be able to see that `numpy` has been imported from the `.venv` directory :
+If you execute `python` and then `import numpy`, you should be able to see that `numpy` has been imported from the `aer-2PgcgopX-py3.8` environment :
 
-```shell
-(.venv) % python
+```
+(aer-2PgcgopX-py3.8) % python
 Python 3.8.13 (default, Jun 16 2022, 12:34:56) 
 [Clang 13.1.6 (clang-1316.0.21.2.5)] on darwin
 Type "help", "copyright", "credits" or "license" for more information.
 >>> import numpy
 >>> numpy
-<module 'numpy' from '.../AER/.venv/lib/python3.8/site-packages/numpy/__init__.py'>
+<module 'numpy' from '/Users/me/Library/Caches/pypoetry/virtualenvs/aer-2PgcgopX-py3.8/lib/python3.8/site-packages/numpy/__init__.py'>
 ```
 
 To deactivate the `poetry` environment, `exit` the session. This should return you to your original prompt, as follows:
-```shell
-(.venv) % exit
+```
+(aer-2PgcgopX-py3.8) % exit
 
 Saving session...
 ...saving history...truncating history files...
@@ -153,6 +153,12 @@ Saving session...
 You can run python programs using poetry without activating the poetry environment, by using `poetry run {command}`. For example, to run the tests, execute:
 
 ```shell
+poetry run python -m unittest
+```
+
+It should return something like:
+
+```
 % poetry run python -m unittest
 .
 --------------------------------
