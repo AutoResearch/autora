@@ -155,11 +155,6 @@ class IV(Variable):
     def manipulate(self):
         pass
 
-    # Method for cleaning up measurement device.
-    @abstractmethod
-    def __clean_up__(self):
-        pass
-
 
 class DV(Variable):
     def __init__(self, *args, **kwargs):

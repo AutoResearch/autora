@@ -1,4 +1,5 @@
 import time
+from abc import abstractmethod
 
 from tinkerforge.bricklet_industrial_analog_out_v2 import BrickletIndustrialAnalogOutV2
 from tinkerforge.bricklet_industrial_dual_0_20ma_v2 import BrickletIndustrialDual020mAV2
@@ -49,7 +50,14 @@ class TinkerforgeVariable(Variable):
     def __set_priority__(self, priority):
         self._priority = priority
 
+    @abstractmethod
     def clean_up(self):
+        """Clean up measurement device."""
+        pass
+
+    @abstractmethod
+    def disconnect(self):
+        """Disconnect from up measurement device."""
         pass
 
 
@@ -82,7 +90,7 @@ class IVTrial(IVTF):
     def manipulate(self):
         pass
 
-    def __clean_up__(self):
+    def disconnect(self):
         pass
 
 
@@ -110,7 +118,7 @@ class IVTime(IVTF, VTime):
         else:
             time.sleep(t_wait)
 
-    def __clean_up__(self):
+    def disconnect(self):
         pass
 
 
@@ -140,7 +148,7 @@ class IVCurrent(IVTF):
         super(IVCurrent, self).__init__(*args, **kwargs)
 
     # Clean up measurement device.
-    def __clean_up__(self):
+    def disconnect(self):
 
         self._iao.set_enabled(False)
 
@@ -185,7 +193,7 @@ class IVVoltage(IVTF):
         super(IVVoltage, self).__init__(*args, **kwargs)
 
     # Clean up measurement device.
-    def __clean_up__(self):
+    def disconnect(self):
 
         self._iao.set_enabled(False)
 
@@ -262,7 +270,7 @@ class DVCurrent(DVTF):
             self.channel = 0
 
     # Clean up measurement device.
-    def __clean_up__(self):
+    def disconnect(self):
 
         self._ipcon.disconnect()
 
@@ -305,7 +313,7 @@ class DVVoltage(DVTF):
             self.channel = 0
 
     # Clean up measurement device.
-    def __clean_up__(self):
+    def disconnect(self):
         self._ipcon.disconnect()
 
     # Waits until specified time has passed relative to reference time
