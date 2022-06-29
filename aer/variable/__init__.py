@@ -116,6 +116,11 @@ class Variable:
 
         self.set_value(value_list[position])
 
+    @property
+    def name(self):
+        """Get variable name."""
+        return self._name
+
     def get_name(self):
         """Get variable name."""
         return self._name
@@ -233,3 +238,22 @@ class VariableCollection:
     @property
     def variable_names(self):
         return (v.get_name() for v in self.all_variables)
+
+    @property
+    def output_type(self):
+        first_type = self.dependent_variables[0].type
+        assert all(dv.type == first_type for dv in self.dependent_variables), (
+            "Dependent variable output types don't match. "
+            "Different output types are not supported yet."
+        )
+        return first_type
+
+    @property
+    def input_dimensions(self):
+        """The number of independent variables and covariates."""
+        return len(self.independent_variables) + len(self.covariates)
+
+    @property
+    def output_dimensions(self):
+        """The number of dependent variables."""
+        return len(self.dependent_variables)

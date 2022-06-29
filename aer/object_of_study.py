@@ -34,13 +34,6 @@ class ObjectOfStudy(Dataset):
         self._normalize_input = False
         self._normalize_output = False
 
-        assert all(
-            dv.type == dependent_variables[0].type for dv in dependent_variables
-        ), (
-            "Dependent variable output types don't match. "
-            "Different output types are not supported yet."
-        )
-
         # set up data
         for dv in self.dependent_variables:
             self.data[dv.get_name()] = list()
@@ -72,17 +65,17 @@ class ObjectOfStudy(Dataset):
     @property
     def input_dimensions(self):
         """The number of independent variables and covariates."""
-        return len(self.independent_variables) + len(self.covariates)
+        return self.metadata.input_dimensions
 
     @property
     def output_dimensions(self):
         """The number of dependent variables."""
-        return len(self.dependent_variables)
+        return self.metadata.output_dimensions
 
     @property
     def output_type(self):
         """The ValueType of the first dependent variable."""
-        return self.dependent_variables[0].type
+        return self.metadata.output_type
 
     @property
     def name(self):
@@ -445,3 +438,13 @@ class ObjectOfStudy(Dataset):
                 raise Exception(
                     "Could not find key '" + key + "' in the new data dictionary."
                 )
+
+
+def new_object_of_study(variable_collection: VariableCollection) -> ObjectOfStudy:
+    object_of_study = ObjectOfStudy(
+        name="anonymous",
+        independent_variables=variable_collection.independent_variables,
+        dependent_variables=variable_collection.dependent_variables,
+        covariates=variable_collection.covariates,
+    )
+    return object_of_study
