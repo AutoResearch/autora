@@ -1,6 +1,6 @@
 import logging
 from types import SimpleNamespace
-from typing import Callable, Iterator
+from typing import Callable, Iterator, Optional
 
 import numpy as np
 import pandas as pd
@@ -10,7 +10,7 @@ from sklearn.utils.validation import check_X_y
 
 import aer.config
 import aer.object_of_study
-from aer.object_of_study import VariableCollection, new_object_of_study
+from aer.object_of_study import ObjectOfStudy, VariableCollection, new_object_of_study
 from aer.theorist.darts.architect import Architect
 from aer.theorist.darts.model_search import DARTS_Type, Network
 from aer.theorist.darts.utils import AvgrageMeter, get_loss_function
@@ -40,6 +40,8 @@ class DARTS:
         fair_darts_loss_weight: int = 1,
         arch_learning_rate: float = 3e-3,
         grad_clip: float = 5,
+        batch_size: int = 20,
+        train_portion: float = 0.8,
     ):
         self.variable_collection = variable_collection
 
@@ -62,8 +64,10 @@ class DARTS:
         self.param_updates_per_epoch = param_updates_per_epoch
         self.learning_rate_min = learning_rate_min
         self.grad_clip = grad_clip
+        self.batch_size = batch_size
+        self.train_portion = train_portion
 
-        pass
+        self.model_: Optional[Network] = None
 
     def fit(self, X: pd.DataFrame, y: pd.DataFrame):
 
@@ -86,22 +90,14 @@ class DARTS:
         data_dict[aer.config.experiment_label] = np.zeros(y_reshaped.shape, dtype=int)
 
         object_of_study.add_data(data_dict)
-        train_queue = torch.utils.data.DataLoader(object_of_study)
-        train_iterator = iter(train_queue)
 
-        def get_next_input_target(train_iterator: Iterator):
-            input_search, target_search = next(train_iterator)
-            input_var = torch.autograd.Variable(input_search, requires_grad=False)
-            target_var = torch.autograd.Variable(target_search, requires_grad=False)
-
-            input_fmt, target_fmt = format_input_target(
-                input_var, target_var, criterion=criterion
-            )
-            return input_fmt, target_fmt
+        data_loader = get_data_loader(
+            object_of_study, self.train_portion, self.batch_size
+        )
 
         criterion = get_loss_function(self.variable_collection.output_type)
 
-        model = Network(
+        self.model_ = Network(
             num_classes=self.variable_collection.output_dimensions,
             criterion=criterion,
             steps=self.num_graph_nodes,
@@ -111,7 +107,7 @@ class DARTS:
         )
 
         optimizer = torch.optim.SGD(
-            params=model.parameters(),
+            params=self.model_.parameters(),
             lr=self.learning_rate,
             momentum=self.momentum,
             weight_decay=self.optimizer_weight_decay,
@@ -125,11 +121,11 @@ class DARTS:
 
         # initialize model
         if self.init_weights_function is not None:
-            model.apply(self.init_weights_function)
+            self.model_.apply(self.init_weights_function)
 
         # Generate the architecture of the model
         architect = Architect(
-            model,
+            self.model_,
             SimpleNamespace(
                 momentum=self.momentum,
                 arch_weight_decay=self.arch_weight_decay,
@@ -142,19 +138,28 @@ class DARTS:
 
         objs = AvgrageMeter()
 
-        logger.info(f"Starting fit.")
-        model.train()
+        logger.info("Starting fit.")
+        self.model_.train()
 
         for epoch in range(self.max_epochs):
 
             logger.info(f"Running fit, epoch {epoch}")
+
+            # Do the Architecture ipdate
+
+            # First reset the data iterator
+            data_iterator = get_data_iterator(data_loader)
+
+            # Then run the arch optimization
             for arch_step in range(self.arch_updates_per_epoch):
 
                 logger.info(
                     f"Running architecture update, epoch:arch {epoch}:{arch_step}"
                 )
 
-                input, target = get_next_input_target(train_iterator)
+                input, target = get_next_input_target(
+                    data_iterator, criterion=criterion
+                )
 
                 architect.step(
                     input_valid=input,
@@ -163,40 +168,80 @@ class DARTS:
                     unrolled=False,
                 )
 
-                for param_step in range(self.param_updates_per_epoch):
+            # Do the param update
+            # First reset the data iterator
+            data_iterator = get_data_iterator(data_loader)
 
-                    logger.info(
-                        f"Running parameter update, "
-                        f"epoch:arch:param "
-                        f"{epoch}:{arch_step}:{param_step}"
-                    )
+            # The run the param optimization
+            for param_step in range(self.param_updates_per_epoch):
 
-                    lr = scheduler.get_last_lr()[0]
-                    input, target = get_next_input_target(train_iterator)
-                    optimizer.zero_grad()
+                logger.info(
+                    f"Running parameter update, "
+                    f"epoch:arch:param "
+                    f"{epoch}:{arch_step}:{param_step}"
+                )
 
-                    # compute loss for the model
-                    logits = model(input)
-                    loss = criterion(logits, target)
+                lr = scheduler.get_last_lr()[0]
+                input, target = get_next_input_target(
+                    data_iterator, criterion=criterion
+                )
+                optimizer.zero_grad()
 
-                    # update gradients for model
-                    loss.backward()
+                # compute loss for the model
+                logits = self.model_(input)
+                loss = criterion(logits, target)
 
-                    # clips the gradient norm
-                    torch.nn.utils.clip_grad_norm_(model.parameters(), self.grad_clip)
-                    # moves optimizer one step (applies gradients to weights)
-                    optimizer.step()
-                    # applies weight decay to classifier weights
-                    model.apply_weight_decay_to_classifier(lr)
+                # update gradients for model
+                loss.backward()
 
-                    # moves the annealing scheduler forward to determine new learning rate
-                    scheduler.step()
+                # clips the gradient norm
+                torch.nn.utils.clip_grad_norm_(self.model_.parameters(), self.grad_clip)
+                # moves optimizer one step (applies gradients to weights)
+                optimizer.step()
+                # applies weight decay to classifier weights
+                self.model_.apply_weight_decay_to_classifier(lr)
 
-                    # compute accuracy metrics
-                    n = input.size(0)
-                    objs.update(loss.data, n)
+                # moves the annealing scheduler forward to determine new learning rate
+                scheduler.step()
+
+                # compute accuracy metrics
+                n = input.size(0)
+                objs.update(loss.data, n)
 
         return self
 
     def predict(self, X):
-        pass
+        return self.model_.forward(torch.tensor(X))
+
+
+def get_data_loader(
+    object_of_study: ObjectOfStudy, train_portion: float, batch_size: int
+) -> Iterator:
+    num_train = len(object_of_study)
+    indices = list(range(num_train))  # indices of all patterns
+    split = int(np.floor(train_portion * num_train))  # size of training set
+
+    data_loader = torch.utils.data.DataLoader(
+        object_of_study,
+        batch_size=batch_size,
+        sampler=torch.utils.data.sampler.SubsetRandomSampler(indices[:split]),
+        pin_memory=True,
+        num_workers=0,
+    )
+    return data_loader
+
+
+def get_data_iterator(data_loader: torch.utils.data.DataLoader):
+    data_iterator = iter(data_loader)
+    return data_iterator
+
+
+def get_next_input_target(data_iterator: Iterator, criterion):
+    input_search, target_search = next(data_iterator)
+    input_var = torch.autograd.Variable(input_search, requires_grad=False)
+    target_var = torch.autograd.Variable(target_search, requires_grad=False)
+
+    input_fmt, target_fmt = format_input_target(
+        input_var, target_var, criterion=criterion
+    )
+    return input_fmt, target_fmt
