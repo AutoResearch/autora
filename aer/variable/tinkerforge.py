@@ -8,7 +8,8 @@ from tinkerforge.bricklet_industrial_dual_analog_in_v2 import (
 )
 from tinkerforge.ip_connection import IPConnection
 
-from aer.variable import Variable
+from aer.variable import DV, IV, Variable
+from aer.variable.time import VTime
 
 
 class TinkerforgeVariable(Variable):
@@ -49,26 +50,27 @@ class TinkerforgeVariable(Variable):
     def __set_priority__(self, priority):
         self._priority = priority
 
+    @abstractmethod
     def clean_up(self):
+        """Clean up measurement device."""
+        pass
+
+    @abstractmethod
+    def disconnect(self):
+        """Disconnect from up measurement device."""
         pass
 
 
-class IVTF(TinkerforgeVariable):
+class IVTF(IV, TinkerforgeVariable):
     def __init__(self, *args, **kwargs):
-        self._name = "IV"
-        self._variable_label = "Independent Variable"
+        IV.__init__(self, *args, **kwargs)
+        TinkerforgeVariable.__init__(self, *args, **kwargs)
 
-        super(IVTF, self).__init__(*args, **kwargs)
 
-    # Method for measuring dependent variable.
-    @abstractmethod
-    def manipulate(self):
-        pass
-
-    # Method for cleaning up measurement device.
-    @abstractmethod
-    def __clean_up__(self):
-        pass
+class DVTF(DV, TinkerforgeVariable):
+    def __init__(self, *args, **kwargs):
+        DV.__init__(self, *args, **kwargs)
+        TinkerforgeVariable.__init__(self, *args, **kwargs)
 
 
 class IVTrial(IVTF):
@@ -88,20 +90,8 @@ class IVTrial(IVTF):
     def manipulate(self):
         pass
 
-    def __clean_up__(self):
+    def disconnect(self):
         pass
-
-
-class VTime:
-
-    _t0 = 0
-
-    def __init__(self):
-        self._t0 = time.time()
-
-    # Resets reference time.
-    def reset(self):
-        self._t0 = time.time()
 
 
 class IVTime(IVTF, VTime):
@@ -128,7 +118,7 @@ class IVTime(IVTF, VTime):
         else:
             time.sleep(t_wait)
 
-    def __clean_up__(self):
+    def disconnect(self):
         pass
 
 
@@ -158,7 +148,7 @@ class IVCurrent(IVTF):
         super(IVCurrent, self).__init__(*args, **kwargs)
 
     # Clean up measurement device.
-    def __clean_up__(self):
+    def disconnect(self):
 
         self._iao.set_enabled(False)
 
@@ -203,7 +193,7 @@ class IVVoltage(IVTF):
         super(IVVoltage, self).__init__(*args, **kwargs)
 
     # Clean up measurement device.
-    def __clean_up__(self):
+    def disconnect(self):
 
         self._iao.set_enabled(False)
 
@@ -220,29 +210,6 @@ class IVVoltage(IVTF):
 
     def clean_up(self):
         self.stop()
-
-
-class DVTF(TinkerforgeVariable):
-    def __init__(self, *args, **kwargs):
-        self._name = "DV"
-        self._variable_label = "Dependent Variable"
-
-        self._is_covariate = False
-
-        super(DVTF, self).__init__(*args, **kwargs)
-
-    # Method for measuring dependent variable.
-    @abstractmethod
-    def measure(self):
-        pass
-
-    # Get whether this dependent variable is treated as covariate.
-    def __is_covariate__(self):
-        return self._is_covariate
-
-    # Set whether this dependent variable is treated as covariate.
-    def __set_covariate__(self, is_covariate):
-        self._is_covariate = is_covariate
 
 
 class DVTime(DVTF, VTime):
@@ -303,7 +270,7 @@ class DVCurrent(DVTF):
             self.channel = 0
 
     # Clean up measurement device.
-    def __clean_up__(self):
+    def disconnect(self):
 
         self._ipcon.disconnect()
 
@@ -346,7 +313,7 @@ class DVVoltage(DVTF):
             self.channel = 0
 
     # Clean up measurement device.
-    def __clean_up__(self):
+    def disconnect(self):
         self._ipcon.disconnect()
 
     # Waits until specified time has passed relative to reference time

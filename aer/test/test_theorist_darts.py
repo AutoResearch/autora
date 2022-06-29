@@ -1,15 +1,15 @@
 import unittest
 
+from aer.experimentalist.experiment_design_synthetic_weber import (
+    Experiment_Design_Synthetic_Weber,
+)
+from aer.experimentalist.experiment_environment import experiment_config as exp_cfg
+from aer.experimentalist.experimentalist_popper import Experimentalist_Popper
 from aer.object_of_study import ObjectOfStudy
+from aer.theorist.theorist_darts import DARTS_Type, Theorist_DARTS
 from aer.variable import DVInSilico as DV
 from aer.variable import IVInSilico as IV
 from aer.variable import ValueType as output_type
-from aer_experimentalist.experiment_design_synthetic_weber import (
-    Experiment_Design_Synthetic_Weber,
-)
-from aer_experimentalist.experiment_environment import experiment_config as exp_cfg
-from aer_experimentalist.experimentalist_popper import Experimentalist_Popper
-from aer_theorist.theorist_darts import DARTS_Type, Theorist_DARTS
 
 
 class WeberDarts(unittest.TestCase):

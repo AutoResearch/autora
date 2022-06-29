@@ -6,7 +6,7 @@ import numpy as np
 import torch
 from torch.utils.data import Dataset
 
-import aer_config as AER_cfg
+import aer.config as AER_cfg
 from aer.variable import Variable, VariableCollection
 
 
