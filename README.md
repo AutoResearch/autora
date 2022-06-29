@@ -6,6 +6,10 @@ Ben Andrew, Hannah Even, Ioana Marinescu, Sebastian Musslick, Sida Li
 
 # Getting started
 
+You should be familiar with the command line for your operating system. The topics required are covered in:
+- **macOS**: Joe Kissell. [*Take Control of the Mac Command Line with Terminal, 3rd Edition*]((https://bruknow.library.brown.edu/permalink/01BU_INST/528fgv/cdi_safari_books_v2_9781947282513)). Take Control Books, 2022. Chapters *Read Me First* through *Bring the Command Line Into The Real World*.
+- **Linux**: William E. Shotts. [*The Linux Command Line: a Complete Introduction. 2nd edition.*](https://bruknow.library.brown.edu/permalink/01BU_INST/9mvq88/alma991043239704906966). No Starch Press, 2019. Parts *I: Learning the Shell* and *II: Configuration and the Environment*.
+
 To use the AER package you need:
 - `python` and packages as specified in the `pyproject.toml` file,
 - `graphviz` for some visualizations.
@@ -31,7 +35,7 @@ The following sections describe how to install and configure the recommended set
 
 ### Prerequisites
 
-For macOS we strongly recommend using `homebrew` to manage packages.
+For macOS, we strongly recommend using `homebrew` to manage packages.
 
 Visit [https://brew.sh](https://brew.sh) and run the installation instructions.
 
@@ -70,9 +74,7 @@ Run the initialization script as follows:
 ```shell
 pyenv init
 ``` 
-... then follow the instructions and add some lines to your shell environment, modifying the following files:
-- If you use `zsh`, you'll modify `~/.zshrc` and `~/.zprofile`, 
-- If you use `bash`, you'll modify `~/.bash_profile`.
+... and follow the instructions to add `pyenv` to the `$PATH`.
 
 #### Restart shell session
 
