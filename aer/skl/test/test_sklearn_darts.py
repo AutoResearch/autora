@@ -25,8 +25,8 @@ class TestDarts(unittest.TestCase):
             }
         )
 
-        X = data[["x1"]]
-        y = data[["y"]]
+        X_train = data[["x1"]]
+        y_train = data[["y"]]
 
         estimator = DARTS(
             VariableCollection(
@@ -35,9 +35,17 @@ class TestDarts(unittest.TestCase):
             )
         )
 
-        theory = estimator.fit(X, y)
+        estimator.fit(X_train, y_train)
 
-        self.assertIsNotNone(theory)
+        self.assertIsNotNone(estimator)
+
+        X_test = np.expand_dims(np.linspace(start=0, stop=1, num=5), axis=1)
+        y_pred = estimator.predict(X_test)
+
+        places = np.ceil(np.log10(1.0 / epsilon)).astype(int)
+
+        for y_pred_i in np.nditer(y_pred):
+            self.assertAlmostEqual(y_pred_i, const, places)
 
 
 if __name__ == "__main__":

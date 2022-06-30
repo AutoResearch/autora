@@ -1,16 +1,17 @@
 import logging
 from types import SimpleNamespace
-from typing import Callable, Iterator, Optional
+from typing import Callable, Iterator
 
 import numpy as np
-import pandas as pd
 import torch
+import torch.nn
 import torch.nn.utils
-from sklearn.utils.validation import check_X_y
+import torch.utils.data
+from sklearn.utils.validation import check_array, check_X_y
 
 import aer.config
 import aer.object_of_study
-from aer.object_of_study import ObjectOfStudy, VariableCollection, new_object_of_study
+from aer.object_of_study import VariableCollection, new_object_of_study
 from aer.theorist.darts.architect import Architect
 from aer.theorist.darts.model_search import DARTS_Type, Network
 from aer.theorist.darts.utils import AvgrageMeter, get_loss_function
@@ -41,7 +42,6 @@ class DARTS:
         arch_learning_rate: float = 3e-3,
         grad_clip: float = 5,
         batch_size: int = 20,
-        train_portion: float = 0.8,
     ):
         self.variable_collection = variable_collection
 
@@ -65,34 +65,19 @@ class DARTS:
         self.learning_rate_min = learning_rate_min
         self.grad_clip = grad_clip
         self.batch_size = batch_size
-        self.train_portion = train_portion
 
-        self.model_: Optional[Network] = None
+        self.model_: Network = Network(0, 0)
 
-    def fit(self, X: pd.DataFrame, y: pd.DataFrame):
+    def fit(self, X: np.ndarray, y: np.ndarray):
 
         # Do whatever happens in theorist.init_model_search
         logger.info("Starting fit initialization")
-        X_reshaped, y_reshaped = check_X_y(X, y)
-
-        object_of_study = new_object_of_study(self.variable_collection)
-        data_dict = {}
-        for i, iv in enumerate(self.variable_collection.independent_variables):
-            data_dict[iv.name] = X_reshaped[:, i]
-
-        assert self.variable_collection.output_dimensions == 1, (
-            f"too many output dimensions "
-            f"({self.variable_collection.output_dimensions}), "
-            f"only one supported"
-        )
-        data_dict[self.variable_collection.dependent_variables[0].name] = y_reshaped
-
-        data_dict[aer.config.experiment_label] = np.zeros(y_reshaped.shape, dtype=int)
-
-        object_of_study.add_data(data_dict)
 
         data_loader = get_data_loader(
-            object_of_study, self.train_portion, self.batch_size
+            X=X,
+            y=y,
+            variable_collection=self.variable_collection,
+            batch_size=self.batch_size,
         )
 
         criterion = get_loss_function(self.variable_collection.output_type)
@@ -145,7 +130,7 @@ class DARTS:
 
             logger.info(f"Running fit, epoch {epoch}")
 
-            # Do the Architecture ipdate
+            # Do the Architecture update
 
             # First reset the data iterator
             data_iterator = get_data_iterator(data_loader)
@@ -154,16 +139,17 @@ class DARTS:
             for arch_step in range(self.arch_updates_per_epoch):
 
                 logger.info(
-                    f"Running architecture update, epoch:arch {epoch}:{arch_step}"
+                    f"Running architecture update, "
+                    f"epoch: {epoch}, architecture: {arch_step}"
                 )
 
-                input, target = get_next_input_target(
+                X_batch, y_batch = get_next_input_target(
                     data_iterator, criterion=criterion
                 )
 
                 architect.step(
-                    input_valid=input,
-                    target_valid=target,
+                    input_valid=X_batch,
+                    target_valid=y_batch,
                     network_optimizer=optimizer,
                     unrolled=False,
                 )
@@ -177,27 +163,29 @@ class DARTS:
 
                 logger.info(
                     f"Running parameter update, "
-                    f"epoch:arch:param "
-                    f"{epoch}:{arch_step}:{param_step}"
+                    f"epoch:param "
+                    f"epoch: {epoch}, param: {param_step}"
                 )
 
                 lr = scheduler.get_last_lr()[0]
-                input, target = get_next_input_target(
+                X_batch, y_batch = get_next_input_target(
                     data_iterator, criterion=criterion
                 )
                 optimizer.zero_grad()
 
                 # compute loss for the model
-                logits = self.model_(input)
-                loss = criterion(logits, target)
+                logits = self.model_(X_batch)
+                loss = criterion(logits, y_batch)
 
                 # update gradients for model
                 loss.backward()
 
                 # clips the gradient norm
                 torch.nn.utils.clip_grad_norm_(self.model_.parameters(), self.grad_clip)
+
                 # moves optimizer one step (applies gradients to weights)
                 optimizer.step()
+
                 # applies weight decay to classifier weights
                 self.model_.apply_weight_decay_to_classifier(lr)
 
@@ -205,39 +193,61 @@ class DARTS:
                 scheduler.step()
 
                 # compute accuracy metrics
-                n = input.size(0)
+                n = X_batch.size(0)
                 objs.update(loss.data, n)
 
         return self
 
-    def predict(self, X):
-        return self.model_.forward(torch.tensor(X))
+    def predict(self, X: np.ndarray) -> np.ndarray:
+        X_ = check_array(X)
+        results_ = self.model_(torch.as_tensor(X_).float())
+        results = results_.detach().numpy()
+        return results
 
 
 def get_data_loader(
-    object_of_study: ObjectOfStudy, train_portion: float, batch_size: int
-) -> Iterator:
-    num_train = len(object_of_study)
-    indices = list(range(num_train))  # indices of all patterns
-    split = int(np.floor(train_portion * num_train))  # size of training set
+    X: np.ndarray,
+    y: np.ndarray,
+    variable_collection: VariableCollection,
+    batch_size: int,
+) -> torch.utils.data.DataLoader:
+
+    # Run checks and datatype conversions
+    assert variable_collection.output_dimensions == 1, (
+        f"too many output dimensions "
+        f"({variable_collection.output_dimensions}), "
+        f"only one supported"
+    )
+    X_, y_ = check_X_y(X, y)
+
+    data_dict = dict()
+    for i, iv in enumerate(variable_collection.independent_variables):
+        data_dict[iv.name] = X_[:, i]
+    data_dict[variable_collection.dependent_variables[0].name] = y_
+
+    data_dict[aer.config.experiment_label] = np.zeros(y_.shape, dtype=int)
+
+    object_of_study = new_object_of_study(variable_collection)
+    object_of_study.add_data(data_dict)
 
     data_loader = torch.utils.data.DataLoader(
         object_of_study,
         batch_size=batch_size,
-        sampler=torch.utils.data.sampler.SubsetRandomSampler(indices[:split]),
+        shuffle=True,
         pin_memory=True,
         num_workers=0,
     )
     return data_loader
 
 
-def get_data_iterator(data_loader: torch.utils.data.DataLoader):
+def get_data_iterator(data_loader: torch.utils.data.DataLoader) -> Iterator:
     data_iterator = iter(data_loader)
     return data_iterator
 
 
-def get_next_input_target(data_iterator: Iterator, criterion):
+def get_next_input_target(data_iterator: Iterator, criterion: torch.nn.Module):
     input_search, target_search = next(data_iterator)
+
     input_var = torch.autograd.Variable(input_search, requires_grad=False)
     target_var = torch.autograd.Variable(target_search, requires_grad=False)
 
