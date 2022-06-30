@@ -7,6 +7,7 @@ import torch
 import torch.nn
 import torch.nn.utils
 import torch.utils.data
+from pandas import DataFrame
 from sklearn.utils.validation import check_array, check_X_y
 
 import aer.config
@@ -68,7 +69,7 @@ class DARTS:
 
         self.model_: Network = Network(0, 0)
 
-    def fit(self, X: np.ndarray, y: np.ndarray):
+    def fit(self, X: DataFrame, y: DataFrame):
 
         # Do whatever happens in theorist.init_model_search
         logger.info("Starting fit initialization")
@@ -206,8 +207,8 @@ class DARTS:
 
 
 def get_data_loader(
-    X: np.ndarray,
-    y: np.ndarray,
+    X: DataFrame,
+    y: DataFrame,
     variable_collection: VariableCollection,
     batch_size: int,
 ) -> torch.utils.data.DataLoader:
