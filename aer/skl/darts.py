@@ -7,7 +7,7 @@ import torch
 import torch.nn
 import torch.nn.utils
 import torch.utils.data
-from pandas import DataFrame
+from sklearn.base import BaseEstimator, RegressorMixin
 from sklearn.utils.validation import check_array, check_X_y
 
 import aer.config
@@ -21,7 +21,7 @@ from aer.theorist.theorist_darts import format_input_target
 logger = logging.getLogger(__name__)
 
 
-class DARTS:
+class DARTS(BaseEstimator, RegressorMixin):
     def __init__(
         self,
         variable_collection: VariableCollection,
@@ -69,7 +69,7 @@ class DARTS:
 
         self.model_: Network = Network(0, 0)
 
-    def fit(self, X: DataFrame, y: DataFrame):
+    def fit(self, X: np.ndarray, y: np.ndarray):
 
         # Do whatever happens in theorist.init_model_search
         logger.info("Starting fit initialization")
@@ -207,8 +207,8 @@ class DARTS:
 
 
 def get_data_loader(
-    X: DataFrame,
-    y: DataFrame,
+    X: np.ndarray,
+    y: np.ndarray,
     variable_collection: VariableCollection,
     batch_size: int,
 ) -> torch.utils.data.DataLoader:
@@ -219,7 +219,10 @@ def get_data_loader(
         f"({variable_collection.output_dimensions}), "
         f"only one supported"
     )
+
     X_, y_ = check_X_y(X, y)
+
+    assert X.shape[1] == variable_collection.input_dimensions
 
     data_dict = dict()
     for i, iv in enumerate(variable_collection.independent_variables):
