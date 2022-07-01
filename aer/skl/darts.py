@@ -1,5 +1,7 @@
+import copy
 import logging
 from dataclasses import dataclass
+from functools import partial
 from types import SimpleNamespace
 from typing import Callable, Iterator, Optional
 
@@ -85,19 +87,6 @@ def _general_darts(
     if init_weights_function is not None:
         network_.apply(init_weights_function)
 
-    optimizer = torch.optim.SGD(
-        params=network_.parameters(),
-        lr=learning_rate,
-        momentum=momentum,
-        weight_decay=optimizer_weight_decay,
-    )
-
-    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
-        optimizer=optimizer,
-        T_max=param_updates_per_epoch,
-        eta_min=learning_rate_min,
-    )
-
     # Generate the architecture of the model
     architect = Architect(
         network_,
@@ -111,7 +100,28 @@ def _general_darts(
         ),
     )
 
-    objs = AvgrageMeter()
+    optimizer = torch.optim.SGD(
+        params=network_.parameters(),
+        lr=learning_rate,
+        momentum=momentum,
+        weight_decay=optimizer_weight_decay,
+    )
+
+    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
+        optimizer=optimizer,
+        T_max=param_updates_per_epoch,
+        eta_min=learning_rate_min,
+    )
+
+    coefficient_optimizer = partial(
+        _optimize_coefficients,
+        criterion=criterion,
+        data_loader=data_loader,
+        grad_clip=grad_clip,
+        optimizer=optimizer,
+        param_updates_per_epoch=param_updates_per_epoch,
+        scheduler=scheduler,
+    )
 
     logger.info("Starting fit.")
     network_.train()
@@ -144,49 +154,68 @@ def _general_darts(
             )
 
         # Do the param update
-        # First reset the data iterator
-        data_iterator = _get_data_iterator(data_loader)
 
         # The run the param optimization
-        for param_step in range(param_updates_per_epoch):
-            logger.info(
-                f"Running parameter update, "
-                f"epoch:param "
-                f"epoch: {epoch}, param: {param_step}"
-            )
+        coefficient_optimizer(network_)
 
-            lr = scheduler.get_last_lr()[0]
-            X_batch, y_batch = _get_next_input_target(
-                data_iterator, criterion=criterion
-            )
-            optimizer.zero_grad()
+    # Create the final model
 
-            # compute loss for the model
-            logits = network_(X_batch)
-            loss = criterion(logits, y_batch)
+    # Set edges in the network with the highest weights to 1, others to 0
+    model_ = copy.deepcopy(network_)
+    new_weights = model_.max_alphas_normal()
+    model_.fix_architecture(True, new_weights)
 
-            # update gradients for model
-            loss.backward()
+    # Re-optimize the parameters
+    coefficient_optimizer(model_)
 
-            # clips the gradient norm
-            torch.nn.utils.clip_grad_norm_(network_.parameters(), grad_clip)
-
-            # moves optimizer one step (applies gradients to weights)
-            optimizer.step()
-
-            # applies weight decay to classifier weights
-            network_.apply_weight_decay_to_classifier(lr)
-
-            # moves the annealing scheduler forward to determine new learning rate
-            scheduler.step()
-
-            # compute accuracy metrics
-            n = X_batch.size(0)
-            objs.update(loss.data, n)
-
-    results = _DARTSResult(model_=network_, network_=network_)
+    results = _DARTSResult(model_=model_, network_=network_)
 
     return results
+
+
+def _optimize_coefficients(
+    network: Network,
+    criterion: Callable,
+    data_loader: torch.utils.data.DataLoader,
+    grad_clip,
+    optimizer,
+    param_updates_per_epoch,
+    scheduler,
+):
+
+    data_iterator = _get_data_iterator(data_loader)
+
+    objs = AvgrageMeter()
+
+    for param_step in range(param_updates_per_epoch):
+        logger.info(f"Running parameter update, " f"param: {param_step}")
+
+        lr = scheduler.get_last_lr()[0]
+        X_batch, y_batch = _get_next_input_target(data_iterator, criterion=criterion)
+        optimizer.zero_grad()
+
+        # compute loss for the model
+        logits = network(X_batch)
+        loss = criterion(logits, y_batch)
+
+        # update gradients for model
+        loss.backward()
+
+        # clips the gradient norm
+        torch.nn.utils.clip_grad_norm_(network.parameters(), grad_clip)
+
+        # moves optimizer one step (applies gradients to weights)
+        optimizer.step()
+
+        # applies weight decay to classifier weights
+        network.apply_weight_decay_to_classifier(lr)
+
+        # moves the annealing scheduler forward to determine new learning rate
+        scheduler.step()
+
+        # compute accuracy metrics
+        n = X_batch.size(0)
+        objs.update(loss.data, n)
 
 
 def _get_data_loader(
@@ -264,9 +293,11 @@ class DARTS(BaseEstimator, RegressorMixin):
         >>> num_samples = 1000
         >>> X = np.linspace(start=0, stop=1, num=num_samples).reshape(-1, 1)
         >>> y = 15. * np.ones(num_samples)
-        >>> estimator = DARTS(VariableCollection(
-        ...    independent_variables=[Variable("x")],
-        ...    dependent_variables=[Variable("y")],
+        >>> estimator = DARTS(
+        ...     num_graph_nodes=1,
+        ...     variable_collection=VariableCollection(
+        ...         independent_variables=[Variable("x")],
+        ...         dependent_variables=[Variable("y")],
         ... ))
         >>> estimator = estimator.fit(X, y)
         >>> estimator.predict([[15.]])
@@ -373,6 +404,7 @@ class DARTS(BaseEstimator, RegressorMixin):
         params = self.get_params()
         fit_results = _general_darts(X=X, y=y, **params)
         self.network_ = fit_results.network_
+        self.model_ = fit_results.model_
         return self
 
     def predict(self, X: np.ndarray) -> np.ndarray:
@@ -387,6 +419,6 @@ class DARTS(BaseEstimator, RegressorMixin):
             y: predicted dependent variable values
         """
         X_ = check_array(X)
-        y_ = self.network_(torch.as_tensor(X_).float())
+        y_ = self.model_(torch.as_tensor(X_).float())
         y = y_.detach().numpy()
         return y
