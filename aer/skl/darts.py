@@ -21,7 +21,7 @@ from aer.variable import VariableCollection
 logger = logging.getLogger(__name__)
 
 
-def general_darts(
+def _general_darts(
     X: np.ndarray,
     y: np.ndarray,
     variable_collection: VariableCollection,
@@ -236,28 +236,32 @@ def _get_next_input_target(data_iterator: Iterator, criterion: torch.nn.Module):
 
 class DARTS(BaseEstimator, RegressorMixin):
     """
-    (Almost-)Scikit-learn compatible estimator which runs the DARTS algorithm.
+    Differentiable ARchiTecture Search.
 
-    Note: Currently requires specifying "VariableCollection" in the DARTS constructor.
-    This is not consistent with scikit-learn.
-    TODO: Remove requirement for VariableCollection.
+    DARTS finds a composition of functions and coefficients to minimize a loss function suitable for
+    the dependent variable.
 
-    # Examples
-    >>> import numpy as np
-    >>> from aer.variable import Variable
-    >>> from sklearn.model_selection import train_test_split
-    >>> num_samples = 100
-    >>> X = np.expand_dims(np.linspace(start=0, stop=1, num=num_samples), 1)
-    >>> y = np.random.default_rng(42).normal(loc=15., scale=1, size=num_samples)
-    >>> X_train, X_test, y_train, y_test = train_test_split(X, y, train_size=.9)
-    >>> seed = torch.manual_seed(42)
-    >>> estimator = DARTS(VariableCollection(
-    ...    independent_variables=[Variable("x")],
-    ...    dependent_variables=[Variable("y")],
-    ... ))
-    >>> estimator = estimator.fit(X_train, y_train)
-    >>> estimator.predict(X_test).mean()
-    14.260409
+    This class is intended to be compatible with the
+    [Scikit-Learn Estimator API](https://scikit-learn.org/stable/developers/develop.html).
+
+    Bug: Scikit-Learn-Incompatibility: Requires specifying "VariableCollection" in the constructor.
+        This is not consistent with scikit-learn.
+        TODO: Remove requirement for VariableCollection.
+
+    Examples:
+
+        >>> import numpy as np
+        >>> from aer.variable import Variable
+        >>> num_samples = 1000
+        >>> X =np.linspace(start=0, stop=1, num=num_samples).reshape(num_samples, 1)
+        >>> y = 15. * np.ones(num_samples)
+        >>> estimator = DARTS(VariableCollection(
+        ...    independent_variables=[Variable("x")],
+        ...    dependent_variables=[Variable("y")],
+        ... ))
+        >>> estimator = estimator.fit(X, y)
+        >>> estimator.predict([[15.]])
+        array([[15.051043]], dtype=float32)
 
     """
 
@@ -319,7 +323,7 @@ class DARTS(BaseEstimator, RegressorMixin):
 
     def fit(self, X: np.ndarray, y: np.ndarray):
         params = self.get_params()
-        fit_results = general_darts(X=X, y=y, **params)
+        fit_results = _general_darts(X=X, y=y, **params)
         self.model_ = fit_results["model_"]
         return self
 

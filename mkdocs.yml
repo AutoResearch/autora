@@ -16,6 +16,13 @@ plugins:
   - mkdocstrings:
       watch:
         - aer/
+      handlers:
+        python:
+          paths: [aer]
+          options:
+            show_source: true
+            show_if_no_docstring: false
+            merge_init_into_class: true
 
 
 nav:
