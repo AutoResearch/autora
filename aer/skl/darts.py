@@ -232,35 +232,23 @@ def _get_data_loader(
     X_, y_ = check_X_y(X, y)
 
     data_dict = dict()
+
+    y_variables = [Variable("y")]
+    data_dict["y"] = y_
+
     X_variables = []
-
     for i in range(X.shape[1]):
-
         xi_name = f"x{i}"
         data_dict[xi_name] = X_[:, i]
-
-        if X_types is not None:
-            X_variables.append(Variable(xi_name, type=X_types[i]))
-
-        else:
-            X_variables.append(Variable(xi_name))
-
-    if y_type is not None:
-        y_variable = Variable("y", type=y_type)
-
-    else:
-        y_variable = Variable("y")
-
-    data_dict["y"] = y_
+        X_variables.append(Variable(xi_name))
 
     data_dict[aer.config.experiment_label] = np.zeros(y_.shape, dtype=int)
 
     variable_collection = VariableCollection(
-        independent_variables=X_variables, dependent_variables=[y_variable]
+        independent_variables=X_variables, dependent_variables=y_variables
     )
 
     object_of_study = new_object_of_study(variable_collection)
-
     object_of_study.add_data(data_dict)
 
     data_loader = torch.utils.data.DataLoader(
