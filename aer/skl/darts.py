@@ -3,7 +3,7 @@ import logging
 from dataclasses import dataclass
 from functools import partial
 from types import SimpleNamespace
-from typing import Callable, Iterator, Optional, Sequence
+from typing import Callable, Iterator, Optional
 
 import numpy as np
 import torch
@@ -224,8 +224,6 @@ def _get_data_loader(
     X: np.ndarray,
     y: np.ndarray,
     batch_size: int,
-    X_types: Optional[Sequence[ValueType]] = None,
-    y_type: Optional[ValueType] = None,
 ) -> torch.utils.data.DataLoader:
     """Construct a minimal torch.utils.data.DataLoader for the input data."""
 
