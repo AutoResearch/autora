@@ -11,9 +11,7 @@ def generate_constant_data(
     const: float = 0.5, epsilon: float = 0.01, num: int = 1000, seed: int = 42
 ):
     X = np.expand_dims(np.linspace(start=0, stop=1, num=num), 1)
-    y = np.expand_dims(
-        np.random.default_rng(seed).normal(loc=const, scale=epsilon, size=num), 1
-    )
+    y = np.random.default_rng(seed).normal(loc=const, scale=epsilon, size=num)
     variable_collection = VariableCollection(
         independent_variables=[Variable("x")],
         dependent_variables=[Variable("y")],
@@ -22,6 +20,10 @@ def generate_constant_data(
 
 
 class TestDarts(unittest.TestCase):
+    def assertBetween(self, a, bmin, bmax):
+        self.assertGreater(a, bmin)
+        self.assertLess(a, bmax)
+
     def test_constant_model(self):
 
         const = 0.5
@@ -39,10 +41,10 @@ class TestDarts(unittest.TestCase):
 
         self.assertIsNotNone(estimator)
 
-        places = np.ceil(np.log10(1.0 / epsilon)).astype(int)
-
         for y_pred_i in np.nditer(estimator.predict(X_test)):
-            self.assertAlmostEqual(y_pred_i, const, places)
+            self.assertBetween(
+                y_pred_i, const - (5.0 * epsilon), const + (5.0 * epsilon)
+            )
 
         print(estimator.model_)
 
