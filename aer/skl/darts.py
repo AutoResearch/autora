@@ -3,7 +3,7 @@ import logging
 from dataclasses import dataclass
 from functools import partial
 from types import SimpleNamespace
-from typing import Callable, Iterator, Optional
+from typing import Callable, Iterator, Optional, Sequence
 
 import numpy as np
 import torch
@@ -19,7 +19,7 @@ from aer.theorist.darts.architect import Architect
 from aer.theorist.darts.model_search import DARTS_Type, Network
 from aer.theorist.darts.utils import AvgrageMeter, get_loss_function
 from aer.theorist.theorist_darts import format_input_target
-from aer.variable import VariableCollection
+from aer.variable import ValueType, Variable, VariableCollection
 
 logger = logging.getLogger(__name__)
 
@@ -40,6 +40,9 @@ def _general_darts(
     batch_size: int = 20,
     # Network parameters
     num_graph_nodes: int = 2,
+    input_dimensions: int = 1,
+    output_dimensions: int = 1,
+    output_type: ValueType = ValueType.REAL,
     classifier_weight_decay: float = 1e-2,
     darts_type: DARTS_Type = DARTS_Type.ORIGINAL,
     init_weights_function: Optional[Callable] = None,
@@ -70,17 +73,16 @@ def _general_darts(
     data_loader = _get_data_loader(
         X=X,
         y=y,
-        variable_collection=variable_collection,
         batch_size=batch_size,
     )
 
-    criterion = get_loss_function(variable_collection.output_type)
+    criterion = get_loss_function(output_type)
 
     network_ = Network(
-        num_classes=variable_collection.output_dimensions,
+        num_classes=output_dimensions,
         criterion=criterion,
         steps=num_graph_nodes,
-        n_input_states=variable_collection.input_dimensions,
+        n_input_states=input_dimensions,
         classifier_weight_decay=classifier_weight_decay,
         darts_type=darts_type,
     )
@@ -221,28 +223,44 @@ def _optimize_coefficients(
 def _get_data_loader(
     X: np.ndarray,
     y: np.ndarray,
-    variable_collection: VariableCollection,
     batch_size: int,
+    X_types: Optional[Sequence[ValueType]] = None,
+    y_type: Optional[ValueType] = None,
 ) -> torch.utils.data.DataLoader:
-    # Run checks and datatype conversions
-    assert variable_collection.output_dimensions == 1, (
-        f"too many output dimensions "
-        f"({variable_collection.output_dimensions}), "
-        f"only one supported"
-    )
+    """Construct a minimal torch.utils.data.DataLoader for the input data."""
 
     X_, y_ = check_X_y(X, y)
 
-    assert X.shape[1] == variable_collection.input_dimensions
-
     data_dict = dict()
-    for i, iv in enumerate(variable_collection.independent_variables):
-        data_dict[iv.name] = X_[:, i]
-    data_dict[variable_collection.dependent_variables[0].name] = y_
+    X_variables = []
+
+    for i in range(X.shape[1]):
+
+        xi_name = f"x{i}"
+        data_dict[xi_name] = X_[:, i]
+
+        if X_types is not None:
+            X_variables.append(Variable(xi_name, type=X_types[i]))
+
+        else:
+            X_variables.append(Variable(xi_name))
+
+    if y_type is not None:
+        y_variable = Variable("y", type=y_type)
+
+    else:
+        y_variable = Variable("y")
+
+    data_dict["y"] = y_
 
     data_dict[aer.config.experiment_label] = np.zeros(y_.shape, dtype=int)
 
+    variable_collection = VariableCollection(
+        independent_variables=X_variables, dependent_variables=[y_variable]
+    )
+
     object_of_study = new_object_of_study(variable_collection)
+
     object_of_study.add_data(data_dict)
 
     data_loader = torch.utils.data.DataLoader(
