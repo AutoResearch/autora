@@ -56,7 +56,7 @@ class TestDarts(unittest.TestCase):
 
         estimator = GridSearchCV(
             estimator=DARTS(variable_collection),
-            param_grid=[{"num_graph_nodes": [1, 2, 3]}],
+            param_grid=[{"num_graph_nodes": [1, 2]}],
         )
 
         estimator.fit(X_train, y_train)
