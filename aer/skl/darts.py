@@ -50,10 +50,13 @@ def general_darts(
     max_epochs: int = 100,
     grad_clip: float = 5,
 ):
+    """
+    Function to implement the DARTS optimization, given a fixed architecture.
+    """
 
     logger.info("Starting fit initialization")
 
-    data_loader = get_data_loader(
+    data_loader = _get_data_loader(
         X=X,
         y=y,
         variable_collection=variable_collection,
@@ -111,7 +114,7 @@ def general_darts(
         # Do the Architecture update
 
         # First reset the data iterator
-        data_iterator = get_data_iterator(data_loader)
+        data_iterator = _get_data_iterator(data_loader)
 
         # Then run the arch optimization
         for arch_step in range(arch_updates_per_epoch):
@@ -120,7 +123,9 @@ def general_darts(
                 f"epoch: {epoch}, architecture: {arch_step}"
             )
 
-            X_batch, y_batch = get_next_input_target(data_iterator, criterion=criterion)
+            X_batch, y_batch = _get_next_input_target(
+                data_iterator, criterion=criterion
+            )
 
             architect.step(
                 input_valid=X_batch,
@@ -131,7 +136,7 @@ def general_darts(
 
         # Do the param update
         # First reset the data iterator
-        data_iterator = get_data_iterator(data_loader)
+        data_iterator = _get_data_iterator(data_loader)
 
         # The run the param optimization
         for param_step in range(param_updates_per_epoch):
@@ -142,7 +147,9 @@ def general_darts(
             )
 
             lr = scheduler.get_last_lr()[0]
-            X_batch, y_batch = get_next_input_target(data_iterator, criterion=criterion)
+            X_batch, y_batch = _get_next_input_target(
+                data_iterator, criterion=criterion
+            )
             optimizer.zero_grad()
 
             # compute loss for the model
@@ -173,7 +180,7 @@ def general_darts(
     return results
 
 
-def get_data_loader(
+def _get_data_loader(
     X: np.ndarray,
     y: np.ndarray,
     variable_collection: VariableCollection,
@@ -210,12 +217,12 @@ def get_data_loader(
     return data_loader
 
 
-def get_data_iterator(data_loader: torch.utils.data.DataLoader) -> Iterator:
+def _get_data_iterator(data_loader: torch.utils.data.DataLoader) -> Iterator:
     data_iterator = iter(data_loader)
     return data_iterator
 
 
-def get_next_input_target(data_iterator: Iterator, criterion: torch.nn.Module):
+def _get_next_input_target(data_iterator: Iterator, criterion: torch.nn.Module):
     input_search, target_search = next(data_iterator)
 
     input_var = torch.autograd.Variable(input_search, requires_grad=False)
@@ -229,7 +236,7 @@ def get_next_input_target(data_iterator: Iterator, criterion: torch.nn.Module):
 
 class DARTS(BaseEstimator, RegressorMixin):
     """
-    Almost-Scikit-learn compatible estimator which runs the DARTS algorithm.
+    (Almost-)Scikit-learn compatible estimator which runs the DARTS algorithm.
 
     Note: Currently requires specifying "VariableCollection" in the DARTS constructor.
     This is not consistent with scikit-learn.
@@ -241,9 +248,7 @@ class DARTS(BaseEstimator, RegressorMixin):
     >>> from sklearn.model_selection import train_test_split
     >>> num_samples = 100
     >>> X = np.expand_dims(np.linspace(start=0, stop=1, num=num_samples), 1)
-    >>> y = np.expand_dims(
-    ...    np.random.default_rng(42).normal(loc=15., scale=1, size=num_samples), 1
-    ... )
+    >>> y = np.random.default_rng(42).normal(loc=15., scale=1, size=num_samples)
     >>> X_train, X_test, y_train, y_test = train_test_split(X, y, train_size=.9)
     >>> seed = torch.manual_seed(42)
     >>> estimator = DARTS(VariableCollection(
@@ -254,15 +259,13 @@ class DARTS(BaseEstimator, RegressorMixin):
     >>> estimator.predict(X_test).mean()
     14.260409
 
-
-
     """
 
     def __init__(
         self,
         variable_collection: VariableCollection,
         # Data loader parameters
-        batch_size: int = 10,
+        batch_size: int = 64,
         # Network parameters
         num_graph_nodes: int = 2,
         classifier_weight_decay: float = 1e-2,
@@ -274,9 +277,9 @@ class DARTS(BaseEstimator, RegressorMixin):
         momentum: float = 9e-1,
         optimizer_weight_decay: float = 3e-4,
         # Scheduler parameters
-        param_updates_per_epoch: int = 5,
+        param_updates_per_epoch: int = 10,
         # Architect parameters
-        arch_updates_per_epoch: int = 5,
+        arch_updates_per_epoch: int = 10,
         arch_weight_decay: float = 1e-4,
         arch_weight_decay_df: float = 3e-4,
         arch_weight_decay_base: float = 0.0,
