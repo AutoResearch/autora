@@ -135,7 +135,9 @@ class Architect(object):
             )  # torch.tensor(0.5, requires_grad=False)
             loss = loss1 + self.fair_darts_loss_weight * loss2
         else:
-            raise Exception("DARTS Type " + str(self.DARTS_type) + " not implemented")
+            raise Exception(
+                "DARTS Type " + str(self.model.DARTS_type) + " not implemented"
+            )
 
         loss.backward()
 
