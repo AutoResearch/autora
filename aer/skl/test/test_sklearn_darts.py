@@ -3,20 +3,21 @@ import unittest
 import numpy as np
 from sklearn.model_selection import GridSearchCV, train_test_split
 
-from aer.object_of_study import Variable, VariableCollection
 from aer.skl.darts import DARTS
 
 
-def generate_constant_data(
+def generate_noisy_constant_data(
     const: float = 0.5, epsilon: float = 0.01, num: int = 1000, seed: int = 42
 ):
     X = np.expand_dims(np.linspace(start=0, stop=1, num=num), 1)
     y = np.random.default_rng(seed).normal(loc=const, scale=epsilon, size=num)
-    variable_collection = VariableCollection(
-        independent_variables=[Variable("x")],
-        dependent_variables=[Variable("y")],
-    )
-    return X, y, variable_collection
+    return X, y, const, epsilon
+
+
+def generate_constant_data(const: float = 0.5, num: int = 1000):
+    X = np.expand_dims(np.linspace(start=0, stop=1, num=num), 1)
+    y = const * np.ones(num)
+    return X, y, const
 
 
 class TestDarts(unittest.TestCase):
@@ -26,16 +27,13 @@ class TestDarts(unittest.TestCase):
 
     def test_constant_model(self):
 
-        const = 0.5
-        epsilon = 0.01
-
-        X, y, variable_collection = generate_constant_data(const, epsilon)
+        X, y, const, epsilon = generate_noisy_constant_data()
 
         X_train, X_test, y_train, y_test = train_test_split(
             X, y, test_size=0.2, random_state=42
         )
 
-        estimator = DARTS(variable_collection, num_graph_nodes=1)
+        estimator = DARTS(num_graph_nodes=1)
 
         estimator.fit(X_train, y_train)
 
@@ -50,20 +48,33 @@ class TestDarts(unittest.TestCase):
 
     def test_metaparam_optimization(self):
 
-        X, y, variable_collection = generate_constant_data()
+        X, y, const = generate_constant_data()
 
         X_train, X_test, y_train, y_test = train_test_split(
             X, y, test_size=0.2, random_state=42
         )
 
         estimator = GridSearchCV(
-            estimator=DARTS(variable_collection),
-            param_grid=[{"num_graph_nodes": [1, 2]}],
+            estimator=DARTS(),
+            cv=2,
+            param_grid=[
+                {
+                    "max_epochs": [10, 50],
+                    "arch_updates_per_epoch": [5, 10, 15],
+                    "param_updates_per_epoch": [5, 10, 15],
+                    "num_graph_nodes": [1, 2, 3],
+                }
+            ],
         )
 
         estimator.fit(X_train, y_train)
 
-        self.assertIsNotNone(estimator)
+        print(estimator.best_params_)
+        print(X_test)
+        print(estimator.predict(X_test))
+
+        for y_pred_i in np.nditer(estimator.predict(X_test)):
+            self.assertBetween(y_pred_i, const - 0.01, const + 0.01)
 
         print(estimator.predict(X_test))
 

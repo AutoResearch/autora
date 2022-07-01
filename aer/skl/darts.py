@@ -35,32 +35,23 @@ class _DARTSResult:
 def _general_darts(
     X: np.ndarray,
     y: np.ndarray,
-    variable_collection: VariableCollection,
-    # Data loader parameters
     batch_size: int = 20,
-    # Network parameters
     num_graph_nodes: int = 2,
-    input_dimensions: int = 1,
-    output_dimensions: int = 1,
     output_type: ValueType = ValueType.REAL,
     classifier_weight_decay: float = 1e-2,
     darts_type: DARTS_Type = DARTS_Type.ORIGINAL,
     init_weights_function: Optional[Callable] = None,
-    # Optimizer parameters
     learning_rate: float = 2.5e-2,
     learning_rate_min: float = 0.01,
     momentum: float = 9e-1,
     optimizer_weight_decay: float = 3e-4,
-    # Scheduler parameters
     param_updates_per_epoch: int = 20,
-    # Architect parameters
     arch_updates_per_epoch: int = 20,
     arch_weight_decay: float = 1e-4,
     arch_weight_decay_df: float = 3e-4,
     arch_weight_decay_base: float = 0.0,
     arch_learning_rate: float = 3e-3,
     fair_darts_loss_weight: int = 1,
-    # General fitting parameters
     max_epochs: int = 100,
     grad_clip: float = 5,
 ) -> _DARTSResult:
@@ -70,7 +61,7 @@ def _general_darts(
 
     logger.info("Starting fit initialization")
 
-    data_loader = _get_data_loader(
+    data_loader, input_dimensions, output_dimensions = _get_data_loader(
         X=X,
         y=y,
         batch_size=batch_size,
@@ -245,6 +236,8 @@ def _get_data_loader(
     variable_collection = VariableCollection(
         independent_variables=X_variables, dependent_variables=y_variables
     )
+    input_dimensions = variable_collection.input_dimensions
+    output_dimensions = variable_collection.output_dimensions
 
     object_of_study = new_object_of_study(variable_collection)
     object_of_study.add_data(data_dict)
@@ -256,7 +249,7 @@ def _get_data_loader(
         pin_memory=True,
         num_workers=0,
     )
-    return data_loader
+    return data_loader, input_dimensions, output_dimensions
 
 
 def _get_data_iterator(data_loader: torch.utils.data.DataLoader) -> Iterator:
@@ -297,12 +290,7 @@ class DARTS(BaseEstimator, RegressorMixin):
         >>> num_samples = 1000
         >>> X = np.linspace(start=0, stop=1, num=num_samples).reshape(-1, 1)
         >>> y = 15. * np.ones(num_samples)
-        >>> estimator = DARTS(
-        ...     num_graph_nodes=1,
-        ...     variable_collection=VariableCollection(
-        ...         independent_variables=[Variable("x")],
-        ...         dependent_variables=[Variable("y")],
-        ... ))
+        >>> estimator = DARTS(num_graph_nodes=1)
         >>> estimator = estimator.fit(X, y)
         >>> estimator.predict([[15.]])
         array([[15.051043]], dtype=float32)
@@ -338,34 +326,25 @@ class DARTS(BaseEstimator, RegressorMixin):
 
     def __init__(
         self,
-        variable_collection: VariableCollection,
-        # Data loader parameters
         batch_size: int = 64,
-        # Network parameters
         num_graph_nodes: int = 2,
         classifier_weight_decay: float = 1e-2,
         darts_type: DARTS_Type = DARTS_Type.ORIGINAL,
         init_weights_function: Optional[Callable] = None,
-        # Optimizer parameters
         learning_rate: float = 2.5e-2,
         learning_rate_min: float = 0.01,
         momentum: float = 9e-1,
         optimizer_weight_decay: float = 3e-4,
-        # Scheduler parameters
         param_updates_per_epoch: int = 10,
-        # Architect parameters
         arch_updates_per_epoch: int = 10,
         arch_weight_decay: float = 1e-4,
         arch_weight_decay_df: float = 3e-4,
         arch_weight_decay_base: float = 0.0,
         arch_learning_rate: float = 3e-3,
         fair_darts_loss_weight: int = 1,
-        # General fitting parameters
         max_epochs: int = 10,
         grad_clip: float = 5,
     ) -> None:
-
-        self.variable_collection = variable_collection
 
         self.batch_size = batch_size
 
