@@ -295,27 +295,6 @@ class DARTS(BaseEstimator, RegressorMixin):
         >>> estimator.predict([[15.]])
         array([[15.051043]], dtype=float32)
 
-    Arguments:
-            variable_collection: name and domain of the indepdendent variables `X` and
-               dependent variable `y`
-            batch_size: number of observations to be used per update
-            num_graph_nodes: number of intermediate nodes in the DARTS graph.
-            classifier_weight_decay:
-            darts_type:
-            init_weights_function:
-            learning_rate:
-            learning_rate_min:
-            momentum:
-            optimizer_weight_decay:
-            param_updates_per_epoch:
-            arch_updates_per_epoch:
-            arch_weight_decay:
-            arch_weight_decay_df:
-            arch_weight_decay_base:
-            arch_learning_rate:
-            fair_darts_loss_weight:
-            max_epochs:
-            grad_clip:
 
     Attributes:
         network_: represents the optimized network for the architecture search
@@ -345,6 +324,27 @@ class DARTS(BaseEstimator, RegressorMixin):
         max_epochs: int = 10,
         grad_clip: float = 5,
     ) -> None:
+        """
+        Arguments:
+            batch_size: number of observations to be used per update
+            num_graph_nodes: number of intermediate nodes in the DARTS graph.
+            classifier_weight_decay:
+            darts_type:
+            init_weights_function:
+            learning_rate:
+            learning_rate_min:
+            momentum:
+            optimizer_weight_decay:
+            param_updates_per_epoch:
+            arch_updates_per_epoch:
+            arch_weight_decay:
+            arch_weight_decay_df:
+            arch_weight_decay_base:
+            arch_learning_rate:
+            fair_darts_loss_weight:
+            max_epochs:
+            grad_clip:
+        """
 
         self.batch_size = batch_size
 
