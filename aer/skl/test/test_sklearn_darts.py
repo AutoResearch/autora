@@ -46,7 +46,7 @@ class TestDarts(unittest.TestCase):
                 y_pred_i, const - (5.0 * epsilon), const + (5.0 * epsilon)
             )
 
-        print(estimator.model_)
+        print(estimator.network_)
 
     def test_metaparam_optimization(self):
 

@@ -1,4 +1,5 @@
 import logging
+from dataclasses import dataclass
 from types import SimpleNamespace
 from typing import Callable, Iterator, Optional
 
@@ -19,6 +20,14 @@ from aer.theorist.theorist_darts import format_input_target
 from aer.variable import VariableCollection
 
 logger = logging.getLogger(__name__)
+
+
+@dataclass(frozen=True)
+class _DARTSResult:
+    """A container for passing fitted DARTS results around."""
+
+    network_: Network
+    model_: Network
 
 
 def _general_darts(
@@ -49,7 +58,7 @@ def _general_darts(
     # General fitting parameters
     max_epochs: int = 100,
     grad_clip: float = 5,
-):
+) -> _DARTSResult:
     """
     Function to implement the DARTS optimization, given a fixed architecture.
     """
@@ -65,7 +74,7 @@ def _general_darts(
 
     criterion = get_loss_function(variable_collection.output_type)
 
-    model_ = Network(
+    network_ = Network(
         num_classes=variable_collection.output_dimensions,
         criterion=criterion,
         steps=num_graph_nodes,
@@ -74,10 +83,10 @@ def _general_darts(
         darts_type=darts_type,
     )
     if init_weights_function is not None:
-        model_.apply(init_weights_function)
+        network_.apply(init_weights_function)
 
     optimizer = torch.optim.SGD(
-        params=model_.parameters(),
+        params=network_.parameters(),
         lr=learning_rate,
         momentum=momentum,
         weight_decay=optimizer_weight_decay,
@@ -91,7 +100,7 @@ def _general_darts(
 
     # Generate the architecture of the model
     architect = Architect(
-        model_,
+        network_,
         SimpleNamespace(
             momentum=momentum,
             arch_weight_decay=arch_weight_decay,
@@ -105,7 +114,7 @@ def _general_darts(
     objs = AvgrageMeter()
 
     logger.info("Starting fit.")
-    model_.train()
+    network_.train()
 
     for epoch in range(max_epochs):
 
@@ -153,20 +162,20 @@ def _general_darts(
             optimizer.zero_grad()
 
             # compute loss for the model
-            logits = model_(X_batch)
+            logits = network_(X_batch)
             loss = criterion(logits, y_batch)
 
             # update gradients for model
             loss.backward()
 
             # clips the gradient norm
-            torch.nn.utils.clip_grad_norm_(model_.parameters(), grad_clip)
+            torch.nn.utils.clip_grad_norm_(network_.parameters(), grad_clip)
 
             # moves optimizer one step (applies gradients to weights)
             optimizer.step()
 
             # applies weight decay to classifier weights
-            model_.apply_weight_decay_to_classifier(lr)
+            network_.apply_weight_decay_to_classifier(lr)
 
             # moves the annealing scheduler forward to determine new learning rate
             scheduler.step()
@@ -175,7 +184,7 @@ def _general_darts(
             n = X_batch.size(0)
             objs.update(loss.data, n)
 
-    results = dict(model_=model_)
+    results = _DARTSResult(model_=network_, network_=network_)
 
     return results
 
@@ -253,7 +262,7 @@ class DARTS(BaseEstimator, RegressorMixin):
         >>> import numpy as np
         >>> from aer.variable import Variable
         >>> num_samples = 1000
-        >>> X =np.linspace(start=0, stop=1, num=num_samples).reshape(num_samples, 1)
+        >>> X = np.linspace(start=0, stop=1, num=num_samples).reshape(-1, 1)
         >>> y = 15. * np.ones(num_samples)
         >>> estimator = DARTS(VariableCollection(
         ...    independent_variables=[Variable("x")],
@@ -262,6 +271,33 @@ class DARTS(BaseEstimator, RegressorMixin):
         >>> estimator = estimator.fit(X, y)
         >>> estimator.predict([[15.]])
         array([[15.051043]], dtype=float32)
+
+    Arguments:
+            variable_collection: name and domain of the indepdendent variables `X` and
+               dependent variable `y`
+            batch_size: number of observations to be used per update
+            num_graph_nodes: number of intermediate nodes in the DARTS graph.
+            classifier_weight_decay:
+            darts_type:
+            init_weights_function:
+            learning_rate:
+            learning_rate_min:
+            momentum:
+            optimizer_weight_decay:
+            param_updates_per_epoch:
+            arch_updates_per_epoch:
+            arch_weight_decay:
+            arch_weight_decay_df:
+            arch_weight_decay_base:
+            arch_learning_rate:
+            fair_darts_loss_weight:
+            max_epochs:
+            grad_clip:
+
+    Attributes:
+        network_: represents the optimized network for the architecture search
+        model_: represents the best-fit model after simplification of the best fit function
+
 
     """
 
@@ -292,7 +328,8 @@ class DARTS(BaseEstimator, RegressorMixin):
         # General fitting parameters
         max_epochs: int = 10,
         grad_clip: float = 5,
-    ):
+    ) -> None:
+
         self.variable_collection = variable_collection
 
         self.batch_size = batch_size
@@ -319,16 +356,37 @@ class DARTS(BaseEstimator, RegressorMixin):
         self.max_epochs = max_epochs
         self.grad_clip = grad_clip
 
+        self.network_: Network = Network(0, 0)
         self.model_: Network = Network(0, 0)
 
     def fit(self, X: np.ndarray, y: np.ndarray):
+        """
+        Runs the optimization for a given set of `X`s and `y`s.
+
+        Arguments:
+            X: independent variables in an n-dimensional array
+            y: dependent variables in an n-dimensional array
+
+        Returns:
+            self (DARTS): the fitted estimator
+        """
         params = self.get_params()
         fit_results = _general_darts(X=X, y=y, **params)
-        self.model_ = fit_results["model_"]
+        self.network_ = fit_results.network_
         return self
 
     def predict(self, X: np.ndarray) -> np.ndarray:
+        """
+        Applies the fitted model to a set of independent variables `X`,
+        to give predictions for the dependent variable `y`.
+
+        Arguments:
+            X: independent variables in an n-dimensional array
+
+        Returns:
+            y: predicted dependent variable values
+        """
         X_ = check_array(X)
-        results_ = self.model_(torch.as_tensor(X_).float())
-        results = results_.detach().numpy()
-        return results
+        y_ = self.network_(torch.as_tensor(X_).float())
+        y = y_.detach().numpy()
+        return y
