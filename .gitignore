@@ -1,5 +1,5 @@
 # AER-specific files
-studies/**/modeling
+example/studies/**/modeling
 
 # PyCharm ignores are handled by the .idea/.gitignore file
 # VSCode ignores are handled by the .vscode/.gitignore file
@@ -63,3 +63,6 @@ cover/
 .mypy_cache/
 .dmypy.json
 dmypy.json
+
+# Material for MkDocs
+site/

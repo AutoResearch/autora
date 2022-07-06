@@ -13,10 +13,14 @@ try:
     from cnnsimple.model_search import Network
 
 except ImportError:
-    import model_search_config as cfg
-    import utils as utils  # type: ignore
-    import visualize as viz
-    from model_search import Network
+    # MyPy throws errors when looking at these imports.
+    # This is a known problem: https://github.com/python/mypy/issues/1153
+    # Fix: include "# type: ignore" comments on each import
+    # Also occurs in run_model_search.py
+    import aer.theorist.darts.model_search_config as cfg  # type: ignore
+    import aer.theorist.darts.utils as utils  # type: ignore
+    import aer.theorist.darts.visualize as viz  # type: ignore
+    from aer.theorist.darts.model_search import Network  # type: ignore
 
 
 # PARSE ARGUMENTS
