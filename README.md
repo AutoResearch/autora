@@ -126,7 +126,7 @@ Set up the Virtual environment – an isolated version of `python` and all the p
   - Poetry executable: select the path to the poetry installation you have, e.g. 
     `/opt/homebrew/bin/poetry`
   - Click "OK" and wait while the environment builds.
-  - Run the "Python tests for aer" Run/Debug configuration in the PyCharm interface, and check that there are no errors.
+  - Run the "Python tests in tests/" Run/Debug configuration in the PyCharm interface, and check that there are no errors.
 
 Additional setup steps for PyCharm:
 
