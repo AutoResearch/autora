@@ -3,13 +3,176 @@ Autonomous Empirical Research is an open source AI-based system for automating e
 
 # Getting started (development)
 
+The following sections describe how to install and configure the supported setup recommended for developing AER, using:
+- `python` and dependencies as described in the `pyproject.toml` file,
+- `pyenv` (optional) which is used for installing different versions of `python`,
+- `poetry` (mandatory) for managing the `python` environment itself,
+- `pre-commit` (mandatory when making changes to the repository) which is used for handling git pre-commit hooks,
+- `graphviz` (mandatory) which is used for some visualizations.
+
+Depending on your computer, the steps to get AER working will vary. At present, macOS is supported. 
+
+## Basic Setup on macOS 
+
+### Install dependencies
+
+#### Install `homebrew` (optional)
+
+For macOS we strongly recommend using `homebrew` as the package manager.
+
+Visit [https://brew.sh](https://brew.sh) and run the installation instructions.
+
+#### Install external tools using `homebrew`
+
+This is a good time to check that the other external dependencies are fulfilled. For developing AER you need:
+- `pyenv` which is required for the `python` setup,
+- `pre-commit` which is used for handling git pre-commit hooks,
+- `graphviz` which is used for some visualizations.
+
+You can install them as follows:
+
+```shell
+brew bundle
+```
+
+This uses the [`Brewfile`](./Brewfile) to install all the packages required.
+
+#### Initialize pyenv
+
+`pyenv` allows installing different versions of `python`. Run the initialization script as follows:
+
+```shell
+pyenv init
+``` 
+... then follow the instructions and add some lines to your shell environment, modifying the following files:
+- If you use `zsh`, you'll modify `~/.zshrc` and `~/.zprofile`, 
+- If you use `bash`, you'll modify `~/.bash_profile`.
+
+#### Restart shell session
+
+After making these changes, restart your shell session by executing:
+
+```shell
+exec "$SHELL" 
+```
+
+## Set up the `python` environment
+
+### Install `python` version 
+
+Install a `python` version listed in the [`pyproject.toml`](./pyproject.toml) file. The entry loks like:  
+
+```toml
+python = '>=3.8.13,<3.11'
+```
+
+In this case, you could install version 3.8.13 as follows:
+
+```shell
+pyenv install 3.8.13
+```
+
+You can use this `python` version with the `poetry` package manager to create an isolated environment where you can run the AER code. `poetry` handles resolving dependencies between `python` modules and ensures that you are using the same package versions as other members of the development team (which is a good thing).
+
+There are two suggested options for initializing an environment:
+- On the command line using `poetry` directly,
+- Using your IDE to initialize the `poetry` environment. 
+
+*Note: For end-users, it may be more appropriate to use an environment manager like `Anaconda` or `Miniconda` instead of `poetry`, but this is not currently supported.*
+
+### `poetry` Setup
+
+#### Command Line `poetry` Setup
+
+From the `<project directory>`, run the following commands:
+
+Activate the target version of `python` using `pyenv`:
+```shell
+pyenv shell 3.8.13
+```
+
+Set up a new poetry environment with that `python` version:
+```shell
+poetry env use $(pyenv which python) 
+```
+
+Update the installation utilities within the new environment:
+```shell
+poetry run python -m pip install --upgrade pip setuptools wheel
+```
+
+Use the `pyproject.toml` file to resolve and then install all the dependencies
+```shell
+poetry install
+```
+
+#### Using `poetry` interactively
+
+To run interactive commands, you can activate the poetry virtual environment. From the `<project directory>` directory, run:
+
+```shell
+poetry shell
+```
+
+This spawns a new shell where you have access to the poetry `python` and all the packages installed using `poetry install`. You should see the prompt change:
+
+```
+% poetry shell
+Spawning shell within /Users/me/Library/Caches/pypoetry/virtualenvs/aer-2PgcgopX-py3.8
+Restored session: Fri Jun 24 12:34:56 EDT 2022
+(aer-2PgcgopX-py3.8) % 
+```
+
+If you execute `python` and then `import numpy`, you should be able to see that `numpy` has been imported from the `aer-2PgcgopX-py3.8` environment :
+
+```
+(aer-2PgcgopX-py3.8) % python
+Python 3.8.13 (default, Jun 16 2022, 12:34:56) 
+[Clang 13.1.6 (clang-1316.0.21.2.5)] on darwin
+Type "help", "copyright", "credits" or "license" for more information.
+>>> import numpy
+>>> numpy
+<module 'numpy' from '/Users/me/Library/Caches/pypoetry/virtualenvs/aer-2PgcgopX-py3.8/lib/python3.8/site-packages/numpy/__init__.py'>
+```
+
+To deactivate the `poetry` environment, `exit` the session. This should return you to your original prompt, as follows:
+```
+(aer-2PgcgopX-py3.8) % exit
+
+Saving session...
+...saving history...truncating history files...
+...completed.
+% 
+```
+
+#### Using `poetry` non-interactively
+
+You can run python programs using poetry without activating the poetry environment, by using `poetry run {command}`. For example, to run the tests, execute:
+
+```shell
+poetry run python -m unittest
+```
+
+It should return something like:
+
+```
+% poetry run python -m unittest
+.
+--------------------------------
+Ran 1 test in 0.000s
+
+OK
+```
+
 ## Pre-Commit Hooks
 
-We use [pre-commit](https://pre-commit.com) to manage pre-commit hooks. 
+We use [`pre-commit`](https://pre-commit.com) to manage pre-commit hooks. 
+
 Pre-commit hooks are programs which run before each git commit and which check that the files to be committed: 
 - are correctly formatted and 
-- have no obvious coding errors. 
-Pre-commit hooks are intended to enforce coding guidelines, including the Python style-guide [PEP8](https://peps.python.org/pep-0008/). 
+- have no obvious coding errors.
+
+Pre-commit hooks are intended to enforce coding guidelines, including the Python style-guide [PEP8](https://peps.python.org/pep-0008/).
 
 The hooks and their settings are specified in [`.pre-commit-config.yaml`](./.pre-commit-config.yaml).
 
@@ -34,10 +197,10 @@ If your `git commit` fails because of the pre-commit hook, then you should:
 2. Inspect the output. It might look like this:
    ```
    $ pre-commit run
-   black....................................................................Passed
-   isort....................................................................Passed
-   flake8...................................................................Passed
-   mypy.....................................................................Failed
+   black....................Passed
+   isort....................Passed
+   flake8...................Passed
+   mypy.....................Failed
    - hook id: mypy
    - exit code: 1
    
@@ -55,10 +218,10 @@ If your `git commit` fails because of the pre-commit hook, then you should:
 6. Repeat 1-4 until all hooks return "passed", e.g.
    ```
    $ pre-commit run
-   black....................................................................Passed
-   isort....................................................................Passed
-   flake8...................................................................Passed
-   mypy.....................................................................Passed
+   black....................Passed
+   isort....................Passed
+   flake8...................Passed
+   mypy.....................Passed
    ```
 
 It's easiest to solve these kinds of problems if you make small commits, often.  

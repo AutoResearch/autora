@@ -2,6 +2,13 @@
 .idea/
 .vscode/
 
+# Python Environment
+.python-version
+.venv
+
+# Dependencies
+Brewfile.lock.json
+
 # Python ignores, from https://github.com/github/gitignore/blob/main/Python.gitignore
 # Byte-compiled / optimized / DLL files
 __pycache__/
