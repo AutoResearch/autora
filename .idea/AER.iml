@@ -6,8 +6,8 @@
       <sourceFolder url="file://$MODULE_DIR$/tests" isTestSource="true" />
       <excludeFolder url="file://$MODULE_DIR$/.pytest_cache" />
       <excludeFolder url="file://$MODULE_DIR$/.mypy_cache" />
-      <excludeFolder url="file://$MODULE_DIR$/studies/Weber Sampled/modeling" />
-      <excludeFolder url="file://$MODULE_DIR$/studies/Weber/modeling" />
+      <excludeFolder url="file://$MODULE_DIR$/example/studies/Weber Sampled/modeling" />
+      <excludeFolder url="file://$MODULE_DIR$/example/studies/Weber/modeling" />
       <excludeFolder url="file://$MODULE_DIR$/.venv" />
       <excludeFolder url="file://$MODULE_DIR$/.vscode" />
     </content>
