@@ -21,7 +21,7 @@ from aer.theorist.darts.utils import AvgrageMeter, get_loss_function
 from aer.theorist.theorist_darts import format_input_target
 from aer.variable import ValueType, Variable, VariableCollection
 
-logger = logging.getLogger(__name__)
+_logger = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
@@ -59,7 +59,7 @@ def _general_darts(
     Function to implement the DARTS optimization, given a fixed architecture and input data.
     """
 
-    logger.info("Starting fit initialization")
+    _logger.info("Starting fit initialization")
 
     data_loader, input_dimensions, output_dimensions = _get_data_loader(
         X=X,
@@ -116,12 +116,12 @@ def _general_darts(
         scheduler=scheduler,
     )
 
-    logger.info("Starting fit.")
+    _logger.info("Starting fit.")
     network_.train()
 
     for epoch in range(max_epochs):
 
-        logger.info(f"Running fit, epoch {epoch}")
+        _logger.info(f"Running fit, epoch {epoch}")
 
         # Do the Architecture update
 
@@ -130,7 +130,7 @@ def _general_darts(
 
         # Then run the arch optimization
         for arch_step in range(arch_updates_per_epoch):
-            logger.info(
+            _logger.info(
                 f"Running architecture update, "
                 f"epoch: {epoch}, architecture: {arch_step}"
             )
@@ -186,7 +186,7 @@ def _optimize_coefficients(
     objs = AvgrageMeter()
 
     for param_step in range(param_updates_per_epoch):
-        logger.info(f"Running parameter update, " f"param: {param_step}")
+        _logger.info(f"Running parameter update, " f"param: {param_step}")
 
         lr = scheduler.get_last_lr()[0]
         X_batch, y_batch = _get_next_input_target(data_iterator, criterion=criterion)
