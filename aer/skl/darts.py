@@ -56,7 +56,7 @@ def _general_darts(
     grad_clip: float = 5,
 ) -> _DARTSResult:
     """
-    Function to implement the DARTS optimization, given a fixed architecture.
+    Function to implement the DARTS optimization, given a fixed architecture and input data.
     """
 
     logger.info("Starting fit initialization")
@@ -170,11 +170,16 @@ def _optimize_coefficients(
     network: Network,
     criterion: Callable,
     data_loader: torch.utils.data.DataLoader,
-    grad_clip,
-    optimizer,
-    param_updates_per_epoch,
-    scheduler,
+    grad_clip: bool,
+    optimizer: torch.optim.Optimizer,
+    param_updates_per_epoch: int,
+    scheduler: torch.optim.lr_scheduler.CosineAnnealingLR,
 ):
+    """
+    Function to optimize the coefficients of a DARTS Network.
+
+    Warning: This modifies the coefficients of the Network in place.
+    """
 
     data_iterator = _get_data_iterator(data_loader)
 
