@@ -229,9 +229,10 @@ Saving session...
 % 
 ```
 
-To run a script, e.g. the `run_weber_study.py` script in the root directory, execute: 
-```
-poetry run python run_weber_study.py
+To run a script, e.g. the `run_weber_study.py` script in the [`example/weber`](./example/weber) directory, execute: 
+
+```shell
+poetry run python example/weber/run_weber_study.py
 ```
 
 #### Using `poetry` non-interactively
