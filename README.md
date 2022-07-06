@@ -1,9 +1,6 @@
 # Autonomous Empirical Research
 Autonomous Empirical Research is an open source AI-based system for automating each aspect empirical research in the behavioral sciences, from the construction of a scientific hypothesis to conducting novel experiments.
 
-# Contributors (Alphabetic Order)
-Ben Andrew, Hannah Even, Ioana Marinescu, Sebastian Musslick, Sida Li
-
 # Getting started
 
 You should be familiar with the command line for your operating system. The topics required are covered in:
@@ -264,18 +261,6 @@ If you successfully set up AER on Windows, please update this readme.
 
 ## Development Practices
 
-### Running the tests
-
-You should run the tests before you commit code to the repository, to ensure that you've not broken anything. 
-
-The unit tests can be run as follows (starting in the root directory of the repository):
-
-```shell
-poetry run python -m unittest
-```
-
-You can also use the run configuration "Python tests for aer" in PyCharm.
-
 ### Pre-Commit Hooks
 
 We use [`pre-commit`](https://pre-commit.com) to manage pre-commit hooks. 
@@ -331,3 +316,25 @@ If your `git commit` fails because of the pre-commit hook, then you should:
    ```
 
 It's easiest to solve these kinds of problems if you make small commits, often.  
+
+# Documentation
+
+Documentation is automatically generated using [Material for MkDocs](https://squidfunk.github.io/mkdocs-material/) based on docstrings in files in the `aer/` directory. 
+
+## Commands
+
+Build and serve the documentation using the following commands:
+
+* `poetry run mkdocs serve` - Start the live-reloading docs server.
+* `poetry run mkdocs build` - Build the documentation site.
+* `poetry run mkdocs gh-deploy` - Build the documentation and serve at https://AutoResearch.github.io/AER/
+* `poetry run mkdocs -h` - Print help message and exit.
+
+## Documentation layout
+```
+mkdocs.yml    # The configuration file for the documentation.
+docs/         # Directory for static pages to be included in the documentation.
+    index.md  # The documentation homepage.
+    ...       # Other markdown pages, images and other files.
+aer/          # The directory containing the source code.
+```
