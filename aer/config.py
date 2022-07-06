@@ -1,0 +1,85 @@
+studies_folder = "example/studies/"
+experiment_folder = "experimentation/"
+models_folder = "modeling/"
+models_results_folder = "results/"
+models_results_plots_folder = "results/plots/"
+models_results_figures_folder = "figures/"
+models_results_weights_folder = "results/weights/"
+models_scripts_folder = "scripts/"
+experiment_file_prefix = "experiment_"
+sequence_file_suffix = "sequence"
+data_file_suffix = "data"
+
+experiment_label = "AER_Experiment"
+
+# GUI
+
+font_family = "Helvetica"
+font_size = 12
+font_size_button = 14
+title_font_size = 16
+
+up_down_bgcolor = "#6b87b5"
+stop_bgcolor = "#ba2014"
+listbox_bgcolor = "white"
+
+plot_colors = [
+    "r",
+    "g",
+    "b",
+    "c",
+    "m",
+    "y",
+    "k",
+    "r--",
+    "g--",
+    "b--",
+    "c--",
+    "m--",
+    "y--",
+    "k--",
+    "r:",
+    "g:",
+    "b:",
+    "c:",
+    "m:",
+    "y:",
+    "k:",
+]
+
+plot_key_type = "plot type"
+plot_key_x_data = "x data"
+plot_key_y_data = "y data"
+plot_key_x_label = "x label"
+plot_key_y_label = "y label"
+plot_key_x_limit = "x limit"
+plot_key_y_limit = "y limit"
+plot_key_legend = "legend"
+plot_key_image = "image"
+plot_key_x_model = "x model"
+plot_key_y_model = "y model"
+plot_key_x_highlighted_data = "x highlighted data"
+plot_key_y_highlighted_data = "y highlighted data"
+plot_key_z_highlighted_data = "z highlighted data"
+plot_key_x_conditions = "x condition"
+
+log_key_timestamp = "timestamp"
+
+max_data_points_simulated = 100
+
+# figures
+arch_weight_decay_label = r"Parameter Penalty $\gamma$"
+num_graph_nodes_label = "$k$"
+validation_loss_label = "Test Loss"
+BIC_loss_label = "BIC"
+darts_original_label = "Regular DARTS"
+darts_fair_label = "Fair DARTS"
+darts_random_label = "Random Search"
+figure_name_graph = "computation_graph"
+figure_name_model_plot = "model_plot"
+figure_size = (2.5, 2.5)  # ICLR: (2.0, 2.5)
+figure_size_model_plot = (7, 2)  # ICLR: (5,2) # (3, 2.5)
+legend_loc = 2
+legend_font_size = 9
+axis_font_size = 9
+title_font_size = 9
