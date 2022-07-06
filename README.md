@@ -160,63 +160,7 @@ Use the `pyproject.toml` file to resolve and then install all the dependencies
 poetry install
 ```
 
-##### Using `poetry` interactively
-
-To run interactive commands, you can activate the poetry virtual environment. From the `<project directory>` directory, run:
-
-```shell
-poetry shell
-```
-
-This spawns a new shell where you have access to the poetry `python` and all the packages installed using `poetry install`. You should see the prompt change:
-
-```
-% poetry shell
-Spawning shell within /Users/me/Library/Caches/pypoetry/virtualenvs/aer-2PgcgopX-py3.8
-Restored session: Fri Jun 24 12:34:56 EDT 2022
-(aer-2PgcgopX-py3.8) % 
-```
-
-If you execute `python` and then `import numpy`, you should be able to see that `numpy` has been imported from the `aer-2PgcgopX-py3.8` environment :
-
-```
-(aer-2PgcgopX-py3.8) % python
-Python 3.8.13 (default, Jun 16 2022, 12:34:56) 
-[Clang 13.1.6 (clang-1316.0.21.2.5)] on darwin
-Type "help", "copyright", "credits" or "license" for more information.
->>> import numpy
->>> numpy
-<module 'numpy' from '/Users/me/Library/Caches/pypoetry/virtualenvs/aer-2PgcgopX-py3.8/lib/python3.8/site-packages/numpy/__init__.py'>
-```
-
-To deactivate the `poetry` environment, `exit` the session. This should return you to your original prompt, as follows:
-```
-(aer-2PgcgopX-py3.8) % exit
-
-Saving session...
-...saving history...truncating history files...
-...completed.
-% 
-```
-
-##### Using `poetry` non-interactively
-
-You can run python programs using poetry without activating the poetry environment, by using `poetry run {command}`. For example, to run the tests, execute:
-
-```shell
-poetry run python -m unittest
-```
-
-It should return something like:
-
-```
-% poetry run python -m unittest
-.
---------------------------------
-Ran 1 test in 0.000s
-
-OK
-```
+Once this step has been completed, skip to the section [Activating and using the environment](#activating-and-using-the-environment) to test it.
 
 #### Visual Studio Code Configuration
 
@@ -244,6 +188,71 @@ After installing Visual Studio Code and the other prerequisites, carry out the f
     ```
     in the built-in terminal. 
 
+### Activating and using the environment
+
+#### Using `poetry` interactively
+
+To run interactive commands, you can activate the poetry virtual environment. From the `<project directory>` directory, run:
+
+```shell
+poetry shell
+```
+
+This spawns a new shell where you have access to the poetry `python` and all the packages installed using `poetry install`. You should see the prompt change:
+
+```
+% poetry shell
+Spawning shell within /Users/me/Library/Caches/pypoetry/virtualenvs/aer-2PgcgopX-py3.8
+Restored session: Fri Jun 24 12:34:56 EDT 2022
+(aer-2PgcgopX-py3.8) % 
+```
+
+If you execute `python` and then `import numpy`, you should be able to see that `numpy` has been imported from the `aer-2PgcgopX-py3.8` environment:
+
+```
+(aer-2PgcgopX-py3.8) % python
+Python 3.8.13 (default, Jun 16 2022, 12:34:56) 
+[Clang 13.1.6 (clang-1316.0.21.2.5)] on darwin
+Type "help", "copyright", "credits" or "license" for more information.
+>>> import numpy
+>>> numpy
+<module 'numpy' from '/Users/me/Library/Caches/pypoetry/virtualenvs/aer-2PgcgopX-py3.8/lib/python3.8/site-packages/numpy/__init__.py'>
+```
+
+To deactivate the `poetry` environment, `exit` the session. This should return you to your original prompt, as follows:
+```
+(aer-2PgcgopX-py3.8) % exit
+
+Saving session...
+...saving history...truncating history files...
+...completed.
+% 
+```
+
+To run a script, e.g. the `run_weber_study.py` script in the root directory, execute: 
+```
+poetry run python run_weber_study.py
+```
+
+#### Using `poetry` non-interactively
+
+You can run python programs using poetry without activating the poetry environment, by using `poetry run {command}`. For example, to run the tests, execute:
+
+```shell
+poetry run python -m unittest
+```
+
+It should return something like:
+
+```
+% poetry run python -m unittest
+.
+--------------------------------
+Ran 1 test in 0.000s
+
+OK
+```
+
 ## Development Setup on Windows
 
 Windows is not yet officially supported. You may be able to follow the same approach as for macOS to set up your development environment, with some modifications, e.g.:
@@ -251,8 +260,6 @@ Windows is not yet officially supported. You may be able to follow the same appr
 - Using the GitHub Desktop application in place of the GitHub CLI.
 
 If you successfully set up AER on Windows, please update this readme.
-
-Please update this readme 
 
 ## Development Practices
 
