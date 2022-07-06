@@ -284,10 +284,6 @@ class DARTS(BaseEstimator, RegressorMixin):
     This class is intended to be compatible with the
     [Scikit-Learn Estimator API](https://scikit-learn.org/stable/developers/develop.html).
 
-    Bug: Scikit-Learn-Incompatibility: Requires specifying "VariableCollection" in the constructor.
-        This is not consistent with scikit-learn.
-        TODO: Remove requirement for VariableCollection.
-
     Examples:
 
         >>> import numpy as np
