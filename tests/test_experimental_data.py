@@ -11,7 +11,7 @@ class TestLoadExperimentalData(unittest.TestCase):
             independent_variables=[Variable("S1"), Variable("S2")],
             dependent_variables=[Variable("difference_detected")],
         )
-        e = load_experimental_data("aer/test/data/weber_test_data.csv", m)
+        e = load_experimental_data("tests/data/weber_test_data.csv", m)
         self.assertIsInstance(e, ExperimentalData)
         print(e)
 

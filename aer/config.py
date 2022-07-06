@@ -1,4 +1,4 @@
-studies_folder = "studies/"
+studies_folder = "example/studies/"
 experiment_folder = "experimentation/"
 models_folder = "modeling/"
 models_results_folder = "results/"

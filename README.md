@@ -1,10 +1,11 @@
 # Autonomous Empirical Research
 Autonomous Empirical Research is an open source AI-based system for automating each aspect empirical research in the behavioral sciences, from the construction of a scientific hypothesis to conducting novel experiments.
 
-# Contributors (Alphabetic Order)
-Ben Andrew, Hannah Even, Ioana Marinescu, Sebastian Musslick, Sida Li
-
 # Getting started
+
+You should be familiar with the command line for your operating system. The topics required are covered in:
+- **macOS**: Joe Kissell. [*Take Control of the Mac Command Line with Terminal, 3rd Edition*]((https://bruknow.library.brown.edu/permalink/01BU_INST/528fgv/cdi_safari_books_v2_9781947282513)). Take Control Books, 2022. Chapters *Read Me First* through *Bring the Command Line Into The Real World*.
+- **Linux**: William E. Shotts. [*The Linux Command Line: a Complete Introduction. 2nd edition.*](https://bruknow.library.brown.edu/permalink/01BU_INST/9mvq88/alma991043239704906966). No Starch Press, 2019. Parts *I: Learning the Shell* and *II: Configuration and the Environment*.
 
 To use the AER package you need:
 - `python` and packages as specified in the `pyproject.toml` file,
@@ -22,7 +23,7 @@ You should also consider using an IDE. We recommend:
 - PyCharm (academic licenses for PyCharm professional edition are available for free). This is a `python`-specific integrated development environment which comes with extremely powerful tools for changing the structure of `python` code, running tests, etc. 
 - Visual Studio Code (free). This is a powerful general text editor with plugins to support `python` development. 
 
-The following sections describe how to install and configure the recommended setup recommended for developing AER.
+The following sections describe how to install and configure the recommended setup for developing AER.
 
 *Note: For end-users, it may be more appropriate to use an environment manager like `Anaconda` or `Miniconda` instead of `poetry`, but this is not currently supported.*
 
@@ -31,7 +32,7 @@ The following sections describe how to install and configure the recommended set
 
 ### Prerequisites
 
-For macOS we strongly recommend using `homebrew` to manage packages.
+For macOS, we strongly recommend using `homebrew` to manage packages.
 
 Visit [https://brew.sh](https://brew.sh) and run the installation instructions.
 
@@ -70,9 +71,7 @@ Run the initialization script as follows:
 ```shell
 pyenv init
 ``` 
-... then follow the instructions and add some lines to your shell environment, modifying the following files:
-- If you use `zsh`, you'll modify `~/.zshrc` and `~/.zprofile`, 
-- If you use `bash`, you'll modify `~/.bash_profile`.
+... and follow the instructions to add `pyenv` to the `$PATH`.
 
 #### Restart shell session
 
@@ -124,7 +123,7 @@ Set up the Virtual environment – an isolated version of `python` and all the p
   - Poetry executable: select the path to the poetry installation you have, e.g. 
     `/opt/homebrew/bin/poetry`
   - Click "OK" and wait while the environment builds.
-  - Run the "Python tests for aer" Run/Debug configuration in the PyCharm interface, and check that there are no errors.
+  - Run the "Python tests in tests/" Run/Debug configuration in the PyCharm interface, and check that there are no errors.
 
 Additional setup steps for PyCharm:
 
@@ -132,7 +131,11 @@ Additional setup steps for PyCharm:
     
 #### Command Line `poetry` Setup
 
-If you need more control over the `poetry` environment than offered by PyCharm, then you can set up a new environment from the command line as follows. From the `<project directory>`, run the following commands:
+If you need more control over the `poetry` environment, then you can set up a new environment from the command line.
+
+*Note: Setting up a `poetry` environment on the command line is the only option for VSCode users.*
+
+From the `<project directory>`, run the following commands.
 
 Activate the target version of `python` using `pyenv`:
 ```shell
@@ -154,7 +157,37 @@ Use the `pyproject.toml` file to resolve and then install all the dependencies
 poetry install
 ```
 
-##### Using `poetry` interactively
+Once this step has been completed, skip to the section [Activating and using the environment](#activating-and-using-the-environment) to test it.
+
+#### Visual Studio Code Configuration
+
+After installing Visual Studio Code and the other prerequisites, carry out the following steps:
+
+- Open the `<project directory>` in Visual Studio Code
+- Install the Visual Studio Code plugin recommendations suggested with the project. These include:
+  - `python`
+  - `python-environment-manager`
+- Run the [Command Line poetry Setup](#command-line-poetry-setup) specified above. This can be done in the built-in terminal if desired (Menu: Terminal > New Terminal).
+- Select the `python` option in the vertical bar on the far left of the window (which appear after installing the plugins). Under the title "PYTHON: ENVIRONMENTS" should be a list of `python` environments. If these do not appear:
+  - Refresh the window pane
+  - Ensure the python-environment-manager is installed correctly.
+  - Ensure the python-environment-manager is activated.
+
+- Locate the correct `poetry` environment. Click the "thumbs up" symbol next to the poetry environment name to "set as active workspace interpreter".
+
+- Check that the `poetry` environment is correctly set-up. 
+  - Open a new terminal within Visual Studio Code (Menu: Terminal > New Terminal). 
+  - It should execute something like `source /Users/me/Library/Caches/pypoetry/virtualenvs/aer-2PgcgopX-py3.8/bin/activate` before offering you a prompt.
+  - If you execute `which python` it should return the path to your python executable in the `.../aer-2PgcgopX-py3.8/bin` directory.
+  - Ensure that there are no errors when you run: 
+    ```shell
+    python -m unittest
+    ```
+    in the built-in terminal. 
+
+### Activating and using the environment
+
+#### Using `poetry` interactively
 
 To run interactive commands, you can activate the poetry virtual environment. From the `<project directory>` directory, run:
 
@@ -171,7 +204,7 @@ Restored session: Fri Jun 24 12:34:56 EDT 2022
 (aer-2PgcgopX-py3.8) % 
 ```
 
-If you execute `python` and then `import numpy`, you should be able to see that `numpy` has been imported from the `aer-2PgcgopX-py3.8` environment :
+If you execute `python` and then `import numpy`, you should be able to see that `numpy` has been imported from the `aer-2PgcgopX-py3.8` environment:
 
 ```
 (aer-2PgcgopX-py3.8) % python
@@ -193,7 +226,13 @@ Saving session...
 % 
 ```
 
-##### Using `poetry` non-interactively
+To run a script, e.g. the `run_weber_study.py` script in the [`example/weber`](./example/weber) directory, execute: 
+
+```shell
+poetry run python example/weber/run_weber_study.py
+```
+
+#### Using `poetry` non-interactively
 
 You can run python programs using poetry without activating the poetry environment, by using `poetry run {command}`. For example, to run the tests, execute:
 
@@ -212,31 +251,6 @@ Ran 1 test in 0.000s
 OK
 ```
 
-#### Visual Studio Code Configuration
-
-After installing Visual Studio Code and the other prerequisites, carry out the following steps:
-
-- Open the `<project directory>` in Visual Studio Code
-- Install the Visual Studio Code plugin recommendations suggested with the project. These include:
-  - `python`
-  - `python-environment-manager`
-- Run the [Command Line poetry Setup](#command-line-poetry-setup) specified above. This can be done in the built-in terminal if desired (Menu: Terminal > New Terminal).
-- Select the `python` option in the vertical bar on the far left of the window (which appear after installing the plugins). Under the title "PYTHON: ENVIRONMENTS" should be a list of `python` environments. If these do not appear:
-  - Ensure the python-environment-manager is installed correctly.
-  - Ensure the python-environment-manager is activated.
-
-- Locate the correct `poetry` environment. Click the "thumbs up" symbol next to the poetry environment name to "set as active workspace interpreter".
-
-- Check that the `poetry` environment is correctly set-up. 
-  - Open a new terminal within Visual Studio Code (Menu: Terminal > New Terminal). 
-  - It should execute something like `source /Users/me/Library/Caches/pypoetry/virtualenvs/aer-2PgcgopX-py3.8/bin/activate` before offering you a prompt.
-  - If you execute `which python` it should return the path to your python executable in the `.../aer-2PgcgopX-py3.8/bin` directory.
-  - Ensure that there are no errors when you run: 
-    ```shell
-    python -m unittest
-    ```
-    in the built-in terminal. 
-
 ## Development Setup on Windows
 
 Windows is not yet officially supported. You may be able to follow the same approach as for macOS to set up your development environment, with some modifications, e.g.:
@@ -245,21 +259,7 @@ Windows is not yet officially supported. You may be able to follow the same appr
 
 If you successfully set up AER on Windows, please update this readme.
 
-Please update this readme 
-
 ## Development Practices
-
-### Running the tests
-
-You should run the tests before you commit code to the repository, to ensure that you've not broken anything. 
-
-The unit tests can be run as follows (starting in the root directory of the repository):
-
-```shell
-poetry run python -m unittest
-```
-
-You can also use the run configuration "Python tests for aer" in PyCharm.
 
 ### Pre-Commit Hooks
 

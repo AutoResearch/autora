@@ -23,15 +23,18 @@ try:
     from cnnsimple.model_search import Network
     from cnnsimple.object_of_study import outputTypes
 except ImportError:
-    import genotypes
-    import model_search_config as cfg
-    import plot_utils as plotutils
-    import utils as utils  # type: ignore
-    import visualize as viz
-    from architect import Architect
-    from model_search import Network
-
-    from aer.variable import ValueType as outputTypes
+    # MyPy throws errors when looking at these imports.
+    # This is a known problem: https://github.com/python/mypy/issues/1153
+    # Fix: include "# type: ignore" comments on each import
+    # Also occurs in parse_model.py
+    import aer.theorist.darts.genotypes as genotypes  # type: ignore
+    import aer.theorist.darts.model_search_config as cfg  # type: ignore
+    import aer.theorist.darts.plot_utils as plotutils  # type: ignore
+    import aer.theorist.darts.utils as utils  # type: ignore
+    import aer.theorist.darts.visualize as viz  # type: ignore
+    from aer.theorist.darts.architect import Architect  # type: ignore
+    from aer.theorist.darts.model_search import Network  # type: ignore
+    from aer.variable import ValueType as outputTypes  # type: ignore
 
 
 # ------------------ PARAMETERIZATION ------------------
