@@ -13,10 +13,10 @@ try:
     from cnnsimple.model_search import Network
 
 except ImportError:
-    import model_search_config as cfg
-    import utils as utils  # type: ignore
-    import visualize as viz
-    from model_search import Network
+    import aer.theorist.darts.model_search_config as cfg
+    import aer.theorist.darts.utils as utils  # type: ignore
+    import aer.theorist.darts.visualize as viz
+    from aer.theorist.darts.model_search import Network
 
 
 # PARSE ARGUMENTS

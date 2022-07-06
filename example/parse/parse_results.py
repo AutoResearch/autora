@@ -7,8 +7,8 @@ try:
 
 
 except ImportError:
-    import model_search_config as cfg
-    import utils  # type: ignore
+    import aer.theorist.darts.model_search_config as cfg
+    import aer.theorist.darts.utils as utils  # type: ignore
 
 # PARSE ARGUMENTS
 
