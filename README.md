@@ -320,10 +320,24 @@ If your `git commit` fails because of the pre-commit hook, then you should:
 
 It's easiest to solve these kinds of problems if you make small commits, often.  
 
+# Documentation
 
+Documentation is automatically generated using [Material for MkDocs](https://squidfunk.github.io/mkdocs-material/) based on docstrings in files in the `aer/` directory. 
 
+## Commands
 
+Build and serve the documentation using the following commands:
 
+* `poetry run mkdocs serve` - Start the live-reloading docs server.
+* `poetry run mkdocs build` - Build the documentation site.
+* `poetry run mkdocs gh-deploy` - Build the documentation and serve at https://AutoResearch.github.io/AER/
+* `poetry run mkdocs -h` - Print help message and exit.
 
-
-
+## Documentation layout
+```
+mkdocs.yml    # The configuration file for the documentation.
+docs/         # Directory for static pages to be included in the documentation.
+    index.md  # The documentation homepage.
+    ...       # Other markdown pages, images and other files.
+aer/          # The directory containing the source code.
+```
