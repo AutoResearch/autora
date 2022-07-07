@@ -1,3 +1,4 @@
+""" Example module with docstring content and formatting. """
 from typing import NamedTuple, Union
 
 import numpy as np
@@ -50,8 +51,8 @@ class FirstOrderLinearModel(NamedTuple):
         Arguments:
             x: locations on the x-axis
 
-        Output:
-            y: result
+        Returns:
+            y: values
 
         """
         y = first_order_linear(x, c=self.c, m=self.m)
