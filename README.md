@@ -337,7 +337,7 @@ There should be **examples** of how to use the function, class or method, with e
 
 We follow the [Google Style Python Docstrings](https://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_google.html), as these are supported by the online documentation tool we use (see [Online Documentation](#online-documentation)). 
 
-For an example of how to write docstrings, see [docs/example_docstrings.py]().
+For an example of a file with docstrings, see [docs/example_docstrings.py]().
 
 *Pro-Tip: Write the docstring for your new high-level object before starting on the code. In particular, writing examples of how you expect it should be used can help clarify the right level of abstraction.*
 
