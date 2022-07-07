@@ -218,12 +218,15 @@ def _round_significant_figures(x: float, significant_figures: int):
 
 
 if __name__ == "__main__":
+    # Some example calls we can use with a debugger to investigate the operation of the code
     _round_significant_figures(11, 1)
     _round_significant_figures(11, 2)
     _round_significant_figures(0.11, 1)
     _round_significant_figures(0.11, 2)
     _round_significant_figures(0, 2)
 
+    # Example code to see how big or small the numbers can get without losing precision.
+    # For visual inspection.
     for e in range(-50, 50):
         x = 10.0**e
         print(f"{x}: {_round_significant_figures(x, 1)}")
