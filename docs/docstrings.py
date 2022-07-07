@@ -35,9 +35,8 @@ class FirstOrderLinearModel(NamedTuple):
         m: gradient of the linear model
 
     Examples:
-        >>> model = FirstOrderLinearModel(m=0.5, c=1)
-        >>> model(np.array([0., 1., 2.]))
-        array([1. , 1.5, 2. ])
+        >>> FirstOrderLinearModel(m=0.5, c=1.0)
+        FirstOrderLinearModel(c=1.0, m=0.5)
 
     """
 
@@ -53,6 +52,11 @@ class FirstOrderLinearModel(NamedTuple):
 
         Returns:
             y: values
+
+        Examples:
+            >>> model = FirstOrderLinearModel(m=0.5, c=1)
+            >>> model(np.array([0., 1., 2.]))
+            array([1. , 1.5, 2. ])
 
         """
         y = first_order_linear(x, c=self.c, m=self.m)
