@@ -319,9 +319,33 @@ It's easiest to solve these kinds of problems if you make small commits, often.
 
 # Documentation
 
-Documentation is automatically generated using [Material for MkDocs](https://squidfunk.github.io/mkdocs-material/) based on docstrings in files in the `aer/` directory. 
+## Commenting code
 
-## Commands
+To help users understand code better, and to make the documentation generation automatic, we have some standards for documenting code. The comments, docstrings, and the structure of the code itself are meant to make life easier for the reader. 
+- If something important isn't _obvious_ from the code, then it should be _made_ obvious with a comment. 
+- Conversely, if something _is_ obvious, then it doesn't need a comment.
+
+These standards are inspired by John Ousterhout. *A Philosophy of Software Design.* Yaknyam Press, 2021. Chapter 12 – 14.
+
+### Every public function, class and method has documentation
+
+We include docstrings for all public functions, classes, and methods. These docstrings are meant to give a concise, high-level overview of **why** the function exists, **what** it is trying to do, and what is **important** about the code. (Details about **how** the code works are often better placed in detailed comments within the code.) 
+
+The **meaning** and **type** of all the input and output parameters should be described.
+
+There should be **examples** of how to use the function, class or method, with expected outputs, formatted as ["doctests"](https://docs.python.org/3/library/doctest.html).
+
+We follow the [Google Style Python Docstrings](https://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_google.html), as these are supported by the online documentation tool we use (see [Online Documentation](#online-documentation)). 
+
+For an example of how to write docstrings, see [docs/example_docstrings.py]().
+
+*Pro-Tip: Write the docstring for your new high-level object before starting on the code. In particular, writing examples of how you expect it should be used can help clarify the right level of abstraction.*
+
+## Online Documentation
+
+Online Documentation is automatically generated using [Material for MkDocs](https://squidfunk.github.io/mkdocs-material/) based on docstrings in files in the `aer/` directory. 
+
+### Commands
 
 Build and serve the documentation using the following commands:
 
@@ -330,7 +354,7 @@ Build and serve the documentation using the following commands:
 * `poetry run mkdocs gh-deploy` - Build the documentation and serve at https://AutoResearch.github.io/AER/
 * `poetry run mkdocs -h` - Print help message and exit.
 
-## Documentation layout
+### Documentation layout
 ```
 mkdocs.yml    # The configuration file for the documentation.
 docs/         # Directory for static pages to be included in the documentation.
@@ -338,3 +362,5 @@ docs/         # Directory for static pages to be included in the documentation.
     ...       # Other markdown pages, images and other files.
 aer/          # The directory containing the source code.
 ```
+
+
