@@ -1,7 +1,6 @@
 from datetime import datetime
 from tkinter import Tk
 
-import aer.experimentalist.experiment_environment.experiment_config as exp_cfg
 from aer.experimentalist.experiment_design_synthetic_weber import (
     Experiment_Design_Synthetic_Weber,
 )
@@ -14,17 +13,13 @@ from aer.experimentalist.experimentalist_popper import Experimentalist_Popper
 from aer.theorist.object_of_study import Object_Of_Study
 from aer.theorist.theorist_darts import DARTS_Type, Theorist_DARTS
 from aer.theorist.theorist_GUI import Theorist_GUI
+from example.weber.weber_setup import params
 
 now = datetime.now()
 dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
 print("date and time =", dt_string)
 
 # GENERAL PARAMETERS
-
-study_name = "Weber"  # name of experiment
-study_name_sampled = "Weber Sampled"
-host = exp_cfg.HOST_IP  # ip address of experiment server
-port = exp_cfg.HOST_PORT  # port of experiment server
 
 AER_cycles = 1
 
@@ -69,12 +64,12 @@ DVs = [diff_detected]
 DVs_validation = [diff_detected_sample]
 
 study_object = Object_Of_Study(
-    name=study_name, independent_variables=IVs, dependent_variables=DVs
+    name=params.study_name, independent_variables=IVs, dependent_variables=DVs
 )
 # initialize objects of study
 
 validation_object_1 = Object_Of_Study(
-    name=study_name_sampled,
+    name=params.study_name_sampled,
     independent_variables=IVs,
     dependent_variables=DVs_validation,
 )
@@ -92,23 +87,23 @@ weber_design_validation = Experiment_Design_Synthetic_Weber(
 
 # initialize experimentalist
 experimentalist = Experimentalist_Popper(
-    study_name=study_name,
-    experiment_server_host=host,
-    experiment_server_port=port,
+    study_name=params.study_name,
+    experiment_server_host=params.host,
+    experiment_server_port=params.port,
     experiment_design=weber_design,
 )
 
 experimentalist_validation = Experimentalist_Popper(
-    study_name=study_name_sampled,
-    experiment_server_host=host,
-    experiment_server_port=port,
+    study_name=params.study_name_sampled,
+    experiment_server_host=params.host,
+    experiment_server_port=params.port,
     experiment_design=weber_design_validation,
 )
 
 # THEORIST
 
 # initialize theorist
-theorist = Theorist_DARTS(study_name, darts_type=DARTS_Type.ORIGINAL)
+theorist = Theorist_DARTS(params.study_name, darts_type=DARTS_Type.ORIGINAL)
 
 # specify plots
 plots = list()
