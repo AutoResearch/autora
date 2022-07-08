@@ -63,3 +63,6 @@ cover/
 .mypy_cache/
 .dmypy.json
 dmypy.json
+
+# Material for MkDocs
+site/
