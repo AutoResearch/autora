@@ -30,6 +30,11 @@ class FirstOrderLinearModel(NamedTuple):
     """
     Describes a first order linear model of the form y = m x + c
 
+    Note:
+        If you need a single function which implements the model
+        without storing the fitted parameters,
+        [`first_order_linear`][docs.docstrings.first_order_linear].
+
     Attributes:
         c: y-intercept of the linear model
         m: gradient of the linear model
@@ -81,7 +86,7 @@ def curve_fitting_function(
         max_iterations: maximum number of optimization steps to use
 
     Returns:
-        model: Callable object which includes the fitted parameters as attributes.
+        model: Callable which includes the fitted parameters as attributes.
 
     Examples:
         >>> x = np.linspace(-1., 1., 100)
