@@ -64,14 +64,14 @@ DVs = [diff_detected]
 DVs_validation = [diff_detected_sample]
 
 study_object = Object_Of_Study(
-    name=params.study_name, independent_variables=IVs, dependent_variables=DVs
+    name=params.study_name, independent_variables=IVs, dependent_variables=DVs  # type: ignore
 )
 # initialize objects of study
 
 validation_object_1 = Object_Of_Study(
     name=params.study_name_sampled,
-    independent_variables=IVs,
-    dependent_variables=DVs_validation,
+    independent_variables=IVs,  # type: ignore
+    dependent_variables=DVs_validation,  # type: ignore
 )
 
 # EXPERIMENTALIST
