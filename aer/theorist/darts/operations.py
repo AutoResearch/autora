@@ -308,8 +308,9 @@ class Zero(nn.Module):
 
 
 class Softplus(nn.Module):
-    """
-    A pytorch module implementing the softplus function: Softplus(x) = 1/β∗log(1+exp(β∗x)).
+    r"""
+    A pytorch module implementing the softplus function:
+    $\operatorname{Softplus}(x) = \frac{1}{β} \operatorname{log} \left( 1 + e^{β x} \right)$
     """
 
     def __init__(self):
