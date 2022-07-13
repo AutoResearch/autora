@@ -10,13 +10,17 @@ from aer.theorist.theorist_darts import DARTS_Type, Theorist_DARTS
 from aer.theorist.theorist_GUI import Theorist_GUI
 from example.weber.weber_setup import DVs, DVs_validation, IVs, gen_params
 
+# %%
+# Note current time
+
 now = datetime.now()
 dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
 print("date and time =", dt_string)
 
+# %%
 # OBJECT OF STUDY
 
-# initialize objects of study
+# Initialize objects of study
 study_object = Object_Of_Study(
     name=gen_params.study_name, independent_variables=IVs, dependent_variables=DVs  # type: ignore
 )
@@ -27,9 +31,10 @@ validation_object_1 = Object_Of_Study(
     dependent_variables=DVs_validation,  # type: ignore
 )
 
+# %%
 # EXPERIMENTALIST
 
-# experiment design
+# Experiment design
 stimulus_resolution = 20
 weber_design = Experiment_Design_Synthetic_Weber(stimulus_resolution)
 
@@ -38,7 +43,7 @@ weber_design_validation = Experiment_Design_Synthetic_Weber(
     stimulus_resolution_validation
 )
 
-# initialize experimentalist
+# Initialize experimentalist
 experimentalist = Experimentalist_Popper(
     study_name=gen_params.study_name,
     experiment_server_host=gen_params.host,
@@ -53,27 +58,28 @@ experimentalist_validation = Experimentalist_Popper(
     experiment_design=weber_design_validation,
 )
 
+# %%
 # THEORIST
 
-# initialize theorist
+# Initialize theorist
 theorist = Theorist_DARTS(gen_params.study_name, darts_type=DARTS_Type.ORIGINAL)
 
-# specify plots
+# Specify plots
 plots = list()
 plots.append(theorist._loss_plot_name)
 theorist.plot()
 
-
+# %%
 # AUTONOMOUS EMPIRICAL RESEARCH
 
-# generate first validation set
+# Generate first validation set
 # validation_data = experimentalist_validation.seed(validation_object_1) # seed with new experiment
 validation_data = experimentalist_validation.seed(
     validation_object_1, datafile="experiment_0_data.csv"
 )  # seed with new experiment
 validation_object_1.add_data(validation_data)
 
-# seed experiment and split into training/validation set
+# Seed experiment and split into training/validation set
 # seed_data = experimentalist.seed(study_object) # seed with new experiment
 seed_data = experimentalist.seed(
     study_object, datafile="experiment_0_data.csv"
@@ -82,11 +88,14 @@ study_object.add_data(seed_data)
 validation_object_2 = study_object.split(proportion=0.5)
 validation_object_2.name = "Weber Sampled"
 
-# add validation sets
+# Add validation sets
 theorist.add_validation_set(validation_object_1, "Weber_Sampled")
 theorist.add_validation_set(validation_object_2, "Weber_Original")
 
-# search model
+# %%
+# ANALYSIS
+
+# Search model
 # model = theorist.search_model(study_object)
 
 root = Tk()
