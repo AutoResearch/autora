@@ -16,10 +16,10 @@ print("date and time =", dt_string)
 
 # OBJECT OF STUDY
 
+# initialize objects of study
 study_object = Object_Of_Study(
     name=gen_params.study_name, independent_variables=IVs, dependent_variables=DVs  # type: ignore
 )
-# initialize objects of study
 
 validation_object_1 = Object_Of_Study(
     name=gen_params.study_name_sampled,

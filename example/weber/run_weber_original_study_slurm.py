@@ -2,18 +2,13 @@ import argparse
 from datetime import datetime
 from typing import List
 
-import aer.experimentalist.experiment_environment.experiment_config as exp_cfg
 from aer.experimentalist.experiment_design_synthetic_weber import (
     Experiment_Design_Synthetic_Weber,
-)
-from aer.experimentalist.experiment_environment.DV_in_silico import DV_In_Silico as DV
-from aer.experimentalist.experiment_environment.IV_in_silico import IV_In_Silico as IV
-from aer.experimentalist.experiment_environment.variable import (
-    outputTypes as output_type,
 )
 from aer.experimentalist.experimentalist_popper import Experimentalist_Popper
 from aer.theorist.object_of_study import Object_Of_Study
 from aer.theorist.theorist_darts import DARTS_Type, Theorist_DARTS
+from example.weber.weber_setup import DVs, DVs_validation, IVs, gen_params
 
 # parse arguments
 parser = argparse.ArgumentParser("parser")
@@ -24,62 +19,15 @@ now = datetime.now()
 dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
 print("date and time =", dt_string)
 
-# GENERAL PARAMETERS
-
-study_name = "Weber ICML"  # Weber  # name of experiment
-study_name_sampled = "Weber Sampled"
-host = exp_cfg.HOST_IP  # ip address of experiment server
-port = exp_cfg.HOST_PORT  # port of experiment server
-
-AER_cycles = 1
-
 # OBJECT OF STUDY
-
-# specify independent variables
-S1 = IV(
-    name="S1",
-    value_range=(0, 5),
-    units="intensity",
-    variable_label="Stimulus 1 Intensity",
-)
-
-S2 = IV(
-    name="S2",
-    value_range=(0, 5),
-    units="intensity",
-    variable_label="Stimulus 2 Intensity",
-)
-
-
-# specify dependent variable with type
-diff_detected = DV(
-    name="difference_detected",
-    value_range=(0, 1),
-    units="probability",
-    variable_label="P(difference detected)",
-    type=output_type.SIGMOID,
-)
-
-diff_detected_sample = DV(
-    name="difference_detected_sample",
-    value_range=(0, 1),
-    units="response",
-    variable_label="difference detected",
-    type=output_type.PROBABILITY_SAMPLE,
-)
-
-# list dependent and independent variables
-IVs = [S1, S2]  # only including subset of available variables
-DVs = [diff_detected]
-DVs_validation = [diff_detected_sample]
 
 # initialize objects of study
 study_object = Object_Of_Study(
-    name=study_name, independent_variables=IVs, dependent_variables=DVs
+    name=gen_params.study_name, independent_variables=IVs, dependent_variables=DVs
 )
 
 validation_object_1 = Object_Of_Study(
-    name=study_name_sampled,
+    name=gen_params.study_name_sampled,
     independent_variables=IVs,
     dependent_variables=DVs_validation,
 )
@@ -97,23 +45,23 @@ weber_design_validation = Experiment_Design_Synthetic_Weber(
 
 # initialize experimentalist
 experimentalist = Experimentalist_Popper(
-    study_name=study_name,
-    experiment_server_host=host,
-    experiment_server_port=port,
+    study_name=gen_params.study_name,
+    experiment_server_host=gen_params.host,
+    experiment_server_port=gen_params.port,
     experiment_design=weber_design,
 )
 
 experimentalist_validation = Experimentalist_Popper(
-    study_name=study_name_sampled,
-    experiment_server_host=host,
-    experiment_server_port=port,
+    study_name=gen_params.study_name_sampled,
+    experiment_server_host=gen_params.host,
+    experiment_server_port=gen_params.port,
     experiment_design=weber_design_validation,
 )
 
 # THEORIST
 
 # initialize theorist
-theorist = Theorist_DARTS(study_name, darts_type=DARTS_Type.ORIGINAL)
+theorist = Theorist_DARTS(gen_params.study_name, darts_type=DARTS_Type.ORIGINAL)
 
 # specify plots
 plots: List[str] = list()
