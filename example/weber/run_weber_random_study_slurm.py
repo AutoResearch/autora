@@ -5,9 +5,8 @@ from aer.experimentalist.experiment_design_synthetic_weber import (
     Experiment_Design_Synthetic_Weber,
 )
 from aer.experimentalist.experimentalist_popper import Experimentalist_Popper
-from aer.theorist.object_of_study import Object_Of_Study
 from aer.theorist.theorist_random_darts import Theorist_Random_DARTS
-from example.weber.weber_setup import DVs, DVs_validation, IVs, gen_params
+from example.weber.weber_setup import gen_params, study_object, validation_object_1
 
 # todo:
 # - import and instantiate theorist_random_darts
@@ -27,20 +26,6 @@ args = parser.parse_args()
 now = datetime.now()
 dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
 print("date and time =", dt_string)
-
-# %%
-# OBJECT OF STUDY
-
-# Initialize objects of study
-study_object = Object_Of_Study(
-    name=gen_params.study_name, independent_variables=IVs, dependent_variables=DVs
-)
-
-validation_object_1 = Object_Of_Study(
-    name=gen_params.study_name_sampled,
-    independent_variables=IVs,
-    dependent_variables=DVs_validation,
-)
 
 # %%
 # EXPERIMENTALIST

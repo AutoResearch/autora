@@ -4,7 +4,9 @@ from experimentalist.experiment_environment import experiment_config as exp_cfg
 from experimentalist.experiment_environment.DV_in_silico import DV_In_Silico as DV
 from experimentalist.experiment_environment.IV_in_silico import IV_In_Silico as IV
 from experimentalist.experiment_environment.variable import outputTypes as output_type
+from theorist.object_of_study import Object_Of_Study
 
+# %%
 # GENERAL PARAMETERS
 
 gen_params = SimpleNamespace(
@@ -16,9 +18,10 @@ gen_params = SimpleNamespace(
 
 AER_cycles = 1
 
+# %%
 # OBJECT OF STUDY
 
-# specify independent variables
+# Specify independent variables
 
 S1 = IV(
     name="S1",
@@ -33,7 +36,7 @@ S2 = IV(
     variable_label="Stimulus 2 Intensity",
 )
 
-# specify dependent variable with type
+# Specify dependent variable with type
 
 diff_detected = DV(
     name="difference_detected",
@@ -51,8 +54,20 @@ diff_detected_sample = DV(
     type=output_type.PROBABILITY_SAMPLE,
 )
 
-# list dependent and independent variables
+# List dependent and independent variables
 
 IVs = [S1, S2]  # only including subset of available variables
 DVs = [diff_detected]
 DVs_validation = [diff_detected_sample]
+
+# Initialize objects of study
+
+study_object = Object_Of_Study(
+    name=gen_params.study_name, independent_variables=IVs, dependent_variables=DVs
+)
+
+validation_object_1 = Object_Of_Study(
+    name=gen_params.study_name_sampled,
+    independent_variables=IVs,
+    dependent_variables=DVs_validation,
+)
