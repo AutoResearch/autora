@@ -31,6 +31,7 @@ print("date and time =", dt_string)
 # EXPERIMENTALIST
 
 # Experiment design
+
 stimulus_resolution = 20
 weber_design = Experiment_Design_Synthetic_Weber(stimulus_resolution)
 
@@ -40,6 +41,7 @@ weber_design_validation = Experiment_Design_Synthetic_Weber(
 )
 
 # Initialize experimentalist
+
 experimentalist = Experimentalist_Popper(
     study_name=gen_params.study_name,
     experiment_server_host=gen_params.host,
@@ -58,9 +60,11 @@ experimentalist_validation = Experimentalist_Popper(
 # THEORIST
 
 # Initialize theorist
+
 theorist = Theorist_DARTS(gen_params.study_name, darts_type=DARTS_Type.ORIGINAL)
 
 # Specify plots
+
 plots = list()
 plots.append(theorist._loss_plot_name)
 theorist.plot()
@@ -69,6 +73,7 @@ theorist.plot()
 # AUTONOMOUS EMPIRICAL RESEARCH
 
 # Generate first validation set
+
 # validation_data = experimentalist_validation.seed(validation_object_1) # seed with new experiment
 validation_data = experimentalist_validation.seed(
     validation_object_1, datafile="experiment_0_data.csv"
@@ -76,6 +81,7 @@ validation_data = experimentalist_validation.seed(
 validation_object_1.add_data(validation_data)
 
 # Seed experiment and split into training/validation set
+
 # seed_data = experimentalist.seed(study_object) # seed with new experiment
 seed_data = experimentalist.seed(
     study_object, datafile="experiment_0_data.csv"
@@ -85,6 +91,7 @@ validation_object_2 = study_object.split(proportion=0.5)
 validation_object_2.name = "Weber Sampled"
 
 # Add validation sets
+
 theorist.add_validation_set(validation_object_1, "Weber_Sampled")
 theorist.add_validation_set(validation_object_2, "Weber_Original")
 
@@ -92,6 +99,7 @@ theorist.add_validation_set(validation_object_2, "Weber_Original")
 # ANALYSIS
 
 # Search model
+
 model = theorist.search_model_job(study_object, args.slurm_id)
 
 # Fair search
