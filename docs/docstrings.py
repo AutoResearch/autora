@@ -12,9 +12,12 @@ def first_order_linear(
     Evaluate a first order linear model of the form y = m x + c.
 
     Arguments:
-        x: input locations on the x-axis
+        x: input location(s) on the x-axis
         c: y-intercept of the linear model
         m: gradient of the linear model
+
+    Returns:
+        y: result y = m x + c, the same shape and type as x
 
     Examples:
         >>> first_order_linear(0. , 1. , 0. )
