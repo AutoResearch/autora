@@ -335,9 +335,9 @@ The **meaning** and **type** of all the input and output parameters should be de
 
 There should be **examples** of how to use the function, class or method, with expected outputs, formatted as ["doctests"](https://docs.python.org/3/library/doctest.html). These should include normal cases for the function, but also include cases where it behaves unexpectedly or fails. 
 
-We follow the [Google Style Python Docstrings](https://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_google.html), as these are supported by the online documentation tool we use (see [Online Documentation](#online-documentation)). 
+We follow the [Google Style Python Docstrings](https://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_google.html), as these are supported by the online documentation tool we use (see [Online Documentation](#online-documentation)).
 
-For an example of a file with docstrings, see [docs/example_docstrings.py](docs/example_docstrings.py).
+For an example of a file with docstrings, see [docs/docstrings.py](./docs/docstrings.py).
 
 *Pro-Tip: Write the docstring for your new high-level object before starting on the code. In particular, writing examples of how you expect it should be used can help clarify the right level of abstraction.*
 
