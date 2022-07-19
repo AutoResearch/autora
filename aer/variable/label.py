@@ -1,12 +1,6 @@
 from aer.variable import DVInSilico, IVInSilico, IVTrial
-from aer.variable.tinkerforge import (
-    DVCurrent,
-    DVTime,
-    DVVoltage,
-    IVCurrent,
-    IVTime,
-    IVVoltage,
-)
+from aer.variable.time import DVTime, IVTime
+from aer.variable.tinkerforge import DVCurrent, DVVoltage, IVCurrent, IVVoltage
 
 dv_labels = {
     "time_DV": (DVTime, "Time", "", "time_DV", "s", 0, (0, 3600)),
