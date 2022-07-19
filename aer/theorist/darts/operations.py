@@ -308,9 +308,16 @@ class Zero(nn.Module):
 
 
 class Softplus(nn.Module):
+    r"""
+    A pytorch module implementing the softplus function:
+
+    $$
+    \operatorname{Softplus}(x) = \frac{1}{β} \operatorname{log} \left( 1 + e^{β x} \right)
+    $$
     """
-    A pytorch module implementing the softplus function: Softplus(x) = 1/β∗log(1+exp(β∗x)).
-    """
+
+    # This docstring is a raw-string (it starts `r"""` rather than `"""`)
+    # so backslashes need not be escaped
 
     def __init__(self):
         """
@@ -336,7 +343,13 @@ class Softplus(nn.Module):
 class Softminus(nn.Module):
     """
     A pytorch module implementing the softminus function: Softminus(x) = x- log(1+exp(β∗x)).
+
+    $$
+    \\operatorname{Softminus}(x) = x - \\operatorname{log} \\left( 1 + e^{β x} \\right)
+    $$
     """
+
+    # This docstring is a normal string, so backslashes need to be escaped
 
     def __init__(self):
         """
