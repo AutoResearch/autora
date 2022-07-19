@@ -5,9 +5,9 @@ from torch.autograd import Variable
 from torch.utils.data import Dataset
 from torchvision import transforms
 
-from aer.experimentalist.experiment_environment.variable import outputTypes
 from aer.theorist.darts.SimpleNet import SimpleNet
 from aer.theorist.object_of_study import Object_Of_Study
+from aer.variable import ValueType
 
 
 class SimpleNetDataset(Object_Of_Study, Dataset):
@@ -64,9 +64,9 @@ class SimpleNetDataset(Object_Of_Study, Dataset):
 
     def __get_output_type__(self):
         if self._sampling is True:
-            return outputTypes.CLASS
+            return ValueType.CLASS
         else:
-            return outputTypes.PROBABILITY_DISTRIBUTION
+            return ValueType.PROBABILITY_DISTRIBUTION
 
     def __get_input_labels__(self):
         input_labels = list()
