@@ -1,11 +1,10 @@
-from aer.variable import DVInSilico, IVInSilico
+from aer.variable import DVInSilico, IVInSilico, IVTrial
 from aer.variable.tinkerforge import (
     DVCurrent,
     DVTime,
     DVVoltage,
     IVCurrent,
     IVTime,
-    IVTrial,
     IVVoltage,
 )
 

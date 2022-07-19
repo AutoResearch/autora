@@ -73,27 +73,6 @@ class DVTF(DV, TinkerforgeVariable):
         TinkerforgeVariable.__init__(self, *args, **kwargs)
 
 
-class IVTrial(IVTF):
-
-    _name = "trial"
-    _UID = ""
-    _variable_label = "Trial"
-    _units = "trials"
-    _priority = 0
-    _value_range = (0, 10000000)
-    _value = 0
-
-    def __init__(self, *args, **kwargs):
-        super(IVTrial, self).__init__(*args, **kwargs)
-
-    # Waits until specified time has passed relative to reference time
-    def manipulate(self):
-        pass
-
-    def disconnect(self):
-        pass
-
-
 class IVTime(IVTF, VTime):
 
     _name = "time_IV"
