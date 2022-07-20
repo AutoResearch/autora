@@ -316,7 +316,7 @@ class DARTS(BaseEstimator, RegressorMixin):
         momentum: float = 9e-1,
         optimizer_weight_decay: float = 3e-4,
         param_updates_per_epoch: int = 10,
-        arch_updates_per_epoch: int = 10,
+        arch_updates_per_epoch: int = 1,
         arch_weight_decay: float = 1e-4,
         arch_weight_decay_df: float = 3e-4,
         arch_weight_decay_base: float = 0.0,
