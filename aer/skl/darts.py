@@ -146,9 +146,7 @@ def _general_darts(
                 unrolled=False,
             )
 
-        # Do the param update
-
-        # The run the param optimization
+        # Then run the param optimization
         coefficient_optimizer(network_)
 
     # Create the final model
