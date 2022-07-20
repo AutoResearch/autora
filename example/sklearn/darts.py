@@ -156,7 +156,7 @@ show_results(
     estimators={
         "1st-order linear": first_order_linear_estimator,
         "[0th-5th]-order linear": polynomial_estimator,
-        # "DARTS": darts_estimator,
+        "DARTS": darts_estimator,
         "Multi-Layer-Perceptron": mlp_estimator,
     }
 )
