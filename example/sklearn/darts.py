@@ -3,8 +3,6 @@ Example file which shows some simple curve fitting using DARTS and some other es
 """
 
 from collections import Iterable
-
-# %%
 from functools import partial
 
 import matplotlib
@@ -82,7 +80,7 @@ def func(x_):
 
 
 # Sample x between 0 and 1, including some noise.
-n_samples = 100
+n_samples = 1000
 noise = 1 / 10
 x = np.linspace(0, 1, n_samples)
 y = func(x) + np.random.default_rng(42).normal(scale=noise, size=n_samples)
@@ -134,9 +132,9 @@ show_results(estimators={"[0th-5th]-order linear": polynomial_estimator})
 darts_estimator = GridSearchCV(
     make_pipeline(
         StandardScaler(),
-        DARTS(),
+        DARTS(batch_size=20),
     ),
-    param_grid=dict(darts__num_graph_nodes=range(5)),
+    param_grid=dict(darts__num_graph_nodes=range(1, 5)),
 )
 darts_estimator.fit(x, y)
 
