@@ -1,53 +1,70 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+### utilities file for Bayesian Scientist / parallel machine scientist (pms)
+import numpy as np 
+import warnings
+warnings.filterwarnings('ignore')
+
+from mcmc import *
+from parallel import *
+
+from copy import deepcopy
+from ipywidgets import IntProgress
+from IPython.display import display
+
+import matplotlib.pyplot as plt
 
 
-# 1) import data from .mat file
-# what I have: a path to a .mat file
-# what I want: every variable as a separate np array from the mat file
-def import_data_from_mat(path_to_mat_file):
-    import mat73
-    data_dict = mat73.loadmat(path_to_mat_file)
-    return data_dict
+def run(pms,
+        num_steps,
+        equilibration_margin=1,
+        thinning=100,
+        anneal=False,
+        clear_cache=True):
+    prog_bar = init_prog(num_steps) # make progress bar
+    desc_len, model, model_len = [], None, np.inf
+    for n in range(num_steps):
+        step(pms,prog_bar)
+        if(num_steps % thinning == 0): # sample less often if we thin more
+            desc_len.append(pms.t1.E)  # Add the description length to the trace
+        if pms.t1.E < model_len:  # Check if this is the MDL expression so far
+            model, model_len = deepcopy(pms.t1), pms.t1.E
+    return model, model_len, desc_len
 
+def step(pms,prog_bar):
+    # MCMC update
+    pms.mcmc_step() # MCMC step within each T
+    pms.tree_swap() # Attempt to swap two randomly selected consecutive temps
+    prog_bar.value += 1
+    display(prog_bar)
+    return 0
 
-def smooth(x, window_len=11, window='hanning'):
-    import numpy
-    """smooth the data using a window with requested size.
+def init_prog(num_steps):
+    # Draw a progress bar to keep track of the MCMC progress
+    prog_bar = IntProgress(min=0, max=num_steps, description='Running:') # instantiate the bar
+    display(prog_bar)
+    return prog_bar
 
-    This method is based on the convolution of a scaled window with the signal.
-    The signal is prepared by introducing reflected copies of the signal 
-    (with the window size) in both ends so that transient parts are minimized
-    in the begining and end part of the output signal.
+def present_results(pms,
+                    model,
+                    model_len,
+                    desc_len):
+    print('Best model:\t', model)
+    print('Desc. length:\t', model_len)
+    plt.figure(figsize=(15, 5))
+    plt.plot(desc_len)
+    plt.xlabel('MCMC step', fontsize=14)
+    plt.ylabel('Description length', fontsize=14)
+    plt.title('MDL model: $%s$' % model.latex())
+    plt.show()
+    return 0
 
-    input:
-        x: the input signal 
-        window_len: the dimension of the smoothing window; should be an odd integer
-        window: the type of window from 'flat', 'hanning', 'hamming', 'bartlett', 'blackman'
-            flat window will produce a moving average smoothing.
-
-    output:
-        the smoothed signal
-
-    example:
-
-    t=linspace(-2,2,0.1)
-    x=sin(t)+randn(len(t))*0.1
-    y=smooth(x)
-
-    see also: 
-
-    numpy.hanning, numpy.hamming, numpy.bartlett, numpy.blackman, numpy.convolve
-    scipy.signal.lfilter
-
-    TODO: the window parameter could be the window itself if an array instead of a string
-    NOTE: length(output) != length(input), to correct this: return y[(window_len/2-1):-(window_len/2)] instead of just y.
-    """
-
-    s = numpy.r_[x[window_len - 1:0:-1], x, x[-2:-window_len - 1:-1]]
-    # print(len(s))
-    if window == 'flat':  # moving average
-        w = numpy.ones(window_len, 'd')
-    else:
-        w = eval('numpy.' + window + '(window_len)')
-
-    y = numpy.convolve(w / w.sum(), s, mode='valid')
-    return y
+# BUG
+def predict(model,x,y):
+    plt.figure(figsize=(6, 6))
+    plt.scatter(model.predict(x),y) # BUG: 
+    plt.plot((-6, 0), (-6, 0))
+    plt.xlabel('MDL model predictions', fontsize=14)
+    plt.ylabel('Actual values', fontsize=14)
+    plt.show()
