@@ -322,6 +322,7 @@ class DARTS(BaseEstimator, RegressorMixin):
         fair_darts_loss_weight: int = 1,
         max_epochs: int = 10,
         grad_clip: float = 5,
+        output_type: ValueType = ValueType.REAL,
     ) -> None:
         """
         Arguments:
@@ -368,6 +369,8 @@ class DARTS(BaseEstimator, RegressorMixin):
 
         self.max_epochs = max_epochs
         self.grad_clip = grad_clip
+
+        self.output_type = output_type
 
         self.network_: Network = Network(0, 0)
         self.model_: Network = Network(0, 0)
