@@ -363,7 +363,7 @@ format-nongpl = ["fqdn", "idna", "isoduration", "jsonpointer (>1.13)", "rfc3339-
 name = "jupyter"
 version = "1.0.0"
 description = "Jupyter metapackage. Install all the Jupyter components in one go."
-category = "main"
+category = "dev"
 optional = false
 python-versions = "*"
 
@@ -400,7 +400,7 @@ test = ["codecov", "coverage", "ipykernel (>=6.5)", "ipython", "mypy", "pre-comm
 name = "jupyter-console"
 version = "6.4.4"
 description = "Jupyter terminal console"
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=3.7"
 
@@ -854,7 +854,7 @@ py = {version = "*", markers = "implementation_name == \"pypy\""}
 name = "qtconsole"
 version = "5.3.1"
 description = "Jupyter Qt console"
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">= 3.7"
 
@@ -876,7 +876,7 @@ test = ["flaky", "pytest", "pytest-qt"]
 name = "qtpy"
 version = "2.1.0"
 description = "Provides an abstraction layer on top of the various Qt bindings (PyQt5/6 and PySide2/6)."
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=3.7"
 
@@ -1131,7 +1131,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.8,<3.11"
-content-hash = "148e807da153b383327250d33a7d9131dbf6df0395aa2e1cfb5604ca60fa6c8c"
+content-hash = "db77142bb5d57bf415ffbcbabf9e41fe6c5c8d6ae9ac35c8d0d8f66cfe577d50"
 
 [metadata.files]
 appnope = [
