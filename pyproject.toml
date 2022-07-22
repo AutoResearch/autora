@@ -11,9 +11,11 @@ scipy = "^1.8.0"
 seaborn = "^0.11.2"
 sympy = "^1.10.1"
 sklearn = "^0.0"
-jupyter = "^1.0.0"
+ipywidgets = "^7.7.1"
+ipython = "^8.4.0"
 
 [tool.poetry.dev-dependencies]
+jupyter = "^1.0.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
