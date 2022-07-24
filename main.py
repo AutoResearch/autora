@@ -68,7 +68,7 @@ pms = Parallel(
 model, model_len, desc_len = utils.run(pms, epochs)
 
 # present results
-utils.present_results(pms, model, model_len, desc_len)
+utils.present_results(model, model_len, desc_len)
 
 # test predictions
 utils.predict(model, x, y)
