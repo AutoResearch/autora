@@ -9,7 +9,7 @@ from theorist.object_of_study import Object_Of_Study
 # %%
 # GENERAL PARAMETERS
 
-gen_params = SimpleNamespace(
+general_params = SimpleNamespace(
     study_name="Weber",  # name of experiment
     study_name_sampled="Weber Sampled",
     host=exp_cfg.HOST_IP,  # ip address of experiment server
@@ -63,11 +63,11 @@ DVs_validation = [diff_detected_sample]
 # Initialize objects of study
 
 study_object = Object_Of_Study(
-    name=gen_params.study_name, independent_variables=IVs, dependent_variables=DVs
+    name=general_params.study_name, independent_variables=IVs, dependent_variables=DVs
 )
 
 validation_object_1 = Object_Of_Study(
-    name=gen_params.study_name_sampled,
+    name=general_params.study_name_sampled,
     independent_variables=IVs,
     dependent_variables=DVs_validation,
 )

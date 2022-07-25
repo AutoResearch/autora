@@ -7,7 +7,7 @@ from aer.experimentalist.experiment_design_synthetic_weber import (
 from aer.experimentalist.experimentalist_popper import Experimentalist_Popper
 from aer.theorist.theorist_darts import DARTS_Type, Theorist_DARTS
 from aer.theorist.theorist_GUI import Theorist_GUI
-from example.weber.weber_setup import gen_params, study_object, validation_object_1
+from example.weber.weber_setup import general_params, study_object, validation_object_1
 
 # %%
 # Note current time
@@ -32,16 +32,16 @@ weber_design_validation = Experiment_Design_Synthetic_Weber(
 # Initialize experimentalist
 
 experimentalist = Experimentalist_Popper(
-    study_name=gen_params.study_name,
-    experiment_server_host=gen_params.host,
-    experiment_server_port=gen_params.port,
+    study_name=general_params.study_name,
+    experiment_server_host=general_params.host,
+    experiment_server_port=general_params.port,
     experiment_design=weber_design,
 )
 
 experimentalist_validation = Experimentalist_Popper(
-    study_name=gen_params.study_name_sampled,
-    experiment_server_host=gen_params.host,
-    experiment_server_port=gen_params.port,
+    study_name=general_params.study_name_sampled,
+    experiment_server_host=general_params.host,
+    experiment_server_port=general_params.port,
     experiment_design=weber_design_validation,
 )
 
@@ -50,7 +50,7 @@ experimentalist_validation = Experimentalist_Popper(
 
 # Initialize theorist
 
-theorist = Theorist_DARTS(gen_params.study_name, darts_type=DARTS_Type.ORIGINAL)
+theorist = Theorist_DARTS(general_params.study_name, darts_type=DARTS_Type.ORIGINAL)
 
 # Specify plots
 
