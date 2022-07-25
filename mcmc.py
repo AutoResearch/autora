@@ -1207,7 +1207,7 @@ class Tree:
                 paccept = (
                     float(nif) * omegai * sf * np.exp(-dEB / self.BT - dEP / self.PT)
                 ) / (float(nfi) * omegaf * si)
-            except ValueError or AttributeError or KeyError:
+            except ValueError:
                 if (dEB / self.BT + dEP / self.PT) < -200:
                     paccept = 1.0
             # Accept / reject
