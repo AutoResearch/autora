@@ -1,4 +1,5 @@
 import json
+import logging
 import sys
 from copy import deepcopy
 from itertools import permutations, product
@@ -12,7 +13,7 @@ from scipy.optimize import curve_fit
 from sympy import lambdify, latex, log, sympify
 
 # from scipy.misc import comb
-
+_logger = logging.getLogger(__name__)
 # import warnings
 # warnings.filterwarnings('error')
 
@@ -870,7 +871,7 @@ class Tree:
             dEB = float(dEB)
             dEP = float(dEP)
             dE = dEB + dEP
-       except ValueError:
+        except ValueError:
             dEB, dEP, dE = np.inf, np.inf, np.inf
         return dE, dEB, dEP, par_valuesNew, nif, nfi
 
