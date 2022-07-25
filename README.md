@@ -329,7 +329,9 @@ These standards are inspired by John Ousterhout. *A Philosophy of Software Desig
 
 ### Every public function, class and method has documentation
 
-We include docstrings for all public functions, classes, and methods. These docstrings are meant to give a concise, high-level overview of **why** the function exists, **what** it is trying to do, and what is **important** about the code. (Details about **how** the code works are often better placed in detailed comments within the code.) 
+We include docstrings for all public functions, classes, and methods. These docstrings are meant to give a concise, high-level overview of **why** the function exists, **what** it is trying to do, and what is **important** about the code. (Details about **how** the code works are often better placed in detailed comments within the code.)
+
+Every function, class or method has a one-line **high-level description** which clarifies its intent.   
 
 The **meaning** and **type** of all the input and output parameters should be described.
 
