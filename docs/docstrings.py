@@ -126,7 +126,7 @@ def curve_fitting_function(
     return model
 
 
-def _round_significant_figures(x: float, significant_figures: int):
+def _round_significant_figures(x: float, significant_figures: int) -> float:
     """
     Examples:
 
