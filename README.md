@@ -363,27 +363,6 @@ def first_order_linear(
     return y
 ```
 
-It has:
-#### A good function signature
-
-- A short, descriptive name; `first_order_linear`,
-- Understandable variable names, like `x` and `m` for mathematical parameters with standard names, or `significant_figures`, `max_iterations` or `starting_m` for parameters which aren't so obvious,
-- Types of the input and output variables (see [PEP 483](https://peps.python.org/pep-0483/) for a short introduction), e.g.
-  - `x: Union[float, np.ndarray]` for the input `x`, and
-  - `...) -> Union[float, np.ndarray]` for the return value,
-
-#### A good `"""docstring"""` in the Google format
-
-  - A high level description of the intention of the function, e.g., `Evaluate a first order linear model of the form y = m x + c.`,
-  - Descriptions of the input variables `Arguments`, 
-  - ... and output variables `Returns`,
-  - `Examples` of usage in the [doctests](https://docs.python.org/3/library/doctest.html) format.
-
-#### Implementation details _if and only if required_ (not shown in this example)
-
-  - If the details of how the function is implemented aren't obvious, then a high-level overview may be included in the docstring,
-  - The details should be included in the body of the function, e.g. in the function `curve_fitting_function` in the example file [docs/docstrings.py](./docs/docstrings.py).
-
 For an example of a file with docstrings, see [docs/docstrings.py](./docs/docstrings.py).
 
 *Pro-Tip: Write the docstring for your new high-level object before starting on the code. In particular, writing examples of how you expect it should be used can help clarify the right level of abstraction.*
