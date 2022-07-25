@@ -10,13 +10,6 @@ from aer.theorist.theorist_GUI import Theorist_GUI
 from example.weber.weber_setup import general_params, study_object, validation_object_1
 
 # %%
-# Note current time
-
-now = datetime.now()
-dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
-print("date and time =", dt_string)
-
-# %%
 # EXPERIMENTALIST
 
 # Experiment design
