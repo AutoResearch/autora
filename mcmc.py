@@ -643,7 +643,7 @@ class Tree:
                                 self.par_values[ds][p] = 1.0
                         # Save this fit
                         self.fit_par[str(self)][ds] = deepcopy(self.par_values[ds])
-                    except ValueError or IndexError or AttributeError or KeyError:
+                    except RuntimeError:
                         # Save this (unsuccessful) fit and print warning
                         self.fit_par[str(self)][ds] = deepcopy(self.par_values[ds])
                         if verbose:
