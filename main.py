@@ -6,7 +6,6 @@ import warnings
 
 import pandas as pd
 
-# import Prior.fit_prior
 import utils
 from parallel import Parallel
 from Prior.fit_prior import read_prior_par
@@ -40,7 +39,7 @@ XLABS = [
 ]
 nv = len(XLABS)
 nc = 1
-epochs = 1500
+epochs = 300
 # raw_data = pd.read_csv('Validation/LogYe/data/seymour.csv')
 # x, y = raw_data[XLABS], np.log(raw_data['rec'])
 
