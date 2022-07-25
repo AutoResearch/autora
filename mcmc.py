@@ -1329,7 +1329,7 @@ class Tree:
             # Predict
             try:
                 prediction = flam(*args)
-            except ValueError or IndexError or AttributeError or KeyError:
+            except SyntaxError:
                 # Do it point by point
                 prediction = [np.nan for i in range(len(this_x[ds]))]
                 """
