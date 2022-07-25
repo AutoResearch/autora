@@ -1029,7 +1029,7 @@ class Tree:
                 dEB = float(dEB)
                 dEP = float(dEP)
                 dE = dEB + dEP
-            except ValueError or IndexError or AttributeError or KeyError:
+            except ValueError:
                 dEB, dEP, dE = np.inf, np.inf, np.inf
             return dE, dEB, dEP, par_valuesNew
 
