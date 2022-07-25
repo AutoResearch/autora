@@ -1152,7 +1152,8 @@ class Tree:
             dE, dEB, dEP, par_valuesNew = self.dE_lr(target, new, verbose=verbose)
             try:
                 paccept = np.exp(-dEB / self.BT - dEP / self.PT)
-            except ValueError or IndexError or AttributeError or KeyError:
+            except ValueError:
+                _logger.warning("Potentially failing to set paccept properly")
                 if (dEB / self.BT + dEP / self.PT) < 0:
                     paccept = 1.0
             # Accept move, if necessary
