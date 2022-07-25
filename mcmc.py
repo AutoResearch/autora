@@ -666,7 +666,7 @@ class Tree:
                     raise ValueError
                 else:
                     self.sse[ds] = np.sum(se)
-            except ValueError or IndexError or AttributeError or KeyError:
+            except ValueError:
                 if verbose:
                     print("> Cannot calculate SSE for %s: inf" % self, file=sys.stderr)
                 self.sse[ds] = np.inf
