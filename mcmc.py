@@ -602,7 +602,7 @@ class Tree:
             flam = lambdify(
                 variables + parameters, ex, ["numpy", {"fac": scipy.special.factorial}]
             )
-        except ValueError or IndexError or AttributeError or KeyError:
+        except Exception:
             self.sse = dict([(ds, np.inf) for ds in self.x])
             return self.sse
         if fit:
