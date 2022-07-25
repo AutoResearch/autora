@@ -474,7 +474,7 @@ class Tree:
     # -------------------------------------------------------------------------
     def _add_et(self, node, et_order=None, et=None, update_gof=True, verbose=False):
         """Add an elementary tree replacing the node, which must be a leaf."""
-        if node.offspring is not []:
+        if node.offspring != []:
             raise
         # If no ET is provided, randomly choose one (of the specified
         # order if given, or totally at random otherwise)
