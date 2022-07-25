@@ -1,4 +1,3 @@
-from datetime import datetime
 from tkinter import Tk
 
 from aer.experimentalist.experiment_design_synthetic_weber import (
@@ -98,7 +97,3 @@ root.mainloop()
 # theorist_fair.add_validation_set(validation_object_1, 'Weber_Sampled')
 # theorist_fair.add_validation_set(validation_object_2, 'Weber_Original')
 # model = theorist_fair.search_model(study_object)
-
-now = datetime.now()
-dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
-print("date and time =", dt_string)
