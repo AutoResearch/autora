@@ -1,12 +1,11 @@
 import argparse
-from datetime import datetime
 
 from aer.experimentalist.experiment_design_synthetic_weber import (
     Experiment_Design_Synthetic_Weber,
 )
 from aer.experimentalist.experimentalist_popper import Experimentalist_Popper
 from aer.theorist.theorist_random_darts import Theorist_Random_DARTS
-from example.weber.weber_setup import gen_params, study_object, validation_object_1
+from example.weber.weber_setup import general_params, study_object, validation_object_1
 
 # todo:
 # - import and instantiate theorist_random_darts
@@ -19,13 +18,6 @@ from example.weber.weber_setup import gen_params, study_object, validation_objec
 parser = argparse.ArgumentParser("parser")
 parser.add_argument("--slurm_id", type=int, default=10, help="number of slurm array")
 args = parser.parse_args()
-
-# %%
-# Note current time
-
-now = datetime.now()
-dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
-print("date and time =", dt_string)
 
 # %%
 # EXPERIMENTALIST
@@ -43,16 +35,16 @@ weber_design_validation = Experiment_Design_Synthetic_Weber(
 # Initialize experimentalist
 
 experimentalist = Experimentalist_Popper(
-    study_name=gen_params.study_name,
-    experiment_server_host=gen_params.host,
-    experiment_server_port=gen_params.port,
+    study_name=general_params.study_name,
+    experiment_server_host=general_params.host,
+    experiment_server_port=general_params.port,
     experiment_design=weber_design,
 )
 
 experimentalist_validation = Experimentalist_Popper(
-    study_name=gen_params.study_name_sampled,
-    experiment_server_host=gen_params.host,
-    experiment_server_port=gen_params.port,
+    study_name=general_params.study_name_sampled,
+    experiment_server_host=general_params.host,
+    experiment_server_port=general_params.port,
     experiment_design=weber_design_validation,
 )
 
@@ -61,7 +53,7 @@ experimentalist_validation = Experimentalist_Popper(
 
 # Initialize theorist
 
-theorist = Theorist_Random_DARTS(gen_params.study_name, theorist_filter="darts")
+theorist = Theorist_Random_DARTS(general_params.study_name, theorist_filter="darts")
 
 # Specify plots
 
@@ -101,7 +93,3 @@ theorist.add_validation_set(validation_object_2, "validation loss")
 # Search model
 
 model = theorist.search_model_job(study_object, args.slurm_id)
-
-now = datetime.now()
-dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
-print("date and time =", dt_string)
