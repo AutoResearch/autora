@@ -237,7 +237,7 @@ class Tree:
             for pos, p in positions:
                 can = can.replace(p, "c%d" % pcount)
                 pcount += 1
-        except Exception:
+        except SyntaxError:
             if verbose:
                 print(
                     "WARNING: Could not get canonical form for",
