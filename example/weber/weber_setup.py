@@ -4,7 +4,10 @@ from experimentalist.experiment_environment import experiment_config as exp_cfg
 from experimentalist.experiment_environment.DV_in_silico import DV_In_Silico as DV
 from experimentalist.experiment_environment.IV_in_silico import IV_In_Silico as IV
 from experimentalist.experiment_environment.variable import outputTypes as output_type
+from experimentalist.experimentalist_popper import Experimentalist_Popper
 from theorist.object_of_study import Object_Of_Study
+
+from example.weber.run_weber_study import weber_design, weber_design_validation
 
 # %%
 # GENERAL PARAMETERS
@@ -70,4 +73,21 @@ validation_object_1 = Object_Of_Study(
     name=general_params.study_name_sampled,
     independent_variables=IVs,
     dependent_variables=DVs_validation,
+)
+
+# EXPERIMENTALIST
+
+# Initialize experimentalist
+
+experimentalist = Experimentalist_Popper(
+    study_name=general_params.study_name,
+    experiment_server_host=general_params.host,
+    experiment_server_port=general_params.port,
+    experiment_design=weber_design,
+)
+experimentalist_validation = Experimentalist_Popper(
+    study_name=general_params.study_name_sampled,
+    experiment_server_host=general_params.host,
+    experiment_server_port=general_params.port,
+    experiment_design=weber_design_validation,
 )
