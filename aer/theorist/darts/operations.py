@@ -3,47 +3,44 @@ import torch.nn as nn
 
 # defines all the operations. affine is turned off for cuda (optimization prposes)
 OPS = {
-    "none": lambda C, stride, affine: Zero(stride),
-    "linear": lambda C, stride, affine: nn.Sequential(nn.Linear(1, 1, bias=True)),
-    "relu": lambda C, stride, affine: nn.Sequential(
+    "none": lambda affine: Zero(1),
+    "linear": lambda affine: nn.Sequential(nn.Linear(1, 1, bias=True)),
+    "relu": lambda affine: nn.Sequential(
         nn.ReLU(inplace=False),
     ),
-    "lin_relu": lambda C, stride, affine: nn.Sequential(
+    "lin_relu": lambda affine: nn.Sequential(
         nn.Linear(1, 1, bias=True),
         nn.ReLU(inplace=False),
     ),
-    "sigmoid": lambda C, stride, affine: nn.Sequential(
+    "sigmoid": lambda affine: nn.Sequential(
         nn.Sigmoid(),
     ),
-    "lin_sigmoid": lambda C, stride, affine: nn.Sequential(
+    "lin_sigmoid": lambda affine: nn.Sequential(
         nn.Linear(1, 1, bias=True),
         nn.Sigmoid(),
     ),
-    "add": lambda C, stride, affine: nn.Sequential(Identity()),
-    "subtract": lambda C, stride, affine: nn.Sequential(NegIdentity()),
-    "mult": lambda C, stride, affine: nn.Sequential(
+    "add": lambda affine: nn.Sequential(Identity()),
+    "subtract": lambda affine: nn.Sequential(NegIdentity()),
+    "mult": lambda affine: nn.Sequential(
         nn.Linear(1, 1, bias=False),
     ),
-    # 'exp': lambda C, stride, affine: nn.Sequential(
-    #   Exponential(),
-    #  ),
-    "exp": lambda C, stride, affine: nn.Sequential(
+    "exp": lambda affine: nn.Sequential(
         nn.Linear(1, 1, bias=True),
         Exponential(),
     ),
-    "1/x": lambda C, stride, affine: nn.Sequential(
+    "1/x": lambda affine: nn.Sequential(
         nn.Linear(1, 1, bias=False),
         MultInverse(),
     ),
-    "ln": lambda C, stride, affine: nn.Sequential(
+    "ln": lambda affine: nn.Sequential(
         nn.Linear(1, 1, bias=False),
         NatLogarithm(),
     ),
-    "softplus": lambda C, stride, affine: nn.Sequential(
+    "softplus": lambda affine: nn.Sequential(
         nn.Linear(1, 1, bias=False),
         Softplus(),
     ),
-    "softminus": lambda C, stride, affine: nn.Sequential(
+    "softminus": lambda affine: nn.Sequential(
         nn.Linear(1, 1, bias=False),
         Softminus(),
     ),
@@ -51,6 +48,12 @@ OPS = {
 
 
 def isiterable(p_object):
+    """
+    Checks if an object is iterable.
+
+    Arguments:
+        p_object: object to be checked
+    """
     try:
         iter(p_object)
     except TypeError:
@@ -59,6 +62,14 @@ def isiterable(p_object):
 
 
 def get_operation_label(op_name, params_org, decimals=4):
+    """
+    Returns a complete string describing a DARTS operation.
+
+    Arguments:
+        op_name: name of the operation
+        params_org: original parameters of the operation
+        decimals: number of decimals to be used for converting the parameters into string format
+    """
     params = params_org.copy()
 
     format_string = "{:." + "{:.0f}".format(decimals) + "f}"
@@ -158,113 +169,87 @@ def get_operation_label(op_name, params_org, decimals=4):
     return labels.get(op_name, "")
 
 
-# this module links two cells
-# The first and second nodes of cell k are set equal to the outputs
-# of cell k − 2 and cell k − 1, respectively, and 1 × 1 convolutions
-# are inserted as necessary
-class ReLUConvBN(nn.Module):
-    def __init__(self, C_in, C_out, kernel_size, stride, padding, affine=True):
-        super(ReLUConvBN, self).__init__()
-        self.op = nn.Sequential(
-            nn.ReLU(inplace=False),
-            nn.Conv2d(
-                C_in, C_out, kernel_size, stride=stride, padding=padding, bias=False
-            ),
-            nn.BatchNorm2d(C_out, affine=affine),
-        )
-
-    def forward(self, x):
-        return self.op(x)
-
-
-class DilConv(nn.Module):
-    def __init__(
-        self, C_in, C_out, kernel_size, stride, padding, dilation, affine=True
-    ):
-        super(DilConv, self).__init__()
-        self.op = nn.Sequential(
-            nn.ReLU(inplace=False),
-            nn.Conv2d(
-                C_in,
-                C_in,
-                kernel_size=kernel_size,
-                stride=stride,
-                padding=padding,
-                dilation=dilation,
-                groups=C_in,
-                bias=False,
-            ),
-            nn.Conv2d(C_in, C_out, kernel_size=1, padding=0, bias=False),
-            nn.BatchNorm2d(C_out, affine=affine),
-        )
-
-    def forward(self, x):
-        return self.op(x)
-
-
-class SepConv(nn.Module):
-    def __init__(self, C_in, C_out, kernel_size, stride, padding, affine=True):
-        super(SepConv, self).__init__()
-        self.op = nn.Sequential(
-            nn.ReLU(inplace=False),
-            nn.Conv2d(
-                C_in,
-                C_in,
-                kernel_size=kernel_size,
-                stride=stride,
-                padding=padding,
-                groups=C_in,
-                bias=False,
-            ),
-            nn.Conv2d(C_in, C_in, kernel_size=1, padding=0, bias=False),
-            nn.BatchNorm2d(C_in, affine=affine),
-            nn.ReLU(inplace=False),
-            nn.Conv2d(
-                C_in,
-                C_in,
-                kernel_size=kernel_size,
-                stride=1,
-                padding=padding,
-                groups=C_in,
-                bias=False,
-            ),
-            nn.Conv2d(C_in, C_out, kernel_size=1, padding=0, bias=False),
-            nn.BatchNorm2d(C_out, affine=affine),
-        )
-
-    def forward(self, x):
-        return self.op(x)
-
-
 class Identity(nn.Module):
+    """
+    A pytorch module implementing the identity function.
+    """
+
     def __init__(self):
+        """
+        Initializes the identify function.
+        """
         super(Identity, self).__init__()
 
     def forward(self, x):
+        """
+        Forward pass of the identity function.
+
+        Arguments:
+            x: input tensor
+        """
         return x
 
 
 class NegIdentity(nn.Module):
+    """
+    A pytorch module implementing the inverse of an identity function.
+    """
+
     def __init__(self):
+        """
+        Initializes the inverse of an identity function.
+        """
         super(NegIdentity, self).__init__()
 
     def forward(self, x):
+        """
+        Forward pass of the inverse of an identity function.
+
+        Arguments:
+            x: input tensor
+        """
         return -x
 
 
 class Exponential(nn.Module):
+    """
+    A pytorch module implementing the exponential function.
+    """
+
     def __init__(self):
+        """
+        Initializes the exponential function.
+        """
         super(Exponential, self).__init__()
 
     def forward(self, x):
+        """
+        Forward pass of the exponential function.
+
+        Arguments:
+            x: input tensor
+        """
         return torch.exp(x)
 
 
 class NatLogarithm(nn.Module):
+    """
+    A pytorch module implementing the natural logarithm function.
+    """
+
     def __init__(self):
+        """
+        Initializes the natural logarithm function.
+        """
         super(NatLogarithm, self).__init__()
 
     def forward(self, x):
+        """
+        Forward pass of the natural logarithm function.
+
+        Arguments:
+            x: input tensor
+        """
         # make sure x is in domain of natural logarithm
         mask = x.clone()
         mask[(x <= 0.0).detach()] = 0
@@ -277,61 +262,109 @@ class NatLogarithm(nn.Module):
 
 
 class MultInverse(nn.Module):
+    """
+    A pytorch module implementing the multiplicative inverse.
+    """
+
     def __init__(self):
+        """
+        Initializes the multiplicative inverse.
+        """
         super(MultInverse, self).__init__()
 
     def forward(self, x):
+        """
+        Forward pass of the multiplicative inverse.
+
+        Arguments:
+            x: input tensor
+        """
         return torch.pow(x, -1)
 
 
 class Zero(nn.Module):
+    """
+    A pytorch module implementing the zero operation (i.e., a null operation). A zero operation
+    presumes that there is no relationship between the input and output.
+    """
+
     def __init__(self, stride):
+        """
+        Initializes the zero operation.
+        """
         super(Zero, self).__init__()
         self.stride = stride
 
     def forward(self, x):
+        """
+        Forward pass of the zero operation.
+
+        Arguments:
+            x: input tensor
+        """
         if self.stride == 1:
             return x.mul(0.0)
         return x[:, :, :: self.stride, :: self.stride].mul(0.0)
 
 
-# module is used for reduction operations
-class FactorizedReduce(nn.Module):
-    def __init__(self, C_in, C_out, affine=True):
-        super(FactorizedReduce, self).__init__()
-        assert C_out % 2 == 0
-        self.relu = nn.ReLU(inplace=False)
-        self.conv_1 = nn.Conv2d(C_in, C_out // 2, 1, stride=2, padding=0, bias=False)
-        self.conv_2 = nn.Conv2d(C_in, C_out // 2, 1, stride=2, padding=0, bias=False)
-        self.bn = nn.BatchNorm2d(C_out, affine=affine)
-
-    def forward(self, x):
-        x = self.relu(x)
-        out = torch.cat([self.conv_1(x), self.conv_2(x[:, :, 1:, 1:])], dim=1)
-        out = self.bn(out)
-        return out
-
-
-# Softplus(x) = 1/β∗log(1+exp(β∗x))
 class Softplus(nn.Module):
+    r"""
+    A pytorch module implementing the softplus function:
+
+    $$
+    \operatorname{Softplus}(x) = \frac{1}{β} \operatorname{log} \left( 1 + e^{β x} \right)
+    $$
+    """
+
+    # This docstring is a raw-string (it starts `r"""` rather than `"""`)
+    # so backslashes need not be escaped
+
     def __init__(self):
+        """
+        Initializes the softplus function.
+        """
         super(Softplus, self).__init__()
         # self.beta = nn.Linear(1, 1, bias=False)
         self.beta = nn.Parameter(torch.ones(1))
         # elf.softplus = nn.Softplus(beta=self.beta)
 
     def forward(self, x):
+        """
+        Forward pass of the softplus function.
+
+        Arguments:
+            x: input tensor
+        """
         y = torch.log(1 + torch.exp(self.beta * x)) / self.beta
         # y = self.softplus(x)
         return y
 
 
 class Softminus(nn.Module):
+    """
+    A pytorch module implementing the softminus function: Softminus(x) = x- log(1+exp(β∗x)).
+
+    $$
+    \\operatorname{Softminus}(x) = x - \\operatorname{log} \\left( 1 + e^{β x} \\right)
+    $$
+    """
+
+    # This docstring is a normal string, so backslashes need to be escaped
+
     def __init__(self):
+        """
+        Initializes the softminus function.
+        """
         super(Softminus, self).__init__()
         # self.beta = nn.Linear(1, 1, bias=False)
         self.beta = nn.Parameter(torch.ones(1))
 
     def forward(self, x):
+        """
+        Forward pass of the softminus function.
+
+        Arguments:
+            x: input tensor
+        """
         y = x - torch.log(1 + torch.exp(self.beta * x)) / self.beta
         return y

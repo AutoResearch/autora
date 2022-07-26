@@ -34,6 +34,34 @@ def generate_darts_summary_figures(
     y_reference_label=None,
     arch_samp_filter=None,
 ):
+    """
+    Generates a summary figure for a given DARTS study.
+    The figure can be composed of different summary plots.
+
+    Arguments:
+        figure_names: list of strings with the names of the figures to be generated
+        titles: list of strings with the titles of the figures to be generated
+        filters: list of strings with the theorist filters to be used to select the models to be
+        used in the figures
+        title_suffix: string with the suffix to be added to the titles of the figures
+        study_name: string with the name of the study (used to identify the study folder)
+        y_name: string with the name of the y-axis variable
+        y_label: string with the label of the y-axis variable
+        y_sem_name: string with the name of the y-axis coding the standard error of the mean
+        x1_name: string with the name of the (first) x-axis variable
+        x1_label: string with the label of the (first) x-axis variable
+        x2_name: string with the name of the second x-axis variable
+        x2_label: string with the label of the second x-axis variable
+        x_limit: list with the limits of the x-axis
+        y_limit: list with the limits of the y-axis
+        best_model_name: string with the name of the best model to be highlighted in the figure
+        figure_size: list with the size of the figure
+        y_reference: list with the values of the reference line
+        y_reference_label: string with the label of the reference line
+        arch_samp_filter: string with the name of the filter to be used to select the
+        samples of the architecture
+
+    """
 
     for idx, (figure_name, title, theorist_filter) in enumerate(
         zip(figure_names, titles, filters)
@@ -106,6 +134,34 @@ def plot_darts_summary(
     save=False,
     figure_name="figure",
 ):
+    """
+    Generates a single summary plot for a given DARTS study.
+
+    Arguments:
+        study_name: string with the name of the study (used to identify the study folder)
+        y_name: string with the name of the y-axis variable
+        x1_name: string with the name of the (first) x-axis variable
+        x2_name: string with the name of the second x-axis variable
+        y_label: string with the label of the y-axis variable
+        x1_label: string with the label of the (first) x-axis variable
+        x2_label: string with the label of the second x-axis variable
+        y_sem_name: string with the name of the y-axis coding the standard error of the mean
+        metric: string with the metric to be used to select the best model
+        y_reference: list with the values of the reference line
+        y_reference_label: string with the label of the reference line
+        figure_dimensions: list with the size of the figure
+        title: string with the title of the figure
+        legend_loc: integer with the location of the legend
+        legend_font_size: integer with the font size of the legend
+        axis_font_size: integer with the font size of the axis
+        title_font_size: integer with the font size of the title
+        show_legend: boolean with the flag to show the legend
+        y_limit: list with the limits of the y-axis
+        x_limit: list with the limits of the x-axis
+        best_model_name: string with the name of the best model to be highlighted in the figure
+        save: boolean with the flag to save the figure
+        figure_name: string with the name of the figure
+    """
 
     palette = "PuBu"
 
@@ -630,6 +686,16 @@ def plot_model_graph(
     object_of_study,
     figure_name="graph",
 ):
+    """
+    Plot the graph of the DARTS model.
+
+    Arguments:
+        study_name: name of the study (used to identify the relevant study folder)
+        arch_weights_name: name of the architecture weights file
+        model_weights_name: name of the model weights file (that contains the trained parameters)
+        object_of_study: name of the object of study
+        figure_name: name of the figure
+    """
 
     import os
 
@@ -670,6 +736,15 @@ def plot_model_graph(
 
 
 def load_model(study_name, model_weights_name, arch_weights_name, object_of_study):
+    """
+    Load the model.
+
+    Arguments:
+        study_name: name of the study (used to identify the relevant study folder)
+        model_weights_name: name of the model weights file (that contains the trained parameters)
+        arch_weights_name: name of the architecture weights file
+        object_of_study: name of the object of study
+    """
 
     import os
 
@@ -702,6 +777,10 @@ def load_model(study_name, model_weights_name, arch_weights_name, object_of_stud
 
 
 class DebugWindow:
+    """
+    A window with plots that are used for debugging.
+    """
+
     def __init__(
         self,
         num_epochs,
@@ -711,6 +790,17 @@ class DebugWindow:
         fitPlot3D=False,
         show_arch_weights=True,
     ):
+        """
+        Initializes the debug window.
+
+        Arguments:
+            num_epochs: number of architecture training epochs
+            numArchEdges: number of architecture edges
+            numArchOps: number of architecture operations
+            ArchOpsLabels: list of architecture operation labels
+            fitPlot3D: if True, the 3D plot of the fit is shown
+            show_arch_weights: if True, the architecture weights are shown
+        """
 
         # initialization
         matplotlib.use("TkAgg")  # need to add this for PyCharm environment
@@ -906,6 +996,23 @@ class DebugWindow:
         target=None,
         prediction=None,
     ):
+        """
+        Update the debug plot with new data.
+
+        Arguments:
+            train_error: training error
+            valid_error: validation error
+            weights: weights of the model
+            BIC: Bayesian information criterion of the model
+            AIC: Akaike information criterion of the model
+            model_graph: the graph of the model
+            range_input1: the range of the first input
+            range_input2: the range of the second input
+            range_target: the range of the target
+            range_prediction: the range of the prediction
+            target: the target
+            prediction: the prediction
+        """
 
         # update training error
         if train_error is not None:
