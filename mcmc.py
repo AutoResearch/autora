@@ -816,7 +816,7 @@ class Tree:
         )
         # check/update canonical representative
         rep_res = self.update_representative(verbose=verbose)
-        if rep_res is -1:
+        if rep_res == -1:
             # this formula is forbidden
             self.et_replace(added, old, update_gof=False, verbose=verbose)
             self.bic, self.sse, self.E = old_bic, deepcopy(old_sse), old_energy
