@@ -5,12 +5,12 @@ Provide a high-level summary of the change and which issue (either on Github or 
 _Fixes #(issue)_ (if the issue is on Github, simply link to it using the '#' symbol; otherwise, provide a notion page link)
 
 ### Type of change:
-*Delete as appropriate:*
-- Bug fix (non-breaking change which fixes an issue)
-- New feature (non-breaking change which adds functionality)
-- Breaking change (fix or feature that would cause existing functionality to not work as expected)
-- Documentation update
-- Anything else (provide your category)
+
+- [ ] Bug fix (non-breaking change which fixes an issue)
+- [ ] New feature (non-breaking change which adds functionality)
+- [ ] Breaking change (fix or feature that would cause existing functionality to not work as expected)
+- [ ] Documentation update
+- [ ] Anything else (provide your category)
 
 
 ### Features: 
