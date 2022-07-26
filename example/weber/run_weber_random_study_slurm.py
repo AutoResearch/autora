@@ -3,9 +3,14 @@ import argparse
 from aer.experimentalist.experiment_design_synthetic_weber import (
     Experiment_Design_Synthetic_Weber,
 )
-from aer.experimentalist.experimentalist_popper import Experimentalist_Popper
 from aer.theorist.theorist_random_darts import Theorist_Random_DARTS
-from example.weber.weber_setup import general_params, study_object, validation_object_1
+from example.weber.weber_setup import (
+    experimentalist,
+    experimentalist_validation,
+    general_params,
+    study_object,
+    validation_object_1,
+)
 
 # todo:
 # - import and instantiate theorist_random_darts
@@ -30,22 +35,6 @@ weber_design = Experiment_Design_Synthetic_Weber(stimulus_resolution)
 stimulus_resolution_validation = 100
 weber_design_validation = Experiment_Design_Synthetic_Weber(
     stimulus_resolution_validation
-)
-
-# Initialize experimentalist
-
-experimentalist = Experimentalist_Popper(
-    study_name=general_params.study_name,
-    experiment_server_host=general_params.host,
-    experiment_server_port=general_params.port,
-    experiment_design=weber_design,
-)
-
-experimentalist_validation = Experimentalist_Popper(
-    study_name=general_params.study_name_sampled,
-    experiment_server_host=general_params.host,
-    experiment_server_port=general_params.port,
-    experiment_design=weber_design_validation,
 )
 
 # %%
