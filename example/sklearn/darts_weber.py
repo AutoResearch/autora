@@ -90,7 +90,7 @@ darts_estimator = GridSearchCV(
             arch_updates_per_epoch=20,
             param_updates_per_epoch=20,
             max_epochs=50,
-            output_type=ValueType.REAL,
+            output_type=ValueType.PROBABILITY,
         ),
     ),
     param_grid=dict(darts__num_graph_nodes=range(1, 5)),
