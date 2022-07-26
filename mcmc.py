@@ -603,7 +603,7 @@ class Tree:
             flam = lambdify(
                 variables + parameters, ex, ["numpy", {"fac": scipy.special.factorial}]
             )
-        except Exception:
+        except SyntaxError:
             self.sse = dict([(ds, np.inf) for ds in self.x])
             return self.sse
         if fit:
