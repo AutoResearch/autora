@@ -105,13 +105,3 @@ mlp_estimator = MLPRegressor()
 mlp_estimator.fit(X, y)
 
 show_results(estimator=mlp_estimator, label="Multilayer-Perceptron")
-
-# %%
-show_results(
-    estimators={
-        "1st-order linear": first_order_linear_estimator,
-        "[0th-5th]-order linear": polynomial_estimator,
-        "DARTS": darts_estimator,
-        "Multi-Layer-Perceptron": mlp_estimator,
-    }
-)
