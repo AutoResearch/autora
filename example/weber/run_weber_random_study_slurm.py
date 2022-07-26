@@ -3,9 +3,6 @@
 
 import argparse
 
-from aer.experimentalist.experiment_design_synthetic_weber import (
-    Experiment_Design_Synthetic_Weber,
-)
 from aer.theorist.theorist_random_darts import Theorist_Random_DARTS
 from example.weber.weber_setup import (
     experimentalist,
@@ -14,10 +11,6 @@ from example.weber.weber_setup import (
     study_object,
     validation_object_1,
 )
-
-# %%
-# Common setup
-
 
 # todo:
 # - import and instantiate theorist_random_darts
@@ -30,19 +23,6 @@ from example.weber.weber_setup import (
 parser = argparse.ArgumentParser("parser")
 parser.add_argument("--slurm_id", type=int, default=10, help="number of slurm array")
 args = parser.parse_args()
-
-# %%
-# EXPERIMENTALIST
-
-# Experiment design
-
-stimulus_resolution = 20
-weber_design = Experiment_Design_Synthetic_Weber(stimulus_resolution)
-
-stimulus_resolution_validation = 100
-weber_design_validation = Experiment_Design_Synthetic_Weber(
-    stimulus_resolution_validation
-)
 
 # %%
 # THEORIST

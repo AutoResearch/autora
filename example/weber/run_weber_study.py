@@ -14,10 +14,6 @@ from example.weber.weber_setup import (
 )
 
 # %%
-# Import setup
-
-
-# %%
 # THEORIST
 
 # Initialize theorist
