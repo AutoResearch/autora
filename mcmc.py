@@ -963,7 +963,7 @@ class Tree:
             dEP = float(dEP)
             dE = dEB + dEP
             return dE, dEB, dEP, par_valuesNew
-        except ValueError or IndexError or AttributeError or KeyError:
+        except ValueError:
             return np.inf, np.inf, np.inf, None
 
     # -------------------------------------------------------------------------
