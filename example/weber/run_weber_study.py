@@ -1,3 +1,6 @@
+# %%
+# Imports
+
 from tkinter import Tk
 
 from aer.experimentalist.experiment_design_synthetic_weber import (
@@ -12,6 +15,10 @@ from example.weber.weber_setup import (
     study_object,
     validation_object_1,
 )
+
+# %%
+# Common setup
+
 
 # %%
 # EXPERIMENTALIST

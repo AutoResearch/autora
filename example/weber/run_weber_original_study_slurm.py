@@ -1,3 +1,6 @@
+# %%
+# Imports
+
 import argparse
 from typing import List
 
@@ -12,6 +15,10 @@ from example.weber.weber_setup import (
     study_object,
     validation_object_1,
 )
+
+# %%
+# Common setup
+
 
 # %%
 # Parse arguments

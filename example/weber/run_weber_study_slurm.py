@@ -1,3 +1,6 @@
+# %%
+# Imports
+
 import argparse
 import os
 import sys
@@ -13,6 +16,10 @@ from example.weber.weber_setup import (
     study_object,
     validation_object_1,
 )
+
+# %%
+# Common setup
+
 
 print(os.getcwd())
 sys.path.append(r"/tigress/musslick/AER/cogsci2021")
