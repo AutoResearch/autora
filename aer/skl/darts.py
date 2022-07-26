@@ -17,7 +17,7 @@ import aer.config
 from aer.object_of_study import new_object_of_study
 from aer.theorist.darts.architect import Architect
 from aer.theorist.darts.model_search import DARTS_Type, Network
-from aer.theorist.darts.utils import AvgrageMeter, get_loss_function
+from aer.theorist.darts.utils import AvgrageMeter, get_loss_function, get_output_format
 from aer.theorist.theorist_darts import format_input_target
 from aer.variable import ValueType, Variable, VariableCollection
 
@@ -29,7 +29,7 @@ class _DARTSResult:
     """A container for passing fitted DARTS results around."""
 
     network_: Network
-    model_: Network
+    model_: torch.nn.Module
 
 
 def _general_darts(
@@ -68,6 +68,7 @@ def _general_darts(
     )
 
     criterion = get_loss_function(output_type)
+    output_function = get_output_format(output_type)
 
     network_ = Network(
         num_classes=output_dimensions,
@@ -152,12 +153,15 @@ def _general_darts(
     # Create the final model
 
     # Set edges in the network with the highest weights to 1, others to 0
-    model_ = copy.deepcopy(network_)
-    new_weights = model_.max_alphas_normal()
-    model_.fix_architecture(True, new_weights)
+    model_without_output_function = copy.deepcopy(network_)
+    new_weights = model_without_output_function.max_alphas_normal()
+    model_without_output_function.fix_architecture(True, new_weights)
 
     # Re-optimize the parameters
-    coefficient_optimizer(model_)
+    coefficient_optimizer(model_without_output_function)
+
+    # Include the output function
+    model_ = torch.nn.Sequential(model_without_output_function, output_function)
 
     results = _DARTSResult(model_=model_, network_=network_)
 
