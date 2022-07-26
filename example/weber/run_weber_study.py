@@ -1,44 +1,28 @@
 # %%
-# Imports
+# Import modules
 
 from tkinter import Tk
 
-from aer.experimentalist.experiment_design_synthetic_weber import (
-    Experiment_Design_Synthetic_Weber,
-)
 from aer.theorist.theorist_darts import DARTS_Type, Theorist_DARTS
 from aer.theorist.theorist_GUI import Theorist_GUI
 from example.weber.weber_setup import (
     experimentalist,
     experimentalist_validation,
-    general_params,
+    general_parameters,
     study_object,
     validation_object_1,
 )
 
 # %%
-# Common setup
+# Import setup
 
-
-# %%
-# EXPERIMENTALIST
-
-# Experiment design
-
-stimulus_resolution = 20
-weber_design = Experiment_Design_Synthetic_Weber(stimulus_resolution)
-
-stimulus_resolution_validation = 100
-weber_design_validation = Experiment_Design_Synthetic_Weber(
-    stimulus_resolution_validation
-)
 
 # %%
 # THEORIST
 
 # Initialize theorist
 
-theorist = Theorist_DARTS(general_params.study_name, darts_type=DARTS_Type.ORIGINAL)
+theorist = Theorist_DARTS(general_parameters.study_name, darts_type=DARTS_Type.ORIGINAL)
 
 # Specify plots
 

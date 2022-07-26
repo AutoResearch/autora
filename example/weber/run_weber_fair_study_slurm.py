@@ -11,7 +11,7 @@ from aer.theorist.theorist_darts import DARTS_Type, Theorist_DARTS
 from example.weber.weber_setup import (
     experimentalist,
     experimentalist_validation,
-    general_params,
+    general_parameters,
     study_object,
     validation_object_1,
 )
@@ -45,7 +45,7 @@ weber_design_validation = Experiment_Design_Synthetic_Weber(
 
 # Initialize theorist
 
-theorist = Theorist_DARTS(general_params.study_name, darts_type=DARTS_Type.FAIR)
+theorist = Theorist_DARTS(general_parameters.study_name, darts_type=DARTS_Type.FAIR)
 
 # Specify plots
 

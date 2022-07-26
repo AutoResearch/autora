@@ -1,5 +1,8 @@
 from types import SimpleNamespace
 
+from experimentalist.experiment_design_synthetic_weber import (
+    Experiment_Design_Synthetic_Weber,
+)
 from experimentalist.experiment_environment import experiment_config as exp_cfg
 from experimentalist.experiment_environment.DV_in_silico import DV_In_Silico as DV
 from experimentalist.experiment_environment.IV_in_silico import IV_In_Silico as IV
@@ -7,12 +10,10 @@ from experimentalist.experiment_environment.variable import outputTypes as outpu
 from experimentalist.experimentalist_popper import Experimentalist_Popper
 from theorist.object_of_study import Object_Of_Study
 
-from example.weber.run_weber_study import weber_design, weber_design_validation
-
 # %%
 # GENERAL PARAMETERS
 
-general_params = SimpleNamespace(
+general_parameters = SimpleNamespace(
     study_name="Weber",  # name of experiment
     study_name_sampled="Weber Sampled",
     host=exp_cfg.HOST_IP,  # ip address of experiment server
@@ -66,28 +67,41 @@ DVs_validation = [diff_detected_sample]
 # Initialize objects of study
 
 study_object = Object_Of_Study(
-    name=general_params.study_name, independent_variables=IVs, dependent_variables=DVs
+    name=general_parameters.study_name,
+    independent_variables=IVs,
+    dependent_variables=DVs,
 )
 
 validation_object_1 = Object_Of_Study(
-    name=general_params.study_name_sampled,
+    name=general_parameters.study_name_sampled,
     independent_variables=IVs,
     dependent_variables=DVs_validation,
 )
 
 # EXPERIMENTALIST
 
+# Experiment design
+
+stimulus_resolution = 20
+weber_design = Experiment_Design_Synthetic_Weber(stimulus_resolution)
+
+stimulus_resolution_validation = 100
+weber_design_validation = Experiment_Design_Synthetic_Weber(
+    stimulus_resolution_validation
+)
+
 # Initialize experimentalist
 
 experimentalist = Experimentalist_Popper(
-    study_name=general_params.study_name,
-    experiment_server_host=general_params.host,
-    experiment_server_port=general_params.port,
+    study_name=general_parameters.study_name,
+    experiment_server_host=general_parameters.host,
+    experiment_server_port=general_parameters.port,
     experiment_design=weber_design,
 )
+
 experimentalist_validation = Experimentalist_Popper(
-    study_name=general_params.study_name_sampled,
-    experiment_server_host=general_params.host,
-    experiment_server_port=general_params.port,
+    study_name=general_parameters.study_name_sampled,
+    experiment_server_host=general_parameters.host,
+    experiment_server_port=general_parameters.port,
     experiment_design=weber_design_validation,
 )

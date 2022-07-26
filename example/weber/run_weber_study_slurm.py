@@ -12,7 +12,7 @@ from aer.theorist.theorist_darts import DARTS_Type, Theorist_DARTS
 from example.weber.weber_setup import (
     experimentalist,
     experimentalist_validation,
-    general_params,
+    general_parameters,
     study_object,
     validation_object_1,
 )
@@ -49,7 +49,7 @@ weber_design_validation = Experiment_Design_Synthetic_Weber(
 
 # Initialize theorist
 
-theorist = Theorist_DARTS(general_params.study_name, darts_type=DARTS_Type.ORIGINAL)
+theorist = Theorist_DARTS(general_parameters.study_name, darts_type=DARTS_Type.ORIGINAL)
 
 # Specify plots
 
@@ -91,7 +91,9 @@ theorist.add_validation_set(validation_object_2, "Weber_Original")
 model = theorist.search_model_job(study_object, args.slurm_id)
 
 # Fair search
-theorist_fair = Theorist_DARTS(general_params.study_name, darts_type=DARTS_Type.FAIR)
+theorist_fair = Theorist_DARTS(
+    general_parameters.study_name, darts_type=DARTS_Type.FAIR
+)
 theorist_fair.plot()
 theorist_fair.add_validation_set(validation_object_1, "Weber_Sampled")
 theorist_fair.add_validation_set(validation_object_2, "Weber_Original")
