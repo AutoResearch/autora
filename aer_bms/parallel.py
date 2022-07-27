@@ -4,10 +4,10 @@ from random import randint, random
 
 import numpy as np
 import pandas as pd
-from numpy import exp
 
 # from mcmc import *
 from mcmc import OPS, Tree
+from numpy import exp
 
 
 class Parallel:
@@ -222,7 +222,7 @@ if __name__ == "__main__":
     sys.path.append("Prior")
     from pprint import pprint
 
-    from Prior.fit_prior import read_prior_par
+    from fit_prior import read_prior_par
 
     # Temperatures
     Ts = [
