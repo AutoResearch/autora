@@ -407,8 +407,11 @@ class DARTS(BaseEstimator, RegressorMixin):
         # First run the checks using the scikit-learn API, listing the key parameters
         check_is_fitted(self, attributes=["model_"])
 
-        # MyPy doesn't understand that the check_is_fitted function ensures that self.model_
-        # parameter is initialized and otherwise throws an error, so we check that explicitly
+        # Since self.model_ is initialized as None, mypy throws an error if we
+        # just call self.model_(X) in the predict method, as it could still be none.
+        # MyPy doesn't understand that the sklearn check_is_fitted function
+        # ensures the self.model_ parameter is initialized and otherwise throws an error,
+        # so we check that explicitly here and pass the model which can't be None.
         assert self.model_ is not None
         return self.model_
 
