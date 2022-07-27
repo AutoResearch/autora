@@ -376,8 +376,10 @@ class DARTS(BaseEstimator, RegressorMixin):
 
         self.output_type = output_type
 
-        self.network_: Network = Network(0, 0)
-        self.model_: Network = Network(0, 0)
+        self.network_: Optional[Network]
+        self.model_: Optional[Network]
+        self.X_: Optional[np.ndarray]
+        self.y_: Optional[np.ndarray]
 
     def fit(self, X: np.ndarray, y: np.ndarray):
         """
@@ -392,9 +394,23 @@ class DARTS(BaseEstimator, RegressorMixin):
         """
         params = self.get_params()
         fit_results = _general_darts(X=X, y=y, **params)
-        self.network_ = fit_results.network_
         self.model_ = fit_results.model_
+        self.X_ = X
+        self.y_ = y
+        self.network_ = fit_results.network_
         return self
+
+    @property
+    def _fitted_model(self) -> Network:
+        """Get the fitted model from the estimator."""
+
+        # First run the checks using the scikit-learn API, listing the key parameters
+        check_is_fitted(self, attributes=["model_"])
+
+        # MyPy doesn't understand that the check_is_fitted function ensures that self.model_
+        # parameter is initialized and otherwise throws an error, so we check that explicitly
+        assert self.model_ is not None
+        return self.model_
 
     def predict(self, X: np.ndarray) -> np.ndarray:
         """
@@ -407,8 +423,8 @@ class DARTS(BaseEstimator, RegressorMixin):
         Returns:
             y: predicted dependent variable values
         """
-        check_is_fitted(self)
         X_ = check_array(X)
-        y_ = self.model_(torch.as_tensor(X_).float())
+        y_ = self._fitted_model(torch.as_tensor(X_).float())
         y = y_.detach().numpy()
+
         return y
