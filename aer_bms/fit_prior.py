@@ -78,12 +78,12 @@ def parse_options():
 def read_target_values(source, quadratic=False):
     """Read the target proportions for each type of operation."""
     # Number of formulas
-    infn1 = "../Process-Formulas/data/%s.wiki.parsed__num_operations.dat" % source
+    infn1 = "../data/%s.wiki.parsed__num_operations.dat" % source
     with open(infn1) as inf1:
         lines = inf1.readlines()
         nform = sum([int(line.strip().split()[1]) for line in lines])
     # Fraction of each of the operations
-    infn2 = "../Process-Formulas/data/%s.wiki.parsed__operation_type.dat" % source
+    infn2 = "../data/%s.wiki.parsed__operation_type.dat" % source
     with open(infn2) as inf2:
         lines = inf2.readlines()
         target = dict(
@@ -97,9 +97,7 @@ def read_target_values(source, quadratic=False):
         )
     # Fraction of each of the operations squared
     if quadratic:
-        infn3 = "../Process-Formulas/data/%s.wiki.parsed__operation_type_sq.dat" % (
-            source
-        )
+        infn3 = "../data/%s.wiki.parsed__operation_type_sq.dat" % (source)
         with open(infn3) as inf3:
             lines = inf3.readlines()
             target2 = dict(
