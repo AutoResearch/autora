@@ -1,1 +1,1 @@
-from parallel import Parallel  # noqa: F401
+from .parallel import Parallel  # noqa: F401

@@ -4,10 +4,9 @@
 import warnings
 
 import pandas as pd
-import utils
 
 # from fit_prior import read_prior_par
-from aer_bms import Parallel
+from aer_bms import Parallel, utils
 
 warnings.filterwarnings("ignore")
 
@@ -39,7 +38,7 @@ epochs = 300
 # raw_data = pd.read_csv('Validation/LogYe/data/seymour.csv')
 # x, y = raw_data[XLABS], np.log(raw_data['rec'])
 
-raw_data = pd.read_csv("aer_bms/experiment_0_data.csv")
+raw_data = pd.read_csv("test/experiment_0_data.csv")
 # x, y = raw_data[XLABS], np.log(raw_data['difference_detected'])
 x, y = raw_data[XLABS], raw_data["difference_detected"]
 

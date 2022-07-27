@@ -4,10 +4,10 @@ from random import randint, random
 
 import numpy as np
 import pandas as pd
+from numpy import exp
 
 # from mcmc import *
-from mcmc import OPS, Tree
-from numpy import exp
+from aer_bms.mcmc import OPS, Tree
 
 
 class Parallel:
