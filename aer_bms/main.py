@@ -5,10 +5,10 @@ import sys
 import warnings
 
 import pandas as pd
-
 import utils
+from fit_prior import read_prior_par
+
 from parallel import Parallel
-from Prior.fit_prior import read_prior_par
 
 warnings.filterwarnings("ignore")
 
