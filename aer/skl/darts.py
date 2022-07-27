@@ -278,7 +278,7 @@ def _get_next_input_target(data_iterator: Iterator, criterion: torch.nn.Module):
 
 class DARTSRegressor(BaseEstimator, RegressorMixin):
     """
-    Differentiable ARchiTecture Search.
+    Differentiable ARchiTecture Search Regressor.
 
     DARTS finds a composition of functions and coefficients to minimize a loss function suitable for
     the dependent variable.
@@ -289,13 +289,12 @@ class DARTSRegressor(BaseEstimator, RegressorMixin):
     Examples:
 
         >>> import numpy as np
-        >>> from aer.variable import Variable
         >>> num_samples = 1000
         >>> X = np.linspace(start=0, stop=1, num=num_samples).reshape(-1, 1)
         >>> y = 15. * np.ones(num_samples)
         >>> estimator = DARTSRegressor(num_graph_nodes=1)
         >>> estimator = estimator.fit(X, y)
-        >>> estimator.predict([[15.]])
+        >>> estimator.predict([[0.5]])
         array([[15.051043]], dtype=float32)
 
 
