@@ -1,7 +1,6 @@
 # main file for Bayesian Scientist
 
 # import packages
-import sys
 import warnings
 
 import pandas as pd
@@ -10,9 +9,6 @@ from fit_prior import read_prior_par
 from parallel import Parallel
 
 warnings.filterwarnings("ignore")
-
-sys.path.append("./")
-sys.path.append("./Prior/")
 
 
 # load data
