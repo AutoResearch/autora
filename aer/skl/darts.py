@@ -10,7 +10,7 @@ import torch
 import torch.nn
 import torch.nn.utils
 import torch.utils.data
-from sklearn.base import BaseEstimator, RegressorMixin
+from sklearn.base import BaseEstimator, ClassifierMixin, RegressorMixin
 from sklearn.utils.validation import check_array, check_is_fitted, check_X_y
 
 import aer.config
@@ -430,3 +430,110 @@ class DARTSRegressor(BaseEstimator, RegressorMixin):
         y = y_.detach().numpy()
 
         return y
+
+
+class DARTSClassifier(DARTSRegressor, ClassifierMixin):
+    """
+    Differentiable ARchiTecture Search Classifier.
+
+    DARTS finds a composition of functions and coefficients to minimize a loss function suitable for
+    the dependent variable.
+
+    This class is intended to be compatible with the
+    [Scikit-Learn Estimator API](https://scikit-learn.org/stable/developers/develop.html).
+
+    Examples:
+
+        >>> import numpy as np
+        >>> import scipy.special
+        >>> num_samples = 1000
+        >>> X = np.linspace(start=-5, stop=5, num=num_samples).reshape(-1, 1)
+        >>> p = scipy.special.expit(X.ravel())
+        >>> y = np.random.default_rng(42).binomial(1, p, num_samples)
+        >>> estimator = DARTSClassifier(num_graph_nodes=1)
+        >>> estimator = estimator.fit(X, y)
+        >>> estimator.predict([[-4, +4]])
+        array([[0, 1]], dtype=float32)
+
+
+    Attributes:
+        network_: represents the optimized network for the architecture search
+        model_: represents the best-fit model after simplification of the best fit function
+
+
+    """
+
+    def __init__(
+        self,
+        batch_size: int = 64,
+        num_graph_nodes: int = 2,
+        classifier_weight_decay: float = 1e-2,
+        darts_type: DARTS_Type = DARTS_Type.ORIGINAL,
+        init_weights_function: Optional[Callable] = None,
+        learning_rate: float = 2.5e-2,
+        learning_rate_min: float = 0.01,
+        momentum: float = 9e-1,
+        optimizer_weight_decay: float = 3e-4,
+        param_updates_per_epoch: int = 10,
+        arch_updates_per_epoch: int = 1,
+        arch_weight_decay: float = 1e-4,
+        arch_weight_decay_df: float = 3e-4,
+        arch_weight_decay_base: float = 0.0,
+        arch_learning_rate: float = 3e-3,
+        fair_darts_loss_weight: int = 1,
+        max_epochs: int = 10,
+        grad_clip: float = 5,
+        output_type: ValueType = ValueType.CLASS,
+    ) -> None:
+        """
+        Arguments:
+            batch_size: number of observations to be used per update
+            num_graph_nodes: number of intermediate nodes in the DARTS graph.
+            classifier_weight_decay:
+            darts_type:
+            init_weights_function:
+            learning_rate:
+            learning_rate_min:
+            momentum:
+            optimizer_weight_decay:
+            param_updates_per_epoch:
+            arch_updates_per_epoch:
+            arch_weight_decay:
+            arch_weight_decay_df:
+            arch_weight_decay_base:
+            arch_learning_rate:
+            fair_darts_loss_weight:
+            max_epochs:
+            grad_clip:
+        """
+
+        self.batch_size = batch_size
+
+        self.num_graph_nodes = num_graph_nodes
+        self.classifier_weight_decay = classifier_weight_decay
+        self.darts_type = darts_type
+        self.init_weights_function = init_weights_function
+
+        self.learning_rate = learning_rate
+        self.learning_rate_min = learning_rate_min
+        self.momentum = momentum
+        self.optimizer_weight_decay = optimizer_weight_decay
+
+        self.param_updates_per_epoch = param_updates_per_epoch
+
+        self.arch_updates_per_epoch = arch_updates_per_epoch
+        self.arch_weight_decay = arch_weight_decay
+        self.arch_weight_decay_df = arch_weight_decay_df
+        self.arch_weight_decay_base = arch_weight_decay_base
+        self.arch_learning_rate = arch_learning_rate
+        self.fair_darts_loss_weight = fair_darts_loss_weight
+
+        self.max_epochs = max_epochs
+        self.grad_clip = grad_clip
+
+        self.output_type = output_type
+
+        self.network_: Optional[Network]
+        self.model_: Optional[Network]
+        self.X_: Optional[np.ndarray]
+        self.y_: Optional[np.ndarray]
