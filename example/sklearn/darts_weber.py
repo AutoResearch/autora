@@ -1,5 +1,5 @@
 """
-Example file which shows some simple curve fitting using DARTS and some other estimators.
+Example file which shows some simple curve fitting using DARTSRegressor and some other estimators.
 """
 
 import logging
@@ -14,7 +14,7 @@ from sklearn.neural_network import MLPRegressor
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import PolynomialFeatures, StandardScaler
 
-from aer.skl.darts import DARTS, ValueType
+from aer.skl.darts import DARTSRegressor, ValueType
 
 logging.basicConfig(level=logging.INFO)
 
@@ -88,7 +88,7 @@ show_results(estimator=polynomial_estimator, label="[0th-3rd]-order linear")
 darts_estimator = GridSearchCV(
     make_pipeline(
         StandardScaler(),
-        DARTS(
+        DARTSRegressor(
             batch_size=5,
             arch_updates_per_epoch=20,
             param_updates_per_epoch=20,
@@ -100,7 +100,7 @@ darts_estimator = GridSearchCV(
 )
 darts_estimator.fit(X, y)
 
-show_results(estimator=darts_estimator, label="DARTS")
+show_results(estimator=darts_estimator, label="DARTSRegressor")
 print(darts_estimator.best_params_)
 
 # %% Fit using Multilayer-Perceptron

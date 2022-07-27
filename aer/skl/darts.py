@@ -276,7 +276,7 @@ def _get_next_input_target(data_iterator: Iterator, criterion: torch.nn.Module):
     return input_fmt, target_fmt
 
 
-class DARTS(BaseEstimator, RegressorMixin):
+class DARTSRegressor(BaseEstimator, RegressorMixin):
     """
     Differentiable ARchiTecture Search.
 
@@ -293,7 +293,7 @@ class DARTS(BaseEstimator, RegressorMixin):
         >>> num_samples = 1000
         >>> X = np.linspace(start=0, stop=1, num=num_samples).reshape(-1, 1)
         >>> y = 15. * np.ones(num_samples)
-        >>> estimator = DARTS(num_graph_nodes=1)
+        >>> estimator = DARTSRegressor(num_graph_nodes=1)
         >>> estimator = estimator.fit(X, y)
         >>> estimator.predict([[15.]])
         array([[15.051043]], dtype=float32)
@@ -390,7 +390,7 @@ class DARTS(BaseEstimator, RegressorMixin):
             y: dependent variables in an n-dimensional array
 
         Returns:
-            self (DARTS): the fitted estimator
+            self (DARTSRegressor): the fitted estimator
         """
         params = self.get_params()
         fit_results = _general_darts(X=X, y=y, **params)

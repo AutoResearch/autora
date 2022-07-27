@@ -1,5 +1,5 @@
 """
-Example file which shows some simple curve fitting using DARTS and some other estimators.
+Example file which shows some simple curve fitting using DARTSRegressor and some other estimators.
 """
 
 from functools import partial
@@ -14,7 +14,7 @@ from sklearn.neural_network import MLPClassifier
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 
-from aer.skl.darts import DARTS
+from aer.skl.darts import DARTSRegressor
 
 matplotlib.use("module://backend_interagg")
 
@@ -99,7 +99,7 @@ show_results(estimator=logistic_estimator)
 darts_estimator = GridSearchCV(
     make_pipeline(
         StandardScaler(),
-        DARTS(
+        DARTSRegressor(
             batch_size=20,
         ),
     ),
@@ -107,7 +107,7 @@ darts_estimator = GridSearchCV(
 )
 darts_estimator.fit(X_train, y_train)
 
-show_results(estimators={"DARTS": darts_estimator})
+show_results(estimators={"DARTSRegressor": darts_estimator})
 print(darts_estimator.best_params_)
 
 # %%

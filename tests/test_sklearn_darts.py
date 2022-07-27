@@ -3,7 +3,7 @@ import unittest
 import numpy as np
 from sklearn.model_selection import GridSearchCV, train_test_split
 
-from aer.skl.darts import DARTS
+from aer.skl.darts import DARTSRegressor
 
 
 def generate_noisy_constant_data(
@@ -33,7 +33,7 @@ class TestDarts(unittest.TestCase):
             X, y, test_size=0.2, random_state=42
         )
 
-        estimator = DARTS(num_graph_nodes=1)
+        estimator = DARTSRegressor(num_graph_nodes=1)
 
         estimator.fit(X_train, y_train)
 
@@ -55,7 +55,7 @@ class TestDarts(unittest.TestCase):
         )
 
         estimator = GridSearchCV(
-            estimator=DARTS(),
+            estimator=DARTSRegressor(),
             cv=2,
             param_grid=[
                 {
