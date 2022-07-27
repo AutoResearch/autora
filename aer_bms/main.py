@@ -7,7 +7,6 @@ import warnings
 import pandas as pd
 import utils
 from fit_prior import read_prior_par
-
 from parallel import Parallel
 
 warnings.filterwarnings("ignore")
