@@ -1,11 +1,8 @@
-import sys
 from datetime import datetime
 from optparse import OptionParser
 from random import choice, random
 
 from mcmc import OPS, Tree
-
-sys.path.append("../")
 
 
 # -----------------------------------------------------------------------------
