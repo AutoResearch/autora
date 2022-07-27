@@ -2,6 +2,7 @@
 Example file which shows some simple curve fitting using DARTS and some other estimators.
 """
 
+import logging
 from functools import partial
 
 import matplotlib.pyplot as plt
@@ -14,6 +15,8 @@ from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import PolynomialFeatures, StandardScaler
 
 from aer.skl.darts import DARTS, ValueType
+
+logging.basicConfig(level=logging.INFO)
 
 # %% Define some helper functions
 
