@@ -11,7 +11,7 @@ import torch.nn
 import torch.nn.utils
 import torch.utils.data
 from sklearn.base import BaseEstimator, RegressorMixin
-from sklearn.utils.validation import check_array, check_X_y
+from sklearn.utils.validation import check_array, check_is_fitted, check_X_y
 
 import aer.config
 from aer.object_of_study import new_object_of_study
@@ -407,6 +407,7 @@ class DARTS(BaseEstimator, RegressorMixin):
         Returns:
             y: predicted dependent variable values
         """
+        check_is_fitted(self)
         X_ = check_array(X)
         y_ = self.model_(torch.as_tensor(X_).float())
         y = y_.detach().numpy()
