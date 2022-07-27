@@ -2,7 +2,7 @@
 Example file which shows some simple curve fitting using DARTSRegressor and some other estimators.
 """
 
-from collections import Iterable
+from collections.abc import Iterable
 from functools import partial
 
 import matplotlib
