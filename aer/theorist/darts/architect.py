@@ -17,13 +17,24 @@ class Architect(object):
     (architecture weights).
     """
 
-    def __init__(self, model, args):
+    def __init__(
+        self,
+        model: Network,
+        arch_learning_rate: float,
+        momentum: float,
+        arch_weight_decay: float,
+        arch_weight_decay_df: float = 0,
+        arch_weight_decay_base: float = 0,
+        fair_darts_loss_weight: float = 1,
+    ):
         """
         Initializes the architecture learner.
 
         Arguments:
             model: a network model implementing the full DARTS model.
-            args: optional arguments such as
+            arch_learning_rate: learning rate for the architecture weights
+            momentum: momentum used in the Adam optimizer for architecture weights
+            arch_weight_decay: general weight decay for the architecture weights
             arch_weight_decay_df (weight decay applied to architecture weights in proportion
             to the number of parameters of an operation)
             arch_weight_decay_base (a constant weight decay applied to architecture weights)
@@ -31,31 +42,20 @@ class Architect(object):
             zero or one in the fair DARTS variant)
         """
         # set parameters for architecture learning
-        self.network_momentum = args.momentum
-        self.network_weight_decay = args.arch_weight_decay
-        if hasattr(args, "arch_weight_decay_df"):
-            self.network_weight_decay_df = args.arch_weight_decay_df
-        else:
-            self.network_weight_decay_df = 0
-
-        if hasattr(args, "arch_weight_decay_base"):
-            self.arch_weight_decay_base = args.arch_weight_decay_base * model._steps
-        else:
-            self.arch_weight_decay_base = 0
-
-        if hasattr(args, "fair_darts_loss_weight"):
-            self.fair_darts_loss_weight = args.fair_darts_loss_weight
-        else:
-            self.fair_darts_loss_weight = 1
+        self.network_momentum = momentum
+        self.network_weight_decay = arch_weight_decay
+        self.network_weight_decay_df = arch_weight_decay_df
+        self.arch_weight_decay_base = arch_weight_decay_base * model._steps
+        self.fair_darts_loss_weight = fair_darts_loss_weight
 
         self.model = model
-        self.lr = args.arch_learning_rate
+        self.lr = arch_learning_rate
         # architecture is optimized using Adam
         self.optimizer = torch.optim.Adam(
             self.model.arch_parameters(),
-            lr=args.arch_learning_rate,
+            lr=arch_learning_rate,
             betas=(0.5, 0.999),
-            weight_decay=args.arch_weight_decay,
+            weight_decay=arch_weight_decay,
         )
 
         # initialize weight decay matrix

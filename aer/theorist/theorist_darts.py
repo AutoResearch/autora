@@ -694,7 +694,15 @@ class Theorist_DARTS(Theorist, ABC):
 
         # generate an architecture of the model
         darts_cfg.arch_weight_decay_df = arch_weight_decay_df
-        self.architect = Architect(self.model, darts_cfg)
+        self.architect = Architect(
+            self.model,
+            arch_learning_rate=darts_cfg.arch_learning_rate,
+            momentum=darts_cfg.momentum,
+            arch_weight_decay=darts_cfg.arch_weight_decay,
+            arch_weight_decay_df=darts_cfg.arch_weight_decay_df,
+            arch_weight_decay_base=darts_cfg.arch_weight_decay_base,
+            fair_darts_loss_weight=darts_cfg.fair_darts_loss_weight,
+        )
 
         # plot variables
         self.num_arch_edges = self.model.alphas_normal.data.shape[

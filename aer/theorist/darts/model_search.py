@@ -52,7 +52,7 @@ class MixedOp(nn.Module):
         for primitive in PRIMITIVES:
             # define operation
             # OPS returns an nn module for a given primitive (defines as a string)
-            op = OPS[primitive](False)
+            op = OPS[primitive]()
 
             # add the operation
             self._ops.append(op)

@@ -3,44 +3,44 @@ import torch.nn as nn
 
 # defines all the operations. affine is turned off for cuda (optimization prposes)
 OPS = {
-    "none": lambda affine: Zero(1),
-    "linear": lambda affine: nn.Sequential(nn.Linear(1, 1, bias=True)),
-    "relu": lambda affine: nn.Sequential(
+    "none": lambda: Zero(1),
+    "linear": lambda: nn.Sequential(nn.Linear(1, 1, bias=True)),
+    "relu": lambda: nn.Sequential(
         nn.ReLU(inplace=False),
     ),
-    "lin_relu": lambda affine: nn.Sequential(
+    "lin_relu": lambda: nn.Sequential(
         nn.Linear(1, 1, bias=True),
         nn.ReLU(inplace=False),
     ),
-    "sigmoid": lambda affine: nn.Sequential(
+    "sigmoid": lambda: nn.Sequential(
         nn.Sigmoid(),
     ),
-    "lin_sigmoid": lambda affine: nn.Sequential(
+    "lin_sigmoid": lambda: nn.Sequential(
         nn.Linear(1, 1, bias=True),
         nn.Sigmoid(),
     ),
-    "add": lambda affine: nn.Sequential(Identity()),
-    "subtract": lambda affine: nn.Sequential(NegIdentity()),
-    "mult": lambda affine: nn.Sequential(
+    "add": lambda: nn.Sequential(Identity()),
+    "subtract": lambda: nn.Sequential(NegIdentity()),
+    "mult": lambda: nn.Sequential(
         nn.Linear(1, 1, bias=False),
     ),
-    "exp": lambda affine: nn.Sequential(
+    "exp": lambda: nn.Sequential(
         nn.Linear(1, 1, bias=True),
         Exponential(),
     ),
-    "1/x": lambda affine: nn.Sequential(
+    "1/x": lambda: nn.Sequential(
         nn.Linear(1, 1, bias=False),
         MultInverse(),
     ),
-    "ln": lambda affine: nn.Sequential(
+    "ln": lambda: nn.Sequential(
         nn.Linear(1, 1, bias=False),
         NatLogarithm(),
     ),
-    "softplus": lambda affine: nn.Sequential(
+    "softplus": lambda: nn.Sequential(
         nn.Linear(1, 1, bias=False),
         Softplus(),
     ),
-    "softminus": lambda affine: nn.Sequential(
+    "softminus": lambda: nn.Sequential(
         nn.Linear(1, 1, bias=False),
         Softminus(),
     ),
