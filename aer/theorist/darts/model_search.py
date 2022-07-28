@@ -1,6 +1,7 @@
 import random
 import warnings
 from enum import Enum
+from typing import Callable
 
 import numpy as np
 import torch
@@ -191,13 +192,13 @@ class Network(nn.Module):
 
     def __init__(
         self,
-        num_classes,
-        criterion,
-        steps=2,
-        n_input_states=2,
-        architecture_fixed=False,
-        classifier_weight_decay=0,
-        darts_type=DARTS_Type.ORIGINAL,
+        num_classes: int,
+        criterion: Callable,
+        steps: int = 2,
+        n_input_states: int = 2,
+        architecture_fixed: bool = False,
+        classifier_weight_decay: float = 0,
+        darts_type: DARTS_Type = DARTS_Type.ORIGINAL,
     ):
         """
         Initializes the network.
@@ -253,7 +254,7 @@ class Network(nn.Module):
         return model_new
 
     # computes forward pass for full network
-    def forward(self, input):
+    def forward(self, input: torch.Tensor):
         """
         Computes output of the network.
 
@@ -300,7 +301,7 @@ class Network(nn.Module):
         return self._criterion(logits, target)  # returns cross entropy by default
 
     # regularization
-    def apply_weight_decay_to_classifier(self, lr):
+    def apply_weight_decay_to_classifier(self, lr: float):
         """
         Applies a weight decay to the weights projecting from the cell to the final output layer.
 
@@ -345,7 +346,7 @@ class Network(nn.Module):
         return self._arch_parameters
 
     # fixes architecture
-    def fix_architecture(self, switch: bool, new_weights=None):
+    def fix_architecture(self, switch: bool, new_weights: torch.Tensor = None):
         """
         Freezes or unfreezes the architecture weights.
 
@@ -358,7 +359,9 @@ class Network(nn.Module):
             self.alphas_normal = new_weights
         return
 
-    def sample_alphas_normal(self, sample_amp=1, fair_darts_weight_threshold=0):
+    def sample_alphas_normal(
+        self, sample_amp: float = 1, fair_darts_weight_threshold: float = 0
+    ):
         """
         Samples an architecture from the mixed operations from a probability distribution that is
         defined by the (softmaxed) architecture weights.
@@ -431,7 +434,7 @@ class Network(nn.Module):
         return alphas_normal_sample
 
     # returns the genotype of the model
-    def genotype(self, sample=False):
+    def genotype(self, sample: bool = False):
         """
         Computes a genotype of the model which specifies the current computation graph based on
         the largest architecture weight for each edge, or based on a sample.
@@ -508,7 +511,7 @@ class Network(nn.Module):
         )
         return genotype
 
-    def countParameters(self, print_parameters=False):
+    def countParameters(self, print_parameters: bool = False):
         """
         Counts and returns the parameters (coefficients) of the architecture defined by the
         highest architecture weights.
