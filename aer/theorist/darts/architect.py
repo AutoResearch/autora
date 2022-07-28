@@ -6,7 +6,7 @@ from torch.autograd import Variable
 from aer.theorist.darts.model_search import DARTS_Type, Network
 
 
-def _concat(xs):
+def _concat(xs) -> torch.Tensor:
     return torch.cat([x.view(-1) for x in xs])
 
 
@@ -95,7 +95,13 @@ class Architect(object):
         self.decay_weights = self.decay_weights
         self.decay_weights = self.decay_weights.data
 
-    def _compute_unrolled_model(self, input, target, eta, network_optimizer):
+    def _compute_unrolled_model(
+        self,
+        input: torch.Tensor,
+        target: torch.Tensor,
+        eta: float,
+        network_optimizer: torch.optim.Optimizer,
+    ):
         """
         Helper function used to compute the approximate architecture gradient.
 
@@ -128,13 +134,13 @@ class Architect(object):
 
     def step(
         self,
-        input_valid,
-        target_valid,
-        network_optimizer,
-        unrolled,
-        input_train=None,
-        target_train=None,
-        eta=1,
+        input_valid: torch.Tensor,
+        target_valid: torch.Tensor,
+        network_optimizer: torch.optim.Optimizer,
+        unrolled: bool,
+        input_train: torch.Tensor = None,
+        target_train: torch.Tensor = None,
+        eta: float = 1,
     ):
         """
         Updates the architecture parameters for one training iteration
@@ -173,7 +179,7 @@ class Architect(object):
         self.optimizer.step()
 
     # backward step (using non-approximate architecture gradient, i.e., full training)
-    def _backward_step(self, input_valid, target_valid):
+    def _backward_step(self, input_valid: torch.Tensor, target_valid: torch.Tensor):
         """
         Computes the loss and updates the architecture weights assuming full optimization
         of coefficients for the current architecture.
@@ -192,7 +198,9 @@ class Architect(object):
             )  # torch.tensor(0.5, requires_grad=False)
             loss = loss1 + self.fair_darts_loss_weight * loss2
         else:
-            raise Exception("DARTS Type " + str(self.DARTS_type) + " not implemented")
+            raise Exception(
+                "DARTS Type " + str(self.model.DARTS_type) + " not implemented"
+            )
 
         loss.backward()
 
@@ -203,12 +211,12 @@ class Architect(object):
     # backward pass using second order approximation
     def _backward_step_unrolled(
         self,
-        input_train,
-        target_train,
-        input_valid,
-        target_valid,
-        eta,
-        network_optimizer,
+        input_train: torch.Tensor,
+        target_train: torch.Tensor,
+        input_valid: torch.Tensor,
+        target_valid: torch.Tensor,
+        eta: float,
+        network_optimizer: torch.optim.Optimizer,
     ):
         """
         Computes the loss and updates the architecture weights using the approximate architecture
@@ -237,9 +245,11 @@ class Architect(object):
                 torch.sigmoid(self.model.alphas_normal),
                 torch.tensor(0.5, requires_grad=False),
             )
-            unrolled_loss = loss1 + self.ifair_darts_loss_weight * loss2
+            unrolled_loss = loss1 + self.fair_darts_loss_weight * loss2
         else:
-            raise Exception("DARTS Type " + str(self.DARTS_type) + " not implemented")
+            raise Exception(
+                "DARTS Type " + str(self.model.DARTS_type) + " not implemented"
+            )
 
         unrolled_loss.backward()
         dalpha = [v.grad for v in unrolled_model.arch_parameters()]
@@ -255,7 +265,7 @@ class Architect(object):
             else:
                 v.grad.data.copy_(g.data)
 
-    def _construct_model_from_theta(self, theta):
+    def _construct_model_from_theta(self, theta: torch.Tensor):
         """
         Helper function used to compute the approximate gradient update
         for the architecture weights.
@@ -279,7 +289,9 @@ class Architect(object):
         return model_new  # .cuda() # Edit SM 10/26/19: uncommented for cuda
 
     # second order approximation of architecture gradient (see Eqn. 8 from Liu et al, 2019)
-    def _hessian_vector_product(self, vector, input, target, r=1e-2):
+    def _hessian_vector_product(
+        self, vector: torch.Tensor, input: torch.Tensor, target: torch.Tensor, r=1e-2
+    ):
         """
         Helper function used to compute the approximate gradient update
         for the architecture weights. It computes the hessian vector product outlined in Eqn. 8

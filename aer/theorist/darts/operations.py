@@ -1,3 +1,4 @@
+import typing
 from collections import namedtuple
 
 import torch
@@ -20,7 +21,9 @@ def isiterable(p_object):
     return True
 
 
-def get_operation_label(op_name, params_org, decimals=4):
+def get_operation_label(
+    op_name: str, params_org: typing.List, decimals: int = 4
+) -> str:
     """
     Returns a complete string describing a DARTS operation.
 
@@ -139,7 +142,7 @@ class Identity(nn.Module):
         """
         super(Identity, self).__init__()
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
         Forward pass of the identity function.
 
@@ -160,7 +163,7 @@ class NegIdentity(nn.Module):
         """
         super(NegIdentity, self).__init__()
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
         Forward pass of the inverse of an identity function.
 
@@ -181,7 +184,7 @@ class Exponential(nn.Module):
         """
         super(Exponential, self).__init__()
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
         Forward pass of the exponential function.
 
@@ -202,7 +205,7 @@ class NatLogarithm(nn.Module):
         """
         super(NatLogarithm, self).__init__()
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
         Forward pass of the natural logarithm function.
 
@@ -231,7 +234,7 @@ class MultInverse(nn.Module):
         """
         super(MultInverse, self).__init__()
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
         Forward pass of the multiplicative inverse.
 
@@ -254,7 +257,7 @@ class Zero(nn.Module):
         super(Zero, self).__init__()
         self.stride = stride
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
         Forward pass of the zero operation.
 
@@ -287,7 +290,7 @@ class Softplus(nn.Module):
         self.beta = nn.Parameter(torch.ones(1))
         # elf.softplus = nn.Softplus(beta=self.beta)
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
         Forward pass of the softplus function.
 
@@ -318,7 +321,7 @@ class Softminus(nn.Module):
         # self.beta = nn.Linear(1, 1, bias=False)
         self.beta = nn.Parameter(torch.ones(1))
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
         Forward pass of the softminus function.
 
