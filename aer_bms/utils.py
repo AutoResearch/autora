@@ -54,7 +54,11 @@ def present_results(model, model_len, desc_len):
 def predict(model, x, y):
     plt.figure(figsize=(6, 6))
     plt.scatter(model.predict(x), y)
-    plt.plot((-6, 0), (-6, 0))
+
+    all_y = np.append(y, model.predict(x))
+    y_range = all_y.min().item(), all_y.max().item()
+    plt.plot(y_range, y_range)
+
     plt.xlabel("MDL model predictions", fontsize=14)
     plt.ylabel("Actual values", fontsize=14)
     plt.show()
