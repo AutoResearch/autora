@@ -14,6 +14,17 @@ from example.weber.weber_setup import (
 )
 
 # %%
+# Print setup objects
+
+print(
+    experimentalist,
+    experimentalist_validation,
+    general_parameters,
+    study_object,
+    validation_object_1,
+)
+
+# %%
 # THEORIST
 
 # Initialize theorist
