@@ -5,7 +5,6 @@ import warnings
 
 import pandas as pd
 
-# from fit_prior import read_prior_par
 from aer_bms import Parallel, utils
 
 warnings.filterwarnings("ignore")
