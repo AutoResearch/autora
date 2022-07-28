@@ -78,7 +78,7 @@ def parse_options():
 def read_target_values(source, quadratic=False):
     """Read the target proportions for each type of operation."""
     # Number of formulas
-    infn1 = "../data/%s.wiki.parsed__num_operations.dat" % source
+    infn1 = "./data/%s.wiki.parsed__num_operations.dat" % source
     with open(infn1) as inf1:
         lines = inf1.readlines()
         nform = sum([int(line.strip().split()[1]) for line in lines])
