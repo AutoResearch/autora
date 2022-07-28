@@ -9,8 +9,7 @@ import torch.nn.functional as F
 from torch.autograd import Variable
 
 from aer.theorist.darts.fan_out import Fan_Out
-from aer.theorist.darts.genotypes import PRIMITIVES, Genotype
-from aer.theorist.darts.operations import OPS, get_operation_label
+from aer.theorist.darts.operations import OPS, PRIMITIVES, Genotype, get_operation_label
 
 
 class DARTS_Type(Enum):

@@ -19,8 +19,8 @@ from aer.experimentalist.experiment_environment.variable import (
     outputTypes as output_types,
 )
 from aer.theorist.darts.architect import Architect
-from aer.theorist.darts.genotypes import PRIMITIVES
 from aer.theorist.darts.model_search import DARTS_Type, Network
+from aer.theorist.darts.operations import PRIMITIVES
 from aer.theorist.theorist import Theorist
 from aer.utils import Plot_Types
 

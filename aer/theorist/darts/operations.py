@@ -1,5 +1,9 @@
+from collections import namedtuple
+
 import torch
 import torch.nn as nn
+
+Genotype = namedtuple("Genotype", "normal normal_concat")
 
 # defines all the operations. affine is turned off for cuda (optimization prposes)
 OPS = {
@@ -45,6 +49,36 @@ OPS = {
         Softminus(),
     ),
 }
+
+# SET OF AVAILABLE PRIMITIVES:
+# "none",
+# "add",
+# "subtract",
+# "linear",
+# "sigmoid",
+# "mult",
+# "exp",
+# "relu",
+# "softplus",
+# "softminus",
+# 'lin_relu',
+# 'lin_sigmoid',
+
+# this is the list of primitives actually used,
+# and it should be a set of names contained in the OPS dictionary
+PRIMITIVES = [
+    "none",
+    "add",
+    "subtract",
+    "linear",
+    "lin_sigmoid",
+    "mult",
+    "lin_relu",
+]
+
+# make sure that every primitive is in the OPS dictionary
+for name in PRIMITIVES:
+    assert name in OPS
 
 
 def isiterable(p_object):
