@@ -5,81 +5,6 @@ import torch.nn as nn
 
 Genotype = namedtuple("Genotype", "normal normal_concat")
 
-# defines all the operations. affine is turned off for cuda (optimization prposes)
-OPS = {
-    "none": lambda: Zero(1),
-    "linear": lambda: nn.Sequential(nn.Linear(1, 1, bias=True)),
-    "relu": lambda: nn.Sequential(
-        nn.ReLU(inplace=False),
-    ),
-    "lin_relu": lambda: nn.Sequential(
-        nn.Linear(1, 1, bias=True),
-        nn.ReLU(inplace=False),
-    ),
-    "sigmoid": lambda: nn.Sequential(
-        nn.Sigmoid(),
-    ),
-    "lin_sigmoid": lambda: nn.Sequential(
-        nn.Linear(1, 1, bias=True),
-        nn.Sigmoid(),
-    ),
-    "add": lambda: nn.Sequential(Identity()),
-    "subtract": lambda: nn.Sequential(NegIdentity()),
-    "mult": lambda: nn.Sequential(
-        nn.Linear(1, 1, bias=False),
-    ),
-    "exp": lambda: nn.Sequential(
-        nn.Linear(1, 1, bias=True),
-        Exponential(),
-    ),
-    "1/x": lambda: nn.Sequential(
-        nn.Linear(1, 1, bias=False),
-        MultInverse(),
-    ),
-    "ln": lambda: nn.Sequential(
-        nn.Linear(1, 1, bias=False),
-        NatLogarithm(),
-    ),
-    "softplus": lambda: nn.Sequential(
-        nn.Linear(1, 1, bias=False),
-        Softplus(),
-    ),
-    "softminus": lambda: nn.Sequential(
-        nn.Linear(1, 1, bias=False),
-        Softminus(),
-    ),
-}
-
-# SET OF AVAILABLE PRIMITIVES:
-# "none",
-# "add",
-# "subtract",
-# "linear",
-# "sigmoid",
-# "mult",
-# "exp",
-# "relu",
-# "softplus",
-# "softminus",
-# 'lin_relu',
-# 'lin_sigmoid',
-
-# this is the list of primitives actually used,
-# and it should be a set of names contained in the OPS dictionary
-PRIMITIVES = [
-    "none",
-    "add",
-    "subtract",
-    "linear",
-    "lin_sigmoid",
-    "mult",
-    "lin_relu",
-]
-
-# make sure that every primitive is in the OPS dictionary
-for name in PRIMITIVES:
-    assert name in OPS
-
 
 def isiterable(p_object):
     """
@@ -402,3 +327,65 @@ class Softminus(nn.Module):
         """
         y = x - torch.log(1 + torch.exp(self.beta * x)) / self.beta
         return y
+
+
+# defines all the operations. affine is turned off for cuda (optimization prposes)
+OPS = {
+    "none": Zero(1),
+    "linear": nn.Sequential(nn.Linear(1, 1, bias=True)),
+    "relu": nn.Sequential(
+        nn.ReLU(inplace=False),
+    ),
+    "lin_relu": nn.Sequential(
+        nn.Linear(1, 1, bias=True),
+        nn.ReLU(inplace=False),
+    ),
+    "sigmoid": nn.Sequential(
+        nn.Sigmoid(),
+    ),
+    "lin_sigmoid": nn.Sequential(
+        nn.Linear(1, 1, bias=True),
+        nn.Sigmoid(),
+    ),
+    "add": nn.Sequential(Identity()),
+    "subtract": nn.Sequential(NegIdentity()),
+    "mult": nn.Sequential(
+        nn.Linear(1, 1, bias=False),
+    ),
+    "exp": nn.Sequential(
+        nn.Linear(1, 1, bias=True),
+        Exponential(),
+    ),
+    "1/x": nn.Sequential(
+        nn.Linear(1, 1, bias=False),
+        MultInverse(),
+    ),
+    "ln": nn.Sequential(
+        nn.Linear(1, 1, bias=False),
+        NatLogarithm(),
+    ),
+    "softplus": nn.Sequential(
+        nn.Linear(1, 1, bias=False),
+        Softplus(),
+    ),
+    "softminus": nn.Sequential(
+        nn.Linear(1, 1, bias=False),
+        Softminus(),
+    ),
+}
+
+# this is the list of primitives actually used,
+# and it should be a set of names contained in the OPS dictionary
+PRIMITIVES = [
+    "none",
+    "add",
+    "subtract",
+    "linear",
+    "lin_sigmoid",
+    "mult",
+    "lin_relu",
+]
+
+# make sure that every primitive is in the OPS dictionary
+for name in PRIMITIVES:
+    assert name in OPS

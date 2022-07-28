@@ -49,9 +49,8 @@ class MixedOp(nn.Module):
         self._ops = nn.ModuleList()
         # loop through all the 8 primitive operations
         for primitive in PRIMITIVES:
-            # define operation
             # OPS returns an nn module for a given primitive (defines as a string)
-            op = OPS[primitive]()
+            op = OPS[primitive]
 
             # add the operation
             self._ops.append(op)
