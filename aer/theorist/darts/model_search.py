@@ -1,4 +1,5 @@
 import random
+import typing
 import warnings
 from enum import Enum
 from typing import Callable
@@ -56,7 +57,7 @@ class MixedOp(nn.Module):
             # add the operation
             self._ops.append(op)
 
-    def forward(self, x, weights):
+    def forward(self, x: torch.Tensor, weights: torch.Tensor):
         """
         Computes a mixture operation as a weighted sum of all primitive operations.
         Arguments:
@@ -89,7 +90,7 @@ class Cell(nn.Module):
         _ops: list of mixture operations (amounts to the list of edges in the cell)
     """
 
-    def __init__(self, steps, n_input_states):
+    def __init__(self, steps: int = 2, n_input_states: int = 1):
         """
         Initializes a cell based on the number of hidden nodes (steps)
         and the number of input nodes (n_input_states).
@@ -125,7 +126,7 @@ class Cell(nn.Module):
                 # appends cell with mixed operation
                 self._ops.append(op)
 
-    def forward(self, input_states, weights):
+    def forward(self, input_states: typing.List, weights: torch.Tensor):
         """
         Computes the output of a cell given a list of input states
         (variables represented in input nodes) and a weight matrix specifying the weights of each
@@ -213,15 +214,18 @@ class Network(nn.Module):
             darts_type: variant of DARTS (regular or fair) that is applied for training
         """
         super(Network, self).__init__()
-        self.DARTS_type = darts_type
+
         # set parameters
         self._num_classes = num_classes  # number of output classes
-        self._criterion = criterion  # optimization criterion (e.g. softmax)
-        self._steps = steps  # the number of intermediate nodes (4)
+        self._criterion = criterion  # optimization criterion (e.g., softmax)
+        self._steps = steps  # the number of intermediate nodes (e.g., 2)
         self._n_input_states = n_input_states  # number of input nodes
+        self.DARTS_type = darts_type  # darts variant
         self._multiplier = (
             1  # the number of internal nodes that get concatenated to the output
         )
+
+        # set parameters
         self._dim_output = self._steps
         self._architecture_fixed = architecture_fixed
         self._classifier_weight_decay = classifier_weight_decay
@@ -245,10 +249,18 @@ class Network(nn.Module):
         self._initialize_alphas()
 
     # function for copying the network
-    def new(self):
+    def new(self) -> nn.Module:
         model_new = Network(
-            self._C, self._num_classes, self._criterion, steps=self._steps
+            # self._C, self._num_classes, self._criterion, steps=self._steps
+            num_classes=self._num_classes,
+            criterion=self._criterion,
+            steps=self._steps,
+            n_input_states=self._n_input_states,
+            architecture_fixed=self._architecture_fixed,
+            classifier_weight_decay=self._classifier_weight_decay,
+            darts_type=self.DARTS_type,
         )
+
         for x, y in zip(model_new.arch_parameters(), self.arch_parameters()):
             x.data.copy_(y.data)
         return model_new
@@ -288,7 +300,7 @@ class Network(nn.Module):
 
         return logits
 
-    def _loss(self, input, target):
+    def _loss(self, input: torch.Tensor, target: torch.Tensor) -> torch.Tensor:
         """
         Computes the loss of the network for the specified criterion.
 
@@ -336,7 +348,7 @@ class Network(nn.Module):
         self._arch_parameters = [self.alphas_normal]
 
     # provide back the architecture as a parameter
-    def arch_parameters(self):
+    def arch_parameters(self) -> typing.List:
         """
         Returns architecture weights.
 
@@ -361,7 +373,7 @@ class Network(nn.Module):
 
     def sample_alphas_normal(
         self, sample_amp: float = 1, fair_darts_weight_threshold: float = 0
-    ):
+    ) -> torch.Tensor:
         """
         Samples an architecture from the mixed operations from a probability distribution that is
         defined by the (softmaxed) architecture weights.
@@ -415,7 +427,7 @@ class Network(nn.Module):
 
         return alphas_normal_sample
 
-    def max_alphas_normal(self):
+    def max_alphas_normal(self) -> torch.Tensor:
         """
         Samples an architecture from the mixed operations by selecting, for each edge,
         the operation with the largest architecture weight.
@@ -434,7 +446,7 @@ class Network(nn.Module):
         return alphas_normal_sample
 
     # returns the genotype of the model
-    def genotype(self, sample: bool = False):
+    def genotype(self, sample: bool = False) -> Genotype:
         """
         Computes a genotype of the model which specifies the current computation graph based on
         the largest architecture weight for each edge, or based on a sample.
@@ -511,7 +523,7 @@ class Network(nn.Module):
         )
         return genotype
 
-    def countParameters(self, print_parameters: bool = False):
+    def countParameters(self, print_parameters: bool = False) -> typing.Tuple:
         """
         Counts and returns the parameters (coefficients) of the architecture defined by the
         highest architecture weights.
