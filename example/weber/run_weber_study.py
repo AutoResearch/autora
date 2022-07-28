@@ -1,5 +1,5 @@
 # %%
-# Import modules
+# Imports
 
 from tkinter import Tk
 
