@@ -1,19 +1,20 @@
 import sys
+import typing
 
 from graphviz import Digraph
 
-from aer.theorist.darts.operations import get_operation_label
+from aer.theorist.darts.operations import Genotype, get_operation_label
 
 
 def plot(
-    genotype,
-    filename,
-    fileFormat="pdf",
-    viewFile=None,
-    full_label=False,
-    param_list=(),
-    input_labels=(),
-    out_dim=None,
+    genotype: Genotype,
+    filename: str,
+    fileFormat: str = "pdf",
+    viewFile: bool = None,
+    full_label: bool = False,
+    param_list: typing.Tuple = (),
+    input_labels: typing.Tuple = (),
+    out_dim: int = None,
     out_fnc=None,
 ):
     """
