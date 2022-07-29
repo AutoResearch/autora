@@ -986,7 +986,7 @@ class Tree:
             self.prune_root(update_gof=False, verbose=verbose)
             # check/update canonical representative
             rep_res = self.update_representative(verbose=verbose)
-            if rep_res is -1:
+            if rep_res == -1:
                 # this formula is forbidden
                 self.replace_root(rr=oldrr, update_gof=False, verbose=verbose)
                 self.bic, self.sse, self.E = old_bic, deepcopy(old_sse), old_energy
@@ -1045,7 +1045,7 @@ class Tree:
                 return np.inf, np.inf, np.inf, deepcopy(self.par_values)
             # check/update canonical representative
             rep_res = self.update_representative(verbose=verbose)
-            if rep_res is -1:
+            if rep_res == -1:
                 # this formula is forbidden
                 self.prune_root(update_gof=False, verbose=verbose)
                 self.bic, self.sse, self.E = old_bic, deepcopy(old_sse), old_energy
