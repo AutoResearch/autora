@@ -1,7 +1,7 @@
 import random
 import warnings
 from enum import Enum
-from typing import Any, Callable, List, Tuple
+from typing import Callable, List, Tuple
 
 import numpy as np
 import torch
@@ -10,7 +10,13 @@ import torch.nn.functional as F
 from torch.autograd import Variable
 
 from aer.theorist.darts.fan_out import Fan_Out
-from aer.theorist.darts.operations import OPS, PRIMITIVES, Genotype, get_operation_label
+from aer.theorist.darts.operations import (
+    OPS,
+    PRIMITIVES,
+    Genotype,
+    get_operation_label,
+    isiterable,
+)
 
 
 class DARTS_Type(Enum):
@@ -567,9 +573,7 @@ class Network(nn.Module):
             maxIdx = np.where(values == max(values))
 
             tmp_param_list = list()
-            if Network.isiterable(
-                op._ops[np.asscalar(maxIdx[0])]
-            ):  # Zero is not iterable
+            if isiterable(op._ops[np.asscalar(maxIdx[0])]):  # Zero is not iterable
 
                 for subop in op._ops[np.asscalar(maxIdx[0])]:
 
@@ -618,20 +622,3 @@ class Network(nn.Module):
                 )
 
         return (n_params_total, n_params_base, param_list)
-
-    @staticmethod
-    def isiterable(p_object: Any) -> bool:
-        """
-        A helper function that determines whether an object is iterable.
-
-        Arguments:
-            p_object: an object that is evaluated to be iterable or not
-
-        Returns:
-            is_iterable: true of the object is iterable
-        """
-        try:
-            iter(p_object)
-        except TypeError:
-            return False
-        return True

@@ -4,6 +4,7 @@ import torch.nn.functional as F
 from torch.autograd import Variable
 
 from aer.theorist.darts.model_search import DARTS_Type, Network
+from aer.theorist.darts.operations import isiterable
 
 
 def _concat(xs) -> torch.Tensor:
@@ -70,7 +71,7 @@ class Architect(object):
         """
         n_params = list()
         for operation in self.model.cells._ops[0]._ops:
-            if Network.isiterable(operation):
+            if isiterable(operation):
                 n_params_total = (
                     1  # any non-zero operation is counted as an additional parameter
                 )
