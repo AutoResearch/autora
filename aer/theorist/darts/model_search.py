@@ -189,7 +189,7 @@ class Network(nn.Module):
         _architecture_fixed: specifies whether the architecture weights shall remain fixed
             (not trained)
         _classifier_weight_decay: a weight decay applied to the classifier
-        _stem: an operation for splitting the input vector into _n_input_states input nodes
+
     """
 
     def __init__(
