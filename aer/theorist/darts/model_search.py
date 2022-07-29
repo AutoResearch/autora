@@ -1,8 +1,7 @@
 import random
-import typing
 import warnings
 from enum import Enum
-from typing import Callable
+from typing import Any, Callable, List, Tuple
 
 import numpy as np
 import torch
@@ -57,7 +56,7 @@ class MixedOp(nn.Module):
             # add the operation
             self._ops.append(op)
 
-    def forward(self, x: torch.Tensor, weights: torch.Tensor):
+    def forward(self, x: torch.Tensor, weights: torch.Tensor) -> float:
         """
         Computes a mixture operation as a weighted sum of all primitive operations.
 
@@ -128,7 +127,7 @@ class Cell(nn.Module):
                 # appends cell with mixed operation
                 self._ops.append(op)
 
-    def forward(self, input_states: typing.List, weights: torch.Tensor):
+    def forward(self, input_states: List, weights: torch.Tensor):
         """
         Computes the output of a cell given a list of input states
         (variables represented in input nodes) and a weight matrix specifying the weights of each
@@ -352,7 +351,7 @@ class Network(nn.Module):
         self._arch_parameters = [self.alphas_normal]
 
     # provide back the architecture as a parameter
-    def arch_parameters(self) -> typing.List:
+    def arch_parameters(self) -> List:
         """
         Returns architecture weights.
 
@@ -527,7 +526,7 @@ class Network(nn.Module):
         )
         return genotype
 
-    def countParameters(self, print_parameters: bool = False) -> typing.Tuple:
+    def countParameters(self, print_parameters: bool = False) -> Tuple[int, int, list]:
         """
         Counts and returns the parameters (coefficients) of the architecture defined by the
         highest architecture weights.
@@ -620,7 +619,8 @@ class Network(nn.Module):
 
         return (n_params_total, n_params_base, param_list)
 
-    def isiterable(p_object):
+    @staticmethod
+    def isiterable(p_object: Any) -> bool:
         """
         A helper function that determines whether an object is iterable.
 
