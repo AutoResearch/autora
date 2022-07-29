@@ -15,14 +15,12 @@ import aer.config as aer_config
 import aer.theorist.darts.darts_config as darts_cfg
 import aer.theorist.darts.utils as utils
 import aer.theorist.darts.visualize as viz
-from aer.experimentalist.experiment_environment.variable import (
-    outputTypes as output_types,
-)
 from aer.theorist.darts.architect import Architect
 from aer.theorist.darts.model_search import DARTS_Type, Network
 from aer.theorist.darts.operations import PRIMITIVES
 from aer.theorist.theorist import Theorist
 from aer.utils import Plot_Types
+from aer.variable import ValueType as output_types
 
 
 class Theorist_DARTS(Theorist, ABC):
@@ -1004,11 +1002,11 @@ class Theorist_DARTS(Theorist, ABC):
                 .numpy()
             )
             if IV2 is None:  # prepare line plot
-                x_prediction, y_prediction = object_of_study.average_DV_for_IVs(
+                x_prediction, y_prediction = object_of_study.average_dv_for_ivs(
                     DV, IVs, counterbalanced_input.detach().numpy(), y_prediction
                 )
             else:
-                x_prediction, y_prediction = object_of_study.average_DV_for_IVs(
+                x_prediction, y_prediction = object_of_study.average_dv_for_ivs(
                     DV, IVs, counterbalanced_input.detach().numpy(), y_prediction
                 )
 
@@ -1016,24 +1014,24 @@ class Theorist_DARTS(Theorist, ABC):
             (input, output) = object_of_study.get_dataset()
             if IV2 is None:  # prepare line plot
                 x_data = (
-                    object_of_study.get_IVs_from_input(input, IV1)
+                    object_of_study.get_ivs_from_input(input, IV1)
                     .detach()
                     .numpy()
                     .flatten()
                 )
             else:
                 x_data = (
-                    object_of_study.get_IVs_from_input(input, IV1)
+                    object_of_study.get_ivs_from_input(input, IV1)
                     .detach()
                     .numpy()
                     .flatten(),
-                    object_of_study.get_IVs_from_input(input, IV2)
+                    object_of_study.get_ivs_from_input(input, IV2)
                     .detach()
                     .numpy()
                     .flatten(),
                 )
             y_data = (
-                object_of_study.get_DV_from_output(output, DV)
+                object_of_study.get_dv_from_output(output, DV)
                 .detach()
                 .numpy()
                 .flatten()
@@ -1046,24 +1044,24 @@ class Theorist_DARTS(Theorist, ABC):
             )
             if IV2 is None:  # prepare line plot
                 x_data_highlighted = (
-                    object_of_study.get_IVs_from_input(input_highlighted, IV1)
+                    object_of_study.get_ivs_from_input(input_highlighted, IV1)
                     .detach()
                     .numpy()
                     .flatten()
                 )
             else:
                 x_data_highlighted = (
-                    object_of_study.get_IVs_from_input(input_highlighted, IV1)
+                    object_of_study.get_ivs_from_input(input_highlighted, IV1)
                     .detach()
                     .numpy()
                     .flatten(),
-                    object_of_study.get_IVs_from_input(input_highlighted, IV2)
+                    object_of_study.get_ivs_from_input(input_highlighted, IV2)
                     .detach()
                     .numpy()
                     .flatten(),
                 )
             y_data_highlighted = (
-                object_of_study.get_DV_from_output(output_highlighted, DV)
+                object_of_study.get_dv_from_output(output_highlighted, DV)
                 .detach()
                 .numpy()
                 .flatten()

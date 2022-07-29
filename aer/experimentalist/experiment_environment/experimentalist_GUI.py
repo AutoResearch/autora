@@ -9,7 +9,7 @@ from aer.experimentalist.experiment_environment.experiment_plot_GUI import (
 from aer.experimentalist.experiment_environment.experiment_table_GUI import (
     Experiment_Table_GUI,
 )
-from aer.experimentalist.experiment_environment.OLED_output import OLED_Output
+from aer.experimentalist.experiment_environment.oled_output import OLED_Output
 from aer.experimentalist.experiment_environment.utils import trial_to_list
 
 

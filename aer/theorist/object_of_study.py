@@ -1,13 +1,13 @@
 import copy
 import random
-from typing import Any, Dict, List
+from typing import Any, Dict, Sequence
 
 import numpy as np
 import torch
 from torch.utils.data import Dataset
 
 import aer.config as AER_cfg
-from aer.experimentalist.experiment_environment.variable import Variable
+from aer.variable import Variable
 
 
 class Object_Of_Study(Dataset):
@@ -17,9 +17,9 @@ class Object_Of_Study(Dataset):
     def __init__(
         self,
         name,
-        independent_variables: List[Variable],
-        dependent_variables: List[Variable],
-        covariates=list(),
+        independent_variables: Sequence[Variable],
+        dependent_variables: Sequence[Variable],
+        covariates: Sequence[Variable] = None,
         input_dimensions=None,
         output_dimensions=None,
         output_type=None,
@@ -27,23 +27,19 @@ class Object_Of_Study(Dataset):
 
         self.name = name
 
-        self.independent_variables = list()
-        self.dependent_variables = list()
-        self.covariates = list()
+        self.independent_variables: Sequence[Variable] = list()
+        self.dependent_variables: Sequence[Variable] = list()
+        self.covariates: Sequence[Variable] = list()
         self.data: Dict[Any, Any] = dict()
         self._normalize_input = False
         self._normalize_output = False
 
         # set independent and dependent variables
-        if len(independent_variables) == 0:
-            Exception("No independent variables specified.")
+        self.independent_variables.extend(independent_variables)
+        self.dependent_variables.extend(dependent_variables)
 
-        if len(dependent_variables) == 0:
-            Exception("No dependent variables specified.")
-
-        self.independent_variables = independent_variables
-        self.dependent_variables = dependent_variables
-        self.covariates = covariates
+        if covariates is not None:
+            self.covariates.extend(covariates)
 
         # set number of output dimensions
         if output_dimensions is None:
@@ -63,18 +59,18 @@ class Object_Of_Study(Dataset):
         self.output_type = self.dependent_variables[0].type
         for variable in dependent_variables:
             if variable.type != self.output_type:
-                Exception(
+                AttributeError(
                     "Dependent variable output types don't match. "
                     "Different output types are not supported yet."
                 )
 
         # set up data
-        for var in self.dependent_variables:
-            self.data[var.get_name()] = list()
-        for var in self.independent_variables:
-            self.data[var.get_name()] = list()
-        for var in self.covariates:
-            self.data[var.get_name()] = list()
+        for dv in self.dependent_variables:
+            self.data[dv.get_name()] = list()
+        for iv in self.independent_variables:
+            self.data[iv.get_name()] = list()
+        for cv in self.covariates:
+            self.data[cv.get_name()] = list()
         self.data[AER_cfg.experiment_label] = list()
 
     def __len__(self, experiment_id=None):
@@ -213,105 +209,105 @@ class Object_Of_Study(Dataset):
 
         return input
 
-    def average_DV_for_IVs(self, DV, IVs, input, output):
-        IV1 = IVs[0]
-        IV2 = IVs[1]
+    def average_dv_for_ivs(self, dv, ivs, input, output):
+        iv1 = ivs[0]
+        iv2 = ivs[1]
 
-        DV_idx = self.get_DV_idx(DV)
+        dv_idx = self.get_dv_idx(dv)
 
-        if IV2 is None:
-            IV1_idx = self.get_IV_idx(IV1)
-            unique_IV_values = np.unique(input[:, IV1_idx])
-            DV_values = np.empty(unique_IV_values.shape)
-            for row, element in enumerate(unique_IV_values):
+        if iv2 is None:
+            iv1_idx = self.get_iv_idx(iv1)
+            unique_iv_values = np.unique(input[:, iv1_idx])
+            dv_values = np.empty(unique_iv_values.shape)
+            for row, element in enumerate(unique_iv_values):
                 value_log = list()
                 for idx in range(output.shape[0]):
-                    if element == input[idx, IV1_idx]:
-                        value_log.append(output[idx, DV_idx])
+                    if element == input[idx, iv1_idx]:
+                        value_log.append(output[idx, dv_idx])
                 value_mean = np.mean(value_log)
-                DV_values[row] = value_mean
-            return unique_IV_values, DV_values
+                dv_values[row] = value_mean
+            return unique_iv_values, dv_values
         else:
-            IV1_idx = self.get_IV_idx(IV1)
-            IV2_idx = self.get_IV_idx(IV2)
-            unique_IV_rows = np.unique(input[:, [IV1_idx, IV2_idx]], axis=0)
-            DV_values = np.empty((unique_IV_rows.shape[0]))
-            IV1_values = np.empty((unique_IV_rows.shape[0]))
-            IV2_values = np.empty((unique_IV_rows.shape[0]))
-            for row, combination in enumerate(unique_IV_rows):
+            iv1_idx = self.get_iv_idx(iv1)
+            iv2_idx = self.get_iv_idx(iv2)
+            unique_iv_rows = np.unique(input[:, [iv1_idx, iv2_idx]], axis=0)
+            dv_values = np.empty((unique_iv_rows.shape[0]))
+            iv1_values = np.empty((unique_iv_rows.shape[0]))
+            iv2_values = np.empty((unique_iv_rows.shape[0]))
+            for row, combination in enumerate(unique_iv_rows):
                 value_log = list()
                 for idx in range(output.shape[0]):
-                    if (combination == input[idx, [IV1_idx, IV2_idx]]).all():
-                        value_log.append(output[idx, DV_idx])
+                    if (combination == input[idx, [iv1_idx, iv2_idx]]).all():
+                        value_log.append(output[idx, dv_idx])
                 value_mean = np.mean(value_log)
-                DV_values[row] = value_mean
-                IV1_values[row] = combination[0]
-                IV2_values[row] = combination[1]
-            unique_IV_values = (IV1_values, IV2_values)
-            return unique_IV_values, DV_values
+                dv_values[row] = value_mean
+                iv1_values[row] = combination[0]
+                iv2_values[row] = combination[1]
+            unique_iv_values = (iv1_values, iv2_values)
+            return unique_iv_values, dv_values
 
     def get_plot_list(self):
-        IV_list_1 = list()
-        IV_list_2 = list()
-        DV_list = list()
+        iv_list_1 = list()
+        iv_list_2 = list()
+        dv_list = list()
 
-        # combine each IV with each IV with each DV
+        # combine each IV with each DV
         independent_variables_1 = self.independent_variables + self.covariates
         independent_variables_2 = [None] + self.independent_variables + self.covariates
 
-        for IV1 in independent_variables_1:
-            for IV2 in independent_variables_2:
-                for DV in self.dependent_variables:
-                    if IV1 != IV2:
-                        IV_list_1.append(IV1)
-                        IV_list_2.append(IV2)
-                        DV_list.append(DV)
+        for iv1 in independent_variables_1:
+            for iv2 in independent_variables_2:
+                for dv in self.dependent_variables:
+                    if iv1 != iv2:
+                        iv_list_1.append(iv1)
+                        iv_list_2.append(iv2)
+                        dv_list.append(dv)
 
         # combine each IV
-        return (IV_list_1, IV_list_2, DV_list)
+        return (iv_list_1, iv_list_2, dv_list)
 
     def get_variable_data(self, variable):
         var_data = list()
         for idx in len(self):
             var_data.append(variable.get_value_from_dict(self.data, idx))
-        IV_data = torch.tensor(var_data).float()
-        return IV_data
+        iv_data = torch.tensor(var_data).float()
+        return iv_data
 
-    def get_IVs_from_input(self, input, IVs):
+    def get_ivs_from_input(self, input, ivs):
         columns = list()
-        if isinstance(IVs, list):
-            for IV in IVs:
-                if IV is not None:
-                    columns.append(self.get_IV_idx(IV))
+        if isinstance(ivs, list):
+            for iv in ivs:
+                if iv is not None:
+                    columns.append(self.get_iv_idx(iv))
         else:
-            columns.append(self.get_IV_idx(IVs))
+            columns.append(self.get_iv_idx(ivs))
         return input[:, columns]
 
-    def get_DV_from_output(self, output, DV):
-        column = self.get_DV_idx(DV)
+    def get_dv_from_output(self, output, dv):
+        column = self.get_dv_idx(dv)
         return output[:, column]
 
-    def get_IV_idx(self, IV):
+    def get_iv_idx(self, iv):
         column = None
         for idx, var in enumerate(self.independent_variables):
-            if var.get_name() == IV.get_name():
+            if var.get_name() == iv.get_name():
                 column = idx
                 break
         for idx, var in enumerate(self.covariates):
-            if var.get_name() == IV.get_name():
+            if var.get_name() == iv.get_name():
                 column = idx + len(self.independent_variables)
                 break
         return column
 
-    def get_DV_idx(self, DV):
+    def get_dv_idx(self, dv):
         column = None
         for idx, var in enumerate(self.dependent_variables):
-            if var.get_name() == DV.get_name():
+            if var.get_name() == dv.get_name():
                 column = idx
                 break
         return column
 
-    def get_IV_name(self, idx):
+    def get_iv_name(self, idx):
         if idx < len(self.independent_variables):
             name = self.independent_variables[idx].get_name()
         else:
@@ -322,7 +318,7 @@ class Object_Of_Study(Dataset):
                 raise Exception("Index exceeds number of independent variables.")
         return name
 
-    def get_DV_name(self, idx):
+    def get_dv_name(self, idx):
         if idx < len(self.dependent_variables):
             name = self.dependent_variables[idx].get_name()
             return name
@@ -340,30 +336,30 @@ class Object_Of_Study(Dataset):
         rescaled_sequence = dict()
         for key in sequence:
             values = sequence[key]
-            rescale = self.get_IV_rescale_from_name(key)
+            rescale = self.get_iv_rescale_from_name(key)
             values_rescaled = [val * rescale for val in values]
             rescaled_sequence[key] = values_rescaled
 
         return rescaled_sequence
 
-    def get_IV_rescale_from_name(self, IV_name):
+    def get_iv_rescale_from_name(self, iv_name):
 
         for var in self.independent_variables:
-            if var.get_name() == IV_name:
+            if var.get_name() == iv_name:
                 return var._rescale
 
         for var in self.covariates:
-            if var.get_name() == IV_name:
+            if var.get_name() == iv_name:
                 return var._rescale
 
-    def get_IV_limits_from_name(self, IV_name):
+    def get_iv_limits_from_name(self, iv_name):
 
         for var in self.independent_variables:
-            if var.get_name() == IV_name:
+            if var.get_name() == iv_name:
                 return self.get_variable_limits(var)
 
         for var in self.covariates:
-            if var.get_name() == IV_name:
+            if var.get_name() == iv_name:
                 return self.get_variable_limits(var)
 
         return None
@@ -374,9 +370,9 @@ class Object_Of_Study(Dataset):
         means = list()
         stds = list()
         for var in variables:
-            IV_data = self.data[var.get_name()][0]
-            m = np.mean(IV_data)
-            s = np.std(IV_data)
+            iv_data = self.data[var.get_name()][0]
+            m = np.mean(iv_data)
+            s = np.std(iv_data)
             means.append(m)
             stds.append(s)
 

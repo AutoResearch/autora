@@ -1,10 +1,10 @@
 from tkinter import Tk
 
-from aer.experimentalist.experiment_environment.variable import Variable as Var
 from aer.experimentalist.experimentalist_popper import Experimentalist_Popper
 from aer.gui import AER_GUI
 from aer.theorist.object_of_study import Object_Of_Study
 from aer.theorist.theorist_darts import Theorist_DARTS
+from aer.variable import Variable as Var
 
 # GENERAL PARAMETERS
 

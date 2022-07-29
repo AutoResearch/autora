@@ -4,13 +4,9 @@ import pandas
 
 import aer.experimentalist.experiment_environment.experiment_config as config
 import aer.experimentalist.experimentalist_config as cfg
-from aer.experimentalist.experiment_environment.DV_time import DV_Time
-from aer.experimentalist.experiment_environment.IV_time import IV_Time
-from aer.experimentalist.experiment_environment.IV_trial import IV_Trial
-from aer.experimentalist.experiment_environment.variable_labels import (
-    DV_labels,
-    IV_labels,
-)
+from aer.variable import IVTrial
+from aer.variable.label import dv_labels, iv_labels
+from aer.variable.time import DVTime, IVTime
 
 
 class Experiment:
@@ -86,7 +82,7 @@ class Experiment:
                 string = string.replace(cfg.exp_file_IV_label, "")
                 labels = string.split(",")
                 for idx, label in enumerate(labels):
-                    if (label in IV_labels) is False:
+                    if (label in iv_labels) is False:
                         raise Exception(
                             "Could not identify sequence variable: " + label
                         )
@@ -98,7 +94,7 @@ class Experiment:
                         units,
                         priority,
                         value_range,
-                    ) = IV_labels.get(label)
+                    ) = iv_labels.get(label)
                     # overwrite priority
                     priority = idx
                     if UID is None:
@@ -141,7 +137,7 @@ class Experiment:
                 for idx, label in enumerate(labels):
                     if label == "":
                         continue
-                    if (label in DV_labels) is False:
+                    if (label in dv_labels) is False:
                         raise Exception(
                             "Could not identify sequence variable: " + label
                         )
@@ -153,7 +149,7 @@ class Experiment:
                         units,
                         priority,
                         value_range,
-                    ) = DV_labels.get(label)
+                    ) = dv_labels.get(label)
                     # overwrite priority
                     priority = idx
                     if covariate:
@@ -244,15 +240,15 @@ class Experiment:
 
         # determine indices for independent variables trial and time
         for idx, independent_variable in enumerate(self.IVs):
-            if isinstance(independent_variable, IV_Trial):
+            if isinstance(independent_variable, IVTrial):
                 self._IV_trial_idx = idx
 
-            if isinstance(independent_variable, IV_Time):
+            if isinstance(independent_variable, IVTime):
                 self._IV_time_idx = idx
 
         # initialize dependent variable time
         for idx, dependent_variable in enumerate(self.DVs):
-            if isinstance(dependent_variable, DV_Time):
+            if isinstance(dependent_variable, DVTime):
                 self._DV_time_idx = idx
 
         # execute inter-trial interval
