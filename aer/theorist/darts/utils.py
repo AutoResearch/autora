@@ -2,17 +2,24 @@ import csv
 import glob
 import os
 import shutil
+import typing
 
 import numpy as np
 import torch
 import torch.nn as nn
 
 from aer.experimentalist.experiment_environment.variable import outputTypes
+from aer.theorist.darts.model_search import Network
 
 
 def create_output_file_name(
-    file_prefix, log_version=None, weight_decay=None, k=None, seed=None, theorist=None
-):
+    file_prefix: str,
+    log_version: int = None,
+    weight_decay: float = None,
+    k: int = None,
+    seed: int = None,
+    theorist: str = None,
+) -> str:
     """
     Creates a file name for the output file of a theorist study.
 
@@ -46,8 +53,11 @@ def create_output_file_name(
 
 
 def assign_slurm_instance(
-    slurm_id, arch_weight_decay_list=None, num_node_list=None, seed_list=None
-):
+    slurm_id: int,
+    arch_weight_decay_list: typing.List,
+    num_node_list: typing.List,
+    seed_list: typing.List,
+) -> typing.Tuple:
     """
     Determines the meta-search parameters based on the slum job id.
 
@@ -71,7 +81,7 @@ def assign_slurm_instance(
     )
 
 
-def get_loss_function(outputType):
+def get_loss_function(outputType: outputTypes):
     """
     Returns the loss function for the given output type of a dependent variable.
 
@@ -111,7 +121,7 @@ def get_output_format(outputType):
     return dataSets.get(outputType, nn.MSELoss)
 
 
-def get_output_str(outputType):
+def get_output_str(outputType) -> typing.Optional[str]:
     """
     Returns the output string for the given output type of a dependent variable.
 
@@ -131,7 +141,7 @@ def get_output_str(outputType):
     return dataSets.get(outputType, nn.MSELoss)
 
 
-def sigmid_mse(output, target):
+def sigmid_mse(output: torch.Tensor, target: torch.Tensor) -> torch.Tensor:
     """
     Returns the MSE loss for a sigmoid output.
 
@@ -145,7 +155,12 @@ def sigmid_mse(output, target):
     return loss
 
 
-def compute_BIC(output_type, model, input, target):
+def compute_BIC(
+    output_type: outputTypes,
+    model: torch.nn.Module,
+    input: torch.Tensor,
+    target: torch.Tensor,
+) -> float:
     """
     Returns the Bayesian information criterion for a DARTS model.
 
@@ -210,7 +225,9 @@ def compute_BIC(output_type, model, input, target):
     # old
 
 
-def compute_BIC_AIC(soft_targets, soft_prediction, model):
+def compute_BIC_AIC(
+    soft_targets: np.array, soft_prediction: np.array, model: Network
+) -> typing.Tuple:
     """
     Returns the Bayesian information criterion (BIC) as well as the
     Aikaike information criterion (AIC) for a DARTS model.
@@ -235,7 +252,7 @@ def compute_BIC_AIC(soft_targets, soft_prediction, model):
     return BIC, AIC
 
 
-def cross_entropy(pred, soft_targets):
+def cross_entropy(pred: torch.Tensor, soft_targets: torch.Tensor) -> torch.Tensor:
     """
     Returns the cross entropy loss for a soft target.
 
@@ -268,7 +285,7 @@ class AvgrageMeter(object):
         self.sum = 0
         self.cnt = 0
 
-    def update(self, val, n=1):
+    def update(self, val: float, n: int = 1):
         """
         Updates the average meter.
 
@@ -281,7 +298,9 @@ class AvgrageMeter(object):
         self.avg = self.sum / self.cnt
 
 
-def accuracy(output, target, topk=(1,)):
+def accuracy(
+    output: torch.Tensor, target: torch.Tensor, topk: typing.Tuple = (1,)
+) -> typing.List:
     """
     Computes the accuracy over the k top predictions for the specified values of k.
 
@@ -304,7 +323,7 @@ def accuracy(output, target, topk=(1,)):
     return res
 
 
-def count_parameters_in_MB(model):
+def count_parameters_in_MB(model: Network) -> int:
     """
     Returns the number of parameters for a model.
 
@@ -321,7 +340,7 @@ def count_parameters_in_MB(model):
     )
 
 
-def save(model, model_path, exp_folder=None):
+def save(model: torch.nn.Module, model_path: str, exp_folder: str = None):
     """
     Saves a model to a file.
 
@@ -337,7 +356,7 @@ def save(model, model_path, exp_folder=None):
         os.chdir("..")  # Edit SM 10/23/19: use local experiment directory
 
 
-def load(model, model_path):
+def load(model: torch.nn.Module, model_path: str):
     """
     Loads a model from a file.
     """
@@ -345,7 +364,10 @@ def load(model, model_path):
 
 
 def create_exp_dir(
-    path, scripts_to_save=None, parent_folder="exps", results_folder=None
+    path: str,
+    scripts_to_save: typing.List = None,
+    parent_folder: str = "exps",
+    results_folder: str = None,
 ):
     """
     Creates an experiment directory and saves all necessary scripts and files.
@@ -380,7 +402,9 @@ def create_exp_dir(
             shutil.copyfile(script, dst_file)
 
 
-def read_log_files(resultsPath, winning_architecture_only=False):
+def read_log_files(
+    results_path: str, winning_architecture_only: bool = False
+) -> typing.Tuple:
     """
     Reads the log files from an experiment directory and returns the results.
 
@@ -391,7 +415,7 @@ def read_log_files(resultsPath, winning_architecture_only=False):
 
     current_wd = os.getcwd()
 
-    os.chdir(resultsPath)
+    os.chdir(results_path)
     filelist = glob.glob("*.{}".format("csv"))
 
     model_name_list = list()
@@ -418,7 +442,12 @@ def read_log_files(resultsPath, winning_architecture_only=False):
     return (model_name_list, loss_list, BIC_list, AIC_list)
 
 
-def get_best_fitting_models(model_name_list, loss_list, BIC_list, topk):
+def get_best_fitting_models(
+    model_name_list: typing.List,
+    loss_list: typing.List,
+    BIC_list: typing.List,
+    topk: int,
+) -> typing.Tuple:
     """
     Returns the topk best fitting models.
 
