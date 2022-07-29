@@ -60,9 +60,11 @@ class MixedOp(nn.Module):
     def forward(self, x: torch.Tensor, weights: torch.Tensor):
         """
         Computes a mixture operation as a weighted sum of all primitive operations.
+
         Arguments:
             x: input to the mixture operations
             weights: weight vector containing the weights associated with each operation
+
         Returns:
             y: result of the weighted mixture operation
         """
@@ -135,7 +137,7 @@ class Cell(nn.Module):
         Arguments:
             input_states: list of input nodes
             weights: matrix specifying architecture weights, i.e. the weights associated
-            with each operation for each edge
+                with each operation for each edge
         """
         # initialize states (activities of each node in the cell)
         states = list()
@@ -186,7 +188,7 @@ class Network(nn.Module):
         _criterion: optimization criterion used to define the loss
         _steps: number of hidden nodes in the cell
         _architecture_fixed: specifies whether the architecture weights shall remain fixed
-        (not trained)
+            (not trained)
         _classifier_weight_decay: a weight decay applied to the classifier
         _stem: an operation for splitting the input vector into _n_input_states input nodes
     """
@@ -307,7 +309,9 @@ class Network(nn.Module):
         Arguments:
             input: input patterns
             target: target patterns
-        Returns: loss
+
+        Returns:
+            loss
         """
         logits = self(input)
         return self._criterion(logits, target)  # returns cross entropy by default
@@ -353,7 +357,7 @@ class Network(nn.Module):
         Returns architecture weights.
 
         Returns:
-            self._arch_parameters: architecture weights.
+            _arch_parameters: architecture weights.
         """
         return self._arch_parameters
 
@@ -383,7 +387,7 @@ class Network(nn.Module):
         Arguments:
             sample_amp: temperature that is applied before passing the weights through a softmax
             fair_darts_weight_threshold: used in fair DARTS. If an architecture weight is below
-            this value then it is set to zero.
+                this value then it is set to zero.
 
         Returns:
             alphas_normal_sample: sampled architecture weights.
@@ -454,9 +458,9 @@ class Network(nn.Module):
 
         Arguments:
             sample: if set to true, the architecture will be determined by sampling
-            from a probability distribution that is determined by the
-            softmaxed architecture weights. If set to false (default), the architecture will be
-            determined based on the largest architecture weight per edge.
+                from a probability distribution that is determined by the
+                softmaxed architecture weights. If set to false (default), the architecture will be
+                determined based on the largest architecture weight per edge.
 
         Returns:
             genotype: genotype describing the current (sampled) architecture
@@ -535,7 +539,7 @@ class Network(nn.Module):
             n_params_total: total number of parameters
             n_params_base: number of parameters determined by the classifier
             param_list: list of parameters specifying the corresponding edge (operation)
-            and value
+                and value
         """
 
         # counts only parameters of operations with the highest architecture weight
