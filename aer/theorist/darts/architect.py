@@ -35,11 +35,11 @@ class Architect(object):
             arch_learning_rate: learning rate for the architecture weights
             momentum: momentum used in the Adam optimizer for architecture weights
             arch_weight_decay: general weight decay for the architecture weights
-            arch_weight_decay_df (weight decay applied to architecture weights in proportion
-            to the number of parameters of an operation)
-            arch_weight_decay_base (a constant weight decay applied to architecture weights)
-            fair_darts_loss_weight (a regularizer that pushes architecture weights more toward
-            zero or one in the fair DARTS variant)
+            arch_weight_decay_df: (weight decay applied to architecture weights in proportion
+                to the number of parameters of an operation)
+            arch_weight_decay_base: (a constant weight decay applied to architecture weights)
+            fair_darts_loss_weight: (a regularizer that pushes architecture weights more toward
+                zero or one in the fair DARTS variant)
         """
         # set parameters for architecture learning
         self.network_momentum = momentum
@@ -150,7 +150,7 @@ class Architect(object):
             target_valid: target patterns for validation set
             network_optimizer: optimizer used to updating the architecture weights
             unrolled: whether to use the unrolled architecture or not (i.e., whether to use
-            the approximate architecture gradient or not)
+                the approximate architecture gradient or not)
             input_train: input patterns for training set
             target_train: target patterns for training set
             eta: learning rate for the architecture weights
