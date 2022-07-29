@@ -83,7 +83,7 @@ def read_target_values(source, quadratic=False):
         lines = inf1.readlines()
         nform = sum([int(line.strip().split()[1]) for line in lines])
     # Fraction of each of the operations
-    infn2 = "../data/%s.wiki.parsed__operation_type.dat" % source
+    infn2 = "./data/%s.wiki.parsed__operation_type.dat" % source
     with open(infn2) as inf2:
         lines = inf2.readlines()
         target = dict(
@@ -97,7 +97,7 @@ def read_target_values(source, quadratic=False):
         )
     # Fraction of each of the operations squared
     if quadratic:
-        infn3 = "../data/%s.wiki.parsed__operation_type_sq.dat" % (source)
+        infn3 = "./data/%s.wiki.parsed__operation_type_sq.dat" % (source)
         with open(infn3) as inf3:
             lines = inf3.readlines()
             target2 = dict(
