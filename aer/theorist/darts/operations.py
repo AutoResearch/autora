@@ -7,7 +7,7 @@ import torch.nn as nn
 Genotype = namedtuple("Genotype", "normal normal_concat")
 
 
-def isiterable(p_object):
+def isiterable(p_object: typing.Any) -> bool:
     """
     Checks if an object is iterable.
 
