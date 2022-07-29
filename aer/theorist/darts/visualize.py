@@ -15,7 +15,7 @@ def plot(
     param_list: typing.Tuple = (),
     input_labels: typing.Tuple = (),
     out_dim: int = None,
-    out_fnc=None,
+    out_fnc: str = None,
 ):
     """
     Generates a graphviz plot for a DARTS model based on the genotype of the model.
@@ -26,7 +26,7 @@ def plot(
         fileFormat: the format of the output file
         viewFile: if True, the plot will be displayed in a window
         full_label: if True, the labels of the nodes will be the full name of the operation
-        (including the coefficients)
+            (including the coefficients)
         param_list: a list of parameters to be included in the labels of the nodes
         input_labels: a list of labels to be included in the input nodes
         out_dim: the number of output nodes of the model
