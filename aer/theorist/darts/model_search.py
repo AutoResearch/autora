@@ -267,16 +267,16 @@ class Network(nn.Module):
         return model_new
 
     # computes forward pass for full network
-    def forward(self, input: torch.Tensor):
+    def forward(self, x: torch.Tensor):
         """
         Computes output of the network.
 
         Arguments:
-            input: input to the network
+            x: input to the network
         """
 
         # compute stem first
-        input_states = self.stem(input)
+        input_states = self.stem(x)
 
         # get architecture weights
         if self._architecture_fixed:
