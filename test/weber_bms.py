@@ -34,18 +34,12 @@ XLABS = [
 nv = len(XLABS)
 nc = 1
 epochs = 300
-# raw_data = pd.read_csv('Validation/LogYe/data/seymour.csv')
-# x, y = raw_data[XLABS], np.log(raw_data['rec'])
 
-raw_data = pd.read_csv("./experiment_0_data.csv")
-# x, y = raw_data[XLABS], np.log(raw_data['difference_detected'])
+raw_data = pd.read_csv("test/experiment_0_data.csv")
 x, y = raw_data[XLABS], raw_data["difference_detected"]
 
 # initialize model
 # hyper parameters
-# prior_par = read_prior_par(
-#    "./Prior/final_prior_param_sq.named_equations.nv2.np2.2016-09-09 18:49:43.038278.dat"
-# )
 
 prior_par = {
     "Nopi_/": 5.912205942815285,
@@ -68,8 +62,6 @@ prior_par = {
     "Nopi_fac": 10.0,
     "Nopi2_*": 1.0,
 }
-# Prior.fit_prior()
-
 
 # temperatures
 Ts = [1.0] + [1.04**k for k in range(1, 20)]
