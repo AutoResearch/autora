@@ -76,6 +76,7 @@ class BMS:
         self,
         prior_par: dict = priors,
         ts: List[float] = temperatures,
+        epochs: int = 3000,
     ) -> None:
         """
         Arguments:
@@ -85,6 +86,7 @@ class BMS:
         """
         self.ts = ts
         self.prior_par = prior_par
+        self.epochs = epochs
         self.pms: Parallel = Parallel(Ts=[])
         self.model_: Tree = Tree()
 
