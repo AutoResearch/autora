@@ -98,7 +98,7 @@ class BMS:
             self (BMS): the fitted estimator
         """
         self.pms = _get_machine_scientist(self, X, y)
-        model, model_len, desc_len = utils.run(self.pms, epochs)
+        model, model_len, desc_len = utils.run(self.pms, self.epochs)
         self.model_ = model
         return self
 
