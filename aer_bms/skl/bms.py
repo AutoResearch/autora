@@ -1,8 +1,10 @@
 from typing import List
 
 import numpy as np
+import pandas as pd
 
 from aer_bms import Parallel, utils
+from aer_bms.mcmc import Tree
 
 priors = {
     "Nopi_/": 5.912205942815285,
@@ -30,8 +32,8 @@ priors = {
 def _get_machine_scientist(self, x, y):
     pms = Parallel(
         Ts=self.ts,
-        variables=x.columns,
-        parameters=["a%d" % i for i in range(len(x.columns))],
+        variables=pd.DataFrame(range(len(x))),
+        parameters=["a%d" % i for i in range(len(x))],
         x=x,
         y=y,
         prior_par=self.prior_par,
@@ -54,14 +56,14 @@ class BMS:
 
     Examples:
 
-        from aer_bms import Parallel, utils
-        import numpy as np
-        num_samples = 1000
-        X = np.linspace(start=0, stop=1, num=num_samples).reshape(-1, 1)
-        y = 15. * np.ones(num_samples)
-        estimator = BMS()
-        estimator = estimator.fit(X, y)
-        estimator.predict([[15.]])
+        >>> from aer_bms import Parallel, utils
+        >>> import numpy as np
+        >>> num_samples = 1000
+        >>> X = np.linspace(start=0, stop=1, num=num_samples).reshape(-1, 1)
+        >>> y = 15. * np.ones(num_samples)
+        >>> estimator = BMS()
+        >>> estimator = estimator.fit(X, y)
+        >>> estimator.predict([[15.]])
         "place holder --- PLEASE FIX ---"
 
 
@@ -81,10 +83,10 @@ class BMS:
             wikipedia data scraping
             ts: contains a list of the temperatures that the parallel ms works at
         """
-        self.ts: List[float] = ts
-        self.prior_par: dict = prior_par
+        self.ts = ts
+        self.prior_par = prior_par
         self.pms: Parallel = Parallel(Ts=[])
-        self.model_: str = ""
+        self.model_: Tree = Tree()
 
     def fit(self, X: np.ndarray, y: np.ndarray, epochs=3000):
         """
@@ -113,4 +115,11 @@ class BMS:
         Returns:
             y: predicted dependent variable values
         """
-        return self.model.predict(X)
+        print(type(X))
+        if type(X) == np.ndarray:
+            x = pd.DataFrame(X)
+        elif type(X) == pd.DataFrame:
+            x = X
+        else:
+            raise TypeError("x must be either a dict or a pandas.DataFrame")
+        return self.model_.predict(x)
