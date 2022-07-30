@@ -6,6 +6,8 @@ import pandas as pd
 from aer_bms import Parallel, utils
 from aer_bms.mcmc import Tree
 
+# from sklearn.utils.validation import check_array, check_X_y
+
 priors = {
     "Nopi_/": 5.912205942815285,
     "Nopi_cosh": 8.12720511103694,
