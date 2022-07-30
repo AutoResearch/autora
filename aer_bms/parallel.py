@@ -4,10 +4,9 @@ from random import randint, random
 
 import numpy as np
 import pandas as pd
-
-# from mcmc import *
-from mcmc import OPS, Tree
 from numpy import exp
+
+from aer_bms.mcmc import OPS, Tree
 
 
 class Parallel:
@@ -79,7 +78,6 @@ class Parallel:
         t2 = self.trees[self.Ts[nT2]]
         # The temperatures and energies
         BT1, BT2 = t1.BT, t2.BT
-        # EB1, EB2, EP1, EP2 = t1.EB, t2.EB, t1.EP, t2.EP
         EB1, EB2 = t1.EB, t2.EB
         # The energy change
         DeltaE = np.float(EB1) * (1.0 / BT2 - 1.0 / BT1) + np.float(EB2) * (
@@ -208,84 +206,3 @@ class Parallel:
             sys.stdout.write("\n")
             sys.stdout.flush()
         return pd.DataFrame.from_dict(ypred)
-
-
-# -----------------------------------------------------------------------------
-# -----------------------------------------------------------------------------
-# Test main
-# -----------------------------------------------------------------------------
-# -----------------------------------------------------------------------------
-if __name__ == "__main__":
-    sys.path.append("Validation/")
-    import iodata
-
-    sys.path.append("Prior")
-    from pprint import pprint
-
-    from fit_prior import read_prior_par
-
-    # Temperatures
-    Ts = [
-        1,
-        1.20,
-        1.44,
-        1.73,
-        2.07,
-        2.49,
-        2.99,
-        3.58,
-        4.30,
-        5.16,
-    ]
-
-    # Read the data
-    prior_par = read_prior_par(
-        "Prior/prior_param_sq.named_equations.nv7.np7.2016-06-06 16:43:26.287530.dat"
-    )
-    VARS = iodata.XVARS["Trepat"]
-    Y = iodata.YLABS["Trepat"]
-    inFileName = "Validation/Trepat/data/%s" % (iodata.FNAMES["Trepat"])
-    data, x, y = iodata.read_data(
-        "Trepat",
-        ylabel=Y,
-        xlabels=VARS,
-        in_fname=inFileName,
-    )
-    # print x, y
-
-    # Initialize the parallel object
-    p = Parallel(
-        Ts,
-        variables=VARS,
-        parameters=["a%d" % i for i in range(7)],
-        x=x,
-        y=y,
-        prior_par=prior_par,
-    )
-
-    NREP = 1000000
-    for rep in range(NREP):
-        print("=" * 77)
-        print(rep, "/", NREP)
-        p.mcmc_step()
-        print(">> Swaping:", p.tree_swap())
-        pprint(p.trees)
-        print("." * 77)
-        for T in Ts:
-            energy_ref = p.trees[T].get_energy(reset=False)[0]
-            print(T, "\t", p.trees[T].E, energy_ref, p.trees[T].bic)
-            if abs(p.trees[T].E - energy_ref) > 1.0e-6:
-                print(
-                    p.trees[T].canonical(),
-                    p.trees[T].representative[p.trees[T].canonical()],
-                )
-                print("Error")
-                # raise
-            if p.trees[T].representative != p.trees["1"].representative:
-                pprint(p.trees[T].representative)
-                pprint(p.trees["1"].representative)
-                print("Error")
-                # raise
-            if p.trees[T].fit_par != p.trees["1"].fit_par:
-                print("Error")
-            # raise
