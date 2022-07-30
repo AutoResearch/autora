@@ -101,8 +101,15 @@ class BMS:
         Returns:
             self (BMS): the fitted estimator
         """
-        self.pms = _get_machine_scientist(self, X, y)
-        model, model_len, desc_len = utils.run(self.pms, self.epochs)
+        self.pms = Parallel(
+            Ts=self.ts,
+            variables=pd.DataFrame(range(len(X))),
+            parameters=["a%d" % i for i in range(len(X))],
+            x=X,
+            y=y,
+            prior_par=self.prior_par,
+        )
+        model, model_len, desc_len = utils.run(self.pms, epochs)
         self.model_ = model
         return self
 
