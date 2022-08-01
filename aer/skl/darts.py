@@ -449,15 +449,15 @@ class DARTSRegressor(BaseEstimator, RegressorMixin):
         self,
         input_labels: Optional[Sequence[str]] = None,
     ):
-        assert self._network is not None
+        assert self.network_ is not None
         genotype = (
-            self._network.genotype().normal
+            self.network_.genotype().normal
         )  # contains information about the architecture of the model
         (
             _,
             _,
             param_list,
-        ) = self._network.countParameters()
+        ) = self.network_.countParameters()
 
         assert self.X_ is not None
 
