@@ -1,6 +1,7 @@
 import random
 import warnings
 from enum import Enum
+from typing import Callable, List, Tuple
 
 import numpy as np
 import torch
@@ -9,8 +10,13 @@ import torch.nn.functional as F
 from torch.autograd import Variable
 
 from aer.theorist.darts.fan_out import Fan_Out
-from aer.theorist.darts.genotypes import PRIMITIVES, Genotype
-from aer.theorist.darts.operations import OPS, get_operation_label
+from aer.theorist.darts.operations import (
+    OPS,
+    PRIMITIVES,
+    Genotype,
+    get_operation_label,
+    isiterable,
+)
 
 
 class DARTS_Type(Enum):
@@ -50,19 +56,20 @@ class MixedOp(nn.Module):
         self._ops = nn.ModuleList()
         # loop through all the 8 primitive operations
         for primitive in PRIMITIVES:
-            # define operation
             # OPS returns an nn module for a given primitive (defines as a string)
-            op = OPS[primitive](False)
+            op = OPS[primitive]
 
             # add the operation
             self._ops.append(op)
 
-    def forward(self, x, weights):
+    def forward(self, x: torch.Tensor, weights: torch.Tensor) -> float:
         """
         Computes a mixture operation as a weighted sum of all primitive operations.
+
         Arguments:
             x: input to the mixture operations
             weights: weight vector containing the weights associated with each operation
+
         Returns:
             y: result of the weighted mixture operation
         """
@@ -90,7 +97,7 @@ class Cell(nn.Module):
         _ops: list of mixture operations (amounts to the list of edges in the cell)
     """
 
-    def __init__(self, steps, n_input_states):
+    def __init__(self, steps: int = 2, n_input_states: int = 1):
         """
         Initializes a cell based on the number of hidden nodes (steps)
         and the number of input nodes (n_input_states).
@@ -126,7 +133,7 @@ class Cell(nn.Module):
                 # appends cell with mixed operation
                 self._ops.append(op)
 
-    def forward(self, input_states, weights):
+    def forward(self, input_states: List, weights: torch.Tensor):
         """
         Computes the output of a cell given a list of input states
         (variables represented in input nodes) and a weight matrix specifying the weights of each
@@ -135,7 +142,7 @@ class Cell(nn.Module):
         Arguments:
             input_states: list of input nodes
             weights: matrix specifying architecture weights, i.e. the weights associated
-            with each operation for each edge
+                with each operation for each edge
         """
         # initialize states (activities of each node in the cell)
         states = list()
@@ -186,20 +193,20 @@ class Network(nn.Module):
         _criterion: optimization criterion used to define the loss
         _steps: number of hidden nodes in the cell
         _architecture_fixed: specifies whether the architecture weights shall remain fixed
-        (not trained)
+            (not trained)
         _classifier_weight_decay: a weight decay applied to the classifier
-        _stem: an operation for splitting the input vector into _n_input_states input nodes
+
     """
 
     def __init__(
         self,
-        num_classes,
-        criterion,
-        steps=2,
-        n_input_states=2,
-        architecture_fixed=False,
-        classifier_weight_decay=0,
-        darts_type=DARTS_Type.ORIGINAL,
+        num_classes: int,
+        criterion: Callable,
+        steps: int = 2,
+        n_input_states: int = 2,
+        architecture_fixed: bool = False,
+        classifier_weight_decay: float = 0,
+        darts_type: DARTS_Type = DARTS_Type.ORIGINAL,
     ):
         """
         Initializes the network.
@@ -214,15 +221,18 @@ class Network(nn.Module):
             darts_type: variant of DARTS (regular or fair) that is applied for training
         """
         super(Network, self).__init__()
-        self.DARTS_type = darts_type
+
         # set parameters
         self._num_classes = num_classes  # number of output classes
-        self._criterion = criterion  # optimization criterion (e.g. softmax)
-        self._steps = steps  # the number of intermediate nodes (4)
+        self._criterion = criterion  # optimization criterion (e.g., softmax)
+        self._steps = steps  # the number of intermediate nodes (e.g., 2)
         self._n_input_states = n_input_states  # number of input nodes
+        self.DARTS_type = darts_type  # darts variant
         self._multiplier = (
             1  # the number of internal nodes that get concatenated to the output
         )
+
+        # set parameters
         self._dim_output = self._steps
         self._architecture_fixed = architecture_fixed
         self._classifier_weight_decay = classifier_weight_decay
@@ -246,25 +256,33 @@ class Network(nn.Module):
         self._initialize_alphas()
 
     # function for copying the network
-    def new(self):
+    def new(self) -> nn.Module:
         model_new = Network(
-            self._C, self._num_classes, self._criterion, steps=self._steps
+            # self._C, self._num_classes, self._criterion, steps=self._steps
+            num_classes=self._num_classes,
+            criterion=self._criterion,
+            steps=self._steps,
+            n_input_states=self._n_input_states,
+            architecture_fixed=self._architecture_fixed,
+            classifier_weight_decay=self._classifier_weight_decay,
+            darts_type=self.DARTS_type,
         )
+
         for x, y in zip(model_new.arch_parameters(), self.arch_parameters()):
             x.data.copy_(y.data)
         return model_new
 
     # computes forward pass for full network
-    def forward(self, input):
+    def forward(self, x: torch.Tensor):
         """
         Computes output of the network.
 
         Arguments:
-            input: input to the network
+            x: input to the network
         """
 
         # compute stem first
-        input_states = self.stem(input)
+        input_states = self.stem(x)
 
         # get architecture weights
         if self._architecture_fixed:
@@ -289,20 +307,22 @@ class Network(nn.Module):
 
         return logits
 
-    def _loss(self, input, target):
+    def _loss(self, input: torch.Tensor, target: torch.Tensor) -> torch.Tensor:
         """
         Computes the loss of the network for the specified criterion.
 
         Arguments:
             input: input patterns
             target: target patterns
-        Returns: loss
+
+        Returns:
+            loss
         """
         logits = self(input)
         return self._criterion(logits, target)  # returns cross entropy by default
 
     # regularization
-    def apply_weight_decay_to_classifier(self, lr):
+    def apply_weight_decay_to_classifier(self, lr: float):
         """
         Applies a weight decay to the weights projecting from the cell to the final output layer.
 
@@ -337,17 +357,17 @@ class Network(nn.Module):
         self._arch_parameters = [self.alphas_normal]
 
     # provide back the architecture as a parameter
-    def arch_parameters(self):
+    def arch_parameters(self) -> List:
         """
         Returns architecture weights.
 
         Returns:
-            self._arch_parameters: architecture weights.
+            _arch_parameters: architecture weights.
         """
         return self._arch_parameters
 
     # fixes architecture
-    def fix_architecture(self, switch: bool, new_weights=None):
+    def fix_architecture(self, switch: bool, new_weights: torch.Tensor = None):
         """
         Freezes or unfreezes the architecture weights.
 
@@ -360,7 +380,9 @@ class Network(nn.Module):
             self.alphas_normal = new_weights
         return
 
-    def sample_alphas_normal(self, sample_amp=1, fair_darts_weight_threshold=0):
+    def sample_alphas_normal(
+        self, sample_amp: float = 1, fair_darts_weight_threshold: float = 0
+    ) -> torch.Tensor:
         """
         Samples an architecture from the mixed operations from a probability distribution that is
         defined by the (softmaxed) architecture weights.
@@ -370,7 +392,7 @@ class Network(nn.Module):
         Arguments:
             sample_amp: temperature that is applied before passing the weights through a softmax
             fair_darts_weight_threshold: used in fair DARTS. If an architecture weight is below
-            this value then it is set to zero.
+                this value then it is set to zero.
 
         Returns:
             alphas_normal_sample: sampled architecture weights.
@@ -414,7 +436,7 @@ class Network(nn.Module):
 
         return alphas_normal_sample
 
-    def max_alphas_normal(self):
+    def max_alphas_normal(self) -> torch.Tensor:
         """
         Samples an architecture from the mixed operations by selecting, for each edge,
         the operation with the largest architecture weight.
@@ -433,7 +455,7 @@ class Network(nn.Module):
         return alphas_normal_sample
 
     # returns the genotype of the model
-    def genotype(self, sample=False):
+    def genotype(self, sample: bool = False) -> Genotype:
         """
         Computes a genotype of the model which specifies the current computation graph based on
         the largest architecture weight for each edge, or based on a sample.
@@ -441,9 +463,9 @@ class Network(nn.Module):
 
         Arguments:
             sample: if set to true, the architecture will be determined by sampling
-            from a probability distribution that is determined by the
-            softmaxed architecture weights. If set to false (default), the architecture will be
-            determined based on the largest architecture weight per edge.
+                from a probability distribution that is determined by the
+                softmaxed architecture weights. If set to false (default), the architecture will be
+                determined based on the largest architecture weight per edge.
 
         Returns:
             genotype: genotype describing the current (sampled) architecture
@@ -510,7 +532,7 @@ class Network(nn.Module):
         )
         return genotype
 
-    def countParameters(self, print_parameters=False):
+    def countParameters(self, print_parameters: bool = False) -> Tuple[int, int, list]:
         """
         Counts and returns the parameters (coefficients) of the architecture defined by the
         highest architecture weights.
@@ -522,7 +544,7 @@ class Network(nn.Module):
             n_params_total: total number of parameters
             n_params_base: number of parameters determined by the classifier
             param_list: list of parameters specifying the corresponding edge (operation)
-            and value
+                and value
         """
 
         # counts only parameters of operations with the highest architecture weight
@@ -551,9 +573,9 @@ class Network(nn.Module):
             maxIdx = np.where(values == max(values))
 
             tmp_param_list = list()
-            if Network.isiterable(op._ops[maxIdx[0].item()]):  # Zero is not iterable
+            if isiterable(op._ops[maxIdx[0].item(0)]):  # Zero is not iterable
 
-                for subop in op._ops[maxIdx[0].item()]:
+                for subop in op._ops[maxIdx[0].item(0)]:
 
                     for parameter in subop.parameters():
                         tmp_param_list.append(parameter.data.numpy().squeeze())
@@ -566,7 +588,7 @@ class Network(nn.Module):
                     "Edge ("
                     + str(idx)
                     + "): "
-                    + get_operation_label(PRIMITIVES[maxIdx[0].item()], tmp_param_list)
+                    + get_operation_label(PRIMITIVES[maxIdx[0].item(0)], tmp_param_list)
                 )
             param_list.append(tmp_param_list)
 
@@ -598,19 +620,3 @@ class Network(nn.Module):
                 )
 
         return (n_params_total, n_params_base, param_list)
-
-    def isiterable(p_object):
-        """
-        A helper function that determines whether an object is iterable.
-
-        Arguments:
-            p_object: an object that is evaluated to be iterable or not
-
-        Returns:
-            is_iterable: true of the object is iterable
-        """
-        try:
-            iter(p_object)
-        except TypeError:
-            return False
-        return True

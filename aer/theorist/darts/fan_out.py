@@ -27,7 +27,7 @@ class Fan_Out(nn.Module):
             linearConnection.weight.requires_grad = False
             self.input_output.append(linearConnection)
 
-    def forward(self, input):
+    def forward(self, input: torch.Tensor) -> torch.Tensor:
         """
         Forward pass of the Fan Out operation.
 

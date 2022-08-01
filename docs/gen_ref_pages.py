@@ -6,7 +6,10 @@ import mkdocs_gen_files
 
 nav = mkdocs_gen_files.Nav()
 
-for path in sorted(Path("./aer").rglob("*.py")):
+source_paths = sorted(Path("./aer").rglob("*.py"))
+special_paths = [Path("./docs/docstrings.py")]
+
+for path in source_paths + special_paths:
     module_path = path.relative_to(".").with_suffix("")
     doc_path = path.relative_to(".").with_suffix(".md")
     full_doc_path = Path("reference", doc_path)

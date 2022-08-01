@@ -1,53 +1,13 @@
+import typing
+from collections import namedtuple
+
 import torch
 import torch.nn as nn
 
-# defines all the operations. affine is turned off for cuda (optimization prposes)
-OPS = {
-    "none": lambda affine: Zero(1),
-    "linear": lambda affine: nn.Sequential(nn.Linear(1, 1, bias=True)),
-    "relu": lambda affine: nn.Sequential(
-        nn.ReLU(inplace=False),
-    ),
-    "lin_relu": lambda affine: nn.Sequential(
-        nn.Linear(1, 1, bias=True),
-        nn.ReLU(inplace=False),
-    ),
-    "sigmoid": lambda affine: nn.Sequential(
-        nn.Sigmoid(),
-    ),
-    "lin_sigmoid": lambda affine: nn.Sequential(
-        nn.Linear(1, 1, bias=True),
-        nn.Sigmoid(),
-    ),
-    "add": lambda affine: nn.Sequential(Identity()),
-    "subtract": lambda affine: nn.Sequential(NegIdentity()),
-    "mult": lambda affine: nn.Sequential(
-        nn.Linear(1, 1, bias=False),
-    ),
-    "exp": lambda affine: nn.Sequential(
-        nn.Linear(1, 1, bias=True),
-        Exponential(),
-    ),
-    "1/x": lambda affine: nn.Sequential(
-        nn.Linear(1, 1, bias=False),
-        MultInverse(),
-    ),
-    "ln": lambda affine: nn.Sequential(
-        nn.Linear(1, 1, bias=False),
-        NatLogarithm(),
-    ),
-    "softplus": lambda affine: nn.Sequential(
-        nn.Linear(1, 1, bias=False),
-        Softplus(),
-    ),
-    "softminus": lambda affine: nn.Sequential(
-        nn.Linear(1, 1, bias=False),
-        Softminus(),
-    ),
-}
+Genotype = namedtuple("Genotype", "normal normal_concat")
 
 
-def isiterable(p_object):
+def isiterable(p_object: typing.Any) -> bool:
     """
     Checks if an object is iterable.
 
@@ -61,7 +21,9 @@ def isiterable(p_object):
     return True
 
 
-def get_operation_label(op_name, params_org, decimals=4):
+def get_operation_label(
+    op_name: str, params_org: typing.List, decimals: int = 4
+) -> str:
     """
     Returns a complete string describing a DARTS operation.
 
@@ -180,7 +142,7 @@ class Identity(nn.Module):
         """
         super(Identity, self).__init__()
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
         Forward pass of the identity function.
 
@@ -201,7 +163,7 @@ class NegIdentity(nn.Module):
         """
         super(NegIdentity, self).__init__()
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
         Forward pass of the inverse of an identity function.
 
@@ -222,7 +184,7 @@ class Exponential(nn.Module):
         """
         super(Exponential, self).__init__()
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
         Forward pass of the exponential function.
 
@@ -243,7 +205,7 @@ class NatLogarithm(nn.Module):
         """
         super(NatLogarithm, self).__init__()
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
         Forward pass of the natural logarithm function.
 
@@ -272,7 +234,7 @@ class MultInverse(nn.Module):
         """
         super(MultInverse, self).__init__()
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
         Forward pass of the multiplicative inverse.
 
@@ -295,7 +257,7 @@ class Zero(nn.Module):
         super(Zero, self).__init__()
         self.stride = stride
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
         Forward pass of the zero operation.
 
@@ -328,7 +290,7 @@ class Softplus(nn.Module):
         self.beta = nn.Parameter(torch.ones(1))
         # elf.softplus = nn.Softplus(beta=self.beta)
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
         Forward pass of the softplus function.
 
@@ -359,7 +321,7 @@ class Softminus(nn.Module):
         # self.beta = nn.Linear(1, 1, bias=False)
         self.beta = nn.Parameter(torch.ones(1))
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
         Forward pass of the softminus function.
 
@@ -368,3 +330,65 @@ class Softminus(nn.Module):
         """
         y = x - torch.log(1 + torch.exp(self.beta * x)) / self.beta
         return y
+
+
+# defines all the operations. affine is turned off for cuda (optimization prposes)
+OPS = {
+    "none": Zero(1),
+    "linear": nn.Sequential(nn.Linear(1, 1, bias=True)),
+    "relu": nn.Sequential(
+        nn.ReLU(inplace=False),
+    ),
+    "lin_relu": nn.Sequential(
+        nn.Linear(1, 1, bias=True),
+        nn.ReLU(inplace=False),
+    ),
+    "sigmoid": nn.Sequential(
+        nn.Sigmoid(),
+    ),
+    "lin_sigmoid": nn.Sequential(
+        nn.Linear(1, 1, bias=True),
+        nn.Sigmoid(),
+    ),
+    "add": nn.Sequential(Identity()),
+    "subtract": nn.Sequential(NegIdentity()),
+    "mult": nn.Sequential(
+        nn.Linear(1, 1, bias=False),
+    ),
+    "exp": nn.Sequential(
+        nn.Linear(1, 1, bias=True),
+        Exponential(),
+    ),
+    "1/x": nn.Sequential(
+        nn.Linear(1, 1, bias=False),
+        MultInverse(),
+    ),
+    "ln": nn.Sequential(
+        nn.Linear(1, 1, bias=False),
+        NatLogarithm(),
+    ),
+    "softplus": nn.Sequential(
+        nn.Linear(1, 1, bias=False),
+        Softplus(),
+    ),
+    "softminus": nn.Sequential(
+        nn.Linear(1, 1, bias=False),
+        Softminus(),
+    ),
+}
+
+# this is the list of primitives actually used,
+# and it should be a set of names contained in the OPS dictionary
+PRIMITIVES = [
+    "none",
+    "add",
+    "subtract",
+    "linear",
+    "lin_sigmoid",
+    "mult",
+    "lin_relu",
+]
+
+# make sure that every primitive is in the OPS dictionary
+for name in PRIMITIVES:
+    assert name in OPS
