@@ -3,7 +3,6 @@ import logging
 from dataclasses import dataclass
 from functools import partial
 from itertools import cycle
-from types import SimpleNamespace
 from typing import Callable, Iterator, Optional
 
 import numpy as np
@@ -85,14 +84,12 @@ def _general_darts(
     # Generate the architecture of the model
     architect = Architect(
         network_,
-        SimpleNamespace(
-            momentum=momentum,
-            arch_weight_decay=arch_weight_decay,
-            arch_weight_decay_df=arch_weight_decay_df,
-            arch_weight_decay_base=arch_weight_decay_base,
-            fair_darts_loss_weight=fair_darts_loss_weight,
-            arch_learning_rate=arch_learning_rate,
-        ),
+        momentum=momentum,
+        arch_weight_decay=arch_weight_decay,
+        arch_weight_decay_df=arch_weight_decay_df,
+        arch_weight_decay_base=arch_weight_decay_base,
+        fair_darts_loss_weight=fair_darts_loss_weight,
+        arch_learning_rate=arch_learning_rate,
     )
 
     optimizer = torch.optim.SGD(
