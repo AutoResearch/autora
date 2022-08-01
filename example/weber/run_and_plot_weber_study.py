@@ -143,7 +143,9 @@ model = theorist.search_model(study_object)
 genotype = (
     model.genotype().normal
 )  # contains information about the architecture of the model
-model_graph_filepath = "aer/example/weber/graph.pdf"  # path to store pdf of plot
+model_graph_filepath = (
+    f"example/weber/graph-{datetime.now().strftime('%Y-%m-%dT%H%M%S.%f%z')}"
+)
 input_labels = study_object.__get_input_labels__()  # labels of input variables
 (
     n_params_total,
