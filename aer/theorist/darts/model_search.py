@@ -1,6 +1,7 @@
 import random
 import warnings
 from enum import Enum
+from typing import Callable, List, Tuple
 
 import numpy as np
 import torch
@@ -9,11 +10,20 @@ import torch.nn.functional as F
 from torch.autograd import Variable
 
 from aer.theorist.darts.fan_out import Fan_Out
-from aer.theorist.darts.genotypes import PRIMITIVES, Genotype
-from aer.theorist.darts.operations import OPS, get_operation_label
+from aer.theorist.darts.operations import (
+    OPS,
+    PRIMITIVES,
+    Genotype,
+    get_operation_label,
+    isiterable,
+)
 
 
 class DARTS_Type(Enum):
+    """
+    Enumerator class that indexes different variants of DARTS.
+    """
+
     ORIGINAL = (
         # Liu, Simonyan & Yang (2018). Darts: Differentiable architecture
         # search
@@ -32,27 +42,37 @@ class DARTS_Type(Enum):
 
 
 class MixedOp(nn.Module):
-    def __init__(self, C, stride):
+    """
+    Mixture operation as applied in Differentiable Architecture Search (DARTS).
+    A mixture operation amounts to a weighted mixture of a pre-defined set of operations
+    that is applied to an input variable.
+    """
+
+    def __init__(self):
+        """
+        Initializes a mixture operation based on a pre-specified set of primitive operations.
+        """
         super(MixedOp, self).__init__()
         self._ops = nn.ModuleList()
         # loop through all the 8 primitive operations
         for primitive in PRIMITIVES:
-            # OPS returns an nn module for a given primitive (defines as a
-            # string). each primitive is defined by the channels size and
-            # stride
-            op = OPS[primitive](C, stride, False)
-
-            # EDIT 11/04/19 SM: adapting to new SimpleNet data
-            # if 'pool' in primitive: # add normalization if there is a pooling operation
-            #   op = nn.Sequential(op, nn.BatchNorm2d(C, affine=False))
+            # OPS returns an nn module for a given primitive (defines as a string)
+            op = OPS[primitive]
 
             # add the operation
             self._ops.append(op)
-            # if primitive == 'relu':
-            #   op[0].weight.data.fill_(1.0)
-            #   op[0].bias.data.fill_(0.001)
 
-    def forward(self, x, weights):
+    def forward(self, x: torch.Tensor, weights: torch.Tensor) -> float:
+        """
+        Computes a mixture operation as a weighted sum of all primitive operations.
+
+        Arguments:
+            x: input to the mixture operations
+            weights: weight vector containing the weights associated with each operation
+
+        Returns:
+            y: result of the weighted mixture operation
+        """
         # there are 8 weights for all the eight primitives. then it returns the
         # weighted sum of all operations performed on a given input
         return sum(w * op(x) for w, op in zip(weights, self._ops))
@@ -61,7 +81,31 @@ class MixedOp(nn.Module):
 # Let a cell be a DAG(directed acyclic graph) containing N nodes (2 input
 # nodes 1 output node?)
 class Cell(nn.Module):
-    def __init__(self, steps, n_input_states, C):
+    """
+    A cell as defined in differentiable architecture search. A single cell corresponds
+    to a computation graph with the number of input nodes defined by n_input_states and
+    the number of hidden nodes defined by steps. Input nodes only project to hidden nodes and hidden
+    nodes project to each other with an acyclic connectivity pattern. The output of a cell
+    corresponds to the concatenation of all hidden nodes. Hidden nodes are computed by integrating
+    transformed outputs from sending nodes. Outputs from sending nodes correspond to
+    mixture operations, i.e. a weighted combination of pre-specified operations applied to the
+    variable specified by the sending node (see MixedOp).
+
+    Attributes:
+        _steps: number of hidden nodes
+        _n_input_states: number of input nodes
+        _ops: list of mixture operations (amounts to the list of edges in the cell)
+    """
+
+    def __init__(self, steps: int = 2, n_input_states: int = 1):
+        """
+        Initializes a cell based on the number of hidden nodes (steps)
+        and the number of input nodes (n_input_states).
+
+        Arguments:
+            steps: number of hidden nodes
+            n_input_states: number of input nodes
+        """
         # The first and second nodes of cell k are set equal to the outputs of
         # cell k − 2 and cell k − 1, respectively, and 1 × 1 convolutions
         # (ReLUConvBN) are inserted as necessary
@@ -77,22 +121,29 @@ class Cell(nn.Module):
 
         # set operations according to number of modules (empty)
         self._ops = nn.ModuleList()
-        self._bns = nn.ModuleList()
         # iterate over edges: edges between each hidden node and input nodes +
         # prev hidden nodes
         for i in range(self._steps):  # hidden nodes
             for j in range(self._n_input_states + i):  # 2 refers to the 2 input nodes
                 # defines the stride for link between cells
-                stride = 1
                 # adds a mixed operation (derived from architecture parameters alpha)
                 # for 4 intermediate nodes, a total of 14 connections
                 # (MixedOps) is added
-                op = MixedOp(C, stride)
+                op = MixedOp()
                 # appends cell with mixed operation
                 self._ops.append(op)
 
-    def forward(self, input_states, weights):
+    def forward(self, input_states: List, weights: torch.Tensor):
+        """
+        Computes the output of a cell given a list of input states
+        (variables represented in input nodes) and a weight matrix specifying the weights of each
+        operation for each edge.
 
+        Arguments:
+            input_states: list of input nodes
+            weights: matrix specifying architecture weights, i.e. the weights associated
+                with each operation for each edge
+        """
         # initialize states (activities of each node in the cell)
         states = list()
 
@@ -123,75 +174,80 @@ class Cell(nn.Module):
 
 
 class Network(nn.Module):
+    """
+    A PyTorch computation graph according to DARTS.
+    It consists of a single computation cell which transforms an
+    input vector (containing all input variable) into an output vector, by applying a set of
+    mixture operations which are defined by the architecture weights (labeled "alphas" of the
+    network).
 
-    # EDIT 11/04/19 SM: adapting to new SimpleNet data (changed steps from 4
-    # to 2)
+    The network flow looks as follows: An input vector (with _n_input_states elements) is split into
+    _n_input_states separate input nodes (one node per element). The input nodes are then passed
+    through a computation cell with _steps hidden nodes (see Cell). The output of the computation
+    cell corresponds to the concatenation of its hidden nodes (a single vector). The final output
+    corresponds to a (trained) affine transformation of this concatenation (labeled "classifier").
+
+    Attributes:
+        _n_input_states: length of input vector (translates to number of input nodes)
+        _num_classes: length of output vector
+        _criterion: optimization criterion used to define the loss
+        _steps: number of hidden nodes in the cell
+        _architecture_fixed: specifies whether the architecture weights shall remain fixed
+            (not trained)
+        _classifier_weight_decay: a weight decay applied to the classifier
+
+    """
+
     def __init__(
         self,
-        num_classes,
-        criterion,
-        steps=2,
-        n_input_states=2,
-        architecture_fixed=False,
-        classifier_weight_decay=0,
-        darts_type=DARTS_Type.ORIGINAL,
+        num_classes: int,
+        criterion: Callable,
+        steps: int = 2,
+        n_input_states: int = 2,
+        architecture_fixed: bool = False,
+        classifier_weight_decay: float = 0,
+        darts_type: DARTS_Type = DARTS_Type.ORIGINAL,
     ):
+        """
+        Initializes the network.
+
+        Arguments:
+            num_classes: length of output vector
+            criterion: optimization criterion used to define the loss
+            steps: number of hidden nodes in the cell
+            n_input_states: length of input vector (translates to number of input nodes)
+            architecture_fixed: specifies whether the architecture weights shall remain fixed
+            classifier_weight_decay: a weight decay applied to the classifier
+            darts_type: variant of DARTS (regular or fair) that is applied for training
+        """
         super(Network, self).__init__()
-        self.DARTS_type = darts_type
+
         # set parameters
-        # number of channels  EDIT 11/04/19 SM: adapting to new SimpleNet data
-        # (set self._C to 1 instead of C)
-        self._C = 1
         self._num_classes = num_classes  # number of output classes
-        self._criterion = criterion  # optimization criterion (e.g. softmax)
-        self._steps = steps  # the number of intermediate nodes (4)
+        self._criterion = criterion  # optimization criterion (e.g., softmax)
+        self._steps = steps  # the number of intermediate nodes (e.g., 2)
         self._n_input_states = n_input_states  # number of input nodes
+        self.DARTS_type = darts_type  # darts variant
         self._multiplier = (
             1  # the number of internal nodes that get concatenated to the output
         )
+
+        # set parameters
         self._dim_output = self._steps
         self._architecture_fixed = architecture_fixed
         self._classifier_weight_decay = classifier_weight_decay
 
-        C_curr = self._C  # computes number of output channels for the stem
-        # define the stem of the model; REMOVE THIS, EMBED FANOUT HERE
-        # EDIT 11/04/19 SM: adapting to new SimpleNet data
-        # self.stem = nn.Sequential(
-        #   nn.Conv2d(3, C_curr, 3, padding=1, bias=False), # 2d convolution with 3 input channels
-        #   (image colors) and 3*16 output channels (16 feature maps per channel)
-        #   nn.BatchNorm2d(C_curr)
-        #  normalizes 4D input (a mini-batch of 2D inputs with additional channel dimension)
-        # )
-
         # input nodes
         self.stem = nn.Sequential(Fan_Out(self._n_input_states))
-
-        # EDIT 11/04/19 SM: adapting to new SimpleNet data
-        # C_prev, C_curr = C_curr, C # compute number of channels for the next
-        # layer
 
         self.cells = (
             nn.ModuleList()
         )  # get list of all current modules (should be empty)
 
         # generate a cell that undergoes architecture search
-        # EDIT 11/04/19 SM: adapting to new SimpleNet data (replaced
-        # self._multiplier with num_input states as second argument)
-        self.cells = Cell(steps, self._n_input_states, C_curr)
-
-        # compute number of input and output channels for the next layer
-        # EDIT 11/04/19 SM: adapting to new SimpleNet data
-        # C_prev = C_curr
-
-        # the pooling stencil size (aka kernel size) is determined to be (input_size+target_size-1)
-        # // target_size, i.e. rounded up
-        # EDIT 11/04/19 SM: adapting to new SimpleNet data
-        # self.global_pooling = nn.AdaptiveAvgPool2d(1) # replace this with a
-        # simple all to all connection (or something more constrained)
+        self.cells = Cell(steps, self._n_input_states)
 
         # last layer is a linear classifier (e.g. with 10 CIFAR classes)
-        # EDIT 11/04/19 SM: adapting to new SimpleNet data (change input of nn
-        # layer from C_prev to self._dim_output)
         self.classifier = nn.Linear(
             self._dim_output, num_classes
         )  # make this the number of input states
@@ -200,24 +256,33 @@ class Network(nn.Module):
         self._initialize_alphas()
 
     # function for copying the network
-    def new(self):
+    def new(self) -> nn.Module:
         model_new = Network(
-            self._C, self._num_classes, self._criterion, steps=self._steps
+            # self._C, self._num_classes, self._criterion, steps=self._steps
+            num_classes=self._num_classes,
+            criterion=self._criterion,
+            steps=self._steps,
+            n_input_states=self._n_input_states,
+            architecture_fixed=self._architecture_fixed,
+            classifier_weight_decay=self._classifier_weight_decay,
+            darts_type=self.DARTS_type,
         )
+
         for x, y in zip(model_new.arch_parameters(), self.arch_parameters()):
             x.data.copy_(y.data)
         return model_new
 
     # computes forward pass for full network
-    def forward(self, input):
+    def forward(self, x: torch.Tensor):
+        """
+        Computes output of the network.
+
+        Arguments:
+            x: input to the network
+        """
 
         # compute stem first
-        # EDIT 11/04/19 SM: adapting to new SimpleNet data
-        # input_states = list()
-        # for i in range(self._n_input_states): # for now, it applies the same stem operation to the
-        # input n times and retrieves states for separate nodes for the cell
-        #   input_states.append(self.stem(input))
-        input_states = self.stem(input)
+        input_states = self.stem(x)
 
         # get architecture weights
         if self._architecture_fixed:
@@ -232,13 +297,8 @@ class Network(nn.Module):
                     "DARTS Type " + str(self.DARTS_type) + " not implemented"
                 )
 
-            # then apply cell with weights
-        # input_states = [s0, s1]
+        # then apply cell with weights
         cell_output = self.cells(input_states, weights)
-
-        # pool last layer
-        # EDIT 11/04/19 SM: adapting to new SimpleNet data
-        # out = self.global_pooling(cell_output)
 
         # compute logits
         logits = self.classifier(cell_output.view(cell_output.size(0), -1))
@@ -247,12 +307,28 @@ class Network(nn.Module):
 
         return logits
 
-    def _loss(self, input, target):
+    def _loss(self, input: torch.Tensor, target: torch.Tensor) -> torch.Tensor:
+        """
+        Computes the loss of the network for the specified criterion.
+
+        Arguments:
+            input: input patterns
+            target: target patterns
+
+        Returns:
+            loss
+        """
         logits = self(input)
-        return self._criterion(logits, target)  # returns cross entropy
+        return self._criterion(logits, target)  # returns cross entropy by default
 
     # regularization
-    def apply_weight_decay_to_classifier(self, lr):
+    def apply_weight_decay_to_classifier(self, lr: float):
+        """
+        Applies a weight decay to the weights projecting from the cell to the final output layer.
+
+        Arguments:
+            lr: learning rate
+        """
         # weight decay proportional to degrees of freedom
         for p in self.classifier.parameters():
             p.data.sub_(
@@ -263,14 +339,16 @@ class Network(nn.Module):
             )  # weight decay
 
     def _initialize_alphas(self):
-        k = sum(
-            1 for i in range(self._steps) for n in range(self._n_input_states + i)
-        )  # the number of possible connections between nodes
+        """
+        Initializes the architecture weights.
+        """
+        # compute the number of possible connections between nodes
+        k = sum(1 for i in range(self._steps) for n in range(self._n_input_states + i))
         # number of available primitive operations (8 different types for a
         # conv net)
         num_ops = len(PRIMITIVES)
 
-        # generate 14 (number of available edges) by 8 (operations)
+        # e.g., generate 14 (number of available edges) by 8 (operations)
         # weight matrix for normal alphas of the architecture
         self.alphas_normal = Variable(
             1e-3 * torch.randn(k, num_ops), requires_grad=True
@@ -279,17 +357,46 @@ class Network(nn.Module):
         self._arch_parameters = [self.alphas_normal]
 
     # provide back the architecture as a parameter
-    def arch_parameters(self):
+    def arch_parameters(self) -> List:
+        """
+        Returns architecture weights.
+
+        Returns:
+            _arch_parameters: architecture weights.
+        """
         return self._arch_parameters
 
     # fixes architecture
-    def fix_architecture(self, switch, new_weights=None):
+    def fix_architecture(self, switch: bool, new_weights: torch.Tensor = None):
+        """
+        Freezes or unfreezes the architecture weights.
+
+        Arguments:
+            switch: set true to freeze architecture weights or false unfreeze
+            new_weights: new set of architecture weights
+        """
         self._architecture_fixed = switch
         if new_weights is not None:
             self.alphas_normal = new_weights
         return
 
-    def sample_alphas_normal(self, sample_amp=1, fair_darts_weight_threshold=0):
+    def sample_alphas_normal(
+        self, sample_amp: float = 1, fair_darts_weight_threshold: float = 0
+    ) -> torch.Tensor:
+        """
+        Samples an architecture from the mixed operations from a probability distribution that is
+        defined by the (softmaxed) architecture weights.
+        This amounts to selecting one operation per edge (i.e., setting the architecture
+        weight of that operation to one while setting the others to zero).
+
+        Arguments:
+            sample_amp: temperature that is applied before passing the weights through a softmax
+            fair_darts_weight_threshold: used in fair DARTS. If an architecture weight is below
+                this value then it is set to zero.
+
+        Returns:
+            alphas_normal_sample: sampled architecture weights.
+        """
 
         alphas_normal = self.alphas_normal.clone()
         alphas_normal_sample = Variable(torch.zeros(alphas_normal.data.shape))
@@ -329,8 +436,14 @@ class Network(nn.Module):
 
         return alphas_normal_sample
 
-    def max_alphas_normal(self):
+    def max_alphas_normal(self) -> torch.Tensor:
+        """
+        Samples an architecture from the mixed operations by selecting, for each edge,
+        the operation with the largest architecture weight.
 
+        Returns:
+            alphas_normal_sample: sampled architecture weights.
+        """
         alphas_normal = self.alphas_normal.clone()
         alphas_normal_sample = Variable(torch.zeros(alphas_normal.data.shape))
 
@@ -342,8 +455,21 @@ class Network(nn.Module):
         return alphas_normal_sample
 
     # returns the genotype of the model
-    def genotype(self, sample=False):
+    def genotype(self, sample: bool = False) -> Genotype:
+        """
+        Computes a genotype of the model which specifies the current computation graph based on
+        the largest architecture weight for each edge, or based on a sample.
+        The genotype can be used for parsing or plotting the computation graph.
 
+        Arguments:
+            sample: if set to true, the architecture will be determined by sampling
+                from a probability distribution that is determined by the
+                softmaxed architecture weights. If set to false (default), the architecture will be
+                determined based on the largest architecture weight per edge.
+
+        Returns:
+            genotype: genotype describing the current (sampled) architecture
+        """
         # this function uses the architecture weights to retrieve the
         # operations with the highest weights
         def _parse(weights):
@@ -406,9 +532,22 @@ class Network(nn.Module):
         )
         return genotype
 
-    def countParameters(self, print_parameters=False):
-        # counts only parameters of operations with the highest architecture
-        # weight
+    def countParameters(self, print_parameters: bool = False) -> Tuple[int, int, list]:
+        """
+        Counts and returns the parameters (coefficients) of the architecture defined by the
+        highest architecture weights.
+
+        Arguments:
+            print_parameters: if set to true, the function will print all parameters.
+
+        Returns:
+            n_params_total: total number of parameters
+            n_params_base: number of parameters determined by the classifier
+            param_list: list of parameters specifying the corresponding edge (operation)
+                and value
+        """
+
+        # counts only parameters of operations with the highest architecture weight
         n_params_total = 0
 
         # count classifier
@@ -434,9 +573,9 @@ class Network(nn.Module):
             maxIdx = np.where(values == max(values))
 
             tmp_param_list = list()
-            if Network.isiterable(op._ops[maxIdx[0].item()]):  # Zero is not iterable
+            if isiterable(op._ops[maxIdx[0].item(0)]):  # Zero is not iterable
 
-                for subop in op._ops[maxIdx[0].item()]:
+                for subop in op._ops[maxIdx[0].item(0)]:
 
                     for parameter in subop.parameters():
                         tmp_param_list.append(parameter.data.numpy().squeeze())
@@ -449,7 +588,7 @@ class Network(nn.Module):
                     "Edge ("
                     + str(idx)
                     + "): "
-                    + get_operation_label(PRIMITIVES[maxIdx[0].item()], tmp_param_list)
+                    + get_operation_label(PRIMITIVES[maxIdx[0].item(0)], tmp_param_list)
                 )
             param_list.append(tmp_param_list)
 
@@ -481,10 +620,3 @@ class Network(nn.Module):
                 )
 
         return (n_params_total, n_params_base, param_list)
-
-    def isiterable(p_object):
-        try:
-            iter(p_object)
-        except TypeError:
-            return False
-        return True

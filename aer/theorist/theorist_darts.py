@@ -16,8 +16,8 @@ import aer.theorist.darts.darts_config as darts_cfg
 import aer.theorist.darts.utils as utils
 import aer.theorist.darts.visualize as viz
 from aer.theorist.darts.architect import Architect
-from aer.theorist.darts.genotypes import PRIMITIVES
 from aer.theorist.darts.model_search import DARTS_Type, Network
+from aer.theorist.darts.operations import PRIMITIVES
 from aer.theorist.theorist import Theorist
 from aer.utils import Plot_Types
 from aer.variable import ValueType as output_types
@@ -692,7 +692,15 @@ class Theorist_DARTS(Theorist, ABC):
 
         # generate an architecture of the model
         darts_cfg.arch_weight_decay_df = arch_weight_decay_df
-        self.architect = Architect(self.model, darts_cfg)
+        self.architect = Architect(
+            self.model,
+            arch_learning_rate=darts_cfg.arch_learning_rate,
+            momentum=darts_cfg.momentum,
+            arch_weight_decay=darts_cfg.arch_weight_decay,
+            arch_weight_decay_df=darts_cfg.arch_weight_decay_df,
+            arch_weight_decay_base=darts_cfg.arch_weight_decay_base,
+            fair_darts_loss_weight=darts_cfg.fair_darts_loss_weight,
+        )
 
         # plot variables
         self.num_arch_edges = self.model.alphas_normal.data.shape[

@@ -2,22 +2,35 @@ import csv
 import glob
 import os
 import shutil
+import typing
 
 import numpy as np
 import torch
 import torch.nn as nn
-from torch.autograd import Variable
 
-import aer.theorist.darts.SimpleNet_dataset as SimpleNetDatasetFile
-from aer.theorist.darts.SimpleNet_dataset import SimpleNetDataset
+from aer.theorist.darts.model_search import Network
 from aer.variable import ValueType
-
-# new
 
 
 def create_output_file_name(
-    file_prefix, log_version=None, weight_decay=None, k=None, seed=None, theorist=None
-):
+    file_prefix: str,
+    log_version: int = None,
+    weight_decay: float = None,
+    k: int = None,
+    seed: int = None,
+    theorist: str = None,
+) -> str:
+    """
+    Creates a file name for the output file of a theorist study.
+
+    Arguments:
+        file_prefix: prefix of the file name
+        log_version: log version of the theorist run
+        weight_decay: weight decay of the model
+        k: number of nodes in the model
+        seed: seed of the model
+        theorist: name of the DARTS variant
+    """
 
     output_str = file_prefix
 
@@ -40,8 +53,20 @@ def create_output_file_name(
 
 
 def assign_slurm_instance(
-    slurm_id, arch_weight_decay_list=None, num_node_list=None, seed_list=None
-):
+    slurm_id: int,
+    arch_weight_decay_list: typing.List,
+    num_node_list: typing.List,
+    seed_list: typing.List,
+) -> typing.Tuple:
+    """
+    Determines the meta-search parameters based on the slum job id.
+
+    Arguments:
+        slurm_id: slurm job id
+        arch_weight_decay_list: list of weight decay values
+        num_node_list: list of number of nodes
+        seed_list: list of seeds
+    """
 
     seed_id = np.floor(
         slurm_id / (len(num_node_list) * len(arch_weight_decay_list))
@@ -56,27 +81,13 @@ def assign_slurm_instance(
     )
 
 
-# old
-def get_object_of_study(studyObject):
+def get_loss_function(outputType: ValueType):
+    """
+    Returns the loss function for the given output type of a dependent variable.
 
-    dataSets = {
-        "SimpleNet": SimpleNetDataset,
-    }
-
-    return dataSets.get(studyObject, SimpleNetDataset)
-
-
-# old
-def get_object_of_study_file(studyObject):
-
-    dataSets = {
-        "SimpleNet": SimpleNetDatasetFile,
-    }
-
-    return dataSets.get(studyObject, SimpleNetDatasetFile)
-
-
-def get_loss_function(outputType):
+    Arguments:
+        outputType: output type of the dependent variable
+    """
 
     dataSets = {
         ValueType.REAL: nn.MSELoss(),
@@ -90,8 +101,14 @@ def get_loss_function(outputType):
     return dataSets.get(outputType, nn.MSELoss)
 
 
-def get_output_format(outputType):
+def get_output_format(outputType: ValueType):
+    """
+    Returns the output format (activation function of the final output layer)
+    for the given output type of a dependent variable.
 
+    Arguments:
+        outputType: output type of the dependent variable
+    """
     dataSets = {
         ValueType.REAL: nn.Identity(),
         ValueType.PROBABILITY: nn.Sigmoid(),
@@ -104,7 +121,13 @@ def get_output_format(outputType):
     return dataSets.get(outputType, nn.MSELoss)
 
 
-def get_output_str(outputType):
+def get_output_str(outputType: ValueType) -> typing.Optional[str]:
+    """
+    Returns the output string for the given output type of a dependent variable.
+
+    Arguments:
+        outputType: output type of the dependent variable
+    """
 
     dataSets = {
         ValueType.REAL: None,
@@ -118,14 +141,35 @@ def get_output_str(outputType):
     return dataSets.get(outputType, nn.MSELoss)
 
 
-def sigmid_mse(output, target):
+def sigmid_mse(output: torch.Tensor, target: torch.Tensor) -> torch.Tensor:
+    """
+    Returns the MSE loss for a sigmoid output.
+
+    Arguments:
+        output: output of the model
+        target: target of the model
+    """
     m = nn.Sigmoid()
     output = m(output)
     loss = torch.mean((output - target) ** 2)
     return loss
 
 
-def compute_BIC(output_type, model, input, target):
+def compute_BIC(
+    output_type: ValueType,
+    model: torch.nn.Module,
+    input: torch.Tensor,
+    target: torch.Tensor,
+) -> float:
+    """
+    Returns the Bayesian information criterion for a DARTS model.
+
+    Arguments:
+        output_type: output type of the dependent variable
+        model: model to compute the BIC for
+        input: input of the model
+        target: target of the model
+    """
 
     # compute raw model output
     classifier_output = model(input)
@@ -181,7 +225,18 @@ def compute_BIC(output_type, model, input, target):
     # old
 
 
-def compute_BIC_AIC(soft_targets, soft_prediction, model):
+def compute_BIC_AIC(
+    soft_targets: np.array, soft_prediction: np.array, model: Network
+) -> typing.Tuple:
+    """
+    Returns the Bayesian information criterion (BIC) as well as the
+    Aikaike information criterion (AIC) for a DARTS model.
+
+    Arguments:
+        soft_targets: soft target of the model
+        soft_prediction: soft prediction of the model
+        model: model to compute the BIC and AIC for
+    """
 
     lik = np.sum(
         np.multiply(soft_prediction, soft_targets), axis=1
@@ -197,7 +252,14 @@ def compute_BIC_AIC(soft_targets, soft_prediction, model):
     return BIC, AIC
 
 
-def cross_entropy(pred, soft_targets):
+def cross_entropy(pred: torch.Tensor, soft_targets: torch.Tensor) -> torch.Tensor:
+    """
+    Returns the cross entropy loss for a soft target.
+
+    Arguments:
+        pred: prediction of the model
+        soft_targets: soft target of the model
+    """
     # assuming pred and soft_targets are both Variables with shape (batchsize, num_of_classes),
     # each row of pred is predicted logits and each row of soft_targets is a discrete distribution.
     logsoftmax = nn.LogSoftmax(dim=1)
@@ -205,21 +267,48 @@ def cross_entropy(pred, soft_targets):
 
 
 class AvgrageMeter(object):
+    """
+    Computes and stores the average and current value.
+    """
+
     def __init__(self):
+        """
+        Initializes the average meter.
+        """
         self.reset()
 
     def reset(self):
+        """
+        Resets the average meter.
+        """
         self.avg = 0
         self.sum = 0
         self.cnt = 0
 
-    def update(self, val, n=1):
+    def update(self, val: float, n: int = 1):
+        """
+        Updates the average meter.
+
+        Arguments:
+            val: value to update the average meter with
+            n: number of times to update the average meter
+        """
         self.sum += val * n
         self.cnt += n
         self.avg = self.sum / self.cnt
 
 
-def accuracy(output, target, topk=(1,)):
+def accuracy(
+    output: torch.Tensor, target: torch.Tensor, topk: typing.Tuple = (1,)
+) -> typing.List:
+    """
+    Computes the accuracy over the k top predictions for the specified values of k.
+
+    Arguments:
+        output: output of the model
+        target: target of the model
+        topk: values of k to compute the accuracy at
+    """
     maxk = max(topk)
     batch_size = target.size(0)
 
@@ -234,29 +323,13 @@ def accuracy(output, target, topk=(1,)):
     return res
 
 
-class Cutout(object):
-    def __init__(self, length):
-        self.length = length
+def count_parameters_in_MB(model: Network) -> int:
+    """
+    Returns the number of parameters for a model.
 
-    def __call__(self, img):
-        h, w = img.size(1), img.size(2)
-        mask = np.ones((h, w), np.float32)
-        y = np.random.randint(h)
-        x = np.random.randint(w)
-
-        y1 = np.clip(y - self.length // 2, 0, h)
-        y2 = np.clip(y + self.length // 2, 0, h)
-        x1 = np.clip(x - self.length // 2, 0, w)
-        x2 = np.clip(x + self.length // 2, 0, w)
-
-        mask[y1:y2, x1:x2] = 0.0
-        mask = torch.from_numpy(mask)
-        mask = mask.expand_as(img)
-        img *= mask
-        return img
-
-
-def count_parameters_in_MB(model):
+    Arguments:
+        model: model to count the parameters for
+    """
     return (
         np.sum(
             np.prod(v.size())
@@ -267,15 +340,15 @@ def count_parameters_in_MB(model):
     )
 
 
-def save_checkpoint(state, is_best, save):
-    filename = os.path.join(save, "checkpoint.pth.tar")
-    torch.save(state, filename)
-    if is_best:
-        best_filename = os.path.join(save, "model_best.pth.tar")
-        shutil.copyfile(filename, best_filename)
+def save(model: torch.nn.Module, model_path: str, exp_folder: str = None):
+    """
+    Saves a model to a file.
 
-
-def save(model, model_path, exp_folder=None):
+    Arguments:
+        model: model to save
+        model_path: path to save the model to
+        exp_folder: general experiment directory to save the model to
+    """
     if exp_folder is not None:
         os.chdir("exps")  # Edit SM 10/23/19: use local experiment directory
     torch.save(model.state_dict(), model_path)
@@ -283,24 +356,28 @@ def save(model, model_path, exp_folder=None):
         os.chdir("..")  # Edit SM 10/23/19: use local experiment directory
 
 
-def load(model, model_path):
+def load(model: torch.nn.Module, model_path: str):
+    """
+    Loads a model from a file.
+    """
     model.load_state_dict(torch.load(model_path))
 
 
-def drop_path(x, drop_prob):
-    if drop_prob > 0.0:
-        keep_prob = 1.0 - drop_prob
-        mask = Variable(
-            torch.cuda.FloatTensor(x.size(0), 1, 1, 1).bernoulli_(keep_prob)
-        )
-        x.div_(keep_prob)
-        x.mul_(mask)
-    return x
-
-
 def create_exp_dir(
-    path, scripts_to_save=None, parent_folder="exps", results_folder=None
+    path: str,
+    scripts_to_save: typing.List = None,
+    parent_folder: str = "exps",
+    results_folder: str = None,
 ):
+    """
+    Creates an experiment directory and saves all necessary scripts and files.
+
+    Arguments:
+        path: path to save the experiment directory to
+        scripts_to_save: list of scripts to save
+        parent_folder: parent folder for the experiment directory
+        results_folder: folder for the results of the experiment
+    """
     os.chdir(parent_folder)  # Edit SM 10/23/19: use local experiment directory
     if not os.path.exists(path):
         os.mkdir(path)
@@ -325,11 +402,20 @@ def create_exp_dir(
             shutil.copyfile(script, dst_file)
 
 
-def read_log_files(resultsPath, winning_architecture_only=False):
+def read_log_files(
+    results_path: str, winning_architecture_only: bool = False
+) -> typing.Tuple:
+    """
+    Reads the log files from an experiment directory and returns the results.
+
+    Arguments:
+        results_path: path to the experiment results directory
+        winning_architecture_only: if True, only the winning architecture is returned
+    """
 
     current_wd = os.getcwd()
 
-    os.chdir(resultsPath)
+    os.chdir(results_path)
     filelist = glob.glob("*.{}".format("csv"))
 
     model_name_list = list()
@@ -356,7 +442,21 @@ def read_log_files(resultsPath, winning_architecture_only=False):
     return (model_name_list, loss_list, BIC_list, AIC_list)
 
 
-def get_best_fitting_models(model_name_list, loss_list, BIC_list, topk):
+def get_best_fitting_models(
+    model_name_list: typing.List,
+    loss_list: typing.List,
+    BIC_list: typing.List,
+    topk: int,
+) -> typing.Tuple:
+    """
+    Returns the topk best fitting models.
+
+    Arguments:
+        model_name_list: list of model names
+        loss_list: list of loss values
+        BIC_list: list of BIC values
+        topk: number of topk models to return
+    """
 
     topk_losses = sorted(zip(loss_list, model_name_list), reverse=False)[:topk]
     res = list(zip(*topk_losses))

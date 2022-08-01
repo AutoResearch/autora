@@ -1,21 +1,37 @@
 import sys
+import typing
 
 from graphviz import Digraph
 
-from aer.theorist.darts.operations import get_operation_label
+from aer.theorist.darts.operations import Genotype, get_operation_label
 
 
 def plot(
-    genotype,
-    filename,
-    fileFormat="pdf",
-    viewFile=None,
-    full_label=False,
-    param_list=(),
-    input_labels=(),
-    out_dim=None,
-    out_fnc=None,
+    genotype: Genotype,
+    filename: str,
+    fileFormat: str = "pdf",
+    viewFile: bool = None,
+    full_label: bool = False,
+    param_list: typing.Tuple = (),
+    input_labels: typing.Tuple = (),
+    out_dim: int = None,
+    out_fnc: str = None,
 ):
+    """
+    Generates a graphviz plot for a DARTS model based on the genotype of the model.
+
+    Arguments:
+        genotype: the genotype of the model
+        filename: the filename of the output file
+        fileFormat: the format of the output file
+        viewFile: if True, the plot will be displayed in a window
+        full_label: if True, the labels of the nodes will be the full name of the operation
+            (including the coefficients)
+        param_list: a list of parameters to be included in the labels of the nodes
+        input_labels: a list of labels to be included in the input nodes
+        out_dim: the number of output nodes of the model
+        out_fnc: the (activation) function to be used for the output nodes
+    """
 
     decimals_to_display = 2
     format_string = "{:." + "{:.0f}".format(decimals_to_display) + "f}"
@@ -155,7 +171,7 @@ if __name__ == "__main__":
     try:
         genotype = eval("genotypes.{}".format(genotype_name))
     except AttributeError:
-        print("{} is not specified in genotypes.py".format(genotype_name))
+        print("{} is not specified in operations.py".format(genotype_name))
         sys.exit(1)
 
     plot(genotype.normal, "normal")
