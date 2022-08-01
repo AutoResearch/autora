@@ -98,15 +98,15 @@ darts_estimator_tuned.fit(X, y)
 
 show_results(estimator=darts_estimator_tuned, label="pre-tuned DARTSRegressor")
 
-# %% Fit using DARTS
+# %% Fit using DARTS with a Cross-Validation-Search
 darts_estimator = GridSearchCV(
     make_pipeline(
         StandardScaler(),
         DARTSRegressor(
             batch_size=5,
-            arch_updates_per_epoch=20,
-            param_updates_per_epoch=20,
-            max_epochs=50,
+            arch_updates_per_epoch=1,
+            param_updates_per_epoch=500,
+            max_epochs=100,
             output_type=ValueType.PROBABILITY,
         ),
     ),
