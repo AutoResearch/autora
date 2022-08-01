@@ -6,13 +6,10 @@ import aer.theorist.darts.visualize as viz
 from aer.experimentalist.experiment_design_synthetic_weber import (
     Experiment_Design_Synthetic_Weber,
 )
-from aer.experimentalist.experiment_environment.variable import Variable as Var
-from aer.experimentalist.experiment_environment.variable import (
-    outputTypes as output_type,
-)
 from aer.experimentalist.experimentalist_popper import Experimentalist_Popper
 from aer.theorist.object_of_study import Object_Of_Study
 from aer.theorist.theorist_darts import DARTS_Type, Theorist_DARTS
+from aer.variable import ValueType, Variable
 
 now = datetime.now()
 dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
@@ -30,14 +27,14 @@ AER_cycles = 1
 # OBJECT OF STUDY
 
 # specify independent variables
-S1 = Var(
+S1 = Variable(
     name="S1",
     value_range=(0, 5),
     units="intensity",
     variable_label="Stimulus 1 Intensity",
 )
 
-S2 = Var(
+S2 = Variable(
     name="S2",
     value_range=(0, 5),
     units="intensity",
@@ -46,20 +43,20 @@ S2 = Var(
 
 
 # specify dependent variable with type
-diff_detected = Var(
+diff_detected = Variable(
     name="difference_detected",
     value_range=(0, 1),
     units="probability",
     variable_label="P(difference detected)",
-    type=output_type.SIGMOID,
+    type=ValueType.SIGMOID,
 )
 
-diff_detected_sample = Var(
+diff_detected_sample = Variable(
     name="difference_detected_sample",
     value_range=(0, 1),
     units="response",
     variable_label="difference detected",
-    type=output_type.PROBABILITY_SAMPLE,
+    type=ValueType.PROBABILITY_SAMPLE,
 )
 
 # list dependent and independent variables
