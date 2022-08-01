@@ -2,6 +2,7 @@ import copy
 import logging
 from dataclasses import dataclass
 from functools import partial
+from itertools import cycle
 from types import SimpleNamespace
 from typing import Callable, Iterator, Optional
 
@@ -260,7 +261,7 @@ def _get_data_loader(
 
 
 def _get_data_iterator(data_loader: torch.utils.data.DataLoader) -> Iterator:
-    data_iterator = iter(data_loader)
+    data_iterator = cycle(iter(data_loader))
     return data_iterator
 
 
