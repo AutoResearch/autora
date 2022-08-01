@@ -45,7 +45,7 @@ def generate_darts_summary_figures(
         figure_names: list of strings with the names of the figures to be generated
         titles: list of strings with the titles of the figures to be generated
         filters: list of strings with the theorist filters to be used to select the models to be
-        used in the figures
+            used in the figures
         title_suffix: string with the suffix to be added to the titles of the figures
         study_name: string with the name of the study (used to identify the study folder)
         y_name: string with the name of the y-axis variable
@@ -62,7 +62,7 @@ def generate_darts_summary_figures(
         y_reference: list with the values of the reference line
         y_reference_label: string with the label of the reference line
         arch_samp_filter: string with the name of the filter to be used to select the
-        samples of the architecture
+            samples of the architecture
 
     """
 
@@ -120,7 +120,7 @@ def plot_darts_summary(
     x2_label: str = "",
     y_sem_name: str = None,
     metric: str = "min",
-    y_reference=None,
+    y_reference: typing.List[float] = None,
     y_reference_label: str = "",
     figure_dimensions: typing.Tuple[int, int] = None,
     title: str = "",

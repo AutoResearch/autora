@@ -8,8 +8,8 @@ import numpy as np
 import torch
 import torch.nn as nn
 
-from aer.experimentalist.experiment_environment.variable import outputTypes
 from aer.theorist.darts.model_search import Network
+from aer.variable import ValueType
 
 
 def create_output_file_name(
@@ -81,7 +81,7 @@ def assign_slurm_instance(
     )
 
 
-def get_loss_function(outputType: outputTypes):
+def get_loss_function(outputType: ValueType):
     """
     Returns the loss function for the given output type of a dependent variable.
 
@@ -90,18 +90,18 @@ def get_loss_function(outputType: outputTypes):
     """
 
     dataSets = {
-        outputTypes.REAL: nn.MSELoss(),
-        outputTypes.PROBABILITY: sigmid_mse,
-        outputTypes.PROBABILITY_SAMPLE: sigmid_mse,
-        outputTypes.PROBABILITY_DISTRIBUTION: cross_entropy,
-        outputTypes.CLASS: nn.CrossEntropyLoss(),
-        outputTypes.SIGMOID: sigmid_mse,
+        ValueType.REAL: nn.MSELoss(),
+        ValueType.PROBABILITY: sigmid_mse,
+        ValueType.PROBABILITY_SAMPLE: sigmid_mse,
+        ValueType.PROBABILITY_DISTRIBUTION: cross_entropy,
+        ValueType.CLASS: nn.CrossEntropyLoss(),
+        ValueType.SIGMOID: sigmid_mse,
     }
 
     return dataSets.get(outputType, nn.MSELoss)
 
 
-def get_output_format(outputType: outputTypes):
+def get_output_format(outputType: ValueType):
     """
     Returns the output format (activation function of the final output layer)
     for the given output type of a dependent variable.
@@ -110,18 +110,18 @@ def get_output_format(outputType: outputTypes):
         outputType: output type of the dependent variable
     """
     dataSets = {
-        outputTypes.REAL: nn.Identity(),
-        outputTypes.PROBABILITY: nn.Sigmoid(),
-        outputTypes.PROBABILITY_SAMPLE: nn.Sigmoid(),
-        outputTypes.PROBABILITY_DISTRIBUTION: nn.Softmax(dim=1),
-        outputTypes.CLASS: nn.Softmax(dim=1),
-        outputTypes.SIGMOID: nn.Sigmoid(),
+        ValueType.REAL: nn.Identity(),
+        ValueType.PROBABILITY: nn.Sigmoid(),
+        ValueType.PROBABILITY_SAMPLE: nn.Sigmoid(),
+        ValueType.PROBABILITY_DISTRIBUTION: nn.Softmax(dim=1),
+        ValueType.CLASS: nn.Softmax(dim=1),
+        ValueType.SIGMOID: nn.Sigmoid(),
     }
 
     return dataSets.get(outputType, nn.MSELoss)
 
 
-def get_output_str(outputType: outputTypes) -> typing.Optional[str]:
+def get_output_str(outputType: ValueType) -> typing.Optional[str]:
     """
     Returns the output string for the given output type of a dependent variable.
 
@@ -130,12 +130,12 @@ def get_output_str(outputType: outputTypes) -> typing.Optional[str]:
     """
 
     dataSets = {
-        outputTypes.REAL: None,
-        outputTypes.PROBABILITY: "Sigmoid",
-        outputTypes.PROBABILITY_SAMPLE: "Sigmoid",
-        outputTypes.PROBABILITY_DISTRIBUTION: "Softmax",
-        outputTypes.CLASS: "Softmax",
-        outputTypes.SIGMOID: "Sigmoid",
+        ValueType.REAL: None,
+        ValueType.PROBABILITY: "Sigmoid",
+        ValueType.PROBABILITY_SAMPLE: "Sigmoid",
+        ValueType.PROBABILITY_DISTRIBUTION: "Softmax",
+        ValueType.CLASS: "Softmax",
+        ValueType.SIGMOID: "Sigmoid",
     }
 
     return dataSets.get(outputType, nn.MSELoss)
@@ -156,7 +156,7 @@ def sigmid_mse(output: torch.Tensor, target: torch.Tensor) -> torch.Tensor:
 
 
 def compute_BIC(
-    output_type: outputTypes,
+    output_type: ValueType,
     model: torch.nn.Module,
     input: torch.Tensor,
     target: torch.Tensor,
@@ -180,7 +180,7 @@ def compute_BIC(
 
     k, _, _ = model.countParameters()  # for most likely architecture
 
-    if output_type == outputTypes.CLASS:
+    if output_type == ValueType.CLASS:
         target_flattened = torch.flatten(target.long())
         llik = 0
         for idx in range(len(target_flattened)):
@@ -191,7 +191,7 @@ def compute_BIC(
         BIC = np.log(n) * k - 2 * llik
         BIC = BIC
 
-    elif output_type == outputTypes.PROBABILITY_SAMPLE:
+    elif output_type == ValueType.PROBABILITY_SAMPLE:
         llik = 0
         for idx in range(len(target)):
 
@@ -216,7 +216,7 @@ def compute_BIC(
     else:
         raise Exception(
             "BIC computation not implemented for output type "
-            + str(outputTypes.PROBABILITY)
+            + str(ValueType.PROBABILITY)
             + "."
         )
 
