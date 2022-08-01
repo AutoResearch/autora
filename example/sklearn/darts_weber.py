@@ -110,12 +110,22 @@ darts_estimator = GridSearchCV(
             output_type=ValueType.PROBABILITY,
         ),
     ),
-    param_grid=dict(darts__num_graph_nodes=range(1, 5)),
+    param_grid=dict(
+        dartsregressor__num_graph_nodes=[
+            2,
+            2,
+            2,
+            2,
+            2,
+        ]
+    ),
+    scoring="neg_mean_squared_error",
+    n_jobs=5,
 )
 darts_estimator.fit(X, y)
 
-show_results(estimator=darts_estimator, label="DARTSRegressor")
 print(darts_estimator.best_params_)
+show_results(estimator=darts_estimator.best_estimator_, label="DARTSRegressor")
 
 # %% Fit using Multilayer-Perceptron
 mlp_estimator = MLPRegressor()
