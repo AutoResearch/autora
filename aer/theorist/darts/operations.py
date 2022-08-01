@@ -1,10 +1,12 @@
 import typing
-from collections import namedtuple
 
 import torch
 import torch.nn as nn
 
-Genotype = namedtuple("Genotype", "normal normal_concat")
+
+class Genotype(typing.NamedTuple):
+    normal: typing.Any
+    normal_concat: typing.Any
 
 
 def isiterable(p_object: typing.Any) -> bool:
