@@ -32,6 +32,7 @@ def show_results_complete(
     Function to plot input data (x_, y_) and the predictions of an estimator for the same x_.
     """
     if projection == "2d":
+        plt.figure()
         data_.plot.scatter(
             "S1", "S2", c="difference_detected", cmap="viridis", zorder=10
         )
@@ -61,7 +62,6 @@ def show_results_complete(
 
 data = pd.read_csv("example/studies/Weber/experimentation/experiment_0_data.csv")
 show_results = partial(show_results_complete, data_=data, projection="3d")
-show_results()
 show_results(label="input data")
 
 X = data[["S1", "S2"]]
