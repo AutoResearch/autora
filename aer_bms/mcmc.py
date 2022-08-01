@@ -12,12 +12,8 @@ import scipy
 from scipy.optimize import curve_fit
 from sympy import lambdify, latex, log, sympify
 
-# from scipy.misc import comb
 _logger = logging.getLogger(__name__)
-# import warnings
-# warnings.filterwarnings('error')
 
-# seed(1111)
 
 # -----------------------------------------------------------------------------
 # The accepted operations (key: operation; value: #offspring)
@@ -143,7 +139,7 @@ class Tree:
         self.num_rr = len(self.rr_space)
         # Number of operations of each type
         self.nops = dict([[o, 0] for o in ops])
-        # The parameters of the prior propability (default: 5 everywhere)
+        # The parameters of the prior probability (default: 5 everywhere)
         if prior_par == {}:
             self.prior_par = dict([("Nopi_%s" % t, 10.0) for t in self.ops])
         else:
@@ -214,7 +210,7 @@ class Tree:
         ):
             # The par_values provided are enough to specify all model
             # parameters (self.parameters is a subset of
-            # par_lavues.keys()) and there is only one dataset: use
+            # par_values.keys()) and there is only one dataset: use
             # the data to specify the dataset label.
             self.par_values = {list(self.x.keys())[0]: deepcopy(par_values)}
         else:
@@ -387,7 +383,7 @@ class Tree:
         # Return None if the replacement is too big
         if (self.size + self.ops[rr[0]]) > self.max_size:
             return None
-        # Create the new root and replace exisiting root
+        # Create the new root and replace existing root
         newRoot = Node(rr[0], offspring=[], parent=None)
         newRoot.order = 1 + len(rr[1])
         if newRoot.order != self.ops[rr[0]]:
@@ -603,7 +599,7 @@ class Tree:
             flam = lambdify(
                 variables + parameters, ex, ["numpy", {"fac": scipy.special.factorial}]
             )
-        except SyntaxError:
+        except (SyntaxError, KeyError):
             self.sse = dict([(ds, np.inf) for ds in self.x])
             return self.sse
         if fit:
@@ -702,7 +698,7 @@ class Tree:
         """Calculate the "energy" of a given formula, that is, approximate minus log-posterior
         of the formula given the data (the approximation coming from the use of the BIC
         instead of the exactly integrated likelihood)."""
-        # Contribtution of the data (recalculating BIC if necessary)
+        # Contribution of the data (recalculating BIC if necessary)
         if bic:
             EB = self.get_bic(reset=reset, verbose=verbose) / 2.0
         else:
@@ -986,7 +982,7 @@ class Tree:
             self.prune_root(update_gof=False, verbose=verbose)
             # check/update canonical representative
             rep_res = self.update_representative(verbose=verbose)
-            if rep_res is -1:
+            if rep_res == -1:
                 # this formula is forbidden
                 self.replace_root(rr=oldrr, update_gof=False, verbose=verbose)
                 self.bic, self.sse, self.E = old_bic, deepcopy(old_sse), old_energy
@@ -1045,7 +1041,7 @@ class Tree:
                 return np.inf, np.inf, np.inf, deepcopy(self.par_values)
             # check/update canonical representative
             rep_res = self.update_representative(verbose=verbose)
-            if rep_res is -1:
+            if rep_res == -1:
                 # this formula is forbidden
                 self.prune_root(update_gof=False, verbose=verbose)
                 self.bic, self.sse, self.E = old_bic, deepcopy(old_sse), old_energy
@@ -1584,8 +1580,4 @@ def test5(string="(P120 + (((ALPHACAT / _a2) + (_a2 * CDH3)) + _a0))"):
 
 if __name__ == "__main__":
     NP, NS = 100, 1000
-    # test1(num_points=NP)
-    # print '\n' + '=' * 73 + '\n'
-    # test2(num_points=NP)
-    # test3(num_points=NP, samples=NS)
     test5()

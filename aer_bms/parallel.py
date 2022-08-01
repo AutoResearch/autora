@@ -6,7 +6,6 @@ import numpy as np
 import pandas as pd
 from numpy import exp
 
-# from mcmc import *
 from aer_bms.mcmc import OPS, Tree
 
 
@@ -79,7 +78,6 @@ class Parallel:
         t2 = self.trees[self.Ts[nT2]]
         # The temperatures and energies
         BT1, BT2 = t1.BT, t2.BT
-        # EB1, EB2, EP1, EP2 = t1.EB, t2.EB, t1.EP, t2.EP
         EB1, EB2 = t1.EB, t2.EB
         # The energy change
         DeltaE = np.float(EB1) * (1.0 / BT2 - 1.0 / BT1) + np.float(EB2) * (
