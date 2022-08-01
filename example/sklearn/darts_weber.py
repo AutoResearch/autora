@@ -84,6 +84,20 @@ polynomial_estimator.fit(X, y)
 
 show_results(estimator=polynomial_estimator, label="[0th-3rd]-order linear")
 
+# %% Fit using DARTS with parameters we know work
+darts_estimator_tuned = DARTSRegressor(
+    batch_size=20,
+    arch_updates_per_epoch=1,
+    param_updates_per_epoch=500,
+    max_epochs=100,
+    output_type=ValueType.PROBABILITY,
+    num_graph_nodes=2,
+)
+
+darts_estimator_tuned.fit(X, y)
+
+show_results(estimator=darts_estimator_tuned, label="pre-tuned DARTSRegressor")
+
 # %% Fit using DARTS
 darts_estimator = GridSearchCV(
     make_pipeline(
