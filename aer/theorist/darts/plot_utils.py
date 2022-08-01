@@ -1,4 +1,5 @@
 import os
+import typing
 
 import imageio
 import matplotlib
@@ -6,33 +7,35 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas
 import seaborn as sns
+import torch.nn
 from matplotlib import pyplot
 from matplotlib.gridspec import GridSpec
 
 import aer.config as aer_config
 import aer.theorist.darts.darts_config as darts_config
+from aer.theorist.object_of_study import Object_Of_Study
 
 
 def generate_darts_summary_figures(
-    figure_names,
-    titles,
-    filters,
-    title_suffix,
-    study_name,
-    y_name,
-    y_label,
-    y_sem_name,
-    x1_name,
-    x1_label,
-    x2_name,
-    x2_label,
-    x_limit,
-    y_limit,
-    best_model_name,
-    figure_size,
-    y_reference=None,
-    y_reference_label=None,
-    arch_samp_filter=None,
+    figure_names: typing.List[str],
+    titles: typing.List[str],
+    filters: typing.List[str],
+    title_suffix: str,
+    study_name: str,
+    y_name: str,
+    y_label: str,
+    y_sem_name: str,
+    x1_name: str,
+    x1_label: str,
+    x2_name: str,
+    x2_label: str,
+    x_limit: typing.List[float],
+    y_limit: typing.List[float],
+    best_model_name: str,
+    figure_size: typing.Tuple[int, int],
+    y_reference: typing.List[float] = None,
+    y_reference_label: str = "",
+    arch_samp_filter: str = None,
 ):
     """
     Generates a summary figure for a given DARTS study.
@@ -108,31 +111,31 @@ def generate_darts_summary_figures(
 
 
 def plot_darts_summary(
-    study_name,
-    y_name,
-    x1_name,
-    x2_name=None,
-    y_label=None,
-    x1_label=None,
-    x2_label=None,
-    y_sem_name=None,
-    metric="min",
+    study_name: str,
+    y_name: str,
+    x1_name: str,
+    x2_name: str = "",
+    y_label: str = "",
+    x1_label: str = "",
+    x2_label: str = "",
+    y_sem_name: str = None,
+    metric: str = "min",
     y_reference=None,
-    y_reference_label=None,
-    figure_dimensions=None,
-    title="",
-    legend_loc=0,
-    legend_font_size=8,
-    axis_font_size=10,
-    title_font_size=10,
-    show_legend=True,
-    y_limit=None,
-    x_limit=None,
-    theorist_filter=None,
-    arch_samp_filter=None,
-    best_model_name=None,
-    save=False,
-    figure_name="figure",
+    y_reference_label: str = "",
+    figure_dimensions: typing.Tuple[int, int] = None,
+    title: str = "",
+    legend_loc: int = 0,
+    legend_font_size: int = 8,
+    axis_font_size: int = 10,
+    title_font_size: int = 10,
+    show_legend: bool = True,
+    y_limit: typing.List[float] = None,
+    x_limit: typing.List[float] = None,
+    theorist_filter: str = None,
+    arch_samp_filter: str = None,
+    best_model_name: str = None,
+    save: bool = False,
+    figure_name: str = "figure",
 ):
     """
     Generates a single summary plot for a given DARTS study.
@@ -158,6 +161,8 @@ def plot_darts_summary(
         show_legend: boolean with the flag to show the legend
         y_limit: list with the limits of the y-axis
         x_limit: list with the limits of the x-axis
+        theorist_filter: string with the name of the filter to be used to select the theorist
+        arch_samp_filter: string with the name of the filter to be used to select the architecture
         best_model_name: string with the name of the best model to be highlighted in the figure
         save: boolean with the flag to save the figure
         figure_name: string with the name of the figure
@@ -168,16 +173,16 @@ def plot_darts_summary(
     if figure_dimensions is None:
         figure_dimensions = (4, 3)
 
-    if y_label is None:
+    if y_label == "":
         y_label = y_name
 
-    if x1_label is None:
+    if x1_label == "":
         x1_label = x1_name
 
-    if x2_label is None:
+    if x2_label == "":
         x2_label = x2_name
 
-    if y_reference_label is None:
+    if y_reference_label == "":
         y_reference_label = "Data Generating Model"
 
     # determine directory for study results and figures
@@ -212,11 +217,11 @@ def plot_darts_summary(
     print("Found " + str(len(files)) + " files.")
 
     # generate a plot dictionary
-    plot_dict = dict()
+    plot_dict: typing.Dict[typing.Optional[str], typing.List] = dict()
     plot_dict[darts_config.csv_arch_file_name] = list()
     plot_dict[y_name] = list()
     plot_dict[x1_name] = list()
-    if x2_name is not None:
+    if x2_name != "":
         plot_dict[x2_name] = list()
     if y_sem_name is not None:
         plot_dict[y_sem_name] = list()
@@ -254,7 +259,7 @@ def plot_darts_summary(
             raise Exception(
                 'Could not find key "' + x1_name + '" in the data file: ' + str(file)
             )
-        if x2_name is not None:
+        if x2_name != "":
             if x2_name in data.keys():
                 plot_dict[x2_name].extend(data[x2_name][valid_data])
             else:
@@ -289,7 +294,7 @@ def plot_darts_summary(
     model_name_list = plot_dict[darts_config.csv_arch_file_name]
     x1_data = np.asarray(plot_dict[x1_name])
     y_data = np.asarray(plot_dict[y_name])
-    if x2_name is None:  # determine for each value of x1 the corresponding y
+    if x2_name == "":  # determine for each value of x1 the corresponding y
         x1_data = np.asarray(plot_dict[x1_name])
         x1_unique = np.sort(np.unique(x1_data))
 
@@ -516,7 +521,7 @@ def plot_darts_summary(
 
     fig, ax = pyplot.subplots(figsize=figure_dimensions)
 
-    if x2_name is None:
+    if x2_name == "":
 
         colors = sns.color_palette(palette, 10)
         color = colors[-1]
@@ -680,11 +685,11 @@ def plot_darts_summary(
 
 
 def plot_model_graph(
-    study_name,
-    arch_weights_name,
-    model_weights_name,
-    object_of_study,
-    figure_name="graph",
+    study_name: str,
+    arch_weights_name: str,
+    model_weights_name: str,
+    object_of_study: Object_Of_Study,
+    figure_name: str = "graph",
 ):
     """
     Plot the graph of the DARTS model.
@@ -735,7 +740,12 @@ def plot_model_graph(
 # old
 
 
-def load_model(study_name, model_weights_name, arch_weights_name, object_of_study):
+def load_model(
+    study_name: str,
+    model_weights_name: str,
+    arch_weights_name: str,
+    object_of_study: Object_Of_Study,
+) -> torch.nn.Module:
     """
     Load the model.
 
@@ -744,6 +754,9 @@ def load_model(study_name, model_weights_name, arch_weights_name, object_of_stud
         model_weights_name: name of the model weights file (that contains the trained parameters)
         arch_weights_name: name of the architecture weights file
         object_of_study: name of the object of study
+
+    Returns:
+        model: DARTS model
     """
 
     import os
@@ -783,12 +796,12 @@ class DebugWindow:
 
     def __init__(
         self,
-        num_epochs,
-        numArchEdges=1,
-        numArchOps=1,
-        ArchOpsLabels=(),
-        fitPlot3D=False,
-        show_arch_weights=True,
+        num_epochs: int,
+        numArchEdges: int = 1,
+        numArchOps: int = 1,
+        ArchOpsLabels: typing.Tuple = (),
+        fitPlot3D: bool = False,
+        show_arch_weights: bool = True,
     ):
         """
         Initializes the debug window.
@@ -983,18 +996,18 @@ class DebugWindow:
 
     def update(
         self,
-        train_error=None,
-        valid_error=None,
-        weights=None,
-        BIC=None,
-        AIC=None,
-        model_graph=None,
-        range_input1=None,
-        range_input2=None,
-        range_target=None,
-        range_prediction=None,
-        target=None,
-        prediction=None,
+        train_error: np.array = None,
+        valid_error: np.array = None,
+        weights: np.array = None,
+        BIC: np.array = None,
+        AIC: np.array = None,
+        model_graph: str = None,
+        range_input1: np.array = None,
+        range_input2: np.array = None,
+        range_target: np.array = None,
+        range_prediction: np.array = None,
+        target: np.array = None,
+        prediction: np.array = None,
     ):
         """
         Update the debug plot with new data.

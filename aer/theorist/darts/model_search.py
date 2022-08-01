@@ -573,9 +573,9 @@ class Network(nn.Module):
             maxIdx = np.where(values == max(values))
 
             tmp_param_list = list()
-            if isiterable(op._ops[np.asscalar(maxIdx[0])]):  # Zero is not iterable
+            if isiterable(op._ops[maxIdx[0].item(0)]):  # Zero is not iterable
 
-                for subop in op._ops[np.asscalar(maxIdx[0])]:
+                for subop in op._ops[maxIdx[0].item(0)]:
 
                     for parameter in subop.parameters():
                         tmp_param_list.append(parameter.data.numpy().squeeze())
@@ -588,9 +588,7 @@ class Network(nn.Module):
                     "Edge ("
                     + str(idx)
                     + "): "
-                    + get_operation_label(
-                        PRIMITIVES[np.asscalar(maxIdx[0])], tmp_param_list
-                    )
+                    + get_operation_label(PRIMITIVES[maxIdx[0].item(0)], tmp_param_list)
                 )
             param_list.append(tmp_param_list)
 
