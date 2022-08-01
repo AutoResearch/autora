@@ -3,7 +3,7 @@ import logging
 from dataclasses import dataclass
 from functools import partial
 from itertools import cycle
-from typing import Callable, Iterator, Optional
+from typing import Callable, Iterator, Optional, Sequence
 
 import numpy as np
 import torch
@@ -17,7 +17,13 @@ import aer.config
 from aer.object_of_study import new_object_of_study
 from aer.theorist.darts.architect import Architect
 from aer.theorist.darts.model_search import DARTS_Type, Network
-from aer.theorist.darts.utils import AvgrageMeter, get_loss_function, get_output_format
+from aer.theorist.darts.utils import (
+    AvgrageMeter,
+    get_loss_function,
+    get_output_format,
+    get_output_str,
+)
+from aer.theorist.darts.visualize import darts_model_plot
 from aer.theorist.theorist_darts import format_input_target
 from aer.variable import ValueType, Variable, VariableCollection
 
@@ -412,6 +418,16 @@ class DARTSRegressor(BaseEstimator, RegressorMixin):
         assert self.model_ is not None
         return self.model_
 
+    @property
+    def _fitted_network(self) -> Network:
+        """Get the fitted network from the estimator."""
+
+        # First run the checks using the scikit-learn API, listing the key parameters
+        check_is_fitted(self, attributes=["network_"])
+
+        assert self.network_ is not None
+        return self.network_
+
     def predict(self, X: np.ndarray) -> np.ndarray:
         """
         Applies the fitted model to a set of independent variables `X`,
@@ -428,6 +444,46 @@ class DARTSRegressor(BaseEstimator, RegressorMixin):
         y = y_.detach().numpy()
 
         return y
+
+    def visualize_model(
+        self,
+        input_labels: Optional[Sequence[str]] = None,
+    ):
+        assert self._network is not None
+        genotype = (
+            self._network.genotype().normal
+        )  # contains information about the architecture of the model
+        (
+            _,
+            _,
+            param_list,
+        ) = self._network.countParameters()
+
+        assert self.X_ is not None
+
+        if input_labels is not None:
+            input_labels_ = tuple(input_labels)
+        elif hasattr(self.X_, "columns"):
+            input_labels_ = tuple(self.X_.columns)
+        else:
+            input_dim = 1 if self.X_.ndim == 1 else self.X_.shape[1]
+            input_labels_ = tuple(f"x{i}" for i in range(input_dim))
+
+        assert self.y_ is not None
+        out_dim = 1 if self.y_.ndim == 1 else self.y_.shape[1]
+        out_func = get_output_str(self.output_type)
+
+        # call to plot function
+        graph = darts_model_plot(
+            genotype=genotype,
+            input_labels=input_labels_,
+            param_list=param_list,
+            full_label=True,
+            out_dim=out_dim,
+            out_fnc=out_func,
+        )
+
+        return graph
 
 
 class DARTSClassifier(DARTSRegressor, ClassifierMixin):

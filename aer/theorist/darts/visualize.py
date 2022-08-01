@@ -33,11 +33,50 @@ def plot(
         out_fnc: the (activation) function to be used for the output nodes
     """
 
-    decimals_to_display = 2
+    g = darts_model_plot(
+        genotype=genotype,
+        full_label=full_label,
+        param_list=param_list,
+        input_labels=input_labels,
+        out_dim=out_dim,
+        out_fnc=out_fnc,
+    )
+
+    if viewFile is None:
+        if fileFormat == "pdf":
+            viewFile = True
+        else:
+            viewFile = False
+
+    g.render(filename, view=viewFile, format=fileFormat)
+
+
+def darts_model_plot(
+    genotype: Genotype,
+    full_label: bool = False,
+    param_list: typing.Sequence = (),
+    input_labels: typing.Sequence = (),
+    out_dim: int = None,
+    out_fnc: str = None,
+    decimals_to_display: int = 2,
+) -> Digraph:
+    """
+    Generates a graphviz plot for a DARTS model based on the genotype of the model.
+
+    Arguments:
+        genotype: the genotype of the model
+        full_label: if True, the labels of the nodes will be the full name of the operation
+            (including the coefficients)
+        param_list: a list of parameters to be included in the labels of the nodes
+        input_labels: a list of labels to be included in the input nodes
+        out_dim: the number of output nodes of the model
+        out_fnc: the (activation) function to be used for the output nodes
+        decimals_to_display: number of decimals to include in parameter values on plot
+    """
+
     format_string = "{:." + "{:.0f}".format(decimals_to_display) + "f}"
 
-    g = Digraph(
-        format=fileFormat,
+    graph = Digraph(
         edge_attr=dict(fontsize="20", fontname="times"),
         node_attr=dict(
             style="filled",
@@ -51,10 +90,10 @@ def plot(
         ),
         engine="dot",
     )
-    g.body.extend(["rankdir=LR"])
+    graph.body.extend(["rankdir=LR"])
 
     for input_node in input_labels:
-        g.node(input_node, fillcolor="#F1EDB9")  # fillcolor='darkseagreen2'
+        graph.node(input_node, fillcolor="#F1EDB9")  # fillcolor='darkseagreen2'
     # assert len(genotype) % 2 == 0
 
     # determine number of steps (intermediate nodes)
@@ -64,17 +103,19 @@ def plot(
             steps += 1
 
     for i in range(steps):
-        g.node(str(i), fillcolor="#BBCCF9")  # fillcolor='lightblue'
+        graph.node(str(i), fillcolor="#BBCCF9")  # fillcolor='lightblue'
 
     params_counter = 0
     n = len(input_labels)
     start = 0
     for i in range(steps):
         end = start + n
+        print(start, end)
         # for k in [2*i, 2*i + 1]:
         for k in range(
             start, end
         ):  # adapted this iteration from get_genotype() in model_search.py
+            print(genotype, k)
             op, j = genotype[k]
             if j < len(input_labels):
                 u = input_labels[j]
@@ -91,9 +132,9 @@ def plot(
                     op_label = get_operation_label(
                         op, params, decimals=decimals_to_display
                     )
-                    g.edge(u, v, label=op_label, fillcolor="gray")
+                    graph.edge(u, v, label=op_label, fillcolor="gray")
                 else:
-                    g.edge(
+                    graph.edge(
                         u,
                         v,
                         label="(" + str(j + start) + ") " + op_label,
@@ -136,7 +177,7 @@ def plot(
                 out_str = out_str + ")"
 
             # add node
-            g.node(out_str, fillcolor="#CBE7C7")  # fillcolor='palegoldenrod'
+            graph.node(out_str, fillcolor="#CBE7C7")  # fillcolor='palegoldenrod'
             out_nodes.append(out_str)
 
     for i in range(steps):
@@ -148,18 +189,12 @@ def plot(
                 op_label = get_operation_label(
                     "classifier", params, decimals=decimals_to_display
                 )
-                g.edge(str(i), out_str, label=op_label, fillcolor="gray")
+                graph.edge(str(i), out_str, label=op_label, fillcolor="gray")
         else:
             for out_idx, out_str in enumerate(out_nodes):
-                g.edge(str(i), out_str, label="linear", fillcolor="gray")
+                graph.edge(str(i), out_str, label="linear", fillcolor="gray")
 
-    if viewFile is None:
-        if fileFormat == "pdf":
-            viewFile = True
-        else:
-            viewFile = False
-
-    g.render(filename, view=viewFile)
+    return graph
 
 
 if __name__ == "__main__":
