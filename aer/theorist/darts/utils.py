@@ -467,3 +467,11 @@ def get_best_fitting_models(
     topk_BICs_names = res[1]
 
     return (topk_losses_names, topk_BICs_names)
+
+
+def format_input_target(input, target, criterion):
+
+    if isinstance(criterion, nn.CrossEntropyLoss):
+        target = target.squeeze()
+
+    return (input, target)

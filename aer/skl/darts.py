@@ -19,12 +19,12 @@ from aer.theorist.darts.architect import Architect
 from aer.theorist.darts.model_search import DARTS_Type, Network
 from aer.theorist.darts.utils import (
     AvgrageMeter,
+    format_input_target,
     get_loss_function,
     get_output_format,
     get_output_str,
 )
 from aer.theorist.darts.visualize import darts_model_plot
-from aer.theorist.theorist_darts import format_input_target
 from aer.variable import ValueType, Variable, VariableCollection
 
 _logger = logging.getLogger(__name__)
