@@ -101,7 +101,7 @@ def get_loss_function(outputType: outputTypes):
     return dataSets.get(outputType, nn.MSELoss)
 
 
-def get_output_format(outputType):
+def get_output_format(outputType: outputTypes):
     """
     Returns the output format (activation function of the final output layer)
     for the given output type of a dependent variable.
@@ -121,7 +121,7 @@ def get_output_format(outputType):
     return dataSets.get(outputType, nn.MSELoss)
 
 
-def get_output_str(outputType) -> typing.Optional[str]:
+def get_output_str(outputType: outputTypes) -> typing.Optional[str]:
     """
     Returns the output string for the given output type of a dependent variable.
 
@@ -409,7 +409,7 @@ def read_log_files(
     Reads the log files from an experiment directory and returns the results.
 
     Arguments:
-        resultsPath: path to the experiment results directory
+        results_path: path to the experiment results directory
         winning_architecture_only: if True, only the winning architecture is returned
     """
 
