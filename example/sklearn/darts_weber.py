@@ -99,6 +99,13 @@ darts_estimator_tuned.fit(X, y)
 show_results(estimator=darts_estimator_tuned, label="pre-tuned DARTSRegressor")
 darts_estimator_tuned.visualize_model().view()
 
+# %%
+
+
+darts_estimator_tuned.resample_model(sampling_strategy="sample")
+show_results(estimator=darts_estimator_tuned, label="resampled DARTSRegressor")
+darts_estimator_tuned.visualize_model().view()
+
 # %% Fit using DARTS with a Cross-Validation-Search
 darts_estimator = GridSearchCV(
     make_pipeline(
