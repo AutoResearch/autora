@@ -7,13 +7,16 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas
 import seaborn as sns
+import torch
 import torch.nn
 from matplotlib import pyplot
 from matplotlib.gridspec import GridSpec
 
 import aer.config as aer_config
 import aer.theorist.darts.darts_config as darts_config
-from aer.theorist.object_of_study import Object_Of_Study
+import aer.theorist.darts.utils as utils
+from aer.object_of_study import ObjectOfStudy
+from aer.theorist.darts.model_search import Network
 
 
 def generate_darts_summary_figures(
@@ -688,7 +691,7 @@ def plot_model_graph(
     study_name: str,
     arch_weights_name: str,
     model_weights_name: str,
-    object_of_study: Object_Of_Study,
+    object_of_study: ObjectOfStudy,
     figure_name: str = "graph",
 ):
     """
@@ -744,7 +747,7 @@ def load_model(
     study_name: str,
     model_weights_name: str,
     arch_weights_name: str,
-    object_of_study: Object_Of_Study,
+    object_of_study: ObjectOfStudy,
 ) -> torch.nn.Module:
     """
     Load the model.
@@ -758,13 +761,6 @@ def load_model(
     Returns:
         model: DARTS model
     """
-
-    import os
-
-    import torch
-
-    import aer.theorist.darts.utils as utils
-    from aer.theorist.darts.model_search import Network
 
     num_output = object_of_study.output_dimensions
     num_input = object_of_study.input_dimensions
