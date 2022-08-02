@@ -334,8 +334,17 @@ class DARTSRegressor(BaseEstimator, RegressorMixin):
 
 
     Attributes:
-        network_: represents the optimized network for the architecture search
-        model_: represents the best-fit model after simplification of the best fit function
+        network_: represents the optimized network for the architecture search, without the
+            output function
+        model_: represents the best-fit model including the output function
+            after sampling of the network to pick a single computation graph.
+            By default, this is the computation graph with the maximum weights,
+            but can be set to a graph based on a sample on the edge weights
+            by running the `resample_model(sample_strategy="sample")` method.
+            It can be reset by running the `resample_model(sample_strategy="max")` method.
+        model_sampler_: a callable which generates versions of the model, either based on the
+            maximum architecture weights or based on a sample over the architecture weights.
+
 
 
     """
@@ -436,11 +445,13 @@ class DARTSRegressor(BaseEstimator, RegressorMixin):
         self.model_sampler_ = fit_results.model_sampler_
         return self
 
-    def resample_model(self, sampling_strategy: SAMPLING_STRATEGIES) -> Network:
+    def resample_model(
+        self, sampling_strategy: SAMPLING_STRATEGIES = "sample"
+    ) -> Network:
         """
-        Generates a new model based on either the maximum architecture weights
-        (`sampling_strategy="max"`) or a sample of the architecture weights
-        (`sampling_strategy="sample"`)
+        Generates a new model based on a sample of the architecture weights
+        (`sampling_strategy="sample"`) or the maximum architecture weights
+        (`sampling_strategy="max"`)
 
         Args:
             sampling_strategy:
@@ -452,31 +463,6 @@ class DARTSRegressor(BaseEstimator, RegressorMixin):
         assert self.model_sampler_ is not None
         self.model_ = self.model_sampler_(sampling_strategy)
         return self.model_
-
-    @property
-    def _fitted_model(self) -> Network:
-        """Get the fitted model from the estimator."""
-
-        # First run the checks using the scikit-learn API, listing the key parameters
-        check_is_fitted(self, attributes=["model_"])
-
-        # Since self.model_ is initialized as None, mypy throws an error if we
-        # just call self.model_(X) in the predict method, as it could still be none.
-        # MyPy doesn't understand that the sklearn check_is_fitted function
-        # ensures the self.model_ parameter is initialized and otherwise throws an error,
-        # so we check that explicitly here and pass the model which can't be None.
-        assert self.model_ is not None
-        return self.model_
-
-    @property
-    def _fitted_network(self) -> Network:
-        """Get the fitted network from the estimator."""
-
-        # First run the checks using the scikit-learn API, listing the key parameters
-        check_is_fitted(self, attributes=["network_"])
-
-        assert self.network_ is not None
-        return self.network_
 
     def predict(self, X: np.ndarray) -> np.ndarray:
         """
@@ -490,6 +476,17 @@ class DARTSRegressor(BaseEstimator, RegressorMixin):
             y: predicted dependent variable values
         """
         X_ = check_array(X)
+
+        # First run the checks using the scikit-learn API, listing the key parameters
+        check_is_fitted(self, attributes=["model_"])
+
+        # Since self.model_ is initialized as None, mypy throws an error if we
+        # just call self.model_(X) in the predict method, as it could still be none.
+        # MyPy doesn't understand that the sklearn check_is_fitted function
+        # ensures the self.model_ parameter is initialized and otherwise throws an error,
+        # so we check that explicitly here and pass the model which can't be None.
+        assert self.model_ is not None
+
         y_ = self._fitted_model(torch.as_tensor(X_).float())
         y = y_.detach().numpy()
 
@@ -500,7 +497,6 @@ class DARTSRegressor(BaseEstimator, RegressorMixin):
         input_labels: Optional[Sequence[str]] = None,
     ):
         assert self.model_ is not None
-
         fitted_sampled_network = self.model_[0]
 
         genotype = Network.genotype(fitted_sampled_network).normal
