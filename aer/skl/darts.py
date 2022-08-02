@@ -29,6 +29,8 @@ from aer.variable import ValueType, Variable, VariableCollection
 
 _logger = logging.getLogger(__name__)
 
+SAMPLING_STRATEGIES = Literal["max", "sample"]
+
 
 @dataclass(frozen=True)
 class _DARTSResult:
@@ -36,7 +38,7 @@ class _DARTSResult:
 
     network_: Network
     model_: torch.nn.Module
-    model_sampler_: Callable[[], torch.nn.Module]
+    model_sampler_: Callable[[SAMPLING_STRATEGIES], torch.nn.Module]
 
 
 def _general_darts(
@@ -166,7 +168,6 @@ def _general_darts(
         network_=network_,
         coefficient_optimizer=coefficient_optimizer,
         output_function=output_function,
-        sampling_strategy="sample",
     )
 
     results = _DARTSResult(
@@ -174,32 +175,6 @@ def _general_darts(
     )
 
     return results
-
-
-def _generate_model(
-    network_: Network,
-    coefficient_optimizer: Callable[[Network], None],
-    output_function: torch.nn.Module,
-    sampling_strategy: Literal["max", "sample"],
-):
-
-    # Set edges in the network with the highest weights to 1, others to 0
-    model_without_output_function = copy.deepcopy(network_)
-
-    if sampling_strategy == "max":
-        new_weights = model_without_output_function.max_alphas_normal()
-    elif sampling_strategy == "sample":
-        new_weights = model_without_output_function.sample_alphas_normal()
-
-    model_without_output_function.fix_architecture(True, new_weights=new_weights)
-
-    # Re-optimize the parameters
-    coefficient_optimizer(model_without_output_function)
-
-    # Include the output function
-    model_ = torch.nn.Sequential(model_without_output_function, output_function)
-
-    return model_
 
 
 def _optimize_coefficients(
@@ -310,6 +285,32 @@ def _get_next_input_target(data_iterator: Iterator, criterion: torch.nn.Module):
     return input_fmt, target_fmt
 
 
+def _generate_model(
+    sampling_strategy: SAMPLING_STRATEGIES,
+    network_: Network,
+    coefficient_optimizer: Callable[[Network], None],
+    output_function: torch.nn.Module,
+):
+
+    # Set edges in the network with the highest weights to 1, others to 0
+    model_without_output_function = copy.deepcopy(network_)
+
+    if sampling_strategy == "max":
+        new_weights = model_without_output_function.max_alphas_normal()
+    elif sampling_strategy == "sample":
+        new_weights = model_without_output_function.sample_alphas_normal()
+
+    model_without_output_function.fix_architecture(True, new_weights=new_weights)
+
+    # Re-optimize the parameters
+    coefficient_optimizer(model_without_output_function)
+
+    # Include the output function
+    model_ = torch.nn.Sequential(model_without_output_function, output_function)
+
+    return model_
+
+
 class DARTSRegressor(BaseEstimator, RegressorMixin):
     """
     Differentiable ARchiTecture Search Regressor.
@@ -413,7 +414,7 @@ class DARTSRegressor(BaseEstimator, RegressorMixin):
         self.y_: Optional[np.ndarray] = None
         self.network_: Optional[Network] = None
         self.model_: Optional[Network] = None
-        self.model_sampler_: Optional[Callable[[], Network]] = None
+        self.model_sampler_: Optional[Callable[[SAMPLING_STRATEGIES], Network]] = None
 
     def fit(self, X: np.ndarray, y: np.ndarray):
         """
@@ -434,6 +435,23 @@ class DARTSRegressor(BaseEstimator, RegressorMixin):
         self.model_ = fit_results.model_
         self.model_sampler_ = fit_results.model_sampler_
         return self
+
+    def resample_model(self, sampling_strategy: SAMPLING_STRATEGIES) -> Network:
+        """
+        Generates a new model based on either the maximum architecture weights
+        (`sampling_strategy="max"`) or a sample of the architecture weights
+        (`sampling_strategy="sample"`)
+
+        Args:
+            sampling_strategy:
+
+        Returns:
+
+        """
+        check_is_fitted(self, attributes=["model_sampler_"])
+        assert self.model_sampler_ is not None
+        self.model_ = self.model_sampler_(sampling_strategy)
+        return self.model_
 
     @property
     def _fitted_model(self) -> Network:
