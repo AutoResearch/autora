@@ -499,15 +499,16 @@ class DARTSRegressor(BaseEstimator, RegressorMixin):
         self,
         input_labels: Optional[Sequence[str]] = None,
     ):
-        assert self.network_ is not None
-        genotype = (
-            self.network_.genotype().normal
-        )  # contains information about the architecture of the model
+        assert self.model_ is not None
+
+        fitted_sampled_network = self.model_[0]
+
+        genotype = Network.genotype(fitted_sampled_network).normal
         (
             _,
             _,
             param_list,
-        ) = self.network_.countParameters()
+        ) = fitted_sampled_network.countParameters()
 
         assert self.X_ is not None
 
