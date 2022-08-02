@@ -487,7 +487,7 @@ class DARTSRegressor(BaseEstimator, RegressorMixin):
         # so we check that explicitly here and pass the model which can't be None.
         assert self.model_ is not None
 
-        y_ = self._fitted_model(torch.as_tensor(X_).float())
+        y_ = self.model_(torch.as_tensor(X_).float())
         y = y_.detach().numpy()
 
         return y
