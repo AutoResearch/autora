@@ -10,6 +10,7 @@ import torch
 import torch.nn
 import torch.nn.utils
 import torch.utils.data
+import tqdm
 from sklearn.base import BaseEstimator, ClassifierMixin, RegressorMixin
 from sklearn.utils.validation import check_array, check_is_fitted, check_X_y
 
@@ -30,6 +31,8 @@ from aer.variable import ValueType, Variable, VariableCollection
 _logger = logging.getLogger(__name__)
 
 SAMPLING_STRATEGIES = Literal["max", "sample"]
+
+progress_indicator = tqdm.auto.tqdm
 
 
 @dataclass(frozen=True)
@@ -127,9 +130,9 @@ def _general_darts(
     _logger.info("Starting fit.")
     network_.train()
 
-    for epoch in range(max_epochs):
+    for epoch in progress_indicator(range(max_epochs)):
 
-        _logger.info(f"Running fit, epoch {epoch}")
+        _logger.debug(f"Running fit, epoch {epoch}")
 
         # Do the Architecture update
 
@@ -138,7 +141,7 @@ def _general_darts(
 
         # Then run the arch optimization
         for arch_step in range(arch_updates_per_epoch):
-            _logger.info(
+            _logger.debug(
                 f"Running architecture update, "
                 f"epoch: {epoch}, architecture: {arch_step}"
             )
@@ -197,7 +200,7 @@ def _optimize_coefficients(
     objs = AvgrageMeter()
 
     for param_step in range(param_updates_per_epoch):
-        _logger.info(f"Running parameter update, " f"param: {param_step}")
+        _logger.debug(f"Running parameter update, " f"param: {param_step}")
 
         lr = scheduler.get_last_lr()[0]
         X_batch, y_batch = _get_next_input_target(data_iterator, criterion=criterion)
