@@ -1,7 +1,7 @@
 import random
 import warnings
 from enum import Enum
-from typing import Callable, List, Tuple
+from typing import Callable, List, Sequence, Tuple
 
 import numpy as np
 import torch
@@ -48,16 +48,13 @@ class MixedOp(nn.Module):
     that is applied to an input variable.
     """
 
-    def __init__(self, primitives: List[str] = []):
+    def __init__(self, primitives: Sequence[str] = PRIMITIVES):
         """
         Initializes a mixture operation based on a pre-specified set of primitive operations.
 
         Arguments:
             primitives: list of primitives to be used in the mixture operation
         """
-        if not primitives:
-            primitives = PRIMITIVES
-
         super(MixedOp, self).__init__()
         self._ops = nn.ModuleList()
         # loop through all the 8 primitive operations
@@ -104,7 +101,10 @@ class Cell(nn.Module):
     """
 
     def __init__(
-        self, steps: int = 2, n_input_states: int = 1, primitives: List[str] = []
+        self,
+        steps: int = 2,
+        n_input_states: int = 1,
+        primitives: Sequence[str] = PRIMITIVES,
     ):
         """
         Initializes a cell based on the number of hidden nodes (steps)
@@ -215,7 +215,7 @@ class Network(nn.Module):
         architecture_fixed: bool = False,
         classifier_weight_decay: float = 0,
         darts_type: DARTS_Type = DARTS_Type.ORIGINAL,
-        primitives: List[str] = [],
+        primitives: Sequence[str] = PRIMITIVES,
     ):
         """
         Initializes the network.
@@ -240,11 +240,7 @@ class Network(nn.Module):
         self._multiplier = (
             1  # the number of internal nodes that get concatenated to the output
         )
-
-        if not primitives:
-            self.primitives = PRIMITIVES
-        else:
-            self.primitives = primitives
+        self.primitives = primitives
 
         # set parameters
         self._dim_output = self._steps

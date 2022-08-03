@@ -106,7 +106,9 @@ experimentalist_validation = Experimentalist_Popper(
 # THEORIST
 
 # initialize theorist
-theorist = Theorist_DARTS(study_name, darts_type=DARTS_Type.ORIGINAL)
+theorist = Theorist_DARTS(
+    study_name, darts_type=DARTS_Type.ORIGINAL, primitives=["none", "add", "subtract"]
+)
 
 # specify plots
 plots = list()
