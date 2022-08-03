@@ -13,7 +13,6 @@ from sympy import lambdify, latex, log, sympify
 
 _logger = logging.getLogger(__name__)
 
-
 # -----------------------------------------------------------------------------
 # The accepted operations (key: operation; value: #offspring)
 # -----------------------------------------------------------------------------
