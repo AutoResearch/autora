@@ -22,7 +22,11 @@ def isiterable(p_object: typing.Any) -> bool:
 
 
 def get_operation_label(
-    op_name: str, params_org: typing.List, decimals: int = 4
+    op_name: str,
+    params_org: typing.List,
+    decimals: int = 4,
+    input_var: str = "x",
+    latex: bool = False,
 ) -> str:
     """
     Returns a complete string describing a DARTS operation.
@@ -31,6 +35,8 @@ def get_operation_label(
         op_name: name of the operation
         params_org: original parameters of the operation
         decimals: number of decimals to be used for converting the parameters into string format
+        input_var: name of the input variable
+        latex: if True, the output will be in LaTeX format
     """
     params = params_org.copy()
 
@@ -39,16 +45,22 @@ def get_operation_label(
     classifier_str = ""
     if op_name == "classifier":
         value = params[0]
-        classifier_str = format_string.format(value) + " * x"
+        classifier_str = format_string.format(value) + " * " + input_var
 
         return classifier_str
 
     if op_name == "classifier_concat":
-        classifier_str = "x.*("
+        if latex is True:
+            classifier_str = input_var + " \\circ \\left("
+        else:
+            classifier_str = input_var + " .* ("
         for param_idx, param in enumerate(params):
 
             if param_idx > 0:
-                classifier_str = classifier_str + " .+("
+                if latex is True:
+                    classifier_str = classifier_str + " + \\left("
+                else:
+                    classifier_str = classifier_str + " .+ ("
 
             if isiterable(param.tolist()):
                 for value_idx, value in enumerate(param.tolist()):
@@ -57,12 +69,24 @@ def get_operation_label(
                             classifier_str + format_string.format(value) + " + "
                         )
                     else:
-                        classifier_str = (
-                            classifier_str + format_string.format(value) + ")"
-                        )
+                        if latex is True:
+                            classifier_str = (
+                                classifier_str
+                                + format_string.format(value)
+                                + "\\right)"
+                            )
+                        else:
+                            classifier_str = (
+                                classifier_str + format_string.format(value) + ")"
+                            )
 
             else:
-                classifier_str = classifier_str + format_string.format(param) + ")"
+                if latex is True:
+                    classifier_str = classifier_str + format_string.format(param) + ")"
+                else:
+                    classifier_str = (
+                        classifier_str + format_string.format(param) + "\\right)"
+                    )
 
         return classifier_str
 
@@ -70,63 +94,189 @@ def get_operation_label(
     params.extend([0, 0, 0])
 
     if num_params == 1:  # without bias
-        labels = {
-            "none": "",
-            "linear": str(format_string.format(params[0])) + " * x",
-            "relu": "ReLU(x)",
-            "lin_relu": "ReLU(" + str(format_string.format(params[0])) + " * x)",
-            # 'sigmoid': '1/(1+e^(-x))',
-            "sigmoid": "logistic(x)",
-            # 'lin_sigmoid': '1/(1+e^(-' + str(format_string.format(params[0])) + ' * x))',
-            "lin_sigmoid": "logistic(" + str(format_string.format(params[0])) + " * x)",
-            "add": "+ x",
-            "subtract": "- x",
-            "mult": str(format_string.format(params[0])) + " * x",
-            # 'exp': 'e^(' + str(format_string.format(params[0])) + ' * x)',
-            "exp": "exp(" + str(format_string.format(params[0])) + " * x)",
-            "1/x": "1 / (" + str(format_string.format(params[0])) + " * x)",
-            "ln": "ln(" + str(format_string.format(params[0])) + " * x)",
-            "classifier": classifier_str,
-        }
+        if latex is False:
+            labels = {
+                "none": "",
+                "linear": str(format_string.format(params[0])) + " * " + input_var,
+                "relu": "ReLU(" + input_var + ")",
+                "lin_relu": "ReLU("
+                + str(format_string.format(params[0]))
+                + " * "
+                + input_var
+                + ")",
+                # 'sigmoid': '1/(1+e^(-x))',
+                "sigmoid": "logistic(" + input_var + ")",
+                # 'lin_sigmoid': '1/(1+e^(-' + str(format_string.format(params[0])) + ' * x))',
+                "lin_sigmoid": "logistic("
+                + str(format_string.format(params[0]))
+                + " * "
+                + input_var
+                + ")",
+                "add": "+ " + input_var,
+                "subtract": "- " + input_var,
+                "mult": str(format_string.format(params[0])) + " * " + input_var,
+                # 'exp': 'e^(' + str(format_string.format(params[0])) + ' * x)',
+                "exp": "exp("
+                + str(format_string.format(params[0]))
+                + " * "
+                + input_var
+                + ")",
+                "1/x": "1 / ("
+                + str(format_string.format(params[0]))
+                + " * "
+                + input_var
+                + ")",
+                "ln": "ln("
+                + str(format_string.format(params[0]))
+                + " * "
+                + input_var
+                + ")",
+                "classifier": classifier_str,
+            }
+        else:
+            labels = {
+                "none": "",
+                "linear": str(format_string.format(params[0])) + "" + input_var,
+                "relu": "ReLU\\left(" + input_var + "\\right)",
+                "lin_relu": "ReLU\\left("
+                + str(format_string.format(params[0]))
+                + ""
+                + input_var
+                + "\\right)",
+                # 'sigmoid': '1/(1+e^(-x))',
+                "sigmoid": "\\sigma\\left(" + input_var + "\\right)",
+                # 'lin_sigmoid': '1/(1+e^(-' + str(format_string.format(params[0])) + ' * x))',
+                "lin_sigmoid": "\\sigma\\left("
+                + str(format_string.format(params[0]))
+                + ""
+                + input_var
+                + "\\right)",
+                "add": "+ " + input_var,
+                "subtract": "- " + input_var,
+                "mult": str(format_string.format(params[0])) + "" + input_var,
+                # 'exp': 'e^(' + str(format_string.format(params[0])) + ' * x)',
+                "exp": "e^{"
+                + str(format_string.format(params[0]))
+                + ""
+                + input_var
+                + "}",
+                "1/x": "\\frac{1}{"
+                + str(format_string.format(params[0]))
+                + ""
+                + input_var
+                + "}",
+                "ln": "\\ln\\left("
+                + str(format_string.format(params[0]))
+                + ""
+                + input_var
+                + "\\right)",
+                "classifier": classifier_str,
+            }
     else:  # with bias
-        labels = {
-            "none": "",
-            "linear": str(format_string.format(params[0]))
-            + " * x + "
-            + str(format_string.format(params[1])),
-            "relu": "ReLU(x)",
-            "lin_relu": "ReLU("
-            + str(format_string.format(params[0]))
-            + " * x + "
-            + str(format_string.format(params[1]))
-            + ")",
-            # 'sigmoid': '1/(1+e^(-x))',
-            "sigmoid": "logistic(x)",
-            "lin_sigmoid": "logistic("
-            + str(format_string.format(params[0]))
-            + " * x + "
-            + str(format_string.format(params[1]))
-            + ")",
-            "add": "+ x",
-            "subtract": "- x",
-            "mult": str(format_string.format(params[0])) + " * x",
-            "exp": "exp("
-            + str(format_string.format(params[0]))
-            + " * x + "
-            + str(format_string.format(params[1]))
-            + ")",
-            "1/x": "1 / ("
-            + str(format_string.format(params[0]))
-            + " * x + "
-            + str(format_string.format(params[1]))
-            + ")",
-            "ln": "ln("
-            + str(format_string.format(params[0]))
-            + " * x + "
-            + str(format_string.format(params[1]))
-            + ")",
-            "classifier": classifier_str,
-        }
+        if latex is False:
+            labels = {
+                "none": "",
+                "linear": str(format_string.format(params[0]))
+                + " * "
+                + input_var
+                + " + "
+                + str(format_string.format(params[1])),
+                "relu": "ReLU(" + input_var + ")",
+                "lin_relu": "ReLU("
+                + str(format_string.format(params[0]))
+                + " * "
+                + input_var
+                + " + "
+                + str(format_string.format(params[1]))
+                + ")",
+                # 'sigmoid': '1/(1+e^(-x))',
+                "sigmoid": "logistic(" + input_var + ")",
+                "lin_sigmoid": "logistic("
+                + str(format_string.format(params[0]))
+                + " * "
+                + input_var
+                + " + "
+                + str(format_string.format(params[1]))
+                + ")",
+                "add": "+ " + input_var,
+                "subtract": "- " + input_var,
+                "mult": str(format_string.format(params[0])) + " * " + input_var,
+                "exp": "exp("
+                + str(format_string.format(params[0]))
+                + " * "
+                + input_var
+                + " + "
+                + str(format_string.format(params[1]))
+                + ")",
+                "1/x"
+                + input_var: "1 / ("
+                + str(format_string.format(params[0]))
+                + " * "
+                + input_var
+                + " + "
+                + str(format_string.format(params[1]))
+                + ")",
+                "ln": "ln("
+                + str(format_string.format(params[0]))
+                + " * "
+                + input_var
+                + " + "
+                + str(format_string.format(params[1]))
+                + ")",
+                "classifier": classifier_str,
+            }
+        else:
+            labels = {
+                "none": "",
+                "linear": str(format_string.format(params[0]))
+                + ""
+                + input_var
+                + " + "
+                + str(format_string.format(params[1])),
+                "relu": "ReLU\\left(" + input_var + "\\right)",
+                "lin_relu": "ReLU\\left("
+                + str(format_string.format(params[0]))
+                + ""
+                + input_var
+                + " + "
+                + str(format_string.format(params[1]))
+                + "\\right)",
+                # 'sigmoid': '1/(1+e^(-x))',
+                "sigmoid": "\\sigma\\left(" + input_var + "\\right)",
+                "lin_sigmoid": "\\sigma\\left("
+                + str(format_string.format(params[0]))
+                + ""
+                + input_var
+                + " + "
+                + str(format_string.format(params[1]))
+                + "\\right)",
+                "add": "+ " + input_var,
+                "subtract": "- " + input_var,
+                "mult": str(format_string.format(params[0])) + " * " + input_var,
+                "exp": "e^{"
+                + str(format_string.format(params[0]))
+                + ""
+                + input_var
+                + " + "
+                + str(format_string.format(params[1]))
+                + "}",
+                "1/x"
+                + input_var: "\\frac{1}{"
+                + str(format_string.format(params[0]))
+                + ""
+                + input_var
+                + " + "
+                + str(format_string.format(params[1]))
+                + "}",
+                "ln": "\\ln\\left("
+                + str(format_string.format(params[0]))
+                + ""
+                + input_var
+                + " + "
+                + str(format_string.format(params[1]))
+                + "\\right)",
+                "classifier": classifier_str,
+            }
 
     return labels.get(op_name, "")
 

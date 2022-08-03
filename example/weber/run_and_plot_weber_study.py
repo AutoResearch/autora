@@ -24,6 +24,10 @@ port = exp_cfg.HOST_PORT  # port of experiment server
 
 AER_cycles = 1
 
+# import os
+# os.chdir("..")
+# os.chdir("..")
+
 # OBJECT OF STUDY
 
 # specify independent variables
@@ -171,6 +175,18 @@ viz.plot(
     out_fnc=out_fnc,
 )
 
+input_labels = ["S1", "S2"]
+output_labels = ["P(detected)"]
+out_fnc = utils.get_output_str(study_object.__get_output_type__())
+
+equations = model.architecture_to_str_list(
+    input_labels=input_labels, output_labels=output_labels, out_fnc=out_fnc, latex=False
+)
+
+print("====== MODEL EQUATIONS ======")
+for eqn in equations:
+    print(eqn)
+print("==============================")
 
 now = datetime.now()
 dt_string = now.strftime("%d/%m/%Y %H:%M:%S")

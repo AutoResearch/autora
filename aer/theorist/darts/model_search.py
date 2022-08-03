@@ -582,7 +582,6 @@ class Network(nn.Module):
                         if parameter.requires_grad is True:
                             n_params_total += parameter.data.numel()
 
-            print_parameters = True
             if print_parameters:
                 print(
                     "Edge ("
@@ -605,7 +604,7 @@ class Network(nn.Module):
             tmp_param_list.append(
                 self.classifier._parameters["weight"].data[:, edge].numpy()
             )
-            # add partial bias (bias of classifier units will be devided by
+            # add partial bias (bias of classifier units will be divided by
             # number of edges)
             if "bias" in self.classifier._parameters.keys() and edge == 0:
                 tmp_param_list.append(self.classifier._parameters["bias"].data.numpy())
@@ -613,10 +612,129 @@ class Network(nn.Module):
 
             if print_parameters:
                 print(
-                    "Classifier from Edge "
+                    "Classifier from Node "
                     + str(edge)
                     + ": "
                     + get_operation_label("classifier_concat", tmp_param_list)
                 )
 
         return (n_params_total, n_params_base, param_list)
+
+    def architecture_to_str_list(
+        self,
+        input_labels: List[str],
+        output_labels: List[str],
+        out_fnc: str = "Fnc",
+        decimals_to_display: int = 2,
+        latex=False,
+    ) -> List:
+        """
+        Returns a list of strings representing the model.
+
+        Arguments:
+            input_labels: list of strings representing the input states.
+            output_labels: list of strings representing the output states.
+            out_fnc: string representing the output function.
+            decimals_to_display: number of decimals to display.
+            latex: if set to true, the function will return the equations in latex format
+
+        Returns:
+            list of strings representing the model
+        """
+        (n_params_total, n_params_base, param_list) = self.countParameters(
+            print_parameters=False
+        )
+        genotype = self.genotype().normal
+        steps = self._steps
+        edge_list = list()
+
+        n = len(input_labels)
+        start = 0
+        for i in range(steps):  # for every node
+            end = start + n
+            # for k in [2*i, 2*i + 1]:
+
+            edge_operations_list = list()
+            op_list = list()
+
+            for k in range(start, end):
+                if latex is True:  # for every edge projecting to current node
+                    v = "k_" + str(i + 1)
+                else:
+                    v = "k" + str(i + 1)
+                op, j = genotype[k]
+                if j < len(input_labels):
+                    u = input_labels[j]
+                else:
+                    u = str(j - len(input_labels))
+                if op != "none":
+                    op_label = op
+                    params = param_list[
+                        start + j
+                    ]  # note: genotype order and param list order don't align
+                    op_label = get_operation_label(
+                        op,
+                        params,
+                        decimals=decimals_to_display,
+                        input_var=u,
+                        latex=latex,
+                    )
+                    op_list.append(op)
+                    edge_operations_list.append(op_label)
+
+            edge_str = ""
+            for i, edge_operation in enumerate(edge_operations_list):
+                if i == 0:
+                    edge_str += v + " = " + edge_operation
+                if i > 0:
+                    if (
+                        op_list[i] != "add"
+                        and op_list[i] != "subtract"
+                        and op_list[i] != "none"
+                    ):
+                        edge_str += " +"
+                    edge_str += " " + edge_operation
+
+            edge_list.append(edge_str)
+            start = end
+            n += 1
+
+        # TODO: extend to multiple outputs
+        if latex is True:
+            classifier_str = output_labels[0] + " = " + out_fnc + "\\left("
+        else:
+            classifier_str = output_labels[0] + " = " + out_fnc + "("
+
+        bias = None
+        for i in range(steps):
+            param_idx = len(param_list) - steps + i
+            tmp_param_list = param_list[param_idx]
+            if i == 0 and len(tmp_param_list) == 2:
+                bias = tmp_param_list[1]
+            if i > 0:
+                classifier_str += " + "
+
+            if latex is True:
+                input_var = "k_" + str(i + 1)
+            else:
+                input_var = "k" + str(i + 1)
+
+            classifier_str += get_operation_label(
+                "classifier",
+                tmp_param_list[0],
+                decimals=decimals_to_display,
+                input_var=input_var,
+            )
+
+            if i == steps - 1 and bias is not None:
+                classifier_str += " + " + str(bias[0])
+
+            if i == steps - 1:
+                if latex is True:
+                    classifier_str += "\\right)"
+                else:
+                    classifier_str += ")"
+
+        edge_list.append(classifier_str)
+
+        return edge_list
