@@ -379,7 +379,7 @@ OPS = {
 
 # this is the list of primitives actually used,
 # and it should be a set of names contained in the OPS dictionary
-PRIMITIVES = [
+PRIMITIVES = (
     "none",
     "add",
     "subtract",
@@ -387,7 +387,7 @@ PRIMITIVES = [
     "lin_sigmoid",
     "mult",
     "lin_relu",
-]
+)
 
 # make sure that every primitive is in the OPS dictionary
 for name in PRIMITIVES:
