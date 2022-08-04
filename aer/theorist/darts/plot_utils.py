@@ -727,13 +727,13 @@ def plot_model_graph(
     viz.plot(
         genotype.normal,
         filepath,
-        fileFormat="png",
-        input_labels=object_of_study.__get_input_labels__(),
+        file_format="png",
+        view_file=True,
         full_label=True,
         param_list=param_list,
+        input_labels=object_of_study.__get_input_labels__(),
         out_dim=object_of_study.__get_output_dim__(),
         out_fnc=utils.get_output_str(object_of_study.__get_output_type__()),
-        viewFile=True,
     )
 
 

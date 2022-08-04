@@ -259,10 +259,10 @@ class Theorist_DARTS(Theorist, ABC):
             viz.plot(
                 genotype.normal,
                 best_model_plot_path,
-                fileFormat="png",
-                input_labels=object_of_study.__get_input_labels__(),
+                file_format="png",
                 full_label=True,
                 param_list=param_list,
+                input_labels=object_of_study.__get_input_labels__(),
                 out_dim=object_of_study.__get_output_dim__(),
                 out_fnc=utils.get_output_str(object_of_study.__get_output_type__()),
             )
