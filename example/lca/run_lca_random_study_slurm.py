@@ -95,7 +95,7 @@ theorist.add_validation_set(validation_object_2, "validation loss")
 model = theorist.search_model_job(study_object, args.slurm_id)
 
 # search model FAIR
-# theorist_fair = Theorist_DARTS(study_name, darts_type=DARTS_Type.FAIR)
+# theorist_fair = Theorist_DARTS(study_name, darts_type=DARTSType.FAIR)
 # theorist_fair.plot(plot=True, plot_name_list=plots)
 # theorist_fair.add_validation_set(validation_object_2, 'validation loss')
 # model = theorist_fair.search_model_job(study_object, args.slurm_id)

@@ -19,7 +19,7 @@ from aer.theorist.darts.operations import (
 )
 
 
-class DARTS_Type(Enum):
+class DARTSType(Enum):
     """
     Enumerator class that indexes different variants of DARTS.
     """
@@ -206,7 +206,7 @@ class Network(nn.Module):
         n_input_states: int = 2,
         architecture_fixed: bool = False,
         classifier_weight_decay: float = 0,
-        darts_type: DARTS_Type = DARTS_Type.ORIGINAL,
+        darts_type: DARTSType = DARTSType.ORIGINAL,
     ):
         """
         Initializes the network.
@@ -288,9 +288,9 @@ class Network(nn.Module):
         if self._architecture_fixed:
             weights = self.alphas_normal
         else:
-            if self.DARTS_type == DARTS_Type.ORIGINAL:
+            if self.DARTS_type == DARTSType.ORIGINAL:
                 weights = F.softmax(self.alphas_normal, dim=-1)
-            elif self.DARTS_type == DARTS_Type.FAIR:
+            elif self.DARTS_type == DARTSType.FAIR:
                 weights = torch.sigmoid(self.alphas_normal)
             else:
                 raise Exception(
@@ -402,9 +402,9 @@ class Network(nn.Module):
         alphas_normal_sample = Variable(torch.zeros(alphas_normal.data.shape))
 
         for edge in range(alphas_normal.data.shape[0]):
-            if self.DARTS_type == DARTS_Type.ORIGINAL:
+            if self.DARTS_type == DARTSType.ORIGINAL:
                 W_soft = F.softmax(alphas_normal[edge] * sample_amp, dim=0)
-            elif self.DARTS_type == DARTS_Type.FAIR:
+            elif self.DARTS_type == DARTSType.FAIR:
                 transformed_alphas_normal = alphas_normal[edge]
                 above_threshold = False
                 for idx in range(len(transformed_alphas_normal.data)):

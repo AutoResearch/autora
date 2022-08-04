@@ -16,7 +16,7 @@ import aer.theorist.darts.darts_config as darts_cfg
 import aer.theorist.darts.utils as utils
 import aer.theorist.darts.visualize as viz
 from aer.theorist.darts.architect import Architect
-from aer.theorist.darts.model_search import DARTS_Type, Network
+from aer.theorist.darts.model_search import DARTSType, Network
 from aer.theorist.darts.operations import PRIMITIVES
 from aer.theorist.theorist import Theorist
 from aer.utils import Plot_Types
@@ -29,7 +29,7 @@ class Theorist_DARTS(Theorist, ABC):
 
     _lr_plot_name = "Learning Rates"
 
-    def __init__(self, study_name, darts_type=DARTS_Type.ORIGINAL):
+    def __init__(self, study_name, darts_type=DARTSType.ORIGINAL):
         super(Theorist_DARTS, self).__init__(study_name)
 
         self.DARTS_type = darts_type
@@ -51,9 +51,9 @@ class Theorist_DARTS(Theorist, ABC):
         self.model_search_epochs = darts_cfg.epochs
         self.eval_epochs = darts_cfg.eval_epochs
 
-        if self.DARTS_type == DARTS_Type.ORIGINAL:
+        if self.DARTS_type == DARTSType.ORIGINAL:
             self.theorist_name = "original_darts"
-        elif self.DARTS_type == DARTS_Type.FAIR:
+        elif self.DARTS_type == DARTSType.FAIR:
             self.theorist_name = "fair_darts"
         else:
             raise Exception("DARTS Type " + str(self.DARTS_type) + " not implemented")
@@ -318,9 +318,9 @@ class Theorist_DARTS(Theorist, ABC):
         # subsample models and retrain
         self._eval_sampled_weights = list()
 
-        if self.DARTS_type == DARTS_Type.ORIGINAL:
+        if self.DARTS_type == DARTSType.ORIGINAL:
             self.sample_amp = darts_cfg.sample_amp
-        elif self.DARTS_type == DARTS_Type.FAIR:
+        elif self.DARTS_type == DARTSType.FAIR:
             self.sample_amp = darts_cfg.sample_amp_fair_darts
 
     def init_model_evaluation(self, object_of_study):
@@ -573,10 +573,10 @@ class Theorist_DARTS(Theorist, ABC):
         viz.plot(
             genotype.normal,
             model_graph_filepath,
-            viewFile=False,
-            input_labels=object_of_study.__get_input_labels__(),
-            param_list=param_list,
+            view_file=False,
             full_label=True,
+            param_list=param_list,
+            input_labels=object_of_study.__get_input_labels__(),
             out_dim=object_of_study.__get_output_dim__(),
             out_fnc=utils.get_output_str(object_of_study.__get_output_type__()),
         )
@@ -752,9 +752,9 @@ class Theorist_DARTS(Theorist, ABC):
         logging.info("genotype: %s", genotype)
 
         # prints and log weights of the normal and reduced architecture
-        if self.DARTS_type == DARTS_Type.ORIGINAL:
+        if self.DARTS_type == DARTSType.ORIGINAL:
             print(F.softmax(self.model.alphas_normal, dim=-1))
-        elif self.DARTS_type == DARTS_Type.FAIR:
+        elif self.DARTS_type == DARTSType.FAIR:
             print(torch.sigmoid(self.model.alphas_normal))
 
         # training (for one epoch)
@@ -794,11 +794,11 @@ class Theorist_DARTS(Theorist, ABC):
         )
 
         # log architecture weights
-        if self.DARTS_type == DARTS_Type.ORIGINAL:
+        if self.DARTS_type == DARTSType.ORIGINAL:
             logged_weights = torch.nn.functional.softmax(
                 self.model.alphas_normal, dim=-1
             ).data.numpy()
-        elif self.DARTS_type == DARTS_Type.FAIR:
+        elif self.DARTS_type == DARTSType.FAIR:
             logged_weights = torch.sigmoid(self.model.alphas_normal).data.numpy()
         self.architecture_weights_log[epoch, :, :] = logged_weights
 
@@ -811,7 +811,7 @@ class Theorist_DARTS(Theorist, ABC):
         viz.plot(
             genotype.normal,
             self.graph_filepath,
-            fileFormat="png",
+            file_format="png",
             input_labels=object_of_study.__get_input_labels__(),
             out_dim=object_of_study.__get_output_dim__(),
             out_fnc=utils.get_output_str(object_of_study.__get_output_type__()),
@@ -847,10 +847,10 @@ class Theorist_DARTS(Theorist, ABC):
             viz.plot(
                 genotype.normal,
                 self.graph_filepath,
-                fileFormat="png",
-                input_labels=object_of_study.__get_input_labels__(),
-                param_list=param_list,
+                file_format="png",
                 full_label=full_label,
+                param_list=param_list,
+                input_labels=object_of_study.__get_input_labels__(),
                 out_dim=object_of_study.__get_output_dim__(),
                 out_fnc=utils.get_output_str(object_of_study.__get_output_type__()),
             )
@@ -860,7 +860,7 @@ class Theorist_DARTS(Theorist, ABC):
             viz.plot(
                 genotype.normal,
                 self.graph_filepath,
-                fileFormat="png",
+                file_format="png",
                 input_labels=object_of_study.__get_input_labels__(),
                 out_dim=object_of_study.__get_output_dim__(),
                 out_fnc=utils.get_output_str(object_of_study.__get_output_type__()),
@@ -1289,9 +1289,9 @@ class Theorist_DARTS(Theorist, ABC):
         arch_name_log = list()
         num_graph_node_log = list()
 
-        if self.DARTS_type == DARTS_Type.ORIGINAL:
+        if self.DARTS_type == DARTSType.ORIGINAL:
             sample_amp = darts_cfg.sample_amp
-        elif self.DARTS_type == DARTS_Type.FAIR:
+        elif self.DARTS_type == DARTSType.FAIR:
             sample_amp = darts_cfg.sample_amp_fair_darts
 
         # generate general model file name
@@ -1484,10 +1484,10 @@ class Theorist_DARTS(Theorist, ABC):
                 viz.plot(
                     genotype.normal,
                     model_graph_filepath,
-                    viewFile=False,
-                    input_labels=object_of_study.__get_input_labels__(),
-                    param_list=param_list,
+                    view_file=False,
                     full_label=True,
+                    param_list=param_list,
+                    input_labels=object_of_study.__get_input_labels__(),
                     out_dim=object_of_study.__get_output_dim__(),
                     out_fnc=utils.get_output_str(object_of_study.__get_output_type__()),
                 )
