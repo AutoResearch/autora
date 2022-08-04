@@ -1,18 +1,18 @@
-import aer.config as aer_cfg
-import aer.experimentalist.experiment_environment.experiment_config as exp_cfg
-from aer.experimentalist.experiment_environment.participant_weber import (
+import autora.config as aer_cfg
+import autora.experimentalist.experiment_environment.experiment_config as exp_cfg
+from autora.experimentalist.experiment_environment.participant_weber import (
     Participant_Weber,
 )
-from aer.experimentalist.experimentalist_popper import Experimentalist_Popper
-from aer.theorist.darts.plot_utils import (
+from autora.experimentalist.experimentalist_popper import Experimentalist_Popper
+from autora.theorist.darts.plot_utils import (
     generate_darts_summary_figures,
     load_model,
     plot_model_graph,
 )
-from aer.theorist.object_of_study import Object_Of_Study
-from aer.variable import DVInSilico as DV
-from aer.variable import IVInSilico as IV
-from aer.variable import ValueType as output_type
+from autora.theorist.object_of_study import Object_Of_Study
+from autora.variable import DVInSilico as DV
+from autora.variable import IVInSilico as IV
+from autora.variable import ValueType as output_type
 
 participant = Participant_Weber()
 

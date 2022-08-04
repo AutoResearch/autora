@@ -1,4 +1,4 @@
-# AER-specific files
+# AutoRA-specific files
 example/studies/**/modeling
 
 # PyCharm ignores are handled by the .idea/.gitignore file

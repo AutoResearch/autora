@@ -5,7 +5,7 @@
 
 from tkinter import Tk
 
-from aer.experimentalist.experiment_environment.experiment_GUI import Experiment_GUI
+from autora.experimentalist.experiment_environment.experiment_GUI import Experiment_GUI
 
 # init_epaper()
 

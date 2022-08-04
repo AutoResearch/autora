@@ -4,10 +4,10 @@ import torch
 import torch.optim as optim
 from torch import nn
 
-from aer.experimentalist.experimentalist_popper import Experimentalist_Popper
-from aer.theorist.object_of_study import Object_Of_Study
-from aer.theorist.theorist_darts import Theorist_DARTS
-from aer.variable import Variable as Var
+from autora.experimentalist.experimentalist_popper import Experimentalist_Popper
+from autora.theorist.object_of_study import Object_Of_Study
+from autora.theorist.theorist_darts import Theorist_DARTS
+from autora.variable import Variable as Var
 
 
 class copyNet(nn.Module):
@@ -152,7 +152,7 @@ x_label = IV1.get_variable_label()
 copy_prediction = copy_model(input_org).detach().numpy()
 
 plt.clf()
-plt.plot(x_prediction, y_prediction, "k", label="AER model prediction")
+plt.plot(x_prediction, y_prediction, "k", label="autora model prediction")
 plt.scatter(input, prediction, marker=".", c="k")
 plt.scatter(input, copy_prediction, marker=".", c="b")
 plt.scatter(input, output, marker=".", c="r", label="data")

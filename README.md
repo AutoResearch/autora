@@ -1,5 +1,5 @@
-# Autonomous Empirical Research
-Autonomous Empirical Research is an open source AI-based system for automating each aspect empirical research in the behavioral sciences, from the construction of a scientific hypothesis to conducting novel experiments.
+# Autonomous Research Assistant
+Autonomous Research Assistant (AutoRA) is an open source AI-based system for automating each aspect empirical research in the behavioral sciences, from the construction of a scientific hypothesis to conducting novel experiments.
 
 # Getting started
 
@@ -7,11 +7,11 @@ You should be familiar with the command line for your operating system. The topi
 - **macOS**: Joe Kissell. [*Take Control of the Mac Command Line with Terminal, 3rd Edition*]((https://bruknow.library.brown.edu/permalink/01BU_INST/528fgv/cdi_safari_books_v2_9781947282513)). Take Control Books, 2022. Chapters *Read Me First* through *Bring the Command Line Into The Real World*.
 - **Linux**: William E. Shotts. [*The Linux Command Line: a Complete Introduction. 2nd edition.*](https://bruknow.library.brown.edu/permalink/01BU_INST/9mvq88/alma991043239704906966). No Starch Press, 2019. Parts *I: Learning the Shell* and *II: Configuration and the Environment*.
 
-To use the AER package you need:
+To use the AutoRA package you need:
 - `python` and packages as specified in the `pyproject.toml` file,
 - `graphviz` for some visualizations.
 
-To develop the AER package, you also need:
+To develop the AutoRA package, you also need:
 - `git`, the source control tool,
 - `pre-commit` which is used for handling git pre-commit hooks.
 
@@ -23,7 +23,7 @@ You should also consider using an IDE. We recommend:
 - PyCharm (academic licenses for PyCharm professional edition are available for free). This is a `python`-specific integrated development environment which comes with extremely powerful tools for changing the structure of `python` code, running tests, etc. 
 - Visual Studio Code (free). This is a powerful general text editor with plugins to support `python` development. 
 
-The following sections describe how to install and configure the recommended setup for developing AER.
+The following sections describe how to install and configure the recommended setup for developing AutoRA.
 
 *Note: For end-users, it may be more appropriate to use an environment manager like `Anaconda` or `Miniconda` instead of `poetry`, but this is not currently supported.*
 
@@ -46,7 +46,7 @@ brew install gh
 
 Clone the repository. Run:
 ```shell
-gh repo clone AutoResearch/AER
+gh repo clone AutoResearch/AutoRA
 ```
 
 ... and following the prompts to authenticate to GitHub. It should clone the repository to a new directory. This is referred to as the `<project directory>` in the rest of this readme.
@@ -112,9 +112,9 @@ There are two suggested options for initializing an environment:
 
 #### PyCharm configuration
 
-Set up the Virtual environment – an isolated version of `python` and all the packages required to run AER and develop it further – as follows:
+Set up the Virtual environment – an isolated version of `python` and all the packages required to run AutoRA and develop it further – as follows:
 - Open the `<project directory>` in PyCharm.
-- Navigate to PyCharm > Preferences > Project: AER > Python Interpreter
+- Navigate to PyCharm > Preferences > Project: AutoRA > Python Interpreter
 - Next to the drop-down list of available interpreters, click the "gear" symbol and choose "Add" to initialize a new interpreter. 
 - Select "Poetry environment" in the list on the left. Specify the following:  
   - Python executable: select the path to the installed `python` version you wish to use, e.g. 
@@ -177,8 +177,8 @@ After installing Visual Studio Code and the other prerequisites, carry out the f
 
 - Check that the `poetry` environment is correctly set-up. 
   - Open a new terminal within Visual Studio Code (Menu: Terminal > New Terminal). 
-  - It should execute something like `source /Users/me/Library/Caches/pypoetry/virtualenvs/aer-2PgcgopX-py3.8/bin/activate` before offering you a prompt.
-  - If you execute `which python` it should return the path to your python executable in the `.../aer-2PgcgopX-py3.8/bin` directory.
+  - It should execute something like `source /Users/me/Library/Caches/pypoetry/virtualenvs/autora-2PgcgopX-py3.8/bin/activate` before offering you a prompt.
+  - If you execute `which python` it should return the path to your python executable in the `.../autora-2PgcgopX-py3.8/bin` directory.
   - Ensure that there are no errors when you run: 
     ```shell
     python -m unittest
@@ -199,26 +199,26 @@ This spawns a new shell where you have access to the poetry `python` and all the
 
 ```
 % poetry shell
-Spawning shell within /Users/me/Library/Caches/pypoetry/virtualenvs/aer-2PgcgopX-py3.8
+Spawning shell within /Users/me/Library/Caches/pypoetry/virtualenvs/autora-2PgcgopX-py3.8
 Restored session: Fri Jun 24 12:34:56 EDT 2022
-(aer-2PgcgopX-py3.8) % 
+(autora-2PgcgopX-py3.8) % 
 ```
 
-If you execute `python` and then `import numpy`, you should be able to see that `numpy` has been imported from the `aer-2PgcgopX-py3.8` environment:
+If you execute `python` and then `import numpy`, you should be able to see that `numpy` has been imported from the `autora-2PgcgopX-py3.8` environment:
 
 ```
-(aer-2PgcgopX-py3.8) % python
+(autora-2PgcgopX-py3.8) % python
 Python 3.8.13 (default, Jun 16 2022, 12:34:56) 
 [Clang 13.1.6 (clang-1316.0.21.2.5)] on darwin
 Type "help", "copyright", "credits" or "license" for more information.
 >>> import numpy
 >>> numpy
-<module 'numpy' from '/Users/me/Library/Caches/pypoetry/virtualenvs/aer-2PgcgopX-py3.8/lib/python3.8/site-packages/numpy/__init__.py'>
+<module 'numpy' from '/Users/me/Library/Caches/pypoetry/virtualenvs/autora-2PgcgopX-py3.8/lib/python3.8/site-packages/numpy/__init__.py'>
 ```
 
 To deactivate the `poetry` environment, `exit` the session. This should return you to your original prompt, as follows:
 ```
-(aer-2PgcgopX-py3.8) % exit
+(autora-2PgcgopX-py3.8) % exit
 
 Saving session...
 ...saving history...truncating history files...
@@ -257,7 +257,7 @@ Windows is not yet officially supported. You may be able to follow the same appr
 - Using `chocolatey` in place of `homebrew`,
 - Using the GitHub Desktop application in place of the GitHub CLI.
 
-If you successfully set up AER on Windows, please update this readme.
+If you successfully set up AutoRA on Windows, please update this readme.
 
 ## Development Practices
 
@@ -371,7 +371,7 @@ For an example of a file with docstrings, see [docs/docstrings.py](./docs/docstr
 
 ## Online Documentation
 
-Online Documentation is automatically generated using [Material for MkDocs](https://squidfunk.github.io/mkdocs-material/) based on docstrings in files in the `aer/` directory. 
+Online Documentation is automatically generated using [Material for MkDocs](https://squidfunk.github.io/mkdocs-material/) based on docstrings in files in the `autora/` directory. 
 
 ### Commands
 
@@ -379,7 +379,7 @@ Build and serve the documentation using the following commands:
 
 * `poetry run mkdocs serve` - Start the live-reloading docs server.
 * `poetry run mkdocs build` - Build the documentation site.
-* `poetry run mkdocs gh-deploy` - Build the documentation and serve at https://AutoResearch.github.io/AER/
+* `poetry run mkdocs gh-deploy` - Build the documentation and serve at https://AutoResearch.github.io/AutoRA/
 * `poetry run mkdocs -h` - Print help message and exit.
 
 ### Documentation layout
@@ -388,7 +388,7 @@ mkdocs.yml    # The configuration file for the documentation.
 docs/         # Directory for static pages to be included in the documentation.
     index.md  # The documentation homepage.
     ...       # Other markdown pages, images and other files.
-aer/          # The directory containing the source code.
+autora/          # The directory containing the source code.
 ```
 
 

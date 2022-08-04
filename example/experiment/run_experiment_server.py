@@ -1,11 +1,11 @@
-import aer.experimentalist.experiment_environment.experiment_config as cfg
-from aer.experimentalist.experiment_environment.experiment_in_silico import (
+import autora.experimentalist.experiment_environment.experiment_config as cfg
+from autora.experimentalist.experiment_environment.experiment_in_silico import (
     Experiment_In_Silico,
 )
-from aer.experimentalist.experiment_environment.experiment_server import (
+from autora.experimentalist.experiment_environment.experiment_server import (
     Experiment_Server,
 )
-from aer.experimentalist.experiment_environment.participant_weber import (
+from autora.experimentalist.experiment_environment.participant_weber import (
     Participant_Weber,
 )
 
