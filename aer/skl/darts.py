@@ -425,6 +425,12 @@ class DARTSRegressor(BaseEstimator, RegressorMixin):
             self (DARTSRegressor): the fitted estimator
         """
         params = self.get_params()
+
+        if self.darts_type == ValueType.CLASS:
+            raise NotImplementedError(
+                "Classification not implemented for DARTSRegressor."
+            )
+
         fit_results = _general_darts(X=X, y=y, **params)
         self.X_ = X
         self.y_ = y
