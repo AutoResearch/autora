@@ -29,7 +29,6 @@ from aer.variable import ValueType
 
 _logger = logging.getLogger(__name__)
 
-
 progress_indicator = tqdm.auto.tqdm
 
 SAMPLING_STRATEGIES = Literal["max", "sample"]
