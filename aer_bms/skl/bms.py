@@ -31,18 +31,6 @@ priors = {
 }
 
 
-def _get_machine_scientist(self, x, y):
-    pms = Parallel(
-        Ts=self.ts,
-        variables=pd.DataFrame(range(len(x))),
-        parameters=["a%d" % i for i in range(len(x))],
-        x=x,
-        y=y,
-        prior_par=self.prior_par,
-    )
-    return pms
-
-
 temperatures = [1.0] + [1.04**k for k in range(1, 20)]
 
 
