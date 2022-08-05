@@ -29,9 +29,18 @@ from aer.variable import ValueType
 
 _logger = logging.getLogger(__name__)
 
-SAMPLING_STRATEGIES = Literal["max", "sample"]
 
 progress_indicator = tqdm.auto.tqdm
+
+SAMPLING_STRATEGIES = Literal["max", "sample"]
+IMPLEMENTED_DARTS_TYPES = Literal["original", "fair"]
+IMPLEMENTED_OUTPUT_TYPES = Literal[
+    "real",
+    "sigmoid",
+    "probability",
+    "probability_sample",
+    "probability_distribution",
+]
 
 
 @dataclass(frozen=True)
@@ -43,25 +52,14 @@ class _DARTSResult:
     model_sampler_: Callable[[SAMPLING_STRATEGIES], torch.nn.Module]
 
 
-implemented_darts_types = Literal["original", "fair"]
-
-implemented_output_types = Literal[
-    "real",
-    "sigmoid",
-    "probability",
-    "probability_sample",
-    "probability_distribution",
-]
-
-
 def _general_darts(
     X: np.ndarray,
     y: np.ndarray,
     batch_size: int = 20,
     num_graph_nodes: int = 2,
-    output_type: implemented_output_types = "real",
+    output_type: IMPLEMENTED_OUTPUT_TYPES = "real",
     classifier_weight_decay: float = 1e-2,
-    darts_type: implemented_darts_types = "original",
+    darts_type: IMPLEMENTED_DARTS_TYPES = "original",
     init_weights_function: Optional[Callable] = None,
     learning_rate: float = 2.5e-2,
     learning_rate_min: float = 0.01,
@@ -353,7 +351,7 @@ class DARTSRegressor(BaseEstimator, RegressorMixin):
         batch_size: int = 64,
         num_graph_nodes: int = 2,
         classifier_weight_decay: float = 1e-2,
-        darts_type: implemented_darts_types = "original",
+        darts_type: IMPLEMENTED_DARTS_TYPES = "original",
         init_weights_function: Optional[Callable] = None,
         learning_rate: float = 2.5e-2,
         learning_rate_min: float = 0.01,
@@ -368,7 +366,7 @@ class DARTSRegressor(BaseEstimator, RegressorMixin):
         fair_darts_loss_weight: int = 1,
         max_epochs: int = 10,
         grad_clip: float = 5,
-        output_type: implemented_output_types = "real",
+        output_type: IMPLEMENTED_OUTPUT_TYPES = "real",
     ) -> None:
         """
         Arguments:
