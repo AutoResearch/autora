@@ -114,6 +114,8 @@ class BMS:
         Returns:
             y: predicted dependent variable values
         """
+        sklearn.utils.validation.check_is_fitted(self)
+        X = sklearn.utils.check_array(X)
         print(type(X))
         if type(X) == np.ndarray:
             x = pd.DataFrame(X)
