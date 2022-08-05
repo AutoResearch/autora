@@ -30,7 +30,7 @@ class TestMCMC(unittest.TestCase):
         }
 
         t = Tree(prior_par=prior_par, from_string=string)
-        for i in range(100):
+        for i in range(1000):
             t.mcmc_step(verbose=True)
             print("-" * 150)
             t2 = Tree(from_string=str(t))
