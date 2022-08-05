@@ -35,7 +35,7 @@ nv = len(XLABS)
 nc = 1
 epochs = 300
 
-raw_data = pd.read_csv("./experiment_0_data.csv")
+raw_data = pd.read_csv("test/experiment_0_data.csv")
 x, y = raw_data[XLABS], raw_data["difference_detected"]
 
 # initialize model
