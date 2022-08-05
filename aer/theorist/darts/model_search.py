@@ -19,19 +19,17 @@ from aer.theorist.darts.operations import (
 )
 
 
-class DARTSType(Enum):
+class DARTSType(str, Enum):
     """
     Enumerator class that indexes different variants of DARTS.
     """
 
-    ORIGINAL = (
-        # Liu, Simonyan & Yang (2018). Darts: Differentiable architecture
-        # search
-        1
-    )
+    # Liu, Simonyan & Yang (2018). Darts: Differentiable architecture search
+    ORIGINAL = "original"
+
     # Chu, Zhou, Zhang & Li (2020). Fair darts: Eliminating unfair advantages
     # in differentiable architecture search
-    FAIR = 2
+    FAIR = "fair"
 
 
 # for 2 input nodes, 1 output node and 4 intermediate nodes,

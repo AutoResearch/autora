@@ -3,7 +3,7 @@ import logging
 from dataclasses import dataclass
 from functools import partial
 from itertools import cycle
-from typing import Callable, Iterator, Literal, Optional, Sequence
+from typing import Callable, Iterator, Literal, Optional, Sequence, Union
 
 import numpy as np
 import torch
@@ -342,7 +342,7 @@ class DARTSRegressor(BaseEstimator, RegressorMixin):
         batch_size: int = 64,
         num_graph_nodes: int = 2,
         classifier_weight_decay: float = 1e-2,
-        darts_type: DARTSType = DARTSType.ORIGINAL,
+        darts_type: Union[DARTSType, Literal["original", "fair"]] = DARTSType.ORIGINAL,
         init_weights_function: Optional[Callable] = None,
         learning_rate: float = 2.5e-2,
         learning_rate_min: float = 0.01,
@@ -424,12 +424,16 @@ class DARTSRegressor(BaseEstimator, RegressorMixin):
         Returns:
             self (DARTSRegressor): the fitted estimator
         """
-        params = self.get_params()
 
         if self.output_type == ValueType.CLASS:
             raise NotImplementedError(
                 "Classification not implemented for DARTSRegressor."
             )
+
+        if isinstance(self.darts_type, str):
+            self.darts_type = DARTSType(self.darts_type)
+
+        params = self.get_params()
 
         fit_results = _general_darts(X=X, y=y, **params)
         self.X_ = X
