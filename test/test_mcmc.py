@@ -4,11 +4,10 @@ import numpy as np
 import pandas as pd
 
 from aer_bms.mcmc import Tree
-from aer_bms.utils import plt
 
 
 class TestMCMC(unittest.TestCase):
-    def test3(num_points=10, samples=100000):
+    def test_predicted_values(self, num_points=10, samples=100000):
         # Create the data
         x = pd.DataFrame(
             dict([("x%d" % i, np.random.uniform(0, 10, num_points)) for i in range(5)])
@@ -51,15 +50,17 @@ class TestMCMC(unittest.TestCase):
         # MCMC
         t.mcmc(burnin=2000, thin=10, samples=samples, verbose=True)
 
+        self.assertEqual(t.predict(x), y)
+
         # Predict
-        print(t.predict(x))
-        print(y)
-        print(50.0 * np.sin(x["x0"]) / x["x2"] - 4.0 * x["x1"] + 3)
+        # print(t.predict(x))
+        # print(y)
+        # print(50.0 * np.sin(x["x0"]) / x["x2"] - 4.0 * x["x1"] + 3)
 
-        plt.plot(t.predict(x), 50.0 * np.sin(x["x0"]) / x["x2"] - 4.0 * x["x1"] + 3)
-        plt.show()
+        # plt.plot(t.predict(x), 50.0 * np.sin(x["x0"]) / x["x2"] - 4.0 * x["x1"] + 3)
+        # plt.show()
 
-        return t
+        # return t
 
     def test4(num_points=10, samples=1000):
         # Create the data
