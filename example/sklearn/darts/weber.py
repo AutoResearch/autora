@@ -94,13 +94,33 @@ darts_estimator_tuned = DARTSRegressor(
     param_updates_per_epoch=100,
     max_epochs=500,
     output_type="probability",
+    darts_type="original",
     num_graph_nodes=2,
 )
 
 darts_estimator_tuned.fit(X, y)
 
-show_results(estimator=darts_estimator_tuned, label="pre-tuned DARTSRegressor")
+show_results(
+    estimator=darts_estimator_tuned, label="pre-tuned Original-DARTS Regressor"
+)
 darts_estimator_tuned.visualize_model().view()
+
+# %% Fit using DARTS with parameters we know should work
+darts_estimator_tuned = DARTSRegressor(
+    batch_size=64,
+    arch_updates_per_epoch=1,
+    param_updates_per_epoch=100,
+    max_epochs=500,
+    output_type="probability",
+    darts_type="fair",
+    num_graph_nodes=2,
+)
+
+darts_estimator_tuned.fit(X, y)
+
+show_results(estimator=darts_estimator_tuned, label="pre-tuned Fair-DARTS Regressor")
+darts_estimator_tuned.visualize_model().view()
+
 
 # %%
 
