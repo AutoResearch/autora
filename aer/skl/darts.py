@@ -3,7 +3,7 @@ import logging
 from dataclasses import dataclass
 from functools import partial
 from itertools import cycle
-from typing import Callable, Iterator, Literal, Optional, Sequence, Union
+from typing import Callable, Iterator, Literal, Optional, Sequence
 
 import numpy as np
 import torch
@@ -43,14 +43,25 @@ class _DARTSResult:
     model_sampler_: Callable[[SAMPLING_STRATEGIES], torch.nn.Module]
 
 
+implemented_darts_types = Literal["original", "fair"]
+
+implemented_output_types = Literal[
+    "real",
+    "sigmoid",
+    "probability",
+    "probability_sample",
+    "probability_distribution",
+]
+
+
 def _general_darts(
     X: np.ndarray,
     y: np.ndarray,
     batch_size: int = 20,
     num_graph_nodes: int = 2,
-    output_type: ValueType = ValueType.REAL,
+    output_type: implemented_output_types = "real",
     classifier_weight_decay: float = 1e-2,
-    darts_type: DARTSType = DARTSType.ORIGINAL,
+    darts_type: implemented_darts_types = "original",
     init_weights_function: Optional[Callable] = None,
     learning_rate: float = 2.5e-2,
     learning_rate_min: float = 0.01,
@@ -78,8 +89,8 @@ def _general_darts(
         batch_size=batch_size,
     )
 
-    criterion = get_loss_function(output_type)
-    output_function = get_output_format(output_type)
+    criterion = get_loss_function(ValueType(output_type))
+    output_function = get_output_format(ValueType(output_type))
 
     network_ = Network(
         num_classes=output_dimensions,
@@ -87,7 +98,7 @@ def _general_darts(
         steps=num_graph_nodes,
         n_input_states=input_dimensions,
         classifier_weight_decay=classifier_weight_decay,
-        darts_type=darts_type,
+        darts_type=DARTSType(darts_type),
     )
     if init_weights_function is not None:
         network_.apply(init_weights_function)
@@ -342,7 +353,7 @@ class DARTSRegressor(BaseEstimator, RegressorMixin):
         batch_size: int = 64,
         num_graph_nodes: int = 2,
         classifier_weight_decay: float = 1e-2,
-        darts_type: Union[DARTSType, Literal["original", "fair"]] = DARTSType.ORIGINAL,
+        darts_type: implemented_darts_types = "original",
         init_weights_function: Optional[Callable] = None,
         learning_rate: float = 2.5e-2,
         learning_rate_min: float = 0.01,
@@ -357,7 +368,7 @@ class DARTSRegressor(BaseEstimator, RegressorMixin):
         fair_darts_loss_weight: int = 1,
         max_epochs: int = 10,
         grad_clip: float = 5,
-        output_type: ValueType = ValueType.REAL,
+        output_type: implemented_output_types = "real",
     ) -> None:
         """
         Arguments:
@@ -406,6 +417,7 @@ class DARTSRegressor(BaseEstimator, RegressorMixin):
         self.grad_clip = grad_clip
 
         self.output_type = output_type
+        self.darts_type = darts_type
 
         self.X_: Optional[np.ndarray] = None
         self.y_: Optional[np.ndarray] = None
@@ -425,13 +437,10 @@ class DARTSRegressor(BaseEstimator, RegressorMixin):
             self (DARTSRegressor): the fitted estimator
         """
 
-        if self.output_type == ValueType.CLASS:
+        if self.output_type == "class":
             raise NotImplementedError(
                 "Classification not implemented for DARTSRegressor."
             )
-
-        if isinstance(self.darts_type, str):
-            self.darts_type = DARTSType(self.darts_type)
 
         params = self.get_params()
 
@@ -516,7 +525,8 @@ class DARTSRegressor(BaseEstimator, RegressorMixin):
 
         assert self.y_ is not None
         out_dim = 1 if self.y_.ndim == 1 else self.y_.shape[1]
-        out_func = get_output_str(self.output_type)
+
+        out_func = get_output_str(ValueType(self.output_type))
 
         # call to plot function
         graph = darts_model_plot(

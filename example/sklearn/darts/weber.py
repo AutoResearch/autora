@@ -15,7 +15,7 @@ from sklearn.neural_network import MLPRegressor
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import PolynomialFeatures, StandardScaler
 
-from aer.skl.darts import DARTSRegressor, ValueType
+from aer.skl.darts import DARTSRegressor
 
 logging.basicConfig(level=logging.INFO)
 
@@ -93,7 +93,7 @@ darts_estimator_tuned = DARTSRegressor(
     arch_updates_per_epoch=1,
     param_updates_per_epoch=100,
     max_epochs=500,
-    output_type=ValueType.PROBABILITY,
+    output_type="probability",
     num_graph_nodes=2,
 )
 
@@ -118,7 +118,7 @@ darts_estimator = GridSearchCV(
             arch_updates_per_epoch=1,
             param_updates_per_epoch=500,
             max_epochs=10,
-            output_type=ValueType.PROBABILITY,
+            output_type="probability",
         ),
     ),
     param_grid=dict(dartsregressor__num_graph_nodes=range(1, 5)),

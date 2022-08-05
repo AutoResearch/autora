@@ -3,7 +3,7 @@ import unittest
 import numpy as np
 from sklearn.model_selection import GridSearchCV, train_test_split
 
-from aer.skl.darts import DARTSRegressor, DARTSType
+from aer.skl.darts import DARTSRegressor, DARTSType, ValueType
 
 
 def generate_noisy_constant_data(
@@ -61,6 +61,23 @@ class TestDarts(unittest.TestCase):
         DARTSRegressor(darts_type=DARTSType.FAIR, **kwargs).fit(X, y)
         DARTSRegressor(darts_type="original", **kwargs).fit(X, y)
         DARTSRegressor(darts_type=DARTSType.ORIGINAL, **kwargs).fit(X, y)
+
+        DARTSRegressor(output_type="probability", **kwargs).fit(X, y)
+        DARTSRegressor(output_type=ValueType.PROBABILITY, **kwargs).fit(X, y)
+        DARTSRegressor(output_type=ValueType.PROBABILITY_SAMPLE, **kwargs).fit(X, y)
+        DARTSRegressor(output_type="probability_distribution", **kwargs).fit(X, y)
+        DARTSRegressor(output_type=ValueType.PROBABILITY_DISTRIBUTION, **kwargs).fit(
+            X, y
+        )
+        self.assertRaises(
+            NotImplementedError, DARTSRegressor(output_type="class", **kwargs).fit, X, y
+        )
+        self.assertRaises(
+            NotImplementedError,
+            DARTSRegressor(output_type=ValueType.CLASS, **kwargs).fit,
+            X,
+            y,
+        )
 
     def test_metaparam_optimization(self):
 
