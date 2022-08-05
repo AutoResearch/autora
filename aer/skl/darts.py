@@ -426,7 +426,7 @@ class DARTSRegressor(BaseEstimator, RegressorMixin):
         """
         params = self.get_params()
 
-        if self.darts_type == ValueType.CLASS:
+        if self.output_type == ValueType.CLASS:
             raise NotImplementedError(
                 "Classification not implemented for DARTSRegressor."
             )
