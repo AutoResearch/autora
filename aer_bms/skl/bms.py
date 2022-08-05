@@ -6,8 +6,6 @@ import pandas as pd
 from aer_bms import Parallel, utils
 from aer_bms.mcmc import Tree
 
-# from sklearn.utils.validation import check_array, check_X_y
-
 priors = {
     "Nopi_/": 5.912205942815285,
     "Nopi_cosh": 8.12720511103694,
@@ -80,7 +78,7 @@ class BMS:
         self.pms: Parallel = Parallel(Ts=[])
         self.model_: Tree = Tree()
 
-    def fit(self, X: np.ndarray, y: np.ndarray, epochs=3000):
+    def fit(self, X: np.ndarray, y: np.ndarray):
         """
         Runs the optimization for a given set of `X`s and `y`s.
 
@@ -99,7 +97,7 @@ class BMS:
             y=y,
             prior_par=self.prior_par,
         )
-        model, model_len, desc_len = utils.run(self.pms, epochs)
+        model, model_len, desc_len = utils.run(self.pms, self.epochs)
         self.model_ = model
         return self
 
