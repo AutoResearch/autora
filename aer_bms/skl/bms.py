@@ -2,6 +2,7 @@ from typing import List
 
 import numpy as np
 import pandas as pd
+import sklearn.utils
 
 from aer_bms import Parallel, utils
 from aer_bms.mcmc import Tree
@@ -89,6 +90,7 @@ class BMS:
         Returns:
             self (BMS): the fitted estimator
         """
+        X, y = sklearn.utils.check_X_y(X, y)
         self.pms = Parallel(
             Ts=self.ts,
             variables=pd.DataFrame(range(len(X))),
