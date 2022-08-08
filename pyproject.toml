@@ -14,7 +14,7 @@ pandas = '~1.4.2'
 graphviz = '~0.14.1'
 seaborn = '~0.11.1'
 sweetpea = '~0.0.36'
-tinkerforge = '~2.1.25'
+tinkerforge = {version = "~2.1.25", optional=true}
 torch = "^1.11.0"
 torchvision = "^0.12.0"
 scipy = "^1.8.1"
@@ -28,6 +28,8 @@ mkdocs-literate-nav = "^0.4.1"
 mkdocs-section-index = "^0.3.4"
 mkdocstrings-python = "^0.7.1"
 
+[tool.poetry.extras]
+tinkerforge = ["tinkerforge"]
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
