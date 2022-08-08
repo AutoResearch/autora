@@ -273,3 +273,187 @@ class IVTrial(IV):
 
     def disconnect(self):
         pass
+
+
+dv_labels = {}
+iv_labels = {}
+
+
+def register_iv_label(**kwargs):
+    iv_labels.update(kwargs)
+    return
+
+
+def register_dv_label(**kwargs):
+    dv_labels.update(kwargs)
+    return
+
+
+register_dv_label(
+    **{
+        "verbal_red": (
+            DVInSilico,
+            "Verbal Response Red",
+            None,
+            "verbal_red",
+            "activation",
+            0,
+            (0, 1),
+        ),
+        "verbal_green": (
+            DVInSilico,
+            "Verbal Response Green",
+            None,
+            "verbal_green",
+            "activation",
+            0,
+            (0, 1),
+        ),
+        "verbal_sample": (
+            DVInSilico,
+            "Verbal Response Sample",
+            None,
+            "verbal_sample",
+            "class",
+            0,
+            (0, 1),
+        ),
+        "difference_detected": (
+            DVInSilico,
+            "Difference Detected",
+            None,
+            "difference_detected",
+            "activation",
+            0,
+            (0, 1),
+        ),
+        "difference_detected_sample": (
+            DVInSilico,
+            "Difference Detected",
+            None,
+            "difference_detected_sample",
+            "class",
+            0,
+            (0, 1),
+        ),
+        "learning_performance": (
+            DVInSilico,
+            "Accuracy",
+            None,
+            "learning_performance",
+            "probability",
+            0,
+            (0, 1),
+        ),
+        "learning_performance_sample": (
+            DVInSilico,
+            "Accuracy Sample",
+            None,
+            "learning_performance_sample",
+            "class",
+            0,
+            (0, 1),
+        ),
+        "dx1_lca": (
+            DVInSilico,
+            "dx1",
+            None,
+            "dx1_lca",
+            "net input delta",
+            0,
+            (-1000, 1000),
+        ),
+    }
+)
+
+register_iv_label(
+    **{
+        "trial": (IVTrial, "Trial", "", "trial", "trials", 0, (0, 10000000)),
+        "color_red": (
+            IVInSilico,
+            "Color Unit Red",
+            None,
+            "color_red",
+            "activation",
+            0,
+            (0, 1),
+        ),
+        "color_green": (
+            IVInSilico,
+            "Color Unit Green",
+            None,
+            "color_green",
+            "activation",
+            0,
+            (0, 1),
+        ),
+        "word_red": (
+            IVInSilico,
+            "Word Unit Red",
+            None,
+            "word_red",
+            "activation",
+            0,
+            (0, 1),
+        ),
+        "word_green": (
+            IVInSilico,
+            "Word Unit Green",
+            None,
+            "word_green",
+            "activation",
+            0,
+            (0, 1),
+        ),
+        "task_color": (
+            IVInSilico,
+            "Task Unit Color Naming",
+            None,
+            "task_color",
+            "activation",
+            0,
+            (0, 1),
+        ),
+        "task_word": (
+            IVInSilico,
+            "Task Unit Word Reading",
+            None,
+            "task_word",
+            "activation",
+            0,
+            (0, 1),
+        ),
+        "S1": (IVInSilico, "Stimulus 1 Intensity", None, "S1", "activation", 0, (0, 5)),
+        "S2": (IVInSilico, "Stimulus 2 Intensity", None, "S2", "activation", 0, (0, 5)),
+        "learning_trial": (
+            IVInSilico,
+            "Trial",
+            None,
+            "learning_trial",
+            "trial",
+            0,
+            (0, 1000),
+        ),
+        "P_initial": (
+            IVInSilico,
+            "Initial Performance",
+            None,
+            "P_initial",
+            "probability",
+            0,
+            (0, 1),
+        ),
+        "P_asymptotic": (
+            IVInSilico,
+            "Best Performance",
+            None,
+            "P_asymptotic",
+            "probability",
+            0,
+            (0, 1),
+        ),
+        "x1_lca": (IVInSilico, "x1", None, "x1_lca", "net input", 0, (-1000, 1000)),
+        "x2_lca": (IVInSilico, "x2", None, "x2_lca", "net input", 0, (-1000, 1000)),
+        "x3_lca": (IVInSilico, "x3", None, "x3_lca", "net input", 0, (-1000, 1000)),
+    }
+)
