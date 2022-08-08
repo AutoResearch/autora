@@ -6,13 +6,13 @@ authors = ["Sebastian Musslick <sebastian_musslick@brown.edu>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = '>=3.8.13,<3.11'
+python = ">=3.8.13,<3.11"
 numpy = "^1.18"
-imageio = '~2.9.0'
-matplotlib = '^3.2.1'
-pandas = '~1.4.2'
-graphviz = '~0.14.1'
-seaborn = '~0.11.1'
+imageio = "~2.9.0"
+matplotlib = "^3.2.1"
+pandas = "~1.4.2"
+graphviz = "~0.14.1"
+seaborn = "~0.11.1"
 tinkerforge = {version = "~2.1.25", optional=true}
 torch = "^1.11.0"
 scipy = "^1.8.1"
