@@ -15,7 +15,7 @@ graphviz = "^0.14.1"
 seaborn = "^0.11.1"
 tinkerforge = {version = "~2.1.25", optional=true}
 torch = "^1.11.0"
-scipy = "^1.8.1"
+scipy = "^1.7.1"
 scikit-learn = "^1.1.1"
 tqdm = "^4.64.0"
 
