@@ -15,7 +15,6 @@ graphviz = '~0.14.1'
 seaborn = '~0.11.1'
 tinkerforge = '~2.1.25'
 torch = "^1.11.0"
-torchvision = "^0.12.0"
 scipy = "^1.8.1"
 scikit-learn = "^1.1.1"
 tqdm = "^4.64.0"
