@@ -6,7 +6,7 @@ authors = ["Sebastian Musslick <sebastian_musslick@brown.edu>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = ">=3.8.13,<3.11"
+python = ">=3.7.4,<3.11"
 numpy = "^1.18"
 imageio = "^2.9.0"
 matplotlib = "^3.2.1"
