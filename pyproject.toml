@@ -1,12 +1,12 @@
 [tool.poetry]
 name = "autora"
-version = "1.0.0-alpha.2"
+version = "1.0.0-alpha.3"
 description = "Autonomous Research Assistant (AutoRA) is a framework for implementing machine learning tools which autonomously and iteratively generate 1) new theories to describe real-world data, and 2) experiments to invalidate those theories and seed a new cycle of theory-making. The experiments will be run online via crowd-sourcing platforms (MTurk, Prolific)."
 authors = ["Sebastian Musslick <sebastian_musslick@brown.edu>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = ">=3.7.4,<3.11"
+python = ">=3.8,<3.11"
 numpy = "^1.18"
 imageio = "^2.9.0"
 matplotlib = "^3.2.1"
