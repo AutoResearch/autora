@@ -1,7 +1,7 @@
 import random
 import warnings
 from enum import Enum
-from typing import Callable, List, Tuple
+from typing import Callable, List, Sequence, Tuple
 
 import numpy as np
 import torch
@@ -48,14 +48,17 @@ class MixedOp(nn.Module):
     that is applied to an input variable.
     """
 
-    def __init__(self):
+    def __init__(self, primitives: Sequence[str] = PRIMITIVES):
         """
         Initializes a mixture operation based on a pre-specified set of primitive operations.
+
+        Arguments:
+            primitives: list of primitives to be used in the mixture operation
         """
         super(MixedOp, self).__init__()
         self._ops = nn.ModuleList()
         # loop through all the 8 primitive operations
-        for primitive in PRIMITIVES:
+        for primitive in primitives:
             # OPS returns an nn module for a given primitive (defines as a string)
             op = OPS[primitive]
 
@@ -97,7 +100,12 @@ class Cell(nn.Module):
         _ops: list of mixture operations (amounts to the list of edges in the cell)
     """
 
-    def __init__(self, steps: int = 2, n_input_states: int = 1):
+    def __init__(
+        self,
+        steps: int = 2,
+        n_input_states: int = 1,
+        primitives: Sequence[str] = PRIMITIVES,
+    ):
         """
         Initializes a cell based on the number of hidden nodes (steps)
         and the number of input nodes (n_input_states).
@@ -129,7 +137,7 @@ class Cell(nn.Module):
                 # adds a mixed operation (derived from architecture parameters alpha)
                 # for 4 intermediate nodes, a total of 14 connections
                 # (MixedOps) is added
-                op = MixedOp()
+                op = MixedOp(primitives)
                 # appends cell with mixed operation
                 self._ops.append(op)
 
@@ -207,6 +215,7 @@ class Network(nn.Module):
         architecture_fixed: bool = False,
         classifier_weight_decay: float = 0,
         darts_type: DARTS_Type = DARTS_Type.ORIGINAL,
+        primitives: Sequence[str] = PRIMITIVES,
     ):
         """
         Initializes the network.
@@ -231,6 +240,7 @@ class Network(nn.Module):
         self._multiplier = (
             1  # the number of internal nodes that get concatenated to the output
         )
+        self.primitives = primitives
 
         # set parameters
         self._dim_output = self._steps
@@ -245,7 +255,7 @@ class Network(nn.Module):
         )  # get list of all current modules (should be empty)
 
         # generate a cell that undergoes architecture search
-        self.cells = Cell(steps, self._n_input_states)
+        self.cells = Cell(steps, self._n_input_states, self.primitives)
 
         # last layer is a linear classifier (e.g. with 10 CIFAR classes)
         self.classifier = nn.Linear(
@@ -266,6 +276,7 @@ class Network(nn.Module):
             architecture_fixed=self._architecture_fixed,
             classifier_weight_decay=self._classifier_weight_decay,
             darts_type=self.DARTS_type,
+            primitives=self.primitives,
         )
 
         for x, y in zip(model_new.arch_parameters(), self.arch_parameters()):
@@ -346,7 +357,7 @@ class Network(nn.Module):
         k = sum(1 for i in range(self._steps) for n in range(self._n_input_states + i))
         # number of available primitive operations (8 different types for a
         # conv net)
-        num_ops = len(PRIMITIVES)
+        num_ops = len(self.primitives)
 
         # e.g., generate 14 (number of available edges) by 8 (operations)
         # weight matrix for normal alphas of the architecture
@@ -418,7 +429,7 @@ class Network(nn.Module):
                     W_soft = F.softmax(transformed_alphas_normal * sample_amp, dim=0)
                 else:
                     W_soft = Variable(torch.zeros(alphas_normal[edge].shape))
-                    W_soft[PRIMITIVES.index("none")] = 1
+                    W_soft[self.primitives.index("none")] = 1
 
             else:
                 raise Exception(
@@ -489,7 +500,7 @@ class Network(nn.Module):
                     key=lambda x: -max(
                         W[x][k]
                         for k in range(len(W[x]))
-                        if k != PRIMITIVES.index("none")
+                        if k != self.primitives.index("none")
                     ),
                 )
                 # for each edge, figure out which is the primitive with the
@@ -507,13 +518,13 @@ class Network(nn.Module):
                         # looping through all the primitives
                         for k in range(len(W[j])):
                             # choose the primitive with the highest weight
-                            # if k != PRIMITIVES.index('none'):
+                            # if k != self.primitives.index('none'):
                             # EDIT SM 01/13: commented to include "none"
                             # weights in genotype
                             if k_best is None or W[j][k] > W[j][k_best]:
                                 k_best = k
                         # add gene (primitive, edge number)
-                    gene.append((PRIMITIVES[k_best], j))
+                    gene.append((self.primitives[k_best], j))
                 start = end
                 n += 1
             return gene
@@ -588,7 +599,9 @@ class Network(nn.Module):
                     "Edge ("
                     + str(idx)
                     + "): "
-                    + get_operation_label(PRIMITIVES[maxIdx[0].item(0)], tmp_param_list)
+                    + get_operation_label(
+                        self.primitives[maxIdx[0].item(0)], tmp_param_list
+                    )
                 )
             param_list.append(tmp_param_list)
 
