@@ -69,6 +69,6 @@ class DVTime(DV, VTime):
         self.set_value(value)
 
 
-register_dv_label(time_DV=(DVTime, "Time", "", "time_DV", "s", 0, (0, 3600)))
+register_dv_label(dict(time_DV=(DVTime, "Time", "", "time_DV", "s", 0, (0, 3600))))
 
-register_iv_label(time_IV=(IVTime, "Time", "", "time_IV", "s", 1, (0, 3600)))
+register_iv_label(dict(time_IV=(IVTime, "Time", "", "time_IV", "s", 1, (0, 3600))))
