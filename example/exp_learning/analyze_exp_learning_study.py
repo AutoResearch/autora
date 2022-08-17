@@ -1,19 +1,19 @@
 import numpy as np
 
-import aer.config as aer_cfg
-import aer.experimentalist.experiment_environment.experiment_config as exp_cfg
-from aer.experimentalist.experiment_environment.participant_exp_learning import (
+import autora.config as aer_cfg
+import autora.experimentalist.experiment_environment.experiment_config as exp_cfg
+from autora.experimentalist.experiment_environment.participant_exp_learning import (
     Participant_Exp_Learning,
 )
-from aer.theorist.darts.plot_utils import (
+from autora.theorist.darts.plot_utils import (
     generate_darts_summary_figures,
     load_model,
     plot_model_graph,
 )
-from aer.theorist.object_of_study import Object_Of_Study
-from aer.variable import DVInSilico as DV
-from aer.variable import IVInSilico as IV
-from aer.variable import ValueType as output_type
+from autora.theorist.object_of_study import Object_Of_Study
+from autora.variable import DVInSilico as DV
+from autora.variable import IVInSilico as IV
+from autora.variable import ValueType as output_type
 
 participant = Participant_Exp_Learning()
 

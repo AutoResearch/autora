@@ -3,7 +3,7 @@ import unittest
 import numpy as np
 from sklearn.model_selection import GridSearchCV, train_test_split
 
-from aer.skl.darts import DARTSRegressor, DARTSType, ValueType
+from autora.skl.darts import DARTSRegressor, DARTSType, ValueType
 
 
 def generate_noisy_constant_data(

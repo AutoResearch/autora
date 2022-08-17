@@ -9,6 +9,6 @@
 #SBATCH --array=0-149
 
 # anaconda env
-source activate aer
+source activate autora
 
 python run_control_original_study_slurm.py --slurm_id $SLURM_ARRAY_TASK_ID

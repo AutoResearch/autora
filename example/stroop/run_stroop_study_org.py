@@ -1,12 +1,12 @@
 from datetime import datetime
 
-import aer.experimentalist.experiment_environment.experiment_config as exp_cfg
-from aer.experimentalist.experimentalist_popper import Experimentalist_Popper
-from aer.theorist.object_of_study import Object_Of_Study
-from aer.theorist.theorist_darts import DARTSType, Theorist_DARTS
-from aer.variable import DVInSilico as DV
-from aer.variable import IVInSilico as IV
-from aer.variable import ValueType as output_type
+import autora.experimentalist.experiment_environment.experiment_config as exp_cfg
+from autora.experimentalist.experimentalist_popper import Experimentalist_Popper
+from autora.theorist.object_of_study import Object_Of_Study
+from autora.theorist.theorist_darts import DARTSType, Theorist_DARTS
+from autora.variable import DVInSilico as DV
+from autora.variable import IVInSilico as IV
+from autora.variable import ValueType as output_type
 
 now = datetime.now()
 dt_string = now.strftime("%d/%m/%Y %H:%M:%S")

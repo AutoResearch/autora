@@ -1,8 +1,9 @@
 [tool.poetry]
-name = "aer"
+name = "autora"
 version = "0.1.0"
-description = "Automated Empirical Research (AER) is a framework for implementing machine learning tools which autonomously and iteratively generate 1) new theories to describe real-world data, and 2) experiments to invalidate those theories and seed a new cycle of theory-making. The experiments will be run online via crowd-sourcing platforms (MTurk, Prolific)."
+description = "Autonomous Research Assistant (AutoRA) is a framework for implementing machine learning tools which autonomously and iteratively generate 1) new theories to describe real-world data, and 2) experiments to invalidate those theories and seed a new cycle of theory-making. The experiments will be run online via crowd-sourcing platforms (MTurk, Prolific)."
 authors = ["Sebastian Musslick <sebastian_musslick@brown.edu>"]
+readme = "README.md"
 
 [tool.poetry.dependencies]
 python = '>=3.8.13,<3.11'

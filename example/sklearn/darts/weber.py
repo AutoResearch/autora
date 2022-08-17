@@ -15,7 +15,7 @@ from sklearn.neural_network import MLPRegressor
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import PolynomialFeatures, StandardScaler
 
-from aer.skl.darts import DARTSRegressor
+from autora.skl.darts import DARTSRegressor
 
 logging.basicConfig(level=logging.INFO)
 

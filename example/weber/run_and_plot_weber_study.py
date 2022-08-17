@@ -1,15 +1,15 @@
 from datetime import datetime
 
-import aer.experimentalist.experiment_environment.experiment_config as exp_cfg
-import aer.theorist.darts.utils as utils
-import aer.theorist.darts.visualize as viz
-from aer.experimentalist.experiment_design_synthetic_weber import (
+import autora.experimentalist.experiment_environment.experiment_config as exp_cfg
+import autora.theorist.darts.utils as utils
+import autora.theorist.darts.visualize as viz
+from autora.experimentalist.experiment_design_synthetic_weber import (
     Experiment_Design_Synthetic_Weber,
 )
-from aer.experimentalist.experimentalist_popper import Experimentalist_Popper
-from aer.theorist.object_of_study import Object_Of_Study
-from aer.theorist.theorist_darts import DARTSType, Theorist_DARTS
-from aer.variable import ValueType, Variable
+from autora.experimentalist.experimentalist_popper import Experimentalist_Popper
+from autora.theorist.object_of_study import Object_Of_Study
+from autora.theorist.theorist_darts import DARTSType, Theorist_DARTS
+from autora.variable import ValueType, Variable
 
 now = datetime.now()
 dt_string = now.strftime("%d/%m/%Y %H:%M:%S")

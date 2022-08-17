@@ -1,6 +1,6 @@
 from tkinter import Tk
 
-from aer.experimentalist.experiment_environment.experiment_server_GUI import (
+from autora.experimentalist.experiment_environment.experiment_server_GUI import (
     Experiment_Server_GUI,
 )
 
