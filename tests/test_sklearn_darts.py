@@ -3,7 +3,7 @@ import unittest
 import numpy as np
 from sklearn.model_selection import GridSearchCV, train_test_split
 
-from autora.skl.darts import DARTSRegressor
+from autora.skl.darts import DARTSRegressor, DARTSType, ValueType
 
 
 def generate_noisy_constant_data(
@@ -45,6 +45,39 @@ class TestDarts(unittest.TestCase):
             )
 
         print(estimator.network_)
+
+    def test_enum_string_inputs(self):
+
+        X, y, const, epsilon = generate_noisy_constant_data()
+
+        kwargs = dict(
+            num_graph_nodes=1,
+            max_epochs=1,
+            arch_updates_per_epoch=1,
+            param_updates_per_epoch=1,
+        )
+
+        DARTSRegressor(darts_type="fair", **kwargs).fit(X, y)
+        DARTSRegressor(darts_type=DARTSType.FAIR, **kwargs).fit(X, y)
+        DARTSRegressor(darts_type="original", **kwargs).fit(X, y)
+        DARTSRegressor(darts_type=DARTSType.ORIGINAL, **kwargs).fit(X, y)
+
+        DARTSRegressor(output_type="probability", **kwargs).fit(X, y)
+        DARTSRegressor(output_type=ValueType.PROBABILITY, **kwargs).fit(X, y)
+        DARTSRegressor(output_type=ValueType.PROBABILITY_SAMPLE, **kwargs).fit(X, y)
+        DARTSRegressor(output_type="probability_distribution", **kwargs).fit(X, y)
+        DARTSRegressor(output_type=ValueType.PROBABILITY_DISTRIBUTION, **kwargs).fit(
+            X, y
+        )
+        self.assertRaises(
+            NotImplementedError, DARTSRegressor(output_type="class", **kwargs).fit, X, y
+        )
+        self.assertRaises(
+            NotImplementedError,
+            DARTSRegressor(output_type=ValueType.CLASS, **kwargs).fit,
+            X,
+            y,
+        )
 
     def test_metaparam_optimization(self):
 

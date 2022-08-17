@@ -30,7 +30,12 @@ class Theorist_DARTS(Theorist, ABC):
 
     _lr_plot_name = "Learning Rates"
 
-    def __init__(self, study_name, darts_type=DARTSType.ORIGINAL):
+    def __init__(
+        self,
+        study_name,
+        darts_type=DARTSType.ORIGINAL,
+        primitives=PRIMITIVES,
+    ):
         super(Theorist_DARTS, self).__init__(study_name)
 
         self.DARTS_type = darts_type
@@ -51,6 +56,8 @@ class Theorist_DARTS(Theorist, ABC):
 
         self.model_search_epochs = darts_cfg.epochs
         self.eval_epochs = darts_cfg.eval_epochs
+
+        self.primitives = primitives
 
         if self.DARTS_type == DARTSType.ORIGINAL:
             self.theorist_name = "original_darts"
@@ -243,6 +250,7 @@ class Theorist_DARTS(Theorist, ABC):
             steps=best_num_graph_nodes,
             n_input_states=object_of_study.__get_input_dim__(),
             darts_type=self.DARTS_type,
+            primitives=self.primitives,
         )
         utils.load(model, model_path)
         alphas_normal = torch.load(arch_path)
@@ -412,6 +420,7 @@ class Theorist_DARTS(Theorist, ABC):
                 n_input_states=object_of_study.__get_input_dim__(),
                 classifier_weight_decay=darts_cfg.classifier_weight_decay,
                 darts_type=self.DARTS_type,
+                primitives=self.primitives,
             )
             if darts_cfg.eval_custom_initialization:
                 self._eval_model.apply(init_weights)
@@ -559,7 +568,9 @@ class Theorist_DARTS(Theorist, ABC):
         self._eval_num_params_log.append(num_params)
         num_non_zero_edges = self._eval_model.alphas_normal.data.shape[0] - int(
             np.sum(
-                self._eval_model.alphas_normal.data[:, PRIMITIVES.index("none")].numpy()
+                self._eval_model.alphas_normal.data[
+                    :, self.primitives.index("none")
+                ].numpy()
             )
         )
         self._eval_num_edges_log.append(num_non_zero_edges)
@@ -645,6 +656,7 @@ class Theorist_DARTS(Theorist, ABC):
             n_input_states=object_of_study.__get_input_dim__(),
             classifier_weight_decay=darts_cfg.classifier_weight_decay,
             darts_type=self.DARTS_type,
+            primitives=self.primitives,
         )
 
         # initialize model
@@ -710,7 +722,7 @@ class Theorist_DARTS(Theorist, ABC):
         self.num_arch_ops = self.model.alphas_normal.data.shape[
             1
         ]  # number of operations
-        self.arch_ops_labels = PRIMITIVES  # operations
+        self.arch_ops_labels = self.primitives  # operations
         self.train_error_log = np.empty(
             (self.model_search_epochs, 1)
         )  # log training error
@@ -1371,6 +1383,7 @@ class Theorist_DARTS(Theorist, ABC):
                         n_input_states=object_of_study.__get_input_dim__(),
                         classifier_weight_decay=darts_cfg.classifier_weight_decay,
                         darts_type=self.DARTS_type,
+                        primitives=self.primitives,
                     )
                     if darts_cfg.eval_custom_initialization:
                         new_model.apply(init_weights)
