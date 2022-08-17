@@ -14,6 +14,7 @@ from sklearn.model_selection import GridSearchCV
 from sklearn.neural_network import MLPRegressor
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import PolynomialFeatures, StandardScaler
+from theorist.darts.operations import PRIMITIVES
 
 from autora.skl.darts import DARTSRegressor
 
@@ -85,6 +86,7 @@ darts_estimator_tuned = DARTSRegressor(
     output_type="probability",
     darts_type="original",
     num_graph_nodes=2,
+    primitives=PRIMITIVES,
 )
 darts_estimator_tuned.fit(X, y)
 show_results(
@@ -101,6 +103,7 @@ darts_estimator_tuned = DARTSRegressor(
     output_type="probability",
     darts_type="fair",
     num_graph_nodes=2,
+    primitives=["add", "subtract", "none"],
 )
 darts_estimator_tuned.fit(X, y)
 show_results(estimator=darts_estimator_tuned, label="pre-tuned Fair-DARTS Regressor")
