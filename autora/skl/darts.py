@@ -17,6 +17,7 @@ from sklearn.utils.validation import check_array, check_is_fitted, check_X_y
 from autora.theorist.darts.architect import Architect
 from autora.theorist.darts.dataset import darts_dataset_from_ndarray
 from autora.theorist.darts.model_search import DARTSType, Network
+from autora.theorist.darts.operations import PRIMITIVES
 from autora.theorist.darts.utils import (
     AvgrageMeter,
     format_input_target,
@@ -73,6 +74,7 @@ def _general_darts(
     fair_darts_loss_weight: int = 1,
     max_epochs: int = 100,
     grad_clip: float = 5,
+    primitives: Sequence[str] = PRIMITIVES,
 ) -> _DARTSResult:
     """
     Function to implement the DARTS optimization, given a fixed architecture and input data.
@@ -96,6 +98,7 @@ def _general_darts(
         n_input_states=input_dimensions,
         classifier_weight_decay=classifier_weight_decay,
         darts_type=DARTSType(darts_type),
+        primitives=primitives,
     )
     if init_weights_function is not None:
         network.apply(init_weights_function)
@@ -364,6 +367,7 @@ class DARTSRegressor(BaseEstimator, RegressorMixin):
         max_epochs: int = 10,
         grad_clip: float = 5,
         output_type: IMPLEMENTED_OUTPUT_TYPES = "real",
+        primitives: Sequence[str] = PRIMITIVES,
     ) -> None:
         """
         Arguments:
@@ -385,6 +389,9 @@ class DARTSRegressor(BaseEstimator, RegressorMixin):
             fair_darts_loss_weight:
             max_epochs:
             grad_clip:
+            primitives: list of primitive operations used in the DARTS network,
+                e.g., 'add', 'subtract', 'none'. For details, see
+                [`autora.theorist.darts.operations`][autora.theorist.darts.operations]
         """
 
         self.batch_size = batch_size
@@ -410,6 +417,8 @@ class DARTSRegressor(BaseEstimator, RegressorMixin):
 
         self.max_epochs = max_epochs
         self.grad_clip = grad_clip
+
+        self.primitives = primitives
 
         self.output_type = output_type
         self.darts_type = darts_type
