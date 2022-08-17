@@ -275,17 +275,17 @@ class IVTrial(IV):
         pass
 
 
-dv_labels = {}
-iv_labels = {}
+DV_LABELS = {}
+IV_LABELS = {}
 
 
 def register_iv_label(**kwargs):
-    iv_labels.update(kwargs)
+    IV_LABELS.update(kwargs)
     return
 
 
 def register_dv_label(**kwargs):
-    dv_labels.update(kwargs)
+    DV_LABELS.update(kwargs)
     return
 
 
