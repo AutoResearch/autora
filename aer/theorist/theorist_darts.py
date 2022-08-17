@@ -18,6 +18,7 @@ import aer.theorist.darts.visualize as viz
 from aer.theorist.darts.architect import Architect
 from aer.theorist.darts.model_search import DARTSType, Network
 from aer.theorist.darts.operations import PRIMITIVES
+from aer.theorist.darts.utils import format_input_target
 from aer.theorist.theorist import Theorist
 from aer.utils import Plot_Types
 from aer.variable import ValueType as output_types
@@ -1536,14 +1537,6 @@ def model_formatted(model, input, object_of_study):
     output = model(input)
     output_formatted = m(output)
     return output_formatted
-
-
-def format_input_target(input, target, criterion):
-
-    if isinstance(criterion, nn.CrossEntropyLoss):
-        target = target.squeeze()
-
-    return (input, target)
 
 
 # trains model for one architecture epoch

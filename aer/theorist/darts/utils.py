@@ -6,7 +6,7 @@ import typing
 
 import numpy as np
 import torch
-import torch.nn as nn
+from torch import nn as nn
 
 from aer.theorist.darts.model_search import Network
 from aer.variable import ValueType
@@ -467,3 +467,11 @@ def get_best_fitting_models(
     topk_BICs_names = res[1]
 
     return (topk_losses_names, topk_BICs_names)
+
+
+def format_input_target(input, target, criterion):
+
+    if isinstance(criterion, nn.CrossEntropyLoss):
+        target = target.squeeze()
+
+    return (input, target)
