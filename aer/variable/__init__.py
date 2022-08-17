@@ -1,5 +1,7 @@
 from abc import abstractmethod
+from dataclasses import dataclass, field
 from enum import Enum
+from typing import Iterator, Sequence
 
 import numpy as np
 
@@ -141,6 +143,48 @@ class Variable:
     def set_covariate(self, is_covariate):
         """Set whether this dependent variable is treated as covariate."""
         self._is_covariate = is_covariate
+
+
+@dataclass(frozen=True)
+class VariableCollection:
+    """Immutable metadata about dependent / independent variables and covariates."""
+
+    independent_variables: Sequence[Variable]
+    dependent_variables: Sequence[Variable]
+    covariates: Sequence[Variable] = field(default_factory=list)
+
+    @property
+    def all_variables(self) -> Iterator[Variable]:
+        for vars in (
+            self.independent_variables,
+            self.dependent_variables,
+            self.covariates,
+        ):
+            for v in vars:
+                yield v
+
+    @property
+    def variable_names(self):
+        return (v.get_name() for v in self.all_variables)
+
+    @property
+    def output_type(self):
+        first_type = self.dependent_variables[0].type
+        assert all(dv.type == first_type for dv in self.dependent_variables), (
+            "Dependent variable output types don't match. "
+            "Different output types are not supported yet."
+        )
+        return first_type
+
+    @property
+    def input_dimensions(self):
+        """The number of independent variables and covariates."""
+        return len(self.independent_variables) + len(self.covariates)
+
+    @property
+    def output_dimensions(self):
+        """The number of dependent variables."""
+        return len(self.dependent_variables)
 
 
 class IV(Variable):
