@@ -10,11 +10,11 @@ echo "new temporary directory: ${tempdir}"
 
 # Copy the test files
 echo "copying the test files"
-cp -r -v ${original_directory}/tests ${tempdir}/.
+cp -r -v "${original_directory}/tests" "${tempdir}/."
 
 # Change to the new directory
 echo "change to the new directory"
-cd $tempdir
+cd "$tempdir"
 
 # Create a new virtualenv and install the distribution
 echo "creating new virtualenv"
