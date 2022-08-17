@@ -14,7 +14,7 @@ cp -r -v "${original_directory}/tests" "${tempdir}/."
 
 # Change to the new directory
 echo "change to the new directory"
-cd "$tempdir"
+cd "$tempdir" || exit
 
 # Create a new virtualenv and install the distribution
 echo "creating new virtualenv"
@@ -24,7 +24,7 @@ echo "activating new venv"
 source venv/bin/activate
 
 echo "installing distribution file ${distfile}"
-pip install ${distfile}
+pip install "${distfile}"
 
 echo "Installed version of AutoRA: $(python -c 'import autora; print(autora.__version__)')"
 
