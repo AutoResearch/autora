@@ -112,7 +112,7 @@ def darts_model_plot(
     start = 0
     for i in range(steps):
         end = start + n
-        print(start, end)
+        _logger.debug(start, end)
         # for k in [2*i, 2*i + 1]:
         for k in range(
             start, end
