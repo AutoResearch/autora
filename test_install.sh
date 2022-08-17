@@ -1,4 +1,4 @@
-#!/bin/zsh
+#!/bin/bash
 
 # Build the distribution
 original_directory=$(pwd)
@@ -21,6 +21,7 @@ echo "creating new virtualenv"
 virtualenv venv
 
 echo "activating new venv"
+# shellcheck source=/dev/null
 source venv/bin/activate
 
 echo "installing distribution file ${distfile}"
@@ -32,7 +33,6 @@ echo "running unit tests:"
 python -m unittest -v
 
 echo "Run and test using:"
-echo "cd ${tempdir}"
-echo "source venv/bin/activate"
+echo "source ${tempdir}/venv/bin/activate"
 echo "python -c 'import autora; print(autora.__version__)'"
 echo "python -m unittest -v"
