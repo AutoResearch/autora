@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "autora"
-version = "0.1.0"
+version = "1.0.0a3"
 description = "Autonomous Research Assistant (AutoRA) is a framework for implementing machine learning tools which autonomously and iteratively generate 1) new theories to describe real-world data, and 2) experiments to invalidate those theories and seed a new cycle of theory-making. The experiments will be run online via crowd-sourcing platforms (MTurk, Prolific)."
 authors = ["Sebastian Musslick <sebastian_musslick@brown.edu>"]
 readme = "README.md"
@@ -18,6 +18,8 @@ tinkerforge = '~2.1.25'
 torch = "^1.11.0"
 torchvision = "^0.12.0"
 scipy = "^1.8.1"
+scikit-learn = "^1.1.2"
+tqdm = "^4.64.0"
 
 [tool.poetry.dev-dependencies]
 mkdocs-material = "^8.3.8"
