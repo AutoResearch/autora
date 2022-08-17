@@ -246,32 +246,28 @@ class DVVoltage(DVTF):
 
 
 register_dv_label(
-    **{
-        "voltage0": (DVVoltage, "Voltage 0", "MjY", "voltage0", "mV", 1, (-3500, 3500)),
-        "voltage1": (DVVoltage, "Voltage 1", "MjY", "voltage1", "mV", 1, (-3500, 3500)),
-        "current0": (DVCurrent, "Current 0", "Hfg", "current0", "mA", 2, (0, 20)),
-        "current1": (DVCurrent, "Current 1", "Hfg", "current1", "mA", 2, (0, 20)),
-    }
+    voltage0=(DVVoltage, "Voltage 0", "MjY", "voltage0", "mV", 1, (-3500, 3500)),
+    voltage1=(DVVoltage, "Voltage 1", "MjY", "voltage1", "mV", 1, (-3500, 3500)),
+    current0=(DVCurrent, "Current 0", "Hfg", "current0", "mA", 2, (0, 20)),
+    current1=(DVCurrent, "Current 1", "Hfg", "current1", "mA", 2, (0, 20)),
 )
 register_iv_label(
-    **{
-        "source_voltage": (
-            IVVoltage,
-            "Source Voltage",
-            "MST",
-            "source_voltage",
-            "mV",
-            2,
-            (0, 5000),
-        ),
-        "source_current": (
-            IVCurrent,
-            "Source Current",
-            "MST",
-            "source_current",
-            "µA",
-            2,
-            (0, 20000),
-        ),
-    }
+    source_voltage=(
+        IVVoltage,
+        "Source Voltage",
+        "MST",
+        "source_voltage",
+        "mV",
+        2,
+        (0, 5000),
+    ),
+    source_current=(
+        IVCurrent,
+        "Source Current",
+        "MST",
+        "source_current",
+        "µA",
+        2,
+        (0, 20000),
+    ),
 )
