@@ -1,8 +1,11 @@
+import logging
 import typing
 
 from graphviz import Digraph
 
 from aer.theorist.darts.operations import Genotype, get_operation_label
+
+_logger = logging.getLogger(__name__)
 
 
 def plot(
@@ -114,7 +117,7 @@ def darts_model_plot(
         for k in range(
             start, end
         ):  # adapted this iteration from get_genotype() in model_search.py
-            print(genotype, k)
+            _logger.debug(genotype, k)
             op, j = genotype[k]
             if j < len(input_labels):
                 u = input_labels[j]
