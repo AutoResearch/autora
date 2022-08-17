@@ -9,7 +9,7 @@ from aer.experimentalist.experiment_design_synthetic_weber import (
 )
 from aer.experimentalist.experimentalist_popper import Experimentalist_Popper
 from aer.theorist.object_of_study import Object_Of_Study
-from aer.theorist.theorist_darts import DARTS_Type, Theorist_DARTS
+from aer.theorist.theorist_darts import DARTSType, Theorist_DARTS
 from aer.variable import DVInSilico as DV
 from aer.variable import IVInSilico as IV
 from aer.variable import ValueType as output_type
@@ -116,7 +116,7 @@ experimentalist_validation = Experimentalist_Popper(
 # THEORIST
 
 # initialize theorist
-theorist = Theorist_DARTS(study_name, darts_type=DARTS_Type.ORIGINAL)
+theorist = Theorist_DARTS(study_name, darts_type=DARTSType.ORIGINAL)
 
 # specify plots
 plots = list()
@@ -149,7 +149,7 @@ theorist.add_validation_set(validation_object_2, "Weber_Original")
 model = theorist.search_model_job(study_object, args.slurm_id)
 
 # fair search
-theorist_fair = Theorist_DARTS(study_name, darts_type=DARTS_Type.FAIR)
+theorist_fair = Theorist_DARTS(study_name, darts_type=DARTSType.FAIR)
 theorist_fair.plot()
 theorist_fair.add_validation_set(validation_object_1, "Weber_Sampled")
 theorist_fair.add_validation_set(validation_object_2, "Weber_Original")

@@ -3,7 +3,7 @@ import torch
 import torch.nn.functional as F
 from torch.autograd import Variable
 
-from aer.theorist.darts.model_search import DARTS_Type, Network
+from aer.theorist.darts.model_search import DARTSType, Network
 from aer.theorist.darts.operations import isiterable
 
 
@@ -189,9 +189,9 @@ class Architect(object):
             input_valid: input patterns for validation set
             target_valid: target patterns for validation set
         """
-        if self.model.DARTS_type == DARTS_Type.ORIGINAL:
+        if self.model.DARTS_type == DARTSType.ORIGINAL:
             loss = self.model._loss(input_valid, target_valid)
-        elif self.model.DARTS_type == DARTS_Type.FAIR:
+        elif self.model.DARTS_type == DARTSType.FAIR:
             loss1 = self.model._loss(input_valid, target_valid)
             loss2 = -F.mse_loss(
                 torch.sigmoid(self.model.alphas_normal),
@@ -238,9 +238,9 @@ class Architect(object):
             input_train, target_train, eta, network_optimizer
         )
 
-        if self.model.DARTS_type == DARTS_Type.ORIGINAL:
+        if self.model.DARTS_type == DARTSType.ORIGINAL:
             unrolled_loss = unrolled_model._loss(input_valid, target_valid)
-        elif self.model.DARTS_type == DARTS_Type.FAIR:
+        elif self.model.DARTS_type == DARTSType.FAIR:
             loss1 = self.model._loss(input_valid, target_valid)
             loss2 = -F.mse_loss(
                 torch.sigmoid(self.model.alphas_normal),

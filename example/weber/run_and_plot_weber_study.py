@@ -8,7 +8,7 @@ from aer.experimentalist.experiment_design_synthetic_weber import (
 )
 from aer.experimentalist.experimentalist_popper import Experimentalist_Popper
 from aer.theorist.object_of_study import Object_Of_Study
-from aer.theorist.theorist_darts import DARTS_Type, Theorist_DARTS
+from aer.theorist.theorist_darts import DARTSType, Theorist_DARTS
 from aer.variable import ValueType, Variable
 
 now = datetime.now()
@@ -104,7 +104,7 @@ experimentalist_validation = Experimentalist_Popper(
 # THEORIST
 
 # initialize theorist
-theorist = Theorist_DARTS(study_name, darts_type=DARTS_Type.ORIGINAL)
+theorist = Theorist_DARTS(study_name, darts_type=DARTSType.ORIGINAL)
 
 # specify plots
 # plots = list()
@@ -163,10 +163,10 @@ out_fnc = utils.get_output_str(
 viz.plot(
     genotype,
     model_graph_filepath,
-    viewFile=True,
-    input_labels=input_labels,
-    param_list=param_list,
+    view_file=True,
     full_label=True,
+    param_list=param_list,
+    input_labels=input_labels,
     out_dim=out_dim,
     out_fnc=out_fnc,
 )

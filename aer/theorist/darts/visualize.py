@@ -9,8 +9,8 @@ from aer.theorist.darts.operations import Genotype, get_operation_label
 def plot(
     genotype: Genotype,
     filename: str,
-    fileFormat: str = "pdf",
-    viewFile: bool = None,
+    file_format: str = "pdf",
+    view_file: bool = None,
     full_label: bool = False,
     param_list: typing.Tuple = (),
     input_labels: typing.Tuple = (),
@@ -23,8 +23,8 @@ def plot(
     Arguments:
         genotype: the genotype of the model
         filename: the filename of the output file
-        fileFormat: the format of the output file
-        viewFile: if True, the plot will be displayed in a window
+        file_format: the format of the output file
+        view_file: if True, the plot will be displayed in a window
         full_label: if True, the labels of the nodes will be the full name of the operation
             (including the coefficients)
         param_list: a list of parameters to be included in the labels of the nodes
@@ -37,7 +37,7 @@ def plot(
     format_string = "{:." + "{:.0f}".format(decimals_to_display) + "f}"
 
     g = Digraph(
-        format=fileFormat,
+        format=file_format,
         edge_attr=dict(fontsize="20", fontname="times"),
         node_attr=dict(
             style="filled",
@@ -153,13 +153,13 @@ def plot(
             for out_idx, out_str in enumerate(out_nodes):
                 g.edge(str(i), out_str, label="linear", fillcolor="gray")
 
-    if viewFile is None:
-        if fileFormat == "pdf":
-            viewFile = True
+    if view_file is None:
+        if file_format == "pdf":
+            view_file = True
         else:
-            viewFile = False
+            view_file = False
 
-    g.render(filename, view=viewFile)
+    g.render(filename, view=view_file)
 
 
 if __name__ == "__main__":

@@ -4,7 +4,7 @@ from datetime import datetime
 import aer.experimentalist.experiment_environment.experiment_config as exp_cfg
 from aer.experimentalist.experimentalist_popper import Experimentalist_Popper
 from aer.theorist.object_of_study import Object_Of_Study
-from aer.theorist.theorist_darts import DARTS_Type, Theorist_DARTS
+from aer.theorist.theorist_darts import DARTSType, Theorist_DARTS
 from aer.variable import DVInSilico as DV
 from aer.variable import IVInSilico as IV
 from aer.variable import ValueType as output_type
@@ -132,7 +132,7 @@ experimentalist_validation = Experimentalist_Popper(
 # THEORIST
 
 # initialize theorist
-theorist = Theorist_DARTS(study_name, darts_type=DARTS_Type.ORIGINAL)
+theorist = Theorist_DARTS(study_name, darts_type=DARTSType.ORIGINAL)
 
 # specify plots
 plots = list()

@@ -7,7 +7,7 @@ from aer.experimentalist.experiment_design_synthetic_weber import (
 )
 from aer.experimentalist.experimentalist_popper import Experimentalist_Popper
 from aer.theorist.object_of_study import Object_Of_Study
-from aer.theorist.theorist_darts import DARTS_Type, Theorist_DARTS
+from aer.theorist.theorist_darts import DARTSType, Theorist_DARTS
 from aer.theorist.theorist_GUI import Theorist_GUI
 from aer.variable import DVInSilico as DV
 from aer.variable import IVInSilico as IV
@@ -107,7 +107,7 @@ experimentalist_validation = Experimentalist_Popper(
 
 # initialize theorist
 theorist = Theorist_DARTS(
-    study_name, darts_type=DARTS_Type.ORIGINAL, primitives=["none", "add", "subtract"]
+    study_name, darts_type=DARTSType.ORIGINAL, primitives=["none", "add", "subtract"]
 )
 
 # specify plots
@@ -150,7 +150,7 @@ root.mainloop()
 # experimentalist=experimentalist, root=root)
 # root.mainloop()
 
-# theorist_fair = Theorist_DARTS(study_name, darts_type=DARTS_Type.FAIR)
+# theorist_fair = Theorist_DARTS(study_name, darts_type=DARTSType.FAIR)
 # theorist_fair.plot()
 # theorist_fair.add_validation_set(validation_object_1, 'Weber_Sampled')
 # theorist_fair.add_validation_set(validation_object_2, 'Weber_Original')
