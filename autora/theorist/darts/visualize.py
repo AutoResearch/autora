@@ -1,8 +1,11 @@
+import logging
 import typing
 
 from graphviz import Digraph
 
 from autora.theorist.darts.operations import Genotype, get_operation_label
+
+_logger = logging.getLogger(__name__)
 
 
 def plot(
@@ -109,12 +112,12 @@ def darts_model_plot(
     start = 0
     for i in range(steps):
         end = start + n
-        print(start, end)
+        _logger.debug(start, end)
         # for k in [2*i, 2*i + 1]:
         for k in range(
             start, end
         ):  # adapted this iteration from get_genotype() in model_search.py
-            print(genotype, k)
+            _logger.debug(genotype, k)
             op, j = genotype[k]
             if j < len(input_labels):
                 u = input_labels[j]
