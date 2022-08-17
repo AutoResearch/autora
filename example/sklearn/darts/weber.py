@@ -3,9 +3,9 @@ Example file which shows some simple curve fitting using DARTSRegressor and some
 """
 
 import logging
+import pathlib
 from functools import partial
 
-import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -18,8 +18,6 @@ from sklearn.preprocessing import PolynomialFeatures, StandardScaler
 from aer.skl.darts import DARTSRegressor
 
 logging.basicConfig(level=logging.INFO)
-
-matplotlib.use("macosx")
 
 # %% Define some helper functions
 
@@ -58,7 +56,8 @@ def show_results_complete(
 
 
 # %% Load the data
-data = pd.read_csv("./weber_data.csv")  # reads from resource root data
+datafile_path = pathlib.Path(__file__).parent.joinpath("./weber_data.csv")
+data = pd.read_csv(datafile_path)
 show_results = partial(show_results_complete, data_=data, projection="3d")
 show_results(label="input data")
 X = data[["S1", "S2"]]
