@@ -6,14 +6,14 @@ authors = ["Sebastian Musslick <sebastian_musslick@brown.edu>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = ">=3.8,<3.11"
+python = "^3.8"
 numpy = "^1.18"
 imageio = "^2.9.0"
 matplotlib = "^3.2.1"
 pandas = "^1.4.2"
 graphviz = "^0.14.1"
 seaborn = "^0.11.1"
-tinkerforge = {version = "~2.1.25", optional=true}
+tinkerforge = {version = "^2.1.25", optional=true}
 torch = "^1.11.0"
 scipy = "^1.7.1"
 scikit-learn = "^1.1.1"
