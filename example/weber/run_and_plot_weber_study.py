@@ -11,6 +11,9 @@ from aer.theorist.object_of_study import Object_Of_Study
 from aer.theorist.theorist_darts import DARTS_Type, Theorist_DARTS
 from aer.variable import ValueType, Variable
 
+# move work directory two folders up
+# os.chdir("../../")
+
 now = datetime.now()
 dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
 print("date and time =", dt_string)
@@ -180,11 +183,22 @@ output_labels = ["P(detected)"]
 out_fnc = utils.get_output_str(study_object.__get_output_type__())
 
 equations = model.architecture_to_str_list(
-    input_labels=input_labels, output_labels=output_labels, out_fnc=out_fnc, latex=False
+    input_labels=input_labels,
+    output_labels=output_labels,
+    out_fnc=out_fnc,
+    output_format="console",
 )
-
+latex_equations = model.architecture_to_str_list(
+    input_labels=input_labels,
+    output_labels=output_labels,
+    out_fnc=out_fnc,
+    output_format="latex",
+)
 print("====== MODEL EQUATIONS ======")
 for eqn in equations:
+    print(eqn)
+print("==============================")
+for eqn in latex_equations:
     print(eqn)
 print("==============================")
 

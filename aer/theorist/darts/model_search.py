@@ -1,7 +1,7 @@
 import random
 import warnings
 from enum import Enum
-from typing import Callable, List, Tuple
+from typing import Callable, List, Literal, Tuple
 
 import numpy as np
 import torch
@@ -626,7 +626,7 @@ class Network(nn.Module):
         output_labels: List[str],
         out_fnc: str = "Fnc",
         decimals_to_display: int = 2,
-        latex=False,
+        output_format: Literal["latex", "console"] = "console",
     ) -> List:
         """
         Returns a list of strings representing the model.
@@ -658,7 +658,9 @@ class Network(nn.Module):
             op_list = list()
 
             for k in range(start, end):
-                if latex is True:  # for every edge projecting to current node
+                if (
+                    output_format == "latex"
+                ):  # for every edge projecting to current node
                     v = "k_" + str(i + 1)
                 else:
                     v = "k" + str(i + 1)
@@ -677,7 +679,7 @@ class Network(nn.Module):
                         params,
                         decimals=decimals_to_display,
                         input_var=u,
-                        latex=latex,
+                        output_format=output_format,
                     )
                     op_list.append(op)
                     edge_operations_list.append(op_label)
@@ -700,7 +702,7 @@ class Network(nn.Module):
             n += 1
 
         # TODO: extend to multiple outputs
-        if latex is True:
+        if output_format == "latex":
             classifier_str = output_labels[0] + " = " + out_fnc + "\\left("
         else:
             classifier_str = output_labels[0] + " = " + out_fnc + "("
@@ -714,7 +716,7 @@ class Network(nn.Module):
             if i > 0:
                 classifier_str += " + "
 
-            if latex is True:
+            if output_format == "latex":
                 input_var = "k_" + str(i + 1)
             else:
                 input_var = "k" + str(i + 1)
@@ -730,7 +732,7 @@ class Network(nn.Module):
                 classifier_str += " + " + str(bias[0])
 
             if i == steps - 1:
-                if latex is True:
+                if output_format == "latex":
                     classifier_str += "\\right)"
                 else:
                     classifier_str += ")"

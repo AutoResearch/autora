@@ -26,7 +26,7 @@ def get_operation_label(
     params_org: typing.List,
     decimals: int = 4,
     input_var: str = "x",
-    latex: bool = False,
+    output_format: typing.Literal["latex", "console"] = "console",
 ) -> str:
     """
     Returns a complete string describing a DARTS operation.
@@ -36,8 +36,40 @@ def get_operation_label(
         params_org: original parameters of the operation
         decimals: number of decimals to be used for converting the parameters into string format
         input_var: name of the input variable
-        latex: if True, the output will be in LaTeX format
+        output_format: format of the output string (either "latex" or "console")
+
+        Examples:
+        >>> get_operation_label("classifier", [1], decimals=2)
+        '1.00 * x'
+        >>> import numpy as np
+        >>> get_operation_label("classifier_concat", np.array([1, 2, 3]), decimals=2,
+        output_format="latex")
+        'x \\circ \\left(1.00\\right) + \\left(2.00\\right) + \\left(3.00\\right)'
+        >>> get_operation_label("classifier_concat", np.array([1, 2, 3]), decimals=2,
+        output_format="console")
+        'x .* (1.00) .+ (2.00) .+ (3.00)'
+        >>> get_operation_label("exp", [1,2], decimals=2)
+        'exp(1.00 * x + 2.00)'
+        >>> get_operation_label("none", [])
+        ''
+        >>> get_operation_label("1/x", [1], decimals=0)
+        '1 / (1 * x)'
+        >>> get_operation_label("lin_relu", [1], decimals=0)
+        'ReLU(1 * x)'
+        >>> get_operation_label("lin_relu", [1], decimals=0, output_format="latex")
+        '\\operatorname{ReLU}\\left(1x\\right)'
+        >>> get_operation_label("linear", [1, 2], decimals=0)
+        '1 * x + 2'
+        >>> get_operation_label("linear", [1, 2], decimals=0, output_format="latex")
+        '1x + 2'
+        >>> get_operation_label("linrelu", [1], decimals=0)  # Mistyped operation name
+        Traceback (most recent call last):
+        ...
+        NotImplementedError: operation 'linrelu' is not defined
     """
+    if output_format != "latex" and output_format != "console":
+        raise ValueError("output_format must be either 'latex' or 'console'")
+
     params = params_org.copy()
 
     format_string = "{:." + "{:.0f}".format(decimals) + "f}"
@@ -50,17 +82,17 @@ def get_operation_label(
         return classifier_str
 
     if op_name == "classifier_concat":
-        if latex is True:
+        if output_format == "latex":
             classifier_str = input_var + " \\circ \\left("
         else:
             classifier_str = input_var + " .* ("
         for param_idx, param in enumerate(params):
 
             if param_idx > 0:
-                if latex is True:
-                    classifier_str = classifier_str + " + \\left("
+                if output_format == "latex":
+                    classifier_str += " + \\left("
                 else:
-                    classifier_str = classifier_str + " .+ ("
+                    classifier_str += " .+ ("
 
             if isiterable(param.tolist()):
 
@@ -70,20 +102,20 @@ def get_operation_label(
 
                 for value_idx, value in enumerate(param_formatted):
                     if value_idx < len(param) - 1:
-                        classifier_str = classifier_str + value + " + "
+                        classifier_str += value + " + "
                     else:
-                        if latex is True:
-                            classifier_str = classifier_str + value + "\\right)"
+                        if output_format == "latex":
+                            classifier_str += value + "\\right)"
                         else:
-                            classifier_str = classifier_str + value + ")"
+                            classifier_str += value + ")"
 
             else:
                 value = format_string.format(param)
 
-                if latex is True:
-                    classifier_str = classifier_str + value + ")"
+                if output_format == "latex":
+                    classifier_str += value + "\\right)"
                 else:
-                    classifier_str = classifier_str + value + "\\right)"
+                    classifier_str += value + ")"
 
         return classifier_str
 
@@ -91,7 +123,7 @@ def get_operation_label(
     params.extend([0, 0, 0])
 
     if num_params == 1:  # without bias
-        if latex is False:
+        if output_format == "console":
             labels = {
                 "none": "",
                 "linear": str(format_string.format(params[0])) + " * " + input_var,
@@ -130,12 +162,12 @@ def get_operation_label(
                 + ")",
                 "classifier": classifier_str,
             }
-        else:
+        elif output_format == "latex":
             labels = {
                 "none": "",
                 "linear": str(format_string.format(params[0])) + "" + input_var,
-                "relu": "ReLU\\left(" + input_var + "\\right)",
-                "lin_relu": "ReLU\\left("
+                "relu": "\\operatorname{ReLU}\\left(" + input_var + "\\right)",
+                "lin_relu": "\\operatorname{ReLU}\\left("
                 + str(format_string.format(params[0]))
                 + ""
                 + input_var
@@ -170,7 +202,7 @@ def get_operation_label(
                 "classifier": classifier_str,
             }
     else:  # with bias
-        if latex is False:
+        if output_format == "console":
             labels = {
                 "none": "",
                 "linear": str(format_string.format(params[0]))
@@ -222,7 +254,7 @@ def get_operation_label(
                 + ")",
                 "classifier": classifier_str,
             }
-        else:
+        elif output_format == "latex":
             labels = {
                 "none": "",
                 "linear": str(format_string.format(params[0]))
@@ -230,8 +262,8 @@ def get_operation_label(
                 + input_var
                 + " + "
                 + str(format_string.format(params[1])),
-                "relu": "ReLU\\left(" + input_var + "\\right)",
-                "lin_relu": "ReLU\\left("
+                "relu": "\\operatorname{ReLU}\\left(" + input_var + "\\right)",
+                "lin_relu": "\\operatorname{ReLU}\\left("
                 + str(format_string.format(params[0]))
                 + ""
                 + input_var
