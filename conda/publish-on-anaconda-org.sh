@@ -1,11 +1,10 @@
 #!/bin/zsh
-
 die() {
   local message="$@"
-  >&2 echo -e "${message}"
+  >&2 echo "${message}"
   exit 1
 }
 
-source env.sh  || die ".env file not found. Run: echo ANACONDA_AUTO_RESEARCH_TOKEN=\"\$(anaconda auth --create --name AutoResearchToken --org AutoResearch)\" > .env"
 conda config --set anaconda_upload yes
-conda build . -c pytorch --output-folder dist/ --token "$ANACONDA_AUTO_RESEARCH_TOKEN"
+TOKEN=$(anaconda auth --create --org AutoResearch --name "$(uname -n)-$(date +%s)" --max-age 3600  || die "Token could not be created.")
+conda build . -c pytorch --output-folder dist/ --token "$TOKEN"
