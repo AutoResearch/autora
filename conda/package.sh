@@ -1,2 +1,4 @@
 #!/bin/zsh
-conda build . -c pytorch --output-folder dist/
+conda config --set anaconda_upload no
+package=$(conda build . -c pytorch --output-folder dist/ --output)
+anaconda upload -u AutoResearch "${package}"
