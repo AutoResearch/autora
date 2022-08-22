@@ -63,30 +63,27 @@ def get_operation_label(
                     classifier_str = classifier_str + " .+ ("
 
             if isiterable(param.tolist()):
-                for value_idx, value in enumerate(param.tolist()):
+
+                param_formatted = list()
+                for value in param.tolist():
+                    param_formatted.append(format_string.format(value))
+
+                for value_idx, value in enumerate(param_formatted):
                     if value_idx < len(param) - 1:
-                        classifier_str = (
-                            classifier_str + format_string.format(value) + " + "
-                        )
+                        classifier_str = classifier_str + value + " + "
                     else:
                         if latex is True:
-                            classifier_str = (
-                                classifier_str
-                                + format_string.format(value)
-                                + "\\right)"
-                            )
+                            classifier_str = classifier_str + value + "\\right)"
                         else:
-                            classifier_str = (
-                                classifier_str + format_string.format(value) + ")"
-                            )
+                            classifier_str = classifier_str + value + ")"
 
             else:
+                value = format_string.format(param)
+
                 if latex is True:
-                    classifier_str = classifier_str + format_string.format(param) + ")"
+                    classifier_str = classifier_str + value + ")"
                 else:
-                    classifier_str = (
-                        classifier_str + format_string.format(param) + "\\right)"
-                    )
+                    classifier_str = classifier_str + value + "\\right)"
 
         return classifier_str
 
