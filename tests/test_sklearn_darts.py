@@ -3,7 +3,7 @@ import unittest
 import numpy as np
 from sklearn.model_selection import GridSearchCV, train_test_split
 
-from autora.skl.darts import DARTSRegressor, DARTSType, ValueType
+from autora.skl.darts import PRIMITIVES, DARTSRegressor, DARTSType, ValueType
 
 
 def generate_noisy_constant_data(
@@ -77,6 +77,22 @@ class TestDarts(unittest.TestCase):
             DARTSRegressor(output_type=ValueType.CLASS, **kwargs).fit,
             X,
             y,
+        )
+
+    def test_primitive_selection(self):
+        X, y, const, epsilon = generate_noisy_constant_data()
+
+        kwargs = dict(
+            num_graph_nodes=1,
+            max_epochs=1,
+            arch_updates_per_epoch=1,
+            param_updates_per_epoch=1,
+        )
+
+        DARTSRegressor(primitives=["add", "subtract", "none"], **kwargs).fit(X, y)
+        DARTSRegressor(primitives=PRIMITIVES, **kwargs).fit(X, y)
+        self.assertRaises(
+            KeyError, DARTSRegressor(primitives=["doesnt_exist"], **kwargs).fit, X, y
         )
 
     def test_metaparam_optimization(self):
