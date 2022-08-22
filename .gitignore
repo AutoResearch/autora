@@ -25,6 +25,8 @@ __pycache__/
 build/
 develop-eggs/
 dist/
+conda/dist
+conda/env.sh
 downloads/
 eggs/
 .eggs/
