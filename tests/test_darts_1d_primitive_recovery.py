@@ -46,7 +46,7 @@ def transform_through_primitive_sigmoid(x: np.ndarray):
 
 
 def transform_through_primitive_exp(x: np.ndarray):
-    y = np.exp(-x)
+    y = np.exp(x)
     return y
 
 
