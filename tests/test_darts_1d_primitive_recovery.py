@@ -4,7 +4,17 @@ from typing import Callable, Sequence
 import numpy as np
 from skl.darts import DARTSRegressor
 
-primitives = ["none", "add", "subtract", "relu", "sigmoid", "mult", "exp", "1/x", "ln"]
+non_interchangeable_primitives = [
+    "none",
+    "add",
+    "subtract",
+    "relu",
+    "sigmoid",
+    "mult",
+    "exp",
+    "1/x",
+    "ln",
+]
 
 
 def generate_x(start=-1, stop=1, num=100):
@@ -39,7 +49,7 @@ def run_test_primitive_fitting(
     X: np.ndarray,
     transformer: Callable,
     expected_primitive: str,
-    primitives: Sequence[str] = primitives,
+    primitives: Sequence[str],
 ):
     y = transformer(X)
     regressor = DARTSRegressor(
@@ -86,28 +96,26 @@ def test_primitive_fitting_none():
         generate_x(),
         transform_through_primitive_none,
         "none",
-        primitives=[
-            "none",
-            "add",
-            "subtract",
-            "relu",
-            "sigmoid",
-            "mult",
-            "exp",
-            "1/x",
-            "ln",
-        ],
+        primitives=non_interchangeable_primitives,
     )
 
 
-def test_primitive_fitting_lin_relu():
+def test_primitive_fitting_relu():
     run_test_primitive_fitting(
-        generate_x(), transform_through_primitive_relu, "lin_relu"
+        generate_x(),
+        transform_through_primitive_relu,
+        "relu",
+        primitives=non_interchangeable_primitives,
     )
 
 
 def test_primitive_fitting_add():
-    run_test_primitive_fitting(generate_x(), transform_through_primitive_add, "add")
+    run_test_primitive_fitting(
+        generate_x(),
+        transform_through_primitive_add,
+        "add",
+        primitives=non_interchangeable_primitives,
+    )
 
 
 def test_primitive_fitting_subtract():
