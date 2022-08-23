@@ -1,4 +1,6 @@
-# Search space
+# Differentiable Architecture Search
+
+## Search space
 
 DARTS uses a search space of operations to find the best model. The search space is defined by the set of operations that can be applied in each computation step of the model. These operations are also referred to as *primitives*. We can select from the following space of primitives:
 
