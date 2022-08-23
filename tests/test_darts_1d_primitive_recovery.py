@@ -2,6 +2,8 @@
 from typing import Callable, Sequence
 
 import numpy as np
+import torch.nn
+from matplotlib import pyplot as plt
 from skl.darts import DARTSRegressor
 
 non_interchangeable_primitives = [
@@ -12,12 +14,10 @@ non_interchangeable_primitives = [
     "sigmoid",
     "mult",
     "exp",
-    "1/x",
-    "ln",
 ]
 
 
-def generate_x(start=-1, stop=1, num=100):
+def generate_x(start=-1, stop=1, num=500):
     x = np.expand_dims(np.linspace(start=start, stop=stop, num=num), 1)
     return x
 
@@ -46,7 +46,22 @@ def transform_through_primitive_sigmoid(x: np.ndarray):
 
 
 def transform_through_primitive_exp(x: np.ndarray):
-    y = np.exp(-x)
+    y = np.exp(x)
+    return y
+
+
+def transform_through_primitive_cos(x: np.ndarray):
+    y = np.cos(x)
+    return y
+
+
+def transform_through_primitive_softplus(x: np.ndarray, beta=1.0):
+    y = np.log(1 + np.exp(beta * x)) / beta
+    return y
+
+
+def transform_through_primitive_softminus(x: np.ndarray, beta=1.0):
+    y = x - np.log(1 + np.exp(beta * x)) / beta
     return y
 
 
@@ -70,23 +85,77 @@ def get_primitive_from_single_node_model(model):
     return primitive
 
 
+def init_weights_uniform(m):
+    if isinstance(m, torch.nn.Linear):
+        torch.nn.init.uniform_(m.weight, -1, 1)
+
+
 def run_test_primitive_fitting(
     X: np.ndarray,
     transformer: Callable,
     expected_primitive: str,
     primitives: Sequence[str],
+    verbose: bool = True,
 ):
     y = transformer(X)
+
     regressor = DARTSRegressor(
         num_graph_nodes=1,
-        param_updates_per_epoch=100,
-        max_epochs=100,
-        arch_updates_per_epoch=100,
+        param_updates_per_epoch=100,  # 100 # 500
+        max_epochs=300,
+        arch_updates_per_epoch=1,
+        param_weight_decay=3e-4,
+        arch_weight_decay_df=0.05,
+        arch_weight_decay=1e-4,
+        arch_learning_rate_max=0.3,
+        param_learning_rate_max=0.0025,  # 0.025
+        param_learning_rate_min=0.01,
+        param_momentum=0.90,
+        train_classifier_coefficients=False,
+        train_classifier_bias=False,
         primitives=primitives,
+        # init_weights_function=init_weights_uniform,
     )
+
     regressor.fit(X, y)
-    print("\n", np.column_stack((X, y, regressor.predict(X))).round(2))
-    assert get_primitive_from_single_node_model(regressor.model_) == expected_primitive
+
+    if verbose:
+        y_predict = regressor.predict(X)
+        print("\n", np.column_stack((X, y, regressor.predict(X))).round(2))
+        print(get_primitive_from_single_node_model(regressor.model_))
+
+        print(
+            "Weight of winning primitive: {0}".format(
+                regressor.model_[0]._arch_parameters[0][
+                    0,
+                    non_interchangeable_primitives.index(
+                        get_primitive_from_single_node_model(regressor.model_)
+                    ),
+                ]
+            )
+        )
+        print(
+            "Weight of correct primitive: {0}".format(
+                regressor.model_[0]._arch_parameters[0][
+                    0, non_interchangeable_primitives.index(expected_primitive)
+                ]
+            )
+        )
+        print(regressor.model_[0]._arch_parameters[0].data)
+
+        plt.plot(X, y, "o")
+        plt.plot(X, y_predict, "-")
+        plt.show()
+
+    if expected_primitive == "add" or expected_primitive == "subtract":
+        assert (
+            get_primitive_from_single_node_model(regressor.model_) == expected_primitive
+            or get_primitive_from_single_node_model(regressor.model_) == "mult"
+        )
+    else:
+        assert (
+            get_primitive_from_single_node_model(regressor.model_) == expected_primitive
+        )
 
 
 def test_primitive_fitting_restricted_none():
@@ -143,6 +212,15 @@ def test_primitive_fitting_subtract():
     )
 
 
+def test_primitive_fitting_mult():
+    run_test_primitive_fitting(
+        generate_x(),
+        transform_through_primitive_mult,
+        "mult",
+        primitives=non_interchangeable_primitives,
+    )
+
+
 def test_primitive_fitting_relu():
     run_test_primitive_fitting(
         generate_x(),
@@ -152,24 +230,55 @@ def test_primitive_fitting_relu():
     )
 
 
-def test_primitive_fitting_sigmoid():
-    run_test_primitive_fitting(
-        generate_x(),
-        transform_through_primitive_sigmoid,
-        "sigmoid",
-        primitives=non_interchangeable_primitives,
-    )
-
-
 def test_primitive_fitting_exp():
     run_test_primitive_fitting(
-        generate_x(),
+        generate_x(start=-1, stop=1),
         transform_through_primitive_exp,
         "exp",
         primitives=non_interchangeable_primitives,
     )
 
 
+def test_primitive_fitting_sigmoid():
+    run_test_primitive_fitting(
+        generate_x(start=-5, stop=5, num=500),
+        transform_through_primitive_sigmoid,
+        "sigmoid",
+        primitives=non_interchangeable_primitives,
+    )
+
+
+# currently not working
+def test_primitive_fitting_cos():
+    run_test_primitive_fitting(
+        generate_x(start=-4, stop=4),
+        transform_through_primitive_cos,
+        "cos",
+        primitives=non_interchangeable_primitives,
+    )
+
+
+# currently not working
+def test_primitive_fitting_softplus():
+    run_test_primitive_fitting(
+        generate_x(start=-4, stop=4, num=500),
+        transform_through_primitive_softplus,
+        "softplus",
+        primitives=non_interchangeable_primitives,
+    )
+
+
+# currently not working
+def test_primitive_fitting_softminus():
+    run_test_primitive_fitting(
+        generate_x(start=-4, stop=4, num=500),
+        transform_through_primitive_softminus,
+        "softminus",
+        primitives=non_interchangeable_primitives,
+    )
+
+
+# currently not working
 def test_primitive_fitting_inverse():
     run_test_primitive_fitting(
         generate_x(),
@@ -179,6 +288,7 @@ def test_primitive_fitting_inverse():
     )
 
 
+# currently not working
 def test_primitive_fitting_ln():
     run_test_primitive_fitting(
         generate_x(),

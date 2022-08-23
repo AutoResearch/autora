@@ -59,18 +59,21 @@ def _general_darts(
     num_graph_nodes: int = 2,
     output_type: IMPLEMENTED_OUTPUT_TYPES = "real",
     classifier_weight_decay: float = 1e-2,
+    train_classifier_coefficients: bool = True,
+    train_classifier_bias: bool = True,
     darts_type: IMPLEMENTED_DARTS_TYPES = "original",
     init_weights_function: Optional[Callable] = None,
-    learning_rate: float = 2.5e-2,
-    learning_rate_min: float = 0.01,
-    momentum: float = 9e-1,
-    optimizer_weight_decay: float = 3e-4,
+    param_learning_rate_max: float = 2.5e-2,
+    param_learning_rate_min: float = 0.01,
+    param_momentum: float = 9e-1,
+    param_weight_decay: float = 3e-4,
     param_updates_per_epoch: int = 20,
+    arch_learning_rate_max: float = 3e-3,
     arch_updates_per_epoch: int = 20,
     arch_weight_decay: float = 1e-4,
     arch_weight_decay_df: float = 3e-4,
     arch_weight_decay_base: float = 0.0,
-    arch_learning_rate: float = 3e-3,
+    arch_momentum: float = 9e-1,
     fair_darts_loss_weight: int = 1,
     max_epochs: int = 100,
     grad_clip: float = 5,
@@ -97,6 +100,8 @@ def _general_darts(
         steps=num_graph_nodes,
         n_input_states=input_dimensions,
         classifier_weight_decay=classifier_weight_decay,
+        train_classifier_coefficients=train_classifier_coefficients,
+        train_classifier_bias=train_classifier_bias,
         darts_type=DARTSType(darts_type),
         primitives=primitives,
     )
@@ -106,25 +111,25 @@ def _general_darts(
     # Generate the architecture of the model
     architect = Architect(
         network,
-        momentum=momentum,
+        arch_momentum=arch_momentum,
         arch_weight_decay=arch_weight_decay,
         arch_weight_decay_df=arch_weight_decay_df,
         arch_weight_decay_base=arch_weight_decay_base,
         fair_darts_loss_weight=fair_darts_loss_weight,
-        arch_learning_rate=arch_learning_rate,
+        arch_learning_rate_max=arch_learning_rate_max,
     )
 
     optimizer = torch.optim.SGD(
         params=network.parameters(),
-        lr=learning_rate,
-        momentum=momentum,
-        weight_decay=optimizer_weight_decay,
+        lr=param_learning_rate_max,
+        momentum=param_momentum,
+        weight_decay=param_weight_decay,
     )
 
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
         optimizer=optimizer,
         T_max=param_updates_per_epoch,
-        eta_min=learning_rate_min,
+        eta_min=param_learning_rate_min,
     )
 
     coefficient_optimizer = partial(
@@ -351,18 +356,21 @@ class DARTSRegressor(BaseEstimator, RegressorMixin):
         batch_size: int = 64,
         num_graph_nodes: int = 2,
         classifier_weight_decay: float = 1e-2,
+        train_classifier_coefficients: bool = True,
+        train_classifier_bias: bool = True,
         darts_type: IMPLEMENTED_DARTS_TYPES = "original",
         init_weights_function: Optional[Callable] = None,
-        learning_rate: float = 2.5e-2,
-        learning_rate_min: float = 0.01,
-        momentum: float = 9e-1,
-        optimizer_weight_decay: float = 3e-4,
+        param_learning_rate_max: float = 2.5e-2,
+        param_learning_rate_min: float = 0.01,
+        param_momentum: float = 9e-1,
+        param_weight_decay: float = 3e-4,
         param_updates_per_epoch: int = 10,
         arch_updates_per_epoch: int = 1,
+        arch_learning_rate_max: float = 3e-3,
         arch_weight_decay: float = 1e-4,
         arch_weight_decay_df: float = 3e-4,
         arch_weight_decay_base: float = 0.0,
-        arch_learning_rate: float = 3e-3,
+        arch_momentum: float = 9e-1,
         fair_darts_loss_weight: int = 1,
         max_epochs: int = 10,
         grad_clip: float = 5,
@@ -374,18 +382,21 @@ class DARTSRegressor(BaseEstimator, RegressorMixin):
             batch_size: number of observations to be used per update
             num_graph_nodes: number of intermediate nodes in the DARTS graph.
             classifier_weight_decay:
+            train_classifier_coefficients:
+            train_classifier_bias:
             darts_type:
             init_weights_function:
-            learning_rate:
-            learning_rate_min:
-            momentum:
-            optimizer_weight_decay:
+            param_learning_rate_max:
+            param_learning_rate_min:
+            param_momentum:
+            arch_momentum:
+            param_weight_decay:
             param_updates_per_epoch:
             arch_updates_per_epoch:
             arch_weight_decay:
             arch_weight_decay_df:
             arch_weight_decay_base:
-            arch_learning_rate:
+            arch_learning_rate_max:
             fair_darts_loss_weight:
             max_epochs:
             grad_clip:
@@ -398,13 +409,16 @@ class DARTSRegressor(BaseEstimator, RegressorMixin):
 
         self.num_graph_nodes = num_graph_nodes
         self.classifier_weight_decay = classifier_weight_decay
+        self.train_classifier_coefficients = train_classifier_coefficients
+        self.train_classifier_bias = train_classifier_bias
         self.darts_type = darts_type
         self.init_weights_function = init_weights_function
 
-        self.learning_rate = learning_rate
-        self.learning_rate_min = learning_rate_min
-        self.momentum = momentum
-        self.optimizer_weight_decay = optimizer_weight_decay
+        self.param_learning_rate_max = param_learning_rate_max
+        self.param_learning_rate_min = param_learning_rate_min
+        self.param_momentum = param_momentum
+        self.arch_momentum = arch_momentum
+        self.param_weight_decay = param_weight_decay
 
         self.param_updates_per_epoch = param_updates_per_epoch
 
@@ -412,7 +426,7 @@ class DARTSRegressor(BaseEstimator, RegressorMixin):
         self.arch_weight_decay = arch_weight_decay
         self.arch_weight_decay_df = arch_weight_decay_df
         self.arch_weight_decay_base = arch_weight_decay_base
-        self.arch_learning_rate = arch_learning_rate
+        self.arch_learning_rate_max = arch_learning_rate_max
         self.fair_darts_loss_weight = fair_darts_loss_weight
 
         self.max_epochs = max_epochs
