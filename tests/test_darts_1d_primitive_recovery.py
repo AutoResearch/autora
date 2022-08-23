@@ -40,6 +40,31 @@ def transform_through_primitive_relu(x: np.ndarray):
     return y
 
 
+def transform_through_primitive_sigmoid(x: np.ndarray):
+    y = 1.0 / (1.0 + np.exp(-x))
+    return y
+
+
+def transform_through_primitive_exp(x: np.ndarray):
+    y = np.exp(-x)
+    return y
+
+
+def transform_through_primitive_inverse(x: np.ndarray):
+    y = 1.0 / x
+    return y
+
+
+def transform_through_primitive_ln(x: np.ndarray):
+    y = np.log(x)
+    return y
+
+
+def transform_through_primitive_mult(x: np.ndarray, coefficient=5.0):
+    y = coefficient * x
+    return y
+
+
 def get_primitive_from_single_node_model(model):
     primitive = model[0].primitives[np.argmax(model[0].max_alphas_normal()).numpy()]
     return primitive
@@ -100,15 +125,6 @@ def test_primitive_fitting_none():
     )
 
 
-def test_primitive_fitting_relu():
-    run_test_primitive_fitting(
-        generate_x(),
-        transform_through_primitive_relu,
-        "relu",
-        primitives=non_interchangeable_primitives,
-    )
-
-
 def test_primitive_fitting_add():
     run_test_primitive_fitting(
         generate_x(),
@@ -120,5 +136,53 @@ def test_primitive_fitting_add():
 
 def test_primitive_fitting_subtract():
     run_test_primitive_fitting(
-        generate_x(), transform_through_primitive_subtract, "subtract"
+        generate_x(),
+        transform_through_primitive_subtract,
+        "subtract",
+        primitives=non_interchangeable_primitives,
+    )
+
+
+def test_primitive_fitting_relu():
+    run_test_primitive_fitting(
+        generate_x(),
+        transform_through_primitive_relu,
+        "relu",
+        primitives=non_interchangeable_primitives,
+    )
+
+
+def test_primitive_fitting_sigmoid():
+    run_test_primitive_fitting(
+        generate_x(),
+        transform_through_primitive_sigmoid,
+        "sigmoid",
+        primitives=non_interchangeable_primitives,
+    )
+
+
+def test_primitive_fitting_exp():
+    run_test_primitive_fitting(
+        generate_x(),
+        transform_through_primitive_exp,
+        "exp",
+        primitives=non_interchangeable_primitives,
+    )
+
+
+def test_primitive_fitting_inverse():
+    run_test_primitive_fitting(
+        generate_x(),
+        transform_through_primitive_inverse,
+        "1/x",
+        primitives=non_interchangeable_primitives,
+    )
+
+
+def test_primitive_fitting_ln():
+    run_test_primitive_fitting(
+        generate_x(),
+        transform_through_primitive_ln,
+        "ln",
+        primitives=non_interchangeable_primitives,
     )
