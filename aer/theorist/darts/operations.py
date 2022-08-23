@@ -28,7 +28,7 @@ def get_operation_label(
     input_var: str = "x",
     output_format: typing.Literal["latex", "console"] = "console",
 ) -> str:
-    """
+    r"""
     Returns a complete string describing a DARTS operation.
 
     Arguments:
@@ -44,7 +44,7 @@ def get_operation_label(
         >>> import numpy as np
         >>> get_operation_label("classifier_concat", np.array([1, 2, 3]), decimals=2,
         output_format="latex")
-        'x \\circ \\left(1.00\\right) + \\left(2.00\\right) + \\left(3.00\\right)'
+        'x \circ \left(1.00\right) + \left(2.00\\right) + \left(3.00\right)'
         >>> get_operation_label("classifier_concat", np.array([1, 2, 3]), decimals=2,
         output_format="console")
         'x .* (1.00) .+ (2.00) .+ (3.00)'
@@ -57,7 +57,7 @@ def get_operation_label(
         >>> get_operation_label("lin_relu", [1], decimals=0)
         'ReLU(1 * x)'
         >>> get_operation_label("lin_relu", [1], decimals=0, output_format="latex")
-        '\\operatorname{ReLU}\\left(1x\\right)'
+        '\operatorname{ReLU}\left(1x\right)'
         >>> get_operation_label("linear", [1, 2], decimals=0)
         '1 * x + 2'
         >>> get_operation_label("linear", [1, 2], decimals=0, output_format="latex")
