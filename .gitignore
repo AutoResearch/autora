@@ -1,4 +1,4 @@
-# AER-specific files
+# AutoRA-specific files
 example/studies/**/modeling
 
 # PyCharm ignores are handled by the .idea/.gitignore file
@@ -25,6 +25,8 @@ __pycache__/
 build/
 develop-eggs/
 dist/
+conda/dist
+conda/env.sh
 downloads/
 eggs/
 .eggs/
