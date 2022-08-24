@@ -89,7 +89,7 @@ Places where changes needed to be made in order to incorporate our own priors
 If we plan to give simple priors, then we simply need to give a csv, with the
 operations and their respective probabilities
 
-I believe all necessary changes can be made in just mcmc.py
+I believe all necessary changes can be made in mcmc.py
 
 If we plan to give different operations than what comes pre-included, we will
 need to make a change to the accepted operations at line 22 in mcmc.py
