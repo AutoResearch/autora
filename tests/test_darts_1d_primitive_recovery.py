@@ -225,7 +225,7 @@ def test_primitive_fitting_exp():
 
 def test_primitive_fitting_inverse():
     run_test_primitive_fitting(
-        generate_x(),
+        generate_x_log(0, +1.1),
         transform_through_primitive_inverse,
         "1/x",
         primitives=non_interchangeable_primitives,
