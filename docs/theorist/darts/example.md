@@ -2,12 +2,6 @@
 
 ## Example
 
-First me must import the necessary modules
-
-```python
-from autora.skl.darts import DARTSRegressor, ValueType
-```
-
 Let's generate a simple data set with two features $x_1, x_2 \in [0, 1]$ and a target $y$. We will use the following generative model: 
 $y = 2 x_1 - e^{(5 x_2)}$
 
