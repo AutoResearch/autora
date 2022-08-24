@@ -138,7 +138,7 @@ def run_test_primitive_fitting(
             "Weight of winning primitive: {0}".format(
                 regressor.model_[0]._arch_parameters[0][
                     0,
-                    non_interchangeable_primitives.index(
+                    primitives.index(
                         get_primitive_from_single_node_model(regressor.model_)
                     ),
                 ]
@@ -147,7 +147,7 @@ def run_test_primitive_fitting(
         print(
             "Weight of correct primitive: {0}".format(
                 regressor.model_[0]._arch_parameters[0][
-                    0, non_interchangeable_primitives.index(expected_primitive)
+                    0, primitives.index(expected_primitive)
                 ]
             )
         )
