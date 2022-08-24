@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 from typing import Callable, Sequence
 
+import matplotlib.pyplot as plt
 import numpy as np
 import pytest  # noqa: 401
 from skl.darts import DARTSRegressor
@@ -80,6 +81,7 @@ def run_test_primitive_fitting(
     transformer: Callable,
     expected_primitive: str,
     primitives: Sequence[str],
+    verbose: bool = True,
 ):
     y = transformer(X)
     regressor = DARTSRegressor(
@@ -90,8 +92,42 @@ def run_test_primitive_fitting(
         primitives=primitives,
     )
     regressor.fit(X, y)
-    print("\n", np.column_stack((X, y, regressor.predict(X))).round(2))
+
+    if verbose:
+        y_predict = regressor.predict(X)
+        report_weights(X, expected_primitive, primitives, regressor, y)
+        plot_results(X, y, y_predict)
+
     assert get_primitive_from_single_node_model(regressor.model_) == expected_primitive
+
+
+def plot_results(X, y, y_predict):
+    plt.plot(X, y, "o")
+    plt.plot(X, y_predict, "-")
+    plt.show()
+
+
+def report_weights(X, expected_primitive, primitives, regressor, y):
+    print("\n", np.column_stack((X, y, regressor.predict(X))).round(2))
+    print(get_primitive_from_single_node_model(regressor.model_))
+    print(
+        "Weight of winning primitive: {0}".format(
+            regressor.model_[0]._arch_parameters[0][
+                0,
+                primitives.index(
+                    get_primitive_from_single_node_model(regressor.model_)
+                ),
+            ]
+        )
+    )
+    print(
+        "Weight of correct primitive: {0}".format(
+            regressor.model_[0]._arch_parameters[0][
+                0, primitives.index(expected_primitive)
+            ]
+        )
+    )
+    print(regressor.model_[0]._arch_parameters[0].data)
 
 
 def test_primitive_fitting_restricted_none():
