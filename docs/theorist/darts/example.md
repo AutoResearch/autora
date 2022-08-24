@@ -24,7 +24,6 @@ y = 2 * X[:,0] + np.exp(5 * X[:,1])
 Now let us define the search space, that is, the space of operations to consider when searching over the space of computation graphs.
 
 ```python
-
 PRIMITIVES = [
     "none",
     "add",
@@ -34,7 +33,6 @@ PRIMITIVES = [
     'exp',
     'relu',
 ]
-
 ```
 
 ## Set up the DARTS Regresssor
