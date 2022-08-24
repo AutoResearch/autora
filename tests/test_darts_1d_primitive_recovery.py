@@ -15,6 +15,7 @@ non_interchangeable_primitives = [
     "sigmoid",
     "exp",
     "ln",
+    "1/x",
     "relu",
     "softplus",
     "softminus",
