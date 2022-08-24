@@ -22,6 +22,11 @@ def generate_x(start=-1, stop=1, num=500):
     return x
 
 
+def generate_x_log(start=-1, stop=1, num=500, base=10):
+    x = np.expand_dims(np.logspace(start=start, stop=stop, num=num, base=base), 1)
+    return x
+
+
 def transform_through_primitive_none(x: np.ndarray) -> np.ndarray:
     return x * 0.0
 
