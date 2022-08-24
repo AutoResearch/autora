@@ -61,7 +61,7 @@ def get_operation_label(
         >>> get_operation_label("linear", [1, 2], decimals=0)
         '1 * x + 2'
         >>> get_operation_label("linear", [1, 2], decimals=0, output_format="latex")
-        '1x + 2'
+        '1 x + 2'
         >>> get_operation_label("linrelu", [1], decimals=0)  # Mistyped operation name
         Traceback (most recent call last):
         ...
@@ -179,17 +179,17 @@ def get_operation_label(
         elif output_format == "latex":
             labels = {
                 "none": "",
-                "linear": f"{fps[0]}{input_var} + {fps[1]}",
-                "relu": f"\\operatorname{{ReLU}}\\left({input_var}\\right)",
+                "linear": f"{fps[0]} {input_var} + {fps[1]}",
+                "relu": f"\\operatorname{{ReLU}}\\left( {input_var}\\right)",
                 "lin_relu": f"\\operatorname{{ReLU}}\\left({fps[0]}{input_var} + {fps[1]} \\right)",
-                "sigmoid": f"\\sigma\\left({input_var}\\right)",
-                "lin_sigmoid": f"\\sigma\\left({fps[0]}{input_var} + {fps[1]}\\right)",
+                "sigmoid": f"\\sigma\\left( {input_var} \\right)",
+                "lin_sigmoid": f"\\sigma\\left( {fps[0]} {input_var} + {fps[1]} \\right)",
                 "add": f"+{input_var}",
                 "subtract": f"-{input_var}",
                 "mult": f"{fps[0]} * {input_var}",
-                "exp": f"e^{{{fps[0]}{input_var} + {fps[1]} }}",
-                "1/x": f"\\frac{1}{{ {fps[0]}{input_var} + {fps[1]} }}",
-                "ln": f"\\ln\\left({fps[0]}{input_var} + {fps[1]} \\right)",
+                "exp": f"e^{{ {fps[0]} {input_var} + {fps[1]} }}",
+                "1/x": f"\\frac{1}{{ {fps[0]}m{input_var} + {fps[1]} }}",
+                "ln": f"\\ln\\left({fps[0]} {input_var} + {fps[1]} \\right)",
                 "classifier": classifier_str,
             }
 
