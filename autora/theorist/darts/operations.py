@@ -119,7 +119,6 @@ def get_operation_label(
         return classifier_str
 
     num_params = len(params)
-    params.extend([0, 0, 0])
 
     fps = [
         str(format_string.format(p)) for p in params_org
