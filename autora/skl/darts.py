@@ -186,6 +186,7 @@ def _general_darts(
         network=network,
         coefficient_optimizer=coefficient_optimizer,
         output_function=output_function,
+        sampling_strategy="sample",
     )
 
     results = _DARTSResult(model=model, model_sampler=model_sampler, network=network)
