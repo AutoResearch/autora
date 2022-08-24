@@ -1,11 +1,11 @@
 import unittest
 
-import aer
+import autora
 
 
 class SmokeTest(unittest.TestCase):
     def test_import(self):
-        self.assertIsNotNone(aer)
+        self.assertIsNotNone(autora)
 
 
 if __name__ == "__main__":

@@ -6,7 +6,7 @@ import mkdocs_gen_files
 
 nav = mkdocs_gen_files.Nav()
 
-source_paths = sorted(Path("./aer").rglob("*.py"))
+source_paths = sorted(Path("./autora").rglob("*.py"))
 special_paths = [Path("./docs/docstrings.py")]
 
 for path in source_paths + special_paths:

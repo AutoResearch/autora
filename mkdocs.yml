@@ -15,7 +15,7 @@ plugins:
   - section-index
   - mkdocstrings:
       watch:
-        - aer/
+        - autora/
 
 markdown_extensions:
   - pymdownx.arithmatex:

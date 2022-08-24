@@ -1,22 +1,23 @@
 [tool.poetry]
-name = "aer"
-version = "0.1.0"
-description = "Automated Empirical Research (AER) is a framework for implementing machine learning tools which autonomously and iteratively generate 1) new theories to describe real-world data, and 2) experiments to invalidate those theories and seed a new cycle of theory-making. The experiments will be run online via crowd-sourcing platforms (MTurk, Prolific)."
+name = "autora"
+version = "1.0.0-alpha.4"
+description = "Autonomous Research Assistant (AutoRA) is a framework for implementing machine learning tools which autonomously and iteratively generate 1) new theories to describe real-world data, and 2) experiments to invalidate those theories and seed a new cycle of theory-making. The experiments will be run online via crowd-sourcing platforms (MTurk, Prolific)."
 authors = ["Sebastian Musslick <sebastian_musslick@brown.edu>"]
+readme = "README.md"
 
 [tool.poetry.dependencies]
-python = '>=3.8.13,<3.11'
+python = "^3.8"
 numpy = "^1.18"
-imageio = '~2.9.0'
-matplotlib = '~3.2.1'
-pandas = '~1.4.2'
-graphviz = '~0.14.1'
-seaborn = '~0.11.1'
-sweetpea = '~0.0.36'
-tinkerforge = '~2.1.25'
+imageio = "^2.9.0"
+matplotlib = "^3.2.1"
+pandas = "^1.4.2"
+graphviz = "^0.14.1"
+seaborn = "^0.11.1"
+tinkerforge = {version = "^2.1.25", optional=true}
 torch = "^1.11.0"
-torchvision = "^0.12.0"
-scipy = "^1.8.1"
+scipy = "^1.7.1"
+scikit-learn = "^1.1.1"
+tqdm = "^4.64.0"
 
 [tool.poetry.dev-dependencies]
 mkdocs-material = "^8.3.8"
@@ -25,6 +26,8 @@ mkdocs-literate-nav = "^0.4.1"
 mkdocs-section-index = "^0.3.4"
 mkdocstrings-python = "^0.7.1"
 
+[tool.poetry.extras]
+tinkerforge = ["tinkerforge"]
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
