@@ -2,6 +2,7 @@
 from typing import Callable, Sequence
 
 import numpy as np
+import pytest  # noqa: 401
 from skl.darts import DARTSRegressor
 
 non_interchangeable_primitives = [
@@ -10,7 +11,6 @@ non_interchangeable_primitives = [
     "subtract",
     "relu",
     "sigmoid",
-    "mult",
     "exp",
     "1/x",
     "ln",
