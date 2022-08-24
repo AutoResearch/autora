@@ -22,16 +22,54 @@ def isiterable(p_object: typing.Any) -> bool:
 
 
 def get_operation_label(
-    op_name: str, params_org: typing.List, decimals: int = 4
+    op_name: str,
+    params_org: typing.List,
+    decimals: int = 4,
+    input_var: str = "x",
+    output_format: typing.Literal["latex", "console"] = "console",
 ) -> str:
-    """
+    r"""
     Returns a complete string describing a DARTS operation.
 
     Arguments:
         op_name: name of the operation
         params_org: original parameters of the operation
         decimals: number of decimals to be used for converting the parameters into string format
+        input_var: name of the input variable
+        output_format: format of the output string (either "latex" or "console")
+
+        Examples:
+        >>> get_operation_label("classifier", [1], decimals=2)
+        '1.00 * x'
+        >>> import numpy as np
+        >>> print(get_operation_label("classifier_concat", np.array([1, 2, 3]),
+        ...     decimals=2, output_format="latex"))
+        x \circ \left(1.00\right) + \left(2.00\right) + \left(3.00\right)
+        >>> get_operation_label("classifier_concat", np.array([1, 2, 3]),
+        ...     decimals=2, output_format="console")
+        'x .* (1.00) .+ (2.00) .+ (3.00)'
+        >>> get_operation_label("exp", [1,2], decimals=2)
+        'exp(1.00 * x + 2.00)'
+        >>> get_operation_label("none", [])
+        ''
+        >>> get_operation_label("1/x", [1], decimals=0)
+        '1 / (1 * x)'
+        >>> get_operation_label("lin_relu", [1], decimals=0)
+        'ReLU(1 * x)'
+        >>> print(get_operation_label("lin_relu", [1], decimals=0, output_format="latex"))
+        \operatorname{ReLU}\left(1x\right)
+        >>> get_operation_label("linear", [1, 2], decimals=0)
+        '1 * x + 2'
+        >>> get_operation_label("linear", [1, 2], decimals=0, output_format="latex")
+        '1 x + 2'
+        >>> get_operation_label("linrelu", [1], decimals=0)  # Mistyped operation name
+        Traceback (most recent call last):
+        ...
+        NotImplementedError: operation 'linrelu' is not defined for output_format 'console'
     """
+    if output_format != "latex" and output_format != "console":
+        raise ValueError("output_format must be either 'latex' or 'console'")
+
     params = params_org.copy()
 
     format_string = "{:." + "{:.0f}".format(decimals) + "f}"
@@ -39,96 +77,125 @@ def get_operation_label(
     classifier_str = ""
     if op_name == "classifier":
         value = params[0]
-        classifier_str = format_string.format(value) + " * x"
-
+        classifier_str = f"{format_string.format(value)} * {input_var}"
         return classifier_str
 
     if op_name == "classifier_concat":
-        classifier_str = "x.*("
+        if output_format == "latex":
+            classifier_str = input_var + " \\circ \\left("
+        else:
+            classifier_str = input_var + " .* ("
         for param_idx, param in enumerate(params):
 
             if param_idx > 0:
-                classifier_str = classifier_str + " .+("
+                if output_format == "latex":
+                    classifier_str += " + \\left("
+                else:
+                    classifier_str += " .+ ("
 
             if isiterable(param.tolist()):
-                for value_idx, value in enumerate(param.tolist()):
+
+                param_formatted = list()
+                for value in param.tolist():
+                    param_formatted.append(format_string.format(value))
+
+                for value_idx, value in enumerate(param_formatted):
                     if value_idx < len(param) - 1:
-                        classifier_str = (
-                            classifier_str + format_string.format(value) + " + "
-                        )
+                        classifier_str += value + " + "
                     else:
-                        classifier_str = (
-                            classifier_str + format_string.format(value) + ")"
-                        )
+                        if output_format == "latex":
+                            classifier_str += value + "\\right)"
+                        else:
+                            classifier_str += value + ")"
 
             else:
-                classifier_str = classifier_str + format_string.format(param) + ")"
+                value = format_string.format(param)
+
+                if output_format == "latex":
+                    classifier_str += value + "\\right)"
+                else:
+                    classifier_str += value + ")"
 
         return classifier_str
 
     num_params = len(params)
-    params.extend([0, 0, 0])
+
+    c = [str(format_string.format(p)) for p in params_org]
+    c.extend(["", "", ""])
 
     if num_params == 1:  # without bias
-        labels = {
-            "none": "",
-            "linear": str(format_string.format(params[0])) + " * x",
-            "relu": "ReLU(x)",
-            "lin_relu": "ReLU(" + str(format_string.format(params[0])) + " * x)",
-            # 'sigmoid': '1/(1+e^(-x))',
-            "sigmoid": "logistic(x)",
-            # 'lin_sigmoid': '1/(1+e^(-' + str(format_string.format(params[0])) + ' * x))',
-            "lin_sigmoid": "logistic(" + str(format_string.format(params[0])) + " * x)",
-            "add": "+ x",
-            "subtract": "- x",
-            "mult": str(format_string.format(params[0])) + " * x",
-            # 'exp': 'e^(' + str(format_string.format(params[0])) + ' * x)',
-            "exp": "exp(" + str(format_string.format(params[0])) + " * x)",
-            "1/x": "1 / (" + str(format_string.format(params[0])) + " * x)",
-            "ln": "ln(" + str(format_string.format(params[0])) + " * x)",
-            "classifier": classifier_str,
-        }
+        if output_format == "console":
+            labels = {
+                "none": "",
+                "linear": f"{c[0]} * {input_var}",
+                "relu": f"ReLU({input_var})",
+                "lin_relu": f"ReLU({c[0]} * {input_var})",
+                "sigmoid": f"logistic({input_var})",
+                "lin_sigmoid": f"logistic({c[0]} * {input_var})",
+                "add": f"+ {input_var}",
+                "subtract": f"- {input_var}",
+                "mult": f"{c[0]} * {input_var}",
+                "exp": f"exp({c[0]} * {input_var})",
+                "1/x": f"1 / ({c[0]} * {input_var})",
+                "ln": f"ln({c[0]} * {input_var})",
+                "classifier": classifier_str,
+            }
+        elif output_format == "latex":
+            labels = {
+                "none": "",
+                "linear": c[0] + "" + input_var,
+                "relu": f"\\operatorname{{ReLU}}\\left({input_var}\\right)",
+                "lin_relu": f"\\operatorname{{ReLU}}\\left({c[0]}{input_var}\\right)",
+                "sigmoid": f"\\sigma\\left({input_var}\\right)",
+                "lin_sigmoid": f"\\sigma\\left({c[0]} {input_var} \\right)",
+                "add": f"+ {input_var}",
+                "subtract": f"- {input_var}",
+                "mult": f"{c[0]} {input_var}",
+                "exp": f"e^{{{c[0]} {input_var} }}",
+                "1/x": f"\\frac{{1}}{{{c[0]} {input_var} }}",
+                "ln": f"\\ln\\left({c[0]} {input_var} \\right)",
+                "classifier": classifier_str,
+            }
     else:  # with bias
-        labels = {
-            "none": "",
-            "linear": str(format_string.format(params[0]))
-            + " * x + "
-            + str(format_string.format(params[1])),
-            "relu": "ReLU(x)",
-            "lin_relu": "ReLU("
-            + str(format_string.format(params[0]))
-            + " * x + "
-            + str(format_string.format(params[1]))
-            + ")",
-            # 'sigmoid': '1/(1+e^(-x))',
-            "sigmoid": "logistic(x)",
-            "lin_sigmoid": "logistic("
-            + str(format_string.format(params[0]))
-            + " * x + "
-            + str(format_string.format(params[1]))
-            + ")",
-            "add": "+ x",
-            "subtract": "- x",
-            "mult": str(format_string.format(params[0])) + " * x",
-            "exp": "exp("
-            + str(format_string.format(params[0]))
-            + " * x + "
-            + str(format_string.format(params[1]))
-            + ")",
-            "1/x": "1 / ("
-            + str(format_string.format(params[0]))
-            + " * x + "
-            + str(format_string.format(params[1]))
-            + ")",
-            "ln": "ln("
-            + str(format_string.format(params[0]))
-            + " * x + "
-            + str(format_string.format(params[1]))
-            + ")",
-            "classifier": classifier_str,
-        }
+        if output_format == "console":
+            labels = {
+                "none": "",
+                "linear": f"{c[0]} * {input_var} + {c[1]}",
+                "relu": f"ReLU({input_var})",
+                "lin_relu": f"ReLU({c[0]} * {input_var} + {c[1]} )",
+                "sigmoid": f"logistic({input_var})",
+                "lin_sigmoid": f"logistic({c[0]} * {input_var} + {c[1]})",
+                "add": f"+ {input_var}",
+                "subtract": f"- {input_var}",
+                "mult": f"{c[0]} * {input_var}",
+                "exp": f"exp({c[0]} * {input_var} + {c[1]})",
+                "1/x": f"1 / ({c[0]} * {input_var} + {c[1]})",
+                "ln": f"ln({c[0]} * {input_var} + {c[1]})",
+                "classifier": classifier_str,
+            }
+        elif output_format == "latex":
+            labels = {
+                "none": "",
+                "linear": f"{c[0]} {input_var} + {c[1]}",
+                "relu": f"\\operatorname{{ReLU}}\\left( {input_var}\\right)",
+                "lin_relu": f"\\operatorname{{ReLU}}\\left({c[0]}{input_var} + {c[1]} \\right)",
+                "sigmoid": f"\\sigma\\left( {input_var} \\right)",
+                "lin_sigmoid": f"\\sigma\\left( {c[0]} {input_var} + {c[1]} \\right)",
+                "add": f"+ {input_var}",
+                "subtract": f"- {input_var}",
+                "mult": f"{c[0]} * {input_var}",
+                "exp": f"e^{{ {c[0]} {input_var} + {c[1]} }}",
+                "1/x": f"\\frac{{1}} {{ {c[0]}{input_var} + {c[1]} }}",
+                "ln": f"\\ln\\left({c[0]} {input_var} + {c[1]} \\right)",
+                "classifier": classifier_str,
+            }
 
-    return labels.get(op_name, "")
+    if op_name not in labels:
+        raise NotImplementedError(
+            f"operation '{op_name}' is not defined for output_format '{output_format}'"
+        )
+
+    return labels[op_name]
 
 
 class Identity(nn.Module):
