@@ -17,7 +17,7 @@ non_interchangeable_primitives = [
 ]
 
 
-def generate_x(start=-1, stop=1, num=100):
+def generate_x(start=-1, stop=1, num=500):
     x = np.expand_dims(np.linspace(start=start, stop=stop, num=num), 1)
     return x
 
