@@ -120,75 +120,73 @@ def get_operation_label(
 
     num_params = len(params)
 
-    fps = [
-        str(format_string.format(p)) for p in params_org
-    ]  # fps = Formatted ParameterS
-    fps.extend(["", "", ""])
+    c = [str(format_string.format(p)) for p in params_org]
+    c.extend(["", "", ""])
 
     if num_params == 1:  # without bias
         if output_format == "console":
             labels = {
                 "none": "",
-                "linear": f"{fps[0]} * {input_var}",
+                "linear": f"{c[0]} * {input_var}",
                 "relu": f"ReLU({input_var})",
-                "lin_relu": f"ReLU({fps[0]} * {input_var})",
+                "lin_relu": f"ReLU({c[0]} * {input_var})",
                 "sigmoid": f"logistic({input_var})",
-                "lin_sigmoid": f"logistic({fps[0]} * {input_var})",
+                "lin_sigmoid": f"logistic({c[0]} * {input_var})",
                 "add": f"+ {input_var}",
                 "subtract": f"- {input_var}",
-                "mult": f"{fps[0]} * {input_var}",
-                "exp": f"exp({fps[0]} * {input_var})",
-                "1/x": f"1 / ({fps[0]} * {input_var})",
-                "ln": f"ln({fps[0]} * {input_var})",
+                "mult": f"{c[0]} * {input_var}",
+                "exp": f"exp({c[0]} * {input_var})",
+                "1/x": f"1 / ({c[0]} * {input_var})",
+                "ln": f"ln({c[0]} * {input_var})",
                 "classifier": classifier_str,
             }
         elif output_format == "latex":
             labels = {
                 "none": "",
-                "linear": fps[0] + "" + input_var,
+                "linear": c[0] + "" + input_var,
                 "relu": f"\\operatorname{{ReLU}}\\left({input_var}\\right)",
-                "lin_relu": f"\\operatorname{{ReLU}}\\left({fps[0]}{input_var}\\right)",
+                "lin_relu": f"\\operatorname{{ReLU}}\\left({c[0]}{input_var}\\right)",
                 "sigmoid": f"\\sigma\\left({input_var}\\right)",
-                "lin_sigmoid": f"\\sigma\\left({fps[0]} {input_var} \\right)",
+                "lin_sigmoid": f"\\sigma\\left({c[0]} {input_var} \\right)",
                 "add": f"+ {input_var}",
                 "subtract": f"- {input_var}",
-                "mult": f"{fps[0]} {input_var}",
-                "exp": f"e^{{{fps[0]} {input_var} }}",
-                "1/x": f"\\frac{{1}}{{{fps[0]} {input_var} }}",
-                "ln": f"\\ln\\left({fps[0]} {input_var} \\right)",
+                "mult": f"{c[0]} {input_var}",
+                "exp": f"e^{{{c[0]} {input_var} }}",
+                "1/x": f"\\frac{{1}}{{{c[0]} {input_var} }}",
+                "ln": f"\\ln\\left({c[0]} {input_var} \\right)",
                 "classifier": classifier_str,
             }
     else:  # with bias
         if output_format == "console":
             labels = {
                 "none": "",
-                "linear": f"{fps[0]} * {input_var} + {fps[1]}",
+                "linear": f"{c[0]} * {input_var} + {c[1]}",
                 "relu": f"ReLU({input_var})",
-                "lin_relu": f"ReLU({fps[0]} * {input_var} + {fps[1]} )",
+                "lin_relu": f"ReLU({c[0]} * {input_var} + {c[1]} )",
                 "sigmoid": f"logistic({input_var})",
-                "lin_sigmoid": f"logistic({fps[0]} * {input_var} + {fps[1]})",
+                "lin_sigmoid": f"logistic({c[0]} * {input_var} + {c[1]})",
                 "add": f"+ {input_var}",
                 "subtract": f"- {input_var}",
-                "mult": f"{fps[0]} * {input_var}",
-                "exp": f"exp({fps[0]} * {input_var} + {fps[1]})",
-                "1/x": f"1 / ({fps[0]} * {input_var} + {fps[1]})",
-                "ln": f"ln({fps[0]} * {input_var} + {fps[1]})",
+                "mult": f"{c[0]} * {input_var}",
+                "exp": f"exp({c[0]} * {input_var} + {c[1]})",
+                "1/x": f"1 / ({c[0]} * {input_var} + {c[1]})",
+                "ln": f"ln({c[0]} * {input_var} + {c[1]})",
                 "classifier": classifier_str,
             }
         elif output_format == "latex":
             labels = {
                 "none": "",
-                "linear": f"{fps[0]} {input_var} + {fps[1]}",
+                "linear": f"{c[0]} {input_var} + {c[1]}",
                 "relu": f"\\operatorname{{ReLU}}\\left( {input_var}\\right)",
-                "lin_relu": f"\\operatorname{{ReLU}}\\left({fps[0]}{input_var} + {fps[1]} \\right)",
+                "lin_relu": f"\\operatorname{{ReLU}}\\left({c[0]}{input_var} + {c[1]} \\right)",
                 "sigmoid": f"\\sigma\\left( {input_var} \\right)",
-                "lin_sigmoid": f"\\sigma\\left( {fps[0]} {input_var} + {fps[1]} \\right)",
+                "lin_sigmoid": f"\\sigma\\left( {c[0]} {input_var} + {c[1]} \\right)",
                 "add": f"+ {input_var}",
                 "subtract": f"- {input_var}",
-                "mult": f"{fps[0]} * {input_var}",
-                "exp": f"e^{{ {fps[0]} {input_var} + {fps[1]} }}",
-                "1/x": f"\\frac{{1}} {{ {fps[0]}{input_var} + {fps[1]} }}",
-                "ln": f"\\ln\\left({fps[0]} {input_var} + {fps[1]} \\right)",
+                "mult": f"{c[0]} * {input_var}",
+                "exp": f"e^{{ {c[0]} {input_var} + {c[1]} }}",
+                "1/x": f"\\frac{{1}} {{ {c[0]}{input_var} + {c[1]} }}",
+                "ln": f"\\ln\\left({c[0]} {input_var} + {c[1]} \\right)",
                 "classifier": classifier_str,
             }
 
