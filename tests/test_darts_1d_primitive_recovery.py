@@ -11,10 +11,13 @@ non_interchangeable_primitives = [
     "none",
     "add",
     "subtract",
-    "relu",
-    "sigmoid",
     "mult",
+    "sigmoid",
     "exp",
+    "ln",
+    "relu",
+    "softplus",
+    "softminus",
 ]
 
 
