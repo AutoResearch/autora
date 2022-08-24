@@ -376,21 +376,25 @@ class DARTSRegressor(BaseEstimator, RegressorMixin):
             batch_size: number of observations to be used per update
             num_graph_nodes: number of intermediate nodes in the DARTS graph.
             classifier_weight_decay:
-            darts_type:
-            init_weights_function:
-            param_learning_rate_max:
-            param_learning_rate_min:
+            darts_type: "original" or "fair"
+            init_weights_function: callable which can be used to initialize the model weights
+                e.g. to particular values corresponding to an expected result
+            param_learning_rate_max: starting learning rate for the param optimization
+            param_learning_rate_min: final learning rate to which the param optimization converges
             param_momentum:
-            arch_momentum:
+            arch_momentum: momentum used in the Adam optimizer for architecture weights
             param_weight_decay:
-            param_updates_per_epoch:
-            arch_updates_per_epoch:
-            arch_weight_decay:
-            arch_weight_decay_df:
-            arch_weight_decay_base:
-            arch_learning_rate_max:
-            fair_darts_loss_weight:
-            max_epochs:
+            param_updates_per_epoch: number of steps used to optimize coefficients each epoch
+            arch_updates_per_epoch: number of steps used to optimize the architecture each epoch
+            arch_weight_decay: general weight decay for the architecture weights
+            arch_weight_decay_df: weight decay applied to architecture weights in proportion
+                to the number of parameters of an operation
+            arch_weight_decay_base: a constant weight decay applied to architecture weights
+            arch_learning_rate_max: learning rate for the architecture weights
+            fair_darts_loss_weight: a regularizer that pushes architecture weights more toward
+                zero or one in the fair DARTS variant. Only used if `darts_type == "fair"`
+            max_epochs: number of optimization cycles,
+                where one cycle involves architecture fitting and then coefficient optimization
             grad_clip:
             primitives: list of primitive operations used in the DARTS network,
                 e.g., 'add', 'subtract', 'none'. For details, see
