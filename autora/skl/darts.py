@@ -76,6 +76,8 @@ def _general_darts(
     max_epochs: int = 100,
     grad_clip: float = 5,
     primitives: Sequence[str] = PRIMITIVES,
+    train_classifier_coefficients: bool = False,
+    train_classifier_bias: bool = False,
 ) -> _DARTSResult:
     """
     Function to implement the DARTS optimization, given a fixed architecture and input data.
@@ -100,6 +102,8 @@ def _general_darts(
         classifier_weight_decay=classifier_weight_decay,
         darts_type=DARTSType(darts_type),
         primitives=primitives,
+        train_classifier_coefficients=train_classifier_coefficients,
+        train_classifier_bias=train_classifier_bias,
     )
     if init_weights_function is not None:
         network.apply(init_weights_function)
@@ -373,6 +377,8 @@ class DARTSRegressor(BaseEstimator, RegressorMixin):
         grad_clip: float = 5,
         output_type: IMPLEMENTED_OUTPUT_TYPES = "real",
         primitives: Sequence[str] = PRIMITIVES,
+        train_classifier_coefficients: bool = False,
+        train_classifier_bias: bool = False,
     ) -> None:
         """
         Arguments:
@@ -435,6 +441,9 @@ class DARTSRegressor(BaseEstimator, RegressorMixin):
         self.network_: Optional[Network] = None
         self.model_: Optional[Network] = None
         self.model_sampler_: Optional[Callable[[SAMPLING_STRATEGIES], Network]] = None
+
+        self.train_classifier_coefficients = train_classifier_coefficients
+        self.train_classifier_bias = train_classifier_bias
 
     def fit(self, X: np.ndarray, y: np.ndarray):
         """
