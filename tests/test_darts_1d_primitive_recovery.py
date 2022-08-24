@@ -12,11 +12,7 @@ non_interchangeable_primitives = [
     "subtract",
     "sigmoid",
     "exp",
-    "1/x",
-    "ln",
     "relu",
-    "softplus",
-    "softminus",
 ]
 
 
@@ -99,8 +95,15 @@ def run_test_primitive_fitting(
     regressor = DARTSRegressor(
         num_graph_nodes=1,
         param_updates_per_epoch=100,
-        max_epochs=100,
-        arch_updates_per_epoch=100,
+        max_epochs=300,
+        arch_updates_per_epoch=1,
+        param_weight_decay=3e-4,
+        arch_weight_decay_df=0.05,
+        arch_weight_decay=1e-4,
+        arch_learning_rate_max=0.3,
+        param_learning_rate_max=0.0025,
+        param_learning_rate_min=0.01,
+        param_momentum=0.90,
         primitives=primitives,
     )
     regressor.fit(X, y)

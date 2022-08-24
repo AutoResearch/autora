@@ -208,6 +208,9 @@ def _optimize_coefficients(
 
     objs = AvgrageMeter()
 
+    if network.countParameters()[0] == 0:
+        return
+
     for param_step in range(param_updates_per_epoch):
         _logger.debug(f"Running parameter update, " f"param: {param_step}")
 
