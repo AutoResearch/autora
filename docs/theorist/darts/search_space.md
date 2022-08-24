@@ -25,22 +25,20 @@ The following example sets up a search space with the following primitives:
 - sigmoid operation
 
 ```python
-
-PRIMITIVES = [
-        "zero",
-        "add",
-        "mult",
-        "sigmoid",
-    ],
-
+primitives = [
+    "zero",
+    "add",
+    "mult",
+    "sigmoid",
+]
 ```
 
 We can then pass these primitives directly to the DARTS regressor:
 
 ```python
-from autora.skl.darts import DARTSRegressor, ValueType
+from autora.skl.darts import DARTSRegressor
 
 darts_estimator = DARTSRegressor(
-    primitives=PRIMITIVES,
+    primitives=primitives
 )
 ```
