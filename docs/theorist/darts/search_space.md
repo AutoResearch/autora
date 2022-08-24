@@ -5,7 +5,7 @@
 DARTS uses a search space of operations to find the best model. The search space is defined by the set of operations that can be applied in each computation step of the model. These operations are also referred to as *primitives*. We can select from the following space of primitives:
 
 - **zero**: The output of the computation $x_j$ is not dependent on its input $x_i$.
-- **add**: The output of the computation $x_j$ is the some of its input $x_i$ and some constant $a$.
+- **add**: The output of the computation $x_j$ is the sum of its input $x_i$ and some constant $a$.
 - **mult**: The output of the computation $x_j$ is its input $x_i$ multiplied by some constant $a$.
 - **linear**: The output of the computation $x_j$ is linear dependent on its input $x_i$: $x_j = a * x_i + b$.
 - **exponential**: The output of the computation $x_j$ is exponentially dependent on its input $x_i$: $x_j = a * \exp(b * x_i)$.
