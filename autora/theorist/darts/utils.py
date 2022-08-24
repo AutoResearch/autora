@@ -243,7 +243,7 @@ def compute_BIC_AIC(
     )  # likelihood of data given model
     llik = np.sum(np.log(lik))  # log likelihood
     n = len(lik)  # number of data points
-    k, _, _ = model.countParameters()  # for most likely architecture
+    k, _, _ = model.count_parameters()  # for most likely architecture
 
     BIC = np.log(n) * k - 2 * llik
 
