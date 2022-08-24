@@ -42,11 +42,11 @@ def get_operation_label(
         >>> get_operation_label("classifier", [1], decimals=2)
         '1.00 * x'
         >>> import numpy as np
-        >>> get_operation_label("classifier_concat", np.array([1, 2, 3]), decimals=2,
-        output_format="latex")
-        'x \circ \left(1.00\right) + \left(2.00\\right) + \left(3.00\right)'
-        >>> get_operation_label("classifier_concat", np.array([1, 2, 3]), decimals=2,
-        output_format="console")
+        >>> print(get_operation_label("classifier_concat", np.array([1, 2, 3]),
+        ...     decimals=2, output_format="latex"))
+        x \circ \left(1.00\right) + \left(2.00\right) + \left(3.00\right)
+        >>> get_operation_label("classifier_concat", np.array([1, 2, 3]),
+        ...     decimals=2, output_format="console")
         'x .* (1.00) .+ (2.00) .+ (3.00)'
         >>> get_operation_label("exp", [1,2], decimals=2)
         'exp(1.00 * x + 2.00)'
@@ -56,8 +56,8 @@ def get_operation_label(
         '1 / (1 * x)'
         >>> get_operation_label("lin_relu", [1], decimals=0)
         'ReLU(1 * x)'
-        >>> get_operation_label("lin_relu", [1], decimals=0, output_format="latex")
-        '\operatorname{ReLU}\left(1x\right)'
+        >>> print(get_operation_label("lin_relu", [1], decimals=0, output_format="latex"))
+        \operatorname{ReLU}\left(1x\right)
         >>> get_operation_label("linear", [1, 2], decimals=0)
         '1 * x + 2'
         >>> get_operation_label("linear", [1, 2], decimals=0, output_format="latex")
@@ -65,7 +65,7 @@ def get_operation_label(
         >>> get_operation_label("linrelu", [1], decimals=0)  # Mistyped operation name
         Traceback (most recent call last):
         ...
-        NotImplementedError: operation 'linrelu' is not defined
+        NotImplementedError: operation 'linrelu' is not defined for output_format 'console'
     """
     if output_format != "latex" and output_format != "console":
         raise ValueError("output_format must be either 'latex' or 'console'")
@@ -262,7 +262,7 @@ def get_operation_label(
                 + input_var
                 + " + "
                 + str(format_string.format(params[1])),
-                "relu": "\\operatorname{ReLU}\\left(" + input_var + "\\right)",
+                "relu": r"\operatorname{ReLU}\left(" + input_var + r"\right)",
                 "lin_relu": "\\operatorname{ReLU}\\left("
                 + str(format_string.format(params[0]))
                 + ""
@@ -307,7 +307,12 @@ def get_operation_label(
                 "classifier": classifier_str,
             }
 
-    return labels.get(op_name, "")
+    if op_name not in labels:
+        raise NotImplementedError(
+            f"operation '{op_name}' is not defined for output_format '{output_format}'"
+        )
+
+    return labels[op_name]
 
 
 class Identity(nn.Module):
