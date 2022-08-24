@@ -21,8 +21,8 @@ class Architect(object):
     def __init__(
         self,
         model: Network,
-        arch_learning_rate_max: float,
-        arch_momentum: float,
+        arch_learning_rate: float,
+        momentum: float,
         arch_weight_decay: float,
         arch_weight_decay_df: float = 0,
         arch_weight_decay_base: float = 0,
@@ -33,8 +33,8 @@ class Architect(object):
 
         Arguments:
             model: a network model implementing the full DARTS model.
-            arch_learning_rate_max: learning rate for the architecture weights
-            arch_momentum: arch_momentum used in the Adam optimizer for architecture weights
+            arch_learning_rate: learning rate for the architecture weights
+            momentum: momentum used in the Adam optimizer for architecture weights
             arch_weight_decay: general weight decay for the architecture weights
             arch_weight_decay_df: (weight decay applied to architecture weights in proportion
                 to the number of parameters of an operation)
@@ -43,18 +43,18 @@ class Architect(object):
                 zero or one in the fair DARTS variant)
         """
         # set parameters for architecture learning
-        self.network_arch_momentum = arch_momentum
+        self.network_momentum = momentum
         self.network_weight_decay = arch_weight_decay
         self.network_weight_decay_df = arch_weight_decay_df
         self.arch_weight_decay_base = arch_weight_decay_base * model._steps
         self.fair_darts_loss_weight = fair_darts_loss_weight
 
         self.model = model
-        self.lr = arch_learning_rate_max
+        self.lr = arch_learning_rate
         # architecture is optimized using Adam
         self.optimizer = torch.optim.Adam(
             self.model.arch_parameters(),
-            lr=arch_learning_rate_max,
+            lr=arch_learning_rate,
             betas=(0.5, 0.999),
             weight_decay=arch_weight_decay,
         )
@@ -121,7 +121,7 @@ class Architect(object):
             moment = _concat(
                 network_optimizer.state[v]["momentum_buffer"]
                 for v in self.model.parameters()
-            ).mul_(self.network_arch_momentum)
+            ).mul_(self.network_momentum)
         except Exception:
             moment = torch.zeros_like(theta)
         dtheta = (

@@ -25,7 +25,6 @@ mkdocs-gen-files = "^0.3.4"
 mkdocs-literate-nav = "^0.4.1"
 mkdocs-section-index = "^0.3.4"
 mkdocstrings-python = "^0.7.1"
-pytest = "^7.1.2"
 
 [tool.poetry.extras]
 tinkerforge = ["tinkerforge"]

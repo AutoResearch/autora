@@ -1,5 +1,12 @@
+import unittest
+
 import autora
 
 
-def test_import():
-    assert autora is not None
+class SmokeTest(unittest.TestCase):
+    def test_import(self):
+        self.assertIsNotNone(autora)
+
+
+if __name__ == "__main__":
+    unittest.main()
