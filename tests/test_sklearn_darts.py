@@ -1,6 +1,5 @@
-import unittest
-
 import numpy as np
+import pytest
 from sklearn.model_selection import GridSearchCV, train_test_split
 
 from autora.skl.darts import PRIMITIVES, DARTSRegressor, DARTSType, ValueType
@@ -20,113 +19,97 @@ def generate_constant_data(const: float = 0.5, num: int = 1000):
     return X, y, const
 
 
-class TestDarts(unittest.TestCase):
-    def assertBetween(self, a, bmin, bmax):
-        self.assertGreater(a, bmin)
-        self.assertLess(a, bmax)
+def test_constant_model():
 
-    def test_constant_model(self):
+    X, y, const, epsilon = generate_noisy_constant_data()
 
-        X, y, const, epsilon = generate_noisy_constant_data()
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.2, random_state=42
+    )
 
-        X_train, X_test, y_train, y_test = train_test_split(
-            X, y, test_size=0.2, random_state=42
-        )
+    estimator = DARTSRegressor(num_graph_nodes=1)
 
-        estimator = DARTSRegressor(num_graph_nodes=1)
+    estimator.fit(X_train, y_train)
 
-        estimator.fit(X_train, y_train)
+    assert estimator is not None
 
-        self.assertIsNotNone(estimator)
+    for y_pred_i in np.nditer(estimator.predict(X_test)):
+        (const - (5.0 * epsilon)) <= y_pred_i <= (const + (5.0 * epsilon))
 
-        for y_pred_i in np.nditer(estimator.predict(X_test)):
-            self.assertBetween(
-                y_pred_i, const - (5.0 * epsilon), const + (5.0 * epsilon)
-            )
-
-        print(estimator.network_)
-
-    def test_enum_string_inputs(self):
-
-        X, y, const, epsilon = generate_noisy_constant_data()
-
-        kwargs = dict(
-            num_graph_nodes=1,
-            max_epochs=1,
-            arch_updates_per_epoch=1,
-            param_updates_per_epoch=1,
-        )
-
-        DARTSRegressor(darts_type="fair", **kwargs).fit(X, y)
-        DARTSRegressor(darts_type=DARTSType.FAIR, **kwargs).fit(X, y)
-        DARTSRegressor(darts_type="original", **kwargs).fit(X, y)
-        DARTSRegressor(darts_type=DARTSType.ORIGINAL, **kwargs).fit(X, y)
-
-        DARTSRegressor(output_type="probability", **kwargs).fit(X, y)
-        DARTSRegressor(output_type=ValueType.PROBABILITY, **kwargs).fit(X, y)
-        DARTSRegressor(output_type=ValueType.PROBABILITY_SAMPLE, **kwargs).fit(X, y)
-        DARTSRegressor(output_type="probability_distribution", **kwargs).fit(X, y)
-        DARTSRegressor(output_type=ValueType.PROBABILITY_DISTRIBUTION, **kwargs).fit(
-            X, y
-        )
-        self.assertRaises(
-            NotImplementedError, DARTSRegressor(output_type="class", **kwargs).fit, X, y
-        )
-        self.assertRaises(
-            NotImplementedError,
-            DARTSRegressor(output_type=ValueType.CLASS, **kwargs).fit,
-            X,
-            y,
-        )
-
-    def test_primitive_selection(self):
-        X, y, const, epsilon = generate_noisy_constant_data()
-
-        kwargs = dict(
-            num_graph_nodes=1,
-            max_epochs=1,
-            arch_updates_per_epoch=1,
-            param_updates_per_epoch=1,
-        )
-
-        DARTSRegressor(primitives=["add", "subtract", "none"], **kwargs).fit(X, y)
-        DARTSRegressor(primitives=PRIMITIVES, **kwargs).fit(X, y)
-        self.assertRaises(
-            KeyError, DARTSRegressor(primitives=["doesnt_exist"], **kwargs).fit, X, y
-        )
-
-    def test_metaparam_optimization(self):
-
-        X, y, const = generate_constant_data()
-
-        X_train, X_test, y_train, y_test = train_test_split(
-            X, y, test_size=0.2, random_state=42
-        )
-
-        estimator = GridSearchCV(
-            estimator=DARTSRegressor(),
-            cv=2,
-            param_grid=[
-                {
-                    "max_epochs": [10, 50],
-                    "arch_updates_per_epoch": [5, 10, 15],
-                    "param_updates_per_epoch": [5, 10, 15],
-                    "num_graph_nodes": [1, 2, 3],
-                }
-            ],
-        )
-
-        estimator.fit(X_train, y_train)
-
-        print(estimator.best_params_)
-        print(X_test)
-        print(estimator.predict(X_test))
-
-        for y_pred_i in np.nditer(estimator.predict(X_test)):
-            self.assertBetween(y_pred_i, const - 0.01, const + 0.01)
-
-        print(estimator.predict(X_test))
+    print(estimator.network_)
 
 
-if __name__ == "__main__":
-    unittest.main()
+def test_enum_string_inputs():
+
+    X, y, const, epsilon = generate_noisy_constant_data()
+
+    kwargs = dict(
+        num_graph_nodes=1,
+        max_epochs=1,
+        arch_updates_per_epoch=1,
+        param_updates_per_epoch=1,
+    )
+
+    DARTSRegressor(darts_type="fair", **kwargs).fit(X, y)
+    DARTSRegressor(darts_type=DARTSType.FAIR, **kwargs).fit(X, y)
+    DARTSRegressor(darts_type="original", **kwargs).fit(X, y)
+    DARTSRegressor(darts_type=DARTSType.ORIGINAL, **kwargs).fit(X, y)
+
+    DARTSRegressor(output_type="probability", **kwargs).fit(X, y)
+    DARTSRegressor(output_type=ValueType.PROBABILITY, **kwargs).fit(X, y)
+    DARTSRegressor(output_type=ValueType.PROBABILITY_SAMPLE, **kwargs).fit(X, y)
+    DARTSRegressor(output_type="probability_distribution", **kwargs).fit(X, y)
+    DARTSRegressor(output_type=ValueType.PROBABILITY_DISTRIBUTION, **kwargs).fit(X, y)
+    with pytest.raises(NotImplementedError):
+        DARTSRegressor(output_type="class", **kwargs).fit(X, y)
+    with pytest.raises(NotImplementedError):
+        DARTSRegressor(output_type=ValueType.CLASS, **kwargs).fit(X, y)
+
+
+def test_primitive_selection():
+    X, y, const, epsilon = generate_noisy_constant_data()
+
+    kwargs = dict(
+        num_graph_nodes=1,
+        max_epochs=1,
+        arch_updates_per_epoch=1,
+        param_updates_per_epoch=1,
+    )
+
+    DARTSRegressor(primitives=["add", "subtract", "none"], **kwargs).fit(X, y)
+    DARTSRegressor(primitives=PRIMITIVES, **kwargs).fit(X, y)
+    with pytest.raises(KeyError):
+        KeyError, DARTSRegressor(primitives=["doesnt_exist"], **kwargs).fit(X, y)
+
+
+def test_metaparam_optimization():
+
+    X, y, const = generate_constant_data()
+
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.2, random_state=42
+    )
+
+    estimator = GridSearchCV(
+        estimator=DARTSRegressor(),
+        cv=2,
+        param_grid=[
+            {
+                "max_epochs": [10, 50],
+                "arch_updates_per_epoch": [5, 10, 15],
+                "param_updates_per_epoch": [5, 10, 15],
+                "num_graph_nodes": [1, 2, 3],
+            }
+        ],
+    )
+
+    estimator.fit(X_train, y_train)
+
+    print(estimator.best_params_)
+    print(X_test)
+    print(estimator.predict(X_test))
+
+    for y_pred_i in np.nditer(estimator.predict(X_test)):
+        assert (const - 0.01) < y_pred_i < (const + 0.01)
+
+    print(estimator.predict(X_test))
