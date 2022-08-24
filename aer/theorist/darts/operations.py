@@ -188,7 +188,7 @@ def get_operation_label(
                 "subtract": f"-{input_var}",
                 "mult": f"{fps[0]} * {input_var}",
                 "exp": f"e^{{ {fps[0]} {input_var} + {fps[1]} }}",
-                "1/x": f"\\frac{1}{{ {fps[0]}m{input_var} + {fps[1]} }}",
+                "1/x": f"\\frac{1}{{ {fps[0]}{input_var} + {fps[1]} }}",
                 "ln": f"\\ln\\left({fps[0]} {input_var} + {fps[1]} \\right)",
                 "classifier": classifier_str,
             }
