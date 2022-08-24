@@ -77,8 +77,7 @@ def get_operation_label(
     classifier_str = ""
     if op_name == "classifier":
         value = params[0]
-        classifier_str = format_string.format(value) + " * " + input_var
-
+        classifier_str = f"{format_string.format(value)} * {input_var}"
         return classifier_str
 
     if op_name == "classifier_concat":
