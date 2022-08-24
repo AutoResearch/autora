@@ -122,7 +122,9 @@ def get_operation_label(
     num_params = len(params)
     params.extend([0, 0, 0])
 
-    fps = [str(format_string.format(p)) for p in params_org]
+    fps = [
+        str(format_string.format(p)) for p in params_org
+    ]  # fps = Formatted ParameterS
     fps.extend(["", "", ""])
 
     if num_params == 1:  # without bias
