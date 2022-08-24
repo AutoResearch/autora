@@ -207,10 +207,10 @@ def test_primitive_fitting_relu():
 
 def test_primitive_fitting_sigmoid():
     run_test_primitive_fitting(
-        generate_x(),
+        generate_x(-10, +10),
         transform_through_primitive_sigmoid,
         "sigmoid",
-        primitives=non_interchangeable_primitives,
+        primitives=["none", "exp", "sigmoid"],
     )
 
 
