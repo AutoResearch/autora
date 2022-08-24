@@ -122,188 +122,73 @@ def get_operation_label(
     num_params = len(params)
     params.extend([0, 0, 0])
 
+    fps = [str(format_string.format(p)) for p in params_org]
+    fps.extend(["", "", ""])
+
     if num_params == 1:  # without bias
         if output_format == "console":
             labels = {
                 "none": "",
-                "linear": str(format_string.format(params[0])) + " * " + input_var,
-                "relu": "ReLU(" + input_var + ")",
-                "lin_relu": "ReLU("
-                + str(format_string.format(params[0]))
-                + " * "
-                + input_var
-                + ")",
-                # 'sigmoid': '1/(1+e^(-x))',
-                "sigmoid": "logistic(" + input_var + ")",
-                # 'lin_sigmoid': '1/(1+e^(-' + str(format_string.format(params[0])) + ' * x))',
-                "lin_sigmoid": "logistic("
-                + str(format_string.format(params[0]))
-                + " * "
-                + input_var
-                + ")",
-                "add": "+ " + input_var,
-                "subtract": "- " + input_var,
-                "mult": str(format_string.format(params[0])) + " * " + input_var,
-                # 'exp': 'e^(' + str(format_string.format(params[0])) + ' * x)',
-                "exp": "exp("
-                + str(format_string.format(params[0]))
-                + " * "
-                + input_var
-                + ")",
-                "1/x": "1 / ("
-                + str(format_string.format(params[0]))
-                + " * "
-                + input_var
-                + ")",
-                "ln": "ln("
-                + str(format_string.format(params[0]))
-                + " * "
-                + input_var
-                + ")",
+                "linear": f"{fps[0]} * {input_var}",
+                "relu": f"ReLU({input_var})",
+                "lin_relu": f"ReLU({fps[0]} * {input_var})",
+                "sigmoid": f"logistic({input_var})",
+                "lin_sigmoid": f"logistic({fps[0]} * {input_var})",
+                "add": f"+ {input_var}",
+                "subtract": f"- {input_var}",
+                "mult": f"{fps[0]} * {input_var}",
+                "exp": f"exp({fps[0]} * {input_var})",
+                "1/x": f"1 / ({fps[0]} * {input_var})",
+                "ln": f"ln({fps[0]} * {input_var})",
                 "classifier": classifier_str,
             }
         elif output_format == "latex":
             labels = {
                 "none": "",
-                "linear": str(format_string.format(params[0])) + "" + input_var,
-                "relu": "\\operatorname{ReLU}\\left(" + input_var + "\\right)",
-                "lin_relu": "\\operatorname{ReLU}\\left("
-                + str(format_string.format(params[0]))
-                + ""
-                + input_var
-                + "\\right)",
-                # 'sigmoid': '1/(1+e^(-x))',
-                "sigmoid": "\\sigma\\left(" + input_var + "\\right)",
-                # 'lin_sigmoid': '1/(1+e^(-' + str(format_string.format(params[0])) + ' * x))',
-                "lin_sigmoid": "\\sigma\\left("
-                + str(format_string.format(params[0]))
-                + ""
-                + input_var
-                + "\\right)",
-                "add": "+ " + input_var,
-                "subtract": "- " + input_var,
-                "mult": str(format_string.format(params[0])) + "" + input_var,
-                # 'exp': 'e^(' + str(format_string.format(params[0])) + ' * x)',
-                "exp": "e^{"
-                + str(format_string.format(params[0]))
-                + ""
-                + input_var
-                + "}",
-                "1/x": "\\frac{1}{"
-                + str(format_string.format(params[0]))
-                + ""
-                + input_var
-                + "}",
-                "ln": "\\ln\\left("
-                + str(format_string.format(params[0]))
-                + ""
-                + input_var
-                + "\\right)",
+                "linear": fps[0] + "" + input_var,
+                "relu": f"\\operatorname{{ReLU}}\\left({input_var}\\right)",
+                "lin_relu": f"\\operatorname{{ReLU}}\\left({fps[0]}{input_var}\\right)",
+                "sigmoid": f"\\sigma\\left({input_var}\\right)",
+                "lin_sigmoid": f"\\sigma\\left({fps[0]} {input_var} \\right)",
+                "add": f"+ {input_var}",
+                "subtract": f"- {input_var}",
+                "mult": f"{fps[0]} {input_var}",
+                "exp": f"e^{{{fps[0]} {input_var} }}",
+                "1/x": f"\\frac{1}{{{fps[0]} {input_var} }}",
+                "ln": f"\\ln\\left({fps[0]} {input_var} \\right)",
                 "classifier": classifier_str,
             }
     else:  # with bias
         if output_format == "console":
             labels = {
                 "none": "",
-                "linear": str(format_string.format(params[0]))
-                + " * "
-                + input_var
-                + " + "
-                + str(format_string.format(params[1])),
-                "relu": "ReLU(" + input_var + ")",
-                "lin_relu": "ReLU("
-                + str(format_string.format(params[0]))
-                + " * "
-                + input_var
-                + " + "
-                + str(format_string.format(params[1]))
-                + ")",
-                # 'sigmoid': '1/(1+e^(-x))',
-                "sigmoid": "logistic(" + input_var + ")",
-                "lin_sigmoid": "logistic("
-                + str(format_string.format(params[0]))
-                + " * "
-                + input_var
-                + " + "
-                + str(format_string.format(params[1]))
-                + ")",
-                "add": "+ " + input_var,
-                "subtract": "- " + input_var,
-                "mult": str(format_string.format(params[0])) + " * " + input_var,
-                "exp": "exp("
-                + str(format_string.format(params[0]))
-                + " * "
-                + input_var
-                + " + "
-                + str(format_string.format(params[1]))
-                + ")",
-                "1/x"
-                + input_var: "1 / ("
-                + str(format_string.format(params[0]))
-                + " * "
-                + input_var
-                + " + "
-                + str(format_string.format(params[1]))
-                + ")",
-                "ln": "ln("
-                + str(format_string.format(params[0]))
-                + " * "
-                + input_var
-                + " + "
-                + str(format_string.format(params[1]))
-                + ")",
+                "linear": f"{fps[0]} * {input_var} + {fps[1]}",
+                "relu": f"ReLU({input_var})",
+                "lin_relu": f"ReLU({fps[0]} * {input_var} + {fps[1]} )",
+                "sigmoid": f"logistic({input_var})",
+                "lin_sigmoid": f"logistic({fps[0]} * {input_var} + {fps[1]})",
+                "add": f"+ {input_var}",
+                "subtract": f"- {input_var}",
+                "mult": f"{fps[0]} * {input_var}",
+                "exp": f"exp({fps[0]} * {input_var} + {fps[1]})",
+                "1/x": f"1 / ({fps[0]} * {input_var} + {fps[1]})",
+                "ln": f"ln({fps[0]} * {input_var} + {fps[1]})",
                 "classifier": classifier_str,
             }
         elif output_format == "latex":
             labels = {
                 "none": "",
-                "linear": str(format_string.format(params[0]))
-                + ""
-                + input_var
-                + " + "
-                + str(format_string.format(params[1])),
-                "relu": r"\operatorname{ReLU}\left(" + input_var + r"\right)",
-                "lin_relu": "\\operatorname{ReLU}\\left("
-                + str(format_string.format(params[0]))
-                + ""
-                + input_var
-                + " + "
-                + str(format_string.format(params[1]))
-                + "\\right)",
-                # 'sigmoid': '1/(1+e^(-x))',
-                "sigmoid": "\\sigma\\left(" + input_var + "\\right)",
-                "lin_sigmoid": "\\sigma\\left("
-                + str(format_string.format(params[0]))
-                + ""
-                + input_var
-                + " + "
-                + str(format_string.format(params[1]))
-                + "\\right)",
-                "add": "+ " + input_var,
-                "subtract": "- " + input_var,
-                "mult": str(format_string.format(params[0])) + " * " + input_var,
-                "exp": "e^{"
-                + str(format_string.format(params[0]))
-                + ""
-                + input_var
-                + " + "
-                + str(format_string.format(params[1]))
-                + "}",
-                "1/x"
-                + input_var: "\\frac{1}{"
-                + str(format_string.format(params[0]))
-                + ""
-                + input_var
-                + " + "
-                + str(format_string.format(params[1]))
-                + "}",
-                "ln": "\\ln\\left("
-                + str(format_string.format(params[0]))
-                + ""
-                + input_var
-                + " + "
-                + str(format_string.format(params[1]))
-                + "\\right)",
+                "linear": f"{fps[0]}{input_var} + {fps[1]}",
+                "relu": f"\\operatorname{{ReLU}}\\left({input_var}\\right)",
+                "lin_relu": f"\\operatorname{{ReLU}}\\left({fps[0]}{input_var} + {fps[1]} \\right)",
+                "sigmoid": f"\\sigma\\left({input_var}\\right)",
+                "lin_sigmoid": f"\\sigma\\left({fps[0]}{input_var} + {fps[1]}\\right)",
+                "add": f"+{input_var}",
+                "subtract": f"-{input_var}",
+                "mult": f"{fps[0]} * {input_var}",
+                "exp": f"e^{{{fps[0]}{input_var} + {fps[1]} }}",
+                "1/x": f"\\frac{1}{{ {fps[0]}{input_var} + {fps[1]} }}",
+                "ln": f"\\ln\\left({fps[0]}{input_var} + {fps[1]} \\right)",
                 "classifier": classifier_str,
             }
 
