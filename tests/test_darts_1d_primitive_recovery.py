@@ -105,6 +105,8 @@ def run_test_primitive_fitting(
         param_learning_rate_min=0.01,
         param_momentum=0.90,
         primitives=primitives,
+        train_classifier_bias=False,
+        train_classifier_coefficients=False,
     )
     regressor.fit(X, y)
 
