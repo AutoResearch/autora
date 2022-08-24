@@ -224,39 +224,3 @@ def test_primitive_fitting_exp():
         "exp",
         primitives=non_interchangeable_primitives,
     )
-
-
-def test_primitive_fitting_inverse():
-    run_test_primitive_fitting(
-        generate_x_log(0, +1.1),
-        transform_through_primitive_inverse,
-        "1/x",
-        primitives=non_interchangeable_primitives,
-    )
-
-
-def test_primitive_fitting_ln():
-    run_test_primitive_fitting(
-        generate_x(),
-        transform_through_primitive_ln,
-        "ln",
-        primitives=non_interchangeable_primitives,
-    )
-
-
-def test_primitive_fitting_softplus():
-    run_test_primitive_fitting(
-        generate_x(start=-4, stop=4, num=500),
-        transform_through_primitive_softplus,
-        "softplus",
-        primitives=non_interchangeable_primitives,
-    )
-
-
-def test_primitive_fitting_softminus():
-    run_test_primitive_fitting(
-        generate_x(start=-4, stop=4, num=500),
-        transform_through_primitive_softminus,
-        "softminus",
-        primitives=non_interchangeable_primitives,
-    )
