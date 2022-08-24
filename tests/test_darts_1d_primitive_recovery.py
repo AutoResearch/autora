@@ -10,11 +10,13 @@ non_interchangeable_primitives = [
     "none",
     "add",
     "subtract",
-    "relu",
     "sigmoid",
     "exp",
     "1/x",
     "ln",
+    "relu",
+    "softplus",
+    "softminus",
 ]
 
 
@@ -53,6 +55,16 @@ def transform_through_primitive_sigmoid(x: np.ndarray):
 
 def transform_through_primitive_exp(x: np.ndarray):
     y = np.exp(x)
+    return y
+
+
+def transform_through_primitive_softplus(x: np.ndarray, beta=1.0):
+    y = np.log(1 + np.exp(beta * x)) / beta
+    return y
+
+
+def transform_through_primitive_softminus(x: np.ndarray, beta=1.0):
+    y = x - np.log(1 + np.exp(beta * x)) / beta
     return y
 
 
@@ -225,5 +237,23 @@ def test_primitive_fitting_ln():
         generate_x(),
         transform_through_primitive_ln,
         "ln",
+        primitives=non_interchangeable_primitives,
+    )
+
+
+def test_primitive_fitting_softplus():
+    run_test_primitive_fitting(
+        generate_x(start=-4, stop=4, num=500),
+        transform_through_primitive_softplus,
+        "softplus",
+        primitives=non_interchangeable_primitives,
+    )
+
+
+def test_primitive_fitting_softminus():
+    run_test_primitive_fitting(
+        generate_x(start=-4, stop=4, num=500),
+        transform_through_primitive_softminus,
+        "softminus",
         primitives=non_interchangeable_primitives,
     )
