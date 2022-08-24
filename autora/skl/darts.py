@@ -208,7 +208,7 @@ def _optimize_coefficients(
 
     objs = AvgrageMeter()
 
-    if network.countParameters()[0] == 0:
+    if network.count_parameters()[0] == 0:
         return
 
     for param_step in range(param_updates_per_epoch):
@@ -522,7 +522,7 @@ class DARTSRegressor(BaseEstimator, RegressorMixin):
             _,
             _,
             param_list,
-        ) = fitted_sampled_network.countParameters()
+        ) = fitted_sampled_network.count_parameters()
 
         assert self.X_ is not None
 

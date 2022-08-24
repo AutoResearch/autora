@@ -557,7 +557,7 @@ class Network(nn.Module):
         )
         return genotype
 
-    def countParameters(self, print_parameters: bool = False) -> Tuple[int, int, list]:
+    def count_parameters(self, print_parameters: bool = False) -> Tuple[int, int, list]:
         """
         Counts and returns the parameters (coefficients) of the architecture defined by the
         highest architecture weights.
