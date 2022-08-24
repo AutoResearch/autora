@@ -22,6 +22,11 @@ def generate_x(start=-1, stop=1, num=500):
     return x
 
 
+def generate_x_log(start=-1, stop=1, num=500, base=10):
+    x = np.expand_dims(np.logspace(start=start, stop=stop, num=num, base=base), 1)
+    return x
+
+
 def transform_through_primitive_none(x: np.ndarray) -> np.ndarray:
     return x * 0.0
 
@@ -101,14 +106,14 @@ def run_test_primitive_fitting(
 
     regressor = DARTSRegressor(
         num_graph_nodes=1,
-        param_updates_per_epoch=100,  # 100 # 500
+        param_updates_per_epoch=100,
         max_epochs=300,
         arch_updates_per_epoch=1,
         param_weight_decay=3e-4,
         arch_weight_decay_df=0.05,
         arch_weight_decay=1e-4,
         arch_learning_rate_max=0.3,
-        param_learning_rate_max=0.0025,  # 0.025
+        param_learning_rate_max=0.0025,
         param_learning_rate_min=0.01,
         param_momentum=0.90,
         train_classifier_coefficients=False,
@@ -291,7 +296,7 @@ def test_primitive_fitting_inverse():
 # currently not working
 def test_primitive_fitting_ln():
     run_test_primitive_fitting(
-        generate_x(),
+        generate_x_log(-5, 5),
         transform_through_primitive_ln,
         "ln",
         primitives=non_interchangeable_primitives,
