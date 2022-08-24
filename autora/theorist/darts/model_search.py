@@ -211,6 +211,8 @@ class Network(nn.Module):
         steps: int = 2,
         n_input_states: int = 2,
         architecture_fixed: bool = False,
+        train_classifier_coefficients: bool = False,
+        train_classifier_bias: bool = False,
         classifier_weight_decay: float = 0,
         darts_type: DARTSType = DARTSType.ORIGINAL,
         primitives: Sequence[str] = PRIMITIVES,
@@ -224,6 +226,9 @@ class Network(nn.Module):
             steps: number of hidden nodes in the cell
             n_input_states: length of input vector (translates to number of input nodes)
             architecture_fixed: specifies whether the architecture weights shall remain fixed
+            train_classifier_coefficients: specifies whether the classifier coefficients shall be
+            trained
+            train_classifier_bias: specifies whether the classifier bias shall be trained
             classifier_weight_decay: a weight decay applied to the classifier
             darts_type: variant of DARTS (regular or fair) that is applied for training
         """
@@ -259,6 +264,15 @@ class Network(nn.Module):
         self.classifier = nn.Linear(
             self._dim_output, num_classes
         )  # make this the number of input states
+
+        # initialize classifier weights
+        if train_classifier_coefficients is False:
+            self.classifier.weight.data.fill_(1)
+            self.classifier.weight.requires_grad = False
+
+        if train_classifier_bias is False:
+            self.classifier.bias.data.fill_(0)
+            self.classifier.bias.requires_grad = False
 
         # initializes weights of the architecture
         self._initialize_alphas()
@@ -340,6 +354,8 @@ class Network(nn.Module):
         """
         # weight decay proportional to degrees of freedom
         for p in self.classifier.parameters():
+            if p.requires_grad is False:
+                continue
             p.data.sub_(
                 self._classifier_weight_decay
                 * lr
@@ -541,7 +557,7 @@ class Network(nn.Module):
         )
         return genotype
 
-    def countParameters(self, print_parameters: bool = False) -> Tuple[int, int, list]:
+    def count_parameters(self, print_parameters: bool = False) -> Tuple[int, int, list]:
         """
         Counts and returns the parameters (coefficients) of the architecture defined by the
         highest architecture weights.

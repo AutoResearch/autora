@@ -61,20 +61,23 @@ def _general_darts(
     classifier_weight_decay: float = 1e-2,
     darts_type: IMPLEMENTED_DARTS_TYPES = "original",
     init_weights_function: Optional[Callable] = None,
-    learning_rate: float = 2.5e-2,
-    learning_rate_min: float = 0.01,
-    momentum: float = 9e-1,
-    optimizer_weight_decay: float = 3e-4,
+    param_learning_rate_max: float = 2.5e-2,
+    param_learning_rate_min: float = 0.01,
+    param_momentum: float = 9e-1,
+    param_weight_decay: float = 3e-4,
     param_updates_per_epoch: int = 20,
+    arch_learning_rate_max: float = 3e-3,
     arch_updates_per_epoch: int = 20,
     arch_weight_decay: float = 1e-4,
     arch_weight_decay_df: float = 3e-4,
     arch_weight_decay_base: float = 0.0,
-    arch_learning_rate: float = 3e-3,
+    arch_momentum: float = 9e-1,
     fair_darts_loss_weight: int = 1,
     max_epochs: int = 100,
     grad_clip: float = 5,
     primitives: Sequence[str] = PRIMITIVES,
+    train_classifier_coefficients: bool = False,
+    train_classifier_bias: bool = False,
 ) -> _DARTSResult:
     """
     Function to implement the DARTS optimization, given a fixed architecture and input data.
@@ -99,6 +102,8 @@ def _general_darts(
         classifier_weight_decay=classifier_weight_decay,
         darts_type=DARTSType(darts_type),
         primitives=primitives,
+        train_classifier_coefficients=train_classifier_coefficients,
+        train_classifier_bias=train_classifier_bias,
     )
     if init_weights_function is not None:
         network.apply(init_weights_function)
@@ -106,25 +111,25 @@ def _general_darts(
     # Generate the architecture of the model
     architect = Architect(
         network,
-        momentum=momentum,
+        arch_momentum=arch_momentum,
         arch_weight_decay=arch_weight_decay,
         arch_weight_decay_df=arch_weight_decay_df,
         arch_weight_decay_base=arch_weight_decay_base,
         fair_darts_loss_weight=fair_darts_loss_weight,
-        arch_learning_rate=arch_learning_rate,
+        arch_learning_rate_max=arch_learning_rate_max,
     )
 
     optimizer = torch.optim.SGD(
         params=network.parameters(),
-        lr=learning_rate,
-        momentum=momentum,
-        weight_decay=optimizer_weight_decay,
+        lr=param_learning_rate_max,
+        momentum=param_momentum,
+        weight_decay=param_weight_decay,
     )
 
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
         optimizer=optimizer,
         T_max=param_updates_per_epoch,
-        eta_min=learning_rate_min,
+        eta_min=param_learning_rate_min,
     )
 
     coefficient_optimizer = partial(
@@ -206,6 +211,9 @@ def _optimize_coefficients(
     data_iterator = _get_data_iterator(data_loader)
 
     objs = AvgrageMeter()
+
+    if network.count_parameters()[0] == 0:
+        return
 
     for param_step in range(param_updates_per_epoch):
         _logger.debug(f"Running parameter update, " f"param: {param_step}")
@@ -353,49 +361,49 @@ class DARTSRegressor(BaseEstimator, RegressorMixin):
         classifier_weight_decay: float = 1e-2,
         darts_type: IMPLEMENTED_DARTS_TYPES = "original",
         init_weights_function: Optional[Callable] = None,
-        learning_rate: float = 2.5e-2,
-        learning_rate_min: float = 0.01,
-        momentum: float = 9e-1,
-        optimizer_weight_decay: float = 3e-4,
+        param_learning_rate_max: float = 2.5e-2,
+        param_learning_rate_min: float = 0.01,
+        param_momentum: float = 9e-1,
+        param_weight_decay: float = 3e-4,
         param_updates_per_epoch: int = 10,
         arch_updates_per_epoch: int = 1,
+        arch_learning_rate_max: float = 3e-3,
         arch_weight_decay: float = 1e-4,
         arch_weight_decay_df: float = 3e-4,
         arch_weight_decay_base: float = 0.0,
-        arch_learning_rate: float = 3e-3,
+        arch_momentum: float = 9e-1,
         fair_darts_loss_weight: int = 1,
         max_epochs: int = 10,
         grad_clip: float = 5,
         output_type: IMPLEMENTED_OUTPUT_TYPES = "real",
         primitives: Sequence[str] = PRIMITIVES,
+        train_classifier_coefficients: bool = False,
+        train_classifier_bias: bool = False,
     ) -> None:
         """
         Arguments:
             batch_size: number of observations to be used per update
-            num_graph_nodes: number of intermediate nodes in the DARTS graph. Minimum = 1
-            darts_type: "original" or "fair"
-            max_epochs: number of optimization cycles,
-                where one cycle involves architecture fitting and then coefficient optimization
-            arch_updates_per_epoch: number of steps used to optimize the architecture each epoch
-            param_updates_per_epoch: number of steps used to optimize coefficients each epoch
+            num_graph_nodes: number of intermediate nodes in the DARTS graph.
+            classifier_weight_decay:
+            darts_type:
+            init_weights_function:
+            param_learning_rate_max:
+            param_learning_rate_min:
+            param_momentum:
+            arch_momentum:
+            param_weight_decay:
+            param_updates_per_epoch:
+            arch_updates_per_epoch:
+            arch_weight_decay:
+            arch_weight_decay_df:
+            arch_weight_decay_base:
+            arch_learning_rate_max:
+            fair_darts_loss_weight:
+            max_epochs:
+            grad_clip:
             primitives: list of primitive operations used in the DARTS network,
                 e.g., 'add', 'subtract', 'none'. For details, see
                 [`autora.theorist.darts.operations`][autora.theorist.darts.operations]
-            momentum: momentum used in the Adam optimizer for architecture weights
-            arch_learning_rate: learning rate for the architecture weights
-            arch_weight_decay: general weight decay for the architecture weights
-            arch_weight_decay_df: weight decay applied to architecture weights in proportion
-                to the number of parameters of an operation
-            arch_weight_decay_base: a constant weight decay applied to architecture weights
-            fair_darts_loss_weight: a regularizer that pushes architecture weights more toward
-                zero or one in the fair DARTS variant. Only used if `darts_type == "fair"`
-            init_weights_function: callable which can be used to initialize the model weights
-                e.g. to particular values corresponding to an expected result
-            learning_rate: learning rate for the coefficient optimization
-            learning_rate_min: a constant rate added to the learning rate
-            classifier_weight_decay:
-            optimizer_weight_decay:
-            grad_clip:
         """
 
         self.batch_size = batch_size
@@ -405,10 +413,11 @@ class DARTSRegressor(BaseEstimator, RegressorMixin):
         self.darts_type = darts_type
         self.init_weights_function = init_weights_function
 
-        self.learning_rate = learning_rate
-        self.learning_rate_min = learning_rate_min
-        self.momentum = momentum
-        self.optimizer_weight_decay = optimizer_weight_decay
+        self.param_learning_rate_max = param_learning_rate_max
+        self.param_learning_rate_min = param_learning_rate_min
+        self.param_momentum = param_momentum
+        self.arch_momentum = arch_momentum
+        self.param_weight_decay = param_weight_decay
 
         self.param_updates_per_epoch = param_updates_per_epoch
 
@@ -416,7 +425,7 @@ class DARTSRegressor(BaseEstimator, RegressorMixin):
         self.arch_weight_decay = arch_weight_decay
         self.arch_weight_decay_df = arch_weight_decay_df
         self.arch_weight_decay_base = arch_weight_decay_base
-        self.arch_learning_rate = arch_learning_rate
+        self.arch_learning_rate_max = arch_learning_rate_max
         self.fair_darts_loss_weight = fair_darts_loss_weight
 
         self.max_epochs = max_epochs
@@ -432,6 +441,9 @@ class DARTSRegressor(BaseEstimator, RegressorMixin):
         self.network_: Optional[Network] = None
         self.model_: Optional[Network] = None
         self.model_sampler_: Optional[Callable[[SAMPLING_STRATEGIES], Network]] = None
+
+        self.train_classifier_coefficients = train_classifier_coefficients
+        self.train_classifier_bias = train_classifier_bias
 
     def fit(self, X: np.ndarray, y: np.ndarray):
         """
@@ -519,7 +531,7 @@ class DARTSRegressor(BaseEstimator, RegressorMixin):
             _,
             _,
             param_list,
-        ) = fitted_sampled_network.countParameters()
+        ) = fitted_sampled_network.count_parameters()
 
         assert self.X_ is not None
 
