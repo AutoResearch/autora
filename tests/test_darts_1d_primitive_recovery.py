@@ -213,7 +213,7 @@ def test_primitive_fitting_sigmoid():
         generate_x(-10, +10),
         transform_through_primitive_sigmoid,
         "sigmoid",
-        primitives=["none", "exp", "sigmoid"],
+        primitives=non_interchangeable_primitives,
     )
 
 
