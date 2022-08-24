@@ -2,6 +2,7 @@
 from typing import Callable, Sequence
 
 import numpy as np
+import pytest  # noqa:F401
 import torch.nn
 from matplotlib import pyplot as plt
 from skl.darts import DARTSRegressor
