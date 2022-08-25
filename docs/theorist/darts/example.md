@@ -35,11 +35,12 @@ We will use the DARTS Regresssor to predict the outcomes. There are a number of 
 
 - **num_graph_nodes**: The number of latent variables used to represent the model.
 - **arch_updates_per_epoch**: The number of architecture updates per training epoch. These updates affect the architecture weights $\alpha$ indicating the relative contribution of each operation for a given computation step.
+- **arch_learning_rate_max**: The initial learning rate of the architecture weight optimizier.
 - **param_updates_per_epoch**: The number of parameter updates per epoch. Once the architecture updates are complete, the parameters associated with each operation are updated.
+- **param_momentum**: The momentum of the parameter optimizier.
 - **max_epochs**: The maximum number of epochs to run DARTS.
 - **output_type**: The type of output to produce. In our case, we treat the outcome as a real variable, i.e., "real".
-- **momentum**: The momentum of the architecture weight optimizier.
-- **learning_rate**: The learning rate of the architecture weight optimizier.
+
 
 Let's set up the DARTS regressor with some default parameters.
 
@@ -49,11 +50,11 @@ from autora.skl.darts import DARTSRegressor
 darts_estimator = DARTSRegressor(
     num_graph_nodes=1,
     arch_updates_per_epoch=1,
+    arch_learning_rate_max=0.001,
     param_updates_per_epoch=500,
+    param_momentum=0.9,
     max_epochs=300,
     output_type="real",
-    momentum=0.9,
-    learning_rate=0.001,
     primitives=primitives,
 )
 ```

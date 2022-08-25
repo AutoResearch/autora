@@ -478,12 +478,14 @@ class DARTSRegressor(BaseEstimator, RegressorMixin):
         """
         Generates a new model based on a sample of the architecture weights
         (`sampling_strategy="sample"`) or the maximum architecture weights
-        (`sampling_strategy="max"`)
+        (`sampling_strategy="max"`). This also updates the `model_` parameter of the estimator.
+        To recover the default `model_`, run again with `sampling_strategy="max"`.
 
         Args:
-            sampling_strategy:
+            sampling_strategy: which strategy to use to select primitives on each model edge.
 
         Returns:
+            The network with primitives selected on each edge, based on the resampling strategy.
 
         """
         check_is_fitted(self, attributes=["model_sampler_"])

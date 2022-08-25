@@ -227,7 +227,7 @@ class Network(nn.Module):
             n_input_states: length of input vector (translates to number of input nodes)
             architecture_fixed: specifies whether the architecture weights shall remain fixed
             train_classifier_coefficients: specifies whether the classifier coefficients shall be
-            trained
+                trained
             train_classifier_bias: specifies whether the classifier bias shall be trained
             classifier_weight_decay: a weight decay applied to the classifier
             darts_type: variant of DARTS (regular or fair) that is applied for training
@@ -663,7 +663,9 @@ class Network(nn.Module):
             output_labels: list of strings representing the output states.
             output_function_label: string representing the output function.
             decimals_to_display: number of decimals to display.
-            latex: if set to true, the function will return the equations in latex format
+            output_format: if set to `"console"`, returns equations formatted for the command line,
+                if set to `"latex"`, returns equations in latex format
+
 
         Returns:
             list of strings representing the model

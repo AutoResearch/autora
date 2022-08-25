@@ -34,6 +34,7 @@ nav:
   - DARTS:
       - Introduction: 'theorist/darts/introduction.md'
       - How it works: 'theorist/darts/how_it_works.md'
+      - Meta parameters: 'theorist/darts/meta_parameters.md'
       - Search space: 'theorist/darts/search_space.md'
       - Example: 'theorist/darts/example.md'
 # rest of the navigation...
