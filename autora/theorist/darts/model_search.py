@@ -649,8 +649,8 @@ class Network(nn.Module):
 
     def architecture_to_str_list(
         self,
-        input_labels: List[str],
-        output_labels: List[str],
+        input_labels: Sequence[str],
+        output_labels: Sequence[str],
         output_function_label: str = "",
         decimals_to_display: int = 2,
         output_format: Literal["latex", "console"] = "console",
