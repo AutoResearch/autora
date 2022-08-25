@@ -695,7 +695,10 @@ class Network(nn.Module):
                 if j < len(input_labels):
                     u = input_labels[j]
                 else:
-                    u = str(j - len(input_labels))
+                    if output_format == "latex":
+                        u = "k_" + str(j - len(input_labels) + 1)
+                    else:
+                        u = "k" + str(j - len(input_labels))
                 if op != "none":
                     op_label = op
                     params = param_list[
@@ -711,7 +714,10 @@ class Network(nn.Module):
                     op_list.append(op)
                     edge_operations_list.append(op_label)
 
-            edge_str = ""
+            if len(edge_operations_list) == 0:
+                edge_str = v + " = 0"
+            else:
+                edge_str = ""
             for i, edge_operation in enumerate(edge_operations_list):
                 if i == 0:
                     edge_str += v + " = " + edge_operation
@@ -770,5 +776,8 @@ class Network(nn.Module):
                         classifier_str += ")"
 
         edge_list.append(classifier_str)
+
+        for edge in edge_list:
+            print(edge)
 
         return edge_list
