@@ -48,8 +48,8 @@ class BasicExecutionMonitor:
     def display(self):
         """
         A function to display the execution monitor. This function will generate two plots:
-        (1) A plot of the training loss vs. epoch.
-        (2) A plot of the architecture weights vs. epoch, divided into subplots by each edge
+        (1) A plot of the training loss vs. epoch,
+        (2) a plot of the architecture weights vs. epoch, divided into subplots by each edge
         in the mixture architecture.
         """
 
