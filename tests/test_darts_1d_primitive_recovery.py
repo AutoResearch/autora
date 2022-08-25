@@ -271,6 +271,3 @@ def test_primitive_fitting_tanh():
         "tanh",
         primitives=non_interchangeable_primitives,
     )
-
-
-test_primitive_fitting_sigmoid()
