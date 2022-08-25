@@ -3,7 +3,7 @@ import logging
 from dataclasses import dataclass
 from functools import partial
 from itertools import cycle
-from typing import Callable, Iterator, Literal, Optional, Sequence
+from typing import Callable, Iterator, Literal, Optional, Sequence, Tuple
 
 import numpy as np
 import torch
@@ -61,13 +61,13 @@ def _general_darts(
     classifier_weight_decay: float = 1e-2,
     darts_type: IMPLEMENTED_DARTS_TYPES = "original",
     init_weights_function: Optional[Callable] = None,
+    param_updates_per_epoch: int = 20,
     param_learning_rate_max: float = 2.5e-2,
     param_learning_rate_min: float = 0.01,
     param_momentum: float = 9e-1,
     param_weight_decay: float = 3e-4,
-    param_updates_per_epoch: int = 20,
-    arch_learning_rate_max: float = 3e-3,
     arch_updates_per_epoch: int = 20,
+    arch_learning_rate_max: float = 3e-3,
     arch_weight_decay: float = 1e-4,
     arch_weight_decay_df: float = 3e-4,
     arch_weight_decay_base: float = 0.0,
@@ -82,6 +82,42 @@ def _general_darts(
 ) -> _DARTSResult:
     """
     Function to implement the DARTS optimization, given a fixed architecture and input data.
+
+    Arguments:
+        X: Input data.
+        y: Target data.
+        batch_size: Batch size for the data loader.
+        num_graph_nodes: Number of nodes in the desired computation graph.
+        output_type: Type of output function to use. This function is applied to transform
+        the output of the mixture architecture.
+        classifier_weight_decay: Weight decay for the classifier.
+        darts_type: Type of DARTS to use ('original' or 'fair').
+        init_weights_function: Function to initialize the parameters of each operation.
+        param_learning_rate_max: Initial (maximum) learning rate for the operation parameters.
+        param_learning_rate_min: Final (minimum) learning rate for the operation parameters.
+        param_momentum: Momentum for the operation parameters.
+        param_weight_decay: Weight decay for the operation parameters.
+        param_updates_per_epoch: Number of updates to perform per epoch.
+        for the operation parameters.
+        arch_learning_rate_max: Initial (maximum) learning rate for the architecture.
+        arch_updates_per_epoch: Number of architecture weight updates to perform per epoch.
+        arch_weight_decay: Weight decay for the architecture weights.
+        arch_weight_decay_df: An additional weight decay that scales with the number of parameters
+        (degrees of freedom) in the operation. The higher this weight decay, the more DARTS will
+        prefer simple operations.
+        arch_weight_decay_base: A base weight decay that is added to the scaled weight decay.
+        arch_momentum: Momentum for the architecture weights.
+        fair_darts_loss_weight: Weight of the loss in fair darts which forces architecture weights
+        to become either 0 or 1.
+        max_epochs: Maximum number of epochs to train for.
+        grad_clip: Gradient clipping value for updating the parameters of the operations.
+        primitives: List of primitives (operations) to use.
+        train_classifier_coefficients: Whether to train the coefficients of the classifier.
+        train_classifier_bias: Whether to train the bias of the classifier.
+        execution_monitor: Function to monitor the execution of the model.
+
+    Returns:
+        A _DARTSResult object containing the fitted model and the network architecture.
     """
 
     _logger.info("Starting fit initialization")
@@ -209,6 +245,15 @@ def _optimize_coefficients(
     Function to optimize the coefficients of a DARTS Network.
 
     Warning: This modifies the coefficients of the Network in place.
+
+    Arguments:
+        network: The DARTS Network to optimize the coefficients of.
+        criterion: The loss function to use.
+        data_loader: The data loader to use for the optimization.
+        grad_clip: Whether to clip the gradients.
+        optimizer: The optimizer to use for the optimization.
+        param_updates_per_epoch: The number of parameter updates to perform per epoch.
+        scheduler: The scheduler to use for the optimization.
     """
 
     data_iterator = _get_data_iterator(data_loader)
@@ -254,7 +299,16 @@ def _get_data_loader(
     y: np.ndarray,
     batch_size: int,
 ) -> torch.utils.data.DataLoader:
-    """Construct a minimal torch.utils.data.DataLoader for the input data."""
+    """Construct a minimal torch.utils.data.DataLoader for the input data.
+
+    Arguments:
+        X: The input data.
+        y: The target data.
+        batch_size: The batch size to use.
+
+    Returns:
+        A torch.utils.data.DataLoader for the input data.
+    """
 
     X_, y_ = check_X_y(X, y, ensure_2d=True, multi_output=True)
 
@@ -277,11 +331,31 @@ def _get_data_loader(
 
 
 def _get_data_iterator(data_loader: torch.utils.data.DataLoader) -> Iterator:
+    """Get an iterator for the data loader.
+
+    Arguments:
+        data_loader: The data loader to get the iterator for.
+
+    Returns:
+        An iterator for the data loader.
+    """
     data_iterator = cycle(iter(data_loader))
     return data_iterator
 
 
-def _get_next_input_target(data_iterator: Iterator, criterion: torch.nn.Module):
+def _get_next_input_target(
+    data_iterator: Iterator, criterion: torch.nn.Module
+) -> Tuple[torch.Tensor, torch.Tensor]:
+    """
+    Get the next input and target from the data iterator.
+    Args:
+        data_iterator: The data iterator to get the next input and target from.
+        criterion: The loss function to use.
+
+    Returns:
+        The next input and target from the data iterator.
+
+    """
     input_search, target_search = next(data_iterator)
 
     input_var = torch.autograd.Variable(input_search, requires_grad=False)
@@ -298,7 +372,20 @@ def _generate_model(
     network: Network,
     coefficient_optimizer: Callable[[Network], None],
     output_function: torch.nn.Module,
-):
+) -> Callable:
+    """
+    Generate a model architecture from mixed DARTS model.
+
+    Arguments:
+        sampling_strategy: The sampling strategy used to pick the operations
+        based on the trained architecture weights (e.g. "max", "sample").
+        network: The mixed DARTS model.
+        coefficient_optimizer: The function to optimize the coefficients of the trained model
+        output_function: The output function that is applied to the output of the sampeld model.
+
+    Returns:
+        A model architecture that is a combination of the trained model and the output function.
+    """
 
     # Set edges in the network with the highest weights to 1, others to 0
     model_without_output_function = copy.deepcopy(network)
@@ -361,14 +448,15 @@ class DARTSRegressor(BaseEstimator, RegressorMixin):
         self,
         batch_size: int = 64,
         num_graph_nodes: int = 2,
+        output_type: IMPLEMENTED_OUTPUT_TYPES = "real",
         classifier_weight_decay: float = 1e-2,
         darts_type: IMPLEMENTED_DARTS_TYPES = "original",
         init_weights_function: Optional[Callable] = None,
+        param_updates_per_epoch: int = 10,
         param_learning_rate_max: float = 2.5e-2,
         param_learning_rate_min: float = 0.01,
         param_momentum: float = 9e-1,
         param_weight_decay: float = 3e-4,
-        param_updates_per_epoch: int = 10,
         arch_updates_per_epoch: int = 1,
         arch_learning_rate_max: float = 3e-3,
         arch_weight_decay: float = 1e-4,
@@ -378,7 +466,6 @@ class DARTSRegressor(BaseEstimator, RegressorMixin):
         fair_darts_loss_weight: int = 1,
         max_epochs: int = 10,
         grad_clip: float = 5,
-        output_type: IMPLEMENTED_OUTPUT_TYPES = "real",
         primitives: Sequence[str] = PRIMITIVES,
         train_classifier_coefficients: bool = False,
         train_classifier_bias: bool = False,
@@ -386,25 +473,35 @@ class DARTSRegressor(BaseEstimator, RegressorMixin):
     ) -> None:
         """
         Arguments:
-            batch_size: number of observations to be used per update
-            num_graph_nodes: number of intermediate nodes in the DARTS graph.
-            classifier_weight_decay:
-            darts_type:
-            init_weights_function:
-            param_learning_rate_max:
-            param_learning_rate_min:
-            param_momentum:
-            arch_momentum:
-            param_weight_decay:
-            param_updates_per_epoch:
-            arch_updates_per_epoch:
-            arch_weight_decay:
-            arch_weight_decay_df:
-            arch_weight_decay_base:
-            arch_learning_rate_max:
-            fair_darts_loss_weight:
-            max_epochs:
-            grad_clip:
+        batch_size: Batch size for the data loader.
+        num_graph_nodes: Number of nodes in the desired computation graph.
+        output_type: Type of output function to use. This function is applied to transform
+        the output of the mixture architecture.
+        classifier_weight_decay: Weight decay for the classifier.
+        darts_type: Type of DARTS to use ('original' or 'fair').
+        init_weights_function: Function to initialize the parameters of each operation.
+        param_updates_per_epoch: Number of updates to perform per epoch.
+        for the operation parameters.
+        param_learning_rate_max: Initial (maximum) learning rate for the operation parameters.
+        param_learning_rate_min: Final (minimum) learning rate for the operation parameters.
+        param_momentum: Momentum for the operation parameters.
+        param_weight_decay: Weight decay for the operation parameters.
+        arch_updates_per_epoch: Number of architecture weight updates to perform per epoch.
+        arch_learning_rate_max: Initial (maximum) learning rate for the architecture.
+        arch_weight_decay: Weight decay for the architecture weights.
+        arch_weight_decay_df: An additional weight decay that scales with the number of parameters
+        (degrees of freedom) in the operation. The higher this weight decay, the more DARTS will
+        prefer simple operations.
+        arch_weight_decay_base: A base weight decay that is added to the scaled weight decay.
+        arch_momentum: Momentum for the architecture weights.
+        fair_darts_loss_weight: Weight of the loss in fair darts which forces architecture weights
+        to become either 0 or 1.
+        max_epochs: Maximum number of epochs to train for.
+        grad_clip: Gradient clipping value for updating the parameters of the operations.
+        primitives: List of primitives (operations) to use.
+        train_classifier_coefficients: Whether to train the coefficients of the classifier.
+        train_classifier_bias: Whether to train the bias of the classifier.
+        execution_monitor: Function to monitor the execution of the model.
             primitives: list of primitive operations used in the DARTS network,
                 e.g., 'add', 'subtract', 'none'. For details, see
                 [`autora.theorist.darts.operations`][autora.theorist.darts.operations]
@@ -573,12 +670,39 @@ class DARTSRegressor(BaseEstimator, RegressorMixin):
         return graph
 
     def _get_input_labels(self):
+        """
+        Returns the input labels for the model.
+
+        Returns:
+            input_labels: labels for the input nodes
+
+        """
         return self._get_labels(self.X_, "x")
 
     def _get_output_labels(self):
+        """
+        Returns the output labels for the model.
+
+        Returns:
+            output_labels: labels for the output nodes
+
+        """
         return self._get_labels(self.y_, "y")
 
-    def _get_labels(self, data, default_label):
+    def _get_labels(
+        self, data: Optional[np.ndarray], default_label: str
+    ) -> Sequence[str]:
+        """
+        Returns the labels for the model.
+
+        Arguments:
+            data: data to get labels for
+            default_label: default label to use if no labels are provided
+
+        Returns:
+            labels: labels for the model
+
+        """
         assert data is not None
 
         if hasattr(data, "columns"):
@@ -596,7 +720,7 @@ class DARTSRegressor(BaseEstimator, RegressorMixin):
         output_function_label: str = "",
         decimals_to_display: int = 2,
         output_format: Literal["latex", "console"] = "console",
-    ):
+    ) -> str:
         """
         Prints the equations of the model architecture
 
@@ -609,6 +733,7 @@ class DARTSRegressor(BaseEstimator, RegressorMixin):
                 the command line (`console`) or as equations in a latex file (`latex`)
 
         Returns:
+            The equations of the model architecture
 
         """
         assert self.model_ is not None
