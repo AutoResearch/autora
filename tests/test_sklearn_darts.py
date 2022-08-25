@@ -66,6 +66,23 @@ def test_enum_string_inputs():
         DARTSRegressor(output_type=ValueType.CLASS, **kwargs).fit(X, y)
 
 
+def test_model_repr():
+
+    X, y, const, epsilon = generate_noisy_constant_data()
+
+    kwargs = dict(
+        max_epochs=1,
+        arch_updates_per_epoch=1,
+        param_updates_per_epoch=1,
+    )
+
+    print(DARTSRegressor(num_graph_nodes=1, **kwargs).fit(X, y).model_repr())
+    print(DARTSRegressor(num_graph_nodes=2, **kwargs).fit(X, y).model_repr())
+    print(DARTSRegressor(num_graph_nodes=4, **kwargs).fit(X, y).model_repr())
+    print(DARTSRegressor(num_graph_nodes=8, **kwargs).fit(X, y).model_repr())
+    print(DARTSRegressor(num_graph_nodes=16, **kwargs).fit(X, y).model_repr())
+
+
 def test_primitive_selection():
     X, y, const, epsilon = generate_noisy_constant_data()
 
