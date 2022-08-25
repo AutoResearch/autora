@@ -1,4 +1,5 @@
 from abc import abstractmethod
+from typing import Sequence
 
 from tinkerforge.bricklet_industrial_analog_out_v2 import BrickletIndustrialAnalogOutV2
 from tinkerforge.bricklet_industrial_dual_0_20ma_v2 import BrickletIndustrialDual020mAV2
@@ -6,11 +7,15 @@ from tinkerforge.bricklet_industrial_dual_analog_in_v2 import (
     BrickletIndustrialDualAnalogInV2,
 )
 from tinkerforge.ip_connection import IPConnection
+from variable import ValueType
 
 from autora.variable import DV, IV, Variable, register_dv_label, register_iv_label
 
 
 class TinkerforgeVariable(Variable):
+    """
+    A representation of a variable used in the Tinkerforge environment.
+    """
 
     _variable_label = ""
     _UID = ""
@@ -18,14 +23,25 @@ class TinkerforgeVariable(Variable):
 
     def __init__(
         self,
-        variable_label="",
-        UID="",
-        name="",
-        units="",
-        priority="",
-        value_range=(0, 1),
-        type=float,
+        variable_label: str = "",
+        UID: str = "",
+        name: str = "",
+        units: str = "",
+        priority: int = 0,
+        value_range: Sequence = (0, 1),
+        type: ValueType = float,
     ):
+        """
+        Initializes a Tinkerforge variable.
+        Args:
+            variable_label: the label of the variable
+            UID: the user identification of the variable
+            name: the name of the variable
+            units: the units of the variable
+            priority: the priority of the variable
+            value_range: the value range of the variable
+            type: the type of the variable
+        """
 
         super().__init__(
             name=name,
@@ -38,14 +54,24 @@ class TinkerforgeVariable(Variable):
         self._UID = UID
         self._priority = priority
 
-    # Get priority of variable.
-    # The priority is used to determine the sequence of variables to be measured or manipulated.
-    def __get_priority__(self):
+    def __get_priority__(self) -> int:
+        """
+        Get priority of variable. The priority is used to determine the sequence of variables
+        to be measured or manipulated.
+
+        Returns:
+            The priority of the variable.
+        """
         return self._priority
 
-    # Set priority of variable.
-    # The priority is used to determine the sequence of variables to be measured or manipulated.
-    def __set_priority__(self, priority):
+    def __set_priority__(self, priority: int = 0):
+        """
+        Set priority of variable.
+        The priority is used to determine the sequence of variables to be measured or manipulated.
+
+        Arguments:
+            priority: The priority of the variable.
+        """
         self._priority = priority
 
     @abstractmethod
@@ -60,18 +86,42 @@ class TinkerforgeVariable(Variable):
 
 
 class IVTF(IV, TinkerforgeVariable):
+    """
+    A representation of an independent variable used in the Tinkerforge environment.
+    """
+
     def __init__(self, *args, **kwargs):
+        """
+        Initializes an independent variable used in the Tinkerforge environment.
+        Args:
+            *args: arguments
+            **kwargs: keyword arguments
+        """
         IV.__init__(self, *args, **kwargs)
         TinkerforgeVariable.__init__(self, *args, **kwargs)
 
 
 class DVTF(DV, TinkerforgeVariable):
+    """
+    A representation of a dependent variable used in the Tinkerforge environment.
+    """
+
     def __init__(self, *args, **kwargs):
+        """
+        Initializes a dependent variable used in the Tinkerforge environment.
+
+        Arguments:
+            *args: arguments
+            **kwargs: keyword arguments
+        """
         DV.__init__(self, *args, **kwargs)
         TinkerforgeVariable.__init__(self, *args, **kwargs)
 
 
 class IVCurrent(IVTF):
+    """
+    An independent tinkerforge variable representing the current.
+    """
 
     _name = "source_current"
     _UID = "MST"
@@ -84,8 +134,14 @@ class IVCurrent(IVTF):
     _HOST = "localhost"
     _PORT = 4223
 
-    # Initializes Industrial Analog Out 2.0 device.
     def __init__(self, *args, **kwargs):
+        """
+        Initializes Industrial Analog Out 2.0 device.
+
+        Arguments:
+            *args: arguments
+            **kwargs: keyword arguments
+        """
 
         self._ipcon = IPConnection()  # Create IP connection
         self._iao = BrickletIndustrialAnalogOutV2(
@@ -96,27 +152,40 @@ class IVCurrent(IVTF):
 
         super(IVCurrent, self).__init__(*args, **kwargs)
 
-    # Clean up measurement device.
     def disconnect(self):
+        """
+        Disconnect from up measurement device.
+        """
 
         self._iao.set_enabled(False)
 
         self._ipcon.disconnect()
 
-    # Disable voltage output
     def stop(self):
+        """
+        Disable current output
+        """
+
         self._iao.set_enabled(False)
 
-    # Waits until specified time has passed relative to reference time
     def manipulate(self):
+        """
+        Sets the current output to the specified value.
+        """
         self._iao.set_current(self.get_value())
         self._iao.set_enabled(True)
 
     def clean_up(self):
+        """
+        Clean up measurement device.
+        """
         self.stop()
 
 
 class IVVoltage(IVTF):
+    """
+    An independent tinkerforge variable representing the voltage.
+    """
 
     _variable_label = "Source Voltage"
     _UID = "MST"
@@ -129,8 +198,10 @@ class IVVoltage(IVTF):
     _HOST = "localhost"
     _PORT = 4223
 
-    # Initializes Industrial Analog Out 2.0 device.
     def __init__(self, *args, **kwargs):
+        """
+        Initializes Industrial Analog Out 2.0 device.
+        """
 
         self._ipcon = IPConnection()  # Create IP connection
         self._iao = BrickletIndustrialAnalogOutV2(
@@ -141,27 +212,39 @@ class IVVoltage(IVTF):
 
         super(IVVoltage, self).__init__(*args, **kwargs)
 
-    # Clean up measurement device.
     def disconnect(self):
+        """
+        Disconnect from up measurement device.
+        """
 
         self._iao.set_enabled(False)
 
         self._ipcon.disconnect()
 
-    # Disable voltage output
     def stop(self):
+        """
+        Disable voltage output
+        """
         self._iao.set_enabled(False)
 
-    # Waits until specified time has passed relative to reference time
     def manipulate(self):
+        """
+        Sets the voltage output to the specified value.
+        """
         self._iao.set_voltage(self.get_value())
         self._iao.set_enabled(True)
 
     def clean_up(self):
+        """
+        Clean up measurement device.
+        """
         self.stop()
 
 
 class DVCurrent(DVTF):
+    """
+    A dependent tinkerforge variable representing the current.
+    """
 
     _name = "current0"
     _UID = "Hfg"
@@ -175,8 +258,13 @@ class DVCurrent(DVTF):
     _PORT = 4223
     channel = 0
 
-    # Initializes Industrial Analog Out 2.0 device.
     def __init__(self, *args, **kwargs):
+        """
+        Initializes Industrial Analog Out 2.0 device.
+        Args:
+            *args: arguments
+            **kwargs: keyword arguments
+        """
 
         super(DVCurrent, self).__init__(*args, **kwargs)
 
@@ -192,18 +280,25 @@ class DVCurrent(DVTF):
         else:
             self.channel = 0
 
-    # Clean up measurement device.
     def disconnect(self):
+        """
+        Disconnect from up measurement device.
+        """
 
         self._ipcon.disconnect()
 
-    # Waits until specified time has passed relative to reference time
     def measure(self):
+        """
+        Measures the current.
+        """
         current = self._id020.get_current(self.channel)
         self.set_value(current / 1000000.0)
 
 
 class DVVoltage(DVTF):
+    """
+    A dependent tinkerforge variable representing the voltage.
+    """
 
     _name = "voltage0"
     _UID = "MjY"
@@ -218,8 +313,14 @@ class DVVoltage(DVTF):
 
     channel = 0
 
-    # Initializes Industrial Analog Out 2.0 device.
     def __init__(self, *args, **kwargs):
+        """
+        Initializes Industrial Analog Out 2.0 device.
+
+        Args:
+            *args: arguments
+            **kwargs: keyword arguments
+        """
 
         super(DVVoltage, self).__init__(*args, **kwargs)
 
@@ -235,12 +336,16 @@ class DVVoltage(DVTF):
         else:
             self.channel = 0
 
-    # Clean up measurement device.
     def disconnect(self):
+        """
+        Disconnect from up measurement device.
+        """
         self._ipcon.disconnect()
 
-    # Waits until specified time has passed relative to reference time
     def measure(self):
+        """
+        Measures the voltage.
+        """
         value = self._idai.get_voltage(self.channel)
         self.set_value(value)
 
