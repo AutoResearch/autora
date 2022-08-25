@@ -3,7 +3,7 @@ import logging
 from dataclasses import dataclass
 from functools import partial
 from itertools import cycle
-from typing import Callable, Iterator, Literal, Optional, Sequence
+from typing import Callable, Iterator, List, Literal, Optional, Sequence
 
 import numpy as np
 import torch
@@ -523,6 +523,13 @@ class DARTSRegressor(BaseEstimator, RegressorMixin):
         self,
         input_labels: Optional[Sequence[str]] = None,
     ):
+        """
+        Visualizes the model architecture as a graph.
+
+        Arguments:
+            input_labels: labels for the input nodes
+
+        """
         assert self.model_ is not None
         fitted_sampled_network = self.model_[0]
 
@@ -559,3 +566,34 @@ class DARTSRegressor(BaseEstimator, RegressorMixin):
         )
 
         return graph
+
+    def print_model(
+        self,
+        input_labels: List[str],
+        output_labels: List[str],
+        output_function_label: str = "",
+        decimals_to_display: int = 2,
+        output_format: Literal["latex", "console"] = "console",
+    ):
+        """
+        Prints the equations of the model architecture
+        Args:
+            input_labels:
+
+        Returns:
+
+        """
+        assert self.model_ is not None
+        fitted_sampled_network = self.model_[0]
+
+        edge_list = fitted_sampled_network.architecture_to_str_list(
+            input_labels=input_labels,
+            output_labels=output_labels,
+            output_function_label=output_function_label,
+            decimals_to_display=decimals_to_display,
+            output_format=output_format,
+        )
+
+        print("Model:")
+        for edge in edge_list:
+            print(edge)

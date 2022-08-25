@@ -651,7 +651,7 @@ class Network(nn.Module):
         self,
         input_labels: List[str],
         output_labels: List[str],
-        out_fnc: str = "Fnc",
+        output_function_label: str = "",
         decimals_to_display: int = 2,
         output_format: Literal["latex", "console"] = "console",
     ) -> List:
@@ -661,14 +661,14 @@ class Network(nn.Module):
         Arguments:
             input_labels: list of strings representing the input states.
             output_labels: list of strings representing the output states.
-            out_fnc: string representing the output function.
+            output_function_label: string representing the output function.
             decimals_to_display: number of decimals to display.
             latex: if set to true, the function will return the equations in latex format
 
         Returns:
             list of strings representing the model
         """
-        (n_params_total, n_params_base, param_list) = self.countParameters(
+        (n_params_total, n_params_base, param_list) = self.count_parameters(
             print_parameters=False
         )
         genotype = self.genotype().normal
@@ -730,9 +730,13 @@ class Network(nn.Module):
 
         # TODO: extend to multiple outputs
         if output_format == "latex":
-            classifier_str = output_labels[0] + " = " + out_fnc + "\\left("
+            classifier_str = output_labels[0] + " = " + output_function_label
+            if output_function_label != "":
+                classifier_str += "\\left("
         else:
-            classifier_str = output_labels[0] + " = " + out_fnc + "("
+            classifier_str = output_labels[0] + " = " + output_function_label
+            if output_function_label != "":
+                classifier_str += "("
 
         bias = None
         for i in range(steps):
@@ -759,10 +763,11 @@ class Network(nn.Module):
                 classifier_str += " + " + str(bias[0])
 
             if i == steps - 1:
-                if output_format == "latex":
-                    classifier_str += "\\right)"
-                else:
-                    classifier_str += ")"
+                if output_function_label != "":
+                    if output_format == "latex":
+                        classifier_str += "\\right)"
+                    else:
+                        classifier_str += ")"
 
         edge_list.append(classifier_str)
 
