@@ -27,7 +27,7 @@ Some of the primitives above may also be preceded by a linear transformation, al
 
 Note that the following functions are available but currently not identifiable by DARTS (<font color="red">please use the following functions with caution</font>):
 
-- **1/x**: The output of the computation $x_j$ is the multiplicative inverse of its input $x_i$: $x_j = \frac{1}{x_i}$.
+- **reciprocal**: The output of the computation $x_j$ is the multiplicative inverse of its input $x_i$: $x_j = \frac{1}{x_i}$.
 - **ln**: The output of the computation $x_j$ is the natural logaritm of its input $x_i$: $x_j = \ln(x_i)$.
 - **softplus**: The output of the computation $x_j$ is a softplus function of its input $x_i$: $x_j = \log(1 + \exp(a * x_i)) / a$.
 - **softminus**: The output of the computation $x_j$ is a softminus function of its input $x_i$: $x_j = x_j - \log(1 + \exp(a * x_i)) / a$.
