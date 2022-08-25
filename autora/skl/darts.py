@@ -91,6 +91,7 @@ def _general_darts(
         y=y,
         batch_size=batch_size,
     )
+    data_iterator = _get_data_iterator(data_loader)
 
     criterion = get_loss_function(ValueType(output_type))
     output_function = get_output_format(ValueType(output_type))
@@ -151,9 +152,6 @@ def _general_darts(
         _logger.debug(f"Running fit, epoch {epoch}")
 
         # Do the Architecture update
-
-        # First reset the data iterator
-        data_iterator = _get_data_iterator(data_loader)
 
         # Then run the arch optimization
         for arch_step in range(arch_updates_per_epoch):
