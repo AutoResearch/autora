@@ -4,18 +4,30 @@ from autora.variable import DV, IV, register_dv_label, register_iv_label
 
 
 class VTime:
+    """
+    A class representing time as a general experimental variable.
+    """
 
     _t0 = 0
 
     def __init__(self):
+        """
+        Initializes the time.
+        """
         self._t0 = time.time()
 
     # Resets reference time.
     def reset(self):
+        """
+        Resets the time.
+        """
         self._t0 = time.time()
 
 
 class IVTime(IV, VTime):
+    """
+    A class representing time as an independent variable.
+    """
 
     _name = "time_IV"
     _UID = ""
@@ -28,10 +40,19 @@ class IVTime(IV, VTime):
     # Initializes reference time.
     # The reference time usually denotes the beginning of an experiment trial.
     def __init__(self, *args, **kwargs):
+        """
+        Initializes the time as independent variable.
+        Args:
+            *args: arguments
+            **kwargs: keyword arguments
+        """
         super(IVTime, self).__init__(*args, **kwargs)
 
     # Waits until specified time has passed relative to reference time
     def manipulate(self):
+        """
+        Waits for the specified time to pass.
+        """
 
         t_wait = self.get_value() - (time.time() - self._t0)
         if t_wait <= 0:
@@ -40,10 +61,16 @@ class IVTime(IV, VTime):
             time.sleep(t_wait)
 
     def disconnect(self):
+        """
+        Disconnects the time.
+        """
         pass
 
 
 class DVTime(DV, VTime):
+    """
+    A class representing time as a dependent variable.
+    """
 
     _name = "time_DV"
     _UID = ""
@@ -58,13 +85,22 @@ class DVTime(DV, VTime):
     # Initializes reference time.
     # The reference time usually denotes the beginning of an experiment trial.
     def __init__(self, *args, **kwargs):
+        """
+        Initializes the time as dependent variable. The reference time usually denotes
+        the beginning of an experiment trial.
+        Args:
+            *args: arguments
+            **kwargs: keyword arguments
+        """
         print(self._variable_label)
         super(DVTime, self).__init__(*args, **kwargs)
         print(self._variable_label)
 
     # Measure number of seconds relative to reference time
     def measure(self):
-
+        """
+        Measures the time in seconds relative to the reference time.
+        """
         value = time.time() - self._t0
         self.set_value(value)
 
