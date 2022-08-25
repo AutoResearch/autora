@@ -581,7 +581,7 @@ class DARTSRegressor(BaseEstimator, RegressorMixin):
             labels_ = tuple(f"{default_label}{i}" for i in range(dim))
         return labels_
 
-    def print(
+    def model_repr(
         self,
         input_labels: Optional[Sequence[str]] = None,
         output_labels: Optional[Sequence[str]] = None,
@@ -618,6 +618,5 @@ class DARTSRegressor(BaseEstimator, RegressorMixin):
             output_format=output_format,
         )
 
-        print("Model:")
-        for edge in edge_list:
-            print(edge)
+        model_repr_ = "\n".join(["Model:"] + edge_list)
+        return model_repr_
