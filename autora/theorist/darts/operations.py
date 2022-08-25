@@ -239,6 +239,10 @@ def get_operation_label(
 class Identity(nn.Module):
     """
     A pytorch module implementing the identity function.
+
+    $$
+    x = x
+    $$
     """
 
     def __init__(self):
@@ -260,6 +264,10 @@ class Identity(nn.Module):
 class NegIdentity(nn.Module):
     """
     A pytorch module implementing the inverse of an identity function.
+
+    $$
+    x = -x
+    $$
     """
 
     def __init__(self):
@@ -281,6 +289,10 @@ class NegIdentity(nn.Module):
 class Exponential(nn.Module):
     """
     A pytorch module implementing the exponential function.
+
+    $$
+    x = e^x
+    $$
     """
 
     def __init__(self):
@@ -300,19 +312,23 @@ class Exponential(nn.Module):
 
 
 class Cosine(nn.Module):
-    """
-    A pytorch module implementing the exponential function.
+    r"""
+    A pytorch module implementing the cosine function.
+
+    $$
+    x = \cos(x)
+    $$
     """
 
     def __init__(self):
         """
-        Initializes the exponential function.
+        Initializes the cosine function.
         """
         super(Cosine, self).__init__()
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
-        Forward pass of the exponential function.
+        Forward pass of the cosine function.
 
         Arguments:
             x: input tensor
@@ -321,19 +337,23 @@ class Cosine(nn.Module):
 
 
 class Sine(nn.Module):
-    """
-    A pytorch module implementing the exponential function.
+    r"""
+    A pytorch module implementing the sine function.
+
+    $$
+    x = \sin(x)
+    $$
     """
 
     def __init__(self):
         """
-        Initializes the exponential function.
+        Initializes the sine function.
         """
         super(Sine, self).__init__()
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
-        Forward pass of the exponential function.
+        Forward pass of the sine function.
 
         Arguments:
             x: input tensor
@@ -342,19 +362,23 @@ class Sine(nn.Module):
 
 
 class Tangens_Hyperbolicus(nn.Module):
-    """
-    A pytorch module implementing the exponential function.
+    r"""
+    A pytorch module implementing the tangens hyperbolicus function.
+
+    $$
+    x = \tanh(x)
+    $$
     """
 
     def __init__(self):
         """
-        Initializes the exponential function.
+        Initializes the tangens hyperbolicus function.
         """
         super(Tangens_Hyperbolicus, self).__init__()
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
-        Forward pass of the exponential function.
+        Forward pass of the tangens hyperbolicus function.
 
         Arguments:
             x: input tensor
@@ -363,8 +387,13 @@ class Tangens_Hyperbolicus(nn.Module):
 
 
 class NatLogarithm(nn.Module):
-    """
+    r"""
     A pytorch module implementing the natural logarithm function.
+
+    $$
+    x = \ln(x)
+    $$
+
     """
 
     def __init__(self):
@@ -392,8 +421,12 @@ class NatLogarithm(nn.Module):
 
 
 class MultInverse(nn.Module):
-    """
+    r"""
     A pytorch module implementing the multiplicative inverse.
+
+    $$
+    x = \frac{1}{x}
+    $$
     """
 
     def __init__(self):
@@ -416,6 +449,10 @@ class Zero(nn.Module):
     """
     A pytorch module implementing the zero operation (i.e., a null operation). A zero operation
     presumes that there is no relationship between the input and output.
+
+    $$
+    x = 0
+    $$
     """
 
     def __init__(self, stride):
@@ -472,7 +509,7 @@ class Softplus(nn.Module):
 
 class Softminus(nn.Module):
     """
-    A pytorch module implementing the softminus function: Softminus(x) = x- log(1+exp(β∗x)).
+    A pytorch module implementing the softminus function:
 
     $$
     \\operatorname{Softminus}(x) = x - \\operatorname{log} \\left( 1 + e^{β x} \\right)
