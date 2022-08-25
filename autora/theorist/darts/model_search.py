@@ -21,7 +21,7 @@ from autora.theorist.darts.operations import (
 
 class DARTSType(str, Enum):
     """
-    Enumerator class that indexes different variants of DARTS.
+    Enumerator that indexes different variants of DARTS.
     """
 
     # Liu, Simonyan & Yang (2018). Darts: Differentiable architecture search

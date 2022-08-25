@@ -7,7 +7,7 @@ from torch.utils.data import Dataset
 
 class DARTSDataset(Dataset):
     """
-    A class that represents the dataset for the DARTS algorithm.
+    A dataset for the DARTS algorithm.
     """
 
     def __init__(self, input_data: torch.tensor, output_data: torch.tensor):

@@ -21,8 +21,8 @@ def _concat(xs) -> torch.Tensor:
 
 class Architect(object):
     """
-    A class representing a learner operating on the architecture weights of a DARTS model.
-    This class handles training the weights associated with mixture operations
+    A learner operating on the architecture weights of a DARTS model.
+    This learner handles training the weights associated with mixture operations
     (architecture weights).
     """
 

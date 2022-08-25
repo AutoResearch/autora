@@ -7,7 +7,7 @@ import skl.darts
 
 class BasicExecutionMonitor:
     """
-    A class to monitor the execution of the DARTS algorithm.
+    A monitor of the execution of the DARTS algorithm.
     """
 
     def __init__(self):

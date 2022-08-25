@@ -279,6 +279,8 @@ class VariableCollection:
 
 
 class IV(Variable):
+    """Independent variable."""
+
     def __init__(self, *args, **kwargs):
         """
         Initialize independent variable.
@@ -300,6 +302,8 @@ class IV(Variable):
 
 
 class DV(Variable):
+    """Dependent variable."""
+
     def __init__(self, *args, **kwargs):
         """
         Initialize dependent variable.
@@ -340,6 +344,10 @@ class DV(Variable):
 
 
 class IVInSilico(IV):
+    """
+    Independent variable in silico.
+    """
+
     _variable_label = "IV"
     _name = "independent variable"
     _units = "activation"
@@ -364,6 +372,10 @@ class IVInSilico(IV):
 
 
 class DVInSilico(DV):
+    """
+    Dependent variable in silico.
+    """
+
     _variable_label = "DV"
     _name = "dependent variable"
     _units = "activation"
@@ -389,6 +401,9 @@ class DVInSilico(DV):
 
 
 class IVTrial(IV):
+    """
+    Experiment trial as independent variable.
+    """
 
     _name = "trial"
     _UID = ""
