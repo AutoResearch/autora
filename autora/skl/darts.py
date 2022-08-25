@@ -567,7 +567,7 @@ class DARTSRegressor(BaseEstimator, RegressorMixin):
 
         return graph
 
-    def print_model(
+    def print(
         self,
         input_labels: List[str],
         output_labels: List[str],
