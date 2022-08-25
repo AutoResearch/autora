@@ -169,7 +169,7 @@ def _general_darts(
             architect.step(
                 input_valid=X_batch,
                 target_valid=y_batch,
-                network_optimizer=optimizer,
+                network_optimizer=architect.optimizer,
                 unrolled=False,
             )
 
