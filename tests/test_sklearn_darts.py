@@ -126,30 +126,63 @@ def test_primitive_selection():
 
 
 def test_fit_with_fixed_architecture():
-    X, y, const, gradient, epsilon = generate_noisy_linear_data()
+    X, y, _, _, _ = generate_noisy_linear_data(const=1.0, gradient=2.0)
+    X1, y1, _, _, _ = generate_noisy_linear_data(const=10.0, gradient=5.0)
 
+    # Initialize the fitter
     regressor = DARTSRegressor(
         primitives=["none", "linear"],
         num_graph_nodes=1,
+    )
+
+    # First fit: normal fitting
+    regressor.set_params(
         max_epochs=100,
         arch_updates_per_epoch=1,
-        param_updates_per_epoch=2,
+        param_updates_per_epoch=1000,
     )
     regressor.fit(X, y)
     network_weights_initial = deepcopy(regressor.network_.alphas_normal)
     equation_initial = regressor.model_repr()
-    print(equation_initial)
 
+    # Refit by setting epochs to one and arch updates to zero, and fit some different data
     regressor.set_params(
         max_epochs=1, param_updates_per_epoch=1000, arch_updates_per_epoch=0
     )
-    regressor.fit(X, y)
+    regressor.fit(X1, y1)
     network_weights_refitted = deepcopy(regressor.network_.alphas_normal)
     equation_refitted = regressor.model_repr()
-    print(equation_refitted)
 
+    # Architecture weights should be the same
     assert torch.all(network_weights_initial.eq(network_weights_refitted))
+
+    # ... but equations should be different
     assert equation_initial != equation_refitted
+
+    # Now refit using the "sampler".
+    regressor.set_params(
+        max_epochs=1,
+        param_updates_per_epoch=1000,
+        arch_updates_per_epoch=0,
+        sampling_strategy="sample",
+    )
+    regressor.fit(X1, y1)
+    equation_resampled = regressor.model_repr()
+    print(equation_resampled)
+
+    # Now return to the original settings and recover the original results.
+    regressor.set_params(
+        max_epochs=1,
+        param_updates_per_epoch=1000,
+        arch_updates_per_epoch=0,
+        sampling_strategy="max",
+    )
+    regressor.fit(X, y)
+    network_weights_max_recovered = deepcopy(regressor.network_.alphas_normal)
+    equation_max_recovered = regressor.model_repr()
+    print(equation_max_recovered)
+    assert equation_initial == equation_max_recovered
+    assert torch.all(network_weights_initial.eq(network_weights_max_recovered))
 
 
 def test_metaparam_optimization():
