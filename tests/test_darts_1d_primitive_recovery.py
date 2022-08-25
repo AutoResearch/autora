@@ -10,9 +10,12 @@ non_interchangeable_primitives = [
     "none",
     "add",
     "subtract",
-    "sigmoid",
+    "logistic",
     "exp",
     "relu",
+    "cos",
+    "sin",
+    "tanh",
 ]
 
 
@@ -51,6 +54,21 @@ def transform_through_primitive_sigmoid(x: np.ndarray):
 
 def transform_through_primitive_exp(x: np.ndarray):
     y = np.exp(x)
+    return y
+
+
+def transform_through_primitive_cos(x: np.ndarray):
+    y = np.cos(x)
+    return y
+
+
+def transform_through_primitive_sin(x: np.ndarray):
+    y = np.sin(x)
+    return y
+
+
+def transform_through_primitive_tanh(x: np.ndarray):
+    y = np.tanh(x)
     return y
 
 
@@ -98,7 +116,7 @@ def run_test_primitive_fitting(
         max_epochs=300,
         arch_updates_per_epoch=1,
         param_weight_decay=3e-4,
-        arch_weight_decay_df=0.05,
+        arch_weight_decay_df=0.001,
         arch_weight_decay=1e-4,
         arch_learning_rate_max=0.3,
         param_learning_rate_max=0.0025,
@@ -214,7 +232,7 @@ def test_primitive_fitting_sigmoid():
     run_test_primitive_fitting(
         generate_x(-10, +10),
         transform_through_primitive_sigmoid,
-        "sigmoid",
+        "logistic",
         primitives=non_interchangeable_primitives,
     )
 
@@ -224,5 +242,32 @@ def test_primitive_fitting_exp():
         generate_x(),
         transform_through_primitive_exp,
         "exp",
+        primitives=non_interchangeable_primitives,
+    )
+
+
+def test_primitive_fitting_cos():
+    run_test_primitive_fitting(
+        generate_x(start=0, stop=2 * np.pi),
+        transform_through_primitive_cos,
+        "cos",
+        primitives=non_interchangeable_primitives,
+    )
+
+
+def test_primitive_fitting_sin():
+    run_test_primitive_fitting(
+        generate_x(start=0, stop=2 * np.pi),
+        transform_through_primitive_sin,
+        "sin",
+        primitives=non_interchangeable_primitives,
+    )
+
+
+def test_primitive_fitting_tanh():
+    run_test_primitive_fitting(
+        generate_x(start=0, stop=2 * np.pi),
+        transform_through_primitive_tanh,
+        "tanh",
         primitives=non_interchangeable_primitives,
     )

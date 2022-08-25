@@ -23,7 +23,7 @@ primitives = [
     "add",
     "subtract",
     'mult',
-    "sigmoid",
+    "logistic",
     'exp',
     'relu',
 ]

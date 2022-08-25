@@ -649,9 +649,9 @@ class Network(nn.Module):
 
     def architecture_to_str_list(
         self,
-        input_labels: List[str],
-        output_labels: List[str],
-        out_fnc: str = "Fnc",
+        input_labels: Sequence[str],
+        output_labels: Sequence[str],
+        output_function_label: str = "",
         decimals_to_display: int = 2,
         output_format: Literal["latex", "console"] = "console",
     ) -> List:
@@ -661,7 +661,7 @@ class Network(nn.Module):
         Arguments:
             input_labels: list of strings representing the input states.
             output_labels: list of strings representing the output states.
-            out_fnc: string representing the output function.
+            output_function_label: string representing the output function.
             decimals_to_display: number of decimals to display.
             output_format: if set to `"console"`, returns equations formatted for the command line,
                 if set to `"latex"`, returns equations in latex format
@@ -670,7 +670,7 @@ class Network(nn.Module):
         Returns:
             list of strings representing the model
         """
-        (n_params_total, n_params_base, param_list) = self.countParameters(
+        (n_params_total, n_params_base, param_list) = self.count_parameters(
             print_parameters=False
         )
         genotype = self.genotype().normal
@@ -697,7 +697,10 @@ class Network(nn.Module):
                 if j < len(input_labels):
                     u = input_labels[j]
                 else:
-                    u = str(j - len(input_labels))
+                    if output_format == "latex":
+                        u = "k_" + str(j - len(input_labels) + 1)
+                    else:
+                        u = "k" + str(j - len(input_labels))
                 if op != "none":
                     op_label = op
                     params = param_list[
@@ -713,7 +716,10 @@ class Network(nn.Module):
                     op_list.append(op)
                     edge_operations_list.append(op_label)
 
-            edge_str = ""
+            if len(edge_operations_list) == 0:
+                edge_str = v + " = 0"
+            else:
+                edge_str = ""
             for i, edge_operation in enumerate(edge_operations_list):
                 if i == 0:
                     edge_str += v + " = " + edge_operation
@@ -732,9 +738,13 @@ class Network(nn.Module):
 
         # TODO: extend to multiple outputs
         if output_format == "latex":
-            classifier_str = output_labels[0] + " = " + out_fnc + "\\left("
+            classifier_str = output_labels[0] + " = " + output_function_label
+            if output_function_label != "":
+                classifier_str += "\\left("
         else:
-            classifier_str = output_labels[0] + " = " + out_fnc + "("
+            classifier_str = output_labels[0] + " = " + output_function_label
+            if output_function_label != "":
+                classifier_str += "("
 
         bias = None
         for i in range(steps):
@@ -761,11 +771,15 @@ class Network(nn.Module):
                 classifier_str += " + " + str(bias[0])
 
             if i == steps - 1:
-                if output_format == "latex":
-                    classifier_str += "\\right)"
-                else:
-                    classifier_str += ")"
+                if output_function_label != "":
+                    if output_format == "latex":
+                        classifier_str += "\\right)"
+                    else:
+                        classifier_str += ")"
 
         edge_list.append(classifier_str)
+
+        for edge in edge_list:
+            print(edge)
 
         return edge_list
