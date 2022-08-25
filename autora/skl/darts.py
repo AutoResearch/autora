@@ -78,6 +78,7 @@ def _general_darts(
     primitives: Sequence[str] = PRIMITIVES,
     train_classifier_coefficients: bool = False,
     train_classifier_bias: bool = False,
+    device: Optional[Literal["cpu", "cuda", "mps"]] = None,
 ) -> _DARTSResult:
     """
     Function to implement the DARTS optimization, given a fixed architecture and input data.
@@ -105,6 +106,9 @@ def _general_darts(
         train_classifier_coefficients=train_classifier_coefficients,
         train_classifier_bias=train_classifier_bias,
     )
+    if device is not None:
+        network.to(torch.device(device))
+
     if init_weights_function is not None:
         network.apply(init_weights_function)
 
@@ -380,6 +384,7 @@ class DARTSRegressor(BaseEstimator, RegressorMixin):
         primitives: Sequence[str] = PRIMITIVES,
         train_classifier_coefficients: bool = False,
         train_classifier_bias: bool = False,
+        device: Optional[Literal["cpu", "cuda", "mps"]] = None,
     ) -> None:
         """
         Arguments:
@@ -453,6 +458,8 @@ class DARTSRegressor(BaseEstimator, RegressorMixin):
 
         self.train_classifier_coefficients = train_classifier_coefficients
         self.train_classifier_bias = train_classifier_bias
+
+        self.device = device
 
     def fit(self, X: np.ndarray, y: np.ndarray):
         """

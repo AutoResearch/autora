@@ -107,6 +107,7 @@ def run_test_primitive_fitting(
         primitives=primitives,
         train_classifier_bias=False,
         train_classifier_coefficients=False,
+        device="mps",
     )
     regressor.fit(X, y)
 
