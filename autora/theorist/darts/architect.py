@@ -62,6 +62,9 @@ class Architect(object):
         # initialize weight decay matrix
         self._init_decay_weights()
 
+        # initialize the logged loss
+        self.current_loss = 0
+
     def _init_decay_weights(self):
         """
         This function initializes the weight decay matrix. The weight decay matrix
@@ -204,6 +207,7 @@ class Architect(object):
             )
 
         loss.backward()
+        self.current_loss = loss.item()
 
         # weight decay proportional to degrees of freedom
         for p in self.model.arch_parameters():

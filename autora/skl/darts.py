@@ -78,6 +78,7 @@ def _general_darts(
     primitives: Sequence[str] = PRIMITIVES,
     train_classifier_coefficients: bool = False,
     train_classifier_bias: bool = False,
+    execution_monitor: Callable = (lambda *args, **kwargs: None),
 ) -> _DARTSResult:
     """
     Function to implement the DARTS optimization, given a fixed architecture and input data.
@@ -174,6 +175,8 @@ def _general_darts(
 
         # Then run the param optimization
         coefficient_optimizer(network)
+
+        execution_monitor(**locals())
 
     model = _generate_model(
         network=network,
@@ -379,6 +382,7 @@ class DARTSRegressor(BaseEstimator, RegressorMixin):
         primitives: Sequence[str] = PRIMITIVES,
         train_classifier_coefficients: bool = False,
         train_classifier_bias: bool = False,
+        execution_monitor: Callable = (lambda *args, **kwargs: None),
     ) -> None:
         """
         Arguments:
@@ -444,6 +448,8 @@ class DARTSRegressor(BaseEstimator, RegressorMixin):
 
         self.train_classifier_coefficients = train_classifier_coefficients
         self.train_classifier_bias = train_classifier_bias
+
+        self.execution_monitor = execution_monitor
 
     def fit(self, X: np.ndarray, y: np.ndarray):
         """
