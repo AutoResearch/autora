@@ -116,7 +116,7 @@ def run_test_primitive_fitting(
         max_epochs=300,
         arch_updates_per_epoch=1,
         param_weight_decay=3e-4,
-        arch_weight_decay_df=0.001,  # 0.05
+        arch_weight_decay_df=0.001,
         arch_weight_decay=1e-4,
         arch_learning_rate_max=0.3,
         param_learning_rate_max=0.0025,
