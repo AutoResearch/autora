@@ -591,8 +591,14 @@ class DARTSRegressor(BaseEstimator, RegressorMixin):
     ):
         """
         Prints the equations of the model architecture
+
         Args:
-            input_labels:
+            input_labels: which names to use for the independent variables (X)
+            output_labels: which names to use for the dependent variables (y)
+            output_function_label: name to use for the output transformation
+            decimals_to_display: amount of rounding for the coefficient values
+            output_format: whether the output should be formatted for
+                the command line (`console`) or as equations in a latex file (`latex`)
 
         Returns:
 
