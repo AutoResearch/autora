@@ -279,6 +279,14 @@ class Network(nn.Module):
 
     # function for copying the network
     def new(self) -> nn.Module:
+        """
+        Returns a copy of the network.
+
+        Returns:
+            a copy of the network
+
+        """
+
         model_new = Network(
             # self._C, self._num_classes, self._criterion, steps=self._steps
             num_classes=self._num_classes,

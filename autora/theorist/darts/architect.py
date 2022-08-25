@@ -8,6 +8,14 @@ from autora.theorist.darts.operations import isiterable
 
 
 def _concat(xs) -> torch.Tensor:
+    """
+    A function to concatenate a list of tensors.
+    Args:
+        xs: The list of tensors to concatenate.
+
+    Returns:
+        The concatenated tensor.
+    """
     return torch.cat([x.view(-1) for x in xs])
 
 
