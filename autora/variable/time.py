@@ -42,9 +42,8 @@ class IVTime(IV, VTime):
     def __init__(self, *args, **kwargs):
         """
         Initializes the time as independent variable.
-        Args:
-            *args: arguments
-            **kwargs: keyword arguments
+
+        For arguments, see [autora.variable.Variable][autora.variable.Variable.__init__]
         """
         super(IVTime, self).__init__(*args, **kwargs)
 
@@ -88,9 +87,8 @@ class DVTime(DV, VTime):
         """
         Initializes the time as dependent variable. The reference time usually denotes
         the beginning of an experiment trial.
-        Args:
-            *args: arguments
-            **kwargs: keyword arguments
+
+        For arguments, see [autora.variable.Variable][autora.variable.Variable.__init__]
         """
         print(self._variable_label)
         super(DVTime, self).__init__(*args, **kwargs)

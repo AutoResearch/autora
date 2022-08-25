@@ -31,7 +31,6 @@ class Variable:
         variable_label: str = "",
         rescale: float = 1,
         is_covariate: bool = False,
-        participant=None,
     ):
         """
         Initialize a variable.
@@ -44,7 +43,6 @@ class Variable:
             variable_label: label of the variable
             rescale: rescale factor for the variable
             is_covariate: whether this variable is a covariate
-            participant: participant object
         """
 
         self._name = name
@@ -58,7 +56,6 @@ class Variable:
             self._variable_label = variable_label
         self._rescale = rescale
         self._is_covariate = is_covariate
-        self._participant = participant
 
     def __get_value_range__(self):
         """Get range of variable.
@@ -86,7 +83,7 @@ class Variable:
         maximum = self._value_range[1]
         return np.min([np.max([value, minimum]), maximum])
 
-    def get_value(self):
+    def get_value(self) -> float:
         """Get value.
 
         Returns:
@@ -200,7 +197,7 @@ class Variable:
         """
         return self._variable_label
 
-    def set_variable_label(self, variable_label):
+    def set_variable_label(self, variable_label: str):
         """Set variable label.
 
         Arguments:
@@ -229,7 +226,8 @@ class VariableCollection:
     def all_variables(self) -> Iterator[Variable]:
         """Get all variables.
 
-        Returns: iterator over all variables
+        Returns:
+            iterator over all variables
         """
         for vars in (
             self.independent_variables,
@@ -243,7 +241,8 @@ class VariableCollection:
     def variable_names(self) -> Generator[str, None, None]:
         """Get variable names.
 
-        Returns: variable names
+        Returns:
+            variable names
         """
         return (v.get_name() for v in self.all_variables)
 
@@ -251,7 +250,8 @@ class VariableCollection:
     def output_type(self) -> str:
         """Get output type.
 
-        Returns: output type
+        Returns:
+            output type
         """
         first_type = self.dependent_variables[0].type
         assert all(dv.type == first_type for dv in self.dependent_variables), (
@@ -264,7 +264,8 @@ class VariableCollection:
     def input_dimensions(self) -> int:
         """The number of independent variables and covariates.
 
-        Returns: number of independent variables and covariates
+        Returns:
+            number of independent variables and covariates
         """
         return len(self.independent_variables) + len(self.covariates)
 
@@ -285,9 +286,7 @@ class IV(Variable):
         """
         Initialize independent variable.
 
-        Arguments:
-            *args: arguments to Variable constructor
-            **kwargs: keyword arguments to Variable constructor
+        For arguments, see [autora.variable.Variable][autora.variable.Variable.__init__]
         """
         self._name = "IV"
         self._variable_label = "Independent Variable"
@@ -308,9 +307,7 @@ class DV(Variable):
         """
         Initialize dependent variable.
 
-        Arguments:
-            *args: arguments to Variable constructor
-            **kwargs: keyword arguments to Variable constructor
+        For arguments, see [autora.variable.Variable][autora.variable.Variable.__init__]
         """
         self._name = "DV"
         self._variable_label = "Dependent Variable"
@@ -329,75 +326,19 @@ class DV(Variable):
     def __is_covariate__(self) -> bool:
         """Get whether this dependent variable is treated as covariate.
 
-        Returns: whether this dependent variable is treated as covariate
+        Returns:
+            whether this dependent variable is treated as covariate
         """
         return self._is_covariate
 
     # Set whether this dependent variable is treated as covariate.
-    def __set_covariate__(self, is_covariate):
+    def __set_covariate__(self, is_covariate: bool):
         """Set whether this dependent variable is treated as covariate.
 
         Arguments:
             is_covariate: whether this dependent variable is treated as covariate
         """
         self._is_covariate = is_covariate
-
-
-class IVInSilico(IV):
-    """
-    Independent variable in silico.
-    """
-
-    _variable_label = "IV"
-    _name = "independent variable"
-    _units = "activation"
-    _priority = 0
-    _value_range = (0, 1)
-    _value = 0
-
-    def __init__(self, *args, **kwargs):
-        """
-        Initialize independent in silico variable.
-        Args:
-            *args: arguments to Variable constructor
-            **kwargs: keyword arguments to Variable constructor
-        """
-        super(IVInSilico, self).__init__(*args, **kwargs)
-
-    def manipulate(self):
-        """
-        Manipulate independent in silico variable.
-        """
-        self._participant.set_value(self._name, self.get_value())
-
-
-class DVInSilico(DV):
-    """
-    Dependent variable in silico.
-    """
-
-    _variable_label = "DV"
-    _name = "dependent variable"
-    _units = "activation"
-    _priority = 0
-    _value_range = (0, 1)
-    _value = 0
-
-    def __init__(self, *args, **kwargs):
-        """
-        Initialize dependent in silico variable.
-        Args:
-            *args: arguments to Variable constructor
-            **kwargs: keyword arguments to Variable constructor
-        """
-        super(DVInSilico, self).__init__(*args, **kwargs)
-
-    def measure(self):
-        """
-        Measure dependent in silico variable.
-        """
-        measurement = self._participant.get_value(self._name)
-        self.set_value(measurement)
 
 
 class IVTrial(IV):
@@ -416,9 +357,8 @@ class IVTrial(IV):
     def __init__(self, *args, **kwargs):
         """
         Initialize independent variable representing experiment trials.
-        Args:
-            *args: arguments to Variable constructor
-            **kwargs: keyword arguments to Variable constructor
+
+        For arguments, see [autora.variable.Variable][autora.variable.Variable.__init__]
         """
         super(IVTrial, self).__init__(*args, **kwargs)
 
@@ -448,173 +388,3 @@ def register_iv_label(**kwargs):
 def register_dv_label(**kwargs):
     dv_labels.update(kwargs)
     return
-
-
-register_dv_label(
-    **{
-        "verbal_red": (
-            DVInSilico,
-            "Verbal Response Red",
-            None,
-            "verbal_red",
-            "activation",
-            0,
-            (0, 1),
-        ),
-        "verbal_green": (
-            DVInSilico,
-            "Verbal Response Green",
-            None,
-            "verbal_green",
-            "activation",
-            0,
-            (0, 1),
-        ),
-        "verbal_sample": (
-            DVInSilico,
-            "Verbal Response Sample",
-            None,
-            "verbal_sample",
-            "class",
-            0,
-            (0, 1),
-        ),
-        "difference_detected": (
-            DVInSilico,
-            "Difference Detected",
-            None,
-            "difference_detected",
-            "activation",
-            0,
-            (0, 1),
-        ),
-        "difference_detected_sample": (
-            DVInSilico,
-            "Difference Detected",
-            None,
-            "difference_detected_sample",
-            "class",
-            0,
-            (0, 1),
-        ),
-        "learning_performance": (
-            DVInSilico,
-            "Accuracy",
-            None,
-            "learning_performance",
-            "probability",
-            0,
-            (0, 1),
-        ),
-        "learning_performance_sample": (
-            DVInSilico,
-            "Accuracy Sample",
-            None,
-            "learning_performance_sample",
-            "class",
-            0,
-            (0, 1),
-        ),
-        "dx1_lca": (
-            DVInSilico,
-            "dx1",
-            None,
-            "dx1_lca",
-            "net input delta",
-            0,
-            (-1000, 1000),
-        ),
-    }
-)
-
-register_iv_label(
-    **{
-        "trial": (IVTrial, "Trial", "", "trial", "trials", 0, (0, 10000000)),
-        "color_red": (
-            IVInSilico,
-            "Color Unit Red",
-            None,
-            "color_red",
-            "activation",
-            0,
-            (0, 1),
-        ),
-        "color_green": (
-            IVInSilico,
-            "Color Unit Green",
-            None,
-            "color_green",
-            "activation",
-            0,
-            (0, 1),
-        ),
-        "word_red": (
-            IVInSilico,
-            "Word Unit Red",
-            None,
-            "word_red",
-            "activation",
-            0,
-            (0, 1),
-        ),
-        "word_green": (
-            IVInSilico,
-            "Word Unit Green",
-            None,
-            "word_green",
-            "activation",
-            0,
-            (0, 1),
-        ),
-        "task_color": (
-            IVInSilico,
-            "Task Unit Color Naming",
-            None,
-            "task_color",
-            "activation",
-            0,
-            (0, 1),
-        ),
-        "task_word": (
-            IVInSilico,
-            "Task Unit Word Reading",
-            None,
-            "task_word",
-            "activation",
-            0,
-            (0, 1),
-        ),
-        "S1": (IVInSilico, "Stimulus 1 Intensity", None, "S1", "activation", 0, (0, 5)),
-        "S2": (IVInSilico, "Stimulus 2 Intensity", None, "S2", "activation", 0, (0, 5)),
-        "learning_trial": (
-            IVInSilico,
-            "Trial",
-            None,
-            "learning_trial",
-            "trial",
-            0,
-            (0, 1000),
-        ),
-        "P_initial": (
-            IVInSilico,
-            "Initial Performance",
-            None,
-            "P_initial",
-            "probability",
-            0,
-            (0, 1),
-        ),
-        "P_asymptotic": (
-            IVInSilico,
-            "Best Performance",
-            None,
-            "P_asymptotic",
-            "probability",
-            0,
-            (0, 1),
-        ),
-        "x1_lca": (IVInSilico, "x1", None, "x1_lca", "net input", 0, (-1000, 1000)),
-        "x2_lca": (IVInSilico, "x2", None, "x2_lca", "net input", 0, (-1000, 1000)),
-        "x3_lca": (IVInSilico, "x3", None, "x3_lca", "net input", 0, (-1000, 1000)),
-    }
-)

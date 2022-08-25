@@ -93,9 +93,9 @@ class IVTF(IV, TinkerforgeVariable):
     def __init__(self, *args, **kwargs):
         """
         Initializes an independent variable used in the Tinkerforge environment.
-        Args:
-            *args: arguments
-            **kwargs: keyword arguments
+
+        For arguments, see [autora.variable.tinkerforge.TinkerforgeVariable]
+        [autora.variable.tinkerforge.TinkerforgeVariable.__init__]
         """
         IV.__init__(self, *args, **kwargs)
         TinkerforgeVariable.__init__(self, *args, **kwargs)
@@ -110,9 +110,8 @@ class DVTF(DV, TinkerforgeVariable):
         """
         Initializes a dependent variable used in the Tinkerforge environment.
 
-        Arguments:
-            *args: arguments
-            **kwargs: keyword arguments
+        For arguments, see [autora.variable.tinkerforge.TinkerforgeVariable]
+        [autora.variable.tinkerforge.TinkerforgeVariable.__init__]
         """
         DV.__init__(self, *args, **kwargs)
         TinkerforgeVariable.__init__(self, *args, **kwargs)
@@ -138,9 +137,8 @@ class IVCurrent(IVTF):
         """
         Initializes Industrial Analog Out 2.0 device.
 
-        Arguments:
-            *args: arguments
-            **kwargs: keyword arguments
+        For arguments, see [autora.variable.tinkerforge.TinkerforgeVariable]
+        [autora.variable.tinkerforge.TinkerforgeVariable.__init__]
         """
 
         self._ipcon = IPConnection()  # Create IP connection
@@ -261,9 +259,9 @@ class DVCurrent(DVTF):
     def __init__(self, *args, **kwargs):
         """
         Initializes Industrial Analog Out 2.0 device.
-        Args:
-            *args: arguments
-            **kwargs: keyword arguments
+
+        For arguments, see [autora.variable.tinkerforge.TinkerforgeVariable]
+        [autora.variable.tinkerforge.TinkerforgeVariable.__init__]
         """
 
         super(DVCurrent, self).__init__(*args, **kwargs)
@@ -317,9 +315,8 @@ class DVVoltage(DVTF):
         """
         Initializes Industrial Analog Out 2.0 device.
 
-        Args:
-            *args: arguments
-            **kwargs: keyword arguments
+        For arguments, see [autora.variable.tinkerforge.TinkerforgeVariable]
+        [autora.variable.tinkerforge.TinkerforgeVariable.__init__]
         """
 
         super(DVVoltage, self).__init__(*args, **kwargs)

@@ -24,17 +24,15 @@ class BasicExecutionMonitor:
         network: skl.darts.Network,
         architect: skl.darts.Architect,
         epoch: int,
-        **kwargs,
     ):
         """
         A function to monitor the execution of the DARTS algorithm.
 
         Arguments:
             network: The DARTS network containing the weights each operation
-            in the mixture architecture
+                in the mixture architecture
             architect: The architect object used to construct the mixture architecture.
             epoch: The current epoch of the training.
-            **kwargs:
         """
 
         # collect data for visualization

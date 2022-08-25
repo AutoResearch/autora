@@ -478,12 +478,12 @@ class DARTSRegressor(BaseEstimator, RegressorMixin):
             batch_size: Batch size for the data loader.
             num_graph_nodes: Number of nodes in the desired computation graph.
             output_type: Type of output function to use. This function is applied to transform
-            the output of the mixture architecture.
+                the output of the mixture architecture.
             classifier_weight_decay: Weight decay for the classifier.
             darts_type: Type of DARTS to use ('original' or 'fair').
             init_weights_function: Function to initialize the parameters of each operation.
             param_updates_per_epoch: Number of updates to perform per epoch.
-            for the operation parameters.
+                for the operation parameters.
             param_learning_rate_max: Initial (maximum) learning rate for the operation parameters.
             param_learning_rate_min: Final (minimum) learning rate for the operation parameters.
             param_momentum: Momentum for the operation parameters.
@@ -492,14 +492,12 @@ class DARTSRegressor(BaseEstimator, RegressorMixin):
             arch_learning_rate_max: Initial (maximum) learning rate for the architecture.
             arch_weight_decay: Weight decay for the architecture weights.
             arch_weight_decay_df: An additional weight decay that scales with the number of
-            parameters
-            (degrees of freedom) in the operation. The higher this weight decay, the more DARTS will
-            prefer simple operations.
+                parameters (degrees of freedom) in the operation. The higher this weight decay,
+                the more DARTS will prefer simple operations.
             arch_weight_decay_base: A base weight decay that is added to the scaled weight decay.
-            arch_momentum: Momentum for the architecture weights.
+                arch_momentum: Momentum for the architecture weights.
             fair_darts_loss_weight: Weight of the loss in fair darts which forces architecture
-            weights
-            to become either 0 or 1.
+                weights to become either 0 or 1.
             max_epochs: Maximum number of epochs to train for.
             grad_clip: Gradient clipping value for updating the parameters of the operations.
             primitives: List of primitives (operations) to use.
