@@ -48,15 +48,17 @@ def get_operation_label(
         >>> get_operation_label("classifier_concat", np.array([1, 2, 3]),
         ...     decimals=2, output_format="console")
         'x .* (1.00) .+ (2.00) .+ (3.00)'
-        >>> get_operation_label("exp", [1,2], decimals=2)
+        >>> get_operation_label("linear_exp", [1,2], decimals=2)
         'exp(1.00 * x + 2.00)'
         >>> get_operation_label("none", [])
         ''
-        >>> get_operation_label("1/x", [1], decimals=0)
-        '1 / (1 * x)'
-        >>> get_operation_label("lin_relu", [1], decimals=0)
+        >>> get_operation_label("reciprocal", [1], decimals=0)
+        '1 / x'
+        >>> get_operation_label("linear_reciprocal", [1, 2], decimals=0)
+        '1 / (1 * x + 2)'
+        >>> get_operation_label("linear_relu", [1], decimals=0)
         'ReLU(1 * x)'
-        >>> print(get_operation_label("lin_relu", [1], decimals=0, output_format="latex"))
+        >>> print(get_operation_label("linear_relu", [1], decimals=0, output_format="latex"))
         \operatorname{ReLU}\left(1x\right)
         >>> get_operation_label("linear", [1, 2], decimals=0)
         '1 * x + 2'
@@ -127,66 +129,102 @@ def get_operation_label(
         if output_format == "console":
             labels = {
                 "none": "",
-                "linear": f"{c[0]} * {input_var}",
-                "relu": f"ReLU({input_var})",
-                "lin_relu": f"ReLU({c[0]} * {input_var})",
-                "sigmoid": f"logistic({input_var})",
-                "lin_sigmoid": f"logistic({c[0]} * {input_var})",
                 "add": f"+ {input_var}",
                 "subtract": f"- {input_var}",
                 "mult": f"{c[0]} * {input_var}",
-                "exp": f"exp({c[0]} * {input_var})",
-                "1/x": f"1 / ({c[0]} * {input_var})",
-                "ln": f"ln({c[0]} * {input_var})",
+                "linear": f"{c[0]} * {input_var}",
+                "relu": f"ReLU({input_var})",
+                "linear_relu": f"ReLU({c[0]} * {input_var})",
+                "logistic": f"logistic({input_var})",
+                "linear_logistic": f"logistic({c[0]} * {input_var})",
+                "exp": f"exp({input_var})",
+                "linear_exp": f"exp({c[0]} * {input_var})",
+                "reciprocal": f"1 / {input_var}",
+                "linear_reciprocal": f"1 / ({c[0]} * {input_var})",
+                "ln": f"ln({input_var})",
+                "linear_ln": f"ln({c[0]} * {input_var})",
+                "cos": f"cos({input_var})",
+                "linear_cos": f"cos({c[0]} * {input_var})",
+                "sin": f"sin({input_var})",
+                "linear_sin": f"sin({c[0]} * {input_var})",
+                "tanh": f"tanh({input_var})",
+                "linear_tanh": f"tanh({c[0]} * {input_var})",
                 "classifier": classifier_str,
             }
         elif output_format == "latex":
             labels = {
                 "none": "",
-                "linear": c[0] + "" + input_var,
-                "relu": f"\\operatorname{{ReLU}}\\left({input_var}\\right)",
-                "lin_relu": f"\\operatorname{{ReLU}}\\left({c[0]}{input_var}\\right)",
-                "sigmoid": f"\\sigma\\left({input_var}\\right)",
-                "lin_sigmoid": f"\\sigma\\left({c[0]} {input_var} \\right)",
                 "add": f"+ {input_var}",
                 "subtract": f"- {input_var}",
                 "mult": f"{c[0]} {input_var}",
-                "exp": f"e^{{{c[0]} {input_var} }}",
-                "1/x": f"\\frac{{1}}{{{c[0]} {input_var} }}",
-                "ln": f"\\ln\\left({c[0]} {input_var} \\right)",
+                "linear": c[0] + "" + input_var,
+                "relu": f"\\operatorname{{ReLU}}\\left({input_var}\\right)",
+                "linear_relu": f"\\operatorname{{ReLU}}\\left({c[0]}{input_var}\\right)",
+                "logistic": f"\\sigma\\left({input_var}\\right)",
+                "linear_logistic": f"\\sigma\\left({c[0]} {input_var} \\right)",
+                "exp": f"+ e^{input_var}",
+                "linear_exp": f"e^{{{c[0]} {input_var} }}",
+                "reciprocal": f"\\frac{{1}}{{{input_var}}}",
+                "linear_reciprocal": f"\\frac{{1}}{{{c[0]} {input_var} }}",
+                "ln": f"\\ln\\left({input_var}\\right)",
+                "linear_ln": f"\\ln\\left({c[0]} {input_var} \\right)",
+                "cos": f"\\cos\\left({input_var}\\right)",
+                "linear_cos": f"\\cos\\left({c[0]} {input_var} \\right)",
+                "sin": f"\\sin\\left({input_var}\\right)",
+                "linear_sin": f"\\sin\\left({c[0]} {input_var} \\right)",
+                "tanh": f"\\tanh\\left({input_var}\\right)",
+                "linear_tanh": f"\\tanh\\left({c[0]} {input_var} \\right)",
                 "classifier": classifier_str,
             }
     else:  # with bias
         if output_format == "console":
             labels = {
                 "none": "",
-                "linear": f"{c[0]} * {input_var} + {c[1]}",
-                "relu": f"ReLU({input_var})",
-                "lin_relu": f"ReLU({c[0]} * {input_var} + {c[1]} )",
-                "sigmoid": f"logistic({input_var})",
-                "lin_sigmoid": f"logistic({c[0]} * {input_var} + {c[1]})",
                 "add": f"+ {input_var}",
                 "subtract": f"- {input_var}",
                 "mult": f"{c[0]} * {input_var}",
-                "exp": f"exp({c[0]} * {input_var} + {c[1]})",
-                "1/x": f"1 / ({c[0]} * {input_var} + {c[1]})",
-                "ln": f"ln({c[0]} * {input_var} + {c[1]})",
+                "linear": f"{c[0]} * {input_var} + {c[1]}",
+                "relu": f"ReLU({input_var})",
+                "linear_relu": f"ReLU({c[0]} * {input_var} + {c[1]} )",
+                "logistic": f"logistic({input_var})",
+                "linear_logistic": f"logistic({c[0]} * {input_var} + {c[1]})",
+                "exp": f"exp({input_var})",
+                "linear_exp": f"exp({c[0]} * {input_var} + {c[1]})",
+                "reciprocal": f"1 / {input_var}",
+                "linear_reciprocal": f"1 / ({c[0]} * {input_var} + {c[1]})",
+                "ln": f"ln({input_var})",
+                "linear_ln": f"ln({c[0]} * {input_var} + {c[1]})",
+                "cos": f"cos({input_var})",
+                "linear_cos": f"cos({c[0]} * {input_var} + {c[1]})",
+                "sin": f"sin({input_var})",
+                "linear_sin": f"sin({c[0]} * {input_var} + {c[1]})",
+                "tanh": f"tanh({input_var})",
+                "linear_tanh": f"tanh({c[0]} * {input_var} + {c[1]})",
                 "classifier": classifier_str,
             }
         elif output_format == "latex":
             labels = {
                 "none": "",
-                "linear": f"{c[0]} {input_var} + {c[1]}",
-                "relu": f"\\operatorname{{ReLU}}\\left( {input_var}\\right)",
-                "lin_relu": f"\\operatorname{{ReLU}}\\left({c[0]}{input_var} + {c[1]} \\right)",
-                "sigmoid": f"\\sigma\\left( {input_var} \\right)",
-                "lin_sigmoid": f"\\sigma\\left( {c[0]} {input_var} + {c[1]} \\right)",
                 "add": f"+ {input_var}",
                 "subtract": f"- {input_var}",
                 "mult": f"{c[0]} * {input_var}",
-                "exp": f"e^{{ {c[0]} {input_var} + {c[1]} }}",
-                "1/x": f"\\frac{{1}} {{ {c[0]}{input_var} + {c[1]} }}",
-                "ln": f"\\ln\\left({c[0]} {input_var} + {c[1]} \\right)",
+                "linear": f"{c[0]} {input_var} + {c[1]}",
+                "relu": f"\\operatorname{{ReLU}}\\left( {input_var}\\right)",
+                "linear_relu": f"\\operatorname{{ReLU}}\\left({c[0]}{input_var} + {c[1]} \\right)",
+                "logistic": f"\\sigma\\left( {input_var} \\right)",
+                "linear_logistic": f"\\sigma\\left( {c[0]} {input_var} + {c[1]} \\right)",
+                "exp": f"e^{input_var}",
+                "linear_exp": f"e^{{ {c[0]} {input_var} + {c[1]} }}",
+                "reciprocal": f"\\frac{{1}}{{{input_var}}}",
+                "linear_reciprocal": f"\\frac{{1}} {{ {c[0]}{input_var} + {c[1]} }}",
+                "ln": f"\\ln\\left({input_var}\\right)",
+                "linear_ln": f"\\ln\\left({c[0]} {input_var} + {c[1]} \\right)",
+                "cos": f"\\cos\\left({input_var}\\right)",
+                "linear_cos": f"\\cos\\left({c[0]} {input_var} + {c[1]} \\right)",
+                "sin": f"\\sin\\left({input_var}\\right)",
+                "linear_sin": f"\\sin\\left({c[0]} {input_var} + {c[1]} \\right)",
+                "tanh": f"\\tanh\\left({input_var}\\right)",
+                "linear_tanh": f"\\tanh\\left({c[0]} {input_var} + {c[1]} \\right)",
                 "classifier": classifier_str,
             }
 
@@ -259,6 +297,69 @@ class Exponential(nn.Module):
             x: input tensor
         """
         return torch.exp(x)
+
+
+class Cosine(nn.Module):
+    """
+    A pytorch module implementing the exponential function.
+    """
+
+    def __init__(self):
+        """
+        Initializes the exponential function.
+        """
+        super(Cosine, self).__init__()
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """
+        Forward pass of the exponential function.
+
+        Arguments:
+            x: input tensor
+        """
+        return torch.cos(x)
+
+
+class Sine(nn.Module):
+    """
+    A pytorch module implementing the exponential function.
+    """
+
+    def __init__(self):
+        """
+        Initializes the exponential function.
+        """
+        super(Sine, self).__init__()
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """
+        Forward pass of the exponential function.
+
+        Arguments:
+            x: input tensor
+        """
+        return torch.sin(x)
+
+
+class Tangens_Hyperbolicus(nn.Module):
+    """
+    A pytorch module implementing the exponential function.
+    """
+
+    def __init__(self):
+        """
+        Initializes the exponential function.
+        """
+        super(Tangens_Hyperbolicus, self).__init__()
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """
+        Forward pass of the exponential function.
+
+        Arguments:
+            x: input tensor
+        """
+        return torch.tanh(x)
 
 
 class NatLogarithm(nn.Module):
@@ -402,43 +503,79 @@ class Softminus(nn.Module):
 # defines all the operations. affine is turned off for cuda (optimization prposes)
 OPS = {
     "none": Zero(1),
-    "linear": nn.Sequential(nn.Linear(1, 1, bias=True)),
-    "relu": nn.Sequential(
-        nn.ReLU(inplace=False),
-    ),
-    "lin_relu": nn.Sequential(
-        nn.Linear(1, 1, bias=True),
-        nn.ReLU(inplace=False),
-    ),
-    "sigmoid": nn.Sequential(
-        nn.Sigmoid(),
-    ),
-    "lin_sigmoid": nn.Sequential(
-        nn.Linear(1, 1, bias=True),
-        nn.Sigmoid(),
-    ),
     "add": nn.Sequential(Identity()),
     "subtract": nn.Sequential(NegIdentity()),
     "mult": nn.Sequential(
         nn.Linear(1, 1, bias=False),
     ),
+    "linear": nn.Sequential(nn.Linear(1, 1, bias=True)),
+    "relu": nn.Sequential(
+        nn.ReLU(inplace=False),
+    ),
+    "linear_relu": nn.Sequential(
+        nn.Linear(1, 1, bias=True),
+        nn.ReLU(inplace=False),
+    ),
+    "logistic": nn.Sequential(
+        nn.Sigmoid(),
+    ),
+    "linear_logistic": nn.Sequential(
+        nn.Linear(1, 1, bias=True),
+        nn.Sigmoid(),
+    ),
     "exp": nn.Sequential(
+        Exponential(),
+    ),
+    "linear_exp": nn.Sequential(
         nn.Linear(1, 1, bias=True),
         Exponential(),
     ),
-    "1/x": nn.Sequential(
+    "cos": nn.Sequential(
+        Cosine(),
+    ),
+    "linear_cos": nn.Sequential(
+        nn.Linear(1, 1, bias=True),
+        Cosine(),
+    ),
+    "sin": nn.Sequential(
+        Sine(),
+    ),
+    "linear_sin": nn.Sequential(
+        nn.Linear(1, 1, bias=True),
+        Sine(),
+    ),
+    "tanh": nn.Sequential(
+        Tangens_Hyperbolicus(),
+    ),
+    "linear_tanh": nn.Sequential(
+        nn.Linear(1, 1, bias=True),
+        Tangens_Hyperbolicus(),
+    ),
+    "reciprocal": nn.Sequential(
+        MultInverse(),
+    ),
+    "linear_reciprocal": nn.Sequential(
         nn.Linear(1, 1, bias=False),
         MultInverse(),
     ),
     "ln": nn.Sequential(
+        NatLogarithm(),
+    ),
+    "linear_ln": nn.Sequential(
         nn.Linear(1, 1, bias=False),
         NatLogarithm(),
     ),
     "softplus": nn.Sequential(
+        Softplus(),
+    ),
+    "linear_softplus": nn.Sequential(
         nn.Linear(1, 1, bias=False),
         Softplus(),
     ),
     "softminus": nn.Sequential(
+        Softminus(),
+    ),
+    "linear_softminus": nn.Sequential(
         nn.Linear(1, 1, bias=False),
         Softminus(),
     ),
@@ -451,9 +588,9 @@ PRIMITIVES = (
     "add",
     "subtract",
     "linear",
-    "lin_sigmoid",
+    "linear_logistic",
     "mult",
-    "lin_relu",
+    "linear_relu",
 )
 
 # make sure that every primitive is in the OPS dictionary
