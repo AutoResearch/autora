@@ -472,36 +472,40 @@ class DARTSRegressor(BaseEstimator, RegressorMixin):
         execution_monitor: Callable = (lambda *args, **kwargs: None),
     ) -> None:
         """
+        Initializes the DARTSRegressor.
+
         Arguments:
-        batch_size: Batch size for the data loader.
-        num_graph_nodes: Number of nodes in the desired computation graph.
-        output_type: Type of output function to use. This function is applied to transform
-        the output of the mixture architecture.
-        classifier_weight_decay: Weight decay for the classifier.
-        darts_type: Type of DARTS to use ('original' or 'fair').
-        init_weights_function: Function to initialize the parameters of each operation.
-        param_updates_per_epoch: Number of updates to perform per epoch.
-        for the operation parameters.
-        param_learning_rate_max: Initial (maximum) learning rate for the operation parameters.
-        param_learning_rate_min: Final (minimum) learning rate for the operation parameters.
-        param_momentum: Momentum for the operation parameters.
-        param_weight_decay: Weight decay for the operation parameters.
-        arch_updates_per_epoch: Number of architecture weight updates to perform per epoch.
-        arch_learning_rate_max: Initial (maximum) learning rate for the architecture.
-        arch_weight_decay: Weight decay for the architecture weights.
-        arch_weight_decay_df: An additional weight decay that scales with the number of parameters
-        (degrees of freedom) in the operation. The higher this weight decay, the more DARTS will
-        prefer simple operations.
-        arch_weight_decay_base: A base weight decay that is added to the scaled weight decay.
-        arch_momentum: Momentum for the architecture weights.
-        fair_darts_loss_weight: Weight of the loss in fair darts which forces architecture weights
-        to become either 0 or 1.
-        max_epochs: Maximum number of epochs to train for.
-        grad_clip: Gradient clipping value for updating the parameters of the operations.
-        primitives: List of primitives (operations) to use.
-        train_classifier_coefficients: Whether to train the coefficients of the classifier.
-        train_classifier_bias: Whether to train the bias of the classifier.
-        execution_monitor: Function to monitor the execution of the model.
+            batch_size: Batch size for the data loader.
+            num_graph_nodes: Number of nodes in the desired computation graph.
+            output_type: Type of output function to use. This function is applied to transform
+            the output of the mixture architecture.
+            classifier_weight_decay: Weight decay for the classifier.
+            darts_type: Type of DARTS to use ('original' or 'fair').
+            init_weights_function: Function to initialize the parameters of each operation.
+            param_updates_per_epoch: Number of updates to perform per epoch.
+            for the operation parameters.
+            param_learning_rate_max: Initial (maximum) learning rate for the operation parameters.
+            param_learning_rate_min: Final (minimum) learning rate for the operation parameters.
+            param_momentum: Momentum for the operation parameters.
+            param_weight_decay: Weight decay for the operation parameters.
+            arch_updates_per_epoch: Number of architecture weight updates to perform per epoch.
+            arch_learning_rate_max: Initial (maximum) learning rate for the architecture.
+            arch_weight_decay: Weight decay for the architecture weights.
+            arch_weight_decay_df: An additional weight decay that scales with the number of
+            parameters
+            (degrees of freedom) in the operation. The higher this weight decay, the more DARTS will
+            prefer simple operations.
+            arch_weight_decay_base: A base weight decay that is added to the scaled weight decay.
+            arch_momentum: Momentum for the architecture weights.
+            fair_darts_loss_weight: Weight of the loss in fair darts which forces architecture
+            weights
+            to become either 0 or 1.
+            max_epochs: Maximum number of epochs to train for.
+            grad_clip: Gradient clipping value for updating the parameters of the operations.
+            primitives: List of primitives (operations) to use.
+            train_classifier_coefficients: Whether to train the coefficients of the classifier.
+            train_classifier_bias: Whether to train the bias of the classifier.
+            execution_monitor: Function to monitor the execution of the model.
             primitives: list of primitive operations used in the DARTS network,
                 e.g., 'add', 'subtract', 'none'. For details, see
                 [`autora.theorist.darts.operations`][autora.theorist.darts.operations]
@@ -722,7 +726,7 @@ class DARTSRegressor(BaseEstimator, RegressorMixin):
         output_format: Literal["latex", "console"] = "console",
     ) -> str:
         """
-        Prints the equations of the model architecture
+        Prints the equations of the model architecture.
 
         Args:
             input_labels: which names to use for the independent variables (X)
