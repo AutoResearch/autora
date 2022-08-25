@@ -78,6 +78,7 @@ def _general_darts(
     primitives: Sequence[str] = PRIMITIVES,
     train_classifier_coefficients: bool = False,
     train_classifier_bias: bool = False,
+    execution_monitor: Callable = (lambda *args, **kwargs: None),
 ) -> _DARTSResult:
     """
     Function to implement the DARTS optimization, given a fixed architecture and input data.
@@ -145,17 +146,6 @@ def _general_darts(
     _logger.info("Starting fit.")
     network.train()
 
-    # prepare variables for plotting
-    edge_weight_data = list()
-    num_edges = network.arch_parameters()[0].shape[0]
-    num_primitives = len(primitives)
-    for edge in range(num_edges):
-        data = np.empty([max_epochs, num_primitives])
-        data[:] = np.nan
-        edge_weight_data.append(data)
-    loss_data = np.empty([max_epochs, 1])
-    loss_data[:] = np.nan
-
     for epoch in progress_indicator(range(max_epochs)):
 
         _logger.debug(f"Running fit, epoch {epoch}")
@@ -186,16 +176,7 @@ def _general_darts(
         # Then run the param optimization
         coefficient_optimizer(network)
 
-        # collect data for visualization
-        architecture_weights = network.arch_parameters()[0].detach().numpy()
-        architecture_weights = architecture_weights[np.newaxis, :]
-        for row in range(architecture_weights.shape[0]):
-            edge_weight_data[row][
-                epoch,
-            ] = architecture_weights[row]
-        loss_data[
-            epoch,
-        ] = architect.current_loss
+        execution_monitor(**locals())
 
     model = _generate_model(
         network=network,
@@ -401,6 +382,7 @@ class DARTSRegressor(BaseEstimator, RegressorMixin):
         primitives: Sequence[str] = PRIMITIVES,
         train_classifier_coefficients: bool = False,
         train_classifier_bias: bool = False,
+        execution_monitor: Callable = (lambda *args, **kwargs: None),
     ) -> None:
         """
         Arguments:
@@ -466,6 +448,8 @@ class DARTSRegressor(BaseEstimator, RegressorMixin):
 
         self.train_classifier_coefficients = train_classifier_coefficients
         self.train_classifier_bias = train_classifier_bias
+
+        self.execution_monitor = execution_monitor
 
     def fit(self, X: np.ndarray, y: np.ndarray):
         """
