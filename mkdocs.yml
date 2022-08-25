@@ -36,7 +36,5 @@ nav:
       - How it works: 'theorist/darts/how_it_works.md'
       - Search space: 'theorist/darts/search_space.md'
       - Example: 'theorist/darts/example.md'
-# rest of the navigation...
-# defer to gen-files + literate-nav
 - Code Reference: reference/  #
-# rest of the navigation...
+
