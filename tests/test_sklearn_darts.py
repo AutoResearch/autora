@@ -66,7 +66,7 @@ def test_enum_string_inputs():
         DARTSRegressor(output_type=ValueType.CLASS, **kwargs).fit(X, y)
 
 
-def test_model_print():
+def test_model_repr():
 
     X, y, const, epsilon = generate_noisy_constant_data()
 
