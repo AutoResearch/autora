@@ -38,7 +38,7 @@ def get_operation_label(
         input_var: name of the input variable
         output_format: format of the output string (either "latex" or "console")
 
-        Examples:
+    Examples:
         >>> get_operation_label("classifier", [1], decimals=2)
         '1.00 * x'
         >>> import numpy as np
