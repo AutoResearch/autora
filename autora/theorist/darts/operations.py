@@ -52,9 +52,9 @@ def get_operation_label(
         'exp(1.00 * x + 2.00)'
         >>> get_operation_label("none", [])
         ''
-        >>> get_operation_label("1/x", [1], decimals=0)
+        >>> get_operation_label("reciprocal", [1], decimals=0)
         '1 / x'
-        >>> get_operation_label("linear_1/x", [1, 2], decimals=0)
+        >>> get_operation_label("linear_reciprocal", [1, 2], decimals=0)
         '1 / (1 * x + 2)'
         >>> get_operation_label("linear_relu", [1], decimals=0)
         'ReLU(1 * x)'
@@ -139,8 +139,8 @@ def get_operation_label(
                 "linear_logistic": f"logistic({c[0]} * {input_var})",
                 "exp": f"exp({input_var})",
                 "linear_exp": f"exp({c[0]} * {input_var})",
-                "1/x": f"1 / {input_var}",
-                "linear_1/x": f"1 / ({c[0]} * {input_var})",
+                "reciprocal": f"1 / {input_var}",
+                "linear_reciprocal": f"1 / ({c[0]} * {input_var})",
                 "ln": f"ln({input_var})",
                 "linear_ln": f"ln({c[0]} * {input_var})",
                 "cos": f"cos({input_var})",
@@ -164,8 +164,8 @@ def get_operation_label(
                 "linear_logistic": f"\\sigma\\left({c[0]} {input_var} \\right)",
                 "exp": f"+ e^{input_var}",
                 "linear_exp": f"e^{{{c[0]} {input_var} }}",
-                "1/x": f"\\frac{{1}}{{{input_var}}}",
-                "linear_1/x": f"\\frac{{1}}{{{c[0]} {input_var} }}",
+                "reciprocal": f"\\frac{{1}}{{{input_var}}}",
+                "linear_reciprocal": f"\\frac{{1}}{{{c[0]} {input_var} }}",
                 "ln": f"\\ln\\left({input_var}\\right)",
                 "linear_ln": f"\\ln\\left({c[0]} {input_var} \\right)",
                 "cos": f"\\cos\\left({input_var}\\right)",
@@ -190,8 +190,8 @@ def get_operation_label(
                 "linear_logistic": f"logistic({c[0]} * {input_var} + {c[1]})",
                 "exp": f"exp({input_var})",
                 "linear_exp": f"exp({c[0]} * {input_var} + {c[1]})",
-                "1/x": f"1 / {input_var}",
-                "linear_1/x": f"1 / ({c[0]} * {input_var} + {c[1]})",
+                "reciprocal": f"1 / {input_var}",
+                "linear_reciprocal": f"1 / ({c[0]} * {input_var} + {c[1]})",
                 "ln": f"ln({input_var})",
                 "linear_ln": f"ln({c[0]} * {input_var} + {c[1]})",
                 "cos": f"cos({input_var})",
@@ -215,8 +215,8 @@ def get_operation_label(
                 "linear_logistic": f"\\sigma\\left( {c[0]} {input_var} + {c[1]} \\right)",
                 "exp": f"e^{input_var}",
                 "linear_exp": f"e^{{ {c[0]} {input_var} + {c[1]} }}",
-                "1/x": f"\\frac{{1}}{{{input_var}}}",
-                "linear_1/x": f"\\frac{{1}} {{ {c[0]}{input_var} + {c[1]} }}",
+                "reciprocal": f"\\frac{{1}}{{{input_var}}}",
+                "linear_reciprocal": f"\\frac{{1}} {{ {c[0]}{input_var} + {c[1]} }}",
                 "ln": f"\\ln\\left({input_var}\\right)",
                 "linear_ln": f"\\ln\\left({c[0]} {input_var} + {c[1]} \\right)",
                 "cos": f"\\cos\\left({input_var}\\right)",
@@ -551,10 +551,10 @@ OPS = {
         nn.Linear(1, 1, bias=True),
         Tangens_Hyperbolicus(),
     ),
-    "1/x": nn.Sequential(
+    "reciprocal": nn.Sequential(
         MultInverse(),
     ),
-    "linear_1/x": nn.Sequential(
+    "linear_reciprocal": nn.Sequential(
         nn.Linear(1, 1, bias=False),
         MultInverse(),
     ),
