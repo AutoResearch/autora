@@ -470,6 +470,18 @@ def get_best_fitting_models(
 
 
 def format_input_target(input, target, criterion):
+    """
+    Formats the input and target for the model.
+
+    Args:
+        input: input to the model
+        target: target of the model
+        criterion: criterion to use for the model
+
+    Returns:
+        input: formatted input and target for the model
+
+    """
 
     if isinstance(criterion, nn.CrossEntropyLoss):
         target = target.squeeze()
