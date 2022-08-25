@@ -779,7 +779,4 @@ class Network(nn.Module):
 
         edge_list.append(classifier_str)
 
-        for edge in edge_list:
-            print(edge)
-
         return edge_list

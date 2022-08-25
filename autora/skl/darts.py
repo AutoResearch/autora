@@ -49,12 +49,12 @@ class _DARTSResult:
 
     network: Network
     model: torch.nn.Module
-    model_sampler: Callable[[SAMPLING_STRATEGIES], torch.nn.Module]
 
 
 def _general_darts(
     X: np.ndarray,
     y: np.ndarray,
+    network: Optional[Network] = None,
     batch_size: int = 20,
     num_graph_nodes: int = 2,
     output_type: IMPLEMENTED_OUTPUT_TYPES = "real",
@@ -79,6 +79,7 @@ def _general_darts(
     train_classifier_coefficients: bool = False,
     train_classifier_bias: bool = False,
     execution_monitor: Callable = (lambda *args, **kwargs: None),
+    sampling_strategy: SAMPLING_STRATEGIES = "max",
 ) -> _DARTSResult:
     """
     Function to implement the DARTS optimization, given a fixed architecture and input data.
@@ -96,17 +97,19 @@ def _general_darts(
     criterion = get_loss_function(ValueType(output_type))
     output_function = get_output_format(ValueType(output_type))
 
-    network = Network(
-        num_classes=output_dimensions,
-        criterion=criterion,
-        steps=num_graph_nodes,
-        n_input_states=input_dimensions,
-        classifier_weight_decay=classifier_weight_decay,
-        darts_type=DARTSType(darts_type),
-        primitives=primitives,
-        train_classifier_coefficients=train_classifier_coefficients,
-        train_classifier_bias=train_classifier_bias,
-    )
+    if network is None:
+        network = Network(
+            num_classes=output_dimensions,
+            criterion=criterion,
+            steps=num_graph_nodes,
+            n_input_states=input_dimensions,
+            classifier_weight_decay=classifier_weight_decay,
+            darts_type=DARTSType(darts_type),
+            primitives=primitives,
+            train_classifier_coefficients=train_classifier_coefficients,
+            train_classifier_bias=train_classifier_bias,
+        )
+
     if init_weights_function is not None:
         network.apply(init_weights_function)
 
@@ -121,29 +124,6 @@ def _general_darts(
         arch_learning_rate_max=arch_learning_rate_max,
     )
 
-    optimizer = torch.optim.SGD(
-        params=network.parameters(),
-        lr=param_learning_rate_max,
-        momentum=param_momentum,
-        weight_decay=param_weight_decay,
-    )
-
-    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
-        optimizer=optimizer,
-        T_max=param_updates_per_epoch,
-        eta_min=param_learning_rate_min,
-    )
-
-    coefficient_optimizer = partial(
-        _optimize_coefficients,
-        criterion=criterion,
-        data_loader=data_loader,
-        grad_clip=grad_clip,
-        optimizer=optimizer,
-        param_updates_per_epoch=param_updates_per_epoch,
-        scheduler=scheduler,
-    )
-
     _logger.info("Starting fit.")
     network.train()
 
@@ -153,7 +133,6 @@ def _general_darts(
 
         # Do the Architecture update
 
-        # Then run the arch optimization
         for arch_step in range(arch_updates_per_epoch):
             _logger.debug(
                 f"Running architecture update, "
@@ -172,26 +151,71 @@ def _general_darts(
             )
 
         # Then run the param optimization
-        coefficient_optimizer(network)
+        coefficient_optimizer = partial(
+            optimize_coefficients,
+            data_loader=data_loader,
+            criterion=criterion,
+            param_updates_per_epoch=param_updates_per_epoch,
+            param_learning_rate_max=param_learning_rate_max,
+            param_learning_rate_min=param_learning_rate_min,
+            param_momentum=param_momentum,
+            param_weight_decay=param_weight_decay,
+            grad_clip=grad_clip,
+        )
+        coefficient_optimizer(network=network)
 
         execution_monitor(**locals())
 
     model = _generate_model(
-        network=network,
-        coefficient_optimizer=coefficient_optimizer,
-        output_function=output_function,
-        sampling_strategy="max",
-    )
-    model_sampler = partial(
-        _generate_model,
-        network=network,
-        coefficient_optimizer=coefficient_optimizer,
-        output_function=output_function,
+        network_=network,
+        output_type=output_type,
+        sampling_strategy=sampling_strategy,
+        data_loader=data_loader,
+        criterion=criterion,
+        param_updates_per_epoch=param_updates_per_epoch,
+        param_learning_rate_max=param_learning_rate_max,
+        param_learning_rate_min=param_learning_rate_min,
+        param_momentum=param_momentum,
+        param_weight_decay=param_weight_decay,
+        grad_clip=grad_clip,
     )
 
-    results = _DARTSResult(model=model, model_sampler=model_sampler, network=network)
+    results = _DARTSResult(model=model, network=network)
 
     return results
+
+
+def optimize_coefficients(
+    network,
+    criterion,
+    data_loader,
+    grad_clip,
+    param_learning_rate_max,
+    param_learning_rate_min,
+    param_momentum,
+    param_updates_per_epoch,
+    param_weight_decay,
+):
+    optimizer = torch.optim.SGD(
+        params=network.parameters(),
+        lr=param_learning_rate_max,
+        momentum=param_momentum,
+        weight_decay=param_weight_decay,
+    )
+    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
+        optimizer=optimizer,
+        T_max=param_updates_per_epoch,
+        eta_min=param_learning_rate_min,
+    )
+    _optimize_coefficients(
+        network=network,
+        criterion=criterion,
+        data_loader=data_loader,
+        grad_clip=grad_clip,
+        optimizer=optimizer,
+        param_updates_per_epoch=param_updates_per_epoch,
+        scheduler=scheduler,
+    )
 
 
 def _optimize_coefficients(
@@ -292,14 +316,35 @@ def _get_next_input_target(data_iterator: Iterator, criterion: torch.nn.Module):
 
 
 def _generate_model(
+    network_: Network,
+    output_type: IMPLEMENTED_OUTPUT_TYPES,
     sampling_strategy: SAMPLING_STRATEGIES,
-    network: Network,
-    coefficient_optimizer: Callable[[Network], None],
-    output_function: torch.nn.Module,
-):
+    data_loader,
+    param_updates_per_epoch,
+    param_learning_rate_max,
+    param_learning_rate_min,
+    param_momentum,
+    param_weight_decay,
+    grad_clip,
+    **kwargs,
+) -> Network:
+    criterion = get_loss_function(ValueType(output_type))
+    output_function = get_output_format(ValueType(output_type))
+
+    coefficient_optimizer = partial(
+        optimize_coefficients,
+        data_loader=data_loader,
+        criterion=criterion,
+        param_updates_per_epoch=param_updates_per_epoch,
+        param_learning_rate_max=param_learning_rate_max,
+        param_learning_rate_min=param_learning_rate_min,
+        param_momentum=param_momentum,
+        param_weight_decay=param_weight_decay,
+        grad_clip=grad_clip,
+    )
 
     # Set edges in the network with the highest weights to 1, others to 0
-    model_without_output_function = copy.deepcopy(network)
+    model_without_output_function = copy.deepcopy(network_)
 
     if sampling_strategy == "max":
         new_weights = model_without_output_function.max_alphas_normal()
@@ -381,6 +426,7 @@ class DARTSRegressor(BaseEstimator, RegressorMixin):
         train_classifier_coefficients: bool = False,
         train_classifier_bias: bool = False,
         execution_monitor: Callable = (lambda *args, **kwargs: None),
+        sampling_strategy: SAMPLING_STRATEGIES = "max",
     ) -> None:
         """
         Arguments:
@@ -415,13 +461,13 @@ class DARTSRegressor(BaseEstimator, RegressorMixin):
         self.darts_type = darts_type
         self.init_weights_function = init_weights_function
 
+        self.param_updates_per_epoch = param_updates_per_epoch
+
         self.param_learning_rate_max = param_learning_rate_max
         self.param_learning_rate_min = param_learning_rate_min
         self.param_momentum = param_momentum
         self.arch_momentum = arch_momentum
         self.param_weight_decay = param_weight_decay
-
-        self.param_updates_per_epoch = param_updates_per_epoch
 
         self.arch_updates_per_epoch = arch_updates_per_epoch
         self.arch_weight_decay = arch_weight_decay
@@ -449,6 +495,8 @@ class DARTSRegressor(BaseEstimator, RegressorMixin):
 
         self.execution_monitor = execution_monitor
 
+        self.sampling_strategy = sampling_strategy
+
     def fit(self, X: np.ndarray, y: np.ndarray):
         """
         Runs the optimization for a given set of `X`s and `y`s.
@@ -468,17 +516,14 @@ class DARTSRegressor(BaseEstimator, RegressorMixin):
 
         params = self.get_params()
 
-        fit_results = _general_darts(X=X, y=y, **params)
+        fit_results = _general_darts(X=X, y=y, network=self.network_, **params)
         self.X_ = X
         self.y_ = y
         self.network_ = fit_results.network
         self.model_ = fit_results.model
-        self.model_sampler_ = fit_results.model_sampler
         return self
 
-    def resample_model(
-        self, sampling_strategy: SAMPLING_STRATEGIES = "sample"
-    ) -> Network:
+    def fit_with_fixed_architecture(self) -> Network:
         """
         Generates a new model based on a sample of the architecture weights
         (`sampling_strategy="sample"`) or the maximum architecture weights
@@ -492,9 +537,10 @@ class DARTSRegressor(BaseEstimator, RegressorMixin):
             The network with primitives selected on each edge, based on the resampling strategy.
 
         """
-        check_is_fitted(self, attributes=["model_sampler_"])
-        assert self.model_sampler_ is not None
-        self.model_ = self.model_sampler_(sampling_strategy)
+        check_is_fitted(self, attributes=["network_"])
+        assert self.network_ is not None
+        self.model_ = _generate_model(network_=self.network_, **self.get_params())
+
         return self.model_
 
     def predict(self, X: np.ndarray) -> np.ndarray:
