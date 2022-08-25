@@ -143,7 +143,7 @@ def test_execution_monitor():
     execution_monitor_0 = BasicExecutionMonitor()
 
     DARTSRegressor(
-        primitives=["add", "subtract", "none", "mult", "sigmoid"],
+        primitives=["add", "subtract", "none", "mult", "logistic"],
         execution_monitor=execution_monitor_0.execution_monitor,
         num_graph_nodes=3,
         max_epochs=100,
