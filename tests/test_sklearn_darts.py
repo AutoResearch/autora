@@ -1,5 +1,6 @@
 import numpy as np
 import pytest
+from skl.darts_execution_monitor import BasicExecutionMonitor
 from sklearn.model_selection import GridSearchCV, train_test_split
 
 from autora.skl.darts import PRIMITIVES, DARTSRegressor, DARTSType, ValueType
@@ -113,3 +114,36 @@ def test_metaparam_optimization():
         assert (const - 0.01) < y_pred_i < (const + 0.01)
 
     print(estimator.predict(X_test))
+
+
+def test_execution_monitor():
+    import matplotlib.pyplot as plt
+
+    X, y, const, epsilon = generate_noisy_constant_data()
+
+    kwargs = dict()
+
+    execution_monitor_0 = BasicExecutionMonitor()
+
+    DARTSRegressor(
+        primitives=["add", "subtract", "none", "mult", "sigmoid"],
+        execution_monitor=execution_monitor_0.execution_monitor,
+        num_graph_nodes=3,
+        max_epochs=100,
+        param_updates_per_epoch=100,
+        **kwargs
+    ).fit(X, y)
+    execution_monitor_0.display()
+
+    execution_monitor_1 = BasicExecutionMonitor()
+    DARTSRegressor(
+        primitives=["add", "ln"],
+        num_graph_nodes=5,
+        max_epochs=100,
+        param_updates_per_epoch=100,
+        execution_monitor=execution_monitor_1.execution_monitor,
+        **kwargs
+    ).fit(X, y)
+    execution_monitor_1.display()
+
+    plt.show()
