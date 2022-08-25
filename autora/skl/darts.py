@@ -530,6 +530,8 @@ class DARTSRegressor(BaseEstimator, RegressorMixin):
             input_labels: labels for the input nodes
 
         """
+
+        check_is_fitted(self, attributes=["model_"])
         assert self.model_ is not None
         fitted_sampled_network = self.model_[0]
 
@@ -540,15 +542,10 @@ class DARTSRegressor(BaseEstimator, RegressorMixin):
             param_list,
         ) = fitted_sampled_network.count_parameters()
 
-        assert self.X_ is not None
-
         if input_labels is not None:
             input_labels_ = tuple(input_labels)
-        elif hasattr(self.X_, "columns"):
-            input_labels_ = tuple(self.X_.columns)
         else:
-            input_dim = 1 if self.X_.ndim == 1 else self.X_.shape[1]
-            input_labels_ = tuple(f"x{i}" for i in range(input_dim))
+            input_labels_ = self._get_input_labels()
 
         assert self.y_ is not None
         out_dim = 1 if self.y_.ndim == 1 else self.y_.shape[1]
@@ -567,10 +564,27 @@ class DARTSRegressor(BaseEstimator, RegressorMixin):
 
         return graph
 
+    def _get_input_labels(self):
+        return self._get_labels(self.X_, "x")
+
+    def _get_output_labels(self):
+        return self._get_labels(self.y_, "y")
+
+    def _get_labels(self, data, default_label):
+        assert data is not None
+
+        if hasattr(data, "columns"):
+            labels_ = tuple(data.columns)
+
+        else:
+            dim = 1 if data.ndim == 1 else data.shape[1]
+            labels_ = tuple(f"{default_label}{i}" for i in range(dim))
+        return labels_
+
     def print(
         self,
-        input_labels: Sequence[str],
-        output_labels: Sequence[str],
+        input_labels: Optional[Sequence[str]] = None,
+        output_labels: Optional[Sequence[str]] = None,
         output_function_label: str = "",
         decimals_to_display: int = 2,
         output_format: Literal["latex", "console"] = "console",
@@ -586,9 +600,19 @@ class DARTSRegressor(BaseEstimator, RegressorMixin):
         assert self.model_ is not None
         fitted_sampled_network: Network = self.model_[0]
 
+        if input_labels is None:
+            input_labels_ = self._get_input_labels()
+        else:
+            input_labels_ = input_labels
+
+        if output_labels is None:
+            output_labels_ = self._get_output_labels()
+        else:
+            output_labels_ = output_labels
+
         edge_list = fitted_sampled_network.architecture_to_str_list(
-            input_labels=input_labels,
-            output_labels=output_labels,
+            input_labels=input_labels_,
+            output_labels=output_labels_,
             output_function_label=output_function_label,
             decimals_to_display=decimals_to_display,
             output_format=output_format,
