@@ -53,7 +53,9 @@ def get_operation_label(
         >>> get_operation_label("none", [])
         ''
         >>> get_operation_label("1/x", [1], decimals=0)
-        '1 / (1 * x)'
+        '1 / x'
+        >>> get_operation_label("linear_1/x", [1, 2], decimals=0)
+        '1 / (1 * x + 2)'
         >>> get_operation_label("linear_relu", [1], decimals=0)
         'ReLU(1 * x)'
         >>> print(get_operation_label("linear_relu", [1], decimals=0, output_format="latex"))
