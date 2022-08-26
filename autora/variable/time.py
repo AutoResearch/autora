@@ -1,9 +1,6 @@
-import logging
 import time
 
 from autora.variable import DV, IV, register_dv_label, register_iv_label
-
-_logger = logging.getLogger(__name__)
 
 
 class VTime:

@@ -849,7 +849,7 @@ class DARTSExecutionMonitor:
 
         for (edge_i, ax) in zip(range(num_edges), arch_axes.flat):
             for primitive_i in range(num_primitives):
-                _logger.debug(f"{edge_i}, {primitive_i}, {ax}")
+                print(f"{edge_i}, {primitive_i}, {ax}")
                 ax.plot(
                     arch_weight_history_array[:, edge_i, primitive_i],
                     label=f"{self.primitives[primitive_i]}",

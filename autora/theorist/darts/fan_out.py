@@ -1,9 +1,5 @@
-import logging
-
 import torch
 import torch.nn as nn
-
-_logger = logging.getLogger(__name__)
 
 
 class Fan_Out(nn.Module):

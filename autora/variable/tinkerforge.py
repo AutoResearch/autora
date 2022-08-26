@@ -1,4 +1,3 @@
-import logging
 from abc import abstractmethod
 from typing import Sequence
 
@@ -11,8 +10,6 @@ from tinkerforge.ip_connection import IPConnection
 from variable import ValueType
 
 from autora.variable import DV, IV, Variable, register_dv_label, register_iv_label
-
-_logger = logging.getLogger(__name__)
 
 
 class TinkerforgeVariable(Variable):
