@@ -93,9 +93,9 @@ class DVTime(DV, VTime):
 
         For arguments, see [autora.variable.Variable][autora.variable.Variable.__init__]
         """
-        _logger.debug(self._variable_label)
+        print(self._variable_label)
         super(DVTime, self).__init__(*args, **kwargs)
-        _logger.debug(self._variable_label)
+        print(self._variable_label)
 
     # Measure number of seconds relative to reference time
     def measure(self):
