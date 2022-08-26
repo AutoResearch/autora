@@ -725,7 +725,7 @@ class DARTSRegressor(BaseEstimator, RegressorMixin):
 
         else:
             dim = 1 if data.ndim == 1 else data.shape[1]
-            labels_ = tuple(f"{default_label}{i}" for i in range(dim))
+            labels_ = tuple(f"{default_label}{i+1}" for i in range(dim))
         return labels_
 
     def model_repr(
