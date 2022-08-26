@@ -79,7 +79,7 @@ class BMS:
         self.pms: Parallel = Parallel(Ts=[])
         self.model_: Tree = Tree()
 
-    def fit(self, X: np.ndarray, y: np.ndarray):
+    def fit(self, X: np.ndarray, y: np.ndarray, np: int = 1):
         """
         Runs the optimization for a given set of `X`s and `y`s.
 
@@ -90,11 +90,18 @@ class BMS:
         Returns:
             self (BMS): the fitted estimator
         """
-        X, y = sklearn.utils.check_X_y(X, y)
+        # X, y = sklearn.utils.check_X_y(X, y)
+        
+        # number of variables equals the number of columns in X
+        if isinstance(X, pd.DataFrame):
+            variables = list(X.columns)
+        else:
+            variables = ["S%d" % i for i in range(X.shape[1])]
+
         self.pms = Parallel(
             Ts=self.ts,
-            variables=pd.DataFrame(range(len(X))),
-            parameters=["a%d" % i for i in range(len(X))],
+            variables=variables,
+            parameters=["a%d" % i for i in range(np)],
             x=X,
             y=y,
             prior_par=self.prior_par,
@@ -116,7 +123,6 @@ class BMS:
         """
         sklearn.utils.validation.check_is_fitted(self)
         X = sklearn.utils.check_array(X)
-        print(type(X))
         if type(X) == np.ndarray:
             x = pd.DataFrame(X)
         elif type(X) == pd.DataFrame:

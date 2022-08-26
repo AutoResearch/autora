@@ -5,6 +5,9 @@ import warnings
 
 import pandas as pd
 
+import sys
+sys.path.append("./")
+
 from aer_bms import Parallel, utils
 
 warnings.filterwarnings("ignore")
