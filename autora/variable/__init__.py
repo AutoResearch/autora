@@ -1,7 +1,7 @@
 from abc import abstractmethod
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Iterator, Sequence
+from typing import Generator, Iterator, Optional, Sequence
 
 import numpy as np
 
@@ -24,15 +24,26 @@ class Variable:
 
     def __init__(
         self,
-        name="",
-        value_range=(0, 1),
-        units="",
-        type=ValueType.REAL,
-        variable_label="",
-        rescale=1,
-        is_covariate=False,
-        participant=None,
+        name: str = "",
+        value_range: Sequence = (0, 1),
+        units: str = "",
+        type: ValueType = ValueType.REAL,
+        variable_label: str = "",
+        rescale: float = 1,
+        is_covariate: bool = False,
     ):
+        """
+        Initialize a variable.
+
+        Args:
+            name: name of the variable
+            value_range: range of the variable
+            units: units of the variable
+            type: type of the variable
+            variable_label: label of the variable
+            rescale: rescale factor for the variable
+            is_covariate: whether this variable is a covariate
+        """
 
         self._name = name
         self._units = units
@@ -45,7 +56,6 @@ class Variable:
             self._variable_label = variable_label
         self._rescale = rescale
         self._is_covariate = is_covariate
-        self._participant = participant
 
     def __get_value_range__(self):
         """Get range of variable.
@@ -53,28 +63,52 @@ class Variable:
         to be manipulated or measured."""
         return self._value_range
 
-    def __set_value_range__(self, value_range):
+    def __set_value_range__(self, value_range: Sequence):
         """Set range of variable.
         The variable range determines the minimum and maximum allowed value
-        to be manipulated or measured."""
+        to be manipulated or measured.
+
+        Arguments:
+            value_range: range of the variable
+        """
         self._value_range = value_range
 
-    def __cap_value__(self, value):
-        """Cap value of variable."""
+    def __cap_value__(self, value: float):
+        """Cap value of variable.
+
+        Arguments:
+            value: value of the variable
+        """
         minimum = self._value_range[0]
         maximum = self._value_range[1]
         return np.min([np.max([value, minimum]), maximum])
 
-    def get_value(self):
-        """Get value."""
+    def get_value(self) -> float:
+        """Get value.
+
+        Returns:
+            value of the variable
+        """
         return self._value * self._rescale
 
-    def set_value(self, value):
-        """Set value."""
+    def set_value(self, value: float):
+        """Set value.
+
+        Arguments:
+            value: value of the variable
+        """
         self._value = self.__cap_value__(value)
 
-    def get_value_from_dict(self, dictionary, position):
-        """Reads value of independent variable from a dictionary."""
+    def get_value_from_dict(self, dictionary: dict, position: int) -> float:
+        """Reads value of independent variable from a dictionary.
+
+        Arguments:
+            dictionary: dictionary with variable_label being the key
+            position: position of the value in the dictionary
+
+        Returns:
+            value of the variable
+        """
 
         value_list = dictionary[self.get_name()]
 
@@ -89,18 +123,29 @@ class Variable:
 
         return value_list[position] * self._rescale
 
-    def get_value_list_from_dict(self, dictionary):
-        """Gets the rescaled values of independent variables from a dictionary."""
+    def get_value_list_from_dict(self, dictionary: dict) -> Sequence:
+        """Gets the rescaled values of independent variables from a dictionary.
+
+        Arguments:
+            dictionary: dictionary with variable_label being the key
+
+        Returns:
+            list of values of the variable
+        """
         value_list = dictionary[self.get_name()]
 
         rescaled_list = [element * self._rescale for element in value_list]
 
         return rescaled_list
 
-    def set_value_from_dict(self, dictionary, position):
+    def set_value_from_dict(self, dictionary: dict, position: int):
         """
         Reads and sets value of independent variable from a dictionary
         with variable_label being the key
+
+        Arguments:
+            dictionary: dictionary with variable_label being the key
+            position: position of the value in the dictionary
         """
 
         value_list = dictionary[self.get_name()]
@@ -116,32 +161,56 @@ class Variable:
 
         self.set_value(value_list[position])
 
-    def get_name(self):
+    def get_name(self) -> str:
         """Get variable name."""
         return self._name
 
-    def set_name(self, name):
-        """Set variable name."""
+    def set_name(self, name: str):
+        """Set variable name.
+
+        Arguments:
+                name: name of the variable
+        """
         self._name = name
 
-    def get_units(self):
-        """Get variable units."""
+    def get_units(self) -> str:
+        """Get variable units.
+
+        Returns:
+            variable units
+        """
         return self._units
 
-    def set_units(self, units):
-        """Set variable units."""
+    def set_units(self, units: str):
+        """Set variable units.
+
+        Arguments:
+            units: units of the variable
+        """
         self._units = units
 
-    def get_variable_label(self):
-        """Get variable label."""
+    def get_variable_label(self) -> str:
+        """Get variable label.
+
+        Returns:
+            variable label
+        """
         return self._variable_label
 
-    def set_variable_label(self, variable_label):
-        """Set variable label."""
+    def set_variable_label(self, variable_label: str):
+        """Set variable label.
+
+        Arguments:
+            variable_label: variable label
+        """
         self._variable_label = variable_label
 
-    def set_covariate(self, is_covariate):
-        """Set whether this dependent variable is treated as covariate."""
+    def set_covariate(self, is_covariate: bool):
+        """Set whether this dependent variable is treated as covariate.
+
+        Arguments:
+            is_covariate: whether this dependent variable is treated as covariate
+        """
         self._is_covariate = is_covariate
 
 
@@ -155,6 +224,11 @@ class VariableCollection:
 
     @property
     def all_variables(self) -> Iterator[Variable]:
+        """Get all variables.
+
+        Returns:
+            iterator over all variables
+        """
         for vars in (
             self.independent_variables,
             self.dependent_variables,
@@ -164,11 +238,21 @@ class VariableCollection:
                 yield v
 
     @property
-    def variable_names(self):
+    def variable_names(self) -> Generator[str, None, None]:
+        """Get variable names.
+
+        Returns:
+            variable names
+        """
         return (v.get_name() for v in self.all_variables)
 
     @property
-    def output_type(self):
+    def output_type(self) -> str:
+        """Get output type.
+
+        Returns:
+            output type
+        """
         first_type = self.dependent_variables[0].type
         assert all(dv.type == first_type for dv in self.dependent_variables), (
             "Dependent variable output types don't match. "
@@ -177,18 +261,33 @@ class VariableCollection:
         return first_type
 
     @property
-    def input_dimensions(self):
-        """The number of independent variables and covariates."""
+    def input_dimensions(self) -> int:
+        """The number of independent variables and covariates.
+
+        Returns:
+            number of independent variables and covariates
+        """
         return len(self.independent_variables) + len(self.covariates)
 
     @property
-    def output_dimensions(self):
-        """The number of dependent variables."""
+    def output_dimensions(self) -> int:
+        """The number of dependent variables.
+
+        Returns:
+            number of dependent variables
+        """
         return len(self.dependent_variables)
 
 
 class IV(Variable):
+    """Independent variable."""
+
     def __init__(self, *args, **kwargs):
+        """
+        Initialize independent variable.
+
+        For arguments, see [autora.variable.Variable][autora.variable.Variable.__init__]
+        """
         self._name = "IV"
         self._variable_label = "Independent Variable"
 
@@ -197,11 +296,19 @@ class IV(Variable):
     # Method for measuring dependent variable.
     @abstractmethod
     def manipulate(self):
+        """Manipulate independent variable."""
         pass
 
 
 class DV(Variable):
+    """Dependent variable."""
+
     def __init__(self, *args, **kwargs):
+        """
+        Initialize dependent variable.
+
+        For arguments, see [autora.variable.Variable][autora.variable.Variable.__init__]
+        """
         self._name = "DV"
         self._variable_label = "Dependent Variable"
 
@@ -212,49 +319,32 @@ class DV(Variable):
     # Method for measuring dependent variable.
     @abstractmethod
     def measure(self):
+        """Measure dependent variable."""
         pass
 
     # Get whether this dependent variable is treated as covariate.
-    def __is_covariate__(self):
+    def __is_covariate__(self) -> bool:
+        """Get whether this dependent variable is treated as covariate.
+
+        Returns:
+            whether this dependent variable is treated as covariate
+        """
         return self._is_covariate
 
     # Set whether this dependent variable is treated as covariate.
-    def __set_covariate__(self, is_covariate):
+    def __set_covariate__(self, is_covariate: bool):
+        """Set whether this dependent variable is treated as covariate.
+
+        Arguments:
+            is_covariate: whether this dependent variable is treated as covariate
+        """
         self._is_covariate = is_covariate
 
 
-class IVInSilico(IV):
-    _variable_label = "IV"
-    _name = "independent variable"
-    _units = "activation"
-    _priority = 0
-    _value_range = (0, 1)
-    _value = 0
-
-    def __init__(self, *args, **kwargs):
-        super(IVInSilico, self).__init__(*args, **kwargs)
-
-    def manipulate(self):
-        self._participant.set_value(self._name, self.get_value())
-
-
-class DVInSilico(DV):
-    _variable_label = "DV"
-    _name = "dependent variable"
-    _units = "activation"
-    _priority = 0
-    _value_range = (0, 1)
-    _value = 0
-
-    def __init__(self, *args, **kwargs):
-        super(DVInSilico, self).__init__(*args, **kwargs)
-
-    def measure(self):
-        measurement = self._participant.get_value(self._name)
-        self.set_value(measurement)
-
-
 class IVTrial(IV):
+    """
+    Experiment trial as independent variable.
+    """
 
     _name = "trial"
     _UID = ""
@@ -265,13 +355,24 @@ class IVTrial(IV):
     _value = 0
 
     def __init__(self, *args, **kwargs):
+        """
+        Initialize independent variable representing experiment trials.
+
+        For arguments, see [autora.variable.Variable][autora.variable.Variable.__init__]
+        """
         super(IVTrial, self).__init__(*args, **kwargs)
 
     # Waits until specified time has passed relative to reference time
     def manipulate(self):
+        """
+        Manipulate independent variable representing experiment trials.
+        """
         pass
 
     def disconnect(self):
+        """
+        Disconnect independent variable representing experiment trials.
+        """
         pass
 
 
@@ -287,173 +388,3 @@ def register_iv_label(**kwargs):
 def register_dv_label(**kwargs):
     dv_labels.update(kwargs)
     return
-
-
-register_dv_label(
-    **{
-        "verbal_red": (
-            DVInSilico,
-            "Verbal Response Red",
-            None,
-            "verbal_red",
-            "activation",
-            0,
-            (0, 1),
-        ),
-        "verbal_green": (
-            DVInSilico,
-            "Verbal Response Green",
-            None,
-            "verbal_green",
-            "activation",
-            0,
-            (0, 1),
-        ),
-        "verbal_sample": (
-            DVInSilico,
-            "Verbal Response Sample",
-            None,
-            "verbal_sample",
-            "class",
-            0,
-            (0, 1),
-        ),
-        "difference_detected": (
-            DVInSilico,
-            "Difference Detected",
-            None,
-            "difference_detected",
-            "activation",
-            0,
-            (0, 1),
-        ),
-        "difference_detected_sample": (
-            DVInSilico,
-            "Difference Detected",
-            None,
-            "difference_detected_sample",
-            "class",
-            0,
-            (0, 1),
-        ),
-        "learning_performance": (
-            DVInSilico,
-            "Accuracy",
-            None,
-            "learning_performance",
-            "probability",
-            0,
-            (0, 1),
-        ),
-        "learning_performance_sample": (
-            DVInSilico,
-            "Accuracy Sample",
-            None,
-            "learning_performance_sample",
-            "class",
-            0,
-            (0, 1),
-        ),
-        "dx1_lca": (
-            DVInSilico,
-            "dx1",
-            None,
-            "dx1_lca",
-            "net input delta",
-            0,
-            (-1000, 1000),
-        ),
-    }
-)
-
-register_iv_label(
-    **{
-        "trial": (IVTrial, "Trial", "", "trial", "trials", 0, (0, 10000000)),
-        "color_red": (
-            IVInSilico,
-            "Color Unit Red",
-            None,
-            "color_red",
-            "activation",
-            0,
-            (0, 1),
-        ),
-        "color_green": (
-            IVInSilico,
-            "Color Unit Green",
-            None,
-            "color_green",
-            "activation",
-            0,
-            (0, 1),
-        ),
-        "word_red": (
-            IVInSilico,
-            "Word Unit Red",
-            None,
-            "word_red",
-            "activation",
-            0,
-            (0, 1),
-        ),
-        "word_green": (
-            IVInSilico,
-            "Word Unit Green",
-            None,
-            "word_green",
-            "activation",
-            0,
-            (0, 1),
-        ),
-        "task_color": (
-            IVInSilico,
-            "Task Unit Color Naming",
-            None,
-            "task_color",
-            "activation",
-            0,
-            (0, 1),
-        ),
-        "task_word": (
-            IVInSilico,
-            "Task Unit Word Reading",
-            None,
-            "task_word",
-            "activation",
-            0,
-            (0, 1),
-        ),
-        "S1": (IVInSilico, "Stimulus 1 Intensity", None, "S1", "activation", 0, (0, 5)),
-        "S2": (IVInSilico, "Stimulus 2 Intensity", None, "S2", "activation", 0, (0, 5)),
-        "learning_trial": (
-            IVInSilico,
-            "Trial",
-            None,
-            "learning_trial",
-            "trial",
-            0,
-            (0, 1000),
-        ),
-        "P_initial": (
-            IVInSilico,
-            "Initial Performance",
-            None,
-            "P_initial",
-            "probability",
-            0,
-            (0, 1),
-        ),
-        "P_asymptotic": (
-            IVInSilico,
-            "Best Performance",
-            None,
-            "P_asymptotic",
-            "probability",
-            0,
-            (0, 1),
-        ),
-        "x1_lca": (IVInSilico, "x1", None, "x1_lca", "net input", 0, (-1000, 1000)),
-        "x2_lca": (IVInSilico, "x2", None, "x2_lca", "net input", 0, (-1000, 1000)),
-        "x3_lca": (IVInSilico, "x3", None, "x3_lca", "net input", 0, (-1000, 1000)),
-    }
-)

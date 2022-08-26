@@ -8,13 +8,21 @@ from autora.theorist.darts.operations import isiterable
 
 
 def _concat(xs) -> torch.Tensor:
+    """
+    A function to concatenate a list of tensors.
+    Args:
+        xs: The list of tensors to concatenate.
+
+    Returns:
+        The concatenated tensor.
+    """
     return torch.cat([x.view(-1) for x in xs])
 
 
 class Architect(object):
     """
-    A class representing a learner operating on the architecture weights of a DARTS model.
-    This class handles training the weights associated with mixture operations
+    A learner operating on the architecture weights of a DARTS model.
+    This learner handles training the weights associated with mixture operations
     (architecture weights).
     """
 

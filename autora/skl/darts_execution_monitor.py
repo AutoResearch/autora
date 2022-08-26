@@ -2,16 +2,39 @@ from types import SimpleNamespace
 
 import matplotlib.pyplot as plt
 import numpy as np
+import skl.darts
 
 
 class BasicExecutionMonitor:
+    """
+    A monitor of the execution of the DARTS algorithm.
+    """
+
     def __init__(self):
+        """
+        Initializes the execution monitor.
+        """
         self.arch_weight_history = list()
         self.loss_history = list()
         self.epoch_history = list()
         self.primitives = list()
 
-    def execution_monitor(self, network, architect, epoch, **kwargs):
+    def execution_monitor(
+        self,
+        network: skl.darts.Network,
+        architect: skl.darts.Architect,
+        epoch: int,
+    ):
+        """
+        A function to monitor the execution of the DARTS algorithm.
+
+        Arguments:
+            network: The DARTS network containing the weights each operation
+                in the mixture architecture
+            architect: The architect object used to construct the mixture architecture.
+            epoch: The current epoch of the training.
+        """
+
         # collect data for visualization
         self.epoch_history.append(epoch)
         self.arch_weight_history.append(
@@ -21,6 +44,12 @@ class BasicExecutionMonitor:
         self.primitives = network.primitives
 
     def display(self):
+        """
+        A function to display the execution monitor. This function will generate two plots:
+        (1) A plot of the training loss vs. epoch,
+        (2) a plot of the architecture weights vs. epoch, divided into subplots by each edge
+        in the mixture architecture.
+        """
 
         loss_fig, loss_ax = plt.subplots(1, 1)
         loss_ax.plot(self.loss_history)
