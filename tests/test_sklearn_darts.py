@@ -3,10 +3,15 @@ from copy import deepcopy
 import numpy as np
 import pytest
 import torch
-from skl.darts_execution_monitor import DARTSExecutionMonitor
 from sklearn.model_selection import GridSearchCV, train_test_split
 
-from autora.skl.darts import PRIMITIVES, DARTSRegressor, DARTSType, ValueType
+from autora.skl.darts import (
+    PRIMITIVES,
+    DARTSExecutionMonitor,
+    DARTSRegressor,
+    DARTSType,
+    ValueType,
+)
 
 
 def generate_noisy_constant_data(

@@ -4,7 +4,8 @@ from typing import Callable, Sequence
 import matplotlib.pyplot as plt
 import numpy as np
 import pytest  # noqa: 401
-from skl.darts import DARTSRegressor
+
+from autora.skl.darts import DARTSRegressor
 
 non_interchangeable_primitives = [
     "none",
