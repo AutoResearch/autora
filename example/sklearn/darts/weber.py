@@ -14,9 +14,8 @@ from sklearn.model_selection import GridSearchCV
 from sklearn.neural_network import MLPRegressor
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import PolynomialFeatures, StandardScaler
-from theorist.darts.operations import PRIMITIVES
 
-from autora.skl.darts import DARTSRegressor
+from autora.skl.darts import PRIMITIVES, DARTSRegressor
 
 logging.basicConfig(level=logging.INFO)
 
