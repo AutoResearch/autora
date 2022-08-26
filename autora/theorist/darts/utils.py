@@ -322,7 +322,7 @@ def create_exp_dir(
     os.chdir(parent_folder)  # Edit SM 10/23/19: use local experiment directory
     if not os.path.exists(path):
         os.mkdir(path)
-    print("Experiment dir : {}".format(path))
+    _logger.info("Experiment dir : {}".format(path))
 
     if results_folder is not None:
         try:
@@ -364,7 +364,7 @@ def read_log_files(results_path: str, winning_architecture_only: bool = False) -
 
     # READ LOG FILES
 
-    print("Reading log files... ")
+    _logger.info("Reading log files... ")
     for file in filelist:
 
         with open(file) as csvfile:
