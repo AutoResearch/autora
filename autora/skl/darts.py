@@ -366,8 +366,6 @@ class DARTSRegressor(BaseEstimator, RegressorMixin):
             but can be set to a graph based on a sample on the edge weights
             by running the `resample_model(sample_strategy="sample")` method.
             It can be reset by running the `resample_model(sample_strategy="max")` method.
-        model_sampler_: a callable which generates versions of the model, either based on the
-            maximum architecture weights or based on a sample over the architecture weights.
 
 
 
@@ -463,7 +461,6 @@ class DARTSRegressor(BaseEstimator, RegressorMixin):
         self.y_: Optional[np.ndarray] = None
         self.network_: Optional[Network] = None
         self.model_: Optional[Network] = None
-        self.model_sampler_: Optional[Callable[[SAMPLING_STRATEGIES], Network]] = None
 
         self.train_classifier_coefficients = train_classifier_coefficients
         self.train_classifier_bias = train_classifier_bias
