@@ -207,9 +207,8 @@ def test_metaparam_optimization():
         param_grid=[
             {
                 "max_epochs": [10, 50],
-                "arch_updates_per_epoch": [5, 10, 15],
-                "param_updates_per_epoch": [5, 10, 15],
-                "num_graph_nodes": [1, 2, 3],
+                "arch_updates_per_epoch": [5, 10],
+                "num_graph_nodes": [1, 2],
             }
         ],
     )
