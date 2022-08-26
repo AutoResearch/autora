@@ -187,7 +187,7 @@ def _general_darts(
             )
 
         # Then run the param optimization
-        optimize_coefficients(
+        _optimize_coefficients(
             network=network,
             criterion=criterion,
             data_loader=data_loader,
@@ -219,7 +219,7 @@ def _general_darts(
     return results
 
 
-def optimize_coefficients(
+def _optimize_coefficients(
     network: Network,
     criterion: torch.nn.Module,
     data_loader: torch.utils.data.DataLoader,
@@ -414,7 +414,7 @@ def _generate_model(
 
     # Re-optimize the parameters
 
-    optimize_coefficients(
+    _optimize_coefficients(
         model_without_output_function,
         criterion=criterion,
         data_loader=data_loader,
