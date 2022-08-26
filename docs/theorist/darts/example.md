@@ -79,6 +79,7 @@ darts_estimator.visualize_model()
 We can also change how the model is sampled from the architecture weight distribution:
 ```python
 darts_estimator.set_params(
+    max_epochs=0,  # no epochs of architecture fitting
     sampling_strategy="sample",  # overriding default "max"
     param_updates_for_sampled_model=800,
 )
@@ -89,6 +90,7 @@ darts_estimator.visualize_model()
 To recover the initial model, we need to return the sampling strategy to the default `"max"`:
 ```python
 darts_estimator.set_params(
+    max_epochs=0,  # no epochs of architecture fitting
     sampling_strategy="max",  
     param_updates_for_sampled_model=1000,
 )
