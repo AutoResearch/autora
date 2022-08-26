@@ -2,7 +2,8 @@ import copy
 import logging
 from dataclasses import dataclass
 from itertools import cycle
-from typing import Callable, Iterator, Literal, Optional, Sequence, Tuple
+from types import SimpleNamespace
+from typing import Any, Callable, Iterator, Literal, Optional, Sequence, Tuple
 
 import numpy as np
 import torch
@@ -10,26 +11,28 @@ import torch.nn
 import torch.nn.utils
 import torch.utils.data
 import tqdm
+from matplotlib import pyplot as plt
 from sklearn.base import BaseEstimator, RegressorMixin
 from sklearn.utils.validation import check_array, check_is_fitted, check_X_y
 
-from autora.theorist.darts.architect import Architect
-from autora.theorist.darts.dataset import darts_dataset_from_ndarray
-from autora.theorist.darts.model_search import DARTSType, Network
-from autora.theorist.darts.operations import PRIMITIVES
-from autora.theorist.darts.utils import (
+from autora.theorist.darts import (
+    PRIMITIVES,
+    Architect,
     AvgrageMeter,
+    DARTSType,
+    Network,
+    darts_dataset_from_ndarray,
+    darts_model_plot,
     format_input_target,
     get_loss_function,
     get_output_format,
     get_output_str,
 )
-from autora.theorist.darts.visualize import darts_model_plot
 from autora.variable import ValueType
 
 _logger = logging.getLogger(__name__)
 
-progress_indicator = tqdm.auto.tqdm
+_progress_indicator = tqdm.auto.tqdm
 
 SAMPLING_STRATEGIES = Literal["max", "sample"]
 IMPLEMENTED_DARTS_TYPES = Literal["original", "fair"]
@@ -162,7 +165,7 @@ def _general_darts(
     _logger.info("Starting fit.")
     network.train()
 
-    for epoch in progress_indicator(range(max_epochs)):
+    for epoch in _progress_indicator(range(max_epochs)):
 
         _logger.debug(f"Running fit, epoch {epoch}")
 
@@ -187,7 +190,7 @@ def _general_darts(
             )
 
         # Then run the param optimization
-        optimize_coefficients(
+        _optimize_coefficients(
             network=network,
             criterion=criterion,
             data_loader=data_loader,
@@ -219,7 +222,7 @@ def _general_darts(
     return results
 
 
-def optimize_coefficients(
+def _optimize_coefficients(
     network: Network,
     criterion: torch.nn.Module,
     data_loader: torch.utils.data.DataLoader,
@@ -374,12 +377,12 @@ def _generate_model(
     output_type: IMPLEMENTED_OUTPUT_TYPES,
     sampling_strategy: SAMPLING_STRATEGIES,
     data_loader: torch.utils.data.DataLoader,
-    param_update_steps,
-    param_learning_rate_max,
-    param_learning_rate_min,
-    param_momentum,
-    param_weight_decay,
-    grad_clip,
+    param_update_steps: int,
+    param_learning_rate_max: float,
+    param_learning_rate_min: float,
+    param_momentum: float,
+    param_weight_decay: float,
+    grad_clip: float,
 ) -> Network:
     """
     Generate a model architecture from mixed DARTS model.
@@ -390,6 +393,11 @@ def _generate_model(
         network: The mixed DARTS model.
         coefficient_optimizer: The function to optimize the coefficients of the trained model
         output_type: The output value type that is used for the output of the sampled model.
+        param_update_steps: The number of parameter update steps to perform.
+        param_learning_rate_max: Initial (maximum) learning rate for the operation parameters.
+        param_learning_rate_min: Final (minimum) learning rate for the operation parameters.
+        param_momentum: Momentum for the operation parameters.
+        param_weight_decay: Weight decay for the operation parameters.
 
     Returns:
         A model architecture that is a combination of the trained model and the output function.
@@ -409,7 +417,7 @@ def _generate_model(
 
     # Re-optimize the parameters
 
-    optimize_coefficients(
+    _optimize_coefficients(
         model_without_output_function,
         criterion=criterion,
         data_loader=data_loader,
@@ -708,12 +716,16 @@ class DARTSRegressor(BaseEstimator, RegressorMixin):
         """
         assert data is not None
 
-        if hasattr(data, "columns"):
+        if hasattr(data, "columns"):  # it's a dataframe with column names
             labels_ = tuple(data.columns)
+        elif (
+            hasattr(data, "name") and len(data.shape) == 1
+        ):  # it's a single series with a single name
+            labels_ = (data.name,)
 
         else:
             dim = 1 if data.ndim == 1 else data.shape[1]
-            labels_ = tuple(f"{default_label}{i}" for i in range(dim))
+            labels_ = tuple(f"{default_label}{i+1}" for i in range(dim))
         return labels_
 
     def model_repr(
@@ -762,3 +774,98 @@ class DARTSRegressor(BaseEstimator, RegressorMixin):
 
         model_repr_ = "\n".join(["Model:"] + edge_list)
         return model_repr_
+
+
+class DARTSExecutionMonitor:
+    """
+    A monitor of the execution of the DARTS algorithm.
+    """
+
+    def __init__(self):
+        """
+        Initializes the execution monitor.
+        """
+        self.arch_weight_history = list()
+        self.loss_history = list()
+        self.epoch_history = list()
+        self.primitives = list()
+
+    def execution_monitor(
+        self,
+        network: Network,
+        architect: Architect,
+        epoch: int,
+        **kwargs: Any,
+    ):
+        """
+        A function to monitor the execution of the DARTS algorithm.
+
+        Arguments:
+            network: The DARTS network containing the weights each operation
+                in the mixture architecture
+            architect: The architect object used to construct the mixture architecture.
+            epoch: The current epoch of the training.
+            **kwargs: other parameters which may be passed from the DARTS optimizer
+        """
+
+        # collect data for visualization
+        self.epoch_history.append(epoch)
+        self.arch_weight_history.append(
+            network.arch_parameters()[0].detach().numpy().copy()[np.newaxis, :]
+        )
+        self.loss_history.append(architect.current_loss)
+        self.primitives = network.primitives
+
+    def display(self):
+        """
+        A function to display the execution monitor. This function will generate two plots:
+        (1) A plot of the training loss vs. epoch,
+        (2) a plot of the architecture weights vs. epoch, divided into subplots by each edge
+        in the mixture architecture.
+        """
+
+        loss_fig, loss_ax = plt.subplots(1, 1)
+        loss_ax.plot(self.loss_history)
+
+        loss_ax.set_ylabel("Loss", fontsize=14)
+        loss_ax.set_xlabel("Epoch", fontsize=14)
+        loss_ax.set_title("Training Loss")
+
+        arch_weight_history_array = np.vstack(self.arch_weight_history)
+        num_epochs, num_edges, num_primitives = arch_weight_history_array.shape
+
+        subplots_per_side = int(np.ceil(np.sqrt(num_edges)))
+
+        arch_fig, arch_axes = plt.subplots(
+            subplots_per_side,
+            subplots_per_side,
+            sharex=True,
+            sharey=True,
+            figsize=(10, 10),
+            squeeze=False,
+        )
+
+        arch_fig.suptitle("Architecture Weights", fontsize=10)
+
+        for (edge_i, ax) in zip(range(num_edges), arch_axes.flat):
+            for primitive_i in range(num_primitives):
+                print(f"{edge_i}, {primitive_i}, {ax}")
+                ax.plot(
+                    arch_weight_history_array[:, edge_i, primitive_i],
+                    label=f"{self.primitives[primitive_i]}",
+                )
+
+            ax.set_title("k{}".format(edge_i), fontsize=8)
+
+            # there is no need to have the legend for each subplot
+            if edge_i == 0:
+                ax.legend(loc="upper center")
+                ax.set_ylabel("Edge Weights", fontsize=8)
+                ax.set_xlabel("Epoch", fontsize=8)
+
+        return SimpleNamespace(
+            loss_fig=loss_fig,
+            loss_ax=loss_ax,
+            arch_fig=arch_fig,
+            arch_axes=arch_axes,
+        )

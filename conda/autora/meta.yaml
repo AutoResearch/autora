@@ -52,14 +52,15 @@ test:
     - autora.variable
 
 about:
-  home: The package home page
+  home: https://musslick.github.io/AER_website/Resources.html
   license: UNKNOWN
   license_family: OTHER
-  license_file:
+  license_file: LICENSE.md
   summary: "Autonomous Research Assistant (AutoRA) is a framework for implementing machine learning tools which autonomously and iteratively generate 1) new theories to describe real-world data, and 2) experiments to invalidate those theories and seed a new cycle of theory-making. The experiments will be run online via crowd-sourcing platforms (MTurk, Prolific)."
-  doc_url:
-  dev_url:
+  doc_url: https://autoresearch.github.io/autora/
+  dev_url: https://github.com/AutoResearch/autora
 
 extra:
   recipe-maintainers:
+    - musslick
     - hollandjg

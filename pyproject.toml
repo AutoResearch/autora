@@ -2,8 +2,14 @@
 name = "autora"
 version = "1.0.0"
 description = "Autonomous Research Assistant (AutoRA) is a framework for implementing machine learning tools which autonomously and iteratively generate 1) new theories to describe real-world data, and 2) experiments to invalidate those theories and seed a new cycle of theory-making. The experiments will be run online via crowd-sourcing platforms (MTurk, Prolific)."
-authors = ["Sebastian Musslick <sebastian_musslick@brown.edu>"]
+authors = [
+    "Sebastian Musslick <sebastian_musslick@brown.edu>",
+    "John Gerrard Holland <john_holland1@brown.edu>",
+]
 readme = "README.md"
+homepage = "https://musslick.github.io/AER_website/Research.html"
+repository = "https://github.com/AutoResearch/autora"
+documentation = "https://autoresearch.github.io/autora/"
 
 [tool.poetry.dependencies]
 python = "^3.8"

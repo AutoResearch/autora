@@ -1,12 +1,18 @@
 from copy import deepcopy
 
 import numpy as np
+import pandas as pd
 import pytest
 import torch
-from skl.darts_execution_monitor import BasicExecutionMonitor
 from sklearn.model_selection import GridSearchCV, train_test_split
 
-from autora.skl.darts import PRIMITIVES, DARTSRegressor, DARTSType, ValueType
+from autora.skl.darts import (
+    PRIMITIVES,
+    DARTSExecutionMonitor,
+    DARTSRegressor,
+    DARTSType,
+    ValueType,
+)
 
 
 def generate_noisy_constant_data(
@@ -232,7 +238,7 @@ def test_execution_monitor():
 
     kwargs = dict()
 
-    execution_monitor_0 = BasicExecutionMonitor()
+    execution_monitor_0 = DARTSExecutionMonitor()
 
     DARTSRegressor(
         primitives=["add", "subtract", "none", "mult", "logistic"],
@@ -244,7 +250,7 @@ def test_execution_monitor():
     ).fit(X, y)
     execution_monitor_0.display()
 
-    execution_monitor_1 = BasicExecutionMonitor()
+    execution_monitor_1 = DARTSExecutionMonitor()
     DARTSRegressor(
         primitives=["add", "ln"],
         num_graph_nodes=5,
@@ -255,4 +261,56 @@ def test_execution_monitor():
     ).fit(X, y)
     execution_monitor_1.display()
 
+    execution_monitor_2 = DARTSExecutionMonitor()
+    DARTSRegressor(
+        primitives=["add", "subtract", "none", "mult", "logistic"],
+        execution_monitor=execution_monitor_2.execution_monitor,
+        num_graph_nodes=1,
+        max_epochs=100,
+        param_updates_per_epoch=100,
+        **kwargs
+    ).fit(X, y)
+    execution_monitor_2.display()
+
     plt.show()
+
+
+def test_label_getter():
+
+    X, y, _ = generate_constant_data(num=10)
+    df = pd.DataFrame(
+        {
+            "input_x1": X.ravel(),
+            "input_x2": X.ravel(),
+            "output_y1": y.ravel(),
+            "output_y2": y.ravel(),
+        }
+    )
+    kwargs = dict(num_graph_nodes=1, max_epochs=0, param_updates_for_sampled_model=0)
+
+    input_dataframe_single_column = df[["input_x1"]]
+    input_dataframe_multi_column = df[["input_x1", "input_x2"]]
+
+    # The input "series" case is not supported – we enforce 2d inputs for the X values
+
+    output_dataframe_single_column = df[["output_y1"]]
+    output_series_single_column = df["output_y1"]
+    output_dataframe_multi_column = df[["output_y1", "output_y2"]]
+
+    estimator0 = DARTSRegressor(**kwargs).fit(
+        input_dataframe_single_column, output_dataframe_single_column
+    )
+    assert estimator0._get_input_labels() == ("input_x1",)
+    assert estimator0._get_output_labels() == ("output_y1",)
+
+    estimator0 = DARTSRegressor(**kwargs).fit(
+        input_dataframe_single_column, output_series_single_column
+    )
+    assert estimator0._get_input_labels() == ("input_x1",)
+    assert estimator0._get_output_labels() == ("output_y1",)
+
+    estimator1 = DARTSRegressor(**kwargs).fit(
+        input_dataframe_multi_column, output_dataframe_multi_column
+    )
+    assert estimator1._get_input_labels() == ("input_x1", "input_x2")
+    assert estimator1._get_output_labels() == ("output_y1", "output_y2")

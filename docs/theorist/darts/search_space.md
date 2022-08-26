@@ -10,11 +10,11 @@ DARTS uses a search space of operations to find the best model. The search space
 - **mult**: The output of the computation $x_j$ is its input $x_i$ multiplied by some constant $a$.
 - **linear**: The output of the computation $x_j$ is linearly dependent on its input $x_i$: $x_j = a * x_i + b$.
 - **relu**: The output of the computation $x_j$ is a rectified linear function of its input $x_i$: $x_j = \max(0, x_i)$.
-- **exp**: The output of the computation $x_j$ is exponentially dependent on its input $x_i$: $x_j = exp(x_i)$.
+- **exp**: The output of the computation $x_j$ is exponentially dependent on its input $x_i$: $x_j = \exp(x_i)$.
 - **logistic**: The output of the computation $x_j$ is a logistic function of its input $x_i$: $x_j = \frac{1}{1 + \exp(-b * x_i)}$.
-- **sin**: The output of the computation $x_j$ is the sinus function of its input $x_i$: $x_j = sin(x_i)$.
-- **cos**: The output of the computation $x_j$ is the cosinus function of its input $x_i$: $x_j = cos(x_i)$.
-- **tanh**: The output of the computation $x_j$ is the tangens hyperbolicus of its input $x_i$: $x_j = tanh(x_i)$.
+- **sin**: The output of the computation $x_j$ is the sinus function of its input $x_i$: $x_j = \sin(x_i)$.
+- **cos**: The output of the computation $x_j$ is the cosinus function of its input $x_i$: $x_j = \cos(x_i)$.
+- **tanh**: The output of the computation $x_j$ is the tangens hyperbolicus of its input $x_i$: $x_j = \tanh(x_i)$.
 
 Some of the primitives above may also be preceded by a linear transformation, allowing for more degrees of freedom in the search space:
 

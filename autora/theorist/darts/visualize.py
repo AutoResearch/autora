@@ -105,7 +105,7 @@ def darts_model_plot(
             steps += 1
 
     for i in range(steps):
-        graph.node(str(i), fillcolor="#BBCCF9")  # fillcolor='lightblue'
+        graph.node("k" + str(i + 1), fillcolor="#BBCCF9")  # fillcolor='lightblue'
 
     params_counter = 0
     n = len(input_labels)
@@ -122,8 +122,8 @@ def darts_model_plot(
             if j < len(input_labels):
                 u = input_labels[j]
             else:
-                u = str(j - len(input_labels))
-            v = str(i)
+                u = "k" + str(j - len(input_labels) + 1)
+            v = "k" + str(i + 1)
             params_counter = k
             if op != "none":
                 op_label = op
@@ -183,6 +183,7 @@ def darts_model_plot(
             out_nodes.append(out_str)
 
     for i in range(steps):
+        u = "k" + str(i + 1)
         if full_label:
             params_org = param_list[params_counter + 1 + i]  # count from k
             for out_idx, out_str in enumerate(out_nodes):
@@ -191,9 +192,9 @@ def darts_model_plot(
                 op_label = get_operation_label(
                     "classifier", params, decimals=decimals_to_display
                 )
-                graph.edge(str(i), out_str, label=op_label, fillcolor="gray")
+                graph.edge(u, out_str, label=op_label, fillcolor="gray")
         else:
             for out_idx, out_str in enumerate(out_nodes):
-                graph.edge(str(i), out_str, label="linear", fillcolor="gray")
+                graph.edge(u, out_str, label="linear", fillcolor="gray")
 
     return graph
