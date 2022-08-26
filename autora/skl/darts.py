@@ -716,8 +716,12 @@ class DARTSRegressor(BaseEstimator, RegressorMixin):
         """
         assert data is not None
 
-        if hasattr(data, "columns"):
+        if hasattr(data, "columns"):  # it's a dataframe with column names
             labels_ = tuple(data.columns)
+        elif (
+            hasattr(data, "name") and len(data.shape) == 1
+        ):  # it's a single series with a single name
+            labels_ = (data.name,)
 
         else:
             dim = 1 if data.ndim == 1 else data.shape[1]
