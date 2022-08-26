@@ -1,5 +1,5 @@
 {% set name = "autora" %}
-{% set version = "1.0.0a6" %}
+{% set version = "1.0.0a7" %}
 
 package:
   name: "{{ name|lower }}"
