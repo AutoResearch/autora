@@ -29,8 +29,10 @@ def generate_noisy_linear_data(
     epsilon: float = 0.01,
     num: int = 1000,
     seed: int = 42,
+    start: float = 0,
+    stop: float = 1,
 ):
-    X = np.expand_dims(np.linspace(start=0, stop=1, num=num), 1)
+    X = np.expand_dims(np.linspace(start=start, stop=stop, num=num), 1)
     y = (
         (gradient * X.ravel())
         + const
@@ -126,32 +128,38 @@ def test_primitive_selection():
 
 
 def test_fit_with_fixed_architecture():
-    X, y, _, _, _ = generate_noisy_linear_data(const=1.0, gradient=2.0)
-    X1, y1, _, _, _ = generate_noisy_linear_data(const=10.0, gradient=5.0)
+    X, y, _, _, _ = generate_noisy_linear_data(
+        start=-5, stop=+5, const=10.0, gradient=20.0
+    )
+    X1, y1, _, _, _ = generate_noisy_linear_data(
+        start=-5, stop=+5, const=10.0, gradient=5.0
+    )
 
     # Initialize the fitter
     regressor = DARTSRegressor(
-        primitives=["none", "linear"],
+        primitives=["linear", "mult"],
         num_graph_nodes=1,
     )
 
     # First fit: normal fitting
     regressor.set_params(
-        max_epochs=100,
+        max_epochs=500,
         arch_updates_per_epoch=1,
-        param_updates_per_epoch=1000,
+        param_updates_per_epoch=100,
     )
     regressor.fit(X, y)
     network_weights_initial = deepcopy(regressor.network_.alphas_normal)
     equation_initial = regressor.model_repr()
+    print(equation_initial)
 
     # Refit by setting epochs to one and arch updates to zero, and fit some different data
     regressor.set_params(
-        max_epochs=1, param_updates_per_epoch=1000, arch_updates_per_epoch=0
+        max_epochs=1, param_updates_per_epoch=100, arch_updates_per_epoch=0
     )
     regressor.fit(X1, y1)
     network_weights_refitted = deepcopy(regressor.network_.alphas_normal)
     equation_refitted = regressor.model_repr()
+    print(equation_refitted)
 
     # Architecture weights should be the same
     assert torch.all(network_weights_initial.eq(network_weights_refitted))
@@ -162,7 +170,7 @@ def test_fit_with_fixed_architecture():
     # Now refit using the "sampler".
     regressor.set_params(
         max_epochs=1,
-        param_updates_per_epoch=1000,
+        param_updates_per_epoch=100,
         arch_updates_per_epoch=0,
         sampling_strategy="sample",
     )
@@ -173,7 +181,7 @@ def test_fit_with_fixed_architecture():
     # Now return to the original settings and recover the original results.
     regressor.set_params(
         max_epochs=1,
-        param_updates_per_epoch=1000,
+        param_updates_per_epoch=100,
         arch_updates_per_epoch=0,
         sampling_strategy="max",
     )
