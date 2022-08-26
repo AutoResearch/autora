@@ -374,12 +374,12 @@ def _generate_model(
     output_type: IMPLEMENTED_OUTPUT_TYPES,
     sampling_strategy: SAMPLING_STRATEGIES,
     data_loader: torch.utils.data.DataLoader,
-    param_update_steps,
-    param_learning_rate_max,
-    param_learning_rate_min,
-    param_momentum,
-    param_weight_decay,
-    grad_clip,
+    param_update_steps: int,
+    param_learning_rate_max: float,
+    param_learning_rate_min: float,
+    param_momentum: float,
+    param_weight_decay: float,
+    grad_clip: float,
 ) -> Network:
     """
     Generate a model architecture from mixed DARTS model.
@@ -390,6 +390,11 @@ def _generate_model(
         network: The mixed DARTS model.
         coefficient_optimizer: The function to optimize the coefficients of the trained model
         output_type: The output value type that is used for the output of the sampled model.
+        param_update_steps: The number of parameter update steps to perform.
+        param_learning_rate_max: Initial (maximum) learning rate for the operation parameters.
+        param_learning_rate_min: Final (minimum) learning rate for the operation parameters.
+        param_momentum: Momentum for the operation parameters.
+        param_weight_decay: Weight decay for the operation parameters.
 
     Returns:
         A model architecture that is a combination of the trained model and the output function.
