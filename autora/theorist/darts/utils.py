@@ -2,7 +2,7 @@ import csv
 import glob
 import os
 import shutil
-import typing
+from typing import Callable, List, Optional, Tuple
 
 import numpy as np
 import torch
@@ -54,10 +54,10 @@ def create_output_file_name(
 
 def assign_slurm_instance(
     slurm_id: int,
-    arch_weight_decay_list: typing.List,
-    num_node_list: typing.List,
-    seed_list: typing.List,
-) -> typing.Tuple:
+    arch_weight_decay_list: List,
+    num_node_list: List,
+    seed_list: List,
+) -> Tuple:
     """
     Determines the meta-search parameters based on the slum job id.
 
@@ -121,7 +121,7 @@ def get_output_format(outputType: ValueType):
     return dataSets.get(outputType, nn.MSELoss)
 
 
-def get_output_str(outputType: ValueType) -> typing.Optional[str]:
+def get_output_str(outputType: ValueType) -> Optional[str]:
     """
     Returns the output string for the given output type of a dependent variable.
 
@@ -227,7 +227,7 @@ def compute_BIC(
 
 def compute_BIC_AIC(
     soft_targets: np.array, soft_prediction: np.array, model: Network
-) -> typing.Tuple:
+) -> Tuple:
     """
     Returns the Bayesian information criterion (BIC) as well as the
     Aikaike information criterion (AIC) for a DARTS model.
@@ -298,9 +298,7 @@ class AvgrageMeter(object):
         self.avg = self.sum / self.cnt
 
 
-def accuracy(
-    output: torch.Tensor, target: torch.Tensor, topk: typing.Tuple = (1,)
-) -> typing.List:
+def accuracy(output: torch.Tensor, target: torch.Tensor, topk: Tuple = (1,)) -> List:
     """
     Computes the accuracy over the k top predictions for the specified values of k.
 
@@ -365,7 +363,7 @@ def load(model: torch.nn.Module, model_path: str):
 
 def create_exp_dir(
     path: str,
-    scripts_to_save: typing.List = None,
+    scripts_to_save: List = None,
     parent_folder: str = "exps",
     results_folder: str = None,
 ):
@@ -402,9 +400,7 @@ def create_exp_dir(
             shutil.copyfile(script, dst_file)
 
 
-def read_log_files(
-    results_path: str, winning_architecture_only: bool = False
-) -> typing.Tuple:
+def read_log_files(results_path: str, winning_architecture_only: bool = False) -> Tuple:
     """
     Reads the log files from an experiment directory and returns the results.
 
@@ -443,11 +439,11 @@ def read_log_files(
 
 
 def get_best_fitting_models(
-    model_name_list: typing.List,
-    loss_list: typing.List,
-    BIC_list: typing.List,
+    model_name_list: List,
+    loss_list: List,
+    BIC_list: List,
     topk: int,
-) -> typing.Tuple:
+) -> Tuple:
     """
     Returns the topk best fitting models.
 
@@ -469,7 +465,21 @@ def get_best_fitting_models(
     return (topk_losses_names, topk_BICs_names)
 
 
-def format_input_target(input, target, criterion):
+def format_input_target(
+    input: torch.tensor, target: torch.tensor, criterion: Callable
+) -> Tuple[torch.tensor, torch.tensor]:
+    """
+    Formats the input and target for the model.
+
+    Args:
+        input: input to the model
+        target: target of the model
+        criterion: criterion to use for the model
+
+    Returns:
+        input: formatted input and target for the model
+
+    """
 
     if isinstance(criterion, nn.CrossEntropyLoss):
         target = target.squeeze()
