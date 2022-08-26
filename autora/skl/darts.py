@@ -1,7 +1,6 @@
 import copy
 import logging
 from dataclasses import dataclass
-from functools import partial
 from itertools import cycle
 from typing import Callable, Iterator, Literal, Optional, Sequence
 
@@ -151,8 +150,8 @@ def _general_darts(
             )
 
         # Then run the param optimization
-        coefficient_optimizer = partial(
-            optimize_coefficients,
+        optimize_coefficients(
+            network=network,
             data_loader=data_loader,
             criterion=criterion,
             param_updates_per_epoch=param_updates_per_epoch,
@@ -162,7 +161,6 @@ def _general_darts(
             param_weight_decay=param_weight_decay,
             grad_clip=grad_clip,
         )
-        coefficient_optimizer(network=network)
 
         execution_monitor(**locals())
 
@@ -207,31 +205,6 @@ def optimize_coefficients(
         T_max=param_updates_per_epoch,
         eta_min=param_learning_rate_min,
     )
-    _optimize_coefficients(
-        network=network,
-        criterion=criterion,
-        data_loader=data_loader,
-        grad_clip=grad_clip,
-        optimizer=optimizer,
-        param_updates_per_epoch=param_updates_per_epoch,
-        scheduler=scheduler,
-    )
-
-
-def _optimize_coefficients(
-    network: Network,
-    criterion: Callable,
-    data_loader: torch.utils.data.DataLoader,
-    grad_clip: bool,
-    optimizer: torch.optim.Optimizer,
-    param_updates_per_epoch: int,
-    scheduler: torch.optim.lr_scheduler.CosineAnnealingLR,
-):
-    """
-    Function to optimize the coefficients of a DARTS Network.
-
-    Warning: This modifies the coefficients of the Network in place.
-    """
 
     data_iterator = _get_data_iterator(data_loader)
 
@@ -331,18 +304,6 @@ def _generate_model(
     criterion = get_loss_function(ValueType(output_type))
     output_function = get_output_format(ValueType(output_type))
 
-    coefficient_optimizer = partial(
-        optimize_coefficients,
-        data_loader=data_loader,
-        criterion=criterion,
-        param_updates_per_epoch=param_updates_per_epoch,
-        param_learning_rate_max=param_learning_rate_max,
-        param_learning_rate_min=param_learning_rate_min,
-        param_momentum=param_momentum,
-        param_weight_decay=param_weight_decay,
-        grad_clip=grad_clip,
-    )
-
     # Set edges in the network with the highest weights to 1, others to 0
     model_without_output_function = copy.deepcopy(network_)
 
@@ -354,7 +315,18 @@ def _generate_model(
     model_without_output_function.fix_architecture(True, new_weights=new_weights)
 
     # Re-optimize the parameters
-    coefficient_optimizer(model_without_output_function)
+
+    optimize_coefficients(
+        model_without_output_function,
+        data_loader=data_loader,
+        criterion=criterion,
+        param_updates_per_epoch=param_updates_per_epoch,
+        param_learning_rate_max=param_learning_rate_max,
+        param_learning_rate_min=param_learning_rate_min,
+        param_momentum=param_momentum,
+        param_weight_decay=param_weight_decay,
+        grad_clip=grad_clip,
+    )
 
     # Include the output function
     model = torch.nn.Sequential(model_without_output_function, output_function)
