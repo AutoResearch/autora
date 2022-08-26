@@ -1,3 +1,6 @@
+# AutoRA-specific files
+example/studies/**/modeling
+
 # PyCharm ignores are handled by the .idea/.gitignore file
 # VSCode ignores are handled by the .vscode/.gitignore file
 
@@ -22,6 +25,8 @@ __pycache__/
 build/
 develop-eggs/
 dist/
+conda/dist
+conda/env.sh
 downloads/
 eggs/
 .eggs/
@@ -60,3 +65,6 @@ cover/
 .mypy_cache/
 .dmypy.json
 dmypy.json
+
+# Material for MkDocs
+site/
