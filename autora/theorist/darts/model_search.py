@@ -712,7 +712,7 @@ class Network(nn.Module):
                     if output_format == "latex":
                         u = "k_" + str(j - len(input_labels) + 1)
                     else:
-                        u = "k" + str(j - len(input_labels))
+                        u = "k" + str(j - len(input_labels) + 1)
                 if op != "none":
                     op_label = op
                     params = param_list[
