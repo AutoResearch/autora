@@ -1,4 +1,5 @@
 from types import SimpleNamespace
+from typing import Any
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -24,6 +25,7 @@ class BasicExecutionMonitor:
         network: skl.darts.Network,
         architect: skl.darts.Architect,
         epoch: int,
+        **kwargs: Any,
     ):
         """
         A function to monitor the execution of the DARTS algorithm.
@@ -33,6 +35,7 @@ class BasicExecutionMonitor:
                 in the mixture architecture
             architect: The architect object used to construct the mixture architecture.
             epoch: The current epoch of the training.
+            **kwargs: other parameters which may be passed from the DARTS optimizer
         """
 
         # collect data for visualization

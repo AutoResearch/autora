@@ -517,12 +517,16 @@ class Network(nn.Module):
                 # first get all the edges for a given node, edges are sorted according to their
                 # highest (non-none) weight, starting from the edge with the smallest heighest
                 # weight
+
+                if "none" in self.primitives:
+                    none_index = self.primitives.index("none")
+                else:
+                    none_index = -1
+
                 edges = sorted(
                     range(n),
                     key=lambda x: -max(
-                        W[x][k]
-                        for k in range(len(W[x]))
-                        if k != self.primitives.index("none")
+                        W[x][k] for k in range(len(W[x])) if k != none_index
                     ),
                 )
                 # for each edge, figure out which is the primitive with the
@@ -786,8 +790,5 @@ class Network(nn.Module):
                         classifier_str += ")"
 
         edge_list.append(classifier_str)
-
-        for edge in edge_list:
-            print(edge)
 
         return edge_list

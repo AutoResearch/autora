@@ -65,3 +65,35 @@ Now we have everything to run differentiable architecture search and visualize t
 darts_estimator.fit(X, y)
 darts_estimator.visualize_model()
 ```
+
+We can refine the fit by running the `fit` method again, after changing the parameters. This allows us to keep the same architecture but refit the parameters in the final sampled model, for example:
+```python
+darts_estimator.set_params(
+    max_epochs=0,  # no epochs of architecture fitting
+    param_updates_for_sampled_model=1000,  # 1000 steps of param optimiziation
+)
+darts_estimator.fit(X, y)
+darts_estimator.visualize_model()
+```
+
+We can also change how the model is sampled from the architecture weight distribution:
+```python
+darts_estimator.set_params(
+    sampling_strategy="sample",  # overriding default "max"
+    param_updates_for_sampled_model=800,
+)
+darts_estimator.fit(X, y)
+darts_estimator.visualize_model()
+```
+
+To recover the initial model, we need to return the sampling strategy to the default `"max"`:
+```python
+darts_estimator.set_params(
+    sampling_strategy="max",  
+    param_updates_for_sampled_model=1000,
+)
+darts_estimator.fit(X, y)
+darts_estimator.visualize_model()
+```
+
+As long as the architecture has not been refitted in the meantime, the architecture should be identical to the initial result, as the `sampling_strategy="max"` is deterministic. The coefficients of the architecture functions may, however, be different, as they have different starting values compared to when they were initially set. 

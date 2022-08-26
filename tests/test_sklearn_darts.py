@@ -1,5 +1,8 @@
+from copy import deepcopy
+
 import numpy as np
 import pytest
+import torch
 from skl.darts_execution_monitor import BasicExecutionMonitor
 from sklearn.model_selection import GridSearchCV, train_test_split
 
@@ -18,6 +21,30 @@ def generate_constant_data(const: float = 0.5, num: int = 1000):
     X = np.expand_dims(np.linspace(start=0, stop=1, num=num), 1)
     y = const * np.ones(num)
     return X, y, const
+
+
+def generate_noisy_linear_data(
+    const: float = 0.5,
+    gradient=0.25,
+    epsilon: float = 0.01,
+    num: int = 1000,
+    seed: int = 42,
+    start: float = 0,
+    stop: float = 1,
+):
+    X = np.expand_dims(np.linspace(start=start, stop=stop, num=num), 1)
+    y = (
+        (gradient * X.ravel())
+        + const
+        + np.random.default_rng(seed).normal(loc=0, scale=epsilon, size=num)
+    )
+    return (
+        X,
+        y,
+        const,
+        gradient,
+        epsilon,
+    )
 
 
 def test_constant_model():
@@ -100,6 +127,72 @@ def test_primitive_selection():
         KeyError, DARTSRegressor(primitives=["doesnt_exist"], **kwargs).fit(X, y)
 
 
+def test_fit_with_fixed_architecture():
+    X, y, _, _, _ = generate_noisy_linear_data(
+        start=-5, stop=+5, const=10.0, gradient=20.0
+    )
+    X1, y1, _, _, _ = generate_noisy_linear_data(
+        start=-5, stop=+5, const=10.0, gradient=5.0
+    )
+
+    # Initialize the fitter
+    regressor = DARTSRegressor(
+        primitives=["linear", "mult"],
+        num_graph_nodes=1,
+    )
+
+    # First fit: normal fitting
+    regressor.set_params(
+        max_epochs=500,
+        arch_updates_per_epoch=1,
+        param_updates_per_epoch=50,
+        param_updates_for_sampled_model=1000,
+    )
+    regressor.fit(X, y)
+    network_weights_initial = deepcopy(regressor.network_.alphas_normal)
+    equation_initial = regressor.model_repr()
+    print(equation_initial)
+
+    # Refit by setting epochs to one and arch updates to zero, and fit some different data
+    regressor.set_params(
+        max_epochs=0,
+        param_updates_for_sampled_model=1000,
+    )
+    regressor.fit(X1, y1)
+    network_weights_refitted = deepcopy(regressor.network_.alphas_normal)
+    equation_refitted = regressor.model_repr()
+    print(equation_refitted)
+
+    # Architecture weights should be the same
+    assert torch.all(network_weights_initial.eq(network_weights_refitted))
+
+    # ... but equations should be different
+    assert equation_initial != equation_refitted
+
+    # Now refit using the "sampler".
+    regressor.set_params(
+        max_epochs=0,
+        param_updates_for_sampled_model=1000,
+        sampling_strategy="sample",
+    )
+    regressor.fit(X1, y1)
+    equation_resampled = regressor.model_repr()
+    print(equation_resampled)
+
+    # Now return to the original settings and recover the original results.
+    regressor.set_params(
+        max_epochs=0,
+        param_updates_for_sampled_model=1000,
+        sampling_strategy="max",
+    )
+    regressor.fit(X, y)
+    network_weights_max_recovered = deepcopy(regressor.network_.alphas_normal)
+    equation_max_recovered = regressor.model_repr()
+    print(equation_max_recovered)
+    assert equation_initial == equation_max_recovered
+    assert torch.all(network_weights_initial.eq(network_weights_max_recovered))
+
+
 def test_metaparam_optimization():
 
     X, y, const = generate_constant_data()
@@ -114,9 +207,8 @@ def test_metaparam_optimization():
         param_grid=[
             {
                 "max_epochs": [10, 50],
-                "arch_updates_per_epoch": [5, 10, 15],
-                "param_updates_per_epoch": [5, 10, 15],
-                "num_graph_nodes": [1, 2, 3],
+                "arch_updates_per_epoch": [5, 10],
+                "num_graph_nodes": [1, 2],
             }
         ],
     )
@@ -143,7 +235,7 @@ def test_execution_monitor():
     execution_monitor_0 = BasicExecutionMonitor()
 
     DARTSRegressor(
-        primitives=["add", "subtract", "none", "mult", "sigmoid"],
+        primitives=["add", "subtract", "none", "mult", "logistic"],
         execution_monitor=execution_monitor_0.execution_monitor,
         num_graph_nodes=3,
         max_epochs=100,

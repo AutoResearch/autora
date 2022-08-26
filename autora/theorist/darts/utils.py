@@ -2,7 +2,7 @@ import csv
 import glob
 import os
 import shutil
-from typing import Callable, List, Optional, Tuple
+from typing import Callable, List, Tuple
 
 import numpy as np
 import torch
@@ -79,66 +79,6 @@ def assign_slurm_instance(
         int(num_node_list[int(k_id)]),
         int(seed_list[int(seed_id)]),
     )
-
-
-def get_loss_function(outputType: ValueType):
-    """
-    Returns the loss function for the given output type of a dependent variable.
-
-    Arguments:
-        outputType: output type of the dependent variable
-    """
-
-    dataSets = {
-        ValueType.REAL: nn.MSELoss(),
-        ValueType.PROBABILITY: sigmid_mse,
-        ValueType.PROBABILITY_SAMPLE: sigmid_mse,
-        ValueType.PROBABILITY_DISTRIBUTION: cross_entropy,
-        ValueType.CLASS: nn.CrossEntropyLoss(),
-        ValueType.SIGMOID: sigmid_mse,
-    }
-
-    return dataSets.get(outputType, nn.MSELoss)
-
-
-def get_output_format(outputType: ValueType):
-    """
-    Returns the output format (activation function of the final output layer)
-    for the given output type of a dependent variable.
-
-    Arguments:
-        outputType: output type of the dependent variable
-    """
-    dataSets = {
-        ValueType.REAL: nn.Identity(),
-        ValueType.PROBABILITY: nn.Sigmoid(),
-        ValueType.PROBABILITY_SAMPLE: nn.Sigmoid(),
-        ValueType.PROBABILITY_DISTRIBUTION: nn.Softmax(dim=1),
-        ValueType.CLASS: nn.Softmax(dim=1),
-        ValueType.SIGMOID: nn.Sigmoid(),
-    }
-
-    return dataSets.get(outputType, nn.MSELoss)
-
-
-def get_output_str(outputType: ValueType) -> Optional[str]:
-    """
-    Returns the output string for the given output type of a dependent variable.
-
-    Arguments:
-        outputType: output type of the dependent variable
-    """
-
-    dataSets = {
-        ValueType.REAL: None,
-        ValueType.PROBABILITY: "Sigmoid",
-        ValueType.PROBABILITY_SAMPLE: "Sigmoid",
-        ValueType.PROBABILITY_DISTRIBUTION: "Softmax",
-        ValueType.CLASS: "Softmax",
-        ValueType.SIGMOID: "Sigmoid",
-    }
-
-    return dataSets.get(outputType, nn.MSELoss)
 
 
 def sigmid_mse(output: torch.Tensor, target: torch.Tensor) -> torch.Tensor:
@@ -485,3 +425,67 @@ def format_input_target(
         target = target.squeeze()
 
     return (input, target)
+
+
+LOSS_FUNCTION_MAPPING = {
+    ValueType.REAL: nn.MSELoss(),
+    ValueType.PROBABILITY: sigmid_mse,
+    ValueType.PROBABILITY_SAMPLE: sigmid_mse,
+    ValueType.PROBABILITY_DISTRIBUTION: cross_entropy,
+    ValueType.CLASS: nn.CrossEntropyLoss(),
+    ValueType.SIGMOID: sigmid_mse,
+}
+
+
+def get_loss_function(outputType: ValueType):
+    """
+    Returns the loss function for the given output type of a dependent variable.
+
+    Arguments:
+        outputType: output type of the dependent variable
+    """
+
+    return LOSS_FUNCTION_MAPPING.get(outputType, nn.MSELoss())
+
+
+OUTPUT_FORMAT_MAPPING = {
+    ValueType.REAL: nn.Identity(),
+    ValueType.PROBABILITY: nn.Sigmoid(),
+    ValueType.PROBABILITY_SAMPLE: nn.Sigmoid(),
+    ValueType.PROBABILITY_DISTRIBUTION: nn.Softmax(dim=1),
+    ValueType.CLASS: nn.Softmax(dim=1),
+    ValueType.SIGMOID: nn.Sigmoid(),
+}
+
+
+def get_output_format(outputType: ValueType):
+    """
+    Returns the output format (activation function of the final output layer)
+    for the given output type of a dependent variable.
+
+    Arguments:
+        outputType: output type of the dependent variable
+    """
+
+    return OUTPUT_FORMAT_MAPPING.get(outputType, nn.MSELoss())
+
+
+OUTPUT_STR_MAPPING = {
+    ValueType.REAL: "",
+    ValueType.PROBABILITY: "Sigmoid",
+    ValueType.PROBABILITY_SAMPLE: "Sigmoid",
+    ValueType.PROBABILITY_DISTRIBUTION: "Softmax",
+    ValueType.CLASS: "Softmax",
+    ValueType.SIGMOID: "Sigmoid",
+}
+
+
+def get_output_str(outputType: ValueType) -> str:
+    """
+    Returns the output string for the given output type of a dependent variable.
+
+    Arguments:
+        outputType: output type of the dependent variable
+    """
+
+    return OUTPUT_STR_MAPPING.get(outputType, "")
