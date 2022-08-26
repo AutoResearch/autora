@@ -6,7 +6,7 @@ import numpy as np
 import skl.darts
 
 
-class BasicExecutionMonitor:
+class DARTSExecutionMonitor:
     """
     A monitor of the execution of the DARTS algorithm.
     """

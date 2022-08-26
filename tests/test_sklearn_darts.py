@@ -3,7 +3,7 @@ from copy import deepcopy
 import numpy as np
 import pytest
 import torch
-from skl.darts_execution_monitor import BasicExecutionMonitor
+from skl.darts_execution_monitor import DARTSExecutionMonitor
 from sklearn.model_selection import GridSearchCV, train_test_split
 
 from autora.skl.darts import PRIMITIVES, DARTSRegressor, DARTSType, ValueType
@@ -232,7 +232,7 @@ def test_execution_monitor():
 
     kwargs = dict()
 
-    execution_monitor_0 = BasicExecutionMonitor()
+    execution_monitor_0 = DARTSExecutionMonitor()
 
     DARTSRegressor(
         primitives=["add", "subtract", "none", "mult", "logistic"],
@@ -244,7 +244,7 @@ def test_execution_monitor():
     ).fit(X, y)
     execution_monitor_0.display()
 
-    execution_monitor_1 = BasicExecutionMonitor()
+    execution_monitor_1 = DARTSExecutionMonitor()
     DARTSRegressor(
         primitives=["add", "ln"],
         num_graph_nodes=5,
