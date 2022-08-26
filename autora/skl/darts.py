@@ -29,7 +29,7 @@ from autora.variable import ValueType
 
 _logger = logging.getLogger(__name__)
 
-progress_indicator = tqdm.auto.tqdm
+_progress_indicator = tqdm.auto.tqdm
 
 SAMPLING_STRATEGIES = Literal["max", "sample"]
 IMPLEMENTED_DARTS_TYPES = Literal["original", "fair"]
@@ -162,7 +162,7 @@ def _general_darts(
     _logger.info("Starting fit.")
     network.train()
 
-    for epoch in progress_indicator(range(max_epochs)):
+    for epoch in _progress_indicator(range(max_epochs)):
 
         _logger.debug(f"Running fit, epoch {epoch}")
 
