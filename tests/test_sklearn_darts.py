@@ -261,6 +261,17 @@ def test_execution_monitor():
     ).fit(X, y)
     execution_monitor_1.display()
 
+    execution_monitor_2 = DARTSExecutionMonitor()
+    DARTSRegressor(
+        primitives=["add", "subtract", "none", "mult", "logistic"],
+        execution_monitor=execution_monitor_2.execution_monitor,
+        num_graph_nodes=1,
+        max_epochs=100,
+        param_updates_per_epoch=100,
+        **kwargs
+    ).fit(X, y)
+    execution_monitor_2.display()
+
     plt.show()
 
 
