@@ -78,6 +78,7 @@ class BMS:
         self.epochs = epochs
         self.pms: Parallel = Parallel(Ts=[])
         self.model_: Tree = Tree()
+        self.variables: List = []
 
     def fit(self, X: np.ndarray, y: np.ndarray, np: int = 1):
         """
@@ -90,17 +91,23 @@ class BMS:
         Returns:
             self (BMS): the fitted estimator
         """
-        # X, y = sklearn.utils.check_X_y(X, y)
-        
-        # number of variables equals the number of columns in X
+        # firstly, store the column names of X since checking will
+        # cast the type of X to np.ndarray
         if isinstance(X, pd.DataFrame):
-            variables = list(X.columns)
+            self.variables = list(X.columns)
         else:
-            variables = ["S%d" % i for i in range(X.shape[1])]
+            # create variables X_1 to X_n where n is the number of columns in X
+            self.variables = ["X%d" % i for i in range(X.shape[1])]
+
+        X, y = sklearn.utils.check_X_y(X, y)
+
+        # cast X into pd.Pandas again to fit the need in mcmc.py
+        X = pd.DataFrame(X, columns=self.variables)
+        y = pd.DataFrame(y)
 
         self.pms = Parallel(
             Ts=self.ts,
-            variables=variables,
+            variables=self.variables,
             parameters=["a%d" % i for i in range(np)],
             x=X,
             y=y,
@@ -122,11 +129,11 @@ class BMS:
             y: predicted dependent variable values
         """
         sklearn.utils.validation.check_is_fitted(self)
+        # this validation step will cast X into np.ndarray format
         X = sklearn.utils.check_array(X)
-        if type(X) == np.ndarray:
-            x = pd.DataFrame(X)
-        elif type(X) == pd.DataFrame:
-            x = X
-        else:
-            raise TypeError("x must be either a dict or a pandas.DataFrame")
-        return self.model_.predict(x)
+        # we need to cast it back into pd.DataFrame with the original
+        # column names (generated in `fit`).
+        # in the future, we might need to look into mcmc.py to remove
+        # these redundant type castings.
+        X = pd.DataFrame(X, columns=self.variables)
+        return self.model_.predict(X)
