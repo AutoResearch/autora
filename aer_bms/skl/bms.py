@@ -103,7 +103,7 @@ class BMS:
 
         # cast X into pd.Pandas again to fit the need in mcmc.py
         X = pd.DataFrame(X, columns=self.variables)
-        y = pd.DataFrame(y)
+        y = pd.Series(y)
 
         self.pms = Parallel(
             Ts=self.ts,
