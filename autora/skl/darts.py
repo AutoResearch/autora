@@ -220,15 +220,15 @@ def _general_darts(
 
 
 def optimize_coefficients(
-    network,
-    criterion,
-    data_loader,
-    grad_clip,
-    param_learning_rate_max,
-    param_learning_rate_min,
-    param_momentum,
-    param_update_steps,
-    param_weight_decay,
+    network: Network,
+    criterion: torch.nn.Module,
+    data_loader: torch.utils.data.DataLoader,
+    grad_clip: float,
+    param_learning_rate_max: float,
+    param_learning_rate_min: float,
+    param_momentum: float,
+    param_update_steps: int,
+    param_weight_decay: float,
 ):
     """
     Function to optimize the coefficients of a DARTS Network.
@@ -240,9 +240,11 @@ def optimize_coefficients(
         criterion: The loss function to use.
         data_loader: The data loader to use for the optimization.
         grad_clip: Whether to clip the gradients.
-        optimizer: The optimizer to use for the optimization.
-        param_updates_per_epoch: The number of parameter updates to perform per epoch.
-        scheduler: The scheduler to use for the optimization.
+        param_update_steps: The number of parameter update steps to perform.
+        param_learning_rate_max: Initial (maximum) learning rate for the operation parameters.
+        param_learning_rate_min: Final (minimum) learning rate for the operation parameters.
+        param_momentum: Momentum for the operation parameters.
+        param_weight_decay: Weight decay for the operation parameters.
     """
     optimizer = torch.optim.SGD(
         params=network.parameters(),
@@ -371,7 +373,7 @@ def _generate_model(
     network_: Network,
     output_type: IMPLEMENTED_OUTPUT_TYPES,
     sampling_strategy: SAMPLING_STRATEGIES,
-    data_loader,
+    data_loader: torch.utils.data.DataLoader,
     param_update_steps,
     param_learning_rate_max,
     param_learning_rate_min,
