@@ -145,7 +145,8 @@ def test_fit_with_fixed_architecture():
     regressor.set_params(
         max_epochs=500,
         arch_updates_per_epoch=1,
-        param_updates_per_epoch=100,
+        param_updates_per_epoch=50,
+        param_updates_for_sampled_model=1000,
     )
     regressor.fit(X, y)
     network_weights_initial = deepcopy(regressor.network_.alphas_normal)
@@ -154,7 +155,8 @@ def test_fit_with_fixed_architecture():
 
     # Refit by setting epochs to one and arch updates to zero, and fit some different data
     regressor.set_params(
-        max_epochs=1, param_updates_per_epoch=100, arch_updates_per_epoch=0
+        max_epochs=0,
+        param_updates_for_sampled_model=1000,
     )
     regressor.fit(X1, y1)
     network_weights_refitted = deepcopy(regressor.network_.alphas_normal)
@@ -169,9 +171,8 @@ def test_fit_with_fixed_architecture():
 
     # Now refit using the "sampler".
     regressor.set_params(
-        max_epochs=1,
-        param_updates_per_epoch=100,
-        arch_updates_per_epoch=0,
+        max_epochs=0,
+        param_updates_for_sampled_model=1000,
         sampling_strategy="sample",
     )
     regressor.fit(X1, y1)
@@ -180,9 +181,8 @@ def test_fit_with_fixed_architecture():
 
     # Now return to the original settings and recover the original results.
     regressor.set_params(
-        max_epochs=1,
-        param_updates_per_epoch=100,
-        arch_updates_per_epoch=0,
+        max_epochs=0,
+        param_updates_for_sampled_model=1000,
         sampling_strategy="max",
     )
     regressor.fit(X, y)
