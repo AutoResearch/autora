@@ -1,3 +1,4 @@
+import logging
 import random
 import warnings
 from enum import Enum
@@ -17,6 +18,8 @@ from autora.theorist.darts.operations import (
     get_operation_label,
     isiterable,
 )
+
+_logger = logging.getLogger(__name__)
 
 
 class DARTSType(str, Enum):

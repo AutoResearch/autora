@@ -1,5 +1,6 @@
 import csv
 import glob
+import logging
 import os
 import shutil
 from typing import Callable, List, Tuple
@@ -10,6 +11,8 @@ from torch import nn as nn
 
 from autora.theorist.darts.model_search import Network
 from autora.variable import ValueType
+
+_logger = logging.getLogger(__name__)
 
 
 def create_output_file_name(

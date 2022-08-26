@@ -1,9 +1,11 @@
+import logging
 import typing
 from collections import namedtuple
 
 import torch
 import torch.nn as nn
 
+_logger = logging.getLogger(__name__)
 Genotype = namedtuple("Genotype", "normal normal_concat")
 
 

@@ -1,3 +1,5 @@
+import logging
+
 import numpy as np
 import torch
 import torch.nn.functional as F
@@ -5,6 +7,8 @@ from torch.autograd import Variable
 
 from autora.theorist.darts.model_search import DARTSType, Network
 from autora.theorist.darts.operations import isiterable
+
+_logger = logging.getLogger(__name__)
 
 
 def _concat(xs) -> torch.Tensor:

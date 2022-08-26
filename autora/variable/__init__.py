@@ -1,9 +1,12 @@
+import logging
 from abc import abstractmethod
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import Generator, Iterator, Optional, Sequence
 
 import numpy as np
+
+_logger = logging.getLogger(__name__)
 
 
 class ValueType(str, Enum):
