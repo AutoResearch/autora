@@ -65,6 +65,7 @@ def _general_darts(
     param_momentum: float = 9e-1,
     param_weight_decay: float = 3e-4,
     param_updates_per_epoch: int = 20,
+    param_updates_for_sampled_model: int = 100,
     arch_learning_rate_max: float = 3e-3,
     arch_updates_per_epoch: int = 20,
     arch_weight_decay: float = 1e-4,
@@ -152,14 +153,14 @@ def _general_darts(
         # Then run the param optimization
         optimize_coefficients(
             network=network,
-            data_loader=data_loader,
             criterion=criterion,
-            param_updates_per_epoch=param_updates_per_epoch,
+            data_loader=data_loader,
+            grad_clip=grad_clip,
             param_learning_rate_max=param_learning_rate_max,
             param_learning_rate_min=param_learning_rate_min,
             param_momentum=param_momentum,
+            param_update_steps=param_updates_per_epoch,
             param_weight_decay=param_weight_decay,
-            grad_clip=grad_clip,
         )
 
         execution_monitor(**locals())
@@ -170,7 +171,7 @@ def _general_darts(
         sampling_strategy=sampling_strategy,
         data_loader=data_loader,
         criterion=criterion,
-        param_updates_per_epoch=param_updates_per_epoch,
+        param_update_steps=param_updates_for_sampled_model,
         param_learning_rate_max=param_learning_rate_max,
         param_learning_rate_min=param_learning_rate_min,
         param_momentum=param_momentum,
@@ -191,7 +192,7 @@ def optimize_coefficients(
     param_learning_rate_max,
     param_learning_rate_min,
     param_momentum,
-    param_updates_per_epoch,
+    param_update_steps,
     param_weight_decay,
 ):
     optimizer = torch.optim.SGD(
@@ -202,7 +203,7 @@ def optimize_coefficients(
     )
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
         optimizer=optimizer,
-        T_max=param_updates_per_epoch,
+        T_max=param_update_steps,
         eta_min=param_learning_rate_min,
     )
 
@@ -213,7 +214,7 @@ def optimize_coefficients(
     if network.count_parameters()[0] == 0:
         return
 
-    for param_step in range(param_updates_per_epoch):
+    for param_step in range(param_update_steps):
         _logger.debug(f"Running parameter update, " f"param: {param_step}")
 
         lr = scheduler.get_last_lr()[0]
@@ -293,7 +294,7 @@ def _generate_model(
     output_type: IMPLEMENTED_OUTPUT_TYPES,
     sampling_strategy: SAMPLING_STRATEGIES,
     data_loader,
-    param_updates_per_epoch,
+    param_update_steps,
     param_learning_rate_max,
     param_learning_rate_min,
     param_momentum,
@@ -318,14 +319,14 @@ def _generate_model(
 
     optimize_coefficients(
         model_without_output_function,
-        data_loader=data_loader,
         criterion=criterion,
-        param_updates_per_epoch=param_updates_per_epoch,
+        data_loader=data_loader,
+        grad_clip=grad_clip,
         param_learning_rate_max=param_learning_rate_max,
         param_learning_rate_min=param_learning_rate_min,
         param_momentum=param_momentum,
+        param_update_steps=param_update_steps,
         param_weight_decay=param_weight_decay,
-        grad_clip=grad_clip,
     )
 
     # Include the output function
@@ -384,6 +385,7 @@ class DARTSRegressor(BaseEstimator, RegressorMixin):
         param_momentum: float = 9e-1,
         param_weight_decay: float = 3e-4,
         param_updates_per_epoch: int = 10,
+        param_updates_for_sampled_model: int = 100,
         arch_updates_per_epoch: int = 1,
         arch_learning_rate_max: float = 3e-3,
         arch_weight_decay: float = 1e-4,
@@ -434,6 +436,7 @@ class DARTSRegressor(BaseEstimator, RegressorMixin):
         self.init_weights_function = init_weights_function
 
         self.param_updates_per_epoch = param_updates_per_epoch
+        self.param_updates_for_sampled_model = param_updates_for_sampled_model
 
         self.param_learning_rate_max = param_learning_rate_max
         self.param_learning_rate_min = param_learning_rate_min
