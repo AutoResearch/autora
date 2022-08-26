@@ -842,11 +842,12 @@ class DARTSExecutionMonitor:
             sharex=True,
             sharey=True,
             figsize=(10, 10),
+            squeeze=False,
         )
 
         arch_fig.suptitle("Architecture Weights", fontsize=10)
 
-        for (edge_i, ax) in zip(range(num_edges), arch_axes.reshape(-1)):
+        for (edge_i, ax) in zip(range(num_edges), arch_axes.flat):
             for primitive_i in range(num_primitives):
                 print(f"{edge_i}, {primitive_i}, {ax}")
                 ax.plot(
