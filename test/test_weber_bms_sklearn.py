@@ -55,12 +55,7 @@ epochs = 100
 estimator = BMS(prior_par, ts, epochs)
 estimator = estimator.fit(x, y)
 
+print(estimator.model_)
+
 test_x = x.head()
 estimator.predict(test_x)
-
-# sklearn -> takes data as numpy ndarray
-# og BMS -> takes data as pandas dataframe
-# problem: metadata 
-# s1 s2
-# 0.2 0.3
-# 0.1 0.2

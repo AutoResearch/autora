@@ -1,13 +1,18 @@
-from typing import List
+from typing import List, Optional
+import logging
 
 import numpy as np
 import pandas as pd
-import sklearn.utils
+from sklearn.base import BaseEstimator, RegressorMixin
+from sklearn.utils.validation import check_array, check_is_fitted, check_X_y
 
 from aer_bms import Parallel, utils
 from aer_bms.mcmc import Tree
 
-priors = {
+_logger = logging.getLogger(__name__)
+# hyperparameters for BMS
+# 1) Priors for MCMC
+PRIORS = {
     "Nopi_/": 5.912205942815285,
     "Nopi_cosh": 8.12720511103694,
     "Nopi_-": 3.350846072163632,
@@ -29,11 +34,10 @@ priors = {
     "Nopi2_*": 1.0,
 }
 
+# 2) Temperatures for parallel tempering
+TEMPERATURES = [1.0] + [1.04**k for k in range(1, 20)]
 
-temperatures = [1.0] + [1.04**k for k in range(1, 20)]
-
-
-class BMS:
+class BMS(BaseEstimator, RegressorMixin):
     """
     Bayesian Machine Scientist.
 
@@ -63,8 +67,8 @@ class BMS:
 
     def __init__(
         self,
-        prior_par: dict = priors,
-        ts: List[float] = temperatures,
+        prior_par: dict = PRIORS,
+        ts: List[float] = TEMPERATURES,
         epochs: int = 3000,
     ) -> None:
         """
@@ -77,6 +81,9 @@ class BMS:
         self.prior_par = prior_par
         self.epochs = epochs
         self.pms: Parallel = Parallel(Ts=[])
+
+        self.X_: Optional[np.ndarray] = None
+        self.y_: Optional[np.ndarray] = None
         self.model_: Tree = Tree()
         self.variables: List = []
 
@@ -93,17 +100,19 @@ class BMS:
         """
         # firstly, store the column names of X since checking will
         # cast the type of X to np.ndarray
-        if isinstance(X, pd.DataFrame):
+        if hasattr(X, "columns"):
             self.variables = list(X.columns)
         else:
             # create variables X_1 to X_n where n is the number of columns in X
             self.variables = ["X%d" % i for i in range(X.shape[1])]
 
-        X, y = sklearn.utils.check_X_y(X, y)
+        X, y = check_X_y(X, y)
 
         # cast X into pd.Pandas again to fit the need in mcmc.py
         X = pd.DataFrame(X, columns=self.variables)
         y = pd.Series(y)
+
+        _logger.info("BMS fitting started")
 
         self.pms = Parallel(
             Ts=self.ts,
@@ -114,10 +123,13 @@ class BMS:
             prior_par=self.prior_par,
         )
         model, model_len, desc_len = utils.run(self.pms, self.epochs)
+
+        _logger.info("BMS fitting finished")
+        self.X_, self.y_ = X, y
         self.model_ = model
         return self
 
-    def predict(self, X):
+    def predict(self, X: np.ndarray):
         """
         Applies the fitted model to a set of independent variables `X`,
         to give predictions for the dependent variable `y`.
@@ -128,9 +140,12 @@ class BMS:
         Returns:
             y: predicted dependent variable values
         """
-        sklearn.utils.validation.check_is_fitted(self)
         # this validation step will cast X into np.ndarray format
-        X = sklearn.utils.check_array(X)
+        X = check_array(X)
+
+        check_is_fitted(self, attributes=["model_"])
+
+        assert self.model_ is not None
         # we need to cast it back into pd.DataFrame with the original
         # column names (generated in `fit`).
         # in the future, we might need to look into mcmc.py to remove
