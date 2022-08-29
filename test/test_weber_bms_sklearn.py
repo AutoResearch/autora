@@ -2,9 +2,6 @@ import warnings
 
 import pandas as pd
 
-import sys
-sys.path.append("./")
-
 from aer_bms.skl.bms import BMS
 
 warnings.filterwarnings("ignore")
@@ -16,9 +13,7 @@ XLABS = [
     "S2",
 ]
 
-epochs = 300
-
-raw_data = pd.read_csv("test/experiment_0_data.csv")
+raw_data = pd.read_csv("experiment_0_data.csv")
 x, y = raw_data[XLABS], raw_data["difference_detected"]
 
 # initialize model
@@ -60,7 +55,7 @@ estimator.predict(test_x)
 
 # sklearn -> takes data as numpy ndarray
 # og BMS -> takes data as pandas dataframe
-# problem: metadata 
+# problem: metadata
 # s1 s2
 # 0.2 0.3
 # 0.1 0.2
