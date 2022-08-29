@@ -2,9 +2,6 @@ import warnings
 
 import pandas as pd
 
-import sys
-sys.path.append("./")
-
 from aer_bms.skl.bms import BMS
 
 warnings.filterwarnings("ignore")
@@ -16,9 +13,7 @@ XLABS = [
     "S2",
 ]
 
-epochs = 300
-
-raw_data = pd.read_csv("test/experiment_0_data.csv")
+raw_data = pd.read_csv("experiment_0_data.csv")
 x, y = raw_data[XLABS], raw_data["difference_detected"]
 
 # initialize model
@@ -59,3 +54,4 @@ print(estimator.model_)
 
 test_x = x.head()
 estimator.predict(test_x)
+
