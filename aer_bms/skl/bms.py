@@ -1,5 +1,5 @@
-from typing import List, Optional
 import logging
+from typing import List, Optional
 
 import numpy as np
 import pandas as pd
@@ -37,6 +37,7 @@ PRIORS = {
 # 2) Temperatures for parallel tempering
 TEMPERATURES = [1.0] + [1.04**k for k in range(1, 20)]
 
+
 class BMS(BaseEstimator, RegressorMixin):
     """
     Bayesian Machine Scientist.
@@ -73,7 +74,7 @@ class BMS(BaseEstimator, RegressorMixin):
     ) -> None:
         """
         Arguments:
-            prior_par: a dictionary of the prior likelihoods of different functions based on
+            prior_par: a dictionary of the prior probabilities of different functions based on
             wikipedia data scraping
             ts: contains a list of the temperatures that the parallel ms works at
         """
