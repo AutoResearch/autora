@@ -229,7 +229,7 @@ Saving session...
 % 
 ```
 
-To run a script, e.g. the `run_weber_study.py` script in the [`example/sklearn/darts`](./example/sklearn/darts) directory, execute: 
+To run a script, e.g. the `weber.py` script in the [`example/sklearn/darts`](./example/sklearn/darts) directory, execute: 
 
 ```shell
 poetry run python example/sklearn/darts/weber.py
