@@ -1,5 +1,5 @@
-from copy import deepcopy
 import logging
+from copy import deepcopy
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -7,7 +7,8 @@ import numpy as np
 logging.basicConfig(level=logging.INFO)
 _logger = logging.getLogger(__name__)
 
-def run(pms, num_steps, thinning=100):  
+
+def run(pms, num_steps, thinning=100):
     desc_len, model, model_len = [], None, np.inf
     for n in range(num_steps):
         pms.mcmc_step()
@@ -18,6 +19,7 @@ def run(pms, num_steps, thinning=100):
             model, model_len = deepcopy(pms.t1), pms.t1.E
         _logger.info("Finish iteration {}".format(n))
     return model, model_len, desc_len
+
 
 def present_results(model, model_len, desc_len):
     print("Best model:\t", model)
@@ -30,6 +32,7 @@ def present_results(model, model_len, desc_len):
     plt.show()
     return 0
 
+
 def predict(model, x, y):
     plt.figure(figsize=(6, 6))
     plt.scatter(model.predict(x), y)
@@ -41,3 +44,4 @@ def predict(model, x, y):
     plt.xlabel("MDL model predictions", fontsize=14)
     plt.ylabel("Actual values", fontsize=14)
     plt.show()
+    return model.predict(x)

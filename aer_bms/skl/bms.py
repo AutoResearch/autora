@@ -70,7 +70,7 @@ class BMS(BaseEstimator, RegressorMixin):
         self,
         prior_par: dict = PRIORS,
         ts: List[float] = TEMPERATURES,
-        epochs: int = 3000,
+        epochs: int = 30,
     ) -> None:
         """
         Arguments:
@@ -81,7 +81,7 @@ class BMS(BaseEstimator, RegressorMixin):
         self.ts = ts
         self.prior_par = prior_par
         self.epochs = epochs
-        self.pms: Parallel = Parallel(Ts=[])
+        self.pms: Parallel = Parallel(Ts=ts)
 
         self.X_: Optional[np.ndarray] = None
         self.y_: Optional[np.ndarray] = None
@@ -112,7 +112,6 @@ class BMS(BaseEstimator, RegressorMixin):
         # cast X into pd.Pandas again to fit the need in mcmc.py
         X = pd.DataFrame(X, columns=self.variables)
         y = pd.Series(y)
-
         _logger.info("BMS fitting started")
 
         self.pms = Parallel(
@@ -152,4 +151,4 @@ class BMS(BaseEstimator, RegressorMixin):
         # in the future, we might need to look into mcmc.py to remove
         # these redundant type castings.
         X = pd.DataFrame(X, columns=self.variables)
-        return self.model_.predict(X)
+        return np.expand_dims(self.model_.predict(X).to_numpy(), axis=1)
