@@ -49,7 +49,7 @@ class Variable:
         self._units = units
         self._value_range = value_range
         self._value = 0
-        self.type = type
+        self._type = type
         if variable_label == "":
             self._variable_label = self._name
         else:
@@ -57,123 +57,21 @@ class Variable:
         self._rescale = rescale
         self._is_covariate = is_covariate
 
-    def __get_value_range__(self):
-        """Get range of variable.
-        The variable range determines the minimum and maximum allowed value
-        to be manipulated or measured."""
-        return self._value_range
+    @property
+    def min(self):
+        return self._value_range[0]
 
-    def __set_value_range__(self, value_range: Sequence):
-        """Set range of variable.
-        The variable range determines the minimum and maximum allowed value
-        to be manipulated or measured.
+    @property
+    def max(self):
+        return self._value_range[1]
 
-        Arguments:
-            value_range: range of the variable
-        """
-        self._value_range = value_range
-
-    def __cap_value__(self, value: float):
-        """Cap value of variable.
-
-        Arguments:
-            value: value of the variable
-        """
-        minimum = self._value_range[0]
-        maximum = self._value_range[1]
-        return np.min([np.max([value, minimum]), maximum])
-
-    def get_value(self) -> float:
-        """Get value.
-
-        Returns:
-            value of the variable
-        """
-        return self._value * self._rescale
-
-    def set_value(self, value: float):
-        """Set value.
-
-        Arguments:
-            value: value of the variable
-        """
-        self._value = self.__cap_value__(value)
-
-    def get_value_from_dict(self, dictionary: dict, position: int) -> float:
-        """Reads value of independent variable from a dictionary.
-
-        Arguments:
-            dictionary: dictionary with variable_label being the key
-            position: position of the value in the dictionary
-
-        Returns:
-            value of the variable
-        """
-
-        value_list = dictionary[self.get_name()]
-
-        if position > len(value_list):
-            raise Exception(
-                f"Queried position "
-                f"{str(position)}"
-                f" for variable "
-                f"{self.get_name()}"
-                f"'exceeds number of available positions for that variable in the dictionary."
-            )
-
-        return value_list[position] * self._rescale
-
-    def get_value_list_from_dict(self, dictionary: dict) -> Sequence:
-        """Gets the rescaled values of independent variables from a dictionary.
-
-        Arguments:
-            dictionary: dictionary with variable_label being the key
-
-        Returns:
-            list of values of the variable
-        """
-        value_list = dictionary[self.get_name()]
-
-        rescaled_list = [element * self._rescale for element in value_list]
-
-        return rescaled_list
-
-    def set_value_from_dict(self, dictionary: dict, position: int):
-        """
-        Reads and sets value of independent variable from a dictionary
-        with variable_label being the key
-
-        Arguments:
-            dictionary: dictionary with variable_label being the key
-            position: position of the value in the dictionary
-        """
-
-        value_list = dictionary[self.get_name()]
-
-        if position > len(value_list):
-            raise Exception(
-                f"Queried position "
-                f"{str(position)}"
-                f" for variable "
-                f"{self.get_name()}"
-                f" exceeds number of available positions for that variable in the dictionary."
-            )
-
-        self.set_value(value_list[position])
-
-    def get_name(self) -> str:
+    @property
+    def name(self) -> str:
         """Get variable name."""
         return self._name
 
-    def set_name(self, name: str):
-        """Set variable name.
-
-        Arguments:
-                name: name of the variable
-        """
-        self._name = name
-
-    def get_units(self) -> str:
+    @property
+    def units(self) -> str:
         """Get variable units.
 
         Returns:
@@ -181,15 +79,8 @@ class Variable:
         """
         return self._units
 
-    def set_units(self, units: str):
-        """Set variable units.
-
-        Arguments:
-            units: units of the variable
-        """
-        self._units = units
-
-    def get_variable_label(self) -> str:
+    @property
+    def variable_label(self) -> str:
         """Get variable label.
 
         Returns:
@@ -197,21 +88,18 @@ class Variable:
         """
         return self._variable_label
 
-    def set_variable_label(self, variable_label: str):
-        """Set variable label.
-
-        Arguments:
-            variable_label: variable label
+    @property
+    def is_covariate(self) -> bool:
         """
-        self._variable_label = variable_label
 
-    def set_covariate(self, is_covariate: bool):
-        """Set whether this dependent variable is treated as covariate.
+        Returns:
 
-        Arguments:
-            is_covariate: whether this dependent variable is treated as covariate
         """
-        self._is_covariate = is_covariate
+        return self._is_covariate
+
+    @property
+    def type(self) -> ValueType:
+        return self._type
 
 
 @dataclass(frozen=True)
@@ -244,7 +132,7 @@ class VariableCollection:
         Returns:
             variable names
         """
-        return (v.get_name() for v in self.all_variables)
+        return (v.name for v in self.all_variables)
 
     @property
     def output_type(self) -> str:
@@ -282,109 +170,34 @@ class VariableCollection:
 class IV(Variable):
     """Independent variable."""
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, name="IV", variable_label="Independent Variable", **kwargs):
         """
         Initialize independent variable.
 
         For arguments, see [autora.variable.Variable][autora.variable.Variable.__init__]
         """
-        self._name = "IV"
-        self._variable_label = "Independent Variable"
+        self._name = name
+        self._variable_label = variable_label
 
-        super().__init__(*args, **kwargs)
-
-    # Method for measuring dependent variable.
-    @abstractmethod
-    def manipulate(self):
-        """Manipulate independent variable."""
-        pass
+        super().__init__(**kwargs)
 
 
 class DV(Variable):
     """Dependent variable."""
 
-    def __init__(self, *args, **kwargs):
+    def __init__(
+        self,
+        name="DV",
+        variable_label="Dependent Variable",
+        is_covariate=False,
+        **kwargs
+    ):
         """
         Initialize dependent variable.
 
         For arguments, see [autora.variable.Variable][autora.variable.Variable.__init__]
         """
-        self._name = "DV"
-        self._variable_label = "Dependent Variable"
-
-        self._is_covariate = False
-
-        super().__init__(*args, **kwargs)
-
-    # Method for measuring dependent variable.
-    @abstractmethod
-    def measure(self):
-        """Measure dependent variable."""
-        pass
-
-    # Get whether this dependent variable is treated as covariate.
-    def __is_covariate__(self) -> bool:
-        """Get whether this dependent variable is treated as covariate.
-
-        Returns:
-            whether this dependent variable is treated as covariate
-        """
-        return self._is_covariate
-
-    # Set whether this dependent variable is treated as covariate.
-    def __set_covariate__(self, is_covariate: bool):
-        """Set whether this dependent variable is treated as covariate.
-
-        Arguments:
-            is_covariate: whether this dependent variable is treated as covariate
-        """
+        self._name = name
+        self._variable_label = variable_label
         self._is_covariate = is_covariate
-
-
-class IVTrial(IV):
-    """
-    Experiment trial as independent variable.
-    """
-
-    _name = "trial"
-    _UID = ""
-    _variable_label = "Trial"
-    _units = "trials"
-    _priority = 0
-    _value_range = (0, 10000000)
-    _value = 0
-
-    def __init__(self, *args, **kwargs):
-        """
-        Initialize independent variable representing experiment trials.
-
-        For arguments, see [autora.variable.Variable][autora.variable.Variable.__init__]
-        """
-        super(IVTrial, self).__init__(*args, **kwargs)
-
-    # Waits until specified time has passed relative to reference time
-    def manipulate(self):
-        """
-        Manipulate independent variable representing experiment trials.
-        """
-        pass
-
-    def disconnect(self):
-        """
-        Disconnect independent variable representing experiment trials.
-        """
-        pass
-
-
-dv_labels = {}
-iv_labels = {}
-
-
-def register_iv_label(**kwargs):
-    iv_labels.update(kwargs)
-    return
-
-
-def register_dv_label(**kwargs):
-    dv_labels.update(kwargs)
-    return
+        super().__init__(**kwargs)
