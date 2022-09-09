@@ -1,13 +1,14 @@
 #!/usr/bin/env python
+import warnings
 from typing import Callable, Sequence
 
 import matplotlib.pyplot as plt
 import numpy as np
+import pytest  # noqa: 401
 
 from aer_bms.skl.bms import BMS
 
-# import pytest  # noqa: 401
-
+warnings.filterwarnings("ignore")
 
 non_interchangeable_primitives = [
     "none",
@@ -17,7 +18,10 @@ non_interchangeable_primitives = [
     "exp",
     "relu",
     "cos",
+    "cosh",
     "sin",
+    "sinh",
+    "tan",
     "tanh",
 ]
 
@@ -65,8 +69,23 @@ def transform_through_primitive_cos(x: np.ndarray):
     return y
 
 
+def transform_through_primitive_cosh(x: np.ndarray):
+    y = np.cosh(x)
+    return y
+
+
 def transform_through_primitive_sin(x: np.ndarray):
     y = np.sin(x)
+    return y
+
+
+def transform_through_primitive_sinh(x: np.ndarray):
+    y = np.sinh(x)
+    return y
+
+
+def transform_through_primitive_tan(x: np.ndarray):
+    y = np.tan(x)
     return y
 
 
@@ -108,12 +127,8 @@ def run_test_primitive_fitting(
     verbose: bool = True,
 ):
     y = transformer(X)
-    print(y.shape)
-    print(X.shape)
     regressor = BMS()
     regressor.fit(X, y)
-    print(expected_primitive)
-    print(primitives)
     if verbose:
         y_predict = regressor.predict(X)
         plot_results(X, y, y_predict)
@@ -216,11 +231,38 @@ def test_primitive_fitting_cos():
     )
 
 
+def test_primitive_fitting_cosh():
+    run_test_primitive_fitting(
+        generate_x(start=0, stop=2 * np.pi),
+        transform_through_primitive_cosh,
+        "cosh",
+        primitives=non_interchangeable_primitives,
+    )
+
+
 def test_primitive_fitting_sin():
     run_test_primitive_fitting(
         generate_x(start=0, stop=2 * np.pi),
         transform_through_primitive_sin,
         "sin",
+        primitives=non_interchangeable_primitives,
+    )
+
+
+def test_primitive_fitting_sinh():
+    run_test_primitive_fitting(
+        generate_x(start=0, stop=2 * np.pi),
+        transform_through_primitive_sinh,
+        "sinh",
+        primitives=non_interchangeable_primitives,
+    )
+
+
+def test_primitive_fitting_tan():
+    run_test_primitive_fitting(
+        generate_x(start=0, stop=2 * np.pi),
+        transform_through_primitive_tan,
+        "tan",
         primitives=non_interchangeable_primitives,
     )
 

@@ -9,7 +9,7 @@ _logger = logging.getLogger(__name__)
 
 
 def run(pms, num_steps, thinning=100):
-    desc_len, model, model_len = [], None, np.inf
+    desc_len, model, model_len = [], pms.t1, np.inf
     for n in range(num_steps):
         pms.mcmc_step()
         pms.tree_swap()
