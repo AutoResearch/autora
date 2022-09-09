@@ -128,7 +128,7 @@ def run_test_primitive_fitting(
 ):
     y = transformer(X)
     regressor = BMS()
-    regressor.fit(X, y)
+    regressor.fit(X, y.ravel())
     if verbose:
         y_predict = regressor.predict(X)
         plot_results(X, y, y_predict)
