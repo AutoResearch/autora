@@ -106,8 +106,8 @@ class Variable:
 class VariableCollection:
     """Immutable metadata about dependent / independent variables and covariates."""
 
-    independent_variables: Sequence[Variable]
-    dependent_variables: Sequence[Variable]
+    independent_variables: Sequence[Variable] = field(default_factory=list)
+    dependent_variables: Sequence[Variable] = field(default_factory=list)
     covariates: Sequence[Variable] = field(default_factory=list)
 
     @property
