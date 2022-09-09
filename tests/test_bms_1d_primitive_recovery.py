@@ -23,6 +23,11 @@ non_interchangeable_primitives = [
     "sinh",
     "tan",
     "tanh",
+    "pow2",
+    "pow3",
+    "sqrt",
+    "abs",
+    "fac",
 ]
 
 
@@ -34,6 +39,29 @@ def generate_x(start=-1, stop=1, num=500):
 def generate_x_log(start=-1, stop=1, num=500, base=10):
     x = np.expand_dims(np.logspace(start=start, stop=stop, num=num, base=base), 1)
     return x
+
+
+def transform_through_primitive_pow2(x: np.ndarray) -> np.ndarray:
+    return x**2
+
+
+def transform_through_primitive_pow3(x: np.ndarray) -> np.ndarray:
+    return x**3
+
+
+def transform_through_primitive_sqrt(x: np.ndarray) -> np.ndarray:
+    return np.sqrt(x)
+
+
+def transform_through_primitive_abs(x: np.ndarray) -> np.ndarray:
+    return np.abs(x)
+
+
+def transform_through_primitive_fac(x: np.ndarray) -> np.ndarray:
+    y = []
+    for x_i in x:
+        y.append(np.math.factorial(x_i))
+    return np.ndarray(y)
 
 
 def transform_through_primitive_none(x: np.ndarray) -> np.ndarray:
@@ -165,6 +193,51 @@ def test_primitive_fitting_restricted_subtract():
         transform_through_primitive_subtract,
         "subtract",
         primitives=["none", "add", "subtract"],
+    )
+
+
+def test_primitive_fitting_pow2():
+    run_test_primitive_fitting(
+        generate_x(),
+        transform_through_primitive_pow2,
+        "pow2",
+        primitives=non_interchangeable_primitives,
+    )
+
+
+def test_primitive_fitting_pow3():
+    run_test_primitive_fitting(
+        generate_x(),
+        transform_through_primitive_pow3,
+        "pow3",
+        primitives=non_interchangeable_primitives,
+    )
+
+
+def test_primitive_fitting_sqrt():
+    run_test_primitive_fitting(
+        generate_x(),
+        transform_through_primitive_sqrt,
+        "sqrt",
+        primitives=non_interchangeable_primitives,
+    )
+
+
+def test_primitive_fitting_abs():
+    run_test_primitive_fitting(
+        generate_x(),
+        transform_through_primitive_abs,
+        "abs",
+        primitives=non_interchangeable_primitives,
+    )
+
+
+def test_primitive_fitting_fac():
+    run_test_primitive_fitting(
+        generate_x(),
+        transform_through_primitive_fac,
+        "fac",
+        primitives=non_interchangeable_primitives,
     )
 
 
