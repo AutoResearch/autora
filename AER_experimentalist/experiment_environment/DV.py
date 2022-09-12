@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from tinkerforge_variable import Tinkerforge_Variable
+from AER_experimentalist.experiment_environment.tinkerforge_variable import Tinkerforge_Variable
 
 class DV(Tinkerforge_Variable):
 

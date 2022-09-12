@@ -1,3 +1,7 @@
+# import os
+# path_list = os.getcwd()
+# print(os.listdir(path_list))
+
 from datetime import datetime
 from AER_experimentalist.experiment_environment.IV_in_silico import IV_In_Silico as IV
 from AER_experimentalist.experiment_environment.DV_in_silico import DV_In_Silico as DV

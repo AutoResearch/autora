@@ -1,5 +1,5 @@
-from DV import DV
-from V_time import V_Time
+from AER_experimentalist.experiment_environment.DV import DV
+from AER_experimentalist.experiment_environment.V_time import V_Time
 import time
 
 class DV_Time(DV, V_Time):

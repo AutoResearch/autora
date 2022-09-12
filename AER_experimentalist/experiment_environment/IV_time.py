@@ -1,5 +1,5 @@
-from IV import IV
-from V_time import V_Time
+from AER_experimentalist.experiment_environment.IV import IV
+from AER_experimentalist.experiment_environment.V_time import V_Time
 import time
 
 class IV_Time(IV, V_Time):

@@ -1,4 +1,4 @@
-from IV import IV
+from AER_experimentalist.experiment_environment.IV import IV
 from tinkerforge.ip_connection import IPConnection
 from tinkerforge.bricklet_industrial_analog_out_v2 import BrickletIndustrialAnalogOutV2
 
