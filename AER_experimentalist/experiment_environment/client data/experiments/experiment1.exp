@@ -1,0 +1,4 @@
+IV:trial
+DV:time_DV
+Sequence:experiment1_sequence.csv
+Data:experiment1_data.csv

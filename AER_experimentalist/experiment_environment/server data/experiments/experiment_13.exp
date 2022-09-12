@@ -1,0 +1,5 @@
+IV:color_red,color_green,word_red,word_green,task_color
+DV:verbal_red,verbal_green
+CV:
+Sequence:experiment_13_sequence.csv
+Data:experiment_13_data.csv

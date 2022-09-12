@@ -1,0 +1,2 @@
+theorist,model_file_name,arch_file_name,num_graph_node,arch_weight_decay,num_params,num_edges,loss
+original_darts,model_weights_original_darts_v_3_wd_0_k_2_s_1.0_sample0_0,architecture_weights_original_darts_v_3_wd_0_k_2_s_1.0_sample0_0,2,0,13,8,0.030257257

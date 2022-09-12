@@ -1,0 +1,4 @@
+IV:trial,source_voltage
+DV:voltage0,voltage1,current0
+Sequence:experiment2_sequence.csv
+Data:experiment2_data.csv

@@ -1,0 +1,5 @@
+IV:S1,S2
+DV:difference_detected
+CV:
+Sequence:experiment_0_sequence.csv
+Data:experiment_0_data.csv
