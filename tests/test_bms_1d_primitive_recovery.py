@@ -36,6 +36,11 @@ def generate_x(start=-1, stop=1, num=500):
     return x
 
 
+def generate_pos_x(start=0.5, stop=1, num=500):
+    x = np.expand_dims(np.linspace(start=start, stop=stop, num=num), 1)
+    return x
+
+
 def generate_x_log(start=-1, stop=1, num=500, base=10):
     x = np.expand_dims(np.logspace(start=start, stop=stop, num=num, base=base), 1)
     return x
@@ -60,8 +65,9 @@ def transform_through_primitive_abs(x: np.ndarray) -> np.ndarray:
 def transform_through_primitive_fac(x: np.ndarray) -> np.ndarray:
     y = []
     for x_i in x:
-        y.append(np.math.factorial(x_i))
-    return np.ndarray(y)
+        y.append(np.math.gamma(x_i[0] + 1.0))
+    y_hat = np.array(y)
+    return np.expand_dims(y_hat, 1)
 
 
 def transform_through_primitive_none(x: np.ndarray) -> np.ndarray:
@@ -216,7 +222,7 @@ def test_primitive_fitting_pow3():
 
 def test_primitive_fitting_sqrt():
     run_test_primitive_fitting(
-        generate_x(),
+        generate_pos_x(),
         transform_through_primitive_sqrt,
         "sqrt",
         primitives=non_interchangeable_primitives,
@@ -234,7 +240,7 @@ def test_primitive_fitting_abs():
 
 def test_primitive_fitting_fac():
     run_test_primitive_fitting(
-        generate_x(),
+        generate_pos_x(),
         transform_through_primitive_fac,
         "fac",
         primitives=non_interchangeable_primitives,
