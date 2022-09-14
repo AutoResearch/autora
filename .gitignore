@@ -68,3 +68,6 @@ dmypy.json
 
 # Material for MkDocs
 site/
+
+# Pycharm IDE files 
+.idea/
