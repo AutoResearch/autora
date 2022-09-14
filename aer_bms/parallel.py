@@ -56,7 +56,6 @@ class Parallel:
             # Share fitted parameters and representative with other trees
             self.trees[BT].fit_par = self.t1.fit_par
             self.trees[BT].representative = self.t1.representative
-        return
 
     # -------------------------------------------------------------------------
     def mcmc_step(self, verbose=False, p_rr=0.05, p_long=0.45):
@@ -65,9 +64,7 @@ class Parallel:
         for T, tree in list(self.trees.items()):
             # MCMC step
             tree.mcmc_step(verbose=verbose, p_rr=p_rr, p_long=p_long)
-        self.t1 = self.trees["1"]
-        # Done
-        return
+        self.t1 = self.trees["1"]   
 
     # -------------------------------------------------------------------------
     def tree_swap(self):

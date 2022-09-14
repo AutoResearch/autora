@@ -1,41 +1,19 @@
-# main file for Bayesian Scientist
-
-# import packages
 import warnings
 
 import pandas as pd
 
-from aer_bms import Parallel, utils
+from aer_bms.skl.bms import BMSRegressor
 
 warnings.filterwarnings("ignore")
 
 
 # load data
-"""
-XLABS = [
-    'eff',
-    'D_max',
-    'D_apr',
-    'D_may',
-    'D_jun',
-    'ET_apr',
-    'ET_may',
-    'ET_jun',
-    'PT_apr',
-    'PT_may',
-    'PT_jun',
-    'PT_jul',
-    'PDO_win',
-]"""
 XLABS = [
     "S1",
     "S2",
 ]
-nv = len(XLABS)
-nc = 1
-epochs = 300
 
-raw_data = pd.read_csv("./experiment_0_data.csv")
+raw_data = pd.read_csv("experiment_0_data.csv")
 x, y = raw_data[XLABS], raw_data["difference_detected"]
 
 # initialize model
@@ -64,32 +42,26 @@ prior_par = {
 }
 
 # temperatures
-Ts = [1.0] + [1.04**k for k in range(1, 20)]
-# model
-pms = Parallel(
-    Ts,
-    variables=XLABS,
-    parameters=["a%d" % i for i in range(nc)],
-    x=x,
-    y=y,
-    prior_par=prior_par,
-)
+ts = [1.0] + [1.04**k for k in range(1, 20)]
 
-# run model ---
-model, model_len, desc_len = utils.run(pms, epochs)
+# epoch num
+epochs = 100
 
-# present results
-utils.present_results(model, model_len, desc_len)
+estimator = BMSRegressor(prior_par, ts, epochs)
+estimator = estimator.fit(x, y)
 
-# test predictions
-utils.predict(model, x, y)
+print(estimator.model_)
+
+test_x = x.head()
+estimator.predict(test_x)
+
 
 """
 Places where changes needed to be made in order to incorporate our own priors
 If we plan to give simple priors, then we simply need to give a csv, with the
 operations and their respective probabilities
 
-I believe all necessary changes can be made in just mcmc.py
+I believe all necessary changes can be made in mcmc.py
 
 If we plan to give different operations than what comes pre-included, we will
 need to make a change to the accepted operations at line 22 in mcmc.py
