@@ -28,7 +28,7 @@ def test_cycle():
 
     """
 
-    # Define basic versions of
+    # Define basic versions of the modules
     def dummy_theorist(data, metadata, search_space):
         def theory(x):
             return x + 1
@@ -51,16 +51,16 @@ def test_cycle():
         dependent_variables=[Variable(name="y", value_range=(-10, 10))],
     )
     parameters = dict(
-        cycle_count=0,
-        max_cycle_count=10,
-        experiment_runner=dummy_experiment_runner,
-        independent_variable_values=x1,
-        data=DataSetCollection([]),
         theorist=dummy_theorist,
-        search_space=None,
-        metadata=metadata,
         experimentalist=dummy_experimentalist,
+        experiment_runner=dummy_experiment_runner,
+        metadata=metadata,
+        search_space=None,
+        data=DataSetCollection([]),
+        cycle_count=0,
         theory=None,
+        independent_variable_values=x1,
+        max_cycle_count=10,
     )
 
     # Test invoking the cycle at different start points using start handlers
@@ -74,11 +74,17 @@ def test_cycle():
     experimentalist_results = start_experimentalist(**parameters)
     print(experimentalist_results)
 
-    # Runs using run statement
+    # Runs using generalized run statements
     experiment_runner_results_run = run(
-        starting_point="dummy_experiment_runner", **parameters
+        starting_point="experiment_runner", **parameters
     )
     print(experiment_runner_results_run)
+
+    theorist_results_run = run(starting_point="theorist", **parameters)
+    print(theorist_results_run)
+
+    experimentalist_results_run = run(starting_point="experimentalist", **parameters)
+    print(experimentalist_results_run)
 
 
 if __name__ == "__main__":

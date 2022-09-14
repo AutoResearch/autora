@@ -110,7 +110,7 @@ class ExperimentRunner(Protocol):
     and generates new observations y for those.
     """
 
-    def __call__(self, x: IndependentVariableValues) -> DependentVariableValues:
+    def __call__(self, x_prime: IndependentVariableValues) -> DependentVariableValues:
         ...
 
 
@@ -125,6 +125,7 @@ def run(
     theory: Optional[Theory] = None,
     independent_variable_values: Optional[IndependentVariableValues] = None,
     cycle_count: int = 0,
+    max_cycle_count: int = 10,
 ):
     if starting_point == "experimentalist":
         return start_experimentalist(**locals())
@@ -132,6 +133,11 @@ def run(
         return start_experiment_runner(**locals())
     elif starting_point == "theorist":
         return start_theorist(**locals())
+    else:
+        raise ValueError(
+            f"Unrecognized starting_point {starting_point}.\n"
+            f"Accepts values: ['experimentalist', 'experiment_runner', 'theorist']"
+        )
 
 
 def new_state(*dicts):
@@ -150,7 +156,7 @@ def start_theorist(
     search_space: SearchSpacePriors,
     cycle_count: int,
     max_cycle_count: int,
-    **kwargs
+    **kwargs,
 ):
     theory = theorist(data=data, metadata=metadata, search_space=search_space)
     cycle_count += 1
@@ -165,7 +171,7 @@ def start_experimentalist(
     data: DataSetCollection,
     metadata: VariableCollection,
     theory: Theory,
-    **kwargs
+    **kwargs,
 ):
     independent_variable_values = experimentalist(
         data=data, metadata=metadata, theory=theory
@@ -178,9 +184,9 @@ def start_experiment_runner(
     experiment_runner: ExperimentRunner,
     independent_variable_values: IndependentVariableValues,
     data: DataSetCollection,
-    **kwargs
+    **kwargs,
 ):
-    dependent_variable_values = experiment_runner(x=independent_variable_values)
+    dependent_variable_values = experiment_runner(x_prime=independent_variable_values)
     data = combine_datasets(
         data,
         DataSet(independent_variable_values, dependent_variable_values),
