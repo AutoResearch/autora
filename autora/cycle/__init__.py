@@ -138,6 +138,7 @@ def new_state(*dicts):
     state = dict()
     for d in dicts:
         state.update(d)
+    state.pop("kwargs", None)
     _logger.info(state)
     return state
 
