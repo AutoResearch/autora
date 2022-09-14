@@ -60,6 +60,10 @@ def transform_through_primitive_add_2d(x: np.ndarray) -> np.ndarray:
     return x[:, 0] + x[:, 1]
 
 
+def transform_through_primitive_subtract_2d(x: np.ndarray) -> np.ndarray:
+    return x[:, 0] + x[:, 1]
+
+
 def transform_through_primitive_pow2(x: np.ndarray) -> np.ndarray:
     return x**2
 
@@ -379,6 +383,15 @@ def test_primitive_fitting_add_2d():
         generate_2d_x(),
         transform_through_primitive_add_2d,
         "add",
+        primitives=non_interchangeable_primitives,
+    )
+
+
+def test_primitive_fitting_subtract_2d():
+    run_test_primitive_fitting(
+        generate_2d_x(),
+        transform_through_primitive_subtract_2d,
+        "subtract",
         primitives=non_interchangeable_primitives,
     )
 
