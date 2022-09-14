@@ -1,13 +1,15 @@
 """
 AutoRA full autonomous cycle functions
 """
+import logging
 from dataclasses import dataclass
-from typing import Any, List, Optional, Protocol, Type
+from typing import Any, List, Literal, Optional, Protocol, Union
 
-import numpy as np
 from numpy.typing import ArrayLike
 
 from autora.variable import VariableCollection
+
+_logger = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
@@ -23,12 +25,20 @@ class DependentVariableValues:
 @dataclass(frozen=True)
 class DataSet:
     x: IndependentVariableValues
-    y: IndependentVariableValues
+    y: DependentVariableValues
 
 
 @dataclass(frozen=False)
 class DataSetCollection:
     datasets: List[DataSet]
+
+
+def combine_datasets(a: Union[DataSetCollection, DataSet], b: DataSet):
+    if isinstance(a, DataSet):
+        new_collection = DataSetCollection([a, b])
+    elif isinstance(a, DataSetCollection):
+        new_collection = DataSetCollection(a.datasets + [b])
+    return new_collection
 
 
 SearchSpacePriors = Any
@@ -104,49 +114,76 @@ class ExperimentRunner(Protocol):
         ...
 
 
-# def run(
-#     theorist: Theorist,
-#     experimentalist: Experimentalist,
-#     experiment_runner: ExperimentRunner,
-#     metadata: VariableCollection,
-#     seed_data: Optional[DataSetCollection] = None,
-#     search_space: ? = None
-# ):
-#     """
-#
-#     Args:
-#         theorist:
-#         experimentalist:
-#         experiment_runner:
-#
-#     Returns:
-#
-#     """
-#     if seed_data is None:
-#         seed_independent_variable_values = experimentalist(
-#             data=None,
-#             metadata=metadata
-#         )
-#         seed_data_ = experiment_runner(seed_independent_variable_values)
-#     else:
-#         seed_data_ = seed_data
-#
-#     theory = theorist(seed_data_, metadata, search_space)
-#
-#     new_independent_variable_values = experimentalist(
-#         data=seed_data_,
-#         theory=theory,
-#         metadata=metadata,
-#     )
-#
-#     new_dependent_variable_values = experiment_runner(
-#         new_independent_variable_values
-#     )
-#
-#     ... go back to the theorist and start over
-#
-#
-#
-#
-#
-#
+def run(
+    theorist: Theorist,
+    experimentalist: Experimentalist,
+    experiment_runner: ExperimentRunner,
+    metadata: VariableCollection,
+    search_space: SearchSpacePriors,
+    starting_point: Literal["experimentalist", "experiment_runner", "theorist"],
+    data: Optional[DataSetCollection] = DataSetCollection([]),
+    theory: Optional[Theory] = lambda x: 0,
+    independent_variable_values: Optional[IndependentVariableValues] = None,
+    cycle_count: int = 0,
+):
+    if starting_point == "experimentalist":
+        start_experimentalist(**locals())
+    elif starting_point == "experiment_runner":
+        start_experiment_runner(**locals())
+    elif starting_point == "theorist":
+        start_theorist(**locals())
+
+
+def new_state(*dicts):
+    state = dict()
+    for d in dicts:
+        state.update(d)
+    _logger.info(state)
+    return state
+
+
+def start_theorist(
+    theorist: Theorist,
+    data: DataSetCollection,
+    metadata: VariableCollection,
+    search_space: SearchSpacePriors,
+    cycle_count: int,
+    **kwargs
+):
+    theory = theorist(data=data, metadata=metadata, search_space=search_space)
+    cycle_count += 1
+    state = new_state(kwargs, locals())
+    start_experimentalist(**state)
+
+
+def start_experimentalist(
+    experimentalist: Experimentalist,
+    data: DataSetCollection,
+    metadata: VariableCollection,
+    theory: Theory,
+    **kwargs
+):
+    independent_variable_values = experimentalist(
+        data=data, metadata=metadata, theory=theory
+    )
+    state = new_state(kwargs, locals())
+    start_experiment_runner(**state)
+
+
+def start_experiment_runner(
+    experiment_runner: ExperimentRunner,
+    independent_variable_values: IndependentVariableValues,
+    data: DataSetCollection,
+    **kwargs
+):
+    dependent_variable_values = experiment_runner(
+        independent_variable_values=independent_variable_values
+    )
+    data__ = combine_datasets(
+        DataSetCollection(
+            DataSet(independent_variable_values, dependent_variable_values)
+        ),
+        data,
+    )
+    state = new_state(kwargs, locals())
+    start_theorist(**state)
