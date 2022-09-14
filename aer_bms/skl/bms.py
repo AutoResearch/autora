@@ -58,7 +58,7 @@ class BMSRegressor(BaseEstimator, RegressorMixin):
         >>> estimator = BMSRegressor()
         >>> estimator = estimator.fit(X, y)
         >>> estimator.predict([[15.]])
-        "place holder --- PLEASE FIX ---"
+        array([[15.]])
 
 
     Attributes:
