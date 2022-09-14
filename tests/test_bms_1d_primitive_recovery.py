@@ -14,6 +14,9 @@ non_interchangeable_primitives = [
     "none",
     "add",
     "subtract",
+    "mult",
+    "div",
+    "pow",
     "logistic",
     "exp",
     "relu",
@@ -42,6 +45,12 @@ def generate_2d_x(start=-1, stop=1, num=40):
     return x2
 
 
+def generate_2d_pos_x(start=0.5, stop=1, num=40):
+    step = abs(stop - start) / num
+    x2 = np.mgrid[start:stop:step, start:stop:step].reshape(2, -1).T
+    return x2
+
+
 def generate_pos_x(start=0.5, stop=1, num=500):
     x = np.expand_dims(np.linspace(start=start, stop=stop, num=num), 1)
     return x
@@ -52,16 +61,24 @@ def generate_x_log(start=-1, stop=1, num=500, base=10):
     return x
 
 
-def transform_through_primitive_mult_2d(x: np.ndarray) -> np.ndarray:
-    return np.multiply(x[:, 0], x[:, 1].T).T
-
-
 def transform_through_primitive_add_2d(x: np.ndarray) -> np.ndarray:
     return x[:, 0] + x[:, 1]
 
 
 def transform_through_primitive_subtract_2d(x: np.ndarray) -> np.ndarray:
-    return x[:, 0] + x[:, 1]
+    return x[:, 0] - x[:, 1]
+
+
+def transform_through_primitive_mult_2d(x: np.ndarray) -> np.ndarray:
+    return np.multiply(x[:, 0], x[:, 1])
+
+
+def transform_through_primitive_div_2d(x: np.ndarray) -> np.ndarray:
+    return np.multiply(x[:, 0], np.reciprocal(x[:, 1]))
+
+
+def transform_through_primitive_pow_2d(x: np.ndarray) -> np.ndarray:
+    return np.power(x[:, 0], x[:, 1])
 
 
 def transform_through_primitive_pow2(x: np.ndarray) -> np.ndarray:
@@ -392,6 +409,33 @@ def test_primitive_fitting_subtract_2d():
         generate_2d_x(),
         transform_through_primitive_subtract_2d,
         "subtract",
+        primitives=non_interchangeable_primitives,
+    )
+
+
+def test_primitive_fitting_mult_2d():
+    run_test_primitive_fitting(
+        generate_2d_x(),
+        transform_through_primitive_mult_2d,
+        "mult",
+        primitives=non_interchangeable_primitives,
+    )
+
+
+def test_primitive_fitting_div_2d():
+    run_test_primitive_fitting(
+        generate_2d_pos_x(),
+        transform_through_primitive_div_2d,
+        "div",
+        primitives=non_interchangeable_primitives,
+    )
+
+
+def test_primitive_fitting_pow_2d():
+    run_test_primitive_fitting(
+        generate_2d_pos_x(),
+        transform_through_primitive_pow_2d,
+        "pow",
         primitives=non_interchangeable_primitives,
     )
 
