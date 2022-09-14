@@ -16,7 +16,6 @@ def test_cycle():
     """
     This test prototypes the design and calling of the closed cycle system starting from
     different modules of the cycle (>> Experiment Runner > Theorist > Experimentalist >>).
-    Different starting points of the cycle are invoked by handlers with the prefix `start_<module>`.
     This prototype uses simplistic representations of the theorist, experimentalist, and experiment
     runner.
 
@@ -45,7 +44,7 @@ def test_cycle():
         return x_prime + 1
 
     #  Define parameters for run
-    x1 = np.linspace(0, 1, 100)
+    x1 = np.linspace(0, 1, 10)
     metadata = VariableCollection(
         independent_variables=[Variable(name="x1", value_range=(-5, 5))],
         dependent_variables=[Variable(name="y", value_range=(-10, 10))],
@@ -63,26 +62,17 @@ def test_cycle():
         max_cycle_count=10,
     )
 
-    # Test invoking the cycle at different start points using start handlers
     # Run from experiment runner
-    experiment_runner_results = start_experiment_runner(**parameters)
-    print(experiment_runner_results)
-    # # Run starting from theorist
-    theorist_results = start_theorist(**parameters)
-    print(theorist_results)
-    # # Run starting from experimentalist
-    experimentalist_results = start_experimentalist(**parameters)
-    print(experimentalist_results)
-
-    # Runs using generalized run statements
     experiment_runner_results_run = run(
         starting_point="experiment_runner", **parameters
     )
     print(experiment_runner_results_run)
 
+    # Run starting from theorist
     theorist_results_run = run(starting_point="theorist", **parameters)
     print(theorist_results_run)
 
+    # Run starting from experimentalist
     experimentalist_results_run = run(starting_point="experimentalist", **parameters)
     print(experimentalist_results_run)
 
