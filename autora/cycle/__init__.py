@@ -122,7 +122,7 @@ def run(
     search_space: SearchSpacePriors,
     starting_point: Literal["experimentalist", "experiment_runner", "theorist"],
     data: Optional[DataSetCollection] = DataSetCollection([]),
-    theory: Optional[Theory] = lambda x: 0,
+    theory: Optional[Theory] = None,
     independent_variable_values: Optional[IndependentVariableValues] = None,
     cycle_count: int = 0,
 ):
@@ -148,12 +148,15 @@ def start_theorist(
     metadata: VariableCollection,
     search_space: SearchSpacePriors,
     cycle_count: int,
+    max_cycle_count: int,
     **kwargs
 ):
     theory = theorist(data=data, metadata=metadata, search_space=search_space)
     cycle_count += 1
     state = new_state(kwargs, locals())
-    start_experimentalist(**state)
+    if cycle_count == max_cycle_count:
+        return state
+    return start_experimentalist(**state)
 
 
 def start_experimentalist(
@@ -167,7 +170,7 @@ def start_experimentalist(
         data=data, metadata=metadata, theory=theory
     )
     state = new_state(kwargs, locals())
-    start_experiment_runner(**state)
+    return start_experiment_runner(**state)
 
 
 def start_experiment_runner(
@@ -176,14 +179,10 @@ def start_experiment_runner(
     data: DataSetCollection,
     **kwargs
 ):
-    dependent_variable_values = experiment_runner(
-        independent_variable_values=independent_variable_values
-    )
-    data__ = combine_datasets(
-        DataSetCollection(
-            DataSet(independent_variable_values, dependent_variable_values)
-        ),
+    dependent_variable_values = experiment_runner(x=independent_variable_values)
+    data = combine_datasets(
         data,
+        DataSet(independent_variable_values, dependent_variable_values),
     )
     state = new_state(kwargs, locals())
-    start_theorist(**state)
+    return start_theorist(**state)
