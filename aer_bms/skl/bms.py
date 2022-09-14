@@ -38,7 +38,7 @@ PRIORS = {
 TEMPERATURES = [1.0] + [1.04**k for k in range(1, 20)]
 
 
-class BMS(BaseEstimator, RegressorMixin):
+class BMSRegressor(BaseEstimator, RegressorMixin):
     """
     Bayesian Machine Scientist.
 
@@ -55,7 +55,7 @@ class BMS(BaseEstimator, RegressorMixin):
         >>> num_samples = 1000
         >>> X = np.linspace(start=0, stop=1, num=num_samples).reshape(-1, 1)
         >>> y = 15. * np.ones(num_samples)
-        >>> estimator = BMS()
+        >>> estimator = BMSRegressor()
         >>> estimator = estimator.fit(X, y)
         >>> estimator.predict([[15.]])
         "place holder --- PLEASE FIX ---"

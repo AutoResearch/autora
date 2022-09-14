@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
 
-from aer_bms.skl.bms import BMS
+from aer_bms.skl.bms import BMSRegressor
 
 warnings.filterwarnings("ignore")
 
@@ -27,7 +27,7 @@ def test_constant_model():
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.2, random_state=42
     )
-    estimator = BMS()
+    estimator = BMSRegressor()
     assert estimator is not None
     estimator.fit(X_train, y_train)
     # print(X_train)
@@ -39,7 +39,7 @@ def test_weber_model():
     raw_data = pd.read_csv("../test/experiment_0_data.csv")
 
     X, y = raw_data[["S1", "S2"]], raw_data["difference_detected"]
-    estimator = BMS()
+    estimator = BMSRegressor()
     estimator.fit(X, y)
     # print(X_train)
     # print(estimator.model_)

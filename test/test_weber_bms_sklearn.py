@@ -2,7 +2,7 @@ import warnings
 
 import pandas as pd
 
-from aer_bms.skl.bms import BMS
+from aer_bms.skl.bms import BMSRegressor
 
 warnings.filterwarnings("ignore")
 
@@ -47,7 +47,7 @@ ts = [1.0] + [1.04**k for k in range(1, 20)]
 # epoch num
 epochs = 100
 
-estimator = BMS(prior_par, ts, epochs)
+estimator = BMSRegressor(prior_par, ts, epochs)
 estimator = estimator.fit(x, y)
 
 print(estimator.model_)

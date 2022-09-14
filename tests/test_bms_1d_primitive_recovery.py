@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pytest  # noqa: 401
 
-from aer_bms.skl.bms import BMS
+from aer_bms.skl.bms import BMSRegressor
 
 warnings.filterwarnings("ignore")
 
@@ -161,7 +161,7 @@ def run_test_primitive_fitting(
     verbose: bool = True,
 ):
     y = transformer(X)
-    regressor = BMS()
+    regressor = BMSRegressor()
     regressor.fit(X, y.ravel())
     if verbose:
         y_predict = regressor.predict(X)
