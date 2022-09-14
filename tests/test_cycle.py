@@ -55,6 +55,11 @@ def test_cycle():
     experimentalist_results = start_experimentalist(**parameters)
     print(experimentalist_results)
 
+    experiment_runner_results_run = run(
+        starting_point="experiment_runner", **parameters
+    )
+    print(experiment_runner_results_run)
+
 
 if __name__ == "__main__":
     test_cycle()

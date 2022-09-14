@@ -127,11 +127,11 @@ def run(
     cycle_count: int = 0,
 ):
     if starting_point == "experimentalist":
-        start_experimentalist(**locals())
+        return start_experimentalist(**locals())
     elif starting_point == "experiment_runner":
-        start_experiment_runner(**locals())
+        return start_experiment_runner(**locals())
     elif starting_point == "theorist":
-        start_theorist(**locals())
+        return start_theorist(**locals())
 
 
 def new_state(*dicts):
