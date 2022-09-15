@@ -19,11 +19,24 @@ def test_cycle():
     This prototype uses simplistic representations of the theorist, experimentalist, and experiment
     runner.
 
-    theorist: Generates a constant theory of  y = x + 1
+    theorist: Generates a constant theory of  y = x + 1, independent of inputs.
     experimentalist: Generates new independent variables (x') to experiment from a uniform random
-                     selection of values from a defined range.
-    experiment_runner: Represents data gained from an experiment that perfectly matches the theory
+                     selection of values from a defined range. Independent of inputs.
+    experiment_runner: Simulates data gained from an experiment that perfectly matches the theory
                        y = x' + 1
+
+    This test was first conceptualized from the exercise of starting from the experiment runner.
+    Seed x' (Independent variable) values are inputs to experiment runner to start the cycle and
+    create syntheticexperimental data.
+
+    Notes on seed requirements:
+    1. Experiment Runner Start
+        a. Independent variable values
+    2. Theorist Start
+        a. Paired independent variable values and dependent variable values
+    3. Experimentalist Start
+        a. Theory
+        b. Paired independent variable values and dependent variable values
 
     """
 
@@ -44,7 +57,7 @@ def test_cycle():
         return x_prime + 1
 
     #  Define parameters for run
-    x1 = np.linspace(0, 1, 10)
+    x1 = np.linspace(0, 1, 10)  # Seed x' to input into the experiment runner
     metadata = VariableCollection(
         independent_variables=[Variable(name="x1", value_range=(-5, 5))],
         dependent_variables=[Variable(name="y", value_range=(-10, 10))],
