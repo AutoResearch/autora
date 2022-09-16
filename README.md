@@ -4,7 +4,7 @@ Autonomous Research Assistant (AutoRA) is an open source AI-based system for aut
 # Getting started
 
 You should be familiar with the command line for your operating system. The topics required are covered in:
-- **macOS**: Joe Kissell. [*Take Control of the Mac Command Line with Terminal, 3rd Edition*]((https://bruknow.library.brown.edu/permalink/01BU_INST/528fgv/cdi_safari_books_v2_9781947282513)). Take Control Books, 2022. Chapters *Read Me First* through *Bring the Command Line Into The Real World*.
+- **macOS**: Joe Kissell. [*Take Control of the Mac Command Line with Terminal, 3rd Edition*](https://bruknow.library.brown.edu/permalink/01BU_INST/528fgv/cdi_safari_books_v2_9781947282513). Take Control Books, 2022. Chapters *Read Me First* through *Bring the Command Line Into The Real World*.
 - **Linux**: William E. Shotts. [*The Linux Command Line: a Complete Introduction. 2nd edition.*](https://bruknow.library.brown.edu/permalink/01BU_INST/9mvq88/alma991043239704906966). No Starch Press, 2019. Parts *I: Learning the Shell* and *II: Configuration and the Environment*.
 
 To use the AutoRA package you need:
