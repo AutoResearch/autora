@@ -71,7 +71,10 @@ Run the initialization script as follows:
 ```shell
 pyenv init
 ``` 
-... and follow the instructions to add `pyenv` to the `$PATH`.
+... and follow the instructions to add `pyenv` to the `$PATH` by editing the interactive shell configuration 
+file, `.zshrc` or `.bashrc`. If it exists, this file is a hidden file ([dotfile](https://missing.csail.mit.edu/2019/dotfiles/)) in your home directory. You can create or edit this file using a 
+text editor or with CLI commands. Add the lines of script from the `pyenv init` response to the `.zshrc` file if they are 
+not already present. 
 
 #### Restart shell session
 
@@ -86,7 +89,7 @@ exec "$SHELL"
 Install a `python` version listed in the [`pyproject.toml`](./pyproject.toml) file. The entry looks like:  
 
 ```toml
-python = '>=3.8.13,<3.11'
+python = "^3.8”
 ```
 
 In this case, you could install version 3.8.13 as follows:
@@ -226,10 +229,10 @@ Saving session...
 % 
 ```
 
-To run a script, e.g. the `run_weber_study.py` script in the [`example/weber`](./example/weber) directory, execute: 
+To run a script, e.g. the `weber.py` script in the [`example/sklearn/darts`](./example/sklearn/darts) directory, execute: 
 
 ```shell
-poetry run python example/weber/run_weber_study.py
+poetry run python example/sklearn/darts/weber.py
 ```
 
 #### Using `poetry` non-interactively
