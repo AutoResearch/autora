@@ -72,7 +72,7 @@ Run the initialization script as follows:
 pyenv init
 ``` 
 ... and follow the instructions to add `pyenv` to the `$PATH` by editing the interactive shell configuration 
-file, `.zshrc` or `.bashrc`. If it exists, this file is a hidden file in your home directory. You can create or edit this file using a 
+file, `.zshrc` or `.bashrc`. If it exists, this file is a hidden file ([dotfile](https://missing.csail.mit.edu/2019/dotfiles/)) in your home directory. You can create or edit this file using a 
 text editor or with CLI commands. Add the lines of script from the `pyenv init` response to the `.zshrc` file if they are 
 not already present. 
 
