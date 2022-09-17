@@ -13,7 +13,6 @@ warnings.filterwarnings("ignore")
 non_interchangeable_primitives = [
     "none",
     "add",
-    "subtract",
     "mult",
     "div",
     "pow",
@@ -39,18 +38,6 @@ def generate_x(start=-1, stop=1, num=500):
     return x
 
 
-def generate_2d_x(start=-1, stop=1, num=40):
-    step = abs(stop - start) / num
-    x2 = np.mgrid[start:stop:step, start:stop:step].reshape(2, -1).T
-    return x2
-
-
-def generate_2d_pos_x(start=0.5, stop=1, num=40):
-    step = abs(stop - start) / num
-    x2 = np.mgrid[start:stop:step, start:stop:step].reshape(2, -1).T
-    return x2
-
-
 def generate_pos_x(start=0.5, stop=1, num=500):
     x = np.expand_dims(np.linspace(start=start, stop=stop, num=num), 1)
     return x
@@ -59,26 +46,6 @@ def generate_pos_x(start=0.5, stop=1, num=500):
 def generate_x_log(start=-1, stop=1, num=500, base=10):
     x = np.expand_dims(np.logspace(start=start, stop=stop, num=num, base=base), 1)
     return x
-
-
-def transform_through_primitive_add_2d(x: np.ndarray) -> np.ndarray:
-    return x[:, 0] + x[:, 1]
-
-
-def transform_through_primitive_subtract_2d(x: np.ndarray) -> np.ndarray:
-    return x[:, 0] - x[:, 1]
-
-
-def transform_through_primitive_mult_2d(x: np.ndarray) -> np.ndarray:
-    return np.multiply(x[:, 0], x[:, 1])
-
-
-def transform_through_primitive_div_2d(x: np.ndarray) -> np.ndarray:
-    return np.multiply(x[:, 0], np.reciprocal(x[:, 1]))
-
-
-def transform_through_primitive_pow_2d(x: np.ndarray) -> np.ndarray:
-    return np.power(x[:, 0], x[:, 1])
 
 
 def transform_through_primitive_pow2(x: np.ndarray) -> np.ndarray:
@@ -111,10 +78,6 @@ def transform_through_primitive_none(x: np.ndarray) -> np.ndarray:
 
 def transform_through_primitive_add(x: np.ndarray) -> np.ndarray:
     return x
-
-
-def transform_through_primitive_subtract(x: np.ndarray) -> np.ndarray:
-    return -x
 
 
 def transform_through_primitive_relu(x: np.ndarray):
@@ -233,15 +196,6 @@ def test_primitive_fitting_restricted_add():
     )
 
 
-def test_primitive_fitting_restricted_subtract():
-    run_test_primitive_fitting(
-        generate_x(),
-        transform_through_primitive_subtract,
-        "subtract",
-        primitives=["none", "add", "subtract"],
-    )
-
-
 def test_primitive_fitting_pow2():
     run_test_primitive_fitting(
         generate_x(),
@@ -301,15 +255,6 @@ def test_primitive_fitting_add():
         generate_x(),
         transform_through_primitive_add,
         "add",
-        primitives=non_interchangeable_primitives,
-    )
-
-
-def test_primitive_fitting_subtract():
-    run_test_primitive_fitting(
-        generate_x(),
-        transform_through_primitive_subtract,
-        "subtract",
         primitives=non_interchangeable_primitives,
     )
 
@@ -395,52 +340,7 @@ def test_primitive_fitting_tanh():
     )
 
 
-def test_primitive_fitting_add_2d():
-    run_test_primitive_fitting(
-        generate_2d_x(),
-        transform_through_primitive_add_2d,
-        "add",
-        primitives=non_interchangeable_primitives,
-    )
-
-
-def test_primitive_fitting_subtract_2d():
-    run_test_primitive_fitting(
-        generate_2d_x(),
-        transform_through_primitive_subtract_2d,
-        "subtract",
-        primitives=non_interchangeable_primitives,
-    )
-
-
-def test_primitive_fitting_mult_2d():
-    run_test_primitive_fitting(
-        generate_2d_x(),
-        transform_through_primitive_mult_2d,
-        "mult",
-        primitives=non_interchangeable_primitives,
-    )
-
-
-def test_primitive_fitting_div_2d():
-    run_test_primitive_fitting(
-        generate_2d_pos_x(),
-        transform_through_primitive_div_2d,
-        "div",
-        primitives=non_interchangeable_primitives,
-    )
-
-
-def test_primitive_fitting_pow_2d():
-    run_test_primitive_fitting(
-        generate_2d_pos_x(),
-        transform_through_primitive_pow_2d,
-        "pow",
-        primitives=non_interchangeable_primitives,
-    )
-
-
 if __name__ == "__main__":
-    print(generate_2d_x())
-    print(transform_through_primitive_add_2d(generate_2d_x()))
-    test_primitive_fitting_add_2d()
+    print(generate_x())
+    print(transform_through_primitive_add(generate_x()))
+    test_primitive_fitting_add()
