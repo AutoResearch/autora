@@ -40,6 +40,10 @@ class Architect(object):
     # initialize weight decay matrix
     self._init_decay_weights()
 
+  # matrix with same dims as alphas = regularization matrix
+  # count number of paramenters per operations
+  # penalize operations with big number of parameters
+  # suppose? rows=edges, cols=operations => same number across col
   def _init_decay_weights(self):
 
     n_params = list()
@@ -56,7 +60,7 @@ class Architect(object):
 
     self.decay_weights = Variable(torch.zeros(self.model.arch_parameters()[0].data.shape))
     for idx, param in enumerate(n_params):
-      if param > 0:
+      if param > 0: # formula from paper
         self.decay_weights[:, idx] = param * self.network_weight_decay_df + self.arch_weight_decay_base
       else:
         self.decay_weights[:, idx] = param
@@ -76,7 +80,7 @@ class Architect(object):
 
   def step(self, input_valid, target_valid, network_optimizer, unrolled, input_train=None, target_train=None, eta=1):
     # input_train, target_train only needed for approximation (unrolled=True) of architecture gradient
-    # when performing a single weigh update
+    # when performing a single weight update
     #
     # initialize gradients to be zero
     self.optimizer.zero_grad()
@@ -86,6 +90,7 @@ class Architect(object):
     else:
         self._backward_step(input_valid, target_valid)
     # move Adam one step
+    # optimizer has all parameters used to update the weights, collects weights and applies + changes learning rate
     self.optimizer.step()
 
   # backward step (using first order approximation?)
@@ -99,11 +104,30 @@ class Architect(object):
     else:
       raise Exception("DARTS Type " + str(self.DARTS_type) + " not implemented")
 
-    loss.backward()
+    # backpropagate weights wrt alphas
+    # print the gradients for betas
+    # torch.autograd.set_detect_anomaly(True)
+    loss.backward() # TODO check retain_graph
+    # print("input valid: {}".format(input_valid))
+    print("betas!", self.model.betas)
+    print("grads", self.model.betas.grad)
+    # this function is called in step, optimizer applies weights change there
 
     # weight decay proportional to degrees of freedom
-    for p in self.model.arch_parameters():
+    # number of parameters doesn't change so matrix of weight decays (decay_weights) stays constant
+
+    # TODO get alpha_params !
+    alpha_parameters = self.model.arch_parameters()[0]
+    alpha_parameters = [alpha_parameters]
+    # print("alpha_parameters", alpha_parameters)
+
+    for p in alpha_parameters: # iterate over params of model, p = alpha matrix (pytorch tensor)
+      # print("decay shape: {}".format(self.decay_weights.shape))
+      # print("p shape: {}".format(p.shape))
+      # print('P', p)
       p.data.sub_((self.decay_weights * self.lr))  # weight decay
+      # access data with .data
+      # subtract with .sub_
 
 
   # backward pass using second order approximation
@@ -129,7 +153,7 @@ class Architect(object):
     for g, ig in zip(dalpha, implicit_grads):
       g.data.sub_(eta, ig.data)
 
-    for v, g in zip(self.model.arch_parameters(), dalpha):
+    for v, g in zip(alpha_parameters, dalpha):
       if v.grad is None:
         v.grad = Variable(g.data)
       else:
@@ -156,12 +180,12 @@ class Architect(object):
     for p, v in zip(self.model.parameters(), vector):
       p.data.add_(R, v)
     loss = self.model._loss(input, target)
-    grads_p = torch.autograd.grad(loss, self.model.arch_parameters())
+    grads_p = torch.autograd.grad(loss, alpha_parameters)
 
     for p, v in zip(self.model.parameters(), vector):
       p.data.sub_(2*R, v)
     loss = self.model._loss(input, target)
-    grads_n = torch.autograd.grad(loss, self.model.arch_parameters())
+    grads_n = torch.autograd.grad(loss, alpha_parameters)
 
     for p, v in zip(self.model.parameters(), vector):
       p.data.add_(R, v)

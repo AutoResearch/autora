@@ -60,8 +60,8 @@ PRIMITIVES = [  # SIMPLIFIED ANALYSIS
     'subtract',
     'linear',
     'sigmoid',
-    'mult',
-    'exp',
+    # 'mult',
+    # 'exp',
     'relu',
     'softplus',
     'softminus'

@@ -42,9 +42,7 @@ class MixedOp(nn.Module):
       #   op[0].weight.data.fill_(1.0)
       #   op[0].bias.data.fill_(0.001)
 
-      # TODO understand / write op between pairs of nodes op[i][j] = op on edge i-j
-
-  def forward(self, x, weights):
+  def forward(self, x, weights): # weights are alphas here
     # there are 8 weights for all the eight primitives. then it returns the weighted sum of all operations performed on a given input
     return sum(w * op(x) for w, op in zip(weights, self._ops))
 
@@ -64,6 +62,9 @@ class Cell(nn.Module):
     # set parameters
     self._steps = steps # hidden nodes
     self._n_input_states = n_input_states # input nodes
+    # self.max_set_size = self._n_input_states + self._steps - 1
+    # self.max_k = 2 ** self.max_set_size - 1
+    # self.mask = np.zeros((self._steps, self.max_k))
 
     # EDIT 11/04/19 SM: adapting to new SimpleNet data (changed from multiplier to steps)
     self._multiplier = steps
@@ -73,7 +74,7 @@ class Cell(nn.Module):
     self._bns = nn.ModuleList()
     # iterate over edges: edges between each hidden node and input nodes + prev hidden nodes
     for i in range(self._steps): # hidden nodes
-      for j in range(self._n_input_states+i): # 2 refers to the 2 input nodes
+      for j in range(self._n_input_states+i): # 2 refers to the 2 input nodes, input nodes + prev hidden nodes
         # defines the stride for link between cells
         stride = 1
         # adds a mixed operation (derived from architecture parameters alpha)
@@ -82,8 +83,8 @@ class Cell(nn.Module):
         # appends cell with mixed operation
         self._ops.append(op)  # edge j -> i
 
-  def forward(self, input_states, weights):
-
+  def forward(self, input_states, alphas, betas):
+    # print("first forward", alphas)
     # initialize states (activities of each node in the cell)
     states = list()
 
@@ -95,31 +96,42 @@ class Cell(nn.Module):
     # this computes the states from intermediate nodes and adds them to the list of states (values of nodes)
     # for each hidden node, compute edge between existing states (input nodes / previous hidden) nodes and current node
     for i in range(self._steps): # compute the state for each hidden node, first hidden node is sum of input nodes, second is sum of input and first hidden
-      # TODO whats the paranthesis (h, weights[offset+j]) - channel size + stride??? not CNN??
       # s = sum(self._ops[offset+j](h, weights[offset+j]) for j, h in enumerate(states))
       s = 0
-      # print("i", i)
-      # print(states)
       set = np.arange(len(states))
       subsets = powerset(set)
       prod = 1
-      for subset in subsets:
+      for (index, subset) in enumerate(subsets):
         if len(subset) > 0:
+          index -= 1
           for j in subset:
             h = states[j]
             # print(len(weights))
             # print(offset+j)
-            prod *= self._ops[offset+j](h, weights[offset+j])
-          s += prod
+            NAN_product = prod
+            prod = prod * self._ops[offset+j](h, alphas[offset+j]) # edge j->i
+            for p in prod:
+              p = p.detach().numpy()
+              if np.isnan(p):
+                print("NAN FOUND", p)
+          s = s + betas[i][index] * prod
+
+      #print("b: ",betas)
+      #print("s: ",s)
       # for j, h in enumerate(states):
       #   s += self._ops[offset+j](h, weights[offset+j])
-      offset += len(states)
+      offset += len(states) # we add edges from all previous nodes (input + prev hidden) to next hidden node i
       states.append(s)
 
-    # print("end forward")
 
+    # print("end forward")
+    # print("alphas after forward", alphas)
+    # print("alphas after fwd grad", alphas.grad)
+    # print("betas after forward", betas)
+    # print("betas after fwd grad", betas.grad)
     # concatenates the states of the last n (self._multiplier) intermediate nodes to get the output of a cell
     result = torch.cat(states[-self._multiplier:], dim=1)
+    # print("result", result)
     return result
 
 
@@ -139,6 +151,7 @@ class Network(nn.Module):
     self._dim_output = self._steps
     self._architecture_fixed = architecture_fixed
     self._classifier_weight_decay = classifier_weight_decay
+
 
     C_curr = self._C # computes number of output channels for the stem
     # define the stem of the model; REMOVE THIS, EMBED FANOUT HERE
@@ -174,7 +187,6 @@ class Network(nn.Module):
     # EDIT 11/04/19 SM: adapting to new SimpleNet data (change input of nn layer from C_prev to self._dim_output)
     self.classifier = nn.Linear(self._dim_output, num_classes) # make this the number of input states
 
-
     # initializes weights of the architecture
     self._initialize_alphas()
     self._initialize_betas()
@@ -195,23 +207,24 @@ class Network(nn.Module):
     # for i in range(self._n_input_states): # for now, it applies the same stem operation to the input n times and retrieves states for separate nodes for the cell
     #   input_states.append(self.stem(input))
     input_states = self.stem(input)
-
+    weights = np.array(2)
     # get architecture weights
     if self._architecture_fixed:
-      weights = self.alphas_normal
+      alphas = self.alphas_normal # weights of the edges
+      betas = self.betas # weights of subsets of edge
     else:
       if self.DARTS_type==DARTS_Type.ORIGINAL:
-        # weights = F.softmax(self.alphas_normal, dim=-1)
-        weights = F.softmax(self.betas, dim=-1)
+        alphas = F.softmax(self.alphas_normal, dim=-1)
+        betas = F.softmax(self.betas, dim=-1)
       elif self.DARTS_type==DARTS_Type.FAIR:
-        # weights = torch.sigmoid(self.alphas_normal)
-        weights = torch.sigmoid(self.betas)
+        alphas = torch.sigmoid(self.alphas_normal)
+        betas = torch.sigmoid(self.betas)
       else:
         raise Exception("DARTS Type " + str(self.DARTS_type) + " not implemented")
 
       # then apply cell with weights
     # input_states = [s0, s1]
-    cell_output = self.cells(input_states, weights)
+    cell_output = self.cells(input_states, alphas, betas)
 
     # pool last layer
     # EDIT 11/04/19 SM: adapting to new SimpleNet data
@@ -240,19 +253,36 @@ class Network(nn.Module):
 
     # generate 14 (number of available edges) by 8 (operations) weight matrix for normal alphas of the architecture
     self.alphas_normal = Variable(1e-3*torch.randn(k, num_ops), requires_grad=True)
-    # those are all the parameters of the architecture
-    self._arch_parameters = [self.alphas_normal]
+
 
   def _initialize_betas(self):
-    k = 0
-    num_ops = len(PRIMITIVES)
+    self.max_set_size = self._n_input_states + self._steps - 1
+    self.max_k = 2 ** self.max_set_size - 1
+    # self.mask = torch.zeros((self._steps, self.max_k))
+    #betas_array = torch.rand((self._steps, self.max_k))
+    # self.betas = torch.tensor(betas_array)
+    # self.mask = np.zeros((self._steps, max_k))
+    # for i in range(self._steps):
+    #     set_size = self._n_input_states + i
+    #     k = 2 ** set_size - 1
+    #     for j in range(k):
+    #         # self.mask[i][j] = 1
+    #         # self.betas[i][j] = Variable(1e-3*torch.randn(k))
+    #     # self.betas[i] = Variable(1e-3*torch.randn(k), requires_grad=True)
+    #     # print(i, self.betas.shape)
 
-    for i in range(self._steps):
-      set_size = self._n_input_states + i # -1 ???
-      k += 2 ** set_size - 1
+    #self.betas = Variable(torch.randn((self._steps, self.max_k)), requires_grad=True)
+    self.betas = torch.randn((self._steps, self.max_k), requires_grad=True) # ???
+    #self.betas = betas_array.clone().detach().requires_grad_(True)
 
-    self.betas = Variable(1e-3*torch.randn(k, num_ops), requires_grad=True)
-    self._arch_parameters = [self.betas]
+    # print("betas array", betas_array)
+    print("tensor betas", self.betas)
+    print("tensor alphas", self.alphas_normal)
+
+    # those are all the parameters of the architecture
+    #self._arch_parameters = [self.alphas_normal]
+    self._arch_parameters = list([self.alphas_normal]) + list([self.betas])
+    # print("parameters!", self._arch_parameters, self._arch_parameters[0])
 
   # provide back the architecture as a parameter
   def arch_parameters(self):
