@@ -14,10 +14,6 @@ from sympy import lambdify, latex, log, sympify
 
 _logger = logging.getLogger(__name__)
 
-
-# -----------------------------------------------------------------------------
-# The accepted operations (key: operation; value: #offspring)
-# -----------------------------------------------------------------------------
 OPS = {
     "sin": 1,
     "cos": 1,
@@ -38,10 +34,12 @@ OPS = {
     "/": 2,
     "**": 2,
 }
+"""
+The accepted operations
 
-# -----------------------------------------------------------------------------
-# The Node class
-# -----------------------------------------------------------------------------
+key: operation
+value: #offspring)
+"""
 
 
 class Node:
@@ -52,39 +50,8 @@ class Node:
         self.order = len(self.offspring)
         return
 
-    def pr(self, show_pow=False):
-        if self.offspring == []:
-            return "%s" % self.value
-        elif len(self.offspring) == 2:
-            return "(%s %s %s)" % (
-                self.offspring[0].pr(show_pow=show_pow),
-                self.value,
-                self.offspring[1].pr(show_pow=show_pow),
-            )
-        else:
-            if show_pow:
-                return "%s(%s)" % (
-                    self.value,
-                    ",".join([o.pr(show_pow=show_pow) for o in self.offspring]),
-                )
-            else:
-                if self.value == "pow2":
-                    return "(%s ** 2)" % (self.offspring[0].pr(show_pow=show_pow))
-                elif self.value == "pow3":
-                    return "(%s ** 3)" % (self.offspring[0].pr(show_pow=show_pow))
-                else:
-                    return "%s(%s)" % (
-                        self.value,
-                        ",".join([o.pr(show_pow=show_pow) for o in self.offspring]),
-                    )
 
-
-# -----------------------------------------------------------------------------
-# The Tree class
-# -----------------------------------------------------------------------------
 class Tree:
-
-    # -------------------------------------------------------------------------
     def __init__(
         self,
         ops=OPS,
@@ -112,7 +79,7 @@ class Tree:
             )
         else:
             self.root = Node(root_value, offspring=[], parent=None)
-        # The poosible operations
+        # The possible operations
         self.ops = ops
         # The possible orders of the operations, move types, and move
         # type probabilities
@@ -191,15 +158,6 @@ class Tree:
         return
 
     # -------------------------------------------------------------------------
-    def __repr__(self):
-        return self.root.pr()
-
-    # -------------------------------------------------------------------------
-    def pr(self, show_pow=True):
-        return self.root.pr(show_pow=show_pow)
-
-    # -------------------------------------------------------------------------
-    # NEED TO DOUBLE CHECK THIS METHOD!!!!
     def set_par_values(self, par_values):
         if set(par_values.keys()) == set(self.x.keys()):
             # Parameter sets match the data: simply overwrite
@@ -760,27 +718,7 @@ class Tree:
         if rep == str(self):  # This IS the representative: return 0
             return 0
         else:
-            # CAUTION: CHANGED TO NEVER UPDATE REPRESENTATIVE!!!!!!!!
             return -1
-            # END OF CAUTION ZONE
-
-    """
-    self.get_bic(reset=True, fit=True, verbose=verbose)
-    new_energy = self.get_energy(bic=False, verbose=verbose)
-    if (new_energy - rep_energy) < -1.e-6: # Update
-                                           # representative &
-                                           # return -2
-        print >> sys.stdout, 'Updating rep: ||', canonical, '||', rep, '||',\
-         str(self), '||', rep_energy, '||', new_energy
-        print >> sys.stderr, 'Updating rep: ||', canonical, '||',  rep, '||',\
-         str(self), '||', rep_energy, '||', new_energy
-        self.representative[canonical] = (str(self),
-                                          new_energy,
-                                          deepcopy(self.par_values))
-        return -2
-    else: # Not the representative: return -1
-        return -1
-    """
 
     # -------------------------------------------------------------------------
     def dE_et(self, target, new, verbose=False):
