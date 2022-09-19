@@ -78,6 +78,24 @@ class Tree:
         root: the root node of the equation tree
         parameters: the settable parameters for this trees model search
         op_orders: order of each function within the ops
+        nops: number of operations of each type
+        move_types: possible combinations of function nesting
+        ets: possible elementary equation trees
+        dist_par: distinct parameters used
+        nodes: nodes of the tree (operations and leaves)
+        et_space: space of all possible leaves and elementary trees
+        rr_space: space of all possible root replacement trees
+        num_rr: number of possible root replacement trees
+        x: independent variable data
+        y: depedent variable data
+        par_values: The values of the model parameters (one set of values for each dataset)
+        fit_par: past successful parameter fittings
+        sse: sum of squared errors (measure of goodness of fit)
+        bic: bayesian information criterion (measure of goodness of fit)
+        E: total energy of model
+        EB: fraction of energy derived from bic score of model
+        EP: fraction of energy derived from model given prior
+        representative: representative tree for each canonical formula
     """
 
     def __init__(
@@ -92,7 +110,6 @@ class Tree:
         PT=1.0,
         max_size=50,
         root_value=None,
-        from_string=None,
     ):
         """
         Initialises the tree object
@@ -176,18 +193,12 @@ class Tree:
         # BIC and prior temperature
         self.BT = float(BT)
         self.PT = float(PT)
-        # Build from string
-        if from_string is not None:
-            self.build_from_string(from_string)
         # For fast fitting, we save past successful fits to this formula
         self.fit_par = {}
         # Goodness of fit measures
         self.sse = self.get_sse()
         self.bic = self.get_bic()
         self.E, self.EB, self.EP = self.get_energy()
-        # Clear cache if the expression was created from string
-        if from_string is not None:
-            self.fit_par = {}
         # To control formula degeneracy (i.e. different trees that
         # correspond to the same cannoninal formula), we store the
         # representative tree for each canonical formula
@@ -201,26 +212,13 @@ class Tree:
         return
 
     # -------------------------------------------------------------------------
-    def set_par_values(self, par_values):
-        if set(par_values.keys()) == set(self.x.keys()):
-            # Parameter sets match the data: simply overwrite
-            self.par_values = deepcopy(par_values)
-        elif (
-            set(self.parameters) <= set(par_values.keys())
-            and len(list(self.x.keys())) == 1
-        ):
-            # The par_values provided are enough to specify all model
-            # parameters (self.parameters is a subset of
-            # par_values.keys()) and there is only one dataset: use
-            # the data to specify the dataset label.
-            self.par_values = {list(self.x.keys())[0]: deepcopy(par_values)}
-        else:
-            raise ValueError("Parameter datasets do not match x/y datasets.")
-        return
-
-    # -------------------------------------------------------------------------
     def canonical(self, verbose=False):
-        """Return the canonical form of a tree."""
+        """
+        Provides canonical form of tree's equation so that functionally equivalent trees
+        are made into structurally equivalent trees
+
+        Return: canonical form of a tree
+        """
         try:
             cansp = sympify(str(self).replace(" ", ""))
             can = str(cansp)
@@ -247,112 +245,21 @@ class Tree:
 
     # -------------------------------------------------------------------------
     def latex(self):
+        """
+        translate equation into latex
+
+        Returns: canonical latex form of equation
+        """
         return latex(sympify(self.canonical()))
 
     # -------------------------------------------------------------------------
-    def __parse_recursive(
-        self, string, variables=None, parameters=None, vpreturn=False
-    ):
-        """Parse a string obtained from Tree.__repr__()
-        so that it can be used by build_from_string."""
-        if variables is None:
-            variables = []
-        if parameters is None:
-            parameters = []
-        # Leaf
-        if "(" not in string:
-            if string.startswith("_"):
-                if string not in parameters:
-                    parameters.append(string)
-            else:
-                if string not in variables:
-                    variables.append(string)
-            rval = [string, []]
-        # Not a leaf: parse the expression
-        else:
-            ready = False
-            while not ready:
-                nterm, terms, nopenpar, op, opactive = 0, [""], 0, "", True
-                for c in string:
-                    if opactive and c == "(":
-                        opactive = False
-                    if opactive and c != " ":
-                        op += c
-                    elif opactive and c == " ":
-                        opactive = False
-                        nterm += 1
-                        terms.append("")
-                    elif nopenpar == 1 and c == " ":
-                        opactive = True
-                    elif c == "(":
-                        if nopenpar > 0:
-                            terms[nterm] += c
-                        nopenpar += 1
-                    elif c == ")":
-                        nopenpar -= 1
-                        if nopenpar > 0:
-                            terms[nterm] += c
-                    else:
-                        terms[nterm] += c
-                if op != "":
-                    ready = True
-                    rval = [
-                        op,
-                        [
-                            self.__parse_recursive(
-                                t, variables=variables, parameters=parameters
-                            )
-                            for t in terms
-                        ],
-                    ]
-                else:
-                    if string[0] == "(" and string[-1] == ")":
-                        string = string[1:-1]
-                    else:
-                        raise
-        # Done parsing
-        if vpreturn:
-            return rval, parameters, variables
-        else:
-            return rval
-
-    # -------------------------------------------------------------------------
-    def __grow_tree(self, target, value, offspring):
-        """Auxiliary function used to recursively grow a tree from an expression parsed
-        with __parse_recursive()."""
-        try:
-            tmpoff = [self.variables[0] for i in range(len(offspring))]
-        except IndexError:
-            tmpoff = [self.parameters[0] for i in range(len(offspring))]
-        self.et_replace(target, [value, tmpoff], verbose=False)
-        for i in range(len(offspring)):
-            self.__grow_tree(target.offspring[i], offspring[i][0], offspring[i][1])
-        return
-
-    # -------------------------------------------------------------------------
-    def build_from_string(self, string, verbose=False):
-        """Build the tree from an expression formatted according to Tree.__repr__()."""
-        tlist, parameters, variables = self.__parse_recursive(string, vpreturn=True)
-        self.__init__(
-            ops=self.ops,
-            prior_par=self.prior_par,
-            x=self.x,
-            y=self.y,
-            BT=self.BT,
-            PT=self.PT,
-            parameters=parameters,
-            variables=variables,
-        )
-        self.__grow_tree(self.root, tlist[0], tlist[1])
-        self.get_sse(verbose=verbose)
-        self.get_bic(verbose=verbose)
-        self.fit_par = {}  # Forget all values fitted so far
-        return
-
-    # -------------------------------------------------------------------------
     def build_et_space(self):
-        """Build the space of possible elementary trees,
-        which is a dictionary indexed by the order of the elementary tree."""
+        """
+        Build the space of possible elementary trees,
+        which is a dictionary indexed by the order of the elementary tree
+
+        Returns: space of elementary trees
+        """
         et_space = dict([(o, []) for o in self.op_orders])
         et_space[0] = [[x, []] for x in self.variables + self.parameters]
         for op, noff in list(self.ops.items()):
@@ -362,7 +269,11 @@ class Tree:
 
     # -------------------------------------------------------------------------
     def build_rr_space(self):
-        """Build the space of possible trees for the root replacement move."""
+        """
+        Build the space of possible trees for the root replacement move
+
+        Returns: space of possible root replacements
+        """
         rr_space = []
         for op, noff in list(self.ops.items()):
             if noff == 1:
@@ -374,10 +285,12 @@ class Tree:
 
     # -------------------------------------------------------------------------
     def replace_root(self, rr=None, update_gof=True, verbose=False):
-        """Replace the root with a "root replacement" rr (if provided;
-        otherwise choose one at random from self.rr_space).
-        Returns the new root if the move was possible,
-        and None if not (because the replacement would lead to a tree larger than self.max_size."""
+        """
+        Replace the root with a "root replacement" rr (if provided;
+        otherwise choose one at random from self.rr_space)
+
+        Returns: new root (if move was possible) or None (otherwise)
+        """
         # If no RR is provided, randomly choose one
         if rr is None:
             rr = choice(self.rr_space)
@@ -419,7 +332,11 @@ class Tree:
 
     # -------------------------------------------------------------------------
     def is_root_prunable(self):
-        """Check if the root is "prunable"."""
+        """
+        Check if the root is "prunable"
+
+        Returns: boolean of root "prunability"
+        """
         if self.size == 1:
             isPrunable = False
         elif self.size == 2:
@@ -434,9 +351,13 @@ class Tree:
 
     # -------------------------------------------------------------------------
     def prune_root(self, update_gof=True, verbose=False):
-        """Cut the root and its rightmost leaves (provided they are, indeed, leaves),
+        """
+        Cut the root and its rightmost leaves (provided they are, indeed, leaves),
         leaving the leftmost branch as the new tree. Returns the pruned root with the same format
-        as the replacement roots in self.rr_space (or None if pruning was impossible)."""
+        as the replacement roots in self.rr_space (or None if pruning was impossible)
+
+        Returns: the replacement root
+        """
         # Check if the root is "prunable" (and return None if not)
         if not self.is_root_prunable():
             return None
@@ -471,7 +392,11 @@ class Tree:
 
     # -------------------------------------------------------------------------
     def _add_et(self, node, et_order=None, et=None, update_gof=True, verbose=False):
-        """Add an elementary tree replacing the node, which must be a leaf."""
+        """
+        Add an elementary tree replacing the node, which must be a leaf
+
+        Returns: the input node
+        """
         if node.offspring != []:
             raise
         # If no ET is provided, randomly choose one (of the specified
@@ -523,7 +448,11 @@ class Tree:
 
     # -------------------------------------------------------------------------
     def _del_et(self, node, leaf=None, update_gof=True, verbose=False):
-        """Remove an elementary tree, replacing it by a leaf."""
+        """
+        Remove an elementary tree, replacing it by a leaf
+
+        Returns: input node
+        """
         if self.size == 1:
             return None
         if leaf is None:
@@ -559,9 +488,11 @@ class Tree:
 
     # -------------------------------------------------------------------------
     def et_replace(self, target, new, update_gof=True, verbose=False):
-        """Replace one ET by another one, both of arbitrary order. target is a
+        """
+        Replace one ET by another one, both of arbitrary order. target is a
         Node and new is a tuple [node_value, [list, of, offspring, values]]
 
+        Returns: target
         """
         oini, ofin = len(target.offspring), len(new[1])
         if oini == 0:
@@ -583,8 +514,12 @@ class Tree:
 
     # -------------------------------------------------------------------------
     def get_sse(self, fit=True, verbose=False):
-        """Get the sum of squared errors, fitting the expression represented by the Tree
-        to the existing data, if specified (by default, yes)."""
+        """
+        Get the sum of squared errors, fitting the expression represented by the Tree
+        to the existing data, if specified (by default, yes)
+
+        Returns: sum of square errors (sse)
+        """
         # Return 0 if there is no data
         if list(self.x.values())[0].empty or list(self.y.values())[0].empty:
             self.sse = 0
@@ -674,9 +609,13 @@ class Tree:
 
     # -------------------------------------------------------------------------
     def get_bic(self, reset=True, fit=False, verbose=False):
-        """Calculate the Bayesian information criterion (BIC) of the current expression,
+        """
+        Calculate the Bayesian information criterion (BIC) of the current expression,
         given the data. If reset==False, the value of self.bic will not be updated
-        (by default, it will)."""
+        (by default, it will)
+
+        Returns: Bayesian Information Criterion (BIC)
+        """
         if list(self.x.values())[0].empty or list(self.y.values())[0].empty:
             if reset:
                 self.bic = 0
@@ -699,9 +638,13 @@ class Tree:
 
     # -------------------------------------------------------------------------
     def get_energy(self, bic=False, reset=False, verbose=False):
-        """Calculate the "energy" of a given formula, that is, approximate minus log-posterior
+        """
+        Calculate the "energy" of a given formula, that is, approximate minus log-posterior
         of the formula given the data (the approximation coming from the use of the BIC
-        instead of the exactly integrated likelihood)."""
+        instead of the exactly integrated likelihood)
+
+        Returns: Energy of formula (as E, EB, and EP)
+        """
         # Contribution of the data (recalculating BIC if necessary)
         if bic:
             EB = self.get_bic(reset=reset, verbose=verbose) / 2.0
@@ -740,6 +683,10 @@ class Tree:
         *If we have seen it and the representative has higher energy, update
         the representatitve and return -2.
 
+        Returns: Integer value (0, 1, or -1) corresponding to:
+            0: we have seen this canonical form before
+            1: we haven't seen this canonical form before
+            -1: we have seen this equation's canonical form before but it isn't in that form yet
         """
         # Check for canonical representative
         canonical = self.canonical(verbose=verbose)
@@ -765,9 +712,12 @@ class Tree:
 
     # -------------------------------------------------------------------------
     def dE_et(self, target, new, verbose=False):
-        """Calculate the energy change associated to the replacement of one ET
+        """
+        Calculate the energy change associated to the replacement of one ET
         by another, both of arbitrary order. "target" is a Node() and "new" is
         a tuple [node_value, [list, of, offspring, values]].
+
+        Returns: change in energy associated with an elementary tree replacement move
         """
         dEB, dEP = 0.0, 0.0
 
@@ -857,8 +807,12 @@ class Tree:
 
     # -------------------------------------------------------------------------
     def dE_lr(self, target, new, verbose=False):
-        """Calculate the energy change associated to a long-range move
-        (the replacement of the value of a node. "target" is a Node() and "new" is a node_value."""
+        """
+        Calculate the energy change associated to a long-range move
+        (the replacement of the value of a node. "target" is a Node() and "new" is a node_value
+
+        Returns: energy change associated with a long-range move
+        """
         dEB, dEP = 0.0, 0.0
         par_valuesNew = deepcopy(self.par_values)
 
@@ -948,9 +902,13 @@ class Tree:
 
     # -------------------------------------------------------------------------
     def dE_rr(self, rr=None, verbose=False):
-        """Calculate the energy change associated to a root replacement move.
+        """
+        Calculate the energy change associated to a root replacement move.
         If rr==None, then it returns the energy change associated to pruning the root; otherwise,
-        it returns the dE associated to adding the root replacement "rr"."""
+        it returns the dE associated to adding the root replacement "rr"
+
+        Returns: energy change associated with a root replacement move
+        """
         dEB, dEP = 0.0, 0.0
 
         # Root pruning
@@ -1075,7 +1033,11 @@ class Tree:
 
     # -------------------------------------------------------------------------
     def mcmc_step(self, verbose=False, p_rr=0.05, p_long=0.45):
-        """Make a single MCMC step."""
+        """
+        Make a single MCMC step
+
+        Returns: None or expression list
+        """
         topDice = random()
         # Root replacement move
         if topDice < p_rr:
@@ -1218,8 +1180,12 @@ class Tree:
         verbose=False,
         progress=True,
     ):
-        """Sample the space of formula trees using MCMC, and write the trace and some progress
-        information to files (unless write_files is False)."""
+        """
+        Sample the space of formula trees using MCMC, and write the trace and some progress
+        information to files (unless write_files is False)
+
+        Returns: None or expression list
+        """
         self.get_energy(reset=True, verbose=verbose)
 
         # Burning
@@ -1275,11 +1241,13 @@ class Tree:
 
     # -------------------------------------------------------------------------
     def predict(self, x):
-        """Calculate the value of the formula at the given data x. The data x
+        """
+        Calculate the value of the formula at the given data x. The data x
         must have the same format as the training data and, in particular, it
         it must specify to which dataset the test data belongs, if multiple
         datasets where used for training.
 
+        Returns: predicted y values
         """
         if isinstance(x, pd.DataFrame):
             this_x = {"d0": x}
@@ -1312,17 +1280,6 @@ class Tree:
             except SyntaxError:
                 # Do it point by point
                 prediction = [np.nan for i in range(len(this_x[ds]))]
-                """
-                # Do it point by point NOT WORKING!!!
-                prediction = []
-                for xi in xmat:
-                    args = [xi] + [p for p in params]
-                    try:
-                        this_prediction = flam(*args)
-                    except:
-                        this_prediction = [np.nan]
-                    prediction += this_prediction
-                """
             predictions[ds] = pd.Series(prediction, index=list(this_x[ds].index))
 
         if input_type == "df":
@@ -1344,8 +1301,12 @@ class Tree:
         verbose=False,
         progress=True,
     ):
-        """Sample the space of formula trees using MCMC,
-        and predict y(x) for each of the sampled formula trees."""
+        """
+        Sample the space of formula trees using MCMC,
+        and predict y(x) for each of the sampled formula trees
+
+        Returns: predicted y values for each of the sampled formula trees
+        """
         ypred = {}
         # Burning
         if progress:
@@ -1373,16 +1334,6 @@ class Tree:
             sys.stdout.write("\b" * (50 + 1))
 
         for s in range(samples):
-            """
-            # Warm up the BIC heavily to escape deep wells
-            self.BT = 1.e100
-            self.get_energy(bic=True, reset=True, verbose=verbose)
-            for kk in range(thin/4):
-                self.mcmc_step(verbose=verbose)
-            # Back to thermalization
-            self.BT = 1.
-            self.get_energy(bic=True, reset=True, verbose=verbose)
-            """
             for kk in range(thin):
                 self.mcmc_step(verbose=verbose)
             # Make prediction
