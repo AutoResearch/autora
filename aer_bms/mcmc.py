@@ -70,6 +70,16 @@ class Node:
 
 
 class Tree:
+    """
+    Object that manages the model equation. It contains the root node, which in turn iteratively
+    holds children nodes. Collectively this represents the model equation tree
+
+    Attributes:
+        root: the root node of the equation tree
+        parameters: the settable parameters for this trees model search
+        op_orders: order of each function within the ops
+    """
+
     def __init__(
         self,
         ops=OPS,
@@ -84,6 +94,21 @@ class Tree:
         root_value=None,
         from_string=None,
     ):
+        """
+        Initialises the tree object
+
+        Args:
+            ops: allowed operations to compose equation
+            variables: dependent variable names
+            parameters: parameters that can be used to better fit the equation to the data
+            prior_par: hyperparameter values over operations within ops
+            x: dependent variables
+            y: independent variables
+            BT: BIC value corresponding to equation
+            PT: prior temperature
+            max_size: maximum size of tree (maximum number of nodes)
+            root_value: algebraic term held at root of equation
+        """
         # The variables and parameters
         self.variables = variables
         self.parameters = [
