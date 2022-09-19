@@ -4,6 +4,7 @@ import sys
 from copy import deepcopy
 from itertools import permutations, product
 from random import choice, random
+from typing import List
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -38,17 +39,34 @@ OPS = {
 The accepted operations
 
 key: operation
-value: #offspring)
+value: offspring
 """
 
 
 class Node:
+    """
+    Object that holds algebraic term. This could be a function, variable, or parameter.
+
+    Attributes:
+        order: number of children nodes this term has
+                e.g. cos(x) has one child, whereas add(x,y) has two children
+    """
+
     def __init__(self, value, parent=None, offspring=[]):
-        self.parent = parent
-        self.offspring = offspring
-        self.value = value
-        self.order = len(self.offspring)
-        return
+        """
+        Initialises the node object.
+
+        Arguments:
+            parent: parent node - unless this node is the root, this will be whichever node contains
+                    the function this node's term is most immediately nested within
+                    e.g. f(x) is the parent of g(x) in f(g(x))
+            offspring: list of child nodes
+            value: the specific term held by this node
+        """
+        self.parent: Node = parent
+        self.offspring: List[Node] = offspring
+        self.value: str = value
+        self.order: int = len(self.offspring)
 
 
 class Tree:
