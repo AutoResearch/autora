@@ -9,6 +9,19 @@ _logger = logging.getLogger(__name__)
 
 
 def run(pms, num_steps, thinning=100):
+    """
+
+    Args:
+        pms: Parallel Machine Scientist (BMS is essentially a wrapper for pms)
+        num_steps: number of epochs / mcmc step & tree swap iterations
+        thinning: number of epochs between recording model loss to the trace
+
+    Returns:
+        model: The equation which best describes the data
+        model_len: The equation loss (defined as description length)
+        desc_len: Record of equation loss over time
+
+    """
     desc_len, model, model_len = [], pms.t1, np.inf
     for n in range(num_steps):
         pms.mcmc_step()
@@ -22,6 +35,18 @@ def run(pms, num_steps, thinning=100):
 
 
 def present_results(model, model_len, desc_len):
+    """
+    Prints out the best equation, its description length,
+    along with a plot of how this has progressed over the course of the search tasks
+
+    Args:
+        model: The equation which best describes the data
+        model_len: The equation loss (defined as description length)
+        desc_len: Record of equation loss over time
+
+    Returns: Nothing
+
+    """
     print("Best model:\t", model)
     print("Desc. length:\t", model_len)
     plt.figure(figsize=(15, 5))
@@ -30,10 +55,19 @@ def present_results(model, model_len, desc_len):
     plt.ylabel("Description length", fontsize=14)
     plt.title("MDL model: $%s$" % model.latex())
     plt.show()
-    return 0
 
 
 def predict(model, x, y):
+    """
+    Maps independent variable data onto expected dependent variable data
+
+    Args:
+        model: The equation / function that best maps x onto y
+        x: The independent variables of the data
+        y: The dependent variable of the data
+
+    Returns: Predicted values for y given x and the model as trained
+    """
     plt.figure(figsize=(6, 6))
     plt.scatter(model.predict(x), y)
 
