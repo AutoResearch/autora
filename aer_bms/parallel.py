@@ -3,14 +3,20 @@ from copy import deepcopy
 from random import randint, random
 
 import numpy as np
-import pandas as pd
 from numpy import exp
 
 from aer_bms.mcmc import OPS, Tree
 
 
 class Parallel:
-    """The Parallel class for parallel tempering."""
+    """
+    The Parallel Machine Scientist Object, equipped with parallel tempering
+
+    Attributes:
+        Ts: list of parallel temperatures
+        trees: list of parallel trees, corresponding to each parallel temperature
+        t1: equation tree which best describes the data
+    """
 
     # -------------------------------------------------------------------------
     def __init__(
@@ -24,6 +30,19 @@ class Parallel:
         x=None,
         y=None,
     ):
+        """
+        Initialises Parallel Machine Scientist
+
+        Args:
+            Ts: list of temperature values
+            ops: allowed operations for the search task
+            variables: independent variables from data
+            parameters: settable values to improve model fit
+            max_size: maximum size (number of nodes) in a tree
+            prior_par: prior values over ops
+            x: independent variables of dataset
+            y: dependent variable of dataset
+        """
         # All trees are initialized to the same tree but with different BT
         Ts.sort()
         self.Ts = [str(T) for T in Ts]
@@ -59,15 +78,23 @@ class Parallel:
 
     # -------------------------------------------------------------------------
     def mcmc_step(self, verbose=False, p_rr=0.05, p_long=0.45):
-        """Perform a MCMC step in each of the trees."""
+        """
+        Perform a MCMC step in each of the trees
+        """
         # Loop over all trees
         for T, tree in list(self.trees.items()):
             # MCMC step
             tree.mcmc_step(verbose=verbose, p_rr=p_rr, p_long=p_long)
-        self.t1 = self.trees["1"]   
+        self.t1 = self.trees["1"]
 
     # -------------------------------------------------------------------------
     def tree_swap(self):
+        """
+        Choose a pair of trees of adjacent temperatures and attempt to swap their temperatures
+        Based on the resultant energy change
+
+        Returns: new temperature values for the pair of trees
+        """
         # Choose Ts to swap
         nT1 = randint(0, len(self.Ts) - 2)
         nT2 = nT1 + 1
@@ -97,7 +124,16 @@ class Parallel:
 
     # -------------------------------------------------------------------------
     def anneal(self, n=1000, factor=5):
-        # Heat up
+        """
+        Annealing function for the Machine Scientist
+
+        Args:
+            n: number of mcmc step & tree swap iterations
+            factor: degree of annealing - how much the temperatures are raised
+
+        Returns: Nothing
+
+        """
         for t in list(self.trees.values()):
             t.BT *= factor
         for kk in range(n):
@@ -117,89 +153,3 @@ class Parallel:
             )
             self.mcmc_step()
             self.tree_swap()
-        # Done
-        return
-
-    # -------------------------------------------------------------------------
-    def trace_predict(
-        self,
-        x,
-        burnin=5000,
-        thin=100,
-        samples=10000,
-        anneal=100,
-        annealf=5,
-        verbose=True,
-        write_files=True,
-        progressfn="progress.dat",
-        reset_files=True,
-    ):
-        # Burnin
-        if verbose:
-            sys.stdout.write("# Burning in\t")
-            sys.stdout.write("[%s]" % (" " * 50))
-            sys.stdout.flush()
-            sys.stdout.write("\b" * (50 + 1))
-        for i in range(burnin):
-            self.mcmc_step()
-            if verbose and (i % (burnin / 50) == 0):
-                sys.stdout.write("=")
-                sys.stdout.flush()
-        # MCMC
-        if write_files:
-            if reset_files:
-                progressf = open(progressfn, "w")
-            else:
-                progressf = open(progressfn, "a")
-        if verbose:
-            sys.stdout.write("\n# Sampling\t")
-            sys.stdout.write("[%s]" % (" " * 50))
-            sys.stdout.flush()
-            sys.stdout.write("\b" * (50 + 1))
-        ypred = {}
-        last_swap = dict([(T, 0) for T in self.Ts[:-1]])
-        max_inactive_swap = 0
-        for s in range(samples):
-            # MCMC updates
-            ready = False
-            while not ready:
-                for kk in range(thin):
-                    self.mcmc_step()
-                    BT1, BT2 = self.tree_swap()
-                    if BT1 is not None:
-                        last_swap[BT1] = s
-                # Predict for this sample (prediction must be finite;
-                # otherwise, repeat
-                ypred[s] = self.trees["1"].predict(x)
-                ready = True not in np.isnan(
-                    np.array(ypred[s])
-                ) and True not in np.isinf(np.array(ypred[s]))
-            # Output
-            if verbose and (s % (samples / 50) == 0):
-                sys.stdout.write("=")
-                sys.stdout.flush()
-            if write_files:
-                progressf.write(
-                    "%s %d %s %lf %lf %d %s\n"
-                    % (
-                        list(x.index),
-                        s,
-                        str(list(ypred[s])),
-                        self.trees["1"].E,
-                        self.trees["1"].bic,
-                        max_inactive_swap,
-                        self.trees["1"],
-                    )
-                )
-                progressf.flush()
-            # Anneal if the some configuration is stuck
-            max_inactive_swap = max([s - last_swap[T] for T in last_swap])
-            if max_inactive_swap > anneal:
-                self.anneal(n=anneal * thin, factor=annealf)
-                last_swap = dict([(T, s) for T in self.Ts[:-1]])
-
-        # Done
-        if verbose:
-            sys.stdout.write("\n")
-            sys.stdout.flush()
-        return pd.DataFrame.from_dict(ypred)
