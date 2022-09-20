@@ -18,8 +18,8 @@ def run(pms, num_steps, thinning=100):
 
     Returns:
         model: The equation which best describes the data
-        model_len: The equation loss (defined as description length)
-        desc_len: Record of equation loss over time
+        model_len: (defined as description length) loss function score
+        desc_len: Record of loss function score over time
 
     """
     desc_len, model, model_len = [], pms.t1, np.inf
