@@ -489,7 +489,7 @@ class Tree:
     # -------------------------------------------------------------------------
     def et_replace(self, target, new, update_gof=True, verbose=False):
         """
-        Replace one ET by another one, both of arbitrary order. target is a
+        Replace one elementary tree with another one, both of arbitrary order. target is a
         Node and new is a tuple [node_value, [list, of, offspring, values]]
 
         Returns: target
