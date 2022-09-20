@@ -905,7 +905,7 @@ class Tree:
         """
         Calculate the energy change associated to a root replacement move.
         If rr==None, then it returns the energy change associated to pruning the root; otherwise,
-        it returns the dE associated to adding the root replacement "rr"
+        it returns the energy change associated to adding the root replacement "rr"
 
         Returns: energy change associated with a root replacement move
         """
