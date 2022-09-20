@@ -91,7 +91,7 @@ class Parallel:
     def tree_swap(self):
         """
         Choose a pair of trees of adjacent temperatures and attempt to swap their temperatures
-        Based on the resultant energy change
+        based on the resultant energy change
 
         Returns: new temperature values for the pair of trees
         """
