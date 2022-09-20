@@ -614,7 +614,7 @@ class Tree:
         given the data. If reset==False, the value of self.bic will not be updated
         (by default, it will)
 
-        Returns: Bayesian Information Criterion (BIC)
+        Returns: Bayesian information criterion (BIC)
         """
         if list(self.x.values())[0].empty or list(self.y.values())[0].empty:
             if reset:
@@ -713,8 +713,8 @@ class Tree:
     # -------------------------------------------------------------------------
     def dE_et(self, target, new, verbose=False):
         """
-        Calculate the energy change associated to the replacement of one ET
-        by another, both of arbitrary order. "target" is a Node() and "new" is
+        Calculate the energy change associated to the replacement of one elementary tree
+        with another, both of arbitrary order. "target" is a Node() and "new" is
         a tuple [node_value, [list, of, offspring, values]].
 
         Returns: change in energy associated with an elementary tree replacement move
