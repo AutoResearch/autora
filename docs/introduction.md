@@ -8,7 +8,16 @@ that accurately map independent variables to dependent variables within a given 
 through genetic programming, wherein evolutionary algorithms mutated and crossbred equations billions of 
 times in search a match. Problems with genetic programming, however, stem from its inherent search constraints as well
 as its reliance upon heuristics and domain knowledge to balance goodness of fit and model complexity. To address these
-problems, Guimerà et. al (2020) proposed a Bayesian Machine Scientist, which combines i) a Bayesian approach that
+problems, Guimerà et. al (2020) proposed a Bayesian Machine Scientist (BMS), which combines i) a Bayesian approach that
 specifies informed priors over expressions and computes their respective posterior probabilities given the data at hand,
 and ii) a Markov chain Monte Carlo (MCMC) algorithm that samples from the posterior over expressions to explore the 
 space of possible symbolic expressions.
+
+AutoRA provides an adapted version of BMS for automating the discovery of interpretable models of human information 
+processing.
+
+## References
+
+R. Guimerà et al., A Bayesian machine scientist to aid in the solution of challenging scientific problems. Sci. Adv.
+6, eaav697 (2020).
+
