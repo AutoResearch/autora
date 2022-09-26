@@ -149,47 +149,78 @@ def new_state(*dicts):
     return state
 
 
-def start_theorist(
-    theorist: Theorist,
-    data: DataSetCollection,
-    metadata: VariableCollection,
-    search_space: SearchSpacePriors,
-    cycle_count: int,
-    max_cycle_count: int,
-    **kwargs,
-):
-    theory = theorist(data=data, metadata=metadata, search_space=search_space)
-    cycle_count += 1
-    state = new_state(kwargs, locals())
-    if cycle_count == max_cycle_count:
-        return state
-    return start_experimentalist(**state)
+# def start_theorist(
+#     theorist: Theorist,
+#     data: DataSetCollection,
+#     metadata: VariableCollection,
+#     search_space: SearchSpacePriors,
+#     cycle_count: int,
+#     max_cycle_count: int,
+#     **kwargs,
+# ):
+#     theory = theorist(data=data, metadata=metadata, search_space=search_space)
+#     cycle_count += 1
+#     state = new_state(kwargs, locals())
+#     if cycle_count == max_cycle_count:
+#         return state
+#     return start_experimentalist(**state)
+
+# def start_experimentalist(
+#     experimentalist: Experimentalist,
+#     data: DataSetCollection,
+#     metadata: VariableCollection,
+#     theory: Theory,
+#     **kwargs,
+# ):
+#     independent_variable_values = experimentalist(
+#         data=data, metadata=metadata, theory=theory
+#     )
+#     state = new_state(kwargs, locals())
+#     return start_experiment_runner(**state)
+#
+#
+# def start_experiment_runner(
+#     experiment_runner: ExperimentRunner,
+#     independent_variable_values: IndependentVariableValues,
+#     data: DataSetCollection,
+#     **kwargs,
+# ):
+#     dependent_variable_values = experiment_runner(x_prime=independent_variable_values)
+#     data = combine_datasets(
+#         data,
+#         DataSet(independent_variable_values, dependent_variable_values),
+#     )
+#     state = new_state(kwargs, locals())
+#     return start_theorist(**state)
 
 
-def start_experimentalist(
-    experimentalist: Experimentalist,
-    data: DataSetCollection,
-    metadata: VariableCollection,
-    theory: Theory,
-    **kwargs,
-):
-    independent_variable_values = experimentalist(
-        data=data, metadata=metadata, theory=theory
+def start_theorist(cycle_model):
+    cycle_model.theory = cycle_model.theorist(
+        data=cycle_model.data,
+        metadata=cycle_model.metadata,
+        search_space=cycle_model.search_space,
     )
-    state = new_state(kwargs, locals())
-    return start_experiment_runner(**state)
+    cycle_model.cycle_count += 1
+    return cycle_model
 
 
-def start_experiment_runner(
-    experiment_runner: ExperimentRunner,
-    independent_variable_values: IndependentVariableValues,
-    data: DataSetCollection,
-    **kwargs,
-):
-    dependent_variable_values = experiment_runner(x_prime=independent_variable_values)
-    data = combine_datasets(
-        data,
-        DataSet(independent_variable_values, dependent_variable_values),
+def start_experimentalist(cycle_model):
+    cycle_model.independent_variable_values = cycle_model.experimentalist(
+        data=cycle_model.data, metadata=cycle_model.metadata, theory=cycle_model.theory
     )
-    state = new_state(kwargs, locals())
-    return start_theorist(**state)
+    return cycle_model
+
+
+def start_experiment_runner(cycle_model):
+
+    cycle_model.dependent_variable_values = cycle_model.experiment_runner(
+        x_prime=cycle_model.independent_variable_values
+    )
+    cycle_model.data = combine_datasets(
+        cycle_model.data,
+        DataSet(
+            cycle_model.independent_variable_values,
+            cycle_model.dependent_variable_values,
+        ),
+    )
+    return cycle_model

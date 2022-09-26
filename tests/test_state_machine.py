@@ -1,4 +1,9 @@
-#!/usr/bin/env python
+"""
+Test the implementation of using the statemachine package.
+https://github.com/fgmacedo/python-statemachine
+"""
+
+# !/usr/bin/env python
 import pytest  # noqa: 401
 from statemachine import State, StateMachine
 from statemachine.mixins import MachineMixin
