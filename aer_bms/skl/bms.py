@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import logging
 from typing import List, Optional
 
@@ -73,7 +75,7 @@ class BMSRegressor(BaseEstimator, RegressorMixin):
         prior_par: dict = PRIORS,
         ts: List[float] = TEMPERATURES,
         epochs: int = 30,
-    ) -> None:
+    ) -> Optional[None]:
         """
         Arguments:
             prior_par: a dictionary of the prior probabilities of different functions based on
@@ -88,17 +90,18 @@ class BMSRegressor(BaseEstimator, RegressorMixin):
         self.X_: Optional[np.ndarray] = None
         self.y_: Optional[np.ndarray] = None
         self.model_: Tree = Tree()
-        self.loss_: int = np.inf
+        self.loss_: float = np.inf
         self.cache_: List = []
         self.variables: List = []
 
-    def fit(self, X: np.ndarray, y: np.ndarray, np: int = 1):
+    def fit(self, X: np.ndarray, y: np.ndarray, num_param: int = 1) -> BMSRegressor:
         """
         Runs the optimization for a given set of `X`s and `y`s.
 
         Arguments:
             X: independent variables in an n-dimensional array
             y: dependent variables in an n-dimensional array
+            num_param: number of parameters
 
         Returns:
             self (BMS): the fitted estimator
@@ -121,7 +124,7 @@ class BMSRegressor(BaseEstimator, RegressorMixin):
         self.pms = Parallel(
             Ts=self.ts,
             variables=self.variables,
-            parameters=["a%d" % i for i in range(np)],
+            parameters=["a%d" % i for i in range(num_param)],
             x=X,
             y=y,
             prior_par=self.prior_par,
@@ -132,7 +135,7 @@ class BMSRegressor(BaseEstimator, RegressorMixin):
         self.X_, self.y_ = X, y
         return self
 
-    def predict(self, X: np.ndarray):
+    def predict(self, X: np.ndarray) -> np.ndarray:
         """
         Applies the fitted model to a set of independent variables `X`,
         to give predictions for the dependent variable `y`.

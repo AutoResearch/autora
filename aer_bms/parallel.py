@@ -1,7 +1,7 @@
 import sys
 from copy import deepcopy
 from random import randint, random
-from typing import List, Optional, Tuple
+from typing import Optional, Tuple
 
 import numpy as np
 from numpy import exp
@@ -22,7 +22,7 @@ class Parallel:
     # -------------------------------------------------------------------------
     def __init__(
         self,
-        Ts: List[str],
+        Ts: list,
         ops=OPS,
         variables=["x"],
         parameters=["a"],
