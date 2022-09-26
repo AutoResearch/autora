@@ -5,7 +5,9 @@ import pytest  # noqa: 401
 from aer_bms.mcmc import Tree
 
 
-def test_tree_mcmc_stepping(num_points=10, samples=10000, show_plot=False):
+def test_tree_mcmc_stepping(
+    num_points: int = 10, samples: int = 10000, show_plot: bool = False
+) -> Tree:
     """
     Testing the basic MCMC capacity. Note that even though an option (`show_plot`) is
     offered to compare the actual data (`y`) against the prediction, this test does not
@@ -13,17 +15,16 @@ def test_tree_mcmc_stepping(num_points=10, samples=10000, show_plot=False):
     can work bug-free.
 
     Parameters:
-        num_points (int):
+        num_points:
             the number of data points in each dimension of the synthetic data
-        samples (int):
+        samples:
             the number of MCMC samples we want to get. The total MCMC iteration can be
-            calcualted as `burnin` + `samples`
-        show_plot (bool):
-            whether to invoke `matplotlib.plt` to plot the predicted against actual
-            response variable
+            calculated as `burnin` + `samples`
+        show_plot:
+            whether to plot the predicted against actual response variable
+
     Returns:
-        t (Tree):
-            the expression tree obtained from running the MCMC algorithm
+        the expression tree obtained from running the MCMC algorithm
     """
 
     # Create the data
