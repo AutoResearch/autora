@@ -1,6 +1,7 @@
 import sys
 from copy import deepcopy
 from random import randint, random
+from typing import List, Optional, Tuple
 
 import numpy as np
 from numpy import exp
@@ -21,7 +22,7 @@ class Parallel:
     # -------------------------------------------------------------------------
     def __init__(
         self,
-        Ts,
+        Ts: List[str],
         ops=OPS,
         variables=["x"],
         parameters=["a"],
@@ -29,7 +30,7 @@ class Parallel:
         prior_par={},
         x=None,
         y=None,
-    ):
+    ) -> None:
         """
         Initialises Parallel Machine Scientist
 
@@ -77,7 +78,7 @@ class Parallel:
             self.trees[BT].representative = self.t1.representative
 
     # -------------------------------------------------------------------------
-    def mcmc_step(self, verbose=False, p_rr=0.05, p_long=0.45):
+    def mcmc_step(self, verbose=False, p_rr=0.05, p_long=0.45) -> None:
         """
         Perform a MCMC step in each of the trees
         """
@@ -88,7 +89,7 @@ class Parallel:
         self.t1 = self.trees["1"]
 
     # -------------------------------------------------------------------------
-    def tree_swap(self):
+    def tree_swap(self) -> Tuple[Optional[str], Optional[str]]:
         """
         Choose a pair of trees of adjacent temperatures and attempt to swap their temperatures
         based on the resultant energy change
@@ -123,7 +124,7 @@ class Parallel:
             return None, None
 
     # -------------------------------------------------------------------------
-    def anneal(self, n=1000, factor=5):
+    def anneal(self, n=1000, factor=5) -> None:
         """
         Annealing function for the Machine Scientist
 
