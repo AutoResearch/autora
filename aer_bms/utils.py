@@ -1,14 +1,21 @@
 import logging
 from copy import deepcopy
+from typing import List, Tuple
 
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
+
+from aer_bms.mcmc import Tree
+from aer_bms.parallel import Parallel
 
 logging.basicConfig(level=logging.INFO)
 _logger = logging.getLogger(__name__)
 
 
-def run(pms, num_steps, thinning=100):
+def run(
+    pms: Parallel, num_steps: int, thinning: int = 100
+) -> Tuple[Tree, float, List[float]]:
     """
 
     Args:
@@ -34,7 +41,7 @@ def run(pms, num_steps, thinning=100):
     return model, model_len, desc_len
 
 
-def present_results(model, model_len, desc_len):
+def present_results(model: Tree, model_len: float, desc_len: List[float]) -> None:
     """
     Prints out the best equation, its description length,
     along with a plot of how this has progressed over the course of the search tasks
@@ -57,7 +64,7 @@ def present_results(model, model_len, desc_len):
     plt.show()
 
 
-def predict(model, x, y):
+def predict(model: Tree, x: pd.DataFrame, y: pd.DataFrame) -> dict:
     """
     Maps independent variable data onto expected dependent variable data
 
