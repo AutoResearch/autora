@@ -85,22 +85,22 @@ def test_tree_mcmc_stepping(
 
 
 def test_build_trees_from_string(
-    string="(P120 + (((ALPHACAT / _a2) + (_a2 * CDH3)) + _a0))", total_iter=1000
-):
+    string: str = "(P120 + (((ALPHACAT / _a2) + (_a2 * CDH3)) + _a0))",
+    total_iter: int = 1000,
+) -> Tree:
     """
     Testing the construction of expression tree from string representation. This test evaluates
     the construction in two parts. In the first part, we construct Tree `t` from the parameter
     `string`, which should be a valid string representation of a formula. In the second part, for
-    each step in `total_iter` iterations, we run one MCMC step on `t` and obtain its string repres
-    -sentation `str(t)`, which is then fed and used to construct another Tree `t2`. We finally make
-    sure that the two trees are the same (`str(t2) == str(t)`) in each step.
+    each step in `total_iter` iterations, we run one MCMC step on `t` and obtain its string
+    representation `str(t)`, which is then fed and used to construct another Tree `t2`.
+    We finally make sure that the two trees are the same (`str(t2) == str(t)`) in each step.
 
     Parameters:
-        string (str):
-            the string representation
-    Returns:
-        t (Tree):
-            the expression tree obtained from running the MCMC algorithm
+        string: the string representation
+        total_iter: the number of iterations
+
+    Returns: the expression tree obtained from running the MCMC algorithm
     """
 
     # Create the formula
