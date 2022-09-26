@@ -78,6 +78,37 @@ class Node:
         self.value: str = value
         self.order: int = len(self.offspring)
 
+    def pr(self, show_pow=False):
+        """
+        Converts expression in readable form
+
+        Returns: Nothing
+        """
+        if self.offspring == []:
+            return "%s" % self.value
+        elif len(self.offspring) == 2:
+            return "(%s %s %s)" % (
+                self.offspring[0].pr(show_pow=show_pow),
+                self.value,
+                self.offspring[1].pr(show_pow=show_pow),
+            )
+        else:
+            if show_pow:
+                return "%s(%s)" % (
+                    self.value,
+                    ",".join([o.pr(show_pow=show_pow) for o in self.offspring]),
+                )
+            else:
+                if self.value == "pow2":
+                    return "(%s ** 2)" % (self.offspring[0].pr(show_pow=show_pow))
+                elif self.value == "pow3":
+                    return "(%s ** 3)" % (self.offspring[0].pr(show_pow=show_pow))
+                else:
+                    return "%s(%s)" % (
+                        self.value,
+                        ",".join([o.pr(show_pow=show_pow) for o in self.offspring]),
+                    )
+
 
 class Tree:
     """
@@ -220,6 +251,26 @@ class Tree:
         )
         # Done
         return
+
+    # -------------------------------------------------------------------------
+    def __repr__(self):
+        """
+        Updates tree's internal representation
+
+        Returns: root node representation
+
+        """
+        return self.root.pr()
+
+    # -------------------------------------------------------------------------
+    def pr(self, show_pow=True):
+        """
+        Returns readable representation of tree's root node
+
+        Returns: root node representation
+
+        """
+        return self.root.pr(show_pow=show_pow)
 
     # -------------------------------------------------------------------------
     def canonical(self, verbose=False):
