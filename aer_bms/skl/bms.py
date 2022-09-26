@@ -64,6 +64,8 @@ class BMSRegressor(BaseEstimator, RegressorMixin):
     Attributes:
         pms: the bayesian (parallel) machine scientist model
         model_: represents the best-fit model
+        loss_: represents loss associated with best-fit model
+        cache_: record of loss_ over model fitting epochs
     """
 
     def __init__(
@@ -86,6 +88,8 @@ class BMSRegressor(BaseEstimator, RegressorMixin):
         self.X_: Optional[np.ndarray] = None
         self.y_: Optional[np.ndarray] = None
         self.model_: Tree = Tree()
+        self.loss_: int = np.inf
+        self.cache_: List = []
         self.variables: List = []
 
     def fit(self, X: np.ndarray, y: np.ndarray, np: int = 1):
@@ -122,11 +126,10 @@ class BMSRegressor(BaseEstimator, RegressorMixin):
             y=y,
             prior_par=self.prior_par,
         )
-        model, model_len, desc_len = utils.run(self.pms, self.epochs)
+        self.model_, self.loss_, self.cache_ = utils.run(self.pms, self.epochs)
 
         _logger.info("BMS fitting finished")
         self.X_, self.y_ = X, y
-        self.model_ = model
         return self
 
     def predict(self, X: np.ndarray):
@@ -151,4 +154,5 @@ class BMSRegressor(BaseEstimator, RegressorMixin):
         # in the future, we might need to look into mcmc.py to remove
         # these redundant type castings.
         X = pd.DataFrame(X, columns=self.variables)
+        utils.present_results(self.model_, self.loss_, self.cache_)
         return np.expand_dims(self.model_.predict(X).to_numpy(), axis=1)
