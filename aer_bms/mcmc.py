@@ -1,3 +1,19 @@
+"""
+A Markov-Chain Monte-Carlo module.
+
+Module constants:
+    `OPS`:
+        A dictionary of accepted operations: `{operation_name: offspring}`
+
+        `operation_name`: the operation name, e.g. 'sin' for the sinusoid function
+
+        `offspring`: the number of arguments the function requires.
+
+        For instance, `OPS = {"sin": 1, "**": 2 }` means for
+        `sin` the function call looks like `sin(x1)` whereas for
+        the exponentiation operator `**`, the function call looks like `x1 ** x2`
+"""
+
 import json
 import logging
 import sys
@@ -35,12 +51,6 @@ OPS = {
     "/": 2,
     "**": 2,
 }
-"""
-The accepted operations
-
-key: operation
-value: offspring
-"""
 
 
 class Node:
