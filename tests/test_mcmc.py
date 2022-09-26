@@ -1,27 +1,28 @@
-import pytest  # noqa: 401
 import numpy as np
 import pandas as pd
+import pytest  # noqa: 401
 
 from aer_bms.mcmc import Tree
+
 
 def test_tree_mcmc_stepping(num_points=10, samples=10000, show_plot=False):
     """
     Testing the basic MCMC capacity. Note that even though an option (`show_plot`) is
     offered to compare the actual data (`y`) against the prediction, this test does not
-    try to assess the prediction accuracy; it only ensures that the MCMC functionality 
+    try to assess the prediction accuracy; it only ensures that the MCMC functionality
     can work bug-free.
 
     Parameters:
-        num_points (int): 
+        num_points (int):
             the number of data points in each dimension of the synthetic data
-        samples (int): 
+        samples (int):
             the number of MCMC samples we want to get. The total MCMC iteration can be
             calcualted as `burnin` + `samples`
-        show_plot (bool): 
+        show_plot (bool):
             whether to invoke `matplotlib.plt` to plot the predicted against actual
             response variable
     Returns:
-        t (Tree): 
+        t (Tree):
             the expression tree obtained from running the MCMC algorithm
     """
     # Create the data
@@ -73,13 +74,16 @@ def test_tree_mcmc_stepping(num_points=10, samples=10000, show_plot=False):
 
     if show_plot:
         import matplotlib.pyplot as plt
+
         plt.plot(t.predict(x), 50.0 * np.sin(x["x0"]) / x["x2"] - 4.0 * x["x1"] + 3)
         plt.show()
 
     return t
 
 
-def test_build_trees_from_string(string="(P120 + (((ALPHACAT / _a2) + (_a2 * CDH3)) + _a0))", total_iter=10000):
+def test_build_trees_from_string(
+    string="(P120 + (((ALPHACAT / _a2) + (_a2 * CDH3)) + _a0))", total_iter=10000
+):
     """
     Testing the construction of expression tree from string representation. This test evaluates
     the construction in two parts. In the first part, we construct Tree `t` from the parameter
@@ -89,10 +93,10 @@ def test_build_trees_from_string(string="(P120 + (((ALPHACAT / _a2) + (_a2 * CDH
     sure that the two trees are the same (`str(t2) == str(t)`) in each step.
 
     Parameters:
-        string (str): 
+        string (str):
             the string representation
     Returns:
-        t (Tree): 
+        t (Tree):
             the expression tree obtained from running the MCMC algorithm
     """
     # Create the formula
