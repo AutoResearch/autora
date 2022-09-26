@@ -25,6 +25,7 @@ def test_tree_mcmc_stepping(num_points=10, samples=10000, show_plot=False):
         t (Tree):
             the expression tree obtained from running the MCMC algorithm
     """
+
     # Create the data
     x = pd.DataFrame(
         dict([("x%d" % i, np.random.uniform(0, 10, num_points)) for i in range(5)])
@@ -64,6 +65,7 @@ def test_tree_mcmc_stepping(num_points=10, samples=10000, show_plot=False):
         prior_par=prior_par,
         BT=1.0,
     )
+
     # MCMC
     t.mcmc(burnin=2000, thin=10, samples=samples, verbose=True)
 
@@ -82,7 +84,7 @@ def test_tree_mcmc_stepping(num_points=10, samples=10000, show_plot=False):
 
 
 def test_build_trees_from_string(
-    string="(P120 + (((ALPHACAT / _a2) + (_a2 * CDH3)) + _a0))", total_iter=10000
+    string="(P120 + (((ALPHACAT / _a2) + (_a2 * CDH3)) + _a0))", total_iter=1000
 ):
     """
     Testing the construction of expression tree from string representation. This test evaluates
@@ -99,6 +101,7 @@ def test_build_trees_from_string(
         t (Tree):
             the expression tree obtained from running the MCMC algorithm
     """
+
     # Create the formula
     prior_par = {
         "Nopi_/": 0,
