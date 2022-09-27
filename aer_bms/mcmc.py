@@ -692,7 +692,7 @@ class Tree:
             BIC += (k - n) * np.log(n) + n * (np.log(2.0 * np.pi) + log(sse[ds]) + 1)
         for ds in self.y:
             if sse[ds] == 0.0:
-                BIC = np.inf
+                BIC = -np.inf
         if reset:
             self.bic = BIC
         return BIC
