@@ -12,9 +12,9 @@ from transitions import Machine, State
 from autora.cycle import (  # noqa: 401
     DataSetCollection,
     run,
-    start_experiment_runner,
-    start_experimentalist,
-    start_theorist,
+    start_experiment_runner_sm,
+    start_experimentalist_sm,
+    start_theorist_sm,
 )
 from autora.variable import Variable, VariableCollection
 
@@ -38,21 +38,21 @@ class aerCycle(object):
 
     def on_enter_theorist(self):
         print("Running Theorist to get new theory from data.")
-        start_theorist(self)
+        start_theorist_sm(self)
 
     def on_exit_theorist(self):
         print("Packaging theory for experimentalist.")
 
     def on_enter_experimentalist(self):
         print("Running Experimentalist to get new test from theory.")
-        start_experimentalist(self)
+        start_experimentalist_sm(self)
 
     def on_exit_experimentalist(self):
         print("Validating Experimental parameters.")
 
     def on_enter_experiment_runner(self):
         print("Running Experiment Runner to get new data from experiment parameters.")
-        start_experiment_runner(self)
+        start_experiment_runner_sm(self)
 
     def on_exit_experiment_runner(self):
         print("Packaging collected data for theorist.")
