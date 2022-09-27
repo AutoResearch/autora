@@ -2,8 +2,9 @@
 AutoRA full autonomous cycle functions
 """
 import logging
+from collections import OrderedDict
 from dataclasses import dataclass
-from typing import Any, List, Literal, Optional, Protocol, Union
+from typing import Any, Callable, List, Literal, Optional, Protocol, Union
 
 from numpy.typing import ArrayLike
 
