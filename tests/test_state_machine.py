@@ -21,8 +21,12 @@ from autora.variable import Variable, VariableCollection
 
 class aerCycle(object):
     """
-    Assigns attributes to the cycle object and sets up methods to call upon entering and exiting
-    states.
+    Contains attributes/parameters of the AER cycle and sets up methods to call upon entering and
+    exiting states of the cycle.
+
+    TODO
+    1. Currently takes all keywords and kwargs dicts passed in. Should probably have specified
+    assignments to check if all the correct parameters are supplied and set defaults values.
     """
 
     def __init__(self, *args, **kwargs):
@@ -58,6 +62,10 @@ class aerCycle(object):
 
 
 class aerMachine(object):
+    """
+    Initializes state machine using defined states and transitions and supplied aerCycle model.
+    """
+
     def __init__(self, model):
         # Define states
         states = [
@@ -161,7 +169,7 @@ def test_state_class():
         max_cycle_count=4,
     )
 
-    # Initialize model
+    # Initialize the cycle model
     cycle = aerCycle(**parameters)
     # Initialize state machine using model
     aerMachine(model=cycle)
