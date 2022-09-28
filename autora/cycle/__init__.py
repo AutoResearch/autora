@@ -193,35 +193,3 @@ def start_experiment_runner(
     )
     state = new_state(kwargs, locals())
     return start_theorist(**state)
-
-
-def start_theorist_sm(cycle_model):
-    cycle_model.theory = cycle_model.theorist(
-        data=cycle_model.data,
-        metadata=cycle_model.metadata,
-        search_space=cycle_model.search_space,
-    )
-    cycle_model.cycle_count += 1
-    return cycle_model
-
-
-def start_experimentalist_sm(cycle_model):
-    cycle_model.independent_variable_values = cycle_model.experimentalist(
-        data=cycle_model.data, metadata=cycle_model.metadata, theory=cycle_model.theory
-    )
-    return cycle_model
-
-
-def start_experiment_runner_sm(cycle_model):
-
-    cycle_model.dependent_variable_values = cycle_model.experiment_runner(
-        x_prime=cycle_model.independent_variable_values
-    )
-    cycle_model.data = combine_datasets(
-        cycle_model.data,
-        DataSet(
-            cycle_model.independent_variable_values,
-            cycle_model.dependent_variable_values,
-        ),
-    )
-    return cycle_model
