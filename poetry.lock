@@ -1096,14 +1096,6 @@ python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,>=2.7"
 six = ">=1.5"
 
 [[package]]
-name = "python-statemachine"
-version = "0.8.0"
-description = "Python Finite State Machines made easy."
-category = "main"
-optional = false
-python-versions = "*"
-
-[[package]]
 name = "pytz"
 version = "2022.1"
 description = "World timezone definitions, modern and historical"
@@ -1462,7 +1454,7 @@ tinkerforge = ["tinkerforge"]
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.8,<3.12"
-content-hash = "4db5f060da9ee868564072823c75b6b4ce3ef97c3e06e2309ba6b706eacee754"
+content-hash = "ce0be9bf7e1ae91f8e338d870d41b455507e404acc1713bd8ecf3518bc688d45"
 
 [metadata.files]
 appnope = [
@@ -2231,10 +2223,6 @@ pytest = [
 python-dateutil = [
     {file = "python-dateutil-2.8.2.tar.gz", hash = "sha256:0123cacc1627ae19ddf3c27a5de5bd67ee4586fbdd6440d9748f8abb483d3e86"},
     {file = "python_dateutil-2.8.2-py2.py3-none-any.whl", hash = "sha256:961d03dc3453ebbc59dbdea9e4e11c5651520a876d0f4db161e8674aae935da9"},
-]
-python-statemachine = [
-    {file = "python-statemachine-0.8.0.tar.gz", hash = "sha256:f6a70c1f4ed8b1198487eac09114ec9ea1166be6d793996f8c1b92d590a9ebae"},
-    {file = "python_statemachine-0.8.0-py2.py3-none-any.whl", hash = "sha256:b816ec61639ddd3b1d3a8ad06a62840d30b9e7176b4b94fc183cebd1c7d5caf2"},
 ]
 pytz = [
     {file = "pytz-2022.1-py2.py3-none-any.whl", hash = "sha256:e68985985296d9a66a881eb3193b0906246245294a881e7c8afe623866ac6a5c"},

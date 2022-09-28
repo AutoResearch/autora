@@ -100,97 +100,94 @@ class aerCycle(object):
         return self
 
 
-class aerMachine(object):
-    """
-    Initializes state machine using defined states and transitions and supplied aerCycle model.
-    """
+def create_state_machine(model, graph=False):
+    states = [
+        State(
+            name="experiment_runner",
+            on_enter=["start_experiment_runner"],
+            # on_exit=[],
+        ),
+        State(
+            name="theorist",
+            on_enter=["start_theorist"],
+            # on_exit=[],
+        ),
+        State(
+            name="experimentalist",
+            on_enter=["start_experimentalist"],
+            # on_exit=[],
+        ),
+        State(name="start"),
+        State(name="end", on_enter=["end_statement"]),
+    ]
 
-    def __init__(self, model, graph=False):
-        # Define states
-        states = [
-            State(
-                name="experiment_runner",
-                on_enter=["start_experiment_runner"],
-                # on_exit=[],
-            ),
-            State(
-                name="theorist",
-                on_enter=["start_theorist"],
-                # on_exit=[],
-            ),
-            State(
-                name="experimentalist",
-                on_enter=["start_experimentalist"],
-                # on_exit=[],
-            ),
-            State(name="start"),
-            State(name="end", on_enter=["end_statement"]),
-        ]
+    transitions = [
+        {
+            "trigger": "next_step",
+            "source": ["experiment_runner"],
+            "dest": "theorist",
+            "unless": [],
+        },
+        {
+            "trigger": "next_step",
+            "source": ["theorist"],
+            "dest": "experimentalist",
+            "unless": ["is_max_cycles"],
+        },
+        {
+            "trigger": "next_step",
+            "source": ["experimentalist"],
+            "dest": "experiment_runner",
+            "unless": [],
+        },
+        {
+            "trigger": "next_step",
+            "source": ["start"],
+            "dest": "experiment_runner",
+            "conditions": ["is_ready_for_experiment_runner"],
+        },
+        {
+            "trigger": "next_step",
+            "source": ["start"],
+            "dest": "theorist",
+            "conditions": ["is_ready_for_theorist"],
+        },
+        {
+            "trigger": "next_step",
+            "source": ["start"],
+            "dest": "experimentalist",
+            "conditions": ["is_ready_for_experimentalist"],
+        },
+        {
+            "trigger": "next_step",
+            "source": ["theorist"],
+            "dest": "end",
+            "conditions": ["is_max_cycles"],
+        },
+    ]
 
-        transitions = [
-            {
-                "trigger": "next_step",
-                "source": ["experiment_runner"],
-                "dest": "theorist",
-                "unless": [],
-            },
-            {
-                "trigger": "next_step",
-                "source": ["theorist"],
-                "dest": "experimentalist",
-                "unless": ["is_max_cycles"],
-            },
-            {
-                "trigger": "next_step",
-                "source": ["experimentalist"],
-                "dest": "experiment_runner",
-                "unless": [],
-            },
-            {
-                "trigger": "next_step",
-                "source": ["start"],
-                "dest": "experiment_runner",
-                "conditions": ["is_ready_for_experiment_runner"],
-            },
-            {
-                "trigger": "next_step",
-                "source": ["start"],
-                "dest": "theorist",
-                "conditions": ["is_ready_for_theorist"],
-            },
-            {
-                "trigger": "next_step",
-                "source": ["start"],
-                "dest": "experimentalist",
-                "conditions": ["is_ready_for_experimentalist"],
-            },
-            {
-                "trigger": "next_step",
-                "source": ["theorist"],
-                "dest": "end",
-                "conditions": ["is_max_cycles"],
-            },
-        ]
+    if graph:
+        machine = GraphMachine(
+            model=model,
+            states=states,
+            transitions=transitions,
+            initial="start",
+            queued=True,
+            ignore_invalid_triggers=False,
+            show_state_attributes=True,
+            show_conditions=True,
+        )
+    else:
+        machine = Machine(
+            model=model,
+            states=states,
+            transitions=transitions,
+            initial="start",
+            queued=True,
+            ignore_invalid_triggers=False,
+        )
 
-        if graph:
-            self.graphmachine = GraphMachine(
-                model=model,
-                states=states,
-                transitions=transitions,
-                initial="start",
-                queued=True,
-                show_state_attributes=True,
-                show_conditions=True,
-            )
-        else:
-            self.machine = Machine(
-                model=model,
-                states=states,
-                transitions=transitions,
-                initial="start",
-                queued=True,
-                ignore_invalid_triggers=False,
-            )
+    return model, machine
 
 
 # Define basic versions of the modules
@@ -244,7 +241,8 @@ def test_state_class():
     cycle = aerCycle(**parameters)
     # Initialize state machine using model
     # This applies state machine methods to the model
-    aerMachine(model=cycle, graph=True)  # make this unto a function
+    # aerMachine(model=cycle, graph=True)  # make this unto a function
+    cycle, _ = create_state_machine(cycle, graph=True)
 
     # Run the state machine
     cycle.run()
