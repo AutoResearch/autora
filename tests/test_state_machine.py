@@ -14,6 +14,25 @@ from autora.cycle import DataSet, DataSetCollection, combine_datasets  # noqa: 4
 from autora.variable import Variable, VariableCollection
 
 
+# Define basic versions of the modules
+def dummy_theorist(data, metadata, search_space):
+    def theory(x):
+        return x + 1
+
+    return theory
+
+
+def dummy_experimentalist(data, metadata: VariableCollection, theory, n_samples=10):
+    low = metadata.independent_variables[0].min
+    high = metadata.independent_variables[0].max
+    x_prime = np.random.uniform(low, high, n_samples)
+    return x_prime
+
+
+def dummy_experiment_runner(x_prime):
+    return x_prime + 1
+
+
 class aerCycle(object):
     """
     Contains attributes/parameters of the AER cycle and sets up methods to call upon entering and
@@ -90,56 +109,28 @@ class aerCycle(object):
     def end_statement(self):
         print("At end state.")
 
-    def run(self):
-        while True:
-            try:
-                self.next_step()
-            except core.MachineError:
-                break
-
-        return self
-
 
 def create_state_machine(model, graph=False):
+
     states = [
+        State(name="start"),
         State(
             name="experiment_runner",
             on_enter=["start_experiment_runner"],
-            # on_exit=[],
         ),
         State(
             name="theorist",
             on_enter=["start_theorist"],
-            # on_exit=[],
         ),
         State(
             name="experimentalist",
             on_enter=["start_experimentalist"],
-            # on_exit=[],
         ),
-        State(name="start"),
         State(name="end", on_enter=["end_statement"]),
     ]
 
     transitions = [
-        {
-            "trigger": "next_step",
-            "source": ["experiment_runner"],
-            "dest": "theorist",
-            "unless": [],
-        },
-        {
-            "trigger": "next_step",
-            "source": ["theorist"],
-            "dest": "experimentalist",
-            "unless": ["is_max_cycles"],
-        },
-        {
-            "trigger": "next_step",
-            "source": ["experimentalist"],
-            "dest": "experiment_runner",
-            "unless": [],
-        },
+        # Start transitions
         {
             "trigger": "next_step",
             "source": ["start"],
@@ -158,6 +149,26 @@ def create_state_machine(model, graph=False):
             "dest": "experimentalist",
             "conditions": ["is_ready_for_experimentalist"],
         },
+        # Module to module transitions
+        {
+            "trigger": "next_step",
+            "source": ["experiment_runner"],
+            "dest": "theorist",
+            "unless": [],
+        },
+        {
+            "trigger": "next_step",
+            "source": ["theorist"],
+            "dest": "experimentalist",
+            "unless": ["is_max_cycles"],
+        },
+        {
+            "trigger": "next_step",
+            "source": ["experimentalist"],
+            "dest": "experiment_runner",
+            "unless": [],
+        },
+        # End transition
         {
             "trigger": "next_step",
             "source": ["theorist"],
@@ -167,7 +178,7 @@ def create_state_machine(model, graph=False):
     ]
 
     if graph:
-        machine = GraphMachine(
+        GraphMachine(
             model=model,
             states=states,
             transitions=transitions,
@@ -178,7 +189,7 @@ def create_state_machine(model, graph=False):
             show_conditions=True,
         )
     else:
-        machine = Machine(
+        Machine(
             model=model,
             states=states,
             transitions=transitions,
@@ -187,26 +198,7 @@ def create_state_machine(model, graph=False):
             ignore_invalid_triggers=False,
         )
 
-    return model, machine
-
-
-# Define basic versions of the modules
-def dummy_theorist(data, metadata, search_space):
-    def theory(x):
-        return x + 1
-
-    return theory
-
-
-def dummy_experimentalist(data, metadata: VariableCollection, theory):
-    low = metadata.independent_variables[0].min
-    high = metadata.independent_variables[0].max
-    x_prime = np.random.uniform(low, high, 10)
-    return x_prime
-
-
-def dummy_experiment_runner(x_prime):
-    return x_prime + 1
+    return model
 
 
 def test_state_class():
@@ -239,22 +231,27 @@ def test_state_class():
 
     # Initialize the cycle model
     cycle = aerCycle(**parameters)
-    # Initialize state machine using model
-    # This applies state machine methods to the model
-    # aerMachine(model=cycle, graph=True)  # make this unto a function
-    cycle, _ = create_state_machine(cycle, graph=True)
-
+    # Initialize state machine using model. This applies state machine methods to the model.
+    cycle = create_state_machine(cycle, graph=True)
     # Run the state machine
-    cycle.run()
+    while True:
+        try:
+            cycle.next_step()
+        except core.MachineError:
+            break
 
     # Save diagram of the state machine
     cycle.get_graph().draw("state_diagram.png", prog="dot")
 
-    print(f"{cycle.data.datasets.__len__()} datasets generated.")
+    # return a dataclass
+
     assert cycle.data.datasets.__len__() == cycle.max_cycle_count, (
         f"Number of datasets generated ({cycle.data.datasets.__len__()}) "
         f"should equal the max number of cycles ({cycle.max_cycle_count})."
     )
+
+    # Other check ideas
+    # Start point checks - need a set-up function
 
 
 if __name__ == "__main__":
