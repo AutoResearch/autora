@@ -2,13 +2,14 @@
 AutoRA full autonomous cycle functions
 """
 import logging
-from collections import OrderedDict
 from dataclasses import dataclass
-from typing import Any, Callable, List, Literal, Optional, Protocol, Union
+from typing import Any, List, Literal, Optional, Protocol, Union
 
 from numpy.typing import ArrayLike
 
 from autora.variable import VariableCollection
+
+from .state_machine import State, StateMachine, Transition
 
 _logger = logging.getLogger(__name__)
 
@@ -115,24 +116,44 @@ class ExperimentRunner(Protocol):
         ...
 
 
+@dataclass(frozen=True)
+class AERData:
+    metadata: VariableCollection
+    search_space: SearchSpacePriors
+    starting_point: Literal["experimentalist", "experiment_runner", "theorist"]
+    data: Optional[DataSetCollection] = DataSetCollection([])
+    theory: Optional[Theory] = None
+    independent_variable_values: Optional[IndependentVariableValues] = None
+    cycle_count: int = 0
+
+
 def run(
     theorist: Theorist,
     experimentalist: Experimentalist,
     experiment_runner: ExperimentRunner,
-    metadata: VariableCollection,
-    search_space: SearchSpacePriors,
-    starting_point: Literal["experimentalist", "experiment_runner", "theorist"],
-    data: Optional[DataSetCollection] = DataSetCollection([]),
-    theory: Optional[Theory] = None,
-    independent_variable_values: Optional[IndependentVariableValues] = None,
-    cycle_count: int = 0,
-):
-    if starting_point == "experimentalist":
-        return start_experimentalist(**locals())
-    elif starting_point == "experiment_runner":
-        return start_experiment_runner(**locals())
-    elif starting_point == "theorist":
-        return start_theorist(**locals())
+    data: AERData,
+) -> AERData:
+    machine = StateMachine()
+
+    state_new_data = State("new data")
+    state_new_theory = State("new theory")
+    state_new_experiment = State("new experiment")
+
+    machine.register_state(state_new_data)
+    machine.register_state(state_new_theory)
+    machine.register_state(state_new_experiment)
+
+    transition_theorist = Transition()
+    machine.register_transition(...)
+
+    machine.set_starting_state("experimentalist")
+
+    while True:
+        try:
+            machine.next_step()
+        except core.MachineError:
+            break
+    return machine.data
 
 
 def new_state(*dicts):

@@ -37,6 +37,9 @@ pytest = "^7.1.2"
 [tool.poetry.extras]
 tinkerforge = ["tinkerforge"]
 
+[tool.poetry.group.dev.dependencies]
+nbconvert = "^7.0.0"
+
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
