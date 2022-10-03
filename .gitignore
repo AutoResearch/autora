@@ -1,3 +1,6 @@
+# Files
+.ipynb_checkpoints
+
 # AER-specific files
 example/studies/**/modeling
 
