@@ -75,7 +75,7 @@ class BMSRegressor(BaseEstimator, RegressorMixin):
         prior_par: dict = PRIORS,
         ts: List[float] = TEMPERATURES,
         epochs: int = 30,
-    ) -> Optional[None]:
+    ):
         """
         Arguments:
             prior_par: a dictionary of the prior probabilities of different functions based on
