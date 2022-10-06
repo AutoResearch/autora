@@ -43,3 +43,28 @@ def get_prior(x=1):
         },
     }
     return prior_dict[x]
+
+
+def get_ops(ops=None):
+    if ops is None:
+        ops = {
+            "sin": 1,
+            "cos": 1,
+            "tan": 1,
+            "exp": 1,
+            "log": 1,
+            "sinh": 1,
+            "cosh": 1,
+            "tanh": 1,
+            "pow2": 1,
+            "pow3": 1,
+            "abs": 1,
+            "sqrt": 1,
+            "fac": 1,
+            "-": 1,
+            "+": 2,
+            "*": 2,
+            "/": 2,
+            "**": 2,
+        }
+    return ops
