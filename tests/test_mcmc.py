@@ -33,8 +33,6 @@ def test_tree_mcmc_stepping(
     )
     eps = np.random.normal(0.0, 5, num_points)
     y = 50.0 * np.sin(x["x0"]) / x["x2"] - 4.0 * x["x1"] + 3 + eps
-    x.to_csv("data_x.csv", index=False)
-    y.to_csv("data_y.csv", index=False, header=["y"])
 
     # Create the formula
     prior_par = {
