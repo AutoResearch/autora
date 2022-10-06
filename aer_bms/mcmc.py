@@ -580,7 +580,9 @@ class Tree:
         parameters = [atomd[p] for p in self.parameters if p in list(atomd.keys())]
         try:
             flam = lambdify(
-                variables + parameters, ex, ["numpy", {"fac": scipy.special.factorial}]
+                variables + parameters,
+                ex,
+                ["numpy", {"fac": scipy.special.factorial, "sig": scipy.special.expit}],
             )
         except (SyntaxError, KeyError):
             self.sse = dict([(ds, np.inf) for ds in self.x])
@@ -1299,7 +1301,9 @@ class Tree:
         variables = [atomd[v] for v in self.variables if v in list(atomd.keys())]
         parameters = [atomd[p] for p in self.parameters if p in list(atomd.keys())]
         flam = lambdify(
-            variables + parameters, ex, ["numpy", {"fac": scipy.special.factorial}]
+            variables + parameters,
+            ex,
+            ["numpy", {"fac": scipy.special.factorial, "sig": scipy.special.expit}],
         )
         # Loop over datasets
         predictions = {}

@@ -19,6 +19,8 @@ def get_prior(x=1):
             "Nopi_+": 0,
             "Nopi_*": 0,
             "Nopi_fac": 0,
+            "Nopi_sig": 0,
+            "Nopi_relu": 0,
         },
         1: {
             "Nopi_/": 5.912205942815285,
@@ -40,6 +42,8 @@ def get_prior(x=1):
             "Nopi_*": 5.002213595420244,
             "Nopi_fac": 10.0,
             "Nopi2_*": 1.0,
+            "Nopi_sig": 1.0,  # arbitrarily set for now
+            "Nopi_relu": 1.0,  # arbitrarily set for now
         },
     }
     return prior_dict[x]
@@ -66,5 +70,7 @@ def get_ops(ops=None):
             "*": 2,
             "/": 2,
             "**": 2,
+            "sig": 1,
+            "relu": 1,
         }
     return ops
