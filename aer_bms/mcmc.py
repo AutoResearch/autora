@@ -12,7 +12,7 @@ import scipy
 from scipy.optimize import curve_fit
 from sympy import lambdify, latex, log, sympify
 
-from aer_bms.prior import get_ops, get_prior
+from aer_bms.prior import get_ops, get_prior, relu
 
 _logger = logging.getLogger(__name__)
 
@@ -582,7 +582,14 @@ class Tree:
             flam = lambdify(
                 variables + parameters,
                 ex,
-                ["numpy", {"fac": scipy.special.factorial, "sig": scipy.special.expit}],
+                [
+                    "numpy",
+                    {
+                        "fac": scipy.special.factorial,
+                        "sig": scipy.special.expit,
+                        "relu": relu,
+                    },
+                ],
             )
         except (SyntaxError, KeyError):
             self.sse = dict([(ds, np.inf) for ds in self.x])
@@ -1303,7 +1310,14 @@ class Tree:
         flam = lambdify(
             variables + parameters,
             ex,
-            ["numpy", {"fac": scipy.special.factorial, "sig": scipy.special.expit}],
+            [
+                "numpy",
+                {
+                    "fac": scipy.special.factorial,
+                    "sig": scipy.special.expit,
+                    "relu": relu,
+                },
+            ],
         )
         # Loop over datasets
         predictions = {}

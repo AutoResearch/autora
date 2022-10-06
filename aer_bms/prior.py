@@ -1,3 +1,6 @@
+import numpy as np
+
+
 def get_prior(x=1):
     prior_dict = {
         0: {
@@ -74,3 +77,7 @@ def get_ops(ops=None):
             "relu": 1,
         }
     return ops
+
+
+def relu(x):
+    return np.maximum(x, 0)
