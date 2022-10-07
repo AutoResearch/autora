@@ -1294,7 +1294,7 @@ class Tree:
     def predict(self, x):
         """Calculate the value of the formula at the given data x. The data x
         must have the same format as the training data and, in particular, it
-        it must specify to which dataset the test data belongs, if multiple
+        it must specify to which dataset the example data belongs, if multiple
         datasets where used for training.
 
         """
