@@ -3,11 +3,11 @@ import numpy as np
 import pytest  # noqa: 401
 
 from autora.cycle import (  # noqa: 401
+    AERModule,
     DataSetCollection,
+    RunCollection,
+    TheoryCollection,
     run,
-    start_experiment_runner,
-    start_experimentalist,
-    start_theorist,
 )
 from autora.variable import Variable, VariableCollection
 
@@ -62,31 +62,34 @@ def test_cycle():
         independent_variables=[Variable(name="x1", value_range=(-5, 5))],
         dependent_variables=[Variable(name="y", value_range=(-10, 10))],
     )
+
     parameters = dict(
-        theorist=dummy_theorist,
-        experimentalist=dummy_experimentalist,
-        experiment_runner=dummy_experiment_runner,
         metadata=metadata,
         search_space=None,
         data=DataSetCollection([]),
-        cycle_count=0,
-        theory=None,
+        theories=TheoryCollection([lambda x: x + 2]),
         independent_variable_values=x1,
         max_cycle_count=10,
+        cycle_count=0,
+        theorist=dummy_theorist,
+        experimentalist=dummy_experimentalist,
+        experiment_runner=dummy_experiment_runner,
     )
 
     # Run from experiment runner
     experiment_runner_results_run = run(
-        starting_point="experiment_runner", **parameters
+        first_state=AERModule.EXPERIMENT_RUNNER, **parameters
     )
     print(experiment_runner_results_run)
 
     # Run starting from theorist
-    theorist_results_run = run(starting_point="theorist", **parameters)
+    theorist_results_run = run(first_state=AERModule.THEORIST, **parameters)
     print(theorist_results_run)
 
     # Run starting from experimentalist
-    experimentalist_results_run = run(starting_point="experimentalist", **parameters)
+    experimentalist_results_run = run(
+        first_state=AERModule.EXPERIMENTALIST, **parameters
+    )
     print(experimentalist_results_run)
 
 

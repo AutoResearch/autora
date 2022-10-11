@@ -2,15 +2,15 @@
 AutoRA full autonomous cycle functions
 """
 import logging
-from dataclasses import asdict, dataclass
+from dataclasses import dataclass, field, replace
 from enum import Enum
-from typing import Any, List, Literal, Optional, Protocol, Union
+from typing import List, Protocol, Union
 
 from numpy.typing import ArrayLike
 from transitions import Machine, State, core
 from transitions.extensions import GraphMachine
 
-from autora.variable import Variable, VariableCollection
+from autora.variable import VariableCollection
 
 _logger = logging.getLogger(__name__)
 
@@ -132,7 +132,7 @@ class ExperimentRunner(Protocol):
         ...
 
 
-class AERModule(Enum):
+class AERModule(str, Enum):
     THEORIST = "theorist"
     EXPERIMENTALIST = "experimentalist"
     EXPERIMENT_RUNNER = "experiment runner"
@@ -140,36 +140,23 @@ class AERModule(Enum):
 
 @dataclass(frozen=False)
 class RunCollection:
-    def __init__(
-        self,
-        search_space: SearchSpacePriors,
-        metadata: VariableCollection,
-        first_state: AERModule,
-        independent_variable_values: IndependentVariableValues,
-        data: DataSetCollection,
-        theories: TheoryCollection,
-        max_cycle_count: int,
-        cycle_count: int = 0,
-    ):
-        # Static
-        self.search_space = search_space
-        self.metadata = metadata
-        self.first_state = first_state
-        self.max_cycle_count = max_cycle_count
+    # Static
+    metadata: VariableCollection
+    first_state: AERModule
+    max_cycle_count: int
+    search_space: SearchSpacePriors
 
-        # Updates each cycle
-        self.cycle_count = cycle_count
-        self.independent_variable_values = independent_variable_values
+    # Updates each cycle
+    independent_variable_values: IndependentVariableValues
+    cycle_count: int
 
-        # Aggregates each cycle
-        self.data = data
-        self.theories = theories
+    # Aggregates each cycle
+    data: DataSetCollection
+    theories: TheoryCollection
 
 
-def update_run_collection(run_collection: RunCollection, **kwargs):
-    run_collection_dict = run_collection.__dict__
-    run_collection_dict.update(kwargs)
-    new_run_collection = RunCollection(**run_collection_dict)
+def update_run_collection(run_collection: RunCollection, **changes):
+    new_run_collection = replace(run_collection, **changes)
     return new_run_collection
 
 
@@ -192,16 +179,16 @@ class AERCycle(object):
         self.run_container = run_container
 
     def is_ready_for_experiment_runner(self):
-        return self.run_container.first_state == AERModule.EXPERIMENT_RUNNER.value
+        return AERModule(self.run_container.first_state) is AERModule.EXPERIMENT_RUNNER
 
     def is_ready_for_theorist(self):
-        return self.run_container.first_state == AERModule.THEORIST.value
+        return AERModule(self.run_container.first_state) is AERModule.THEORIST
 
     def is_ready_for_experimentalist(self):
-        return self.run_container.first_state == AERModule.EXPERIMENTALIST.value
+        return AERModule(self.run_container.first_state) is AERModule.EXPERIMENTALIST
 
     def is_max_cycles(self):
-        return self.run_container.cycle_count == self.run_container.max_cycle_count
+        return self.run_container.cycle_count >= self.run_container.max_cycle_count
 
     def start_theorist(self):
         print("Running Theorist to get new theory from data.")
@@ -227,7 +214,7 @@ class AERCycle(object):
         print("Running Experimentalist to get new test from theory.")
         # Run experimentalist
         new_independent_variable_values = self.experimentalist(
-            data=self.run_container.data.datasets[-1],
+            data=self.run_container.data,
             metadata=self.run_container.metadata,
             theory=self.run_container.theories.theories[-1],
         )
@@ -366,8 +353,7 @@ def run(
     theorist: Theorist,
     experimentalist: Experimentalist,
     experiment_runner: ExperimentRunner,
-    run_container: RunCollection,
-    graph: bool = False,
+    **kwargs
 ):
     """
     Runs the closed-loop prototype.
@@ -381,10 +367,12 @@ def run(
     Returns:
     The run container object with run parameters and aggregated data.
     """
+    # Initialize the data
+    run_container = RunCollection(**kwargs)
     # Initialize the cycle model
     cycle = AERCycle(theorist, experimentalist, experiment_runner, run_container)
     # Initialize state machine using model. This applies state machine methods to the model.
-    cycle = create_state_machine(cycle, graph=graph)
+    cycle = create_state_machine(cycle, graph=True)
 
     # Run the state machine
     while True:
@@ -392,10 +380,6 @@ def run(
             cycle.next_step()  # type: ignore
         except core.MachineError:
             break
-
-    if graph:
-        # Save diagram of the state machine
-        cycle.get_graph().draw("state_diagram.png", prog="dot")  # type: ignore
 
     # Return run container
     return cycle.run_container
