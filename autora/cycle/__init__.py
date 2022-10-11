@@ -194,7 +194,7 @@ class AERCycle(object):
         print("Running Theorist to get new theory from data.")
         # Run Theorist
         new_theory = self.theorist(
-            data=self.run_container.data.datasets[-1],
+            data=self.run_container.data,
             metadata=self.run_container.metadata,
             search_space=self.run_container.search_space,
         )
@@ -214,7 +214,7 @@ class AERCycle(object):
         print("Running Experimentalist to get new test from theory.")
         # Run experimentalist
         new_independent_variable_values = self.experimentalist(
-            data=self.run_container.data.datasets[-1],
+            data=self.run_container.data,
             metadata=self.run_container.metadata,
             theory=self.run_container.theories.theories[-1],
         )
