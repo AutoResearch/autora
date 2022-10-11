@@ -353,8 +353,7 @@ def run(
     theorist: Theorist,
     experimentalist: Experimentalist,
     experiment_runner: ExperimentRunner,
-    run_container: RunCollection,
-    graph: bool = False,
+    **kwargs
 ):
     """
     Runs the closed-loop prototype.
@@ -368,10 +367,12 @@ def run(
     Returns:
     The run container object with run parameters and aggregated data.
     """
+    # Initialize the data
+    run_container = RunCollection(**kwargs)
     # Initialize the cycle model
     cycle = AERCycle(theorist, experimentalist, experiment_runner, run_container)
     # Initialize state machine using model. This applies state machine methods to the model.
-    cycle = create_state_machine(cycle, graph=graph)
+    cycle = create_state_machine(cycle, graph=True)
 
     # Run the state machine
     while True:
@@ -379,10 +380,6 @@ def run(
             cycle.next_step()  # type: ignore
         except core.MachineError:
             break
-
-    if graph:
-        # Save diagram of the state machine
-        cycle.get_graph().draw("state_diagram.png", prog="dot")  # type: ignore
 
     # Return run container
     return cycle.run_container
