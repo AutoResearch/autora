@@ -11,6 +11,8 @@ import scipy
 from scipy.optimize import curve_fit
 from sympy import lambdify, latex, log, sympify
 
+from aer_bms.prior import get_prior
+
 _logger = logging.getLogger(__name__)
 
 # -----------------------------------------------------------------------------
@@ -1435,3 +1437,93 @@ class Tree:
 # MAIN
 # -----------------------------------------------------------------------------
 # -----------------------------------------------------------------------------
+
+def test3(num_points=10, samples=100000):
+    # Create the data
+    x = pd.DataFrame(
+        dict([("x%d" % i, np.random.uniform(0, 10, num_points)) for i in range(5)])
+    )
+    eps = np.random.normal(0.0, 5, num_points)
+    y = 50.0 * np.sin(x["x0"]) / x["x2"] - 4.0 * x["x1"] + 3 + eps
+    x.to_csv("data_x.csv", index=False)
+    y.to_csv("data_y.csv", index=False, header=["y"])
+
+    # Create the formula
+    prior_par = get_prior()
+    t = Tree(
+        variables=["x%d" % i for i in range(5)],
+        parameters=["a%d" % i for i in range(10)],
+        x=x,
+        y=y,
+        prior_par=prior_par,
+        BT=1.0,
+    )
+    # MCMC
+    t.mcmc(burnin=2000, thin=10, samples=samples, verbose=True)
+
+    # Predict
+    print(t.predict(x))
+    print(y)
+    print(50.0 * np.sin(x["x0"]) / x["x2"] - 4.0 * x["x1"] + 3)
+
+    plt.plot(t.predict(x), 50.0 * np.sin(x["x0"]) / x["x2"] - 4.0 * x["x1"] + 3)
+    plt.show()
+
+    return t
+
+
+def test4(num_points=10, samples=1000):
+    # Create the data
+    x = pd.DataFrame(
+        dict([("x%d" % i, np.random.uniform(0, 10, num_points)) for i in range(5)])
+    )
+    eps = np.random.normal(0.0, 5, num_points)
+    y = 50.0 * np.sin(x["x0"]) / x["x2"] - 4.0 * x["x1"] + 3 + eps
+    x.to_csv("data_x.csv", index=False)
+    y.to_csv("data_y.csv", index=False, header=["y"])
+
+    xtrain, ytrain = x.iloc[5:], y.iloc[5:]
+    xtest, ytest = x.iloc[:5], y.iloc[:5]
+
+    # Create the formula
+    prior_par = get_prior()
+    t = Tree(
+        variables=["x%d" % i for i in range(5)],
+        parameters=["a%d" % i for i in range(10)],
+        x=xtrain,
+        y=ytrain,
+        prior_par=prior_par,
+    )
+    print(xtest)
+
+    # Predict
+    ypred = t.trace_predict(xtest, samples=samples, burnin=10000)
+
+    print(ypred)
+    print(ytest)
+    print(50.0 * np.sin(xtest["x0"]) / xtest["x2"] - 4.0 * xtest["x1"] + 3)
+
+    # Done
+    return t
+
+
+def test5(string="(P120 + (((ALPHACAT / _a2) + (_a2 * CDH3)) + _a0))"):
+    # Create the formula
+    prior_par = get_prior(0)
+
+    t = Tree(prior_par=prior_par, from_string=string)
+    for i in range(1000000):
+        t.mcmc_step(verbose=True)
+        print("-" * 150)
+        t2 = Tree(from_string=str(t))
+        print(t)
+        print(t2)
+        if str(t2) != str(t):
+            raise
+
+    return t
+
+
+if __name__ == "__main__":
+    NP, NS = 100, 1000
+    test5()
