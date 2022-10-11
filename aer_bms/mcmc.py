@@ -22,7 +22,6 @@ from itertools import permutations, product
 from random import choice, random
 from typing import List
 
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import scipy
@@ -84,7 +83,7 @@ class Node:
         """
         Converts expression in readable form
 
-        Returns: Nothing
+        Returns: String
         """
         if self.offspring == []:
             return "%s" % self.value
@@ -1432,6 +1431,7 @@ class Tree:
 # MAIN
 # -----------------------------------------------------------------------------
 # -----------------------------------------------------------------------------
+
 def test3(num_points=10, samples=100000):
     # Create the data
     x = pd.DataFrame(
