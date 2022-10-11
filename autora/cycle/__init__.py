@@ -2,7 +2,7 @@
 AutoRA full autonomous cycle functions
 """
 import logging
-from dataclasses import asdict, dataclass
+from dataclasses import dataclass, field, replace
 from enum import Enum
 from typing import Any, List, Literal, Optional, Protocol, Union
 
@@ -165,11 +165,8 @@ class RunCollection:
         self.data = data
         self.theories = theories
 
-
-def update_run_collection(run_collection: RunCollection, **kwargs):
-    run_collection_dict = run_collection.__dict__
-    run_collection_dict.update(kwargs)
-    new_run_collection = RunCollection(**run_collection_dict)
+def update_run_collection(run_collection: RunCollection, **changes):
+    new_run_collection = replace(run_collection, **changes)
     return new_run_collection
 
 
