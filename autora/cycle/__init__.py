@@ -4,13 +4,13 @@ AutoRA full autonomous cycle functions
 import logging
 from dataclasses import dataclass, field, replace
 from enum import Enum
-from typing import Any, List, Literal, Optional, Protocol, Union
+from typing import List, Protocol, Union
 
 from numpy.typing import ArrayLike
 from transitions import Machine, State, core
 from transitions.extensions import GraphMachine
 
-from autora.variable import Variable, VariableCollection
+from autora.variable import VariableCollection
 
 _logger = logging.getLogger(__name__)
 
