@@ -6,7 +6,8 @@ from typing import Optional, Tuple
 import numpy as np
 from numpy import exp
 
-from aer_bms.mcmc import OPS, Tree
+from autora_bms.mcmc import Tree
+from autora_bms.prior import get_prior
 
 
 class Parallel:
@@ -23,7 +24,7 @@ class Parallel:
     def __init__(
         self,
         Ts: list,
-        ops=OPS,
+        ops=get_prior(),
         variables=["x"],
         parameters=["a"],
         max_size=50,
