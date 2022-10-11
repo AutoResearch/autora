@@ -188,7 +188,7 @@ class AERCycle(object):
         return self.run_container.first_state is AERModule.EXPERIMENTALIST
 
     def is_max_cycles(self):
-        return self.run_container.cycle_count == self.run_container.max_cycle_count
+        return self.run_container.cycle_count >= self.run_container.max_cycle_count
 
     def start_theorist(self):
         print("Running Theorist to get new theory from data.")
