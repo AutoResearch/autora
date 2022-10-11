@@ -179,13 +179,13 @@ class AERCycle(object):
         self.run_container = run_container
 
     def is_ready_for_experiment_runner(self):
-        return self.run_container.first_state == AERModule.EXPERIMENT_RUNNER.value
+        return self.run_container.first_state is AERModule.EXPERIMENT_RUNNER
 
     def is_ready_for_theorist(self):
-        return self.run_container.first_state == AERModule.THEORIST.value
+        return self.run_container.first_state is AERModule.THEORIST
 
     def is_ready_for_experimentalist(self):
-        return self.run_container.first_state == AERModule.EXPERIMENTALIST.value
+        return self.run_container.first_state is AERModule.EXPERIMENTALIST
 
     def is_max_cycles(self):
         return self.run_container.cycle_count == self.run_container.max_cycle_count
