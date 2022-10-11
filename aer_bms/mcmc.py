@@ -84,7 +84,7 @@ class Node:
         """
         Converts expression in readable form
 
-        Returns: Nothing
+        Returns: String
         """
         if self.offspring == []:
             return "%s" % self.value
