@@ -140,30 +140,20 @@ class AERModule(Enum):
 
 @dataclass(frozen=False)
 class RunCollection:
-    def __init__(
-        self,
-        search_space: SearchSpacePriors,
-        metadata: VariableCollection,
-        first_state: AERModule,
-        independent_variable_values: IndependentVariableValues,
-        data: DataSetCollection,
-        theories: TheoryCollection,
-        max_cycle_count: int,
-        cycle_count: int = 0,
-    ):
-        # Static
-        self.search_space = search_space
-        self.metadata = metadata
-        self.first_state = first_state
-        self.max_cycle_count = max_cycle_count
+    # Static
+    metadata: VariableCollection
+    first_state: AERModule
+    max_cycle_count: int
+    search_space: SearchSpacePriors
 
-        # Updates each cycle
-        self.cycle_count = cycle_count
-        self.independent_variable_values = independent_variable_values
+    # Updates each cycle
+    independent_variable_values: IndependentVariableValues
+    cycle_count: int
 
-        # Aggregates each cycle
-        self.data = data
-        self.theories = theories
+    # Aggregates each cycle
+    data: DataSetCollection
+    theories: TheoryCollection
+
 
 def update_run_collection(run_collection: RunCollection, **changes):
     new_run_collection = replace(run_collection, **changes)
