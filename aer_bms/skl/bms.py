@@ -139,5 +139,17 @@ class BMSRegressor(BaseEstimator, RegressorMixin):
         # in the future, we might need to look into mcmc.py to remove
         # these redundant type castings.
         X = pd.DataFrame(X, columns=self.variables)
-        utils.present_results(self.model_, self.loss_, self.cache_)
+
         return np.expand_dims(self.model_.predict(X).to_numpy(), axis=1)
+
+    def present_results(self):
+        """
+        Prints out the best equation, its description length,
+        along with a plot of how this has progressed over the course of the search tasks.
+        """
+        check_is_fitted(self, attributes=["model_", "loss_", "cache_"])
+        assert self.model_ is not None
+        assert self.loss_ is not None
+        assert self.cache_ is not None
+
+        utils.present_results(self.model_, self.loss_, self.cache_)
