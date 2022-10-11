@@ -132,7 +132,7 @@ class ExperimentRunner(Protocol):
         ...
 
 
-class AERModule(Enum):
+class AERModule(str, Enum):
     THEORIST = "theorist"
     EXPERIMENTALIST = "experimentalist"
     EXPERIMENT_RUNNER = "experiment runner"
@@ -179,13 +179,13 @@ class AERCycle(object):
         self.run_container = run_container
 
     def is_ready_for_experiment_runner(self):
-        return self.run_container.first_state is AERModule.EXPERIMENT_RUNNER
+        return AERModule(self.run_container.first_state) is AERModule.EXPERIMENT_RUNNER
 
     def is_ready_for_theorist(self):
-        return self.run_container.first_state is AERModule.THEORIST
+        return AERModule(self.run_container.first_state) is AERModule.THEORIST
 
     def is_ready_for_experimentalist(self):
-        return self.run_container.first_state is AERModule.EXPERIMENTALIST
+        return AERModule(self.run_container.first_state) is AERModule.EXPERIMENTALIST
 
     def is_max_cycles(self):
         return self.run_container.cycle_count >= self.run_container.max_cycle_count
@@ -194,7 +194,7 @@ class AERCycle(object):
         print("Running Theorist to get new theory from data.")
         # Run Theorist
         new_theory = self.theorist(
-            data=self.run_container.data,
+            data=self.run_container.data.datasets[-1],
             metadata=self.run_container.metadata,
             search_space=self.run_container.search_space,
         )
