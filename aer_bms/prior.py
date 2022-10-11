@@ -1,3 +1,6 @@
+import numpy as np
+
+
 def get_prior(x=1):
     prior_dict = {
         0: {
@@ -19,6 +22,8 @@ def get_prior(x=1):
             "Nopi_+": 0,
             "Nopi_*": 0,
             "Nopi_fac": 0,
+            "Nopi_sig": 0,
+            "Nopi_relu": 0,
         },
         1: {
             "Nopi_/": 5.912205942815285,
@@ -40,6 +45,39 @@ def get_prior(x=1):
             "Nopi_*": 5.002213595420244,
             "Nopi_fac": 10.0,
             "Nopi2_*": 1.0,
+            "Nopi_sig": 1.0,  # arbitrarily set for now
+            "Nopi_relu": 1.0,  # arbitrarily set for now
         },
     }
     return prior_dict[x]
+
+
+def get_ops(ops=None):
+    if ops is None:
+        ops = {
+            "sin": 1,
+            "cos": 1,
+            "tan": 1,
+            "exp": 1,
+            "log": 1,
+            "sinh": 1,
+            "cosh": 1,
+            "tanh": 1,
+            "pow2": 1,
+            "pow3": 1,
+            "abs": 1,
+            "sqrt": 1,
+            "fac": 1,
+            "-": 1,
+            "+": 2,
+            "*": 2,
+            "/": 2,
+            "**": 2,
+            "sig": 1,
+            "relu": 1,
+        }
+    return ops
+
+
+def relu(x):
+    return np.maximum(x, 0)

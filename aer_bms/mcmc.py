@@ -28,30 +28,9 @@ import scipy
 from scipy.optimize import curve_fit
 from sympy import lambdify, latex, log, sympify
 
-from aer_bms.prior import get_prior
+from aer_bms.prior import get_ops, get_prior, relu
 
 _logger = logging.getLogger(__name__)
-
-OPS = {
-    "sin": 1,
-    "cos": 1,
-    "tan": 1,
-    "exp": 1,
-    "log": 1,
-    "sinh": 1,
-    "cosh": 1,
-    "tanh": 1,
-    "pow2": 1,
-    "pow3": 1,
-    "abs": 1,
-    "sqrt": 1,
-    "fac": 1,
-    "-": 1,
-    "+": 2,
-    "*": 2,
-    "/": 2,
-    "**": 2,
-}
 
 
 class Node:
@@ -595,7 +574,16 @@ class Tree:
         parameters = [atomd[p] for p in self.parameters if p in list(atomd.keys())]
         try:
             flam = lambdify(
-                variables + parameters, ex, ["numpy", {"fac": scipy.special.factorial}]
+                variables + parameters,
+                ex,
+                [
+                    "numpy",
+                    {
+                        "fac": scipy.special.factorial,
+                        "sig": scipy.special.expit,
+                        "relu": relu,
+                    },
+                ],
             )
         except (SyntaxError, KeyError):
             self.sse = dict([(ds, np.inf) for ds in self.x])
@@ -1327,7 +1315,16 @@ class Tree:
         variables = [atomd[v] for v in self.variables if v in list(atomd.keys())]
         parameters = [atomd[p] for p in self.parameters if p in list(atomd.keys())]
         flam = lambdify(
-            variables + parameters, ex, ["numpy", {"fac": scipy.special.factorial}]
+            variables + parameters,
+            ex,
+            [
+                "numpy",
+                {
+                    "fac": scipy.special.factorial,
+                    "sig": scipy.special.expit,
+                    "relu": relu,
+                },
+            ],
         )
         # Loop over datasets
         predictions = {}
