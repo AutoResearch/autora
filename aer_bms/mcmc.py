@@ -5,7 +5,6 @@ from copy import deepcopy
 from itertools import permutations, product
 from random import choice, random
 
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import scipy
@@ -15,7 +14,6 @@ from sympy import lambdify, latex, log, sympify
 from aer_bms.prior import get_prior
 
 _logger = logging.getLogger(__name__)
-
 
 # -----------------------------------------------------------------------------
 # The accepted operations (key: operation; value: #offspring)
@@ -1439,6 +1437,7 @@ class Tree:
 # MAIN
 # -----------------------------------------------------------------------------
 # -----------------------------------------------------------------------------
+
 def test3(num_points=10, samples=100000):
     # Create the data
     x = pd.DataFrame(
