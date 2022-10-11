@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import logging
 from typing import List, Optional
 
@@ -46,6 +48,8 @@ class BMSRegressor(BaseEstimator, RegressorMixin):
     Attributes:
         pms: the bayesian (parallel) machine scientist model
         model_: represents the best-fit model
+        loss_: represents loss associated with best-fit model
+        cache_: record of loss_ over model fitting epochs
     """
 
     def __init__(
@@ -53,7 +57,7 @@ class BMSRegressor(BaseEstimator, RegressorMixin):
         prior_par: dict = PRIORS,
         ts: List[float] = TEMPERATURES,
         epochs: int = 30,
-    ) -> None:
+    ):
         """
         Arguments:
             prior_par: a dictionary of the prior probabilities of different functions based on
@@ -68,15 +72,18 @@ class BMSRegressor(BaseEstimator, RegressorMixin):
         self.X_: Optional[np.ndarray] = None
         self.y_: Optional[np.ndarray] = None
         self.model_: Tree = Tree()
+        self.loss_: float = np.inf
+        self.cache_: List = []
         self.variables: List = []
 
-    def fit(self, X: np.ndarray, y: np.ndarray, np: int = 1):
+    def fit(self, X: np.ndarray, y: np.ndarray, num_param: int = 1) -> BMSRegressor:
         """
         Runs the optimization for a given set of `X`s and `y`s.
 
         Arguments:
             X: independent variables in an n-dimensional array
             y: dependent variables in an n-dimensional array
+            num_param: number of parameters
 
         Returns:
             self (BMS): the fitted estimator
@@ -99,19 +106,18 @@ class BMSRegressor(BaseEstimator, RegressorMixin):
         self.pms = Parallel(
             Ts=self.ts,
             variables=self.variables,
-            parameters=["a%d" % i for i in range(np)],
+            parameters=["a%d" % i for i in range(num_param)],
             x=X,
             y=y,
             prior_par=self.prior_par,
         )
-        model, model_len, desc_len = utils.run(self.pms, self.epochs)
+        self.model_, self.loss_, self.cache_ = utils.run(self.pms, self.epochs)
 
         _logger.info("BMS fitting finished")
         self.X_, self.y_ = X, y
-        self.model_ = model
         return self
 
-    def predict(self, X: np.ndarray):
+    def predict(self, X: np.ndarray) -> np.ndarray:
         """
         Applies the fitted model to a set of independent variables `X`,
         to give predictions for the dependent variable `y`.
@@ -133,4 +139,5 @@ class BMSRegressor(BaseEstimator, RegressorMixin):
         # in the future, we might need to look into mcmc.py to remove
         # these redundant type castings.
         X = pd.DataFrame(X, columns=self.variables)
+        utils.present_results(self.model_, self.loss_, self.cache_)
         return np.expand_dims(self.model_.predict(X).to_numpy(), axis=1)
