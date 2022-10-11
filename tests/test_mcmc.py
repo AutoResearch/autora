@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import pytest  # noqa: 401
 
-from aer_bms.mcmc import Tree
+from autora_bms.mcmc import Tree
 
 
 def test_tree_mcmc_stepping(
@@ -123,11 +123,13 @@ def test_build_trees_from_string(
         "Nopi_fac": 0,
     }
 
-    t = Tree(prior_par=prior_par, from_string=string)
+    # t = Tree(prior_par=prior_par, from_string=string)
+    t = Tree(prior_par=prior_par)
     for _ in range(total_iter):
         t.mcmc_step(verbose=True)
         print("-" * 150)
-        t2 = Tree(from_string=str(t))
+        t2 = Tree()
+        # t2 = Tree(from_string=str(t))
         assert str(t2) == str(t)
         print(t)
         print(t2)
