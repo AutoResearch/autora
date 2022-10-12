@@ -40,6 +40,9 @@ class DataSet:
 class DataSetCollection:
     datasets: List[DataSet]
 
+    def __getitem__(self, item):
+        return self.datasets[item]
+
 
 def combine_datasets(a: Union[DataSetCollection, DataSet], b: DataSet):
     if isinstance(a, DataSet):
