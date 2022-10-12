@@ -67,6 +67,9 @@ class Theory(Protocol):
 class TheoryCollection:
     theories: List[Theory]
 
+    def __getitem__(self, item):
+        return self.theories[item]
+
 
 def combine_theories(a: Union[TheoryCollection, Theory], b: Theory):
     if callable(a):
