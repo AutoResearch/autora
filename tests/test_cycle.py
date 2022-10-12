@@ -168,14 +168,9 @@ def test_sklearn_theorist():
         theorist=scikit_learn_regressor_theorist_wrapper(
             DARTSRegressor(
                 num_graph_nodes=2,
-                max_epochs=1000,
-                primitives=(
-                    "none",
-                    "add",
-                    "subtract",
-                    "linear",
-                    "relu",
-                ),
+                param_updates_per_epoch=1,
+                max_epochs=100,
+                primitives=("none", "linear", "add", "subtract"),
             )
         ),
         experimentalist=make_random_experimentalist(n_observations_per_experiment=50),
@@ -191,14 +186,21 @@ def test_sklearn_theorist():
         cycle_count=0,
     )
     print(experimentalist_results_run)
+
+    fig = plt.figure()
+
+    # Plot the experimental results
+    for data in experimentalist_results_run.data.datasets:
+        if data is not None:
+            plt.scatter(data.x, data.y)
+
+    # Plot the fitted theory
     x_test = np.linspace(
         metadata.independent_variables[0].min,
         metadata.independent_variables[0].max,
         100,
     ).reshape(-1, 1)
-    fig = plt.figure()
-    for data in experimentalist_results_run.data.datasets:
-        if data is not None:
-            plt.scatter(data.x, data.y)
     plt.plot(x_test, experimentalist_results_run.theories[-1](x_test), c="orange")
+
+    # Show the results
     fig.show()
