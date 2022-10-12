@@ -6,7 +6,7 @@ Test the closed-loop state-machine with run function implementation.
 import numpy as np
 import pytest  # noqa: 401
 
-from autora.cycle import run
+from autora.cycle import AERCycle, plot_state_diagram, run
 from autora.variable import Variable, VariableCollection
 
 
@@ -44,6 +44,7 @@ def test_run_function():
         dependent_variables=[Variable(name="y", value_range=(-10, 10))],
     )
 
+    # Run the closed-loop cycle
     results = run(
         theorist=dummy_theorist,
         experimentalist=dummy_experimentalist,
@@ -52,6 +53,9 @@ def test_run_function():
         first_state="experiment runner",
         independent_variable_values=x1,
     )
+
+    # Plot a state diagram of the cycle model
+    plot_state_diagram(AERCycle())
 
     assert results.data.datasets.__len__() == results.max_cycle_count, (
         f"Number of datasets generated ({results.data.datasets.__len__()}) "

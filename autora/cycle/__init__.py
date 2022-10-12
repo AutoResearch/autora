@@ -2,6 +2,7 @@
 AutoRA full autonomous cycle functions
 """
 import logging
+import os
 from dataclasses import dataclass, field, replace
 from enum import Enum
 from numbers import Number
@@ -226,9 +227,22 @@ def run(
     )
 
     # Initialize the cycle model
-    cycle = AERCycle(theorist, experimentalist, experiment_runner, run_container)
+    cycle = AERCycle()
+    cycle.add_modules(
+        theorist=theorist,
+        experimentalist=experimentalist,
+        experiment_runner=experiment_runner,
+        run_container=run_container,
+    )
     # Initialize state machine using model. This applies state machine methods to the model.
-    cycle = create_state_machine(cycle, graph=True)
+    Machine(
+        model=cycle,
+        states=cycle.states,
+        transitions=cycle.transitions,
+        initial="start",
+        queued=True,
+        ignore_invalid_triggers=False,
+    )
 
     # Run the state machine
     while True:
@@ -241,13 +255,51 @@ def run(
     return cycle.run_container
 
 
+def plot_state_diagram(model, path=None, filename=None):
+    """
+    Runs the closed-loop prototype.
+
+    """
+    if path is None:
+        path = os.getcwd()
+
+    if filename is None:
+        filename = f"{model.name}_diagram.png"
+    else:
+        filename = f"{filename}.png"
+
+    # Initialize graphing state machine using model.
+    # This applies state machine graphing methods to the model.
+    GraphMachine(
+        model=model,
+        states=model.states,
+        transitions=model.transitions,
+        initial="start",
+        queued=True,
+        ignore_invalid_triggers=False,
+        show_state_attributes=True,
+        show_conditions=True,
+    )
+    # Print graph
+    model.get_graph().draw(os.path.join(path, filename), prog="dot")
+
+
 class AERCycle(object):
     """
     Contains attributes/parameters of the AER cycle and handler and condition methods
     to enact between state transitions.
     """
 
-    def __init__(
+    def __init__(self, name=None):
+        self.name = name if name is not None else "AERCycle"
+        self.states = self.add_states()
+        self.transitions = self.add_transitions()
+        self.theorist = None
+        self.experimentalist = None
+        self.experiment_runner = None
+        self.run_container = None
+
+    def add_modules(
         self,
         theorist: Theorist,
         experimentalist: Experimentalist,
@@ -331,102 +383,71 @@ class AERCycle(object):
     def end_statement(self):
         print("At end state.")
 
+    def add_states(self):
+        l_states = [
+            State(name="start"),
+            State(
+                name="experiment_runner",
+                on_enter=["start_experiment_runner"],
+            ),
+            State(
+                name="theorist",
+                on_enter=["start_theorist"],
+            ),
+            State(
+                name="experimentalist",
+                on_enter=["start_experimentalist"],
+            ),
+            State(name="end", on_enter=["end_statement"]),
+        ]
+        return l_states
 
-def create_state_machine(model, graph=False):
-    """
-    Adds state-machine methods to a cycle model.
-    Args:
-        model (AERCycle): Class with run attributes, module handler methods,
-                          and node transition conditions defined.
-        graph (bool): Option add graphing methods to the  model.
-
-    Returns:
-    AERCycle model with state-machine methods.
-    """
-    states = [
-        State(name="start"),
-        State(
-            name="experiment_runner",
-            on_enter=["start_experiment_runner"],
-        ),
-        State(
-            name="theorist",
-            on_enter=["start_theorist"],
-        ),
-        State(
-            name="experimentalist",
-            on_enter=["start_experimentalist"],
-        ),
-        State(name="end", on_enter=["end_statement"]),
-    ]
-
-    transitions = [
-        # Start transitions
-        {
-            "trigger": "next_step",
-            "source": ["start"],
-            "dest": "experiment_runner",
-            "conditions": ["is_ready_for_experiment_runner"],
-        },
-        {
-            "trigger": "next_step",
-            "source": ["start"],
-            "dest": "theorist",
-            "conditions": ["is_ready_for_theorist"],
-        },
-        {
-            "trigger": "next_step",
-            "source": ["start"],
-            "dest": "experimentalist",
-            "conditions": ["is_ready_for_experimentalist"],
-        },
-        # Module to module transitions
-        {
-            "trigger": "next_step",
-            "source": ["experiment_runner"],
-            "dest": "theorist",
-            "unless": [],
-        },
-        {
-            "trigger": "next_step",
-            "source": ["theorist"],
-            "dest": "experimentalist",
-            "unless": ["is_max_cycles"],
-        },
-        {
-            "trigger": "next_step",
-            "source": ["experimentalist"],
-            "dest": "experiment_runner",
-            "unless": [],
-        },
-        # End transition
-        {
-            "trigger": "next_step",
-            "source": ["theorist"],
-            "dest": "end",
-            "conditions": ["is_max_cycles"],
-        },
-    ]
-
-    if graph:
-        GraphMachine(
-            model=model,
-            states=states,
-            transitions=transitions,
-            initial="start",
-            queued=True,
-            ignore_invalid_triggers=False,
-            show_state_attributes=True,
-            show_conditions=True,
-        )
-    else:
-        Machine(
-            model=model,
-            states=states,
-            transitions=transitions,
-            initial="start",
-            queued=True,
-            ignore_invalid_triggers=False,
-        )
-
-    return model
+    def add_transitions(self):
+        l_transitions = [
+            # Start transitions
+            {
+                "trigger": "next_step",
+                "source": ["start"],
+                "dest": "experiment_runner",
+                "conditions": ["is_ready_for_experiment_runner"],
+            },
+            {
+                "trigger": "next_step",
+                "source": ["start"],
+                "dest": "theorist",
+                "conditions": ["is_ready_for_theorist"],
+            },
+            {
+                "trigger": "next_step",
+                "source": ["start"],
+                "dest": "experimentalist",
+                "conditions": ["is_ready_for_experimentalist"],
+            },
+            # Module to module transitions
+            {
+                "trigger": "next_step",
+                "source": ["experiment_runner"],
+                "dest": "theorist",
+                "unless": [],
+            },
+            {
+                "trigger": "next_step",
+                "source": ["theorist"],
+                "dest": "experimentalist",
+                "unless": ["is_max_cycles"],
+            },
+            {
+                "trigger": "next_step",
+                "source": ["experimentalist"],
+                "dest": "experiment_runner",
+                "unless": [],
+            },
+            # End transition
+            {
+                "trigger": "next_step",
+                "source": ["theorist"],
+                "dest": "end",
+                "conditions": ["is_max_cycles"],
+            },
+        ]
+        return l_transitions
