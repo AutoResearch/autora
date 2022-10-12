@@ -2,14 +2,14 @@
 A Markov-Chain Monte-Carlo module.
 
 Module constants:
-    `OPS`:
+    `get_ops()`:
         A dictionary of accepted operations: `{operation_name: offspring}`
 
         `operation_name`: the operation name, e.g. 'sin' for the sinusoid function
 
         `offspring`: the number of arguments the function requires.
 
-        For instance, `OPS = {"sin": 1, "**": 2 }` means for
+        For instance, `get_ops() = {"sin": 1, "**": 2 }` means for
         `sin` the function call looks like `sin(x1)` whereas for
         the exponentiation operator `**`, the function call looks like `x1 ** x2`
 """
