@@ -6,7 +6,7 @@ Test the closed-loop state-machine with run function implementation.
 import numpy as np
 import pytest  # noqa: 401
 
-from autora.cycle import DataSetCollection, RunCollection, TheoryCollection, run
+from autora.cycle import run
 from autora.variable import Variable, VariableCollection
 
 
@@ -26,7 +26,7 @@ def dummy_experimentalist(data, metadata: VariableCollection, theory, n_samples=
 
 
 def dummy_experiment_runner(x_prime):
-    return x_prime + 1
+    return x_prime.x + 1
 
 
 def test_run_function():
@@ -43,23 +43,14 @@ def test_run_function():
         independent_variables=[Variable(name="x1", value_range=(-5, 5))],
         dependent_variables=[Variable(name="y", value_range=(-10, 10))],
     )
-    parameters = RunCollection(
-        metadata=metadata,
-        search_space=None,
-        data=DataSetCollection([]),
-        cycle_count=0,
-        theories=TheoryCollection([]),
-        independent_variable_values=x1,
-        max_cycle_count=4,
-        first_state="experiment runner",
-    )
 
     results = run(
         theorist=dummy_theorist,
         experimentalist=dummy_experimentalist,
         experiment_runner=dummy_experiment_runner,
-        run_container=parameters,
-        graph=True,
+        metadata=metadata,
+        first_state="experiment runner",
+        independent_variable_values=x1,
     )
 
     assert results.data.datasets.__len__() == results.max_cycle_count, (
