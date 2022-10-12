@@ -138,7 +138,7 @@ class ExperimentRunner(Protocol):
         ...
 
 
-class AERModule(Enum):
+class AERModule(str, Enum):
     THEORIST = "theorist"
     EXPERIMENTALIST = "experimentalist"
     EXPERIMENT_RUNNER = "experiment runner"
