@@ -56,7 +56,7 @@ class BMSRegressor(BaseEstimator, RegressorMixin):
         self,
         prior_par: dict = PRIORS,
         ts: List[float] = TEMPERATURES,
-        epochs: int = 30,
+        epochs: int = 1500,
     ):
         """
         Arguments:

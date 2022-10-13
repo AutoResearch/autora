@@ -854,7 +854,7 @@ class Tree:
             dEB = float(dEB)
             dEP = float(dEP)
             dE = dEB + dEP
-        except ValueError:
+        except (ValueError, TypeError):
             dEB, dEP, dE = np.inf, np.inf, np.inf
         return dE, dEB, dEP, par_valuesNew, nif, nfi
 
@@ -950,7 +950,7 @@ class Tree:
             dEP = float(dEP)
             dE = dEB + dEP
             return dE, dEB, dEP, par_valuesNew
-        except ValueError:
+        except (ValueError, TypeError):
             return np.inf, np.inf, np.inf, None
 
     # -------------------------------------------------------------------------
@@ -1021,7 +1021,7 @@ class Tree:
                 dEB = float(dEB)
                 dEP = float(dEP)
                 dE = dEB + dEP
-            except ValueError:
+            except (ValueError, TypeError):
                 dEB, dEP, dE = np.inf, np.inf, np.inf
             return dE, dEB, dEP, par_valuesNew
 
@@ -1080,7 +1080,7 @@ class Tree:
                 dEB = float(dEB)
                 dEP = float(dEP)
                 dE = dEB + dEP
-            except ValueError:
+            except (ValueError, TypeError):
                 dEB, dEP, dE = np.inf, np.inf, np.inf
             return dE, dEB, dEP, par_valuesNew
 
