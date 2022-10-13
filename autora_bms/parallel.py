@@ -7,7 +7,7 @@ import numpy as np
 from numpy import exp
 
 from autora_bms.mcmc import Tree
-from autora_bms.prior import get_ops, get_prior
+from autora_bms.prior import get_prior
 
 
 class Parallel:
@@ -24,11 +24,11 @@ class Parallel:
     def __init__(
         self,
         Ts: list,
-        ops=get_ops(),
+        ops=get_prior(),
         variables=["x"],
         parameters=["a"],
         max_size=50,
-        prior_par=get_prior(),
+        prior_par={},
         x=None,
         y=None,
     ) -> None:
