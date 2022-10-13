@@ -2,8 +2,8 @@ import warnings
 
 import pandas as pd
 
-from aer_bms.prior import get_prior
-from aer_bms.skl.bms import BMSRegressor
+from autora_bms.prior import get_prior
+from autora_bms.skl.bms import BMSRegressor
 
 warnings.filterwarnings("ignore")
 

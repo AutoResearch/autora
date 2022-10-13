@@ -2,7 +2,8 @@ from datetime import datetime
 from optparse import OptionParser
 from random import choice, random
 
-from mcmc import OPS, Tree
+from autora_bms.mcmc import Tree
+from autora_bms.prior import get_ops
 
 
 # -----------------------------------------------------------------------------
@@ -223,7 +224,9 @@ if __name__ == "__main__":
     while True:
         # Create new seed formula
         tree = Tree(
-            ops=dict([(o[5:], OPS[o[5:]]) for o in ppar if o.startswith("Nopi_")]),
+            ops=dict(
+                [(o[5:], get_ops()[o[5:]]) for o in ppar if o.startswith("Nopi_")]
+            ),
             variables=["x%d" % (i + 1) for i in range(opt.nvar)],
             parameters=["a%d" % (i + 1) for i in range(opt.npar)],
             max_size=opt.max_size,

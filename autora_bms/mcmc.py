@@ -2,14 +2,14 @@
 A Markov-Chain Monte-Carlo module.
 
 Module constants:
-    `OPS`:
+    `get_ops()`:
         A dictionary of accepted operations: `{operation_name: offspring}`
 
         `operation_name`: the operation name, e.g. 'sin' for the sinusoid function
 
         `offspring`: the number of arguments the function requires.
 
-        For instance, `OPS = {"sin": 1, "**": 2 }` means for
+        For instance, `get_ops() = {"sin": 1, "**": 2 }` means for
         `sin` the function call looks like `sin(x1)` whereas for
         the exponentiation operator `**`, the function call looks like `x1 ** x2`
 """
@@ -22,13 +22,14 @@ from itertools import permutations, product
 from random import choice, random
 from typing import List
 
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import scipy
 from scipy.optimize import curve_fit
 from sympy import lambdify, latex, log, sympify
 
-from aer_bms.prior import get_ops, get_prior, relu
+from autora_bms.prior import get_ops, get_prior, relu
 
 _logger = logging.getLogger(__name__)
 
@@ -121,7 +122,7 @@ class Tree:
 
     def __init__(
         self,
-        ops=OPS,
+        ops=get_ops(),
         variables=["x"],
         parameters=["a"],
         prior_par={},
@@ -1428,6 +1429,7 @@ class Tree:
 # MAIN
 # -----------------------------------------------------------------------------
 # -----------------------------------------------------------------------------
+
 
 def test3(num_points=10, samples=100000):
     # Create the data

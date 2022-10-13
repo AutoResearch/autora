@@ -8,9 +8,9 @@ import pandas as pd
 from sklearn.base import BaseEstimator, RegressorMixin
 from sklearn.utils.validation import check_array, check_is_fitted, check_X_y
 
-from aer_bms import Parallel, utils
-from aer_bms.mcmc import Tree
-from aer_bms.prior import get_prior
+from autora_bms import Parallel, utils
+from autora_bms.mcmc import Tree
+from autora_bms.prior import get_prior
 
 _logger = logging.getLogger(__name__)
 
@@ -34,7 +34,7 @@ class BMSRegressor(BaseEstimator, RegressorMixin):
 
     Examples:
 
-        >>> from aer_bms import Parallel, utils
+        >>> from autora_bms import Parallel, utils
         >>> import numpy as np
         >>> num_samples = 1000
         >>> X = np.linspace(start=0, stop=1, num=num_samples).reshape(-1, 1)

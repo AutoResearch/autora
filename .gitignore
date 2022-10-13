@@ -1,7 +1,7 @@
 # Files
 .ipynb_checkpoints
 
-# AER-specific files
+# Autora-specific files
 example/studies/**/modeling
 
 # PyCharm ignores are handled by the .idea/.gitignore file
