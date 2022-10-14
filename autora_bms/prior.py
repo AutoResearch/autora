@@ -82,7 +82,7 @@ def __get_ops():
 def get_priors(prior="Guimera2020"):
     priors = __get_prior(prior)
     all_ops = __get_ops()
-    ops = {k: v for k, v in all_ops if "Nopi_" + k in priors.items()}
+    ops = {k: v for k, v in all_ops.items() if "Nopi_" + k in priors}
     return priors, ops
 
 
