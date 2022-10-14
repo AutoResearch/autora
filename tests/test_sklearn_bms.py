@@ -36,7 +36,7 @@ def test_constant_model():
 
 
 def test_weber_model():
-    raw_data = pd.read_csv("../example/experiment_0_data.csv")
+    raw_data = pd.read_csv("./experiment_0_data.csv")
 
     X, y = raw_data[["S1", "S2"]], raw_data["difference_detected"]
     estimator = BMSRegressor(epochs=30)
