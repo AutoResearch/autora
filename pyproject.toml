@@ -25,16 +25,17 @@ scipy = "^1.7.1"
 scikit-learn = "^1.1.1"
 tqdm = "^4.64.0"
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.extras]
+tinkerforge = ["tinkerforge"]
+
+[tool.poetry.group.dev.dependencies]
+flake8 = "^5.0.4"
 mkdocs-material = "^8.3.8"
 mkdocs-gen-files = "^0.3.4"
 mkdocs-literate-nav = "^0.4.1"
 mkdocs-section-index = "^0.3.4"
 mkdocstrings-python = "^0.7.1"
 pytest = "^7.1.2"
-
-[tool.poetry.extras]
-tinkerforge = ["tinkerforge"]
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
