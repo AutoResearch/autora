@@ -28,13 +28,15 @@ tqdm = "^4.64.0"
 [tool.poetry.extras]
 tinkerforge = ["tinkerforge"]
 
-[tool.poetry.group.dev.dependencies]
-flake8 = "^5.0.4"
+[tool.poetry.group.docs.dependencies]
 mkdocs-material = "^8.3.8"
 mkdocs-gen-files = "^0.3.4"
 mkdocs-literate-nav = "^0.4.1"
 mkdocs-section-index = "^0.3.4"
 mkdocstrings-python = "^0.7.1"
+
+[tool.poetry.group.ci.dependencies]
+flake8 = "^5.0.4"
 pytest = "^7.1.2"
 
 [build-system]

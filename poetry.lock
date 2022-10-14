@@ -673,7 +673,7 @@ tinkerforge = ["tinkerforge"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "21d0bc4ac769a9eed25735bc455085a8832fc1f4280c22b9dccfb7134061b348"
+content-hash = "a1ecbe1068a452cf9b44b9994b52bda7cffb7fd3c9a4feab0e486cccce266b01"
 
 [metadata.files]
 atomicwrites = [
