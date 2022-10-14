@@ -7,7 +7,7 @@ from autora_bms.prior import get_priors
 
 
 def test_tree_mcmc_stepping(
-    num_points: int = 10, samples: int = 10000, show_plot: bool = False
+    num_points: int = 10, samples: int = 100, show_plot: bool = False
 ) -> Tree:
     """
     Testing the basic MCMC capacity. Note that even though an option (`show_plot`) is
@@ -46,7 +46,7 @@ def test_tree_mcmc_stepping(
     )
 
     # MCMC
-    t.mcmc(burnin=2000, thin=10, samples=samples, verbose=True)
+    t.mcmc(burnin=200, thin=10, samples=samples, verbose=True)
 
     # Predict
     print(t.predict(x))
