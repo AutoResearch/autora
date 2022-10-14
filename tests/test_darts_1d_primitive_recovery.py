@@ -234,7 +234,8 @@ def test_primitive_fitting_sigmoid():
         generate_x(-10, +10),
         transform_through_primitive_sigmoid,
         "logistic",
-        primitives=non_interchangeable_primitives,
+        # Restricted group of primitives, as sigmoid function doesn't fit otherwise.
+        primitives=["none", "logistic", "linear", "sin", "tanh"],
     )
 
 
