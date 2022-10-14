@@ -1,9 +1,9 @@
 import numpy as np
 
 
-def get_prior(x=1):
+def __get_prior(prior_name):
     prior_dict = {
-        0: {
+        "GuimeraTest2020": {
             "Nopi_/": 0,
             "Nopi_cosh": 0,
             "Nopi_-": 0,
@@ -25,7 +25,7 @@ def get_prior(x=1):
             "Nopi_sig": 0,
             "Nopi_relu": 0,
         },
-        1: {
+        "Guimera2020": {
             "Nopi_/": 5.912205942815285,
             "Nopi_cosh": 8.12720511103694,
             "Nopi_-": 3.350846072163632,
@@ -49,34 +49,41 @@ def get_prior(x=1):
             "Nopi_relu": 1.0,  # arbitrarily set for now
         },
     }
-    return prior_dict[x]
+    assert prior_dict[prior_name] is not None, "prior key not recognized"
+    return prior_dict[prior_name]
 
 
-def get_ops(ops=None):
-    if ops is None:
-        ops = {
-            "sin": 1,
-            "cos": 1,
-            "tan": 1,
-            "exp": 1,
-            "log": 1,
-            "sinh": 1,
-            "cosh": 1,
-            "tanh": 1,
-            "pow2": 1,
-            "pow3": 1,
-            "abs": 1,
-            "sqrt": 1,
-            "fac": 1,
-            "-": 1,
-            "+": 2,
-            "*": 2,
-            "/": 2,
-            "**": 2,
-            "sig": 1,
-            "relu": 1,
-        }
+def __get_ops():
+    ops = {
+        "sin": 1,
+        "cos": 1,
+        "tan": 1,
+        "exp": 1,
+        "log": 1,
+        "sinh": 1,
+        "cosh": 1,
+        "tanh": 1,
+        "pow2": 1,
+        "pow3": 1,
+        "abs": 1,
+        "sqrt": 1,
+        "fac": 1,
+        "-": 1,
+        "+": 2,
+        "*": 2,
+        "/": 2,
+        "**": 2,
+        "sig": 1,
+        "relu": 1,
+    }
     return ops
+
+
+def get_priors(prior="Guimera2020"):
+    priors = __get_prior(prior)
+    all_ops = __get_ops()
+    ops = {k: v for k, v in all_ops if "Nopi_" + k in priors.items()}
+    return priors, ops
 
 
 def relu(x):
