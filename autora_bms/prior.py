@@ -1,5 +1,3 @@
-from copy import deepcopy
-
 import numpy as np
 
 
@@ -84,12 +82,7 @@ def __get_ops():
 def get_priors(prior="Guimera2020"):
     priors = __get_prior(prior)
     all_ops = __get_ops()
-    ops = deepcopy(all_ops)
-    for key in all_ops:
-        try:
-            priors["Nopi_" + str(key)]
-        except KeyError:
-            del ops[key]
+    ops = {k: v for k, v in all_ops if "Nopi_" + k in priors.items()}
     return priors, ops
 
 
