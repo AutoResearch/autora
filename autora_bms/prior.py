@@ -3,7 +3,7 @@ from copy import deepcopy
 import numpy as np
 
 
-def __get_prior(prior):
+def __get_prior(prior_name):
     prior_dict = {
         "GuimeraTest2020": {
             "Nopi_/": 0,
@@ -51,8 +51,8 @@ def __get_prior(prior):
             "Nopi_relu": 1.0,  # arbitrarily set for now
         },
     }
-    assert set(prior_dict).contains(prior), "prior key not recognized"
-    return prior_dict[prior]
+    assert prior_dict[prior_name] is not None, "prior key not recognized"
+    return prior_dict[prior_name]
 
 
 def __get_ops():
@@ -87,7 +87,7 @@ def get_priors(prior="Guimera2020"):
     ops = deepcopy(all_ops)
     for key in all_ops:
         try:
-            priors["nopi_" + str(key)]
+            priors["Nopi_" + str(key)]
         except KeyError:
             del ops[key]
     return priors, ops
