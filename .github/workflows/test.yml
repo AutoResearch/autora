@@ -29,7 +29,7 @@ jobs:
     - name: Install poetry
       run: |
         pip install poetry==${{ matrix.poetry-version }}
-    - name Install dependencies:
+    - name: Install dependencies
       run: |
         poetry install --with ci 
 
