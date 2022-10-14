@@ -27,7 +27,7 @@ def test_constant_model():
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.2, random_state=42
     )
-    estimator = BMSRegressor()
+    estimator = BMSRegressor(epochs=30)
     assert estimator is not None
     estimator.fit(X_train, y_train)
     # print(X_train)
@@ -39,7 +39,7 @@ def test_weber_model():
     raw_data = pd.read_csv("../example/experiment_0_data.csv")
 
     X, y = raw_data[["S1", "S2"]], raw_data["difference_detected"]
-    estimator = BMSRegressor()
+    estimator = BMSRegressor(epochs=30)
     estimator.fit(X, y)
     # print(X_train)
     # print(estimator.model_)

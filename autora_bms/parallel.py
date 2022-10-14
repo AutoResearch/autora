@@ -7,7 +7,7 @@ import numpy as np
 from numpy import exp
 
 from autora_bms.mcmc import Tree
-from autora_bms.prior import get_prior, get_ops
+from autora_bms.prior import get_ops, get_prior
 
 
 class Parallel:

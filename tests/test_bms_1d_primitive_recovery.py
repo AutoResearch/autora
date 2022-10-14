@@ -120,7 +120,7 @@ def run_test_primitive_fitting(
     verbose: bool = True,
 ):
     y = transformer(X)
-    regressor = BMSRegressor()
+    regressor = BMSRegressor(epochs=30)
     regressor.fit(X, y.ravel())
     if verbose:
         y_predict = regressor.predict(X)
