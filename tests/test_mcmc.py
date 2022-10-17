@@ -3,10 +3,11 @@ import pandas as pd
 import pytest  # noqa: 401
 
 from autora_bms.mcmc import Tree
+from autora_bms.prior import get_priors
 
 
 def test_tree_mcmc_stepping(
-    num_points: int = 10, samples: int = 10000, show_plot: bool = False
+    num_points: int = 10, samples: int = 100, show_plot: bool = False
 ) -> Tree:
     """
     Testing the basic MCMC capacity. Note that even though an option (`show_plot`) is
@@ -35,38 +36,17 @@ def test_tree_mcmc_stepping(
     y = 50.0 * np.sin(x["x0"]) / x["x2"] - 4.0 * x["x1"] + 3 + eps
 
     # Create the formula
-    prior_par = {
-        "Nopi_/": 5.912205942815285,
-        "Nopi_cosh": 8.12720511103694,
-        "Nopi_-": 3.350846072163632,
-        "Nopi_sin": 5.965917796154835,
-        "Nopi_tan": 8.127427922862411,
-        "Nopi_tanh": 7.799259068142255,
-        "Nopi_**": 6.4734429542245495,
-        "Nopi_pow2": 3.3017352779079734,
-        "Nopi_pow3": 5.9907496760026175,
-        "Nopi_exp": 4.768665265735502,
-        "Nopi_log": 4.745957377206544,
-        "Nopi_sqrt": 4.760686909134266,
-        "Nopi_cos": 5.452564657261127,
-        "Nopi_sinh": 7.955723540761046,
-        "Nopi_abs": 6.333544134938385,
-        "Nopi_+": 5.808163661224514,
-        "Nopi_*": 5.002213595420244,
-        "Nopi_fac": 10.0,
-        "Nopi2_*": 1.0,
-    }
     t = Tree(
         variables=["x%d" % i for i in range(5)],
         parameters=["a%d" % i for i in range(10)],
         x=x,
         y=y,
-        prior_par=prior_par,
+        prior_par=get_priors()[0],
         BT=1.0,
     )
 
     # MCMC
-    t.mcmc(burnin=2000, thin=10, samples=samples, verbose=True)
+    t.mcmc(burnin=200, thin=10, samples=samples, verbose=True)
 
     # Predict
     print(t.predict(x))

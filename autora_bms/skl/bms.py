@@ -10,13 +10,13 @@ from sklearn.utils.validation import check_array, check_is_fitted, check_X_y
 
 from autora_bms import Parallel, utils
 from autora_bms.mcmc import Tree
-from autora_bms.prior import get_prior
+from autora_bms.prior import get_priors
 
 _logger = logging.getLogger(__name__)
 
 # hyperparameters for BMS
 # 1) Priors for MCMC
-PRIORS = get_prior()
+PRIORS, _ = get_priors()
 
 # 2) Temperatures for parallel tempering
 TEMPERATURES = [1.0] + [1.04**k for k in range(1, 20)]

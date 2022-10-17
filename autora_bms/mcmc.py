@@ -29,7 +29,7 @@ import scipy
 from scipy.optimize import curve_fit
 from sympy import lambdify, latex, log, sympify
 
-from autora_bms.prior import get_ops, get_prior, relu
+from autora_bms.prior import get_priors, relu
 
 _logger = logging.getLogger(__name__)
 
@@ -120,12 +120,14 @@ class Tree:
         representative: representative tree for each canonical formula
     """
 
+    prior, ops = get_priors()
+
     def __init__(
         self,
-        ops=get_ops(),
+        ops=ops,
         variables=["x"],
         parameters=["a"],
-        prior_par={},
+        prior_par=prior,
         x=None,
         y=None,
         BT=1.0,
@@ -1442,7 +1444,7 @@ def test3(num_points=10, samples=100000):
     y.to_csv("data_y.csv", index=False, header=["y"])
 
     # Create the formula
-    prior_par = get_prior()
+    prior_par, _ = get_priors()
     t = Tree(
         variables=["x%d" % i for i in range(5)],
         parameters=["a%d" % i for i in range(10)],
@@ -1479,7 +1481,7 @@ def test4(num_points=10, samples=1000):
     xtest, ytest = x.iloc[:5], y.iloc[:5]
 
     # Create the formula
-    prior_par = get_prior()
+    prior_par, _ = get_priors()
     t = Tree(
         variables=["x%d" % i for i in range(5)],
         parameters=["a%d" % i for i in range(10)],
@@ -1502,7 +1504,7 @@ def test4(num_points=10, samples=1000):
 
 def test5(string="(P120 + (((ALPHACAT / _a2) + (_a2 * CDH3)) + _a0))"):
     # Create the formula
-    prior_par = get_prior(0)
+    prior_par, _ = get_priors("GuimeraTest2020")
 
     t = Tree(prior_par=prior_par, from_string=string)
     for i in range(1000000):
