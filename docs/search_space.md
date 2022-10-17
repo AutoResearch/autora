@@ -23,7 +23,7 @@ BMS uses a search space of operations, along with parameters to find the best mo
 
 # Example
 
-How we search the search space is determined by the priors. The following example sets up the BMS Regressor with priors over psychology wiki equations. This will optimize the model to search for equations most prevalent in the psychology. 
+How we search the search space is determined by the priors. The following example sets up the BMS Regressor with priors over equations found in Wikipedia pages that are tagged with the psychology category. This will optimize the model to search for equations most prevalent in the field of psychology. 
 
 ```python
 from autora.skl.bms import BMSRegressor
