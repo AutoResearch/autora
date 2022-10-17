@@ -16,7 +16,7 @@ BMS uses a search space of operations, along with parameters to find the best mo
 - **sin**: The output of the computation $x_j$ is the sine function applied to its input $x_i$: $x_j = \sin(x_i)$.
 - **sinh**: The output of the computation $x_j$ is the hyperbolic sine function applied to its input $x_i$: $x_j = \sinh(x_i)$.
 - **cos**: The output of the computation $x_j$ is the cosinus function of its input $x_i$: $x_j = \cos(x_i)$.
-- **cosh**: The output of the computation $x_j$ is the cosinus hyperbolicus of its input $x_i$: $x_j = \cosh(x_i)$.
+- **cosh**: The output of the computation $x_j$ is the hyperbolic cosine function applied to its input $x_i$: $x_j = \cosh(x_i)$.
 - **tan**: The output of the computation $x_j$ is the tangens of its input $x_i$: $x_j = \tan(x_i)$.
 - **tanh**: The output of the computation $x_j$ is the tangens hyperbolicus of its input $x_i$: $x_j = \tanh(x_i)$.
 
