@@ -12,7 +12,7 @@ BMS uses a search space of operations, along with parameters to find the best mo
 - **relu**: The output of the computation $x_j$ is a rectified linear function of its input $x_i$: $x_j = \max(0, x_i)$.
 - **exp**: The output of the computation $x_j$ is the natural exponential function applied to its input $x_i$: $x_j = \exp(x_i)$.
 - **sig**: The output of the computation $x_j$ is a logistic function applied to its input $x_i$: $x_j = \frac{1}{1 + \exp(-b * x_i)}$.
-- **fac**: The output of the computation $x_j$ is the generalized factorial function of its input $x_i$: $x_j = \Gamma(1 + x_i)$.
+- **fac**: The output of the computation $x_j$ is the generalized factorial function applied to its input $x_i$: $x_j = \Gamma(1 + x_i)$.
 - **sin**: The output of the computation $x_j$ is the sine function applied to its input $x_i$: $x_j = \sin(x_i)$.
 - **sinh**: The output of the computation $x_j$ is the hyperbolic sine function applied to its input $x_i$: $x_j = \sinh(x_i)$.
 - **cos**: The output of the computation $x_j$ is the cosinus function of its input $x_i$: $x_j = \cos(x_i)$.
