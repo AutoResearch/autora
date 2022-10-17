@@ -2,7 +2,7 @@
 
 ## Search space
 
-BMS uses a search space of operations, along with parameters to find the best model. The search space is very rugged, and so multiple equations at parallel temperatures are considered. The search space is defined by the set of operations that can be applied in each computation step of the model. These operations are also referred to as *primitives*. We can select from the following space of primitives:
+BMS uses a search space of operations, along with parameters to find the best model. Since the search space is very rugged, BMS considers multiple equation trees in parallel, with each tree governed by a different temperature parameter. The search space is defined by the set of operations that can be applied in each computation step of the model. These operations are also referred to as *primitives*. We can select from the following space of primitives:
 
 - **\textit{constant}**: The output of the computation $x_j$ is a constant parameter value $a$ where $a$ is a fitted float value.
 - **\+**: The output of the computation $x_j$ is the sum over its two inputs $x_i,x_{ii}$.
