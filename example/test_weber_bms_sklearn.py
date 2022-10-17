@@ -2,7 +2,7 @@ import warnings
 
 import pandas as pd
 
-from autora_bms.prior import get_prior
+from autora_bms.prior import get_priors
 from autora_bms.skl.bms import BMSRegressor
 
 warnings.filterwarnings("ignore")
@@ -20,7 +20,7 @@ x, y = raw_data[XLABS], raw_data["difference_detected"]
 # initialize model
 # hyper parameters
 
-prior_par = get_prior()
+prior_par, _ = get_priors()
 
 # temperatures
 ts = [1.0] + [1.04**k for k in range(1, 20)]
