@@ -49,6 +49,6 @@ bms_estimator.predict(X)
 
 We can troubleshoot the model by playing with a few parameters:
 - Increasing the number of epochs. The original paper recommends 1500-3000 epochs for reliable fitting. The default is set to 1500.
-- using custom priors, more relevant to the data. The default priors are over equations nonspecific to scientific domain.
+- Using custom priors, more relevant to the data. The default priors are over equations nonspecific to scientific domain.
 - increasing the range of temperature values to escape local minima.
 - reduce the differences between parallel temperatures to escape local minima.
