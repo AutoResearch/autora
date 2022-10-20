@@ -15,7 +15,7 @@ X = np.array(np.meshgrid(x_1, x_2)).T.reshape(-1,2)
 y = 2 * X[:,0] + np.exp(5 * X[:,1])
 ```
 
-Now let us choose a prior over the primitives.
+Now let us choose a prior over the primitives. In this case, we will use priors determined by Guimerà et al (2020).
 
 ```python
 prior = "Guimera2020"
