@@ -4,7 +4,19 @@
 
 The Bayesian Machine Scientist (BMS) utilizes Bayesian Statistical Theory to more effectively search the space of possible equations:
 
-![Comptuation Graph](img/BayesianMath.png)
+$P(x):$ Probability of $x$
+$P(x|\theta)$: Conditional Probability of $x$ given $\theta$
+$P(x,\theta)$: Joint Probability of $x$ and $\theta$
+
+$P(x,\theta)=P(x)P(\theta|x)=P(\theta)P(x|\theta)$
+
+Bayes Rule:
+
+$P(\theta|x)=\dfrac{P(x|\theta)P(\theta)}{P(x)}$
+
+Marginalization:
+
+$P(x)=\int P(x,\theta)d\theta$
 
 In essence, prior knowledge is incorporated with current knowledge to better predict future knowledge, and hence, better fit on the current data.
 
@@ -12,16 +24,18 @@ BMS utilizes this theory:
 
 1) Formulating the problem of fitting an equation to data, with priors over equations found on wikipedia:
 
-![Comptuation Graph](img/BMSMath1.png)
+$P(f_i|D)=\dfrac{1}{Z}\int_{\Theta_i}P(D|f_i,\theta_i)P(\theta_i|f_i)P(f_i)d\theta_i$
+
+With $Z=P(D)$ being a constant for a given dataset - we can ignore it since we are only interested in finding the best equation within the context of the data at hand.
 
 2) Deriving a Loss Function to score different equations - defined as the description length of the model, which is the number of nats needed to jointly encode the data and the model with an optimal code:
 
-![Comptuation Graph](img/BMSMath2.png)
+$\mathscr{L}(f_i)\equiv-\log\[P(D,f_i)\]=-\log\[P(f_i|D)P(D)\]=-\log\[\int_{\Theta_i}P(D|f_i,\theta_i)P(\theta_i|f_i)P(f_i)d\theta_i\]$
 
 3) Finding a computationally tractable approximation for the Loss Function:
 
-![Comptuation Graph](img/BMSMath3.png)
-![Comptuation Graph](img/BMSMath4.png)
+$\mathscr{L}(f_i)\approx\dfrac{B(f_i)}{2} - \log\[P(f_i)\]
+$B(f_i)=k\log\[n\] - 2\log\[P(D|\theta^{\*},f_i)\]$
 
 In this formulation, the goodness of fit $p(D|\theta^\*,f_i)$ and likelihood $p(f_i)$ of an equation are equally and logarithmically weighted to each other - e.g. improving the fit by a factor of 2 is offset by being half as likely.
 
