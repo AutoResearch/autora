@@ -41,7 +41,7 @@ bms_estimator = BMSRegressor()
 Now we have everything to fit and verify the model.
 
 ```python
-bms_estimator.fit(X)
+bms_estimator.fit(X,y)
 bms_estimator.predict(X)
 ```
 
