@@ -24,7 +24,7 @@ BMS uses a search space of operations, along with parameters to find the best mo
 - **cosh**: The output of the computation $x_j$ is the hyperbolic cosine function applied to its input $x_i$: $x_j = \cosh(x_i)$.
 - **tan**: The output of the computation $x_j$ is the tangent function applied to its input $x_i$: $x_j = \tan(x_i)$.
 - **tanh**: The output of the computation $x_j$ is the hyperbolic tangent function applied to its input $x_i$: $x_j = \tanh(x_i)$.
-
+- **\*\***: The output of the computation $x_j$ is the product over its two inputs $x_i,x_{ii}$: $x_j = x_i \*\* x_{ii}$.
 
 # Example
 
