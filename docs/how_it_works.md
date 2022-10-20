@@ -72,3 +72,4 @@ After iterating over these two steps for $n$ epochs, the tree held at the lowest
 
 R. Guimerà et al., A Bayesian machine scientist to aid in the solution of challenging scientific problems. Sci. Adv.
 6, eaav697 (2020).
+Wit, Ernst; Edwin van den Heuvel; Jan-Willem Romeyn (2012).
