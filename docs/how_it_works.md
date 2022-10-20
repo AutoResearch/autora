@@ -34,10 +34,11 @@ $\mathscr{L}(f_i)\equiv-\log\[P(D,f_i)\]=-\log\[P(f_i|D)P(D)\]=-\log\[\int_{\The
 
 3) Finding a computationally tractable approximation for the Loss Function:
 
-$\mathscr{L}(f_i)\approx\dfrac{B(f_i)}{2} - \log\[P(f_i)\]
-$B(f_i)=k\log\[n\] - 2\log\[P(D|\theta^{\*},f_i)\]$
+$\mathscr{L}(f_i)\approx\dfrac{B(f_i)}{2} - \log\[P(f_i)\]$
 
-In this formulation, the goodness of fit $p(D|\theta^\*,f_i)$ and likelihood $p(f_i)$ of an equation are equally and logarithmically weighted to each other - e.g. improving the fit by a factor of 2 is offset by being half as likely.
+$B(f_i)=k\log\[n\] - 2\log\[P(D|\theta^\*,f_i)\]$
+
+In this formulation, the goodness of fit $p(D|\theta^\*,f_i)$ and likelihood $p(f_i)$ of an equation are equally and logarithmically weighted to each other - e.g. improving the fit by a factor of 2 is offset by having half the likelihood.
 
 To better understand the problem, equations are framed in terms of acyclic (tree) graphs.
 
