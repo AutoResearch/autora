@@ -30,7 +30,7 @@ We will use the BMS Regresssor to predict the outcomes. There are a number of pa
 - **`ts`**: A list of temperature values. The machine scientist creates an equation tree for each temperature. Higher temperature trees are harder to fit, and thus they help to avoid overfitting the model.
 
 
-Let's set up the DARTS regressor with default parameters.
+Let's set up the BMS regressor with default parameters.
 
 ```python
 from autora.skl.bms import BMSRegressor
