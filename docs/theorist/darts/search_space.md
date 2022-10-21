@@ -12,18 +12,18 @@ DARTS uses a search space of operations to find the best model. The search space
 - **relu**: The output of the computation $x_j$ is a rectified linear function of its input $x_i$: $x_j = \max(0, x_i)$.
 - **exp**: The output of the computation $x_j$ is exponentially dependent on its input $x_i$: $x_j = \exp(x_i)$.
 - **logistic**: The output of the computation $x_j$ is a logistic function of its input $x_i$: $x_j = \frac{1}{1 + \exp(-b * x_i)}$.
-- **sin**: The output of the computation $x_j$ is the sinus function of its input $x_i$: $x_j = \sin(x_i)$.
-- **cos**: The output of the computation $x_j$ is the cosinus function of its input $x_i$: $x_j = \cos(x_i)$.
-- **tanh**: The output of the computation $x_j$ is the tangens hyperbolicus of its input $x_i$: $x_j = \tanh(x_i)$.
+- **sin**: The output of the computation $x_j$ is the sine function of its input $x_i$: $x_j = \sin(x_i)$.
+- **cos**: The output of the computation $x_j$ is the cosine function of its input $x_i$: $x_j = \cos(x_i)$.
+- **tanh**: The output of the computation $x_j$ is the hyperbolic tangent function of its input $x_i$: $x_j = \tanh(x_i)$.
 
 Some of the primitives above may also be preceded by a linear transformation, allowing for more degrees of freedom in the search space:
 
 - **linear_relu**: The output of the computation $x_j$ is a rectified linear function of its *linearly transformed* input $x_i$: $x_j = \max(0, (a * x_i + b)$.
 - **linear_exp**: The output of the computation $x_j$ is exponentially dependent on its *linearly transformed* input $x_i$: $x_j = \exp(a * x_i + b)$.
 - **linear_logistic**: The output of the computation $x_j$ is a logistic function of its *linearly transformed* input $x_i$: $x_j = \frac{1}{1 + \exp(-b * (a * x_i + b))}$.
-- **linear_sin**: The output of the computation $x_j$ the sinus function of its *linearly transformed* input $x_i$: $x_j = a * \sin(a * x_i + b)$.
-- **linear_cos**: The output of the computation $x_j$ the cosinus function of its *linearly transformed* input $x_i$: $x_j = a * \cos(a * x_i + b)$.
-- **linear_tanh**: The output of the computation $x_j$ the tangens hyperbolicus of its *linearly transformed* input $x_i$: $x_j = a * \tanh(a * x_i + b)$.
+- **linear_sin**: The output of the computation $x_j$ the sine function of its *linearly transformed* input $x_i$: $x_j = a * \sin(a * x_i + b)$.
+- **linear_cos**: The output of the computation $x_j$ the cosine function of its *linearly transformed* input $x_i$: $x_j = a * \cos(a * x_i + b)$.
+- **linear_tanh**: The output of the computation $x_j$ the hyperbolic tangent function of its *linearly transformed* input $x_i$: $x_j = a * \tanh(a * x_i + b)$.
 
 Note that the following functions are available but currently not identifiable by DARTS (<font color="red">please use the following functions with caution</font>):
 
@@ -35,6 +35,7 @@ Note that the following functions are available but currently not identifiable b
 # Example
 
 The following example sets up a search space with the following primitives:
+
 - zero operation
 - addition
 - multiplication
