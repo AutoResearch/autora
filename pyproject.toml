@@ -16,11 +16,11 @@ ipython = "^8.4.0"
 
 [tool.poetry.group.dev.dependencies]
 jupyter = "^1.0.0"
-pytest = "^7.1.3"
+pytest = "^7.1.0"
 
 [tool.poetry.group.ci.dependencies]
 flake8 = "^5.0.4"
-pytest = "^7.1.2"
+pytest = "^7.1.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
