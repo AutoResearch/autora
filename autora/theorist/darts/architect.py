@@ -217,8 +217,10 @@ class Architect(object):
         loss.backward()
         self.current_loss = loss.item()
 
+        alpha_parameters = self.model.arch_parameters()[0]
+        alpha_parameters = [alpha_parameters]
         # weight decay proportional to degrees of freedom
-        for p in self.model.arch_parameters():
+        for p in alpha_parameters:
             p.data.sub_((self.decay_weights * self.lr))  # weight decay
 
     # backward pass using second order approximation

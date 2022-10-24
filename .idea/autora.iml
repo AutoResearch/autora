@@ -12,7 +12,7 @@
       <excludeFolder url="file://$MODULE_DIR$/.vscode" />
       <excludeFolder url="file://$MODULE_DIR$/site" />
     </content>
-    <orderEntry type="jdk" jdkName="Poetry (AER)" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="Poetry (autora) (2)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
   <component name="PyDocumentationSettings">

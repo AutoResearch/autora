@@ -7,6 +7,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from more_itertools import powerset
 from torch.autograd import Variable
 
 from autora.theorist.darts.fan_out import Fan_Out
@@ -139,7 +140,9 @@ class Cell(nn.Module):
                 # appends cell with mixed operation
                 self._ops.append(op)
 
-    def forward(self, input_states: List, weights: torch.Tensor):
+    def forward(
+        self, input_states: List, weights: torch.Tensor, weights_mixt: torch.Tensor
+    ):
         """
         Computes the output of a cell given a list of input states
         (variables represented in input nodes) and a weight matrix specifying the weights of each
@@ -149,6 +152,7 @@ class Cell(nn.Module):
             input_states: list of input nodes
             weights: matrix specifying architecture weights, i.e. the weights associated
                 with each operation for each edge
+            weights_mixt: [steps x steps] matrix specifying the weight of each subset previous nodes
         """
         # initialize states (activities of each node in the cell)
         states = list()
@@ -162,17 +166,25 @@ class Cell(nn.Module):
         # (values of nodes)
         # for each hidden node, compute edge between existing states (input
         # nodes / previous hidden) nodes and current node
-        for i in range(
-            self._steps
-        ):  # compute the state for each hidden node, first hidden node is
+        for i in range(self._steps):
+            # compute the state for each hidden node, first hidden node is
             # sum of input nodes, second is sum of input and first hidden
-            s = sum(
-                self._ops[offset + j](h, weights[offset + j])
-                for j, h in enumerate(states)
-            )
+            s = 0
+            set = np.arange(len(states))
+            subsets = powerset(set)
+            prod = 1
+            for (index, subset) in enumerate(subsets):
+                if len(subset) > 0:
+                    index -= 1
+                    for j in subset:
+                        prod = prod * self._ops[offset + j](
+                            states[j], weights[offset + j]
+                        )  # edge j->i
+                    s = s + weights_mixt[i][index] * prod
+
+            # add edges from all previous nodes (input + prev hidden) to next hidden node i + 1
             offset += len(states)
             states.append(s)
-
         # concatenates the states of the last n (self._multiplier) intermediate
         # nodes to get the output of a cell
         result = torch.cat(states[-self._multiplier :], dim=1)
@@ -276,6 +288,7 @@ class Network(nn.Module):
 
         # initializes weights of the architecture
         self._initialize_alphas()
+        self._initialize_betas()
 
     # function for copying the network
     def new(self) -> nn.Module:
@@ -318,18 +331,21 @@ class Network(nn.Module):
         # get architecture weights
         if self._architecture_fixed:
             weights = self.alphas_normal
+            weights_mixt = self.betas
         else:
             if self.DARTS_type == DARTSType.ORIGINAL:
                 weights = F.softmax(self.alphas_normal, dim=-1)
+                weights_mixt = F.softmax(self.betas, dim=-1)
             elif self.DARTS_type == DARTSType.FAIR:
                 weights = torch.sigmoid(self.alphas_normal)
+                weights_mixt = torch.sigmoid(self.betas)
             else:
                 raise Exception(
                     "DARTS Type " + str(self.DARTS_type) + " not implemented"
                 )
 
         # then apply cell with weights
-        cell_output = self.cells(input_states, weights)
+        cell_output = self.cells(input_states, weights, weights_mixt)
 
         # compute logits
         logits = self.classifier(cell_output.view(cell_output.size(0), -1))
@@ -386,8 +402,16 @@ class Network(nn.Module):
         self.alphas_normal = Variable(
             1e-3 * torch.randn(k, num_ops), requires_grad=True
         )
-        # those are all the parameters of the architecture
-        self._arch_parameters = [self.alphas_normal]
+
+    def _initialize_betas(self):
+        self.max_set_size = self._n_input_states + self._steps - 1
+        self.max_k = 2**self.max_set_size - 1
+
+        self.betas = Variable(
+            torch.randn((self._steps, self.max_k), requires_grad=True)
+        )
+
+        self._arch_parameters = list([self.alphas_normal]) + list([self.betas])
 
     # provide back the architecture as a parameter
     def arch_parameters(self) -> List:
