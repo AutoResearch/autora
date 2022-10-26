@@ -1,4 +1,4 @@
-# MCMC-SymReg
+# BSR
 Bayesian symbolic regression using mcmc sampling. 
 
 Paper here: https://arxiv.org/abs/1910.08892
