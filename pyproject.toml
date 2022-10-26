@@ -2,7 +2,7 @@
 name = "bayesian-symbolic-regression"
 version = "0.1.0"
 description = ""
-authors = ["Your Name <you@example.com>"]
+authors = ["listar2000 <35262801+listar2000@users.noreply.github.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
