@@ -263,9 +263,3 @@ def test_primitive_fitting_tanh():
         generate_x(start=0, stop=2 * np.pi),
         transform_through_primitive_tanh,
     )
-
-
-if __name__ == "__main__":
-    print(generate_x())
-    print(transform_through_primitive_add(generate_x()))
-    test_primitive_fitting_add()

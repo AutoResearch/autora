@@ -105,9 +105,3 @@ def test_primitive_fitting_pow_2d():
         generate_pos_x_2d(),
         transform_through_primitive_pow_2d,
     )
-
-
-if __name__ == "__main__":
-    print(generate_x_2d())
-    print(transform_through_primitive_add_2d(generate_x_2d()))
-    test_primitive_fitting_add_2d()
