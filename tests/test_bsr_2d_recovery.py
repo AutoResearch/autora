@@ -75,3 +75,31 @@ def test_primitive_fitting_add_2d():
         generate_x_2d(),
         transform_through_primitive_add_2d,
     )
+
+
+def test_primitive_fitting_subtract_2d():
+    run_test_primitive_fitting_2d(
+        generate_x_2d(),
+        transform_through_primitive_subtract_2d,
+    )
+
+
+def test_primitive_fitting_mult_2d():
+    run_test_primitive_fitting_2d(
+        generate_x_2d(),
+        transform_through_primitive_mult_2d,
+    )
+
+
+def test_primitive_fitting_div_2d():
+    run_test_primitive_fitting_2d(
+        generate_pos_x_2d(),
+        transform_through_primitive_div_2d,
+    )
+
+
+def test_primitive_fitting_pow_2d():
+    run_test_primitive_fitting_2d(
+        generate_pos_x_2d(),
+        transform_through_primitive_pow_2d,
+    )
