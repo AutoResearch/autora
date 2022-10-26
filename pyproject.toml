@@ -2,9 +2,8 @@
 name = "bayesian-symbolic-regression"
 version = "0.1.0"
 description = ""
-authors = ["listar2000 <35262801+listar2000@users.noreply.github.com>"]
+authors = ["Your Name <you@example.com>"]
 readme = "README.md"
-packages = [{include = "bayesian_symbolic_regression"}]
 
 [tool.poetry.dependencies]
 python = "^3.9"
