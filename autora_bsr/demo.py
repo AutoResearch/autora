@@ -4,7 +4,7 @@ from bsr_class import BSRRegressor
 K = 3
 MM = 50
 
-hyper_params = [{'treeNum': 3, 'itrNum': 50, 'alpha1': 0.4, 'alpha2': 0.4, 'beta': -1}]
+hyper_params = [{"treeNum": 3, "itrNum": 50, "alpha1": 0.4, "alpha2": 0.4, "beta": -1}]
 # initialize
 my_bsr = BSRRegressor(K, MM)
 # train (need to fill in parameters)
