@@ -97,8 +97,6 @@ class BSRRegressor(BaseEstimator, RegressorMixin):
         BETAS = []
         MM = self.itrNum
         K = self.treeNum
-        alpha1 = self.alpha1
-        alpha2 = self.alpha2
         beta = self.beta
 
         if self.disp:
@@ -240,7 +238,7 @@ class BSRRegressor(BaseEstimator, RegressorMixin):
                         XX = XX / scale
                         epsilon = (
                             np.eye(XX.shape[1]) * 1e-6
-                        )  # add to the matrix to prevent singular matrrix
+                        )  # add to prevent singular matrix
                         yy = np.array(train_y)
                         yy.shape = (yy.shape[0], 1)
                         Beta = np.linalg.inv(np.matmul(XX.transpose(), XX) + epsilon)

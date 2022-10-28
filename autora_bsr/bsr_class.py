@@ -95,6 +95,7 @@ class BSRRegressor(BaseEstimator, RegressorMixin):
 
         if self.disp:
             _logger.info("Starting training.")
+
         while len(trainERRS) < MM:
             n_feature = train_data.shape[1]
             n_train = train_data.shape[0]
@@ -127,7 +128,9 @@ class BSRRegressor(BaseEstimator, RegressorMixin):
 
                 # grow a tree from the Root node
                 if self.disp:
+
                     _logger.info("Grow a tree from the Root node")
+
                 grow(Root, n_feature, Ops, Op_weights, Op_type, beta, sigma_a, sigma_b)
                 # Tree = genList(Root)
 
@@ -151,7 +154,7 @@ class BSRRegressor(BaseEstimator, RegressorMixin):
             XX = XX / scale
             epsilon = (
                 np.eye(XX.shape[1]) * 1e-6
-            )  # add to the matrix to prevent singular matrix
+            )  # add to the matrix to prevent singular matrrix
             yy = np.array(train_y)
             yy.shape = (yy.shape[0], 1)
             Beta = np.linalg.inv(np.matmul(XX.transpose(), XX) + epsilon)
@@ -232,7 +235,7 @@ class BSRRegressor(BaseEstimator, RegressorMixin):
                         XX = XX / scale
                         epsilon = (
                             np.eye(XX.shape[1]) * 1e-6
-                        )  # add to the matrix to prevent singular matrrix
+                        )  # add prevent singular matrix
                         yy = np.array(train_y)
                         yy.shape = (yy.shape[0], 1)
                         Beta = np.linalg.inv(np.matmul(XX.transpose(), XX) + epsilon)
@@ -326,8 +329,6 @@ def symreg(K, MM, train_data, test_data, train_y, test_y, disp=True):
         n_train = train_data.shape[0]
         n_test = test_data.shape[0]
 
-        alpha1 = 0.4
-        alpha2 = 0.4
         beta = -1
 
         # Ops = ['inv', 'ln', 'neg', 'sin', 'cos', 'exp', '+', '*']
@@ -338,7 +339,6 @@ def symreg(K, MM, train_data, test_data, train_y, test_y, disp=True):
         Ops = ["inv", "ln", "neg", "sin", "cos", "exp", "square", "cubic", "+", "*"]
         Op_weights = [1.0 / len(Ops)] * len(Ops)
         Op_type = [1, 1, 1, 1, 1, 1, 1, 1, 2, 2]
-        n_op = len(Ops)
 
         # List of tree samples
         RootLists = []
@@ -412,7 +412,6 @@ def symreg(K, MM, train_data, test_data, train_y, test_y, disp=True):
                 sigma_a = SigaList[count]
                 sigma_b = SigbList[count]
 
-                oldRoot = copy.deepcopy(Roots[count])
                 # the returned Root is a new copy
                 [res, sigma, Root, sigma_a, sigma_b] = newProp(
                     Roots,
@@ -458,7 +457,7 @@ def symreg(K, MM, train_data, test_data, train_y, test_y, disp=True):
                     XX = XX / scale
                     epsilon = (
                         np.eye(XX.shape[1]) * 1e-6
-                    )  # add to the matrix to prevent singular matrrix
+                    )  # add to prevent singular matrix
                     yy = np.array(train_y)
                     yy.shape = (yy.shape[0], 1)
                     Beta = np.linalg.inv(np.matmul(XX.transpose(), XX) + epsilon)
