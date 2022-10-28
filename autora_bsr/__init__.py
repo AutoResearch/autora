@@ -1,3 +1,20 @@
-from .funcs import Operator, Node  # noqa: F401
-from .funcs import grow, genList, shrink, upgOd, allcal, display, getHeight, getNum, numLT, upDepth, Express, fStruc  # noqa: F401
-from .funcs import ylogLike, newProp, Prop, auxProp  # noqa: F401
+from .funcs import (  # noqa: F401
+    Express,
+    Node,
+    Operator,
+    Prop,
+    allcal,
+    auxProp,
+    display,
+    fStruc,
+    genList,
+    getHeight,
+    getNum,
+    grow,
+    newProp,
+    numLT,
+    shrink,
+    upDepth,
+    upgOd,
+    ylogLike,
+)
