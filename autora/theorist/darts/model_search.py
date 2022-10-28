@@ -181,6 +181,7 @@ class Cell(nn.Module):
                             states[j], weights[offset + j]
                         )  # edge j->i
                     s = s + weights_mixt[i][index] * prod
+                    # s = s + 1 * prod
 
             # add edges from all previous nodes (input + prev hidden) to next hidden node i + 1
             offset += len(states)
@@ -407,9 +408,7 @@ class Network(nn.Module):
         self.max_set_size = self._n_input_states + self._steps - 1
         self.max_k = 2**self.max_set_size - 1
 
-        self.betas = Variable(
-            torch.randn((self._steps, self.max_k), requires_grad=True)
-        )
+        self.betas = Variable(torch.ones((self._steps, self.max_k), requires_grad=True))
 
         self._arch_parameters = list([self.alphas_normal]) + list([self.betas])
 
@@ -632,7 +631,6 @@ class Network(nn.Module):
             # pick most operation with highest likelihood
             values = self.alphas_normal[idx, :].data.numpy()
             maxIdx = np.where(values == max(values))
-
             tmp_param_list = list()
             if isiterable(op._ops[maxIdx[0].item(0)]):  # Zero is not iterable
 

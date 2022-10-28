@@ -114,7 +114,7 @@ def run_test_primitive_fitting(
     regressor = DARTSRegressor(
         num_graph_nodes=1,
         param_updates_per_epoch=100,
-        max_epochs=300,
+        max_epochs=400,
         arch_updates_per_epoch=1,
         param_weight_decay=3e-4,
         arch_weight_decay_df=0.001,

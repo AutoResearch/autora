@@ -628,6 +628,7 @@ PRIMITIVES = (
     "linear_logistic",
     "mult",
     "linear_relu",
+    "logistic",
 )
 
 # make sure that every primitive is in the OPS dictionary
