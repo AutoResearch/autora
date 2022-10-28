@@ -136,7 +136,7 @@ def genList(node):
 # =============================================================================
 def shrink(node):
     if node.left is None:
-        print("Already a terminal node!")
+        _logger.info("Already a terminal node!")
     else:
         node.left = None
         node.right = None
@@ -192,18 +192,18 @@ def allcal(node, indata):
         elif node.operator == "cubic":  # operator added by fwl
             node.data = np.power(allcal(node.left, indata), 3)
         else:
-            print("No matching type and operator!")
+            _logger.info("No matching type and operator!")
     elif node.type == 2:  # two child nodes
         if node.operator == "+":
             node.data = allcal(node.left, indata) + allcal(node.right, indata)
         elif node.operator == "*":
             node.data = allcal(node.left, indata) * allcal(node.right, indata)
         else:
-            print("No matching type and operator!")
+            _logger.info("No matching type and operator!")
     elif node.type == -1:  # not grown
-        print("Not a grown tree!")
+        _logger.info("Not a grown tree!")
     else:
-        print("No legal node type!")
+        _logger.info("No legal node type!")
 
     return node.data
 

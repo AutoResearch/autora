@@ -1,4 +1,5 @@
 import copy
+import logging
 import time
 
 import numpy as np
@@ -16,6 +17,8 @@ from autora_bsr.funcs import (
     grow,
     newProp,
 )
+
+_logger = logging.getLogger(__name__)
 
 
 class BSRRegressor(BaseEstimator, RegressorMixin):
@@ -97,7 +100,7 @@ class BSRRegressor(BaseEstimator, RegressorMixin):
         beta = self.beta
 
         if self.disp:
-            print("starting training...")
+            _logger.info("Starting training")
         while len(trainERRS) < MM:
             n_feature = train_data.shape[1]
             n_train = train_data.shape[0]
@@ -130,7 +133,7 @@ class BSRRegressor(BaseEstimator, RegressorMixin):
 
                 # grow a tree from the Root node
                 if self.disp:
-                    print("grow a tree from the Root node")
+                    _logger.info("Grow a tree from the Root node")
                 grow(Root, n_feature, Ops, Op_weights, Op_type, beta, sigma_a, sigma_b)
                 # Tree = genList(Root)
 
@@ -141,7 +144,7 @@ class BSRRegressor(BaseEstimator, RegressorMixin):
 
             # calculate beta
             if self.disp:
-                print("calculate beta")
+                _logger.info("Calculate beta")
             # added a constant in the regression by fwl
             XX = np.zeros((n_train, K))
             for count in np.arange(K):
@@ -173,7 +176,7 @@ class BSRRegressor(BaseEstimator, RegressorMixin):
             tic = time.time()
 
             if self.disp:
-                print("while total < ", self.val)
+                _logger.info("While total < ", self.val)
             while total < self.val:
                 Roots = []  # list of current components
                 # for count in np.arange(K):
@@ -189,7 +192,7 @@ class BSRRegressor(BaseEstimator, RegressorMixin):
 
                     # the returned Root is a new copy
                     if self.disp:
-                        print("newProp...")
+                        _logger.info("newProp...")
                     [res, sigma, Root, sigma_a, sigma_b] = newProp(
                         Roots,
                         count,
@@ -205,7 +208,7 @@ class BSRRegressor(BaseEstimator, RegressorMixin):
                         sigma_b,
                     )
                     if self.disp:
-                        print("res:", res)
+                        _logger.info("res:", res)
                         display(genList(Root))
 
                     total += 1
@@ -255,8 +258,8 @@ class BSRRegressor(BaseEstimator, RegressorMixin):
                         errList.append(rmse)
 
                         if self.disp:
-                            print(
-                                "accept",
+                            _logger.info(
+                                "Accept",
                                 accepted,
                                 "th after",
                                 total,
@@ -264,12 +267,12 @@ class BSRRegressor(BaseEstimator, RegressorMixin):
                                 count,
                                 "th component",
                             )
-                            print(
+                            _logger.info(
                                 "sigma:", round(sigma, 5), "error:", round(rmse, 5)
                             )  # ,"log.likelihood:",round(llh,5))
 
                             display(genList(Root))
-                            print("---------------")
+                            _logger.info("---------------")
                         totList.append(total)
                         total = 0
 
@@ -295,10 +298,10 @@ class BSRRegressor(BaseEstimator, RegressorMixin):
             toc = time.time()  # cauculate running time
             tictoc = toc - tic
             if self.disp:
-                print("run time:{:.2f}s".format(tictoc))
+                _logger.info("Run time:{:.2f}s".format(tictoc))
 
-                print("------")
-                print("mean rmse of last 5 accepts:", np.mean(errList[-6:-1]))
+                _logger.info("------")
+                _logger.info("Mean rmse of last 5 accepts:", np.mean(errList[-6:-1]))
 
             trainERRS.append(errList)
             ROOTS.append(Roots)
