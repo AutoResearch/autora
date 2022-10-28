@@ -1,7 +1,10 @@
-import numpy as np
-from scipy.stats import invgamma
-from scipy.stats import norm
 import copy
+import logging
+
+import numpy as np
+from scipy.stats import invgamma, norm
+
+_logger = logging.getLogger(__name__)
 
 
 class Operator:
@@ -44,7 +47,7 @@ class Node:
         print("operator:", self.operator)
         print("data:", self.data)
         print("feature:", self.feature)
-        if self.operator == 'ln':
+        if self.operator == "ln":
             print(" ln_a:", self.a)
             print(" ln_b:", self.b)
 
@@ -54,6 +57,7 @@ class Node:
 # =============================================================================
 # # grow from a node, assign an operator or stop as terminal
 # =============================================================================
+
 
 def grow(node, nfeature, Ops, Op_weights, Op_type, beta, sigma_a, sigma_b):
     depth = node.depth
@@ -85,7 +89,7 @@ def grow(node, nfeature, Ops, Op_weights, Op_type, beta, sigma_a, sigma_b):
     elif node.type == 1:
         node.left = Node(depth + 1)
         node.left.parent = node
-        if node.operator == 'ln':  # linear parameters
+        if node.operator == "ln":  # linear parameters
             node.a = norm.rvs(loc=1, scale=np.sqrt(sigma_a))
             node.b = norm.rvs(loc=0, scale=np.sqrt(sigma_b))
         grow(node.left, nfeature, Ops, Op_weights, Op_type, beta, sigma_a, sigma_b)
@@ -123,7 +127,7 @@ def genList(node):
             lst = lst + genList(node.right)
     for i in np.arange(0, len(lst)):
         lst[i].order = i
-    return (lst)
+    return lst
 
 
 # =============================================================================
@@ -161,38 +165,38 @@ def allcal(node, indata):
         if indata is not None:
             node.data = np.array(indata.iloc[:, node.feature])
     elif node.type == 1:  # one child node
-        if node.operator == 'ln':
+        if node.operator == "ln":
             node.data = node.a * allcal(node.left, indata) + node.b
-        elif node.operator == 'exp':
+        elif node.operator == "exp":
             node.data = allcal(node.left, indata)
             for i in np.arange(len(node.data[:, 0])):
                 if node.data[i, 0] <= 200:
                     node.data[i, 0] = np.exp(node.data[i, 0])
                 else:
-                    node.data[i, 0] = 1e+10
-        elif node.operator == 'inv':
+                    node.data[i, 0] = 1e10
+        elif node.operator == "inv":
             node.data = allcal(node.left, indata)
             for i in np.arange(len(node.data[:, 0])):
                 if node.data[i, 0] == 0:
                     node.data[i, 0] = 0
                 else:
                     node.data[i, 0] = 1 / node.data[i, 0]
-        elif node.operator == 'neg':
+        elif node.operator == "neg":
             node.data = -1 * allcal(node.left, indata)
-        elif node.operator == 'sin':
+        elif node.operator == "sin":
             node.data = np.sin(allcal(node.left, indata))
-        elif node.operator == 'cos':
+        elif node.operator == "cos":
             node.data = np.cos(allcal(node.left, indata))
-        elif node.operator == 'square': ## operator added by fwl
+        elif node.operator == "square":  # operator added by fwl
             node.data = np.square(allcal(node.left, indata))
-        elif node.operator == 'cubic': ## operator added by fwl
-            node.data = np.power(allcal(node.left, indata),3)
+        elif node.operator == "cubic":  # operator added by fwl
+            node.data = np.power(allcal(node.left, indata), 3)
         else:
             print("No matching type and operator!")
     elif node.type == 2:  # two child nodes
-        if node.operator == '+':
+        if node.operator == "+":
             node.data = allcal(node.left, indata) + allcal(node.right, indata)
-        elif node.operator == '*':
+        elif node.operator == "*":
             node.data = allcal(node.left, indata) * allcal(node.right, indata)
         else:
             print("No matching type and operator!")
@@ -258,7 +262,7 @@ def getNum(node):
     else:
         lnum = getNum(node.left)
         rnum = getNum(node.right)
-        return (lnum + rnum + 1)
+        return lnum + rnum + 1
 
 
 # =============================================================================
@@ -268,7 +272,7 @@ def numLT(node):
     if node.type == 0:
         return 0
     elif node.type == 1:
-        if node.operator == 'ln':
+        if node.operator == "ln":
             return 1 + numLT(node.left)
         else:
             return numLT(node.left)
@@ -299,31 +303,37 @@ def Express(node):
     expr = ""
     if node.type == 0:  # terminal
         expr = "x" + str(node.feature)
-        return (expr)
+        return expr
     elif node.type == 1:
-        if node.operator == 'exp':
+        if node.operator == "exp":
             expr = "exp(" + Express(node.left) + ")"
-        elif node.operator == 'ln':
-            expr = str(round(node.a, 4)) + "*(" + Express(node.left) + ")+" + str(round(node.b, 4))
-        elif node.operator == 'inv':  # node.operator == 'inv':
+        elif node.operator == "ln":
+            expr = (
+                str(round(node.a, 4))
+                + "*("
+                + Express(node.left)
+                + ")+"
+                + str(round(node.b, 4))
+            )
+        elif node.operator == "inv":  # node.operator == 'inv':
             expr = "1/[" + Express(node.left) + "]"
-        elif node.operator == 'sin':
+        elif node.operator == "sin":
             expr = "sin(" + Express(node.left) + ")"
-        elif node.operator == 'cos':
+        elif node.operator == "cos":
             expr = "cos(" + Express(node.left) + ")"
-        elif node.operator == 'square': ## added by fwl
+        elif node.operator == "square":  # added by fwl
             expr = "(" + Express(node.left) + ")^2"
-        elif node.operator == 'cubic': ## added by fwl
+        elif node.operator == "cubic":  # added by fwl
             expr = "(" + Express(node.left) + ")^3"
         else:  # note.operate=='neg'
             expr = "-(" + Express(node.left) + ")"
 
     else:  # node.type==2
-        if node.operator == '+':
+        if node.operator == "+":
             expr = Express(node.left) + "+" + Express(node.right)
         else:
             expr = "(" + Express(node.left) + ")*(" + Express(node.right) + ")"
-    return (expr)
+    return expr
 
 
 # =============================================================================
@@ -334,17 +344,18 @@ def fStruc(node, n_feature, Ops, Op_weights, Op_type, beta, sigma_a, sigma_b):
     loglike = 0  # log.likelihood of structure S=(T,M)
     loglike_para = 0  # log.likelihood of linear paras
 
-    '''
+    """
     # contribution of hyperparameter sigma_theta
     if node.depth == 0:#root node
         loglike += np.log(invgamma.pdf(node.sigma_a,1))
         loglike += np.log(invgamma.pdf(node.sigma_b,1))
-    '''
+    """
 
     # contribution of splitting the node or becoming terminal
     if node.type == 0:  # terminal node
         loglike += np.log(
-            1 - 1 / np.power((1 + node.depth), -beta))  # * np.power(node.depth,beta) #contribution of choosing terminal
+            1 - 1 / np.power((1 + node.depth), -beta)
+        )  # contribution of choosing terminal
         loglike -= np.log(n_feature)  # contribution of feature selection
     elif node.type == 1:  # unitary operator
         # contribution of splitting
@@ -353,7 +364,7 @@ def fStruc(node, n_feature, Ops, Op_weights, Op_type, beta, sigma_a, sigma_b):
         else:
             loglike += np.log((1 + node.depth)) * beta + np.log(Op_weights[node.op_ind])
         # contribution of parameters of linear nodes
-        if node.operator == 'ln':
+        if node.operator == "ln":
             loglike_para -= np.power((node.a - 1), 2) / (2 * sigma_a)
             loglike_para -= np.power(node.b, 2) / (2 * sigma_b)
             loglike_para -= 0.5 * np.log(2 * np.pi * sigma_a)
@@ -369,13 +380,17 @@ def fStruc(node, n_feature, Ops, Op_weights, Op_type, beta, sigma_a, sigma_b):
     if node.left is None:  # no child nodes
         return [loglike, loglike_para]
     else:
-        fleft = fStruc(node.left, n_feature, Ops, Op_weights, Op_type, beta, sigma_a, sigma_b)
+        fleft = fStruc(
+            node.left, n_feature, Ops, Op_weights, Op_type, beta, sigma_a, sigma_b
+        )
         loglike += fleft[0]
         loglike_para += fleft[1]
         if node.right is None:  # only one child
             return [loglike, loglike_para]
         else:
-            fright = fStruc(node.right, n_feature, Ops, Op_weights, Op_type, beta, sigma_a, sigma_b)
+            fright = fStruc(
+                node.right, n_feature, Ops, Op_weights, Op_type, beta, sigma_a, sigma_b
+            )
             loglike += fright[0]
             loglike_para += fright[1]
 
@@ -388,9 +403,6 @@ def fStruc(node, n_feature, Ops, Op_weights, Op_type, beta, sigma_a, sigma_b):
 # # five possible actions: stay, grow, prune, ReassignOp, ReassignFea.
 # =============================================================================
 def Prop(Root, n_feature, Ops, Op_weights, Op_type, beta, sigma_a, sigma_b):
-    ###############################
-    ######### preparations ########
-    ###############################
 
     # make a copy of Root
     oldRoot = copy.deepcopy(Root)
@@ -406,7 +418,7 @@ def Prop(Root, n_feature, Ops, Op_weights, Op_type, beta, sigma_a, sigma_b):
     last_a = []
     last_b = []
     for i in np.arange(0, len(Tree)):
-        if Tree[i].operator == 'ln':
+        if Tree[i].operator == "ln":
             lnPointers.append(Tree[i])
             last_a.append(Tree[i].a)
             last_b.append(Tree[i].b)
@@ -424,14 +436,14 @@ def Prop(Root, n_feature, Ops, Op_weights, Op_type, beta, sigma_a, sigma_b):
     # get the list of lt() nodes
     Lins = []
     for i in np.arange(0, len(Tree)):
-        if Tree[i].operator == 'ln':
+        if Tree[i].operator == "ln":
             Lins.append(Tree[i])
     ltNum = len(Lins)
 
     # record expansion and shrinkage
     # expansion occurs when num of lt() increases
     # shrinkage occurs when num of lt() decreases
-    change = ''
+    change = ""
     Q = Qinv = 1
 
     # qualified candidates for detransformation
@@ -448,7 +460,7 @@ def Prop(Root, n_feature, Ops, Op_weights, Op_type, beta, sigma_a, sigma_b):
             elif Tree[i].left.type == 0 and Tree[i].right.type == 0:
                 flag = False
 
-        if flag == True:
+        if flag is True:
             detcd.append(Tree[i])
 
     ###############################
@@ -466,26 +478,22 @@ def Prop(Root, n_feature, Ops, Op_weights, Op_type, beta, sigma_a, sigma_b):
     # auxiliary
     test = np.random.uniform(0, 1, 1)[0]
 
-    ###############################
-    ########### take action #######
-    ###############################
-
     # stay
     if test <= p_stay:
-        action = 'stay'
+        action = "stay"
         # print('action:',action)
         # calculate Q and Qinv
         Q = p_stay
         Qinv = p_stay
-        # update all linear nodes 
+        # update all linear nodes
         for i in np.arange(0, len(Tree)):
-            if Tree[i].operator == 'ln':
-                Tree[i].a = norm.rvs(loc=1,scale=np.sqrt(sigma_a))
-                Tree[i].b = norm.rvs(loc=1,scale=np.sqrt(sigma_b))
+            if Tree[i].operator == "ln":
+                Tree[i].a = norm.rvs(loc=1, scale=np.sqrt(sigma_a))
+                Tree[i].b = norm.rvs(loc=1, scale=np.sqrt(sigma_b))
 
     # grow
     elif test <= p_stay + p_grow:
-        action = 'grow'
+        action = "grow"
         # print("action:",action)
 
         # pick a terminal node
@@ -498,11 +506,12 @@ def Prop(Root, n_feature, Ops, Op_weights, Op_type, beta, sigma_a, sigma_b):
             Q = Qinv = 1
         else:
             # calculate Q
-            fstrc = fStruc(Term[pod], n_feature, Ops, Op_weights, Op_type, beta, sigma_a, sigma_b)
+            fstrc = fStruc(
+                Term[pod], n_feature, Ops, Op_weights, Op_type, beta, sigma_a, sigma_b
+            )
             Q = p_grow * np.exp(fstrc[0]) / len(Term)
             # calculate Qinv (equiv to prune)
             new_ltNum = numLT(Root)
-            new_height = getHeight(Root)
             new_nodeNum = getNum(Root)
             newTerm = []  # terminal
             newTree = genList(Root)
@@ -513,26 +522,32 @@ def Prop(Root, n_feature, Ops, Op_weights, Op_type, beta, sigma_a, sigma_b):
                 else:
                     new_nterm.append(newTree[i])
             new_termNum = len(newTerm)
-            new_p = (1 - 0.25 * new_ltNum / (new_ltNum + 3)) * (1 - min(1, 4 / (len(new_nterm) + 2))) / 3
+            new_p = (
+                (1 - 0.25 * new_ltNum / (new_ltNum + 3))
+                * (1 - min(1, 4 / (len(new_nterm) + 2)))
+                / 3
+            )
             Qinv = new_p / max(1, (new_nodeNum - new_termNum - 1))  # except root node
 
             if new_ltNum > ltNum:
-                change = 'expansion'
+                change = "expansion"
 
     # prune
     elif test <= p_stay + p_grow + p_prune:
-        action = 'prune'
+        action = "prune"
         # print("action:",action)
 
         # pick a node to prune
         pod = np.random.randint(1, len(Nterm), 1)[0]  # except root node
-        fstrc = fStruc(Nterm[pod], n_feature, Ops, Op_weights, Op_type, beta, sigma_a, sigma_b)
+        fstrc = fStruc(
+            Nterm[pod], n_feature, Ops, Op_weights, Op_type, beta, sigma_a, sigma_b
+        )
         pruned = copy.deepcopy(Nterm[pod])  # preserve a copy
 
         # preserve pointers to all cutted ln
         p_ltNum = numLT(pruned)
         if p_ltNum > 0:
-            change = 'shrinkage'
+            change = "shrinkage"
 
         # prune the node
         Nterm[pod].left = None
@@ -544,7 +559,6 @@ def Prop(Root, n_feature, Ops, Op_weights, Op_type, beta, sigma_a, sigma_b):
 
         # quantities for new tree
         new_ltNum = numLT(Root)
-        new_height = getHeight(Root)
         new_nodeNum = getNum(Root)
         newTerm = []  # terminal
         new_nTerm = []  # non-terminal
@@ -559,12 +573,14 @@ def Prop(Root, n_feature, Ops, Op_weights, Op_type, beta, sigma_a, sigma_b):
         Q = p_prune / ((len(Nterm) - 1) * n_feature)
 
         # calculate Qinv (correspond to grow)
-        pg = 1 - 0.25 * new_ltNum / (new_ltNum + 3) * 0.75 * min(1, 4 / (len(new_nTerm) + 2))
+        pg = 1 - 0.25 * new_ltNum / (new_ltNum + 3) * 0.75 * min(
+            1, 4 / (len(new_nTerm) + 2)
+        )
         Qinv = pg * np.exp(fstrc[0]) / len(newTerm)
 
     # detransformation
     elif test <= p_stay + p_grow + p_prune + p_detr:
-        action = 'detransform'
+        action = "detransform"
 
         det_od = np.random.randint(0, len(detcd), 1)[0]
         det_node = detcd[det_od]
@@ -629,10 +645,10 @@ def Prop(Root, n_feature, Ops, Op_weights, Op_type, beta, sigma_a, sigma_b):
         new_ltnum = 0
         new_tree = genList(Root)
         for i in np.arange(len(new_tree)):
-            if new_tree[i].operator == 'ln':
+            if new_tree[i].operator == "ln":
                 new_ltnum += 1
         if new_ltnum < ltNum:
-            change = 'shrinkage'
+            change = "shrinkage"
 
         new_pstay = 0.25 * new_ltnum / (new_ltnum + 3)
 
@@ -647,17 +663,16 @@ def Prop(Root, n_feature, Ops, Op_weights, Op_type, beta, sigma_a, sigma_b):
                     flag = False
                 elif new_tree[i].left.type == 0 and new_tree[i].right.type == 0:
                     flag = False
-            if flag == True:
+            if flag is True:
                 new_detcd.append(new_tree[i])
         new_pdetr = (1 - new_pstay) * (1 / 3) * len(new_detcd) / (len(new_detcd) + 3)
         new_ptr = (1 - new_pstay) / 3 - new_pdetr
         Qinv = new_ptr * Op_weights[det_node.op_ind] / len(new_tree)
         if cutt is not None:
-            fstrc = fStruc(cutt, n_feature, Ops, Op_weights, Op_type, beta, sigma_a, sigma_b)
+            fstrc = fStruc(
+                cutt, n_feature, Ops, Op_weights, Op_type, beta, sigma_a, sigma_b
+            )
             Qinv = Qinv * np.exp(fstrc[0])
-
-
-
 
     # transformation
     elif test <= p_stay + p_grow + p_prune + p_detr + p_trans:
@@ -682,8 +697,8 @@ def Prop(Root, n_feature, Ops, Op_weights, Op_type, beta, sigma_a, sigma_b):
         new_node.op_ind = ins_opind
 
         if ins_type == 1:  # unary
-            if ins_op == 'ln':  # linear node
-                change = 'expansion'
+            if ins_op == "ln":  # linear node
+                change = "expansion"
                 # new_node.a = norm.rvs(loc=1,scale=np.sqrt(sigma_a))
                 # new_node.b = norm.rvs(loc=0,scale=np.sqrt(sigma_b))
             if ins_node.parent is None:  # inserted node is root
@@ -711,8 +726,26 @@ def Prop(Root, n_feature, Ops, Op_weights, Op_type, beta, sigma_a, sigma_b):
                 new_node.right = new_right
                 new_right.parent = new_node
                 upDepth(Root)
-                grow(new_right, n_feature, Ops, Op_weights, Op_type, beta, sigma_a, sigma_b)
-                fstrc = fStruc(new_right, n_feature, Ops, Op_weights, Op_type, beta, sigma_a, sigma_b)
+                grow(
+                    new_right,
+                    n_feature,
+                    Ops,
+                    Op_weights,
+                    Op_type,
+                    beta,
+                    sigma_a,
+                    sigma_b,
+                )
+                fstrc = fStruc(
+                    new_right,
+                    n_feature,
+                    Ops,
+                    Op_weights,
+                    Op_type,
+                    beta,
+                    sigma_a,
+                    sigma_b,
+                )
                 # calculate Q
                 Q = p_trans * ins_opweight * np.exp(fstrc[0]) / len(Tree)
             else:  # inserted node is not root
@@ -730,8 +763,26 @@ def Prop(Root, n_feature, Ops, Op_weights, Op_type, beta, sigma_a, sigma_b):
                 new_node.right = new_right
                 new_right.parent = new_node
                 upDepth(Root)
-                grow(new_right, n_feature, Ops, Op_weights, Op_type, beta, sigma_a, sigma_b)
-                fstrc = fStruc(new_right, n_feature, Ops, Op_weights, Op_type, beta, sigma_a, sigma_b)
+                grow(
+                    new_right,
+                    n_feature,
+                    Ops,
+                    Op_weights,
+                    Op_type,
+                    beta,
+                    sigma_a,
+                    sigma_b,
+                )
+                fstrc = fStruc(
+                    new_right,
+                    n_feature,
+                    Ops,
+                    Op_weights,
+                    Op_type,
+                    beta,
+                    sigma_a,
+                    sigma_b,
+                )
 
                 # calculate Q
                 Q = p_trans * ins_opweight * np.exp(fstrc[0]) / len(Tree)
@@ -740,10 +791,10 @@ def Prop(Root, n_feature, Ops, Op_weights, Op_type, beta, sigma_a, sigma_b):
         new_ltnum = 0
         new_tree = genList(Root)
         for i in np.arange(len(new_tree)):
-            if new_tree[i].operator == 'ln':
+            if new_tree[i].operator == "ln":
                 new_ltnum += 1
         if new_ltnum > ltNum:
-            change = 'expansion'
+            change = "expansion"
 
         # calculate Qinv (correspond to detransform)
         new_pstay = 0.25 * new_ltnum / (new_ltnum + 3)
@@ -758,7 +809,7 @@ def Prop(Root, n_feature, Ops, Op_weights, Op_type, beta, sigma_a, sigma_b):
                     flag = False
                 elif new_tree[i].left.type == 0 and new_tree[i].right.type == 0:
                     flag = False
-            if flag == True:
+            if flag is True:
                 new_detcd.append(new_tree[i])
 
         new_pdetr = (1 - new_pstay) * (1 / 3) * len(new_detcd) / (len(new_detcd) + 3)
@@ -769,20 +820,17 @@ def Prop(Root, n_feature, Ops, Op_weights, Op_type, beta, sigma_a, sigma_b):
             if new_node.left.type > 0 and new_node.right.type > 0:
                 Qinv = Qinv / 2
 
-
-
     # reassignOperator
     elif test <= p_stay + p_grow + p_prune + p_detr + p_trans + p_rop:
-        action = 'ReassignOperator'
+        action = "ReassignOperator"
         # print("action:",action)
         pod = np.random.randint(0, len(Nterm), 1)[0]
         last_op = Nterm[pod].operator
         last_op_ind = Nterm[pod].op_ind
         last_type = Nterm[pod].type
         # print('replaced operator:',last_op)
-        cnode = Nterm[pod]  ########pointer to the node changed#######
+        cnode = Nterm[pod]  # pointer to the node changed
         # a deep copy of the changed node and its descendents
-        replaced = copy.deepcopy(Nterm[pod])
 
         new_od = np.random.choice(np.arange(0, len(Ops)), p=Op_weights)
         new_op = Ops[new_od]
@@ -794,15 +842,15 @@ def Prop(Root, n_feature, Ops, Op_weights, Op_type, beta, sigma_a, sigma_b):
             if new_type == 1:  # unary to unary
                 # assign operator and type
                 Nterm[pod].operator = new_op
-                if last_op == 'ln':  # originally linear
-                    if new_op != 'ln':  # change from linear to other ops
+                if last_op == "ln":  # originally linear
+                    if new_op != "ln":  # change from linear to other ops
                         cnode.a = None
                         cnode.b = None
-                        change = 'shrinkage'
+                        change = "shrinkage"
                 else:  # orignally not linear
-                    if new_op == 'ln':  # linear increases by 1
-                        ###### a and b is not sampled
-                        change = 'expansion'
+                    if new_op == "ln":  # linear increases by 1
+                        # a and b is not sampled
+                        change = "expansion"
 
                 # calculate Q, Qinv (equal)
                 Q = Op_weights[new_od]
@@ -812,20 +860,37 @@ def Prop(Root, n_feature, Ops, Op_weights, Op_type, beta, sigma_a, sigma_b):
                 # assign operator and type
                 cnode.operator = new_op
                 cnode.type = 2
-                if last_op == 'ln':
+                if last_op == "ln":
                     cnode.a = None
                     cnode.b = None
                     # grow a new sub-tree rooted at right child
                 cnode.right = Node(cnode.depth + 1)
                 cnode.right.parent = cnode
-                grow(cnode.right, n_feature, Ops, Op_weights, Op_type, beta, sigma_a, sigma_b)
-                fstrc = fStruc(cnode.right, n_feature, Ops, Op_weights, Op_type, beta, sigma_a, sigma_b)
+                grow(
+                    cnode.right,
+                    n_feature,
+                    Ops,
+                    Op_weights,
+                    Op_type,
+                    beta,
+                    sigma_a,
+                    sigma_b,
+                )
+                fstrc = fStruc(
+                    cnode.right,
+                    n_feature,
+                    Ops,
+                    Op_weights,
+                    Op_type,
+                    beta,
+                    sigma_a,
+                    sigma_b,
+                )
 
                 # calculate Q
                 Q = p_rop * np.exp(fstrc[0]) * Op_weights[new_od] / (len(Nterm))
                 # calculate Qinv
                 # get necessary quantities
-                new_height = getHeight(Root)
                 new_nodeNum = getNum(Root)
                 newTerm = []  # terminal
                 newTree = genList(Root)
@@ -835,29 +900,33 @@ def Prop(Root, n_feature, Ops, Op_weights, Op_type, beta, sigma_a, sigma_b):
                         newTerm.append(newTree[i])
                     # reversed action is binary to unary
                 new_p0 = new_ltNum / (4 * (new_ltNum + 3))
-                Qinv = 0.125 * (1 - new_p0) * Op_weights[last_op_ind] / (new_nodeNum - len(newTerm))
+                Qinv = (
+                    0.125
+                    * (1 - new_p0)
+                    * Op_weights[last_op_ind]
+                    / (new_nodeNum - len(newTerm))
+                )
 
                 # record change of dim
                 if new_ltNum > ltNum:
-                    change = 'expansion'
+                    change = "expansion"
                 elif new_ltNum < ltNum:
-                    change = 'shrinkage'
-
-
-
+                    change = "shrinkage"
 
         # originally binary
         else:
             if new_type == 1:  # binary to unary
                 # assign operator and type
-                cutted = copy.deepcopy(cnode.right)  # deep copy root of the cutted subtree
+                cutted = copy.deepcopy(
+                    cnode.right
+                )  # deep copy root of the cutted subtree
                 # preserve pointers to all cutted ln
                 p_ltNum = numLT(cutted)
                 if p_ltNum > 1:
-                    change = 'shrinkage'
-                elif new_op == 'ln':
+                    change = "shrinkage"
+                elif new_op == "ln":
                     if p_ltNum == 0:
-                        change = 'expansion'
+                        change = "expansion"
 
                 cnode.right = None
                 cnode.operator = new_op
@@ -873,11 +942,16 @@ def Prop(Root, n_feature, Ops, Op_weights, Op_type, beta, sigma_a, sigma_b):
                 new_ltNum = numLT(Root)
                 # reversed action is unary to binary and grow
                 new_p0 = new_ltNum / (4 * (new_ltNum + 3))
-                fstrc = fStruc(cutted, n_feature, Ops, Op_weights, Op_type, beta, sigma_a, sigma_b)
-                Qinv = 0.125 * (1 - new_p0) * np.exp(fstrc[0]) * Op_weights[last_op_ind] / (
-                (new_nodeNum - len(newTerm)))
-
-
+                fstrc = fStruc(
+                    cutted, n_feature, Ops, Op_weights, Op_type, beta, sigma_a, sigma_b
+                )
+                Qinv = (
+                    0.125
+                    * (1 - new_p0)
+                    * np.exp(fstrc[0])
+                    * Op_weights[last_op_ind]
+                    / ((new_nodeNum - len(newTerm)))
+                )
 
             else:  # binary to binary
                 # assign operator
@@ -886,11 +960,10 @@ def Prop(Root, n_feature, Ops, Op_weights, Op_type, beta, sigma_a, sigma_b):
                 Q = Op_weights[new_od]
                 Qinv = Op_weights[last_op_ind]
 
-
     # reassign feature
     else:
-        action = 'ReassignFeature'
-        # print("action:",action)
+        action = "ReassignFeature"
+        _logger.info("action:", action)
 
         # pick a terminal node
         pod = np.random.randint(0, len(Term), 1)[0]
@@ -916,13 +989,15 @@ def Prop(Root, n_feature, Ops, Op_weights, Op_type, beta, sigma_a, sigma_b):
 # # last_a and last_b is the parameters for the shrinked node (if applicable)
 # # lnPointers is list of pointers to originally linear nodes in Tree before changing
 # =============================================================================
-def auxProp(change, oldRoot, Root, lnPointers, sigma_a, sigma_b, last_a, last_b, cnode=None):
+def auxProp(
+    change, oldRoot, Root, lnPointers, sigma_a, sigma_b, last_a, last_b, cnode=None
+):
     # record the informations of linear nodes other than the shrinked or expanded
     odList = []  # list of orders of linear nodes
     Tree = genList(Root)
 
     for i in np.arange(0, len(Tree)):
-        if Tree[i].operator == 'ln':
+        if Tree[i].operator == "ln":
             odList.append(i)
 
     # sample new sigma_a2 and sigma_b2
@@ -931,14 +1006,14 @@ def auxProp(change, oldRoot, Root, lnPointers, sigma_a, sigma_b, last_a, last_b,
     old_sa2 = sigma_a
     old_sb2 = sigma_b
 
-    if change == 'shrinkage':
+    if change == "shrinkage":
         prsv_aList = []
         prsv_bList = []
         cut_aList = []
         cut_bList = []
         # find the preserved a's
         for i in np.arange(0, len(lnPointers)):
-            if lnPointers[i].operator == 'ln':  # still linear
+            if lnPointers[i].operator == "ln":  # still linear
                 prsv_aList.append(last_a[i])
                 prsv_bList.append(last_b[i])
             else:  # no longer linear
@@ -1000,7 +1075,7 @@ def auxProp(change, oldRoot, Root, lnPointers, sigma_a, sigma_b, last_a, last_b,
         detjacob = np.power(2, 2 * len(prsv_aList))
         # print("detjacob:",detjacob)
 
-        #### assign Theta* to the variables
+        # assign Theta* to the variables
         # new values of Theta
         # new sigma_a, sigma_b are directly returned
         for i in np.arange(0, len(odList)):
@@ -1009,9 +1084,7 @@ def auxProp(change, oldRoot, Root, lnPointers, sigma_a, sigma_b, last_a, last_b,
 
         return [hratio, detjacob, new_sa2, new_sb2]
 
-
-
-    elif change == 'expansion':
+    elif change == "expansion":
         # sample new sigma_a2 and sigma_b2
         new_sa2 = invgamma.rvs(1)
         new_sb2 = invgamma.rvs(1)
@@ -1023,7 +1096,7 @@ def auxProp(change, oldRoot, Root, lnPointers, sigma_a, sigma_b, last_a, last_b,
         # last_b is the list of all original b's
         odList = []
         for i in np.arange(0, len(Tree)):
-            if Tree[i].operator == 'ln':
+            if Tree[i].operator == "ln":
                 odList.append(i)
 
         # sample auxiliary U
@@ -1084,7 +1157,7 @@ def auxProp(change, oldRoot, Root, lnPointers, sigma_a, sigma_b, last_a, last_b,
         # determinant of jacobian
         detjacob = 1 / np.power(2, 2 * len(last_a))
 
-        #### assign Theta* to the variables
+        # assign Theta* to the variables
         # new values of sigma_a sigma_b
         # new values of Theta
         for i in np.arange(0, len(odList)):
@@ -1092,7 +1165,6 @@ def auxProp(change, oldRoot, Root, lnPointers, sigma_a, sigma_b, last_a, last_b,
             Tree[odList[i]].b = NbList[i]
 
         return [hratio, detjacob, new_sa2, new_sb2]
-
 
     else:  # same set of parameters
         # record the informations of linear nodes other than the shrinked or expanded
@@ -1103,7 +1175,7 @@ def auxProp(change, oldRoot, Root, lnPointers, sigma_a, sigma_b, last_a, last_b,
         old_sb2 = sigma_b
 
         for i in np.arange(0, len(Tree)):
-            if Tree[i].operator == 'ln':
+            if Tree[i].operator == "ln":
                 odList.append(i)
 
         NaList = []
@@ -1132,10 +1204,10 @@ def ylogLike(y, outputs, sigma):
     XX = copy.deepcopy(outputs)
     scale = np.max(np.abs(XX))
     XX = XX / scale
-    epsilon = np.eye(XX.shape[1])*1e-6
+    epsilon = np.eye(XX.shape[1]) * 1e-6
     yy = np.array(y)
     yy.shape = (yy.shape[0], 1)
-    Beta = np.linalg.inv(np.matmul(XX.transpose(), XX)+epsilon)
+    Beta = np.linalg.inv(np.matmul(XX.transpose(), XX) + epsilon)
     Beta = np.matmul(Beta, np.matmul(XX.transpose(), yy))
 
     output = np.matmul(XX, Beta)
@@ -1143,19 +1215,19 @@ def ylogLike(y, outputs, sigma):
     # error = 0
     # for i in np.arange(0, len(y)):
     #     error += (y[i] - output[i, 0]) * (y[i] - output[i, 0])
-    error = np.sum(np.square(y-output[:,0]))
-    #error = np.sqrt(error / len(y))
+    error = np.sum(np.square(y - output[:, 0]))
+    # error = np.sqrt(error / len(y))
     # print("mean error:",error)
 
     # log_sum = 0
     # for i in np.arange(0, len(y)):
-    #     temp = np.power(y[i] - output[i, 0], 2)  # np.log(norm.pdf(y[i],loc=output[i,0],scale=np.sqrt(sigma)))
+    #     temp = np.power(y[i] - output[i, 0], 2)
     #     # print(i,temp)
     #     log_sum += temp
     log_sum = error
     log_sum = -log_sum / (2 * sigma * sigma)
     log_sum -= 0.5 * len(y) * np.log(2 * np.pi * sigma * sigma)
-    return (log_sum)
+    return log_sum
 
 
 # =============================================================================
@@ -1165,13 +1237,27 @@ def ylogLike(y, outputs, sigma):
 # # sigma is for output to y
 # # sigma_a, sigma_b are (squared) hyper-paras for linear paras
 # =============================================================================
-def newProp(Roots, count, sigma, y, indata, n_feature, Ops, Op_weights, Op_type, beta, sigma_a, sigma_b):
+def newProp(
+    Roots,
+    count,
+    sigma,
+    y,
+    indata,
+    n_feature,
+    Ops,
+    Op_weights,
+    Op_type,
+    beta,
+    sigma_a,
+    sigma_b,
+):
     # number of components
     K = len(Roots)
     # the root to edit
     Root = copy.deepcopy(Roots[count])
-    [oldRoot, Root, lnPointers, change, Q, Qinv, last_a, last_b, cnode] = Prop(Root, n_feature, Ops, Op_weights,
-                                                                               Op_type, beta, sigma_a, sigma_b)
+    [oldRoot, Root, lnPointers, change, Q, Qinv, last_a, last_b, cnode] = Prop(
+        Root, n_feature, Ops, Op_weights, Op_type, beta, sigma_a, sigma_b
+    )
     # print("change:",change)
     # display(genList(Root))
     # allcal(Root,train_data)
@@ -1183,27 +1269,31 @@ def newProp(Roots, count, sigma, y, indata, n_feature, Ops, Op_weights, Op_type,
     old_outputs = np.zeros((len(y), K))
 
     # auxiliary propose
-    if change == 'shrinkage':
-        [hratio, detjacob, new_sa2, new_sb2] = auxProp(change, oldRoot, Root, lnPointers, sigma_a, sigma_b, last_a,
-                                                       last_b, cnode)
-    elif change == 'expansion':
-        [hratio, detjacob, new_sa2, new_sb2] = auxProp(change, oldRoot, Root, lnPointers, sigma_a, sigma_b, last_a,
-                                                       last_b, cnode)
+    if change == "shrinkage":
+        [hratio, detjacob, new_sa2, new_sb2] = auxProp(
+            change, oldRoot, Root, lnPointers, sigma_a, sigma_b, last_a, last_b, cnode
+        )
+    elif change == "expansion":
+        [hratio, detjacob, new_sa2, new_sb2] = auxProp(
+            change, oldRoot, Root, lnPointers, sigma_a, sigma_b, last_a, last_b, cnode
+        )
     else:  # no dimension jump
         # the parameters are upgraded as well
-        [new_sa2, new_sb2] = auxProp(change, oldRoot, Root, lnPointers, sigma_a, sigma_b, last_a, last_b, cnode)
+        [new_sa2, new_sb2] = auxProp(
+            change, oldRoot, Root, lnPointers, sigma_a, sigma_b, last_a, last_b, cnode
+        )
 
     for i in np.arange(K):
         if i == count:
             temp = allcal(Root, indata)
-            temp.shape = (temp.shape[0])
+            temp.shape = temp.shape[0]
             new_outputs[:, i] = temp
             temp = allcal(oldRoot, indata)
-            temp.shape = (temp.shape[0])
+            temp.shape = temp.shape[0]
             old_outputs[:, i] = temp
         else:
             temp = allcal(Roots[i], indata)
-            temp.shape = (temp.shape[0])
+            temp.shape = temp.shape[0]
             new_outputs[:, i] = temp
             old_outputs[:, i] = temp
 
@@ -1211,7 +1301,7 @@ def newProp(Roots, count, sigma, y, indata, n_feature, Ops, Op_weights, Op_type,
         Root = oldRoot
         return [False, sigma, copy.deepcopy(oldRoot), sigma_a, sigma_b]
 
-    if change == 'shrinkage':
+    if change == "shrinkage":
         # contribution of f(y|S,Theta,x)
         # print("new sigma:",round(new_sigma,3))
         yllstar = ylogLike(y, new_outputs, new_sigma)
@@ -1222,23 +1312,37 @@ def newProp(Roots, count, sigma, y, indata, n_feature, Ops, Op_weights, Op_type,
         # print("log yratio:",log_yratio)
 
         # contribution of f(Theta,S)
-        strucl = fStruc(Root, n_feature, Ops, Op_weights, Op_type, beta, new_sa2, new_sb2)
-        struclstar = fStruc(oldRoot, n_feature, Ops, Op_weights, Op_type, beta, sigma_a, sigma_b)
+        strucl = fStruc(
+            Root, n_feature, Ops, Op_weights, Op_type, beta, new_sa2, new_sb2
+        )
+        struclstar = fStruc(
+            oldRoot, n_feature, Ops, Op_weights, Op_type, beta, sigma_a, sigma_b
+        )
         sl = strucl[0] + strucl[1]
         slstar = struclstar[0] + struclstar[1]
         log_strucratio = slstar - sl  # struclstar / strucl
         # print("log strucratio:",log_strucratio)
 
         # contribution of proposal Q and Qinv
-        log_qratio = np.log(max(1e-5,Qinv / Q))
+        log_qratio = np.log(max(1e-5, Qinv / Q))
         # print("log qratio:",log_qratio)
 
         # R
-        logR = log_yratio + log_strucratio + log_qratio + np.log(max(1e-5,hratio)) + np.log(max(1e-5,detjacob))
-        logR = logR + np.log(invgamma.pdf(new_sigma, sig)) - np.log(invgamma.pdf(sigma, sig))
+        logR = (
+            log_yratio
+            + log_strucratio
+            + log_qratio
+            + np.log(max(1e-5, hratio))
+            + np.log(max(1e-5, detjacob))
+        )
+        logR = (
+            logR
+            + np.log(invgamma.pdf(new_sigma, sig))
+            - np.log(invgamma.pdf(sigma, sig))
+        )
         # print("logR:",logR)
 
-    elif change == 'expansion':
+    elif change == "expansion":
         # contribution of f(y|S,Theta,x)
         yllstar = ylogLike(y, new_outputs, new_sigma)
         yll = ylogLike(y, old_outputs, sigma)
@@ -1246,18 +1350,32 @@ def newProp(Roots, count, sigma, y, indata, n_feature, Ops, Op_weights, Op_type,
         log_yratio = yllstar - yll
 
         # contribution of f(Theta,S)
-        strucl = fStruc(Root, n_feature, Ops, Op_weights, Op_type, beta, new_sa2, new_sb2)
-        struclstar = fStruc(oldRoot, n_feature, Ops, Op_weights, Op_type, beta, sigma_a, sigma_b)
+        strucl = fStruc(
+            Root, n_feature, Ops, Op_weights, Op_type, beta, new_sa2, new_sb2
+        )
+        struclstar = fStruc(
+            oldRoot, n_feature, Ops, Op_weights, Op_type, beta, sigma_a, sigma_b
+        )
         sl = strucl[0] + strucl[1]
         slstar = struclstar[0] + struclstar[1]
         log_strucratio = slstar - sl  # struclstar / strucl
 
         # contribution of proposal Q and Qinv
-        log_qratio = np.log(max(1e-5,Qinv / Q))
+        log_qratio = np.log(max(1e-5, Qinv / Q))
 
         # R
-        logR = log_yratio + log_strucratio + log_qratio + np.log(max(1e-5,hratio)) + np.log(max(1e-5,detjacob))
-        logR = logR + np.log(invgamma.pdf(new_sigma, sig)) - np.log(invgamma.pdf(sigma, sig))
+        logR = (
+            log_yratio
+            + log_strucratio
+            + log_qratio
+            + np.log(max(1e-5, hratio))
+            + np.log(max(1e-5, detjacob))
+        )
+        logR = (
+            logR
+            + np.log(invgamma.pdf(new_sigma, sig))
+            - np.log(invgamma.pdf(sigma, sig))
+        )
 
     else:  # no dimension jump
         # contribution of f(y|S,Theta,x)
@@ -1268,16 +1386,24 @@ def newProp(Roots, count, sigma, y, indata, n_feature, Ops, Op_weights, Op_type,
         # yratio = np.exp(yllstar-yll)
 
         # contribution of f(Theta,S)
-        strucl = fStruc(Root, n_feature, Ops, Op_weights, Op_type, beta, new_sa2, new_sb2)[0]
-        struclstar = fStruc(oldRoot, n_feature, Ops, Op_weights, Op_type, beta, sigma_a, sigma_b)[0]
+        strucl = fStruc(
+            Root, n_feature, Ops, Op_weights, Op_type, beta, new_sa2, new_sb2
+        )[0]
+        struclstar = fStruc(
+            oldRoot, n_feature, Ops, Op_weights, Op_type, beta, sigma_a, sigma_b
+        )[0]
         log_strucratio = struclstar - strucl
 
         # contribution of proposal Q and Qinv
-        log_qratio = np.log(max(1e-5,Qinv / Q))
+        log_qratio = np.log(max(1e-5, Qinv / Q))
 
         # R
         logR = log_yratio + log_strucratio + log_qratio
-        logR = logR + np.log(invgamma.pdf(new_sigma, sig)) - np.log(invgamma.pdf(sigma, sig))
+        logR = (
+            logR
+            + np.log(invgamma.pdf(new_sigma, sig))
+            - np.log(invgamma.pdf(sigma, sig))
+        )
 
     alpha = min(logR, 0)
     test = np.random.uniform(low=0, high=1, size=1)[0]
@@ -1288,7 +1414,3 @@ def newProp(Roots, count, sigma, y, indata, n_feature, Ops, Op_weights, Op_type,
     else:
         # print("||||||accepted||||||")
         return [True, new_sigma, copy.deepcopy(Root), new_sa2, new_sb2]
-
-
-
-
