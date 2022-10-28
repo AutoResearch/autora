@@ -89,8 +89,6 @@ class BSRRegressor(BaseEstimator, RegressorMixin):
         BETAS = []
         MM = self.itrNum
         K = self.treeNum
-        alpha1 = self.alpha1
-        alpha2 = self.alpha2
         beta = self.beta
 
         if self.disp:
