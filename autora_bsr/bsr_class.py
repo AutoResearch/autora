@@ -81,7 +81,7 @@ class BSRRegressor(BaseEstimator, RegressorMixin):
         self.betas_ = []
         self.train_err_ = []
 
-        # train_data must be a dataframe
+        # X must be a dataframe
         if isinstance(train_data, np.ndarray):
             train_data = pd.DataFrame(train_data)
         trainERRS = []

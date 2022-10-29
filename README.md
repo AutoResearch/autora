@@ -26,7 +26,7 @@ hyper_params = [{'treeNum': 3, 'itrNum':50, 'alpha1':0.4, 'alpha2':0.4, 'beta':-
 my_bsr = BSR(K,MM)
 # train (need to fill in parameters)
 # train_X is dataframe with each row a datapoint
-# train_y is series with default index
+# y is series with default index
 my_bsr.fit(train_X,train_y)
 # fit new values
 # new_X is dataframe of new data

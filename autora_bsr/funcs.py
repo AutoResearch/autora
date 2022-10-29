@@ -1260,7 +1260,7 @@ def newProp(
     )
     # print("change:",change)
     # display(genList(Root))
-    # allcal(Root,train_data)
+    # allcal(Root,X)
     sig = 4
     new_sigma = invgamma.rvs(sig)
 

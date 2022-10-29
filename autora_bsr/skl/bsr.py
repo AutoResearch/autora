@@ -88,10 +88,10 @@ class BSRRegressor(BaseEstimator, RegressorMixin):
     # alpha1, alpha2, beta are hyperparameters of priors
     # disp chooses whether to display intermediate results
 
-    def fit(self, train_data, train_y):
-        # train_data must be a dataframe
-        if isinstance(train_data, np.ndarray):
-            train_data = pd.DataFrame(train_data)
+    def fit(self, X, y):
+        # X must be a dataframe
+        if isinstance(X, np.ndarray):
+            X = pd.DataFrame(X)
         trainERRS = []
         ROOTS = []
         BETAS = []
@@ -102,8 +102,8 @@ class BSRRegressor(BaseEstimator, RegressorMixin):
         if self.disp:
             _logger.info("Starting training")
         while len(trainERRS) < MM:
-            n_feature = train_data.shape[1]
-            n_train = train_data.shape[0]
+            n_feature = X.shape[1]
+            n_train = X.shape[0]
             """
             alpha1 = 0.4
             alpha2 = 0.4
@@ -148,7 +148,7 @@ class BSRRegressor(BaseEstimator, RegressorMixin):
             # added a constant in the regression by fwl
             XX = np.zeros((n_train, K))
             for count in np.arange(K):
-                temp = allcal(RootLists[count][-1], train_data)
+                temp = allcal(RootLists[count][-1], X)
                 temp.shape = temp.shape[0]
                 XX[:, count] = temp
             constant = np.ones((n_train, 1))  # added a constant
@@ -158,7 +158,7 @@ class BSRRegressor(BaseEstimator, RegressorMixin):
             epsilon = (
                 np.eye(XX.shape[1]) * 1e-6
             )  # add to the matrix to prevent singular matrrix
-            yy = np.array(train_y)
+            yy = np.array(y)
             yy.shape = (yy.shape[0], 1)
             Beta = np.linalg.inv(np.matmul(XX.transpose(), XX) + epsilon)
             Beta = np.matmul(Beta, np.matmul(XX.transpose(), yy))
@@ -197,8 +197,8 @@ class BSRRegressor(BaseEstimator, RegressorMixin):
                         Roots,
                         count,
                         sigma,
-                        train_y,
-                        train_data,
+                        y,
+                        X,
                         n_feature,
                         Ops,
                         Op_weights,
@@ -229,7 +229,7 @@ class BSRRegressor(BaseEstimator, RegressorMixin):
 
                         XX = np.zeros((n_train, K))
                         for i in np.arange(K):
-                            temp = allcal(RootLists[i][-1], train_data)
+                            temp = allcal(RootLists[i][-1], X)
                             temp.shape = temp.shape[0]
                             XX[:, i] = temp
                         constant = np.ones((n_train, 1))
@@ -239,7 +239,7 @@ class BSRRegressor(BaseEstimator, RegressorMixin):
                         epsilon = (
                             np.eye(XX.shape[1]) * 1e-6
                         )  # add to prevent singular matrix
-                        yy = np.array(train_y)
+                        yy = np.array(y)
                         yy.shape = (yy.shape[0], 1)
                         Beta = np.linalg.inv(np.matmul(XX.transpose(), XX) + epsilon)
                         Beta = np.matmul(Beta, np.matmul(XX.transpose(), yy))
@@ -251,9 +251,7 @@ class BSRRegressor(BaseEstimator, RegressorMixin):
 
                         error = 0
                         for i in np.arange(0, n_train):
-                            error += (output[i, 0] - train_y[i]) * (
-                                output[i, 0] - train_y[i]
-                            )
+                            error += (output[i, 0] - y[i]) * (output[i, 0] - y[i])
                         rmse = np.sqrt(error / n_train)
                         errList.append(rmse)
 
@@ -292,8 +290,8 @@ class BSRRegressor(BaseEstimator, RegressorMixin):
                     break
 
             if self.disp:
-                for i in np.arange(0, len(train_y)):
-                    print(output[i, 0], train_y[i])
+                for i in np.arange(0, len(y)):
+                    print(output[i, 0], y[i])
 
             toc = time.time()  # cauculate running time
             tictoc = toc - tic
