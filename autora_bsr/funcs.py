@@ -1409,7 +1409,6 @@ def newProp(
     test = np.random.uniform(low=0, high=1, size=1)[0]
     if np.log(test) >= alpha:  # no accept
         # print("no accept")
-        Root = oldRoot
         return [False, sigma, copy.deepcopy(oldRoot), sigma_a, sigma_b]
     else:
         # print("||||||accepted||||||")

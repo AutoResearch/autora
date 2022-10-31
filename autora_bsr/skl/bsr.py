@@ -6,6 +6,7 @@ import numpy as np
 import pandas as pd
 from scipy.stats import invgamma
 from sklearn.base import BaseEstimator, RegressorMixin
+from sklearn.utils.validation import check_is_fitted
 
 from autora_bsr.funcs import (
     Express,
@@ -18,292 +19,325 @@ from autora_bsr.funcs import (
     newProp,
 )
 
+from typing import Union, Optional, List
+
 _logger = logging.getLogger(__name__)
 
 
 class BSRRegressor(BaseEstimator, RegressorMixin):
     """
-    Bayesian Symbolic Regression
+    Bayesian Symbolic Regression (BSR)
+
+    A MCMC-sampling-based Bayesian approach to symbolic regression -- a machine learning method
+    that bridges `X` and `y` by automatically building up mathematical expressions of basic functions.
+    Performance and speed of `BSR` depends on pre-defined parameters.
+
+    This class is intended to be compatible with the
+    [Scikit-Learn Estimator API](https://scikit-learn.org/stable/developers/develop.html).
+
+    Examples:
+
+        >>> import numpy as np
+        >>> num_samples = 1000
+        >>> X = np.linspace(start=0, stop=1, num=num_samples).reshape(-1, 1)
+        >>> y = np.sqrt(X)
+        >>> estimator = BSRRegressor()
+        >>> estimator = estimator.fit(X, y)
+        >>> estimator.predict([[1.5]])
+
+    Attributes:
+        roots_: the root(s) of the best-fit symbolic regression (SR) tree(s)
+        betas_: the beta parameters of the best-fit model
+        train_errs: the training losses associated with the best-fit model
     """
 
     def __init__(
         self,
-        treeNum=3,
-        itrNum=5000,
-        alpha1=0.4,
-        alpha2=0.4,
-        beta=-1,
-        disp=False,
-        val=100,
+        tree_num: int = 3,
+        itr_num: int = 5000,
+        alpha1: float = 0.4,
+        alpha2: float = 0.4,
+        beta: float = -1,
+        show_log: bool = False,
+        val: int = 100,
+        last_idx: int = -1,
     ):
-        self.treeNum = treeNum
-        self.itrNum = itrNum
+        """
+        Arguments:
+            tree_num: pre-specified number of SR trees to fit in the model
+            itr_num: number of iterations steps to run for the model fitting process
+            alpha1, alpha2, beta: the hyper-parameters of priors
+            show_log: whether to output certain logging info
+            val: number of validation steps to run for each iteration step
+            last_idx: the index of which latest (most best-fit) model to use
+                (-1 means the latest one)
+        """
+        self.tree_num = tree_num
+        self.itr_num = itr_num
         self.alpha1 = alpha1
         self.alpha2 = alpha2
         self.beta = beta
-        self.disp = disp
+        self.show_log = show_log
         self.val = val
+        self.last_idx = last_idx
 
         self.roots_ = []
         self.betas_ = []
-        self.train_err_ = []
+        self.train_errs_ = []
 
-    def model(self, last_ind=1):
-        modd = []
-        for i in range(self.treeNum):
-            modd.append(Express(self.roots_[-last_ind][i]))
-        return modd
+        self.X_: Optional[Union[np.ndarray, pd.DataFrame]] = None
+        self.y_: Optional[Union[np.ndarray, pd.DataFrame]] = None
 
-    def complexity(self):
-        compl = 0
-        cmpls = []
-        for i in range(self.treeNum):
+    def model(self, last_ind: int = 1) -> List[str]:
+        models = []
+        for i in range(self.tree_num):
+            models.append(Express(self.roots_[-last_ind][i]))
+        return models
+
+    def complexity(self) -> int:
+        cp = 0
+        cps = []
+        for i in range(self.tree_num):
             root_node = self.roots_[-1][i]
-            numm = getNum(root_node)
-            cmpls.append(numm)
-            compl = compl + numm
-        return compl
+            num = getNum(root_node)
+            cps.append(num)
+            cp = cp + num
+        return cp
 
-    def predict(self, test_data, method="last", last_ind=1):
-        if isinstance(test_data, np.ndarray):
-            test_data = pd.DataFrame(test_data)
-        K = self.treeNum
-        n_test = test_data.shape[0]
-        XX = np.zeros((n_test, K))
-        if method == "last":
-            for countt in np.arange(K):
-                temp = allcal(self.roots_[-last_ind][countt], test_data)
-                temp.shape = temp.shape[0]
-                XX[:, countt] = temp
-            constant = np.ones((n_test, 1))
-            XX = np.concatenate((constant, XX), axis=1)
-            Beta = self.betas_[-last_ind]
-            toutput = np.matmul(XX, Beta)
-        return toutput
+    def predict(self, X: Union[np.ndarray, pd.DataFrame]) -> np.ndarray:
+        """
+        Applies the fitted model to a set of independent variables `X`,
+        to give predictions for the dependent variable `y`.
 
-    # =============================================================================
-    # # MCMC algorithm
-    # K is the number of trees
-    # MM is the number of iterations
-    # alpha1, alpha2, beta are hyperparameters of priors
-    # disp chooses whether to display intermediate results
-
-    def fit(self, X, y):
-        # X must be a dataframe
+        Arguments:
+            X: independent variables in an n-dimensional array
+        Returns:
+            y: predicted dependent variable values
+        """
         if isinstance(X, np.ndarray):
             X = pd.DataFrame(X)
-        trainERRS = []
-        ROOTS = []
-        BETAS = []
-        MM = self.itrNum
-        K = self.treeNum
+
+        check_is_fitted(self, attributes=["roots_"])
+
+        k = self.tree_num
+        n_test = X.shape[0]
+        tree_outs = np.zeros((n_test, k))
+
+        for i in np.arange(k):
+            tree_out = allcal(self.roots_[-self.last_idx][i], X)
+            tree_out.shape = tree_out.shape[0]
+            tree_outs[:, i] = tree_out
+
+        ones = np.ones((n_test, 1))
+        tree_outs = np.concatenate((ones, tree_outs), axis=1)
+        beta = self.betas_[-self.last_idx]
+        output = np.matmul(tree_outs, beta)
+
+        return output
+
+    def fit(self, X: Union[np.ndarray, pd.DataFrame], y: Union[np.ndarray, pd.DataFrame]):
+        """
+        Runs the optimization for a given set of `X`s and `y`s.
+
+        Arguments:
+            X: independent variables in an n-dimensional array
+            y: dependent variables in an n-dimensional array
+        Returns:
+            self (BSR): the fitted estimator
+        """
+        # train_data must be a dataframe
+        if isinstance(X, np.ndarray):
+            X = pd.DataFrame(X)
+        train_errs = []
+        roots = []
+        betas = []
+        itr_num = self.itr_num
+        k = self.tree_num
         beta = self.beta
 
-        if self.disp:
+        if self.show_log:
             _logger.info("Starting training")
-        while len(trainERRS) < MM:
+        while len(train_errs) < itr_num:
             n_feature = X.shape[1]
             n_train = X.shape[0]
-            """
-            alpha1 = 0.4
-            alpha2 = 0.4
-            beta = -1
-            """
 
-            Ops = ["inv", "ln", "neg", "sin", "cos", "exp", "square", "cubic", "+", "*"]
-            Op_weights = [1.0 / len(Ops)] * len(Ops)
-            Op_type = [1, 1, 1, 1, 1, 1, 1, 1, 2, 2]
+            ops = ["inv", "ln", "neg", "sin", "cos", "exp", "square", "cubic", "+", "*"]
+            op_weights = [1.0 / len(ops)] * len(ops)
+            op_type = [1, 1, 1, 1, 1, 1, 1, 1, 2, 2]
 
             # List of tree samples
-            RootLists = []
-            for i in np.arange(K):
-                RootLists.append([])
+            root_lists = [[] for _ in range(k)]
 
-            SigaList = []  # List of sigma_a, for each component tree
-            SigbList = []  # List of sigma_b, for each component tree
+            sigma_a_list = []  # List of sigma_a, for each component tree
+            sigma_b_list = []  # List of sigma_b, for each component tree
 
             sigma = invgamma.rvs(1)  # for output y
 
             # Initialization
-            for count in np.arange(K):
-                # create a new Root node
-                Root = Node(0)
+            for count in np.arange(k):
+                # create a new root node
+                root = Node(0)
                 sigma_a = invgamma.rvs(1)
                 sigma_b = invgamma.rvs(1)
 
-                # grow a tree from the Root node
-                if self.disp:
-                    _logger.info("Grow a tree from the Root node")
-                grow(Root, n_feature, Ops, Op_weights, Op_type, beta, sigma_a, sigma_b)
-                # Tree = genList(Root)
+                # grow a tree from the root node
+                if self.show_log:
+                    _logger.info("Grow a tree from the root node")
+                grow(root, n_feature, ops, op_weights, op_type, beta, sigma_a, sigma_b)
+                # Tree = genList(root)
 
                 # put the root into list
-                RootLists[count].append(copy.deepcopy(Root))
-                SigaList.append(sigma_a)
-                SigbList.append(sigma_b)
+                root_lists[count].append(copy.deepcopy(root))
+                sigma_a_list.append(sigma_a)
+                sigma_b_list.append(sigma_b)
 
             # calculate beta
-            if self.disp:
+            if self.show_log:
                 _logger.info("Calculate beta")
             # added a constant in the regression by fwl
-            XX = np.zeros((n_train, K))
-            for count in np.arange(K):
-                temp = allcal(RootLists[count][-1], X)
+            tree_outputs = np.zeros((n_train, k))
+
+            for count in np.arange(k):
+                temp = allcal(root_lists[count][-1], X)
                 temp.shape = temp.shape[0]
-                XX[:, count] = temp
+                tree_outputs[:, count] = temp
+
             constant = np.ones((n_train, 1))  # added a constant
-            XX = np.concatenate((constant, XX), axis=1)
-            scale = np.max(np.abs(XX))
-            XX = XX / scale
+            tree_outputs = np.concatenate((constant, tree_outputs), axis=1)
+            scale = np.max(np.abs(tree_outputs))
+            tree_outputs = tree_outputs / scale
             epsilon = (
-                np.eye(XX.shape[1]) * 1e-6
+                np.eye(tree_outputs.shape[1]) * 1e-6
             )  # add to the matrix to prevent singular matrrix
             yy = np.array(y)
             yy.shape = (yy.shape[0], 1)
-            Beta = np.linalg.inv(np.matmul(XX.transpose(), XX) + epsilon)
-            Beta = np.matmul(Beta, np.matmul(XX.transpose(), yy))
-            output = np.matmul(XX, Beta)
-            Beta = (
-                Beta / scale
-            )  # rescale the beta, above we scale XX for calculation by fwl
+            beta = np.linalg.inv(np.matmul(tree_outputs.transpose(), tree_outputs) + epsilon)
+            beta = np.matmul(beta, np.matmul(tree_outputs.transpose(), yy))
+            output = np.matmul(tree_outputs, beta)
+            # rescale the beta, above we scale tree_outputs for calculation by fwl
+            beta /= scale
 
             total = 0
             accepted = 0
-            errList = []
-            totList = []
-            nodeCounts = []
+            errs = []
+            total_list = []
+            node_counts = []
 
             tic = time.time()
 
-            if self.disp:
+            if self.show_log:
                 _logger.info("While total < ", self.val)
             while total < self.val:
-                Roots = []  # list of current components
-                # for count in np.arange(K):
-                #     Roots.append(RootLists[count][-1])
-                switch_label = False
-                for count in np.arange(K):
-                    Roots = []  # list of current components
-                    for ccount in np.arange(K):
-                        Roots.append(RootLists[ccount][-1])
-                    # pick the root to be changed
-                    sigma_a = SigaList[count]
-                    sigma_b = SigbList[count]
+                curr_roots = []  # list of current components
 
-                    # the returned Root is a new copy
-                    if self.disp:
+                switch_label = False
+                for count in np.arange(k):
+                    curr_roots = []  # list of current components
+                    for i in np.arange(k):
+                        curr_roots.append(root_lists[i][-1])
+                    # pick the root to be changed
+                    sigma_a = sigma_a_list[count]
+                    sigma_b = sigma_b_list[count]
+
+                    # the returned root is a new copy
+                    if self.show_log:
                         _logger.info("newProp...")
-                    [res, sigma, Root, sigma_a, sigma_b] = newProp(
-                        Roots,
+                    res, sigma, root, sigma_a, sigma_b = newProp(
+                        curr_roots,
                         count,
                         sigma,
                         y,
                         X,
                         n_feature,
-                        Ops,
-                        Op_weights,
-                        Op_type,
+                        ops,
+                        op_weights,
+                        op_type,
                         beta,
                         sigma_a,
                         sigma_b,
                     )
-                    if self.disp:
+                    if self.show_log:
                         _logger.info("res:", res)
-                        display(genList(Root))
+                        display(genList(root))
 
                     total += 1
                     # update sigma_a and sigma_b
-                    SigaList[count] = sigma_a
-                    SigbList[count] = sigma_b
+                    sigma_a_list[count] = sigma_a
+                    sigma_b_list[count] = sigma_b
 
                     if res is True:
                         # flag = False
                         accepted += 1
                         # record newly accepted root
-                        RootLists[count].append(copy.deepcopy(Root))
+                        root_lists[count].append(copy.deepcopy(root))
 
                         node_sums = 0
-                        for k in np.arange(0, K):
-                            node_sums += getNum(RootLists[k][-1])
-                        nodeCounts.append(node_sums)
+                        for k in np.arange(0, k):
+                            node_sums += getNum(root_lists[k][-1])
+                        node_counts.append(node_sums)
 
-                        XX = np.zeros((n_train, K))
-                        for i in np.arange(K):
-                            temp = allcal(RootLists[i][-1], X)
+                        tree_outputs = np.zeros((n_train, k))
+
+                        for i in np.arange(k):
+                            temp = allcal(root_lists[count][-1], X)
                             temp.shape = temp.shape[0]
-                            XX[:, i] = temp
+                            tree_outputs[:, i] = temp
+
                         constant = np.ones((n_train, 1))
-                        XX = np.concatenate((constant, XX), axis=1)
-                        scale = np.max(np.abs(XX))
-                        XX = XX / scale
+                        tree_outputs = np.concatenate((constant, tree_outputs), axis=1)
+                        scale = np.max(np.abs(tree_outputs))
+                        tree_outputs = tree_outputs / scale
                         epsilon = (
-                            np.eye(XX.shape[1]) * 1e-6
+                            np.eye(tree_outputs.shape[1]) * 1e-6
                         )  # add to prevent singular matrix
                         yy = np.array(y)
                         yy.shape = (yy.shape[0], 1)
-                        Beta = np.linalg.inv(np.matmul(XX.transpose(), XX) + epsilon)
-                        Beta = np.matmul(Beta, np.matmul(XX.transpose(), yy))
+                        beta = np.linalg.inv(np.matmul(tree_outputs.transpose(), tree_outputs) + epsilon)
+                        beta = np.matmul(beta, np.matmul(tree_outputs.transpose(), yy))
 
-                        output = np.matmul(XX, Beta)
-                        Beta = (
-                            Beta / scale
-                        )  # rescale the beta, above we scale XX for calculation
+                        output = np.matmul(tree_outputs, beta)
+                        beta = (
+                            beta / scale
+                        )  # rescale the beta, above we scale tree_outputs for calculation
 
                         error = 0
                         for i in np.arange(0, n_train):
-                            error += (output[i, 0] - y[i]) * (output[i, 0] - y[i])
-                        rmse = np.sqrt(error / n_train)
-                        errList.append(rmse)
-
-                        if self.disp:
-                            _logger.info(
-                                "Accept",
-                                accepted,
-                                "th after",
-                                total,
-                                "proposals and update ",
-                                count,
-                                "th component",
+                            error += (output[i, 0] - y[i]) * (
+                                    output[i, 0] - y[i]
                             )
-                            _logger.info(
-                                "sigma:", round(sigma, 5), "error:", round(rmse, 5)
-                            )  # ,"log.likelihood:",round(llh,5))
 
-                            display(genList(Root))
-                            _logger.info("---------------")
-                        totList.append(total)
+                        rmse = np.sqrt(error / n_train)
+                        errs.append(rmse)
+
+                        total_list.append(total)
                         total = 0
 
-                    # @fwl added condition to control running time
-                    my_index = min(10, len(errList))
-                    if (
-                        len(errList) > 100
-                        and 1
-                        - np.min(errList[-my_index:]) / np.mean(errList[-my_index:])
-                        < 0.05
-                    ):
+                    lapses = min(10, len(errs))
+                    converge_ratio = 1 - np.min(errs[-lapses:]) / np.mean(errs[-lapses:])
+                    if lapses > 100 and converge_ratio < 0.05:
                         # converged
                         switch_label = True
                         break
-                        # Roots[count] = oldRoot
                 if switch_label:
                     break
 
-            if self.disp:
+            if self.show_log:
                 for i in np.arange(0, len(y)):
-                    print(output[i, 0], y[i])
-
-            toc = time.time()  # cauculate running time
+                    _logger.info(output[i, 0], y[i])
+            toc = time.time()
             tictoc = toc - tic
-            if self.disp:
-                _logger.info("Run time:{:.2f}s".format(tictoc))
+            if self.show_log:
+                _logger.info("Run time: {:.2f}s".format(tictoc))
 
                 _logger.info("------")
-                _logger.info("Mean rmse of last 5 accepts:", np.mean(errList[-6:-1]))
+                _logger.info("Mean rmse of last 5 accepts: {}".format(np.mean(errs[-6:-1])))
 
-            trainERRS.append(errList)
-            ROOTS.append(Roots)
-            BETAS.append(Beta)
-        self.roots_ = ROOTS
-        self.train_err_ = trainERRS
-        self.betas_ = BETAS
+            train_errs.append(errs)
+            roots.append(curr_roots)
+            betas.append(beta)
+
+        self.roots_ = roots
+        self.train_errs_ = train_errs
+        self.betas_ = betas
+        self.X_, self.y_ = X, y
+        return self
