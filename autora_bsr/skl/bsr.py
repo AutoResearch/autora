@@ -262,7 +262,7 @@ class BSRRegressor(BaseEstimator, RegressorMixin):
 
                         if self.disp:
                             _logger.info(
-                                "Accept %s after %s proposals and update %s component",
+                                "Accept %sth after %s proposals and update %sth component",
                                 accepted,
                                 total,
                                 count,
