@@ -32,10 +32,9 @@ jobs:
       run: |
         poetry install --with ci 
 
-    - name: Lint with flake8
-      run: |
-        # stop the build if there are Python syntax errors or undefined names
-        poetry run flake8 . --max-line-length=100 --extend-ignore=E203 --per-file-ignores=__init__.py:F401
     - name: Test with pytest
       run: |
         poetry run pytest
+    - name: Run pre-commit hooks
+      run: |
+        pre-commit run --all-files --show-diff-on-failure --color=always
