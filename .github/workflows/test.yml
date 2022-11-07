@@ -31,6 +31,11 @@ jobs:
     - name: Install dependencies
       run: |
         poetry install --with ci
+    - name: Load pre-commit cache
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pre-commit
+        key: pre-commit-3|${{ env.pythonLocation }}|${{ hashFiles('.pre-commit-config.yaml') }}
     - name: Run pre-commit hooks
       run: |
         poetry run pre-commit run --all-files --show-diff-on-failure --color=always
