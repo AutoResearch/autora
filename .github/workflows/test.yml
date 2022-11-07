@@ -35,7 +35,7 @@ jobs:
       uses: actions/cache@v3
       with:
         path: ~/.cache/pre-commit
-        key: pre-commit-3|${{ env.pythonLocation }}|${{ matrix.os }}|${{ matrix.python-version }}|${{ hashFiles('.pre-commit-config.yaml') }}
+        key: pre-commit-3|${{ env.pythonLocation }}|${{ matrix.os }}|${{ runner.os }}|${{ matrix.python-version }}|${{ hashFiles('.pre-commit-config.yaml') }}
     - name: Run pre-commit hooks
       run: |
         poetry run pre-commit run --all-files --show-diff-on-failure --color=always
