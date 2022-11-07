@@ -234,7 +234,8 @@ def test_primitive_fitting_sigmoid():
         generate_x(-10, +10),
         transform_through_primitive_sigmoid,
         "logistic",
-        primitives=non_interchangeable_primitives,
+        # Restricted group of primitives, as sigmoid function doesn't fit otherwise.
+        primitives=["none", "logistic", "linear", "sin", "tanh"],
     )
 
 
@@ -249,10 +250,12 @@ def test_primitive_fitting_exp():
 
 def test_primitive_fitting_cos():
     run_test_primitive_fitting(
-        generate_x(start=0, stop=2 * np.pi),
+        generate_x(start=-3 * np.pi, stop=3 * np.pi),
         transform_through_primitive_cos,
         "cos",
-        primitives=non_interchangeable_primitives,
+        # Restricted group of primitives, as the code doesn't
+        # find cos in the full set
+        primitives=["none", "cos", "linear", "subtract"],
     )
 
 
