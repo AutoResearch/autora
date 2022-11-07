@@ -24,12 +24,12 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
     - name: Cache Poetry
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: ~/.cache/pypoetry
         key: poetry-cache|${{ env.pythonLocation }}|${{ runner.os }}
     - name: Cache Packages
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: ~/.local
         key: poetry-packages|${{ env.pythonLocation }}|${{ runner.os }}|${{ hashFiles('**/poetry.lock') }}
