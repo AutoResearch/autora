@@ -257,19 +257,17 @@ class BSRRegressor(BaseEstimator, RegressorMixin):
                         rmse = np.sqrt(error / n_train)
                         errList.append(rmse)
 
+                        sigma_rounded = round(sigma, 5)
+                        rmse_rounded = round(rmse, 5)
+
                         if self.disp:
                             _logger.info(
-                                "Accept",
-                                accepted,
-                                "th after",
-                                total,
-                                "proposals and update ",
-                                count,
-                                "th component",
+                                f"Accept {accepted}th after {total} proposals "
+                                f"and update {count}th component"
                             )
                             _logger.info(
-                                "sigma:", round(sigma, 5), "error:", round(rmse, 5)
-                            )  # ,"log.likelihood:",round(llh,5))
+                                f"sigma: {sigma_rounded}s; error: {rmse_rounded}s"
+                            )
 
                             display(genList(Root))
                             _logger.info("---------------")

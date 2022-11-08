@@ -252,20 +252,19 @@ class BSRRegressor(BaseEstimator, RegressorMixin):
                         rmse = np.sqrt(error / n_train)
                         errList.append(rmse)
 
-                        if self.disp:
+                        sigma_rounded = round(sigma, 5)
+                        rmse_rounded = round(rmse, 5)
 
+                        if self.disp:
                             _logger.info(
-                                "accept",
+                                "Accept %s after %s proposals and update %s component",
                                 accepted,
-                                "th after",
                                 total,
-                                "proposals and update ",
                                 count,
-                                "th component",
                             )
                             _logger.info(
-                                "sigma:", round(sigma, 5), "error:", round(rmse, 5)
-                            )  # ,"log.likelihood:",round(llh,5))
+                                "sigma: %s; error: %s", sigma_rounded, rmse_rounded
+                            )
 
                             display(genList(Root))
                             _logger.info("---------------")
@@ -492,19 +491,19 @@ def symreg(K, MM, train_data, test_data, train_y, test_y, disp=True):
                     trmse = np.sqrt(terror / n_test)
                     testList.append(trmse)
 
+                    sigma_rounded = round(sigma, 5)
+                    rmse_rounded = round(rmse, 5)
+
                     if disp:
                         _logger.info(
-                            "accept",
+                            "Accept %s after %s proposals and update %s component",
                             accepted,
-                            "th after",
                             total,
-                            "proposals and update ",
                             count,
-                            "th component",
                         )
                         _logger.info(
-                            "sigma:", round(sigma, 5), "error:", round(rmse, 5)
-                        )  # ,"log.likelihood:",round(llh,5))
+                            "sigma: %s; error: %s", sigma_rounded, rmse_rounded
+                        )
 
                         display(genList(Root))
                         _logger.info("---------------")
