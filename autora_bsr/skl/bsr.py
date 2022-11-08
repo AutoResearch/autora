@@ -262,13 +262,11 @@ class BSRRegressor(BaseEstimator, RegressorMixin):
 
                         if self.disp:
                             _logger.info(
-                                "Accept %sth after %s proposals and update %sth component",
-                                accepted,
-                                total,
-                                count,
+                                f"Accept {accepted}th after {total} proposals "
+                                f"and update {count}th component"
                             )
                             _logger.info(
-                                "sigma: %s; error: %s", sigma_rounded, rmse_rounded
+                                f"sigma: {sigma_rounded}s; error: {rmse_rounded}s"
                             )
 
                             display(genList(Root))
