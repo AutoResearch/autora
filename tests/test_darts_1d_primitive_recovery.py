@@ -127,10 +127,16 @@ def run_test_primitive_fitting(
         train_classifier_bias=False,
         train_classifier_coefficients=False,
     )
+    # print("XX")
+    # print(X)
+    # print("yy")
+    # print(y)
     regressor.fit(X, y)
 
     if verbose:
         y_predict = regressor.predict(X)
+        # print("y_pred")
+        # print(y_predict)
         report_weights(X, expected_primitive, primitives, regressor, y)
         plot_results(X, y, y_predict)
 

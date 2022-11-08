@@ -249,6 +249,7 @@ def test_execution_monitor():
         **kwargs
     ).fit(X, y)
     execution_monitor_0.display()
+    plt.show()
 
     execution_monitor_1 = DARTSExecutionMonitor()
     DARTSRegressor(
@@ -260,6 +261,7 @@ def test_execution_monitor():
         **kwargs
     ).fit(X, y)
     execution_monitor_1.display()
+    plt.show()
 
     execution_monitor_2 = DARTSExecutionMonitor()
     DARTSRegressor(

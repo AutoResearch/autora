@@ -158,7 +158,9 @@ class Cell(nn.Module):
         states = list()
 
         # add each input node to the number of states
+        # print("inputs")
         for input in input_states:
+            # print(input.size())
             states.append(input)
 
         offset = 0
@@ -166,6 +168,7 @@ class Cell(nn.Module):
         # (values of nodes)
         # for each hidden node, compute edge between existing states (input
         # nodes / previous hidden) nodes and current node
+        # print(self._steps)
         for i in range(self._steps):
             # compute the state for each hidden node, first hidden node is
             # sum of input nodes, second is sum of input and first hidden
@@ -177,9 +180,18 @@ class Cell(nn.Module):
                 if len(subset) > 0:
                     index -= 1
                     for j in subset:
+                        # print("OPS")
+                        # print(self._ops[offset + j])
+                        # print("weights alphas for individual op")
+                        # print(weights[offset + j])
+                        # print("state of parent node")
+                        # print(states[j])
+                        # print("result of ops")
+                        # print(self._ops[offset + j](states[j], weights[offset + j]))
                         prod = prod * self._ops[offset + j](
                             states[j], weights[offset + j]
                         )  # edge j->i
+                    # print(i, index)
                     s = s + weights_mixt[i][index] * prod
                     # s = s + 1 * prod
 
@@ -189,6 +201,8 @@ class Cell(nn.Module):
         # concatenates the states of the last n (self._multiplier) intermediate
         # nodes to get the output of a cell
         result = torch.cat(states[-self._multiplier :], dim=1)
+        # print(weights)
+        # print(weights_mixt)
         return result
 
 
@@ -336,7 +350,9 @@ class Network(nn.Module):
         else:
             if self.DARTS_type == DARTSType.ORIGINAL:
                 weights = F.softmax(self.alphas_normal, dim=-1)
-                weights_mixt = F.softmax(self.betas, dim=-1)
+                # weights = self.alphas_normal
+                # weights_mixt = F.softmax(self.betas, dim=-1)
+                weights_mixt = self.betas
             elif self.DARTS_type == DARTSType.FAIR:
                 weights = torch.sigmoid(self.alphas_normal)
                 weights_mixt = torch.sigmoid(self.betas)
@@ -404,13 +420,18 @@ class Network(nn.Module):
             1e-3 * torch.randn(k, num_ops), requires_grad=True
         )
 
+        # self.alphas_normal = torch.tensor([[0, 1, 0]])
+
     def _initialize_betas(self):
         self.max_set_size = self._n_input_states + self._steps - 1
         self.max_k = 2**self.max_set_size - 1
 
-        self.betas = Variable(torch.ones((self._steps, self.max_k), requires_grad=True))
+        self.betas = Variable(torch.ones(self._steps, self.max_k), requires_grad=True)
+
+        # self.betas = torch.tensor([[0]])
 
         self._arch_parameters = list([self.alphas_normal]) + list([self.betas])
+        # self._arch_parameters = list([self.betas])
 
     # provide back the architecture as a parameter
     def arch_parameters(self) -> List:
