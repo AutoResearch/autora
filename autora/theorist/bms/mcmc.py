@@ -29,7 +29,7 @@ import scipy
 from scipy.optimize import curve_fit
 from sympy import lambdify, latex, log, sympify
 
-from autora_bms.prior import get_priors, relu
+from .prior import get_priors, relu
 
 _logger = logging.getLogger(__name__)
 

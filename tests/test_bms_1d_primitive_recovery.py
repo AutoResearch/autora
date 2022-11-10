@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pytest  # noqa: 401
 
-from autora_bms.skl.bms import BMSRegressor
+from autora.skl.bms import BMSRegressor
 
 warnings.filterwarnings("ignore")
 

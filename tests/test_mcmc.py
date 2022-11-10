@@ -2,8 +2,7 @@ import numpy as np
 import pandas as pd
 import pytest  # noqa: 401
 
-from autora_bms.mcmc import Tree
-from autora_bms.prior import get_priors
+from autora.theorist.bms import Tree, get_priors
 
 
 def test_tree_mcmc_stepping(

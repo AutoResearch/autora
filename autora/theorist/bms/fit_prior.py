@@ -2,8 +2,8 @@ from datetime import datetime
 from optparse import OptionParser
 from random import choice, random
 
-from autora_bms.mcmc import Tree
-from autora_bms.prior import get_priors
+from .mcmc import Tree
+from .prior import get_priors
 
 
 # -----------------------------------------------------------------------------

@@ -6,8 +6,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-from autora_bms.mcmc import Tree
-from autora_bms.parallel import Parallel
+from .mcmc import Tree
+from .parallel import Parallel
 
 logging.basicConfig(level=logging.INFO)
 _logger = logging.getLogger(__name__)

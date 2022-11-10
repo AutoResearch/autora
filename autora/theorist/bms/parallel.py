@@ -6,8 +6,8 @@ from typing import Optional, Tuple
 import numpy as np
 from numpy import exp
 
-from autora_bms.mcmc import Tree
-from autora_bms.prior import get_priors
+from .mcmc import Tree
+from .prior import get_priors
 
 
 class Parallel:
