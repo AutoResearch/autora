@@ -1,208 +1,397 @@
-# Bayesian Machine Scientist
+# Autonomous Research Assistant
+Autonomous Research Assistant (AutoRA) is an open source AI-based system for automating each aspect of empirical research in the behavioral sciences, from the construction of a scientific hypothesis to conducting novel experiments. The documentation is here: [https://autoresearch.github.io/autora/](https://autoresearch.github.io/autora/)
 
-This repository contains the code of the paper:
+# Getting started
 
-Guimera, R, Reichardt, I, Aguilar-Mogas, A, Massucci, FA, Miranda, M, Pallares, J, Sales-Pardo, M. [A Bayesian machine scientist to aid in the solution of challenging scientific problems](http://dx.doi.org/10.1126/sciadv.aav6971), Sci. Adv. 6 (5) , eaav6971 (2020).
+You should be familiar with the command line for your operating system. The topics required are covered in:
+- **macOS**: Joe Kissell. [*Take Control of the Mac Command Line with Terminal, 3rd Edition*](https://bruknow.library.brown.edu/permalink/01BU_INST/528fgv/cdi_safari_books_v2_9781947282513). Take Control Books, 2022. Chapters *Read Me First* through *Bring the Command Line Into The Real World*.
+- **Linux**: William E. Shotts. [*The Linux Command Line: a Complete Introduction. 2nd edition.*](https://bruknow.library.brown.edu/permalink/01BU_INST/9mvq88/alma991043239704906966). No Starch Press, 2019. Parts *I: Learning the Shell* and *II: Configuration and the Environment*.
 
-# Tutorial 
+To use the AutoRA package you need:
+- `python` and packages as specified in the `pyproject.toml` file,
+- `graphviz` for some visualizations.
 
-This tutorial illustrates how to program a Bayesian machine scientist, using the code provided here. The tutorial assumes general knowledge of Python programming. We start by importing all necessary Python modules:
+To develop the AutoRA package, you also need:
+- `git`, the source control tool,
+- `pre-commit` which is used for handling git pre-commit hooks.
+
+We recommend setting up your development environment using:
+- `pyenv` which is used for installing different versions of `python`,
+- `poetry`, which handles resolving dependencies between `python` modules and ensures that you are using the same package versions as other members of the development team.
+
+You should also consider using an IDE. We recommend: 
+- PyCharm (academic licenses for PyCharm professional edition are available for free). This is a `python`-specific integrated development environment which comes with extremely powerful tools for changing the structure of `python` code, running tests, etc. 
+- Visual Studio Code (free). This is a powerful general text editor with plugins to support `python` development. 
+
+The following sections describe how to install and configure the recommended setup for developing AutoRA.
+
+*Note: For end-users, it may be more appropriate to use an environment manager like `Anaconda` or `Miniconda` instead of `poetry`, but this is not currently supported.*
 
 
-```python
-import sys
-import numpy as np 
-import pandas as pd
-import warnings
-warnings.filterwarnings('ignore')
+## Development Setup on macOS
 
-import matplotlib.pyplot as plt
-from copy import deepcopy
-from ipywidgets import IntProgress
-from IPython.display import display
+### Prerequisites
 
-sys.path.append('./')
-sys.path.append('./Prior/')
-from mcmc import *
-from parallel import *
-from fit_prior import read_prior_par
+For macOS, we strongly recommend using `homebrew` to manage packages.
+
+Visit [https://brew.sh](https://brew.sh) and run the installation instructions.
+
+### Clone Repository
+
+We recommend using the GitHub CLI to clone the repository. Install it: 
+
+```shell
+brew install gh
 ```
 
-## Loading and preparing the data 
-
-We then load the data. In this particular case, we load the salmon stocks data. The features (independent variables) are loaded into a Pandas `DataFrame` named `x`, whereas the target (dependent) variable is loaded into a Pandas `Series` named `y`. Data should **always** be loaded in these formats to avoid problems. 
-
-
-```python
-XLABS = [
-    'eff',
-    'D_max',
-    'D_apr',
-    'D_may',
-    'D_jun',
-    'ET_apr',
-    'ET_may',
-    'ET_jun',
-    'PT_apr',
-    'PT_may',
-    'PT_jun',
-    'PT_jul',
-    'PDO_win',
-]
-raw_data = pd.read_csv('Validation/LogYe/data/seymour.csv')
-x, y = raw_data[XLABS], np.log(raw_data['rec'])
-x.head()
+Clone the repository. Run:
+```shell
+gh repo clone AutoResearch/AutoRA
 ```
 
- 
-|       | eff      | D_max | D_apr | D_may | D_jun | ET_apr | ET_may | ET_jun | PT_apr | PT_may | PT_jun | PT_jul | PDO_win |
-| --|----------|-------|-------|-------|-------|--------|--------|--------|--------|--------|--------|--------|---------|
-| 0 | 0.004697 | 12500 | 952   | 4160  | 8880  | 7.8    | 10.6   | 14.5   | 6.7    | 7.3    | 8.6    | 9.7    | -1.544  |
-| 1 | 0.011504 | 8040  | 1650  | 6040  | 6020  | 9.1    | 12.4   | 14.5   | 7.2    | 8.2    | 8.9    | 9.8    | -1.012  |
-| 2 | 0.002780 | 8330  | 1700  | 5670  | 6790  | 8.4    | 11.4   | 13.5   | 7.1    | 8.0    | 8.6    | 9.3    | -0.496  |
-| 3 | 0.002907 | 7220  | 920   | 4960  | 6020  | 9.1    | 12.2   | 14.4   | 7.6    | 8.5    | 9.1    | 9.9    | -0.682  |
-| 4 | 0.012463 | 9060  | 796   | 4100  | 7600  | 8.4    | 12.3   | 13.2   | 7.5    | 8.3    | 8.8    | 9.2    | -0.472  |                         
+... and following the prompts to authenticate to GitHub. It should clone the repository to a new directory. This is referred to as the `<project directory>` in the rest of this readme.
 
+### Install Dependencies
 
-## Initializing the Bayesian machine scienstist 
+Open the repository directory in the terminal.
 
-We start by initializing the machine scientist. This involves three steps:
+Install the dependencies, which are listed in the [`Brewfile`](./Brewfile) by running:
 
-* **Reading the prior hyperparameters.** The values of the hyperparameters depend on the number of variables `nv` and parameters `np`considered during the search. Many combinations of `nv` and `np` have hyperparameters calculated in the `Prior` directory. Otherwise, the hyperparameters should be fit. 
-* **Setting the "temperatures" for the parallel tempering.** If you don't know what parallel tempering is, you can read it in the Methods section of the paper, or just leave it as is in the code. In general, more temperatures (here 20) lead to better sampling of the expression space (we use a maximum of 100 different temperatures)
-* **Initializing the (parallel) scientist.**
-
-
-```python
-# Read the hyperparameters for the prior
-prior_par = read_prior_par('./Prior/final_prior_param_sq.named_equations.nv13.np13.2016-09-01 17:05:57.196882.dat')
-
-# Set the temperatures for the parallel tempering
-Ts = [1] + [1.04**k for k in range(1, 20)]
-
-# Initialize the parallel machine scientist
-pms = Parallel(
-    Ts,
-    variables=XLABS,
-    parameters=['a%d' % i for i in range(13)],
-    x=x, y=y,
-    prior_par=prior_par,
-)
+```shell
+brew bundle
 ```
 
-## Sampling expressions with the Bayesian machine scientist 
+### Install `python`
 
-We are now ready to start sampling expressions with the Bayesian machine scientist, using MCMC. In its simplest form, one just needs to run the `mcmc_step()` and the `tree_swap()` methods as many times as necessary. `mcmc_step()` performs an MCMC update at each of the temperatures of the parallel tempering, whereas `tree_swap()` attempts to swap the expressions at two consecutive temperatures.
+We recommend using `pyenv` to manage `python` versions. 
 
+#### Initialize pyenv
+Run the initialization script as follows:
 
-```python
-# Number of MCMC steps
-nstep = 100
+```shell
+pyenv init
+``` 
+... and follow the instructions to add `pyenv` to the `$PATH` by editing the interactive shell configuration 
+file, `.zshrc` or `.bashrc`. If it exists, this file is a hidden file ([dotfile](https://missing.csail.mit.edu/2019/dotfiles/)) in your home directory. You can create or edit this file using a 
+text editor or with CLI commands. Add the lines of script from the `pyenv init` response to the `.zshrc` file if they are 
+not already present. 
 
-# Draw a progress bar to keep track of the MCMC progress
-f = IntProgress(min=0, max=nstep, description='Running:') # instantiate the bar
-display(f)
+#### Restart shell session
 
-# MCMC
-for i in range(nstep):
-    # MCMC update
-    pms.mcmc_step() # MCMC step within each T
-    pms.tree_swap() # Attempt to swap two randomly selected consecutive temps
-    # Update the progress bar
-    f.value += 1
+After making these changes, restart your shell session by executing:
+
+```shell
+exec "$SHELL" 
 ```
 
+#### Install `python`
 
-    IntProgress(value=0, description='Running:')
+Install a `python` version listed in the [`pyproject.toml`](./pyproject.toml) file. The entry looks like:  
 
-
-Typically, of course, one wants to do something other than just generate expressions. For example, one may want to keep track of the most plausible (or, equivalently, the minimum description length) model visited so far by the MCMC, or to keep a trace of some of the properties of the sampled expressions. The example below keeps the best model, as well as a trace of all the description lengths visited. Note that, in `Parallel` objects, the relevant expression is stored in the `t1` attribute (which stands for temperature 1).
-
-
-```python
-# Number of MCMC steps
-nstep = 5000
-
-# Draw a progress bar to keep track of the MCMC progress
-f = IntProgress(min=0, max=nstep, description='Running:') # instantiate the bar
-display(f)
-
-# MCMC
-description_lengths, mdl, mdl_model = [], np.inf, None
-for i in range(nstep):
-    # MCMC update
-    pms.mcmc_step() # MCMC step within each T
-    pms.tree_swap() # Attempt to swap two randomly selected consecutive temps
-    # Add the description length to the trace
-    description_lengths.append(pms.t1.E)
-    # Check if this is the MDL expression so far
-    if pms.t1.E < mdl:
-        mdl, mdl_model = pms.t1.E, deepcopy(pms.t1)
-    # Update the progress bar
-    f.value += 1
+```toml
+python = "^3.8”
 ```
 
+In this case, you could install version 3.8.13 as follows:
 
-    IntProgress(value=0, description='Running:', max=5000)
-
-
-So let's take a look at the objects we stored. Here is the best model sampled by the machine scientist, along with the parameter values and the corresponding (minimum) description length:
-
-
-```python
-print('Best model:       ', mdl_model)
-print('Parameter values: ', mdl_model.par_values['d0'])
-print('Desc. length:     ', mdl)
+```shell
+pyenv install 3.8.13
 ```
 
-    Best model:        log((eff * (_a0_ / D_apr)))
-    Parameter values:  {'_a0_': 15025.635233071398, '_a1_': 1.0, '_a2_': 1.0, '_a3_': 1.0, '_a4_': 1.0, '_a5_': 1.0, '_a6_': 1.0, '_a7_': 1.0, '_a8_': 1.0, '_a9_': 1.0, '_a10_': 1.0, '_a11_': 1.0, '_a12_': 1.0}
-    Desc. length:      91.3327839647592
+### Install Pre-Commit Hooks
 
-
-And here is the trace of the description length:
-
-
-```python
-plt.figure(figsize=(15, 5))
-plt.plot(description_lengths)
-plt.xlabel('MCMC step', fontsize=14)
-plt.ylabel('Description length', fontsize=14)
-plt.title('MDL model: $%s$' % mdl_model.latex())
-plt.show()
+If you wish to commit to the repository, you should install the pre-commit hooks with the following command: 
+```shell
+pre-commit install
 ```
 
+For more information on pre-commit hooks, see [Pre-Commit-Hooks](#pre-commit-hooks)
 
+### Configure your development environment
+
+There are two suggested options for initializing an environment:
+- _(Recommended)_ Using PyCharm,
+- _(Advanced)_ Using `poetry` from the command line.
+
+#### PyCharm configuration
+
+Set up the Virtual environment – an isolated version of `python` and all the packages required to run AutoRA and develop it further – as follows:
+- Open the `<project directory>` in PyCharm.
+- Navigate to PyCharm > Preferences > Project: AutoRA > Python Interpreter
+- Next to the drop-down list of available interpreters, click the "gear" symbol and choose "Add" to initialize a new interpreter. 
+- Select "Poetry environment" in the list on the left. Specify the following:  
+  - Python executable: select the path to the installed `python` version you wish to use, e.g. 
+    `~/.pyenv/versions/3.8.13/bin/python3`
+  - Select "install packages from pyproject.toml"
+  - Poetry executable: select the path to the poetry installation you have, e.g. 
+    `/opt/homebrew/bin/poetry`
+  - Click "OK" and wait while the environment builds.
+  - Run the "Python tests in tests/" Run/Debug configuration in the PyCharm interface, and check that there are no errors.
+
+Additional setup steps for PyCharm:
+
+- You can (and should) completely hide the IDE-specific directory for Visual Studio Code in PyCharm by adding `.vscode` to the list of ignored folder names in Preferences > Editor > File Types > Ignored Files and Folders. This only needs to be done once.
     
-![png](https://bitbucket.org/rguimera/machine-scientist/raw/6dbf8519c47197ae183c72dfee2dff371882b5d6/Images/output_18_0.png)
-    
+#### Command Line `poetry` Setup
 
+If you need more control over the `poetry` environment, then you can set up a new environment from the command line.
 
-## Making predictions with the Bayesian machine scientist 
+*Note: Setting up a `poetry` environment on the command line is the only option for VSCode users.*
 
-Finally, we typically want to make predictions with models. In this regard, the interface of the machine scientist is similar to those in Scikit Learn: to make a prediction we call the `predict(x)` method, with an argument that has the same format as the training `x`, that is, a Pandas `DataFrame` with the exact same columns.
+From the `<project directory>`, run the following commands.
 
+Activate the target version of `python` using `pyenv`:
+```shell
+pyenv shell 3.8.13
+```
 
+Set up a new poetry environment with that `python` version:
+```shell
+poetry env use $(pyenv which python) 
+```
+
+Update the installation utilities within the new environment:
+```shell
+poetry run python -m pip install --upgrade pip setuptools wheel
+```
+
+Use the `pyproject.toml` file to resolve and then install all the dependencies
+```shell
+poetry install
+```
+
+Once this step has been completed, skip to the section [Activating and using the environment](#activating-and-using-the-environment) to test it.
+
+#### Visual Studio Code Configuration
+
+After installing Visual Studio Code and the other prerequisites, carry out the following steps:
+
+- Open the `<project directory>` in Visual Studio Code
+- Install the Visual Studio Code plugin recommendations suggested with the project. These include:
+  - `python`
+  - `python-environment-manager`
+- Run the [Command Line poetry Setup](#command-line-poetry-setup) specified above. This can be done in the built-in terminal if desired (Menu: Terminal > New Terminal).
+- Select the `python` option in the vertical bar on the far left of the window (which appear after installing the plugins). Under the title "PYTHON: ENVIRONMENTS" should be a list of `python` environments. If these do not appear:
+  - Refresh the window pane
+  - Ensure the python-environment-manager is installed correctly.
+  - Ensure the python-environment-manager is activated.
+
+- Locate the correct `poetry` environment. Click the "thumbs up" symbol next to the poetry environment name to "set as active workspace interpreter".
+
+- Check that the `poetry` environment is correctly set-up. 
+  - Open a new terminal within Visual Studio Code (Menu: Terminal > New Terminal). 
+  - It should execute something like `source /Users/me/Library/Caches/pypoetry/virtualenvs/autora-2PgcgopX-py3.8/bin/activate` before offering you a prompt.
+  - If you execute `which python` it should return the path to your python executable in the `.../autora-2PgcgopX-py3.8/bin` directory.
+  - Ensure that there are no errors when you run: 
+    ```shell
+    python -m unittest
+    ```
+    in the built-in terminal. 
+
+### Activating and using the environment
+
+#### Using `poetry` interactively
+
+To run interactive commands, you can activate the poetry virtual environment. From the `<project directory>` directory, run:
+
+```shell
+poetry shell
+```
+
+This spawns a new shell where you have access to the poetry `python` and all the packages installed using `poetry install`. You should see the prompt change:
+
+```
+% poetry shell
+Spawning shell within /Users/me/Library/Caches/pypoetry/virtualenvs/autora-2PgcgopX-py3.8
+Restored session: Fri Jun 24 12:34:56 EDT 2022
+(autora-2PgcgopX-py3.8) % 
+```
+
+If you execute `python` and then `import numpy`, you should be able to see that `numpy` has been imported from the `autora-2PgcgopX-py3.8` environment:
+
+```
+(autora-2PgcgopX-py3.8) % python
+Python 3.8.13 (default, Jun 16 2022, 12:34:56) 
+[Clang 13.1.6 (clang-1316.0.21.2.5)] on darwin
+Type "help", "copyright", "credits" or "license" for more information.
+>>> import numpy
+>>> numpy
+<module 'numpy' from '/Users/me/Library/Caches/pypoetry/virtualenvs/autora-2PgcgopX-py3.8/lib/python3.8/site-packages/numpy/__init__.py'>
+```
+
+To deactivate the `poetry` environment, `exit` the session. This should return you to your original prompt, as follows:
+```
+(autora-2PgcgopX-py3.8) % exit
+
+Saving session...
+...saving history...truncating history files...
+...completed.
+% 
+```
+
+To run a script, e.g. the `weber.py` script in the [`example/sklearn/darts`](./example/sklearn/darts) directory, execute: 
+
+```shell
+poetry run python example/sklearn/darts/weber.py
+```
+
+#### Using `poetry` non-interactively
+
+You can run python programs using poetry without activating the poetry environment, by using `poetry run {command}`. For example, to run the tests, execute:
+
+```shell
+poetry run python -m unittest
+```
+
+It should return something like:
+
+```
+% poetry run python -m unittest
+.
+--------------------------------
+Ran 1 test in 0.000s
+
+OK
+```
+
+## Development Setup on Windows
+
+Windows is not yet officially supported. You may be able to follow the same approach as for macOS to set up your development environment, with some modifications, e.g.:
+- Using `chocolatey` in place of `homebrew`,
+- Using the GitHub Desktop application in place of the GitHub CLI.
+
+If you successfully set up AutoRA on Windows, please update this readme.
+
+## Development Practices
+
+### Pre-Commit Hooks
+
+We use [`pre-commit`](https://pre-commit.com) to manage pre-commit hooks. 
+
+Pre-commit hooks are programs which run before each git commit, and can read and potentially modify the files which are to be committed. 
+
+We use pre-commit hooks to:
+- enforce coding guidelines, including the `python` style-guide [PEP8](https://peps.python.org/pep-0008/) (`black` and `flake8`), 
+- to check the order of `import` statements (`isort`),
+- to check the types of `python` objects (`mypy`).
+
+The hooks and their settings are specified in [`.pre-commit-config.yaml`](./.pre-commit-config.yaml).
+
+See the section [Install Pre-commit Hooks](#install-pre-commit-hooks) for installation instructions.
+
+#### Handling Pre-Commit Hook Errors
+
+If your `git commit` fails because of the pre-commit hook, then you should:
+
+1. Run the pre-commit hooks on the files which you have staged, by running the following command in your terminal: 
+    ```zsh
+    $ pre-commit run
+    ```
+
+2. Inspect the output. It might look like this:
+   ```
+   $ pre-commit run
+   black....................Passed
+   isort....................Passed
+   flake8...................Passed
+   mypy.....................Failed
+   - hook id: mypy
+   - exit code: 1
+   
+   example.py:33: error: Need type annotation for "data" (hint: "data: Dict[<type>, <type>] = ...")
+   Found 1 errors in 1 files (checked 10 source files)
+   ```
+3. Fix any errors which are reported.
+   **Important: Once you've changed the code, re-stage the files it to Git. 
+   This might mean unstaging changes and then adding them again.**
+4. If you have trouble:
+   - Do a web-search to see if someone else had a similar error in the past.
+   - Check that the tests you've written work correctly.
+   - Check that there aren't any other obvious errors with the code.
+   - If you've done all of that, and you still can't fix the problem, get help from someone else on the team.
+5. Repeat 1-4 until all hooks return "passed", e.g.
+   ```
+   $ pre-commit run
+   black....................Passed
+   isort....................Passed
+   flake8...................Passed
+   mypy.....................Passed
+   ```
+
+It's easiest to solve these kinds of problems if you make small commits, often.  
+
+# Documentation
+
+## Commenting code
+
+To help users understand code better, and to make the documentation generation automatic, we have some standards for documenting code. The comments, docstrings, and the structure of the code itself are meant to make life easier for the reader. 
+- If something important isn't _obvious_ from the code, then it should be _made_ obvious with a comment. 
+- Conversely, if something _is_ obvious, then it doesn't need a comment.
+
+These standards are inspired by John Ousterhout. *A Philosophy of Software Design.* Yaknyam Press, 2021. Chapter 12 – 14.
+
+### Every public function, class and method has documentation
+
+We include docstrings for all public functions, classes, and methods. These docstrings are meant to give a concise, high-level overview of **why** the function exists, **what** it is trying to do, and what is **important** about the code. (Details about **how** the code works are often better placed in detailed comments within the code.)
+
+Every function, class or method has a one-line **high-level description** which clarifies its intent.   
+
+The **meaning** and **type** of all the input and output parameters should be described.
+
+There should be **examples** of how to use the function, class or method, with expected outputs, formatted as ["doctests"](https://docs.python.org/3/library/doctest.html). These should include normal cases for the function, but also include cases where it behaves unexpectedly or fails. 
+
+We follow the [Google Style Python Docstrings](https://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_google.html), as these are supported by the online documentation tool we use (see [Online Documentation](#online-documentation)).
+
+A well documented function looks something like this:
 ```python
-plt.figure(figsize=(6, 6))
-plt.scatter(mdl_model.predict(x), y)
-plt.plot((-6, 0), (-6, 0))
-plt.xlabel('MDL model predictions', fontsize=14)
-plt.ylabel('Actual values', fontsize=14)
-plt.show()
+def first_order_linear(
+    x: Union[float, np.ndarray], c: float, m: float
+) -> Union[float, np.ndarray]:
+    """
+    Evaluate a first order linear model of the form y = m x + c.
+
+    Arguments:
+        x: input location(s) on the x-axis
+        c: y-intercept of the linear model
+        m: gradient of the linear model
+
+    Returns:
+        y: result y = m x + c, the same shape and type as x
+
+    Examples:
+        >>> first_order_linear(0. , 1. , 0. )
+        1.0
+        >>> first_order_linear(np.array([-1. , 0. , 1. ]), c=1.0, m=2.0)
+        array([-1.,  1.,  3.])
+    """
+    y = m * x + c
+    return y
+```
+
+For an example of a file with docstrings, see [docs/docstrings.py](./docs/docstrings.py).
+
+*Pro-Tip: Write the docstring for your new high-level object before starting on the code. In particular, writing examples of how you expect it should be used can help clarify the right level of abstraction.*
+
+## Online Documentation
+
+Online Documentation is automatically generated using [Material for MkDocs](https://squidfunk.github.io/mkdocs-material/) based on docstrings in files in the `autora/` directory. 
+
+### Commands
+
+Build and serve the documentation using the following commands:
+
+* `poetry run mkdocs serve` - Start the live-reloading docs server.
+* `poetry run mkdocs build` - Build the documentation site.
+* `poetry run mkdocs gh-deploy` - Build the documentation and serve at https://AutoResearch.github.io/AutoRA/
+* `poetry run mkdocs -h` - Print help message and exit.
+
+### Documentation layout
+```
+mkdocs.yml    # The configuration file for the documentation.
+docs/         # Directory for static pages to be included in the documentation.
+    index.md  # The documentation homepage.
+    ...       # Other markdown pages, images and other files.
+autora/          # The directory containing the source code.
 ```
 
 
-    
-![png](https://bitbucket.org/rguimera/machine-scientist/raw/6dbf8519c47197ae183c72dfee2dff371882b5d6/Images/output_21_0.png)
-    
-
-
-## Further refinements 
-
-The examples above are only intended to illustrate how a basic MCMC would be implemented. In practice, there are other considerations that we kept in mind in all the experiments reported in the manuscriot, and that anyone using the code should too:
-
-* **Equilibration**: One should not start sampling until the MCMC has converged to the stationary distribution. Although determining when a sample is in equilibrium, a necessary condition is that the description length is not increasing or, more typically, decreasing. The trace of the description length should be flat (except for fluctuations) before we start collecting samples.
-* **Thinning**: MCMC samples should be thinned, so only one in, say, 100 samples are kept for the trace. Otherwise, one is getting highly correlated samples, which may lead to, for example, erroneous estimates of confidence intervals.
-* **Getting trapped**: Despite the parallel tempering, the MCMC can get trapped in local minima of the description length. For this, we typically keep track of the number of steps since the last `tree_swap()` move was accepted for each temperature. If a particular temperature has *not* accepted swaps in a long time, then we anneal the whole system, that is, we increase all temperatures and decrease them slowly back to equilibrium so as to escape the local minima. Using several restarts of the MCMC and comparing the results is also a convenient check.
-* **Memory issues**: By default, the machine scientist keeps a cache of all visited models, so as to avoid duplicates of previously considered models, as well as to speed up the process of obtaining the maximum likelihood estimators of the model parameters. For long MCMC chains this becomes memory intensive, so it may be convenient to periodically clean this cache (or, at least, old models in this cache) by reinitializing the `fit_pat` and `representative` attributes of the `Parallel` instance.
