@@ -1358,7 +1358,7 @@ class Tree:
         samples=1000,
         tracefn="trace.dat",
         progressfn="progress.dat",
-        write_files=True,
+        write_files=False,
         reset_files=True,
         verbose=False,
         progress=True,
