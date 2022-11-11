@@ -49,7 +49,7 @@ class Variable:
         self._units = units
         self._value_range = value_range
         self._value = 0
-        self._type = type
+        self.type = type
         if variable_label == "":
             self._variable_label = self._name
         else:
@@ -57,13 +57,123 @@ class Variable:
         self._rescale = rescale
         self._is_covariate = is_covariate
 
-    @property
-    def name(self) -> str:
+    def __get_value_range__(self):
+        """Get range of variable.
+        The variable range determines the minimum and maximum allowed value
+        to be manipulated or measured."""
+        return self._value_range
+
+    def __set_value_range__(self, value_range: Sequence):
+        """Set range of variable.
+        The variable range determines the minimum and maximum allowed value
+        to be manipulated or measured.
+
+        Arguments:
+            value_range: range of the variable
+        """
+        self._value_range = value_range
+
+    def __cap_value__(self, value: float):
+        """Cap value of variable.
+
+        Arguments:
+            value: value of the variable
+        """
+        minimum = self._value_range[0]
+        maximum = self._value_range[1]
+        return np.min([np.max([value, minimum]), maximum])
+
+    def get_value(self) -> float:
+        """Get value.
+
+        Returns:
+            value of the variable
+        """
+        return self._value * self._rescale
+
+    def set_value(self, value: float):
+        """Set value.
+
+        Arguments:
+            value: value of the variable
+        """
+        self._value = self.__cap_value__(value)
+
+    def get_value_from_dict(self, dictionary: dict, position: int) -> float:
+        """Reads value of independent variable from a dictionary.
+
+        Arguments:
+            dictionary: dictionary with variable_label being the key
+            position: position of the value in the dictionary
+
+        Returns:
+            value of the variable
+        """
+
+        value_list = dictionary[self.get_name()]
+
+        if position > len(value_list):
+            raise Exception(
+                f"Queried position "
+                f"{str(position)}"
+                f" for variable "
+                f"{self.get_name()}"
+                f"'exceeds number of available positions for that variable in the dictionary."
+            )
+
+        return value_list[position] * self._rescale
+
+    def get_value_list_from_dict(self, dictionary: dict) -> Sequence:
+        """Gets the rescaled values of independent variables from a dictionary.
+
+        Arguments:
+            dictionary: dictionary with variable_label being the key
+
+        Returns:
+            list of values of the variable
+        """
+        value_list = dictionary[self.get_name()]
+
+        rescaled_list = [element * self._rescale for element in value_list]
+
+        return rescaled_list
+
+    def set_value_from_dict(self, dictionary: dict, position: int):
+        """
+        Reads and sets value of independent variable from a dictionary
+        with variable_label being the key
+
+        Arguments:
+            dictionary: dictionary with variable_label being the key
+            position: position of the value in the dictionary
+        """
+
+        value_list = dictionary[self.get_name()]
+
+        if position > len(value_list):
+            raise Exception(
+                f"Queried position "
+                f"{str(position)}"
+                f" for variable "
+                f"{self.get_name()}"
+                f" exceeds number of available positions for that variable in the dictionary."
+            )
+
+        self.set_value(value_list[position])
+
+    def get_name(self) -> str:
         """Get variable name."""
         return self._name
 
-    @property
-    def units(self) -> str:
+    def set_name(self, name: str):
+        """Set variable name.
+
+        Arguments:
+                name: name of the variable
+        """
+        self._name = name
+
+    def get_units(self) -> str:
         """Get variable units.
 
         Returns:
@@ -71,8 +181,15 @@ class Variable:
         """
         return self._units
 
-    @property
-    def variable_label(self) -> str:
+    def set_units(self, units: str):
+        """Set variable units.
+
+        Arguments:
+            units: units of the variable
+        """
+        self._units = units
+
+    def get_variable_label(self) -> str:
         """Get variable label.
 
         Returns:
@@ -80,15 +197,21 @@ class Variable:
         """
         return self._variable_label
 
-    @property
-    def type(self) -> ValueType:
-        """
-        Get variable value type.
+    def set_variable_label(self, variable_label: str):
+        """Set variable label.
 
-        Returns:
-            the relevant ValueType
+        Arguments:
+            variable_label: variable label
         """
-        return self._type
+        self._variable_label = variable_label
+
+    def set_covariate(self, is_covariate: bool):
+        """Set whether this dependent variable is treated as covariate.
+
+        Arguments:
+            is_covariate: whether this dependent variable is treated as covariate
+        """
+        self._is_covariate = is_covariate
 
 
 @dataclass(frozen=True)
@@ -121,7 +244,7 @@ class VariableCollection:
         Returns:
             variable names
         """
-        return (v.name for v in self.all_variables)
+        return (v.get_name() for v in self.all_variables)
 
     @property
     def output_type(self) -> str:
