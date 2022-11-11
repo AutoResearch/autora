@@ -168,24 +168,34 @@ def update_run_collection(run_collection: RunCollection, **changes):
     return new_run_collection
 
 
-def run(
-    theorist: Theorist,
-    experimentalist: Experimentalist,
-    experiment_runner: ExperimentRunner,
-    metadata: VariableCollection,
-    first_state: str,
-    search_space: List[str] = [],
-    max_cycle_count: int = 5,
-    cycle_count: int = 0,
-    independent_variable_values: List[Number] = [],
-    data: DataSetCollection = DataSetCollection([]),
-    theories: TheoryCollection = TheoryCollection([]),
-):
+class AERCycle(object):
     """
-    Runs the closed-loop prototype.
+    Contains attributes/parameters of the AER cycle and handler and condition methods
+    to enact between state transitions.
 
 
-    Args:
+
+    """
+
+    def __init__(
+        self,
+        theorist: Theorist,
+        experimentalist: Experimentalist,
+        experiment_runner: ExperimentRunner,
+        metadata: VariableCollection,
+        first_state: str,
+        search_space: List[str] = [],
+        max_cycle_count: int = 5,
+        cycle_count: int = 0,
+        independent_variable_values: List[Number] = [],
+        data: DataSetCollection = DataSetCollection([]),
+        theories: TheoryCollection = TheoryCollection([]),
+        name=None,
+        add_graphing=True,
+    ):
+        """
+
+        Args:
         ---Required---
         theorist: Theorist function
         experimentalist: Experimentalist function
@@ -198,7 +208,9 @@ def run(
         ---Optional---
         search_space: Priors
         max_cycle_count: Maximum number of cycles to conduct. Aggregates after the Theorist.
-        cycle_count: Current cycle number, default = 0.
+        cycle_count: Current cycle number, default = 0
+        add_graphing: Boolean to add get_graph method to graph state machine
+        name: Name of the cycle
 
         ---Optional Depending on First State---
         independent_variable_values: Seed values for the "experiment runner" if starting at the
@@ -207,153 +219,76 @@ def run(
             empty DataSetCollection.
         theories: Seed theory if starting at the experimentalist. Default is an empty
             TheoryCollection.
+        """
 
-    Returns:
-    The run container object with run parameters and aggregated data.
+        # Create a run collection object
+        run_container = RunCollection(
+            metadata=metadata,
+            first_state=AERModule(first_state),
+            search_space=SearchSpacePriors(search_space),
+            max_cycle_count=max_cycle_count,
+            cycle_count=cycle_count,
+            independent_variable_values=IndependentVariableValues(
+                independent_variable_values
+            ),
+            data=data,
+            theories=theories,
+        )
 
-    """
-    # Initialize the data
-    run_container = RunCollection(
-        metadata=metadata,
-        first_state=AERModule(first_state),
-        search_space=SearchSpacePriors(search_space),
-        max_cycle_count=max_cycle_count,
-        cycle_count=cycle_count,
-        independent_variable_values=IndependentVariableValues(
-            independent_variable_values
-        ),
-        data=data,
-        theories=theories,
-    )
-
-    # Initialize the cycle model
-    cycle = AERCycle()
-    cycle.add_modules(
-        theorist=theorist,
-        experimentalist=experimentalist,
-        experiment_runner=experiment_runner,
-        run_container=run_container,
-    )
-    # Initialize state machine using model. This applies state machine methods to the model.
-    Machine(
-        model=cycle,
-        states=cycle.states,
-        transitions=cycle.transitions,
-        initial="start",
-        queued=True,
-        ignore_invalid_triggers=False,
-    )
-
-    # Run the state machine
-    while True:
-        try:
-            cycle.next_step()  # type: ignore
-        except core.MachineError:
-            break
-
-    # Return run container
-    return cycle.run_container
-
-
-def plot_state_diagram(model, path=None, filename=None):
-    """
-    Runs the closed-loop prototype.
-
-    """
-    if path is None:
-        path = os.getcwd()
-
-    if filename is None:
-        filename = f"{model.name}_diagram.png"
-    else:
-        filename = f"{filename}.png"
-
-    # Initialize graphing state machine using model.
-    # This applies state machine graphing methods to the model.
-    GraphMachine(
-        model=model,
-        states=model.states,
-        transitions=model.transitions,
-        initial="start",
-        queued=True,
-        ignore_invalid_triggers=False,
-        show_state_attributes=True,
-        show_conditions=True,
-    )
-    # Print graph
-    model.get_graph().draw(os.path.join(path, filename), prog="dot")
-
-
-class AERCycle(object):
-    """
-    Contains attributes/parameters of the AER cycle and handler and condition methods
-    to enact between state transitions.
-    """
-
-    def __init__(self, name=None):
+        self._theorist = theorist
+        self._experimentalist = experimentalist
+        self._experiment_runner = experiment_runner
+        self._run_container = run_container
         self.name = name if name is not None else "AERCycle"
-        self.states = self.add_states()
-        self.transitions = self.add_transitions()
-        self.theorist = None
-        self.experimentalist = None
-        self.experiment_runner = None
-        self.run_container = None
 
-    def add_modules(
-        self,
-        theorist: Theorist,
-        experimentalist: Experimentalist,
-        experiment_runner: ExperimentRunner,
-        run_container: RunCollection,
-    ):
-        self.theorist = theorist
-        self.experimentalist = experimentalist
-        self.experiment_runner = experiment_runner
-        self.run_container = run_container
+        # Add machine methods
+        self._states = self.__add_states()
+        self._transitions = self.__add_transitions()
+        self.__add_sm_methods(graph=add_graphing)
 
     def is_ready_for_experiment_runner(self):
-        return AERModule(self.run_container.first_state) is AERModule.EXPERIMENT_RUNNER
+        return AERModule(self._run_container.first_state) is AERModule.EXPERIMENT_RUNNER
 
     def is_ready_for_theorist(self):
-        return AERModule(self.run_container.first_state) is AERModule.THEORIST
+        return AERModule(self._run_container.first_state) is AERModule.THEORIST
 
     def is_ready_for_experimentalist(self):
-        return AERModule(self.run_container.first_state) is AERModule.EXPERIMENTALIST
+        return AERModule(self._run_container.first_state) is AERModule.EXPERIMENTALIST
 
     def is_max_cycles(self):
-        return self.run_container.cycle_count >= self.run_container.max_cycle_count
+        return self._run_container.cycle_count >= self._run_container.max_cycle_count
 
     def start_theorist(self):
         print("Running Theorist to get new theory from data.")
         # Run Theorist
-        new_theory = self.theorist(
-            data=self.run_container.data[-1],
-            metadata=self.run_container.metadata,
-            search_space=self.run_container.search_space,
+        new_theory = self._theorist(
+            data=self._run_container.data[-1],
+            metadata=self._run_container.metadata,
+            search_space=self._run_container.search_space,
         )
         # Append new theory to theory list
         new_theory_collection = combine_theories(
-            self.run_container.theories, new_theory
+            self._run_container.theories, new_theory
         )
 
         # Update run container with updated theory and cycle count
-        self.run_container = update_run_collection(
-            self.run_container,
+        self._run_container = update_run_collection(
+            self._run_container,
             theories=new_theory_collection,
-            cycle_count=self.run_container.cycle_count + 1,
+            cycle_count=self._run_container.cycle_count + 1,
         )
 
     def start_experimentalist(self):
         print("Running Experimentalist to get new test from theory.")
         # Run experimentalist
-        new_independent_variable_values = self.experimentalist(
-            data=self.run_container.data,
-            metadata=self.run_container.metadata,
-            theory=self.run_container.theories[-1],
+        new_independent_variable_values = self._experimentalist(
+            data=self._run_container.data,
+            metadata=self._run_container.metadata,
+            theory=self._run_container.theories[-1],
         )
         # Update run container with X' values to test
-        self.run_container = update_run_collection(
-            self.run_container,
+        self._run_container = update_run_collection(
+            self._run_container,
             independent_variable_values=IndependentVariableValues(
                 new_independent_variable_values
             ),
@@ -362,28 +297,28 @@ class AERCycle(object):
     def start_experiment_runner(self):
         print("Running Experiment Runner to get new data from experiment parameters.")
         # Run experiment runner
-        dependent_variable_values = self.experiment_runner(
-            x_prime=self.run_container.independent_variable_values
+        dependent_variable_values = self._experiment_runner(
+            x_prime=self._run_container.independent_variable_values
         )
         # Append or create a new dataset object
         new_dataset_collection = combine_datasets(
-            self.run_container.data,
+            self._run_container.data,
             DataSet(
-                self.run_container.independent_variable_values,
+                self._run_container.independent_variable_values,
                 dependent_variable_values,
             ),
         )
 
         # Update run container with new DataSetCollection
-        self.run_container = update_run_collection(
-            self.run_container,
+        self._run_container = update_run_collection(
+            self._run_container,
             data=new_dataset_collection,
         )
 
-    def end_statement(self):
+    def __end_statement(self):
         print("At end state.")
 
-    def add_states(self):
+    def __add_states(self):
         l_states = [
             State(name="start"),
             State(
@@ -398,11 +333,11 @@ class AERCycle(object):
                 name="experimentalist",
                 on_enter=["start_experimentalist"],
             ),
-            State(name="end", on_enter=["end_statement"]),
+            State(name="end", on_enter=["_AERCycle__end_statement"]),
         ]
         return l_states
 
-    def add_transitions(self):
+    def __add_transitions(self):
         l_transitions = [
             # Start transitions
             {
@@ -450,4 +385,43 @@ class AERCycle(object):
                 "conditions": ["is_max_cycles"],
             },
         ]
+
         return l_transitions
+
+    def __add_sm_methods(self, graph):
+        # Initialize state machine using model. This applies state machine methods to the model.
+
+        if not graph:
+            Machine(
+                model=self,
+                states=self._states,
+                transitions=self._transitions,
+                initial="start",
+                queued=True,
+                ignore_invalid_triggers=False,
+            )
+        else:
+
+            GraphMachine(
+                model=self,
+                states=self._states,
+                transitions=self._transitions,
+                initial="start",
+                queued=True,
+                ignore_invalid_triggers=False,
+                show_state_attributes=True,
+                show_conditions=True,
+            )
+
+    def run(self):
+        # Run the state machine
+        while True:
+            try:
+                self.next_step()  # type: ignore
+            except core.MachineError:
+                break
+        print("Run finished.")
+
+    @property
+    def results(self):
+        return self._run_container

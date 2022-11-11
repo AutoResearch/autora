@@ -6,7 +6,7 @@ Test the closed-loop state-machine with run function implementation.
 import numpy as np
 import pytest  # noqa: 401
 
-from autora.cycle import AERCycle, plot_state_diagram, run
+from autora.cycle import AERCycle
 from autora.variable import Variable, VariableCollection
 
 
@@ -29,7 +29,7 @@ def dummy_experiment_runner(x_prime):
     return x_prime.x + 1
 
 
-def test_run_function():
+def test_run():
     """
     This is a prototype closed-loop cycle using the "transitions" package as a state-machine
     handler.
@@ -44,18 +44,20 @@ def test_run_function():
         dependent_variables=[Variable(name="y", value_range=(-10, 10))],
     )
 
-    # Run the closed-loop cycle
-    results = run(
+    cycle = AERCycle(
         theorist=dummy_theorist,
         experimentalist=dummy_experimentalist,
         experiment_runner=dummy_experiment_runner,
         metadata=metadata,
         first_state="experiment runner",
         independent_variable_values=x1,
+        add_graphing=True,
     )
+    cycle.run()
+    results = cycle.results
 
-    # Plot a state diagram of the cycle model
-    plot_state_diagram(AERCycle())
+    # Plot diagram, will remove this functionality in production
+    cycle.get_graph().draw("state_machine_diagram.png", prog="dot")
 
     assert results.data.datasets.__len__() == results.max_cycle_count, (
         f"Number of datasets generated ({results.data.datasets.__len__()}) "
@@ -72,5 +74,5 @@ def test_run_function():
 
 
 if __name__ == "__main__":
-    test_run_function()
+    test_run()
     print("end")
