@@ -18,7 +18,7 @@ imageio = "^2.9.0"
 matplotlib = "^3.2.1"
 pandas = "^1.4.2"
 graphviz = "^0.14.1"
-seaborn = "^0.11.1"
+seaborn = ">=0.11.1,<0.13.0"
 tinkerforge = {version = "^2.1.25", optional=true}
 torch = "^1.11.0"
 scipy = "^1.7.1"
