@@ -18,7 +18,7 @@ $P(\theta|x)=\dfrac{P(x|\theta)P(\theta)}{P(x)}$
 
 Here, $P(\theta)$ is the prior probability, $P(x|\theta)$ is the probability of data given the prior (also known as the 'likelihood'), $P(x)$ is the probability of the data marginalized over all possible values of \theta, and P(\theta|x) is the posterior probability. 
 
-In essence, prior knowledge $P(/theta)$ is combined with evidence $P(x|\theta)$ to arrive at better knowledge $P(\theta|x). 
+In essence, prior knowledge $P(\theta)$ is combined with evidence $P(x|\theta)$ to arrive at better knowledge $P(\theta|x)$. 
 
 BMS capitalizes on this process for updating knowledge:
 
