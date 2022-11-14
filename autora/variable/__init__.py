@@ -17,18 +17,7 @@ class ValueType(str, Enum):
 
 
 @dataclass
-class _Variable:
-    name: str
-    value_range: Tuple[Any, Any]
-    units: str
-    type: ValueType
-    variable_label: str
-    rescale: float
-    is_covariate: bool
-
-
-@dataclass
-class Variable(_Variable):
+class Variable:
     """Describes an experimental variable: name, type, range, units, and value of a variable."""
 
     name: str = ""
