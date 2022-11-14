@@ -30,15 +30,15 @@ With $Z=P(D)$ being a constant for a given dataset - we can ignore it since we a
 
 2) It then scores different candidate equations using description length as a loss function. Formally, this description length is the number of natural units of information (nats) needed to jointly encode the data and the equation optimally.
 
-$\mathscr{L}(f_i)\equiv-\log\[P(D,f_i)\]=-\log\[P(f_i|D)P(D)\]=-\log\[\int_{\Theta_i}P(D|f_i,\theta_i)P(\theta_i|f_i)P(f_i)d\theta_i\]$
+$\mathscr{L}(f_i)\equiv-\log[P(D,f_i)]=-\log[P(f_i|D)P(D)]=-\log[\int_{\Theta_i}P(D|f_i,\theta_i)P(\theta_i|f_i)P(f_i)d\theta_i]$
 
 3) Since the loss function is computationally intractable, it uses an approximation:
 
-$\mathscr{L}(f_i)\approx\dfrac{B(f_i)}{2} - \log\[P(f_i)\]$
+$\mathscr{L}(f_i)\approx\dfrac{B(f_i)}{2} - \log[P(f_i)]$
 
-where $B(f_i)=k\log\[n\] - 2\log\[P(D|\theta^\*,f_i)\]$
+where $B(f_i)=k\log[n] - 2\log[P(D|\theta^*,f_i)]$
 
-In this formulation, the goodness of fit $p(D|\theta^\*,f_i)$ and likelihood $p(f_i)$ of an equation are equally and logarithmically weighted to each other - e.g., improving the fit by a factor of 2 is offset by having half the likelihood.
+In this formulation, the goodness of fit $p(D|\theta^*,f_i)$ and likelihood $p(f_i)$ of an equation are equally and logarithmically weighted to each other - e.g., improving the fit by a factor of 2 is offset by having half the likelihood.
 
 To better understand the problem, equations are framed in terms of acyclic graphs (i.e., trees)
 
