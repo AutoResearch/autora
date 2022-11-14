@@ -28,6 +28,9 @@ tqdm = "^4.64.0"
 [tool.poetry.extras]
 tinkerforge = ["tinkerforge"]
 
+[tool.poetry.group.dev.dependencies]
+jupyter = "^1.0.0"
+
 [tool.poetry.group.docs.dependencies]
 mkdocs-material = "^8.3.8"
 mkdocs-gen-files = "^0.3.4"
