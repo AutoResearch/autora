@@ -5,10 +5,10 @@
 BMS uses a search space of operations, along with parameters to find the best model. Since the search space is very rugged, BMS considers multiple equation trees in parallel, with each tree governed by a different temperature parameter. The search space is defined by the set of operations that can be applied in each computation step of the model. These operations are also referred to as *primitives*. We can select from the following space of primitives:
 
 - **$\textit{constant}$**: The output of the computation $x_j$ is a constant parameter value $a$ where $a$ is a fitted float value.
-- **\+**: The output of the computation $x_j$ is the sum over its two inputs $x_i, x_{ii}$: $x_j = x_i \+ x_{ii}$.
-- **\-**: The output of the computation $x_j$ is the respective difference between its inputs $x_i, x_{ii}$: $x_j = x_i \- x_{ii}$.
-- **\***: The output of the computation $x_j$ is the product over its two inputs $x_i, x_{ii}$: $x_j = x_i \* x_{ii}$.
-- **\/**: The output of the computation $x_j$ is the respective quotient between its inputs $x_i, x_{ii}$: $x_j = x_i \/ x_{ii}$.
+- **\+**: The output of the computation $x_j$ is the sum over its two inputs $x_i, x_{ii}$: $x_j = x_i + x_{ii}$.
+- **\-**: The output of the computation $x_j$ is the respective difference between its inputs $x_i, x_{ii}$: $x_j = x_i - x_{ii}$.
+- **\***: The output of the computation $x_j$ is the product over its two inputs $x_i, x_{ii}$: $x_j = x_i * x_{ii}$.
+- **\/**: The output of the computation $x_j$ is the respective quotient between its inputs $x_i, x_{ii}$: $x_j = x_i / x_{ii}$.
 - **abs**: The output of the computation $x_j$ is the absolute value of its input $x_i$: $x_j = |(x_i)|$.
 - **relu**: The output of the computation $x_j$ is a rectified linear function applied to its input $x_i$: $x_j = \max(0, x_i)$.
 - **exp**: The output of the computation $x_j$ is the natural exponential function applied to its input $x_i$: $x_j = \exp(x_i)$.
@@ -24,7 +24,7 @@ BMS uses a search space of operations, along with parameters to find the best mo
 - **cosh**: The output of the computation $x_j$ is the hyperbolic cosine function applied to its input $x_i$: $x_j = \cosh(x_i)$.
 - **tan**: The output of the computation $x_j$ is the tangent function applied to its input $x_i$: $x_j = \tan(x_i)$.
 - **tanh**: The output of the computation $x_j$ is the hyperbolic tangent function applied to its input $x_i$: $x_j = \tanh(x_i)$.
-- **\*\***: The output of the computation $x_j$ is the first input raised to the power of the second input $x_i,x_{ii}$: $x_j = x_i \*\* x_{ii}$.
+- **\*\***: The output of the computation $x_j$ is the first input raised to the power of the second input $x_i,x_{ii}$: $x_j = x_i ** x_{ii}$.
 
 # Example
 
