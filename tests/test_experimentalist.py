@@ -44,6 +44,10 @@ def random_sampler(values, n):
     return samples
 
 
+def weber_filter(values):
+    return filter(lambda s: s[0] >= s[1], values)
+
+
 def uncertainty_sampler(
     model,
 ):
@@ -109,14 +113,31 @@ def test_experimentalist():
     pooler = partial(gridsearch_pool, ivs=metadata.independent_variables)
     sampler = partial(random_sampler, n=n_trials)
 
-    pipeline = Pipeline(
+    pipeline_random_samp = Pipeline(
         pooler,
+        weber_filter,
         sampler,
     )
 
-    results = pipeline.run()
+    results = pipeline_random_samp.run()
 
+    # ***Checks***
+    # Gridsearch pool is working as expected
+    pool_len = len(list(pipeline_random_samp.pool()))
+    pool_len_expected = np.prod(
+        [len(s.allowed_values) for s in metadata.independent_variables]
+    )
+    assert pool_len == pool_len_expected
+
+    # Is sampling the number of trials we expect
     assert len(results) == n_trials
+
+    # Filter is selecting where IV1 >= IV2
+    assert all([s[0] >= s[1] for s in results])
+
+    # Is sampling randomly
+    results2 = pipeline_random_samp.run()
+    assert results != results2
 
 
 if __name__ == "__main__":
