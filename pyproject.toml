@@ -36,7 +36,7 @@ ipython = "^8.4.0"
 ipywidgets = "^7.7.1"
 
 [tool.poetry.group.docs.dependencies]
-mkdocs-material = "^8.3.8"
+mkdocs-material = "^8.5.10"
 mkdocs-gen-files = "^0.3.4"
 mkdocs-literate-nav = "^0.4.1"
 mkdocs-section-index = "^0.3.4"
