@@ -40,7 +40,7 @@ where $B(f_i)=k\log[n] - 2\log[P(D|\theta^*,f_i)]$
 
 In this formulation, the goodness of fit $p(D|\theta^*,f_i)$ and likelihood $p(f_i)$ of an equation are equally and logarithmically weighted to each other (e.g., improving the fit by a factor of 2 is offset by halving the likelihood).
 
-To better frame the problem, equations are cast as acyclic graphs (i.e., trees).
+To better frame the problem, equations are modeled as acyclic graphs (i.e., trees).
 
 Bayesian inference via MCMC is then applied to navigate the search space efficiently. Note, there are many sampling strategies other than MCMC that could be used.
 
