@@ -21,10 +21,10 @@ pandas = "^1.4.2"
 graphviz = ">=0.14.1,<0.21.0"
 seaborn = ">=0.11.1,<0.13.0"
 scikit-learn = "^1.1.1"
+sympy = "^1.10.1"
 tinkerforge = {version = "^2.1.25", optional=true}
 torch = "1.12.1"
 tqdm = "^4.64.0"
-sympy = "^1.10.1"
 
 [tool.poetry.extras]
 tinkerforge = ["tinkerforge"]
