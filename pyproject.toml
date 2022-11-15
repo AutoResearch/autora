@@ -31,7 +31,7 @@ tinkerforge = ["tinkerforge"]
 
 [tool.poetry.group.dev.dependencies]
 jupyter = "^1.0.0"
-pytest = "^7.1.0"
+pytest = "^7.2.0"
 ipython = "^8.4.0"
 ipywidgets = "^7.7.1"
 

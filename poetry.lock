@@ -1869,7 +1869,7 @@ tinkerforge = ["tinkerforge"]
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.8,<3.11"
-content-hash = "af97e2d5fc5d3365c50ba3118ad4c0ef5f523d7098e1a34190240a812431fe47"
+content-hash = "ee88aa3b8e294e48eba123d5383ed5c08ae11f34441f72c74348ead3abbd9797"
 
 [metadata.files]
 anyio = [
