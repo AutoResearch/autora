@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any, Sequence, Tuple, Union
+from typing import Any, Optional, Sequence, Tuple
 
 
 class ValueType(str, Enum):
@@ -21,8 +21,8 @@ class Variable:
     """Describes an experimental variable: name, type, range, units, and value of a variable."""
 
     name: str = ""
-    value_range: Tuple[Any, Any] = (0, 1)
-    allowed_values: Union[Sequence, None] = None
+    value_range: Optional[Tuple[Any, Any]] = (0, 1)
+    allowed_values: Optional[Sequence] = None
     units: str = ""
     type: ValueType = ValueType.REAL
     variable_label: str = ""
