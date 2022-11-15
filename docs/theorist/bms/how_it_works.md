@@ -2,7 +2,7 @@
 
 ## How it works
 
-The Bayesian Machine Scientist (BMS) uses Bayesian probability to search the space of possible equations. The following are the relevant quantities in this Bayesian approach:
+The Bayesian Machine Scientist (BMS) uses Bayesian inference to search the space of possible equations. The following are the relevant quantities in this Bayesian approach:
 
 - $P(x):$ Probability of $x$
 - $P(x|\theta)$: Conditional Probability of $x$ given $\theta$
@@ -12,21 +12,21 @@ Mathematically, we know:
 
 $P(x,\theta)=P(x)P(\theta|x)=P(\theta)P(x|\theta)$
 
-Bayes Rule, which just rearranges the expression above, states the following:
+Rearranging this expression, we get Bayes rule:
 
 $P(\theta|x)=\dfrac{P(x|\theta)P(\theta)}{P(x)}$
 
-Here, $P(\theta)$ is the prior probability, $P(x|\theta)$ is the probability of data given the prior (also known as the 'likelihood'), $P(x)$ is the probability of the data marginalized over all possible values of \theta, and P(\theta|x) is the posterior probability. 
+Here, $P(\theta)$ is the prior probability, $P(x|\theta)$ is the probability of data given the prior (also known as the 'likelihood'), $P(x)$ is the probability of the data marginalized over all possible values of $\theta$, and $P(\theta|x)$ is the posterior probability. 
 
 In essence, prior knowledge $P(\theta)$ is combined with evidence $P(x|\theta)$ to arrive at better knowledge $P(\theta|x)$. 
 
 BMS capitalizes on this process for updating knowledge:
 
-1) It formulates the problem of fitting an equation to data by first specifying priors over equations found on wikipedia:
+1) It formulates the problem of fitting an equation to data by first specifying priors over equations. In their paper, Guimerà et al. use the empirical frequency of equations on Wikipedia to specify these priors.
 
 $P(f_i|D)=\dfrac{1}{Z}\int_{\Theta_i}P(D|f_i,\theta_i)P(\theta_i|f_i)P(f_i)d\theta_i$
 
-With $Z=P(D)$ being a constant for a given dataset - we can ignore it since we are only interested in finding the best equation within the context of the data at hand.
+$Z=P(D)$ is a constant, so we can ignore it since we are only interested in finding the best equation for the specific data at hand.
 
 2) It then scores different candidate equations using description length as a loss function. Formally, this description length is the number of natural units of information (nats) needed to jointly encode the data and the equation optimally.
 
@@ -38,11 +38,11 @@ $\mathscr{L}(f_i)\approx\dfrac{B(f_i)}{2} - \log[P(f_i)]$
 
 where $B(f_i)=k\log[n] - 2\log[P(D|\theta^*,f_i)]$
 
-In this formulation, the goodness of fit $p(D|\theta^*,f_i)$ and likelihood $p(f_i)$ of an equation are equally and logarithmically weighted to each other - e.g., improving the fit by a factor of 2 is offset by having half the likelihood.
+In this formulation, the goodness of fit $p(D|\theta^*,f_i)$ and likelihood $p(f_i)$ of an equation are equally and logarithmically weighted to each other (e.g., improving the fit by a factor of 2 is offset by halving the likelihood).
 
-To better understand the problem, equations are framed in terms of acyclic graphs (i.e., trees)
+To better frame the problem, equations are cast as acyclic graphs (i.e., trees).
 
-Bayesian Theory is then applied to navigating the search space. BMS employs a popular sampling method (MCMC) to do this efficiently.
+Bayesian inference via MCMC is then applied to navigate the search space efficiently. Note, there are many sampling strategies other than MCMC that could be used.
 
 The search space is very rugged, and local minima are difficult to escape, so BMS employs parallel tempering to overcome this.
 
@@ -50,7 +50,7 @@ The search space is very rugged, and local minima are difficult to escape, so BM
 
 One incremental unit of search in this approach involves two steps:
 
-I) Markov Chain Monte Carlo Sampling:
+I) Markov chain Monte Carlo Sampling:
 
     a) One of three mutations - Root Removal/Addition, Elementary Tree Replacement, Node Replacement - are selected for the equation tree.
     b) Choosing the operator associated with the mutation relies on how likely the operator is to turn up (encoded in the priors).
@@ -63,10 +63,10 @@ II) Parallel Tree Swap:
 
     a) Two parallel trees held at different temperatures are selected.
     b) The temperatures of the two trees are swapped.
-    c) If this improves/lowers the loss of the now colder tree, the tree temperatures are permanently swapped.
+    c) If this decreases the loss of the now colder tree, the tree temperatures are permanently swapped.
     d) If not, the trees are reverted to preexisting temperatures.
     
-After iterating over these two steps for $n$ epochs, the tree held at the lowest temperature is returned as the fitted model.
+After iterating over these two steps for $n$ epochs, the tree held at the lowest temperature is returned as the best fitted model for the data provided.
 
 ## References
 
