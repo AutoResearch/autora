@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "autora"
-version = "1.0.0"
+version = "1.1.0"
 description = "Autonomous Research Assistant (AutoRA) is a framework for implementing machine learning tools which autonomously and iteratively generate 1) new theories to describe real-world data, and 2) experiments to invalidate those theories and seed a new cycle of theory-making. The experiments will be run online via crowd-sourcing platforms (MTurk, Prolific)."
 authors = [
     "Sebastian Musslick <sebastian_musslick@brown.edu>",
@@ -12,15 +12,16 @@ repository = "https://github.com/AutoResearch/autora"
 documentation = "https://autoresearch.github.io/autora/"
 
 [tool.poetry.dependencies]
-python = "^3.8"
-numpy = "^1.18"
+python = ">=3.8,<3.11"
+numpy = "^1.23.1"
+scipy = "^1.9.3"
 imageio = "^2.9.0"
 matplotlib = "^3.2.1"
 pandas = "^1.4.2"
 graphviz = ">=0.14.1,<0.21.0"
 seaborn = ">=0.11.1,<0.13.0"
-scipy = "^1.7.1"
 scikit-learn = "^1.1.1"
+sympy = "^1.10.1"
 tinkerforge = {version = "^2.1.25", optional=true}
 torch = "1.12.1"
 tqdm = "^4.64.0"
@@ -30,9 +31,12 @@ tinkerforge = ["tinkerforge"]
 
 [tool.poetry.group.dev.dependencies]
 jupyter = "^1.0.0"
+pytest = "^7.2.0"
+ipython = "^8.4.0"
+ipywidgets = "^7.7.1"
 
 [tool.poetry.group.docs.dependencies]
-mkdocs-material = "^8.3.8"
+mkdocs-material = "^8.5.10"
 mkdocs-gen-files = "^0.3.4"
 mkdocs-literate-nav = "^0.4.1"
 mkdocs-section-index = "^0.3.4"
