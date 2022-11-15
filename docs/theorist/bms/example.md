@@ -25,9 +25,9 @@ prior = "Guimera2020"
 
 We will use the BMS Regresssor to predict the outcomes. There are a number of parameters that determine how the architecture search is performed. The most important ones are listed below:
 
-- **`epochs`**: The number of epochs to run BMS. This corresponds to the total number of equation mutations - one mcmc step for each parallel-tempered equation and one tree swap between a pair of parallel-tempered equations
-- **`prior_par`**: A dictionary of priors for each operation. The keys correspond to operations and the values correspond to a measure of the prior probability of that operation occurring. The model comes with a default.  
-- **`ts`**: A list of temperature values. The machine scientist creates an equation tree for each temperature. Higher temperature trees are harder to fit, and thus they help to avoid overfitting the model.
+- **`epochs`**: The number of epochs to run BMS. This corresponds to the total number of equation mutations - one mcmc step for each parallel-tempered equation and one tree swap between a pair of parallel-tempered equations.
+- **`prior_par`**: A dictionary of priors for each operation. The keys correspond to operations and the respective values correspond to prior probabilities of those operations. The model comes with a default.  
+- **`ts`**: A list of temperature values. The machine scientist creates an equation tree for each of these values. Higher temperature trees are harder to fit, and thus they help prevent overfitting of the model.
 
 
 Let's set up the BMS regressor with default parameters.
@@ -48,7 +48,8 @@ bms_estimator.predict(X)
 ## Troubleshooting
 
 We can troubleshoot the model by playing with a few parameters:
+
 - Increasing the number of epochs. The original paper recommends 1500-3000 epochs for reliable fitting. The default is set to 1500.
-- Using custom priors, more relevant to the data. The default priors are over equations nonspecific to scientific domain.
+- Using custom priors that are more relevant to the data. The default priors are over equations nonspecific to any particular scientific domain.
 - Increasing the range of temperature values to escape local minima.
 - Reducing the differences between parallel temperatures to escape local minima.
