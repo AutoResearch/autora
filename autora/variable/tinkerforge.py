@@ -1,5 +1,5 @@
 from abc import abstractmethod
-from typing import Sequence
+from typing import Any, Tuple
 
 from tinkerforge.bricklet_industrial_analog_out_v2 import BrickletIndustrialAnalogOutV2
 from tinkerforge.bricklet_industrial_dual_0_20ma_v2 import BrickletIndustrialDual020mAV2
@@ -9,7 +9,7 @@ from tinkerforge.bricklet_industrial_dual_analog_in_v2 import (
 from tinkerforge.ip_connection import IPConnection
 from variable import ValueType
 
-from autora.variable import DV, IV, Variable, register_dv_label, register_iv_label
+from autora.variable import DV, IV, Variable
 
 
 class TinkerforgeVariable(Variable):
@@ -28,7 +28,7 @@ class TinkerforgeVariable(Variable):
         name: str = "",
         units: str = "",
         priority: int = 0,
-        value_range: Sequence = (0, 1),
+        value_range: Tuple[Any, Any] = (0, 1),
         type: ValueType = float,
     ):
         """
@@ -345,35 +345,3 @@ class DVVoltage(DVTF):
         """
         value = self._idai.get_voltage(self.channel)
         self.set_value(value)
-
-
-register_dv_label(
-    **{
-        "voltage0": (DVVoltage, "Voltage 0", "MjY", "voltage0", "mV", 1, (-3500, 3500)),
-        "voltage1": (DVVoltage, "Voltage 1", "MjY", "voltage1", "mV", 1, (-3500, 3500)),
-        "current0": (DVCurrent, "Current 0", "Hfg", "current0", "mA", 2, (0, 20)),
-        "current1": (DVCurrent, "Current 1", "Hfg", "current1", "mA", 2, (0, 20)),
-    }
-)
-register_iv_label(
-    **{
-        "source_voltage": (
-            IVVoltage,
-            "Source Voltage",
-            "MST",
-            "source_voltage",
-            "mV",
-            2,
-            (0, 5000),
-        ),
-        "source_current": (
-            IVCurrent,
-            "Source Current",
-            "MST",
-            "source_current",
-            "µA",
-            2,
-            (0, 20000),
-        ),
-    }
-)
