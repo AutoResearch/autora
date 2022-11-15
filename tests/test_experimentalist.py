@@ -110,11 +110,11 @@ def test_experimentalist():
     n_trials = 25
 
     # Set up pipeline functions with partial
-    pooler = partial(gridsearch_pool, ivs=metadata.independent_variables)
+    pooler_callable = partial(gridsearch_pool, ivs=metadata.independent_variables)
     sampler = partial(random_sampler, n=n_trials)
 
     pipeline_random_samp = Pipeline(
-        pooler,
+        pooler_callable,
         weber_filter,
         sampler,
     )
@@ -138,6 +138,26 @@ def test_experimentalist():
     # Is sampling randomly
     results2 = pipeline_random_samp.run()
     assert results != results2
+
+    # ---Pool using Generator----
+    pooler_generator = gridsearch_pool(metadata.independent_variables)
+    pipeline_random_samp_poolgen = Pipeline(
+        pooler_generator,
+        weber_filter,
+        sampler,
+    )
+
+    results_poolgen = pipeline_random_samp_poolgen.run()
+
+    # Is sampling the number of trials we expect
+    assert len(results_poolgen) == n_trials
+
+    # Filter is selecting where IV1 >= IV2
+    assert all([s[0] >= s[1] for s in results_poolgen])
+
+    # This will fail. Generator is exhausted and pool is not regenerated when pipeline is run again.
+    results_poolgen2 = pipeline_random_samp_poolgen.run()
+    assert len(results_poolgen2) > 0
 
 
 if __name__ == "__main__":
