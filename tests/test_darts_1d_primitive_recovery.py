@@ -108,7 +108,7 @@ def run_test_primitive_fitting(
     transformer: Callable,
     expected_primitive: str,
     primitives: Sequence[str],
-    verbose: bool = True,
+    verbose: bool = False,
 ):
     y = transformer(X)
     regressor = DARTSRegressor(

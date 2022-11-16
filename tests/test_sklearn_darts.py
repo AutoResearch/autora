@@ -223,7 +223,6 @@ def test_metaparam_optimization():
 
 
 def test_execution_monitor():
-    import matplotlib.pyplot as plt
 
     X, y, const, epsilon = generate_noisy_constant_data()
 
@@ -262,8 +261,6 @@ def test_execution_monitor():
         **kwargs
     ).fit(X, y)
     execution_monitor_2.display()
-
-    plt.show()
 
 
 def test_label_getter():
