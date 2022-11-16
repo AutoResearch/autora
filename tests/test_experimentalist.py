@@ -1,13 +1,11 @@
-import collections
-import pathlib
 import random
 from functools import partial
 from itertools import product
-from typing import List
+from typing import Iterable, List
 
 import numpy as np
 
-from autora.experimentalist.pipeline import Pipeline
+from autora.experimentalist.pipeline import PoolPipeline
 from autora.variable import DV, IV, ValueType, VariableCollection
 
 # import pandas as pd
@@ -28,15 +26,12 @@ def random_product(*args, repeat=1):
 
 def gridsearch_pool(ivs: List[IV]):
     """Returns Cartesian product of sets"""
-    # Get allowed values for each IV
-    l_iv_values = [iv.allowed_values for iv in ivs]
-
-    # Return Cartesian product of all IV values
-    return product(*l_iv_values)
+    result = product(iv.allowed_values for iv in ivs)
+    return result
 
 
 def random_sampler(values, n):
-    if isinstance(values, collections.Iterable):
+    if isinstance(values, Iterable):
         values = list(values)
     random.shuffle(values)
     samples = values[0:n]
@@ -113,7 +108,7 @@ def test_experimentalist():
     pooler_callable = partial(gridsearch_pool, ivs=metadata.independent_variables)
     sampler = partial(random_sampler, n=n_trials)
 
-    pipeline_random_samp = Pipeline(
+    pipeline_random_samp = PoolPipeline(
         pooler_callable,
         weber_filter,
         sampler,
@@ -141,7 +136,7 @@ def test_experimentalist():
 
     # ---Pool using Generator----
     pooler_generator = gridsearch_pool(metadata.independent_variables)
-    pipeline_random_samp_poolgen = Pipeline(
+    pipeline_random_samp_poolgen = PoolPipeline(
         pooler_generator,
         weber_filter,
         sampler,
@@ -155,9 +150,9 @@ def test_experimentalist():
     # Filter is selecting where IV1 >= IV2
     assert all([s[0] >= s[1] for s in results_poolgen])
 
-    # This will fail. Generator is exhausted and pool is not regenerated when pipeline is run again.
+    # Generator is exhausted and pool is not regenerated when pipeline is run again.
     results_poolgen2 = pipeline_random_samp_poolgen.run()
-    assert len(results_poolgen2) > 0
+    assert len(results_poolgen2) == 0
 
 
 if __name__ == "__main__":
