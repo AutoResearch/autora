@@ -57,7 +57,7 @@ test:
     - autora.variable
 
 about:
-  home: https://musslick.github.io/AER_website/Resources.html
+  home: https://empiricalresearch.ai
   license: UNKNOWN
   license_family: OTHER
   license_file: LICENSE.md
