@@ -49,8 +49,11 @@ test:
   imports:
     - autora
     - autora.skl
+    - autora.skl.darts
+    - autora.skl.bms
     - autora.theorist
     - autora.theorist.darts
+    - autora.theorist.bms
     - autora.variable
 
 about:
