@@ -46,7 +46,7 @@ def transform_through_primitive_pow_2d(x: np.ndarray) -> np.ndarray:
 def run_test_primitive_fitting_2d(
     X: np.ndarray,
     transformer: Callable,
-    verbose: bool = True,
+    verbose: bool = False,
 ):
     y = transformer(X)
     regressor = BMSRegressor(epochs=30)
