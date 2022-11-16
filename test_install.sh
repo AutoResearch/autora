@@ -34,6 +34,7 @@ echo "running unit tests:"
 pytest
 
 echo "Run and test using:"
+echo "cd \"${tempdir}\""
 echo "source ${tempdir}/venv/bin/activate"
 echo "python -c 'import autora; print(autora.__version__)'"
 echo "pytest"
