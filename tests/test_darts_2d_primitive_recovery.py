@@ -12,7 +12,7 @@ non_interchangeable_primitives = [
     "add",
     "subtract",
     "logistic",
-    "exp",
+    # "exp",
     "relu",
     "cos",
     "sin",
@@ -40,6 +40,43 @@ def get_2d_primitive_from_two_node_model(model):
 def transform_through_primitive_xcos(x: np.ndarray):
     y = np.cos(x)
     return x * y
+
+
+def transform_through_primitive_xtanh(x: np.ndarray):
+    y = np.tanh(x)
+    return x * y
+
+
+def transform_through_primitive_xrelu(x: np.ndarray):
+    y = x.copy()
+    y[x < 0.0] = 0.0
+    return x * y
+
+
+def transform_through_primitive_xcosplusx(x: np.ndarray):
+    y = np.cos(x)
+    return x * y + x
+
+
+def transform_through_primitive_cosplussin(x: np.ndarray):
+    y = np.cos(x)
+    z = np.sin(x)
+    return y + z
+
+
+def transform_through_primitive_xsin(x: np.ndarray):
+    y = np.sin(x)
+    return x * y
+
+
+def transform_through_primitive_xsquared(x: np.ndarray):
+    return x * x
+
+
+def transform_through_primitive_sincos(x: np.ndarray):
+    y = np.sin(x)
+    z = np.cos(x)
+    return y * z
 
 
 def run_test_primitive_fitting(
@@ -105,11 +142,74 @@ def report_weights(X, expected_primitive, primitives, regressor, y):
     print(regressor.model_[0]._arch_parameters[0].data)
 
 
+def test_primitive_fitting_xsquared():  # x * cos(x)
+    run_test_primitive_fitting(
+        generate_x(start=-10, stop=10),
+        transform_through_primitive_xsquared,
+        "xsquared",
+        primitives=non_interchangeable_primitives,
+    )
+
+
 def test_primitive_fitting_xcos():  # x * cos(x)
     run_test_primitive_fitting(
         generate_x(start=0, stop=2 * np.pi),
         transform_through_primitive_xcos,
         "xcos",
+        primitives=non_interchangeable_primitives,
+    )
+
+
+def test_primitive_fitting_xcosplusx():  # x * cos(x) + x
+    run_test_primitive_fitting(
+        generate_x(start=0, stop=5 * np.pi),
+        transform_through_primitive_xcosplusx,
+        "xcosplusx",
+        primitives=non_interchangeable_primitives,
+    )
+
+
+def test_primitive_fitting_xsin():  # x * sin(x)
+    run_test_primitive_fitting(
+        generate_x(start=0, stop=3 * np.pi),
+        transform_through_primitive_xsin,
+        "xsin",
+        primitives=non_interchangeable_primitives,
+    )
+
+
+def test_primitive_fitting_xtanh():  # x * tanh
+    run_test_primitive_fitting(
+        generate_x(start=-10, stop=10),
+        transform_through_primitive_xtanh,
+        "xtanh",
+        primitives=non_interchangeable_primitives,
+    )
+
+
+def test_primitive_fitting_xrelu():  # x * relu
+    run_test_primitive_fitting(
+        generate_x(start=-20, stop=50),
+        transform_through_primitive_xrelu,
+        "xrelu",
+        primitives=non_interchangeable_primitives,
+    )
+
+
+def test_primitive_fitting_sincos():  # sin(x) * cos(x)
+    run_test_primitive_fitting(
+        generate_x(start=0, stop=2 * np.pi),
+        transform_through_primitive_sincos,
+        "sincos",
+        primitives=non_interchangeable_primitives,
+    )
+
+
+def test_primitive_fitting_cosplussin():  # x * sin(x)
+    run_test_primitive_fitting(
+        generate_x(start=0, stop=4 * np.pi),
+        transform_through_primitive_cosplussin,
+        "cos+sin",
         primitives=non_interchangeable_primitives,
     )
 

@@ -352,7 +352,7 @@ class Network(nn.Module):
                 weights = F.softmax(self.alphas_normal, dim=-1)
                 # weights = self.alphas_normal
                 # weights_mixt = F.softmax(self.betas, dim=-1)
-                weights_mixt = self.betas
+                weights_mixt = F.softmax(self.betas, dim=0)
             elif self.DARTS_type == DARTSType.FAIR:
                 weights = torch.sigmoid(self.alphas_normal)
                 weights_mixt = torch.sigmoid(self.betas)
@@ -444,17 +444,30 @@ class Network(nn.Module):
         return self._arch_parameters
 
     # fixes architecture
-    def fix_architecture(self, switch: bool, new_weights: torch.Tensor = None):
+    def fix_architecture(
+        self,
+        switch: bool,
+        sampled_alphas: torch.Tensor = None,
+        sampled_betas: torch.Tensor = None,
+    ):
         """
         Freezes or unfreezes the architecture weights.
 
         Arguments:
+            sampled_alphas: new set of architecture edge weights
+            sampled_betas: new set of architecture node interactions weights
             switch: set true to freeze architecture weights or false unfreeze
-            new_weights: new set of architecture weights
         """
         self._architecture_fixed = switch
-        if new_weights is not None:
-            self.alphas_normal = new_weights
+        if sampled_alphas is not None:
+            self.alphas_normal = sampled_alphas
+        if sampled_betas is not None:
+            self.betas = sampled_betas
+
+        print("sampled alphas")
+        print(sampled_alphas)
+        print("sampled betas")
+        print(sampled_betas)
         return
 
     def sample_alphas_normal(
@@ -530,6 +543,24 @@ class Network(nn.Module):
             alphas_normal_sample[edge, max_idx] = 1
 
         return alphas_normal_sample
+
+    def max_betas_normal(self) -> torch.Tensor:
+        """
+        Samples an architecture from the mixed operations by selecting, for each edge,
+        the operation with the largest architecture weight.
+
+        Returns:
+            alphas_normal_sample: sampled architecture weights.
+        """
+        betas_normal = self.betas.clone()
+        betas_normal_sample = Variable(torch.zeros(betas_normal.data.shape))
+
+        for i in range(betas_normal.data.shape[0]):  # interactions including node i
+            row = betas_normal[i]
+            max_idx = np.argmax(row.data)
+            betas_normal_sample[i, max_idx] = 1
+
+        return betas_normal_sample
 
     # returns the genotype of the model
     def genotype(self, sample: bool = False) -> Genotype:

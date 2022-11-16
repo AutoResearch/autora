@@ -138,14 +138,18 @@ def run_test_primitive_fitting(
         # print("y_pred")
         # print(y_predict)
         report_weights(X, expected_primitive, primitives, regressor, y)
-        plot_results(X, y, y_predict)
+        plot_results(X, y, y_predict, expected_primitive, primitives)
 
     assert get_primitive_from_single_node_model(regressor.model_) == expected_primitive
 
 
-def plot_results(X, y, y_predict):
+def plot_results(X, y, y_predict, expected_primitive, primitives):
     plt.plot(X, y, "o")
     plt.plot(X, y_predict, "-")
+    primitives_string = " ".join(primitives)
+    title = "expected " + expected_primitive + " from: " + primitives_string
+    plt.title(title)
+    # plt.savefig(title+'.png')
     plt.show()
 
 
@@ -196,6 +200,15 @@ def test_primitive_fitting_restricted_subtract():
         transform_through_primitive_subtract,
         "subtract",
         primitives=["none", "add", "subtract"],
+    )
+
+
+def test_primitive_fitting_restricted_cos():
+    run_test_primitive_fitting(
+        generate_x(),
+        transform_through_primitive_cos,
+        "cos",
+        primitives=["cos", "sin", "subtract"],
     )
 
 

@@ -409,11 +409,16 @@ def _generate_model(
     model_without_output_function = copy.deepcopy(network_)
 
     if sampling_strategy == "max":
-        new_weights = model_without_output_function.max_alphas_normal()
-    elif sampling_strategy == "sample":
-        new_weights = model_without_output_function.sample_alphas_normal()
+        sampled_alphas = model_without_output_function.max_alphas_normal()
+        sampled_betas = model_without_output_function.max_betas_normal()
 
-    model_without_output_function.fix_architecture(True, new_weights=new_weights)
+    elif sampling_strategy == "sample":
+        sampled_alphas = model_without_output_function.sample_alphas_normal()
+        sampled_betas = model_without_output_function.sample_betas_normal()
+
+    model_without_output_function.fix_architecture(
+        True, sampled_alphas=sampled_alphas, sampled_betas=sampled_betas
+    )
 
     # Re-optimize the parameters
 
