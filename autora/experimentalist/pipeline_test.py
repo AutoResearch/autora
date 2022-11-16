@@ -2,7 +2,7 @@ from itertools import product
 
 import numpy as np
 
-from .pipeline import Pipeline
+from .pipeline import PoolPipeline
 
 ##############################################################################
 # Simple pool and filters of one variable
@@ -22,20 +22,26 @@ def odd_filter(values):
 
 
 def test_zeroth_pipeline():
-    pipeline = Pipeline(linear_pool_generator)
+    pipeline = PoolPipeline(linear_pool_generator)
     result = list(pipeline())
     assert result == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 
 
 def test_even_pipeline():
-    pipeline = Pipeline(linear_pool_generator, even_filter)
+    pipeline = PoolPipeline(linear_pool_generator, even_filter)
     result = list(pipeline())
     assert result == [0, 2, 4, 6, 8]
 
 
 def test_odd_pipeline():
-    pipeline = Pipeline(linear_pool_generator, odd_filter)
+    pipeline = PoolPipeline(linear_pool_generator, odd_filter)
     result = list(pipeline())
+    assert result == [1, 3, 5, 7, 9]
+
+
+def test_pipeline_run():
+    pipeline = PoolPipeline(linear_pool_generator, odd_filter)
+    result = list(pipeline.run())
     assert result == [1, 3, 5, 7, 9]
 
 
@@ -55,7 +61,7 @@ def weber_filter(values):
 
 
 def test_weber_unfiltered_pipeline():
-    pipeline = Pipeline(weber_pool)
+    pipeline = PoolPipeline(weber_pool)
     result = list(pipeline())
     assert result[0] == (0.0, 0.0)
     assert result[1] == (0.0, 0.25)
@@ -63,7 +69,7 @@ def test_weber_unfiltered_pipeline():
 
 
 def test_weber_filtered_pipeline():
-    pipeline = Pipeline(weber_pool, weber_filter)
+    pipeline = PoolPipeline(weber_pool, weber_filter)
     result = list(pipeline())
     assert result[0] == (0.0, 0.0)
     assert result[1] == (0.25, 0.0)

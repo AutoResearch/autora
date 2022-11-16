@@ -1,37 +1,105 @@
-from typing import List, Protocol, Union
+"""
+Provides tools to chain functions used to create experiment sequences.
+"""
+
+from typing import Iterable, List, Protocol, Union, runtime_checkable
+
+import numpy as np
 
 
-# TODO: Change this to be an np.ndarray
-class ExperimentalSequence:
+class ExperimentalCondition:
+    """An ExperimentalCondition represents a trial."""
+
     pass
 
 
+ExperimentalSequence = Iterable[ExperimentalCondition]
+ExperimentalSequence.__doc__ = """
+An ExperimentalSequence represents a series of trials.
+"""
+
+
+def sequence_to_ndarray(sequence: ExperimentalSequence):
+    """Converts an ExperimentalSequence to a numpy-ndarray."""
+    ndarray = np.ndarray(list(sequence))
+    return ndarray
+
+
+@runtime_checkable
 class Pool(Protocol):
+    """Creates an experimental sequence from scratch."""
+
     def __call__(self) -> ExperimentalSequence:
         ...
 
 
+@runtime_checkable
 class Pipe(Protocol):
+    """Takes in an ExperimentalSequence and modifies it before returning it."""
+
     def __call__(self, ex: ExperimentalSequence) -> ExperimentalSequence:
         ...
 
 
-PipelineElement = Union[Pool, Pipe]
+class PoolPipeline:
+    """
+    Creates ("pools") and processes ("pipelines") a series of ExperimentalSequences.
+
+    Examples:
+        A pipeline which generates the list of integers from 0 to 9
+        >>> p = PoolPipeline(
+        ... lambda: range(10), # the "pool" function
+        ... )
+        >>> list(p())
+        [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+        A pipeline which generates the list of even values from 0 to 9
+        >>> q = PoolPipeline(
+        ... lambda: range(10),                                   # the "pool" function
+        ... lambda values: filter(lambda i: i % 2 == 0, values)  # a "pipe" function
+        ... )
+        >>> list(q())
+        [0, 2, 4, 6, 8]
+
+        A pipeline which generates the list of even values from 0 to 4 paired with "a" and "b"
+        >>> from itertools import product
+        >>> r = PoolPipeline(
+        ... lambda: product(range(5), ["a", "b"]),          # the "pool" function
+        ... lambda values: filter(lambda i: i[0] % 2 == 0, values)  # a "pipe" function
+        ... )
+        >>> list(r())
+        [(0, 'a'), (0, 'b'), (2, 'a'), (2, 'b'), (4, 'a'), (4, 'b')]
+
+        The pipeline can also be called using the "run" syntax:
+        >>> list(r.run())
+        [(0, 'a'), (0, 'b'), (2, 'a'), (2, 'b'), (4, 'a'), (4, 'b')]
+
+        If the pipeline is evaluated without wrapping the result in a function like "list" which
+        ensures that all the values are really instantiated, it remains unevaluated.
+        >>> s = r.run()
+        >>> s # doctest: +ELLIPSIS
+        <filter object at 0x...>
+
+        The filter can be evaluated by wrapping it in a function like "list" as above, or "tuple":
+        >>> tuple(s)
+        ((0, 'a'), (0, 'b'), (2, 'a'), (2, 'b'), (4, 'a'), (4, 'b'))
 
 
-class Pipeline:
-    def __init__(self, pool: Pool, *pipes: Pipe):
+    """
+
+    def __init__(self, pool: Union[Pool, Iterable], *pipes: Pipe):
+        """Initialize the pipeline with a Pool object and a series of Pipe objects."""
         self.pool = pool
         self.pipes = pipes
-        self.results: List[ExperimentalSequence] = []
+        self.results: List[ExperimentalSequence] = list()
 
     def __call__(self) -> ExperimentalSequence:
-        self.results = []
+        """Create the pool of values, then successively pass it through the Pipe."""
         # Create pool
-        if callable(self.pool):
-            self.results.append(self.pool())
-        else:
-            self.results.append(self.pool)
+        if isinstance(self.pool, Iterable):
+            self.results = [self.pool]
+        elif isinstance(self.pool, Pool):
+            self.results = [self.pool()]
 
         # Run filters
         for pipe in self.pipes:
@@ -39,17 +107,4 @@ class Pipeline:
 
         return self.results[-1]
 
-    # May be more intuitive to run the pipeline with a named method. Similar to skl.
-    def run(self):
-        self.results = []
-        # Create pool
-        if callable(self.pool):
-            self.results.append(self.pool())
-        else:
-            self.results.append(self.pool)
-
-        # Run filters
-        for pipe in self.pipes:
-            self.results.append(pipe(self.results[-1]))
-
-        return self.results[-1]
+    run = __call__
