@@ -26,8 +26,14 @@ def random_product(*args, repeat=1):
 
 def gridsearch_pool(ivs: List[IV]):
     """Returns Cartesian product of sets"""
-    result = product(iv.allowed_values for iv in ivs)
-    return result
+    # Get allowed values for each IV
+    l_iv_values = []
+    for iv in ivs:
+        assert iv.allowed_values is not None
+        l_iv_values.append(iv.allowed_values)
+
+    # Return Cartesian product of all IV values
+    return product(*l_iv_values)
 
 
 def random_sampler(values, n):
