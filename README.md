@@ -303,7 +303,7 @@ If your `git commit` fails because of the pre-commit hook, then you should:
    ```
 3. Fix any errors which are reported.
    **Important: Once you've changed the code, re-stage the files it to Git. 
-   This might mean unstaging changes and then adding them again.**
+   This might mean un-staging changes and then adding them again.**
 4. If you have trouble:
    - Do a web-search to see if someone else had a similar error in the past.
    - Check that the tests you've written work correctly.
@@ -404,7 +404,7 @@ We use the standard poetry publishing workflow as outlined here: https://python-
 This directory includes files for packaging the code for `conda`.
 - [`meta.yaml`](meta.yaml) is the `conda` recipe (configuration file)
 - [`publish-on-anaconda-org.sh`](publish-on-anaconda-org.
-sh) is a script which runs the packaging and outputs the package into the `./dist` directory, then uploads the files to [anaconda.org](anaconda.org).
+sh) is a script which runs the packaging and outputs the package into the `./dist` directory, then uploads the files to [anaconda.org](https://anaconda.org).
 
 To create and publish the `conda` package:
 - Update `./meta.yaml` with any changed dependencies, to match `pyproject.toml` and taking into account the dependencies which are actually available on the anaconda channels we use: defaults and pytorch. Commit these changes.
