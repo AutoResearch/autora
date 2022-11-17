@@ -1,73 +1,26 @@
-import random
+import pathlib
 from functools import partial
-from itertools import product
-from typing import Iterable, List
 
 import numpy as np
+import pandas as pd
+from sklearn.linear_model import LogisticRegression
 
+from autora.experimentalist.filter import weber_filter
 from autora.experimentalist.pipeline import PoolPipeline
+from autora.experimentalist.pool import gridsearch_pool
+from autora.experimentalist.sampler import random_sampler, uncertainty_sampler
 from autora.variable import DV, IV, ValueType, VariableCollection
 
-# import pandas as pd
-# from alipy.query_strategy.query_labels import QueryInstanceUncertainty
 
+def test_random_experimentalist():
+    """
+    Tests the implementation of the experimentalist pipeline with an exhaustive pool of discrete
+    values, Weber filter, random selector. Tests two different implementations of the pool function
+    as a callable and passing in as interator/generator.
 
-class Experimentalist:
-    def __init__(self, pool_method, sampling_method, **args):
-        self._pool_method = pool_method
-        self._sampling_method = sampling_method
+    """
 
-
-def random_product(*args, repeat=1):
-    """Random selection from itertools.product(*args, **kwds)"""
-    pools = [tuple(pool) for pool in args] * repeat
-    return tuple(map(random.choice, pools))
-
-
-def gridsearch_pool(ivs: List[IV]):
-    """Returns Cartesian product of sets"""
-    # Get allowed values for each IV
-    l_iv_values = []
-    for iv in ivs:
-        assert iv.allowed_values is not None, (
-            f"gridsearch_pool only supports independent variables with discrete allowed values, "
-            f"but allowed_values is None on {iv=} "
-        )
-        l_iv_values.append(iv.allowed_values)
-
-    # Return Cartesian product of all IV values
-    return product(*l_iv_values)
-
-
-def random_sampler(values, n):
-    if isinstance(values, Iterable):
-        values = list(values)
-    random.shuffle(values)
-    samples = values[0:n]
-
-    return samples
-
-
-def weber_filter(values):
-    return filter(lambda s: s[0] >= s[1], values)
-
-
-def uncertainty_sampler(
-    model,
-):
-    model
-    # Theory
-    # n samples to select
-
-
-def test_experimentalist():
-    # %% Load the data
-    # datafile_path = pathlib.Path(__file__).parent.parent.joinpath(
-    #     "example/sklearn/darts/weber_data.csv"
-    # )
-    # data = pd.read_csv(datafile_path)
-
-    # specify independent variables
+    # Specify independent variables
     iv1 = IV(
         name="S1",
         allowed_values=np.linspace(0, 5, 5),
@@ -89,7 +42,9 @@ def test_experimentalist():
         variable_label="Stimulus 3 Binary",
     )
 
-    # specify dependent variable with type
+    # Specify dependent variable with type
+    # The experimentalist pipeline doesn't actually use DVs, they are just specified here for
+    # example.
     dv1 = DV(
         name="difference_detected",
         value_range=(0, 1),
@@ -105,18 +60,18 @@ def test_experimentalist():
         variable_label="difference detected",
         type=ValueType.PROBABILITY_SAMPLE,
     )
-
+    # Variable collection with ivs and dvs
     metadata = VariableCollection(
         independent_variables=[iv1, iv2, iv3],
         dependent_variables=[dv1, dv2],
     )
 
-    n_trials = 25
+    n_trials = 25  # Number of trails for sampler to select
 
+    # ---Implementation 1 - Pool using Callable via partial function----
     # Set up pipeline functions with partial
     pooler_callable = partial(gridsearch_pool, ivs=metadata.independent_variables)
     sampler = partial(random_sampler, n=n_trials)
-
     pipeline_random_samp = PoolPipeline(
         pooler_callable,
         weber_filter,
@@ -137,13 +92,13 @@ def test_experimentalist():
     assert len(results) == n_trials
 
     # Filter is selecting where IV1 >= IV2
-    assert all([s[0] >= s[1] for s in results])
+    assert all([s[0] <= s[1] for s in results])
 
     # Is sampling randomly
     results2 = pipeline_random_samp.run()
     assert results != results2
 
-    # ---Pool using Generator----
+    # ---Implementation 2 - Pool using Generator----
     pooler_generator = gridsearch_pool(metadata.independent_variables)
     pipeline_random_samp_poolgen = PoolPipeline(
         pooler_generator,
@@ -157,12 +112,102 @@ def test_experimentalist():
     assert len(results_poolgen) == n_trials
 
     # Filter is selecting where IV1 >= IV2
-    assert all([s[0] >= s[1] for s in results_poolgen])
+    assert all([s[0] <= s[1] for s in results_poolgen])
 
-    # Generator is exhausted and pool is not regenerated when pipeline is run again.
+    # This will fail
+    # The Generator is exhausted after the first run and the pool is not regenerated when pipeline
+    # is run again. The pool should be set up as a callable if the pipeline is to be rerun.
     results_poolgen2 = pipeline_random_samp_poolgen.run()
     assert len(results_poolgen2) == 0
 
 
+def test_uncertainty_experimentalist():
+    """
+    Tests the implementation of the experimentalist pipeline with an exhaustive pool of discrete
+    values, Weber filter, uncertainty sampler. A logistic regression model is trained using
+    synthetic Weber experiment data for use in Uncertainty sampling.
+
+    """
+    # Load the data
+    datafile_path = pathlib.Path(__file__).parent.parent.joinpath(
+        "example/sklearn/darts/weber_data.csv"
+    )
+    data = pd.read_csv(datafile_path)
+    X = data[["S1", "S2"]]
+    y = data["difference_detected"]
+    y_classified = np.where(y >= 0.5, 1, 0)
+
+    # Train logistic regression model
+    logireg_model = LogisticRegression()
+    logireg_model.fit(X, y_classified)
+
+    # Specify independent variables
+    iv1 = IV(
+        name="S1",
+        allowed_values=np.linspace(0, 5, 5),
+        units="intensity",
+        variable_label="Stimulus 1 Intensity",
+    )
+
+    iv2 = IV(
+        name="S2",
+        allowed_values=np.linspace(0, 5, 5),
+        units="intensity",
+        variable_label="Stimulus 2 Intensity",
+    )
+
+    # The experimentalist pipeline doesn't actually use DVs, they are just specified here for
+    # example.
+    dv1 = DV(
+        name="difference_detected",
+        value_range=(0, 1),
+        units="probability",
+        variable_label="P(difference detected)",
+        type=ValueType.PROBABILITY,
+    )
+
+    # Variable collection with ivs and dvs
+    metadata = VariableCollection(
+        independent_variables=[iv1, iv2],
+        dependent_variables=[dv1],
+    )
+
+    n_trials = 10  # Number of trails for sampler to select
+
+    # Set up pipeline functions with partial
+    pooler_callable = partial(gridsearch_pool, ivs=metadata.independent_variables)
+    sampler = partial(uncertainty_sampler, model=logireg_model, n=n_trials)
+
+    # Initialize pipeline
+    pipeline = PoolPipeline(
+        pooler_callable,
+        weber_filter,
+        sampler,
+    )
+    # Run the pipeline
+    results = pipeline.run()
+
+    # ***Checks***
+    # Is sampling the number of trials we expect
+    assert len(results) == n_trials
+
+    # Filter is selecting where IV1 >= IV2
+    assert all([s[0] <= s[1] for s in results])
+
+    # Uncertainty sampling is behaving as expected by comparing results with manual calculation
+    pipeline_pool_filter = PoolPipeline(pooler_callable, weber_filter)
+    pool = np.array(list(pipeline_pool_filter.run()))  # Create filtered pool
+    a_prob = logireg_model.predict_proba(pool)  # Get predicted probabilities
+    # Calculate and sort max probability from each condition
+    s_max_prob = pd.Series([np.max(s) for s in a_prob]).sort_values(ascending=True)
+    select_idx = s_max_prob.index[
+        0:n_trials
+    ].to_list()  # Get index of lowest probabilities
+    results_manual = np.flip(pool[select_idx], axis=0)  # Index conditions from pool
+    # Check results from the function match manaual method
+    assert np.array_equal(results, results_manual)
+
+
 if __name__ == "__main__":
-    test_experimentalist()
+    test_random_experimentalist()
+    test_uncertainty_experimentalist()
