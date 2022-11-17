@@ -395,6 +395,10 @@ autora/          # The directory containing the source code.
 ```
 # Release Process
 
+## PyPi
+
+We use the standard poetry publishing workflow as outlined here: https://python-poetry.org/docs/libraries/#publishing-to-pypi
+
 ## Conda
 
 This directory includes files for packaging the code for `conda`.
