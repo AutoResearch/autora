@@ -401,10 +401,9 @@ We use the standard poetry publishing workflow as outlined here: https://python-
 
 ## Conda
 
-This directory includes files for packaging the code for `conda`.
-- [`meta.yaml`](meta.yaml) is the `conda` recipe (configuration file)
-- [`publish-on-anaconda-org.sh`](publish-on-anaconda-org.
-sh) is a script which runs the packaging and outputs the package into the `./dist` directory, then uploads the files to [anaconda.org](https://anaconda.org).
+The `conda` directory includes files for packaging the code for the Anaconda package manager `conda`.
+- [`meta.yaml`](conda/recipe/meta.yaml) is the `conda` recipe (configuration file)
+- [`publish-on-anaconda-org.sh`](conda/publish-on-anaconda-org.sh) is a script which runs the packaging and outputs the package into the `./dist` directory, then uploads the files to [anaconda.org](https://anaconda.org).
 
 To create and publish the `conda` package:
 - Update `./meta.yaml` with any changed dependencies, to match `pyproject.toml` and taking into account the dependencies which are actually available on the anaconda channels we use: defaults and pytorch. Commit these changes.
