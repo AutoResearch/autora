@@ -1,8 +1,7 @@
 """
 Provides tools to chain functions used to create experiment sequences.
 """
-
-from typing import Iterable, List, Protocol, Union, runtime_checkable
+from typing import Iterable, List, Protocol, Sequence, Union, runtime_checkable
 
 import numpy as np
 
@@ -96,15 +95,27 @@ class PoolPipeline:
     def __call__(self) -> ExperimentalSequence:
         """Create the pool of values, then successively pass it through the Pipe."""
         # Create pool
+        results = []
         if isinstance(self.pool, Iterable):
-            self.results = [self.pool]
+            results = [self.pool]
         elif isinstance(self.pool, Pool):
-            self.results = [self.pool()]
+            results = [self.pool()]
 
         # Run filters
         for pipe in self.pipes:
-            self.results.append(pipe(self.results[-1]))
+            results.append(pipe(results[-1]))
 
-        return self.results[-1]
+        return results[-1]
 
     run = __call__
+
+
+def make_pipeline(steps: Sequence[Union[Pool, Iterable, Pipe]]):
+    pool = steps[0]
+    assert isinstance(pool, Pool) or isinstance(pool, Iterable)
+
+    pipes = steps[1:]
+    assert all([isinstance(pipe, Pipe) for pipe in pipes])
+
+    pipeline = PoolPipeline(pool, *pipes)  # type: ignore ## todo: fix this
+    return pipeline
