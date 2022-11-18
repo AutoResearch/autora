@@ -395,7 +395,7 @@ autora/          # The directory containing the source code.
 ```
 # Release Process
 
-## PyPi
+## PyPI
 
 We use the standard poetry publishing workflow as outlined here: https://python-poetry.org/docs/libraries/#publishing-to-pypi
 
@@ -407,5 +407,5 @@ The `conda` directory includes files for packaging the code for the Anaconda pac
 
 To create and publish the `conda` package:
 - Update `./meta.yaml` with any changed dependencies, to match `pyproject.toml` and taking into account the dependencies which are actually available on the anaconda channels we use: defaults and pytorch. Commit these changes.
-- 🐛 Bugfix: While poetry >=1.2 is not available on anaconda.org, delete the [tool.poetry.group...] parts of pyproject.toml. These are recognized as incorrect Poetry configuration in poetry 1.1 and below, and will cause the build to fail. Don't commit these changes.  
+- 🐛 Bugfix: Until poetry >=1.2 is available on anaconda.org (you should check each time we publish until it is), delete the [tool.poetry.group...] parts of pyproject.toml. These are recognized as incorrect Poetry configuration in poetry 1.1 and below, and will cause the build to fail. Don't commit these changes.  
 - run `publish-on-anaconda-org.sh`
