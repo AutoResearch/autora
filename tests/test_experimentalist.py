@@ -94,9 +94,16 @@ def test_random_experimentalist():
     # Filter is selecting where IV1 >= IV2
     assert all([s[0] <= s[1] for s in results])
 
-    # Is sampling randomly
-    results2 = pipeline_random_samp.run()
-    assert results != results2
+    # Is sampling randomly. Runs 10 times and checks if consecutive runs are equal.
+    # Assert will fail if all 9 pairs return equal.
+    l_results = [pipeline_random_samp.run() for s in range(10)]
+    assert not np.all(
+        [
+            np.array_equal(l_results[i], l_results[i + 1])
+            for i, s in enumerate(l_results)
+            if i < len(l_results) - 1
+        ]
+    )
 
     # ---Implementation 2 - Pool using Generator----
     pooler_generator = gridsearch_pool(metadata.independent_variables)
@@ -118,7 +125,7 @@ def test_random_experimentalist():
     # The Generator is exhausted after the first run and the pool is not regenerated when pipeline
     # is run again. The pool should be set up as a callable if the pipeline is to be rerun.
     results_poolgen2 = pipeline_random_samp_poolgen.run()
-    assert len(results_poolgen2) == 0
+    assert len(results_poolgen2) > 0
 
 
 def test_uncertainty_experimentalist():
