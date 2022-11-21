@@ -145,6 +145,41 @@ def test_nested_pipeline_flat_parameters():
     assert result == [0, 8, 16, 24]
 
 
+def test_nested_pipeline_nested_parameters_in_kwargs():
+    inner_pipeline = Pipeline([("pool", lambda _, maximum: range(maximum))])
+    outer_pipeline = Pipeline(
+        [
+            ("inner_pipeline", inner_pipeline),
+            ("filter_by_divisor", divisor_filter),
+        ],
+    )
+    result = list(
+        outer_pipeline(
+            **{
+                "inner_pipeline": {"pool": {"maximum": 32}},
+                "filter_by_divisor": {"divisor": 8},
+            }
+        )
+    )
+    assert result == [0, 8, 16, 24]
+
+
+def test_nested_pipeline_flat_parameters_in_kwargs():
+    inner_pipeline = Pipeline([("pool", lambda _, maximum: range(maximum))])
+    outer_pipeline = Pipeline(
+        [
+            ("inner_pipeline", inner_pipeline),
+            ("filter_by_divisor", divisor_filter),
+        ],
+    )
+    result = list(
+        outer_pipeline(
+            **{"inner_pipeline__pool__maximum": 32, "filter_by_divisor__divisor": 8}
+        )
+    )
+    assert result == [0, 8, 16, 24]
+
+
 ##############################################################################
 # Simple pool and filters of one variable
 ##############################################################################

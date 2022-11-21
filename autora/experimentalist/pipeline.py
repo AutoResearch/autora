@@ -2,12 +2,10 @@
 Provides tools to chain functions used to create experiment sequences.
 """
 import copy
-from types import MappingProxyType
 from typing import (
     Any,
     Iterable,
     List,
-    Mapping,
     Optional,
     Protocol,
     Sequence,
@@ -120,19 +118,23 @@ class Pipeline:
     def __call__(
         self,
         ex: Optional[ExperimentalSequence] = None,
-        **kwargs,
+        **params,
     ) -> ExperimentalSequence:
-        """Successively pass the input valuesthrough the Pipe."""
+        """Successively pass the input values through the Pipe."""
         if ex is None:
             ex = tuple()
+
+        pipeline_params = _parse_params_to_nested_dict(self.params)
+        call_params = _parse_params_to_nested_dict(params)
 
         results = [ex]
 
         # Run filters
-        empty_frozen_mapping: Mapping = MappingProxyType({})
         for name, pipe in self.pipes:
-            params = self.params.get(name, empty_frozen_mapping)
-            results.append(pipe(results[-1], **params))
+            pipeline_params_for_pipe = pipeline_params.get(name, dict())
+            call_params_for_pipe = call_params.get(name, dict())
+            all_params_for_pipe = dict(pipeline_params_for_pipe, **call_params_for_pipe)
+            results.append(pipe(results[-1], **all_params_for_pipe))
 
         return results[-1]
 
