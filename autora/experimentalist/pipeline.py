@@ -100,9 +100,11 @@ class PoolPipeline:
         self,
         pool: Union[Pool, Iterable],
         *pipes: Pipe,
-        params: Optional[dict[str, Any]] = None
+        params: Optional[dict[str, Any]] = None,
     ):
         """Initialize the pipeline with a Pool object and a series of Pipe objects."""
+        if params is None:
+            params = dict()
         self.pool = pool
         self.pipes = pipes
         self.params = params
