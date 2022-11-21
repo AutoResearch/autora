@@ -1,9 +1,9 @@
-{% set name = "autora" %}
-{% set version = "2.0.0" %}
+{% set pyproject = load_file_data("../../pyproject.toml", from_recipe_dir=True) %}
+{% set poetry = pyproject.get('tool', {}).get('poetry') %}
 
 package:
-  name: "{{ name|lower }}"
-  version: "{{ version }}"
+  name: {{ poetry.get('name') }}
+  version: {{ poetry.get('version') }}
 
 source:
   path: ../../
@@ -19,31 +19,31 @@ requirements:
     - pip
     - poetry
     - graphviz
-    - python-graphviz >=0.14.1,<0.21.0
-    - imageio >=2.9.0
+    - imageio >=2.9.0,<3.0.0
     - matplotlib >=3.2.1,<4.0.0
-    - numpy >=1.23.1,<2.0
+    - numpy >=1.23.1,<2.0.0
     - pandas >=1.4.2,<2.0.0
+    - pytorch >=1.12.1,<2.0.0
+    - python-graphviz >=0.14.1,<0.21.0
     - scikit-learn >=1.1.1,<2.0.0
     - scipy >=1.9.3,<2.0.0
     - seaborn >=0.11.1,<0.13.0
-    - pytorch >=1.12.1,<2.0.0
-    - tqdm >=4.64.0,<5.0.0
     - sympy >=1.10.1,<2.0.0
+    - tqdm >=4.64.0,<5.0.0
   run:
     - python
     - graphviz
-    - python-graphviz >=0.14.1,<0.21.0
-    - imageio >=2.9.0
+    - imageio >=2.9.0,<3.0.0
     - matplotlib >=3.2.1,<4.0.0
-    - numpy >=1.23.1,<2.0
+    - numpy >=1.23.1,<2.0.0
     - pandas >=1.4.2,<2.0.0
+    - pytorch >=1.12.1,<2.0.0
+    - python-graphviz >=0.14.1,<0.21.0
     - scikit-learn >=1.1.1,<2.0.0
     - scipy >=1.9.3,<2.0.0
     - seaborn >=0.11.1,<0.13.0
-    - pytorch >=1.12.1,<2.0.0
-    - tqdm >=4.64.0,<5.0.0
     - sympy >=1.10.1,<2.0.0
+    - tqdm >=4.64.0,<5.0.0
 
 test:
   imports:
@@ -52,12 +52,12 @@ test:
     - autora.skl.darts
     - autora.skl.bms
     - autora.theorist
-    - autora.theorist.darts
     - autora.theorist.bms
+    - autora.theorist.darts
     - autora.variable
 
 about:
-  home: https://musslick.github.io/AER_website/Research.html
+  home: "https://musslick.github.io/AER_website/Research.html"
   license: UNKNOWN
   license_family: OTHER
   license_file: LICENSE.md
