@@ -147,7 +147,10 @@ def _parse_params_to_nested_dict(params_dict, divider="__"):
     return nested_dictionary
 
 
-def make_pipeline(steps: Sequence[Union[Pool, Iterable, Pipe]], params: dict[str, Any]):
+def make_pipeline(
+    steps: Sequence[Union[Pool, Iterable, Pipe]],
+    params: Optional[dict[str, Any]] = None,
+):
     assert isinstance(steps[0], Pool) or isinstance(steps[0], Iterable)
     pool: Union[Pool, Iterable] = steps[0]
 
