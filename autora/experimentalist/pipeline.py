@@ -1,7 +1,7 @@
 """
 Provides tools to chain functions used to create experiment sequences.
 """
-from typing import Iterable, List, Protocol, Sequence, Union, runtime_checkable
+from typing import Any, Iterable, Protocol, Sequence, Union, runtime_checkable
 
 import numpy as np
 
@@ -86,11 +86,13 @@ class PoolPipeline:
 
     """
 
-    def __init__(self, pool: Union[Pool, Iterable], *pipes: Pipe):
+    def __init__(
+        self, pool: Union[Pool, Iterable], *pipes: Pipe, params: dict[str, Any]
+    ):
         """Initialize the pipeline with a Pool object and a series of Pipe objects."""
         self.pool = pool
         self.pipes = pipes
-        self.results: List[ExperimentalSequence] = list()
+        self.params = params
 
     def __call__(self) -> ExperimentalSequence:
         """Create the pool of values, then successively pass it through the Pipe."""
@@ -110,12 +112,23 @@ class PoolPipeline:
     run = __call__
 
 
-def make_pipeline(steps: Sequence[Union[Pool, Iterable, Pipe]]):
+def _parse_params_to_nested_dict(params_dict):
+    nested_dictionary = {}
+    for key, value in params_dict.items():
+        part0, part1 = key.split("__", 1)
+        subdictionary = nested_dictionary.get(part0, {})
+        subdictionary.update({part1: value})
+        nested_dictionary[part0] = subdictionary
+
+    return nested_dictionary
+
+
+def make_pipeline(steps: Sequence[Union[Pool, Iterable, Pipe]], params: dict[str, Any]):
     pool = steps[0]
     assert isinstance(pool, Pool) or isinstance(pool, Iterable)
 
     pipes = steps[1:]
     assert all([isinstance(pipe, Pipe) for pipe in pipes])
 
-    pipeline = PoolPipeline(pool, *pipes)  # type: ignore ## todo: fix this
+    pipeline = PoolPipeline(pool, *pipes, params=params)  # type: ignore ## todo: fix this
     return pipeline

@@ -2,7 +2,7 @@ from itertools import product
 
 import numpy as np
 
-from .pipeline import PoolPipeline
+from .pipeline import PoolPipeline, _parse_params_to_nested_dict
 
 ##############################################################################
 # Simple pool and filters of one variable
@@ -74,3 +74,49 @@ def test_weber_filtered_pipeline():
     assert result[0] == (0.0, 0.0)
     assert result[1] == (0.25, 0.0)
     assert result[-1] == (1.0, 1.0)
+
+
+def test_params_parser_one_level():
+    params = {
+        "pool__ivs": "%%independent_variables%%",
+        "uncertainty_sampler__model": "%%newest_theory%%",
+        "uncertainty_sampler__n": 10,
+        "uncertainty_sampler__measure": "least_confident",
+    }
+
+    result = _parse_params_to_nested_dict(params)
+    assert result == {
+        "pool": {
+            "ivs": "%%independent_variables%%",
+        },
+        "uncertainty_sampler": {
+            "model": "%%newest_theory%%",
+            "n": 10,
+            "measure": "least_confident",
+        },
+    }
+
+
+def test_params_parser_recurse():
+
+    params = {
+        "pool__ivs": "%%independent_variables%%",
+        "filter_pipeline__step1__n_samples": 100,
+        "filter_pipeline__step2__n_samples": 10,
+        "uncertainty_sampler__model": "%%newest_theory%%",
+        "uncertainty_sampler__n": 10,
+        "uncertainty_sampler__measure": "least_confident",
+    }
+
+    result = _parse_params_to_nested_dict(params)
+    assert result == {
+        "pool": {
+            "ivs": "%%independent_variables%%",
+        },
+        "filter_pipeline": {"step1": {"n_samples": 100}, "step2": {"n_samples": 10}},
+        "uncertainty_sampler": {
+            "model": "%%newest_theory%%",
+            "n": 10,
+            "measure": "least_confident",
+        },
+    }
