@@ -76,6 +76,16 @@ def test_weber_filtered_pipeline():
     assert result[-1] == (1.0, 1.0)
 
 
+def test_params_parser_zero_level():
+    params = {
+        "model": "%%newest_theory%%",
+        "n": 10,
+        "measure": "least_confident",
+    }
+    result = _parse_params_to_nested_dict(params)
+    assert result == params
+
+
 def test_params_parser_one_level():
     params = {
         "pool__ivs": "%%independent_variables%%",
@@ -95,6 +105,36 @@ def test_params_parser_one_level():
             "measure": "least_confident",
         },
     }
+
+
+def test_params_parser_recurse_one():
+
+    params = {
+        "filter_pipeline__step1__n_samples": 100,
+    }
+
+    result = _parse_params_to_nested_dict(params)
+    assert result == {"filter_pipeline": {"step1": {"n_samples": 100}}}
+
+
+def test_params_parser_recurse_one_n_levels():
+    params = {
+        "a__b__c__d__e__f": 100,
+        "a__b__c__d__e__g": 200,
+        "a__b__h": 300,
+    }
+    result = _parse_params_to_nested_dict(params)
+    assert result == {"a": {"b": {"c": {"d": {"e": {"f": 100, "g": 200}}}, "h": 300}}}
+
+
+def test_params_parser_recurse_one_n_levels_alternative_divider():
+    params = {
+        "a:b:c:d:e:f": 100,
+        "a:b:c:d:e:g": 200,
+        "a:b:h": 300,
+    }
+    result = _parse_params_to_nested_dict(params, divider=":")
+    assert result == {"a": {"b": {"c": {"d": {"e": {"f": 100, "g": 200}}}, "h": 300}}}
 
 
 def test_params_parser_recurse():

@@ -1,7 +1,8 @@
 """
 Provides tools to chain functions used to create experiment sequences.
 """
-from typing import Any, Iterable, Protocol, Sequence, Union, runtime_checkable
+import copy
+from typing import Any, Iterable, Optional, Protocol, Sequence, Union, runtime_checkable
 
 import numpy as np
 
@@ -87,7 +88,10 @@ class PoolPipeline:
     """
 
     def __init__(
-        self, pool: Union[Pool, Iterable], *pipes: Pipe, params: dict[str, Any]
+        self,
+        pool: Union[Pool, Iterable],
+        *pipes: Pipe,
+        params: Optional[dict[str, Any]] = None
     ):
         """Initialize the pipeline with a Pool object and a series of Pipe objects."""
         self.pool = pool
@@ -112,13 +116,22 @@ class PoolPipeline:
     run = __call__
 
 
-def _parse_params_to_nested_dict(params_dict):
-    nested_dictionary = {}
-    for key, value in params_dict.items():
-        part0, part1 = key.split("__", 1)
-        subdictionary = nested_dictionary.get(part0, {})
-        subdictionary.update({part1: value})
-        nested_dictionary[part0] = subdictionary
+def _parse_params_to_nested_dict(params_dict, divider="__"):
+
+    nested_dictionary: dict = copy.copy(params_dict)
+    for key in params_dict.keys():
+        if divider in key:
+            value = nested_dictionary.pop(key)
+            new_key, new_subkey = key.split(divider, 1)
+            subdictionary = nested_dictionary.get(new_key, {})
+            subdictionary.update({new_subkey: value})
+            nested_dictionary[new_key] = subdictionary
+
+    for key, value in nested_dictionary.items():
+        if isinstance(value, dict):
+            nested_dictionary[key] = _parse_params_to_nested_dict(
+                value, divider=divider
+            )
 
     return nested_dictionary
 
