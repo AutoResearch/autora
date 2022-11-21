@@ -1,11 +1,18 @@
+from functools import partial
 from itertools import product
+from math import sqrt
 
 import numpy as np
 
-from .pipeline import PoolPipeline, _parse_params_to_nested_dict
+from .pipeline import (
+    Pipeline,
+    PoolPipeline,
+    _parse_params_to_nested_dict,
+    make_pipeline,
+)
 
 ##############################################################################
-# Simple pool and filters of one variable
+# Building blocks
 ##############################################################################
 
 
@@ -21,25 +28,152 @@ def odd_filter(values):
     return filter(lambda i: (i + 1) % 2 == 0, values)
 
 
-def test_zeroth_pipeline():
+def divisor_filter(values, divisor):
+    return filter(lambda i: i % divisor == 0, values)
+
+
+def is_sqrt_filter(values):
+    return filter(lambda i: sqrt(i) % 1 == 0.0, values)
+
+
+##############################################################################
+# Simple pipelines of one variable
+##############################################################################
+
+
+def test_zeroth_pipline_zeroth_input():
+    pipeline = Pipeline([])
+    result_0 = list(pipeline())
+    assert result_0 == []
+
+
+def test_zeroth_pipline_basic_input():
+    pipeline = Pipeline([])
+    result_0 = list(pipeline([0, 1, 2, 3]))
+    assert result_0 == [0, 1, 2, 3]
+
+
+def test_zeroth_make_pipeline():
+    pipeline = make_pipeline()
+    result = list(pipeline([0, 1, 2, 3]))
+    assert result == [0, 1, 2, 3]
+
+
+def test_single_element_pipeline():
+    pipeline = Pipeline([("even_filter", even_filter)])
+    result = list(pipeline(range(10)))
+    assert result == [0, 2, 4, 6, 8]
+
+
+def test_single_element_make_pipeline():
+    pipeline = make_pipeline([even_filter])
+    result = list(pipeline(range(10)))
+    assert result == [0, 2, 4, 6, 8]
+
+
+def test_multiple_element_pipeline():
+    pipeline = Pipeline(
+        [
+            ("even_filter", even_filter),
+            ("divisor_filter", partial(divisor_filter, divisor=3)),
+        ]
+    )
+    result = list(pipeline(range(13)))
+    assert result == [0, 6, 12]
+
+
+def test_multiple_element_make_pipeline():
+    pipeline = make_pipeline([even_filter, partial(divisor_filter, divisor=3)])
+    result = list(pipeline(range(13)))
+    assert result == [0, 6, 12]
+
+
+def test_two_element_make_pipeline_with_params():
+    pipeline = make_pipeline(
+        [even_filter, divisor_filter], params={"divisor_filter": {"divisor": 5}}
+    )
+    result = list(pipeline(range(21)))
+    assert result == [0, 10, 20]
+
+
+def test_three_element_make_pipeline():
+    pipeline = make_pipeline(
+        [divisor_filter, divisor_filter, divisor_filter],
+        params={
+            "divisor_filter_0": {"divisor": 5},
+            "divisor_filter_1": {"divisor": 7},
+            "divisor_filter_2": {"divisor": 11},
+        },
+    )
+    result = list(pipeline(range(500)))
+    assert result == [0, 385]
+
+
+def test_nested_pipeline():
+    inner_pipeline = Pipeline([("pool", lambda _: range(32))])
+    outer_pipeline = Pipeline(
+        [
+            ("inner_pipeline", inner_pipeline),
+            ("filter_by_divisor", partial(divisor_filter, divisor=8)),
+        ],
+    )
+    result = list(outer_pipeline())
+    assert result == [0, 8, 16, 24]
+
+
+def test_nested_pipeline_nested_parameters():
+    inner_pipeline = Pipeline([("pool", lambda _, maximum: range(maximum))])
+    outer_pipeline = Pipeline(
+        [
+            ("inner_pipeline", inner_pipeline),
+            ("filter_by_divisor", divisor_filter),
+        ],
+        params={
+            "inner_pipeline": {"pool": {"maximum": 32}},
+            "filter_by_divisor": {"divisor": 8},
+        },
+    )
+    result = list(outer_pipeline())
+    assert result == [0, 8, 16, 24]
+
+
+def test_nested_pipeline_flat_parameters():
+    inner_pipeline = Pipeline([("pool", lambda _, maximum: range(maximum))])
+    outer_pipeline = Pipeline(
+        [
+            ("inner_pipeline", inner_pipeline),
+            ("filter_by_divisor", divisor_filter),
+        ],
+        params={"inner_pipeline__pool__maximum": 32, "filter_by_divisor__divisor": 8},
+    )
+    result = list(outer_pipeline())
+    assert result == [0, 8, 16, 24]
+
+
+##############################################################################
+# Simple pool and filters of one variable
+##############################################################################
+
+
+def test_zeroth_poolpipeline():
     pipeline = PoolPipeline(linear_pool_generator)
     result = list(pipeline())
     assert result == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 
 
-def test_even_pipeline():
+def test_even_poolpipeline():
     pipeline = PoolPipeline(linear_pool_generator, even_filter)
     result = list(pipeline())
     assert result == [0, 2, 4, 6, 8]
 
 
-def test_odd_pipeline():
+def test_odd_poolpipeline():
     pipeline = PoolPipeline(linear_pool_generator, odd_filter)
     result = list(pipeline())
     assert result == [1, 3, 5, 7, 9]
 
 
-def test_pipeline_run():
+def test_poolpipeline_run():
     pipeline = PoolPipeline(linear_pool_generator, odd_filter)
     result = list(pipeline.run())
     assert result == [1, 3, 5, 7, 9]
@@ -60,7 +194,7 @@ def weber_filter(values):
     return filter(lambda s: s[0] >= s[1], values)
 
 
-def test_weber_unfiltered_pipeline():
+def test_weber_unfiltered_poolpipeline():
     pipeline = PoolPipeline(weber_pool)
     result = list(pipeline())
     assert result[0] == (0.0, 0.0)
@@ -68,7 +202,7 @@ def test_weber_unfiltered_pipeline():
     assert result[-1] == (1.0, 1.0)
 
 
-def test_weber_filtered_pipeline():
+def test_weber_filtered_poolpipeline():
     pipeline = PoolPipeline(weber_pool, weber_filter)
     result = list(pipeline())
     assert result[0] == (0.0, 0.0)
