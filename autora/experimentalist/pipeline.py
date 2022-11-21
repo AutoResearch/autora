@@ -2,7 +2,16 @@
 Provides tools to chain functions used to create experiment sequences.
 """
 import copy
-from typing import Any, Iterable, Optional, Protocol, Sequence, Union, runtime_checkable
+from typing import (
+    Any,
+    Iterable,
+    List,
+    Optional,
+    Protocol,
+    Sequence,
+    Union,
+    runtime_checkable,
+)
 
 import numpy as np
 
@@ -137,11 +146,13 @@ def _parse_params_to_nested_dict(params_dict, divider="__"):
 
 
 def make_pipeline(steps: Sequence[Union[Pool, Iterable, Pipe]], params: dict[str, Any]):
-    pool = steps[0]
-    assert isinstance(pool, Pool) or isinstance(pool, Iterable)
+    assert isinstance(steps[0], Pool) or isinstance(steps[0], Iterable)
+    pool: Union[Pool, Iterable] = steps[0]
 
-    pipes = steps[1:]
-    assert all([isinstance(pipe, Pipe) for pipe in pipes])
+    pipes: List[Pipe] = []
+    for pipe in steps[1:]:
+        assert isinstance(pipe, Pipe)
+        pipes.append(pipe)
 
-    pipeline = PoolPipeline(pool, *pipes, params=params)  # type: ignore ## todo: fix this
+    pipeline = PoolPipeline(pool, *pipes, params=params)
     return pipeline
