@@ -1,6 +1,8 @@
 """
 Provides tools to chain functions used to create experiment sequences.
 """
+from __future__ import annotations
+
 import copy
 from typing import (
     Any,
@@ -21,24 +23,6 @@ import numpy as np
 __all__ = ["Pool", "Pipe", "Pipeline"]
 
 
-class _ExperimentalCondition:
-    """An _ExperimentalCondition represents a trial."""
-
-    pass
-
-
-_ExperimentalSequence = Iterable[_ExperimentalCondition]
-_ExperimentalSequence.__doc__ = """
-An _ExperimentalSequence represents a series of trials.
-"""
-
-
-def sequence_to_ndarray(sequence: _ExperimentalSequence):
-    """Converts an _ExperimentalSequence to a numpy-ndarray."""
-    ndarray = np.ndarray(list(sequence))
-    return ndarray
-
-
 @runtime_checkable
 class Pool(Protocol):
     """Creates an experimental sequence from scratch."""
@@ -57,7 +41,7 @@ class Pipe(Protocol):
 
 _StepType = Tuple[str, Union[Pool, Pipe, Iterable]]
 _StepType.__doc__ = (
-    "A Pipeline step's name and generating object, as tuple(name, object)."
+    "A Pipeline step's name and generating object, as tuple(name, pipeline_piece)."
 )
 
 
@@ -345,3 +329,21 @@ def make_pipeline(
     pipeline = Pipeline(steps_, params=params)
 
     return pipeline
+
+
+class _ExperimentalCondition:
+    """An _ExperimentalCondition represents a trial."""
+
+    pass
+
+
+_ExperimentalSequence = Iterable[_ExperimentalCondition]
+_ExperimentalSequence.__doc__ = """
+An _ExperimentalSequence represents a series of trials.
+"""
+
+
+def sequence_to_ndarray(sequence: _ExperimentalSequence):
+    """Converts an _ExperimentalSequence to a numpy-ndarray."""
+    ndarray = np.ndarray(list(sequence))
+    return ndarray
