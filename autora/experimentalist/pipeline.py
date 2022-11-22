@@ -35,11 +35,22 @@ def sequence_to_ndarray(sequence: ExperimentalSequence):
 
 
 @runtime_checkable
+class Pool(Protocol):
+    """Creates an experimental sequence from scratch."""
+
+    def __call__(self) -> ExperimentalSequence:
+        ...
+
+
+@runtime_checkable
 class Pipe(Protocol):
     """Takes in an ExperimentalSequence and modifies it before returning it."""
 
     def __call__(self, ex: ExperimentalSequence) -> ExperimentalSequence:
         ...
+
+
+StepType = Tuple[str, Pool | Pipe]
 
 
 class Pipeline:
@@ -63,11 +74,11 @@ class Pipeline:
         >>> list(p(range(100)))
         [1, 9, 25, 49, 81]
 
-        >>> Pipeline([("pool", lambda _: product(range(5), ["a", "b"]))]) # doctest: +ELLIPSIS
+        >>> Pipeline([("pool", lambda: product(range(5), ["a", "b"]))]) # doctest: +ELLIPSIS
         Pipeline(pipes=[('pool', <function <lambda> at 0x...>)], params={})
 
         >>> Pipeline([
-        ... ("pool", lambda _: product(range(5), ["a", "b"])),
+        ... ("pool", lambda: product(range(5), ["a", "b"])),
         ... ("filter", lambda values: filter(lambda i: i[0] % 2 == 0, values))
         ... ]) # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
         Pipeline(pipes=[('pool', <function <lambda> at 0x...>), \
@@ -76,7 +87,7 @@ class Pipeline:
 
         >>> from itertools import product
         >>> pipeline = Pipeline([
-        ... ("pool", lambda _, maximum: product(range(maximum), ["a", "b"])),
+        ... ("pool", lambda maximum: product(range(maximum), ["a", "b"])),
         ... ("filter", lambda values, divisor: filter(lambda i: i[0] % divisor == 0, values))
         ... ] ,
         ... params = {"pool": {"maximum":5}, "filter": {"divisor": 2}})
@@ -102,10 +113,12 @@ class Pipeline:
 
     def __init__(
         self,
-        pipes: Sequence[Tuple[str, Pipe]],
+        pipes: Optional[Sequence[StepType]] = None,
         params: Optional[dict[str, Any]] = None,
     ):
         """Initialize the pipeline with a series of Pipe objects."""
+        if pipes is None:
+            pipes = list()
         self.pipes = pipes
 
         if params is None:
@@ -121,22 +134,57 @@ class Pipeline:
         **params,
     ) -> ExperimentalSequence:
         """Successively pass the input values through the Pipe."""
-        if ex is None:
-            ex = tuple()
 
+        # Initialize the parameters objects.
         pipeline_params = _parse_params_to_nested_dict(self.params)
         call_params = _parse_params_to_nested_dict(params)
 
-        results = [ex]
+        try:
+            # Check we have pipes to use
+            assert len(self.pipes) > 0
+        except AssertionError:
+            # If the pipeline doesn't have any pipes...
+            if ex is not None:
+                # ...the output is the input
+                return ex
+            elif ex is None:
+                # ... unless the input was None, in which case it's an emtpy list
+                return []
 
-        # Run filters
-        for name, pipe in self.pipes:
-            pipeline_params_for_pipe = pipeline_params.get(name, dict())
-            call_params_for_pipe = call_params.get(name, dict())
-            all_params_for_pipe = dict(pipeline_params_for_pipe, **call_params_for_pipe)
+        # Make an iterator from the pipes, so that we can be sure to only go through them once
+        # (Otherwise if we handle the "pool" as a special case, we have to track our starting point)
+        pipes_iterator = iter(self.pipes)
+
+        # Initialize our results object
+        if ex is None:
+            # ... there's no input, so presumably the first element in the pipes is a pool
+            # which should generate something for us
+            name, pool = next(pipes_iterator)
+            assert isinstance(pool, Pool)
+            all_params_for_pool = self._get_params_for_name(
+                pipeline_params, call_params, name
+            )
+            results = [pool(**all_params_for_pool)]
+        else:
+            # ... there's some input, so we can use that as the initial value
+            results = [ex]
+
+        # Run the successive pipes over the last result
+        for name, pipe in pipes_iterator:
+            assert isinstance(pipe, Pipe)
+            all_params_for_pipe = self._get_params_for_name(
+                pipeline_params, call_params, name
+            )
             results.append(pipe(results[-1], **all_params_for_pipe))
 
         return results[-1]
+
+    @staticmethod
+    def _get_params_for_name(pipeline_params, call_params, name):
+        pipeline_params_for_pipe = pipeline_params.get(name, dict())
+        call_params_for_pipe = call_params.get(name, dict())
+        all_params_for_pipe = dict(pipeline_params_for_pipe, **call_params_for_pipe)
+        return all_params_for_pipe
 
     run = __call__
 
@@ -161,7 +209,7 @@ def _parse_params_to_nested_dict(params_dict, divider="__"):
 
 
 def make_pipeline(
-    steps: Optional[Sequence[Pipe]] = None,
+    steps: Optional[Sequence[Pool | Pipe]] = None,
     params: Optional[dict[str, Any]] = None,
 ) -> Pipeline:
     """
@@ -253,13 +301,13 @@ def make_pipeline(
 
     if steps is None:
         steps = []
-    steps_: List[Tuple[str, Pipe]] = []
+    steps_: List[StepType] = []
     raw_names_ = [getattr(pipe, "__name__", "step").lower() for pipe in steps]
     names_tally_ = dict([(name, raw_names_.count(name)) for name in set(raw_names_)])
     names_index_ = dict([(name, 0) for name in set(raw_names_)])
 
     for name, pipe in zip(raw_names_, steps):
-        assert isinstance(pipe, Pipe)
+        assert isinstance(pipe, Pipe | Pool)
 
         if names_tally_[name] > 1:
             current_index_for_this_name = names_index_.get(name, 0)

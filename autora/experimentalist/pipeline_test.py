@@ -11,7 +11,7 @@ from .pipeline import Pipeline, _parse_params_to_nested_dict, make_pipeline
 ##############################################################################
 
 
-def linear_pool_generator(_, stop=10):
+def linear_pool_generator(stop=10):
     return range(stop)
 
 
@@ -37,7 +37,7 @@ def is_sqrt_filter(values):
 
 
 def test_zeroth_pipline_zeroth_input():
-    pipeline = Pipeline([])
+    pipeline = Pipeline()
     result_0 = list(pipeline())
     assert result_0 == []
 
@@ -105,7 +105,7 @@ def test_three_element_make_pipeline():
 
 
 def test_nested_pipeline():
-    inner_pipeline = Pipeline([("pool", lambda _: range(32))])
+    inner_pipeline = Pipeline([("pool", lambda: range(32))])
     outer_pipeline = Pipeline(
         [
             ("inner_pipeline", inner_pipeline),
@@ -117,7 +117,7 @@ def test_nested_pipeline():
 
 
 def test_nested_pipeline_nested_parameters():
-    inner_pipeline = Pipeline([("pool", lambda _, maximum: range(maximum))])
+    inner_pipeline = Pipeline([("pool", lambda maximum: range(maximum))])
     outer_pipeline = Pipeline(
         [
             ("inner_pipeline", inner_pipeline),
@@ -133,7 +133,7 @@ def test_nested_pipeline_nested_parameters():
 
 
 def test_nested_pipeline_flat_parameters():
-    inner_pipeline = Pipeline([("pool", lambda _, maximum: range(maximum))])
+    inner_pipeline = Pipeline([("pool", lambda maximum: range(maximum))])
     outer_pipeline = Pipeline(
         [
             ("inner_pipeline", inner_pipeline),
@@ -146,7 +146,7 @@ def test_nested_pipeline_flat_parameters():
 
 
 def test_nested_pipeline_nested_parameters_in_kwargs():
-    inner_pipeline = Pipeline([("pool", lambda _, maximum: range(maximum))])
+    inner_pipeline = Pipeline([("pool", lambda maximum: range(maximum))])
     outer_pipeline = Pipeline(
         [
             ("inner_pipeline", inner_pipeline),
@@ -165,7 +165,7 @@ def test_nested_pipeline_nested_parameters_in_kwargs():
 
 
 def test_nested_pipeline_flat_parameters_in_kwargs():
-    inner_pipeline = Pipeline([("pool", lambda _, maximum: range(maximum))])
+    inner_pipeline = Pipeline([("pool", lambda maximum: range(maximum))])
     outer_pipeline = Pipeline(
         [
             ("inner_pipeline", inner_pipeline),
@@ -214,7 +214,7 @@ def test_poolpipeline_run():
 ##############################################################################
 
 
-def weber_pool(_, vmin=0, vmax=1, steps=5):
+def weber_pool(vmin=0, vmax=1, steps=5):
     s1 = s2 = np.linspace(vmin, vmax, steps)
     pool = product(s1, s2)
     return pool
