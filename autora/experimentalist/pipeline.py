@@ -19,20 +19,20 @@ from typing import (
 import numpy as np
 
 
-class ExperimentalCondition:
-    """An ExperimentalCondition represents a trial."""
+class _ExperimentalCondition:
+    """An _ExperimentalCondition represents a trial."""
 
     pass
 
 
-ExperimentalSequence = Iterable[ExperimentalCondition]
-ExperimentalSequence.__doc__ = """
-An ExperimentalSequence represents a series of trials.
+_ExperimentalSequence = Iterable[_ExperimentalCondition]
+_ExperimentalSequence.__doc__ = """
+An _ExperimentalSequence represents a series of trials.
 """
 
 
-def sequence_to_ndarray(sequence: ExperimentalSequence):
-    """Converts an ExperimentalSequence to a numpy-ndarray."""
+def sequence_to_ndarray(sequence: _ExperimentalSequence):
+    """Converts an _ExperimentalSequence to a numpy-ndarray."""
     ndarray = np.ndarray(list(sequence))
     return ndarray
 
@@ -41,20 +41,20 @@ def sequence_to_ndarray(sequence: ExperimentalSequence):
 class Pool(Protocol):
     """Creates an experimental sequence from scratch."""
 
-    def __call__(self) -> ExperimentalSequence:
+    def __call__(self) -> _ExperimentalSequence:
         ...
 
 
 @runtime_checkable
 class Pipe(Protocol):
-    """Takes in an ExperimentalSequence and modifies it before returning it."""
+    """Takes in an _ExperimentalSequence and modifies it before returning it."""
 
-    def __call__(self, ex: ExperimentalSequence) -> ExperimentalSequence:
+    def __call__(self, ex: _ExperimentalSequence) -> _ExperimentalSequence:
         ...
 
 
-StepType = Tuple[str, Union[Pool, Pipe, Iterable]]
-StepType.__doc__ = (
+_StepType = Tuple[str, Union[Pool, Pipe, Iterable]]
+_StepType.__doc__ = (
     "A Pipeline step's name and generating object, as tuple(name, object)."
 )
 
@@ -120,7 +120,7 @@ class Pipeline:
 
     def __init__(
         self,
-        pipes: Optional[Sequence[StepType]] = None,
+        pipes: Optional[Sequence[_StepType]] = None,
         params: Optional[Dict[str, Any]] = None,
     ):
         """Initialize the pipeline with a series of Pipe objects."""
@@ -137,9 +137,9 @@ class Pipeline:
 
     def __call__(
         self,
-        ex: Optional[ExperimentalSequence] = None,
+        ex: Optional[_ExperimentalSequence] = None,
         **params,
-    ) -> ExperimentalSequence:
+    ) -> _ExperimentalSequence:
         """Successively pass the input values through the Pipe."""
 
         # Initialize the parameters objects.
@@ -323,7 +323,7 @@ def make_pipeline(
 
     if steps is None:
         steps = []
-    steps_: List[StepType] = []
+    steps_: List[_StepType] = []
     raw_names_ = [getattr(pipe, "__name__", "step").lower() for pipe in steps]
     names_tally_ = dict([(name, raw_names_.count(name)) for name in set(raw_names_)])
     names_index_ = dict([(name, 0) for name in set(raw_names_)])
