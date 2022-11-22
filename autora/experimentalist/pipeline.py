@@ -10,6 +10,8 @@ from typing import (
     Protocol,
     Sequence,
     Tuple,
+    Union,
+    get_args,
     runtime_checkable,
 )
 
@@ -50,7 +52,7 @@ class Pipe(Protocol):
         ...
 
 
-StepType = Tuple[str, Pool | Pipe | Iterable]
+StepType = Tuple[str, Union[Pool, Pipe, Iterable]]
 StepType.__doc__ = (
     "A Pipeline step's name and generating object, as tuple(name, object)."
 )
@@ -218,7 +220,7 @@ def _parse_params_to_nested_dict(params_dict, divider="__"):
 
 
 def make_pipeline(
-    steps: Optional[Sequence[Pool | Pipe]] = None,
+    steps: Optional[Sequence[Union[Pool, Pipe]]] = None,
     params: Optional[dict[str, Any]] = None,
 ) -> Pipeline:
     """
@@ -326,7 +328,7 @@ def make_pipeline(
     names_index_ = dict([(name, 0) for name in set(raw_names_)])
 
     for name, pipe in zip(raw_names_, steps):
-        assert isinstance(pipe, Pipe | Pool | Iterable)
+        assert isinstance(pipe, get_args(Union[Pipe, Pool, Iterable]))
 
         if names_tally_[name] > 1:
             current_index_for_this_name = names_index_.get(name, 0)
