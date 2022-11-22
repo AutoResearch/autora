@@ -51,6 +51,7 @@ class Pipe(Protocol):
 
 
 StepType = Tuple[str, Pool | Pipe]
+StepType.__doc__ = "A Pipeline step's name and callable, as tuple(name, callable)."
 
 
 class Pipeline:
@@ -227,11 +228,11 @@ def make_pipeline(
 
     Examples:
         You can create pipelines using purely anonymous functions:
-        >>> make_pipeline([lambda _: product(range(5), ["a", "b"])]) # doctest: +ELLIPSIS
+        >>> make_pipeline([lambda: product(range(5), ["a", "b"])]) # doctest: +ELLIPSIS
         Pipeline(pipes=[('<lambda>', <function <lambda> at 0x...>)], params={})
 
         You can create pipelines with normal functions.
-        >>> def ab_pool(_, maximum=5): return product(range(maximum), ["a", "b"])
+        >>> def ab_pool(maximum=5): return product(range(maximum), ["a", "b"])
         >>> def even_filter(values): return filter(lambda i: i[0] % 2 == 0, values)
         >>> make_pipeline([ab_pool, even_filter]) # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
         Pipeline(pipes=[('ab_pool', <function ab_pool at 0x...>), \
@@ -284,18 +285,18 @@ def make_pipeline(
         these steps are renamed to "step".
         >>> from functools import partial
         >>> pipeline = make_pipeline([partial(ab_pool, maximum=100)])
-        >>> pipeline  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
+        >>> pipeline # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
         Pipeline(pipes=[('step', functools.partial(<function ab_pool at 0x...>, maximum=100))], \
         params={})
 
         If there are multiple steps with the same name, they get suffixes as usual:
         >>> pipeline = make_pipeline([partial(range, stop=10), partial(divisor_filter, divisor=3)])
-        >>> pipeline  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
-        Pipeline(pipes=[ \
-            ('step_0', functools.partial(<class 'range'>, stop=10)), \
-            ('step_1', functools.partial(<function divisor_filter at 0x...>, divisor=3))
-        ], \
+        >>> pipeline # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
+        Pipeline(pipes=[('step_0', functools.partial(<class 'range'>, stop=10)), \
+        ('step_1', functools.partial(<function divisor_filter at 0x...>, divisor=3))], \
         params={})
+
+
 
     """
 
