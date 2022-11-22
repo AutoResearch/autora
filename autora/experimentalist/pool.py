@@ -7,7 +7,7 @@ import numpy as np
 from autora.variable import IV
 
 
-def gridsearch_pool(ivs: List[IV]):
+def grid_pool(ivs: List[IV]):
     """Creates exhaustive pool from discrete values using a Cartesian product of sets"""
     # Get allowed values for each IV
     l_iv_values = []
@@ -30,8 +30,8 @@ def random_pool(*args, n=1, duplicates=True):
         n: Number of samples to sample
         duplicates: Boolean if duplicate value are allowed.
 
-    Returns:
-        An iterable  of
+    Examples:
+        >>> random_pool(
 
     """
     l_samples = []
