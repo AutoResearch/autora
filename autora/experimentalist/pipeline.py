@@ -50,8 +50,10 @@ class Pipe(Protocol):
         ...
 
 
-StepType = Tuple[str, Pool | Pipe]
-StepType.__doc__ = "A Pipeline step's name and callable, as tuple(name, callable)."
+StepType = Tuple[str, Pool | Pipe | Iterable]
+StepType.__doc__ = (
+    "A Pipeline step's name and generating object, as tuple(name, object)."
+)
 
 
 class Pipeline:
@@ -59,14 +61,14 @@ class Pipeline:
     Processes ("pipelines") a series of ExperimentalSequences through a pipeline.
 
     Examples:
-        A pipeline which filters even values 0 to 9
+        A pipeline which filters even values 0 to 9:
         >>> p = Pipeline(
         ... [("is_even", lambda values: filter(lambda i: i % 2 == 0, values))]  # a "pipe" function
         ... )
         >>> list(p(range(10)))
         [0, 2, 4, 6, 8]
 
-        A pipeline which filters for square, odd numbers
+        A pipeline which filters for square, odd numbers:
         >>> from math import sqrt
         >>> p = Pipeline([
         ... ("is_odd", lambda values: filter(lambda i: i % 2 != 0, values)),
@@ -75,6 +77,8 @@ class Pipeline:
         >>> list(p(range(100)))
         [1, 9, 25, 49, 81]
 
+
+        >>> from itertools import product
         >>> Pipeline([("pool", lambda: product(range(5), ["a", "b"]))]) # doctest: +ELLIPSIS
         Pipeline(pipes=[('pool', <function <lambda> at 0x...>)], params={})
 
@@ -86,7 +90,6 @@ class Pipeline:
         ('filter', <function <lambda> at 0x...>)], \
         params={})
 
-        >>> from itertools import product
         >>> pipeline = Pipeline([
         ... ("pool", lambda maximum: product(range(maximum), ["a", "b"])),
         ... ("filter", lambda values, divisor: filter(lambda i: i[0] % divisor == 0, values))
@@ -159,13 +162,18 @@ class Pipeline:
         # Initialize our results object
         if ex is None:
             # ... there's no input, so presumably the first element in the pipes is a pool
-            # which should generate something for us
+            # which should generate our initial values.
             name, pool = next(pipes_iterator)
-            assert isinstance(pool, Pool)
-            all_params_for_pool = self._get_params_for_name(
-                pipeline_params, call_params, name
-            )
-            results = [pool(**all_params_for_pool)]
+            if isinstance(pool, Pool):
+                # Here, the pool is a Pool callable, which we can pass parameters.
+                all_params_for_pool = self._get_params_for_name(
+                    pipeline_params, call_params, name
+                )
+                results = [pool(**all_params_for_pool)]
+            elif isinstance(pool, Iterable):
+                # Otherwise, the pool should be an iterable which we can just use as is.
+                results = [pool]
+
         else:
             # ... there's some input, so we can use that as the initial value
             results = [ex]
@@ -227,7 +235,9 @@ def make_pipeline(
         A pipeline object
 
     Examples:
+
         You can create pipelines using purely anonymous functions:
+        >>> from itertools import product
         >>> make_pipeline([lambda: product(range(5), ["a", "b"])]) # doctest: +ELLIPSIS
         Pipeline(pipes=[('<lambda>', <function <lambda> at 0x...>)], params={})
 
@@ -238,9 +248,17 @@ def make_pipeline(
         Pipeline(pipes=[('ab_pool', <function ab_pool at 0x...>), \
         ('even_filter', <function even_filter at 0x...>)], params={})
 
+        You can create pipelines with generators as their first elements functions.
+        >>> ab_pool_gen = product(range(3), ["a", "b"])
+        >>> pipeline = make_pipeline([ab_pool_gen, even_filter])
+        >>> pipeline # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
+        Pipeline(pipes=[('step', <itertools.product object at 0x...>),
+        ('even_filter', <function even_filter at 0x...>)], params={})
+        >>> list(pipeline.run())
+        [(0, 'a'), (0, 'b'), (2, 'a'), (2, 'b')]
+
         You can pass parameters into the different steps of the pipeline using the "params"
         argument:
-        >>> from itertools import product
         >>> def divisor_filter(x, divisor): return filter(lambda i: i[0] % divisor == 0, x)
         >>> pipeline = make_pipeline([ab_pool, divisor_filter],
         ... params = {"ab_pool": {"maximum":5}, "divisor_filter": {"divisor": 2}})
@@ -308,7 +326,7 @@ def make_pipeline(
     names_index_ = dict([(name, 0) for name in set(raw_names_)])
 
     for name, pipe in zip(raw_names_, steps):
-        assert isinstance(pipe, Pipe | Pool)
+        assert isinstance(pipe, Pipe | Pool | Iterable)
 
         if names_tally_[name] > 1:
             current_index_for_this_name = names_index_.get(name, 0)
