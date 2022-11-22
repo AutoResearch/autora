@@ -3,16 +3,17 @@ from functools import partial
 
 import numpy as np
 import pandas as pd
+import pytest
 from sklearn.linear_model import LogisticRegression
 
 from autora.experimentalist.filter import weber_filter
-from autora.experimentalist.pipeline import PoolPipeline
+from autora.experimentalist.pipeline import make_pipeline
 from autora.experimentalist.pool import gridsearch_pool
 from autora.experimentalist.sampler import random_sampler, uncertainty_sampler
 from autora.variable import DV, IV, ValueType, VariableCollection
 
 
-def test_random_experimentalist():
+def test_random_experimentalist(metadata):
     """
     Tests the implementation of the experimentalist pipeline with an exhaustive pool of discrete
     values, Weber filter, random selector. Tests two different implementations of the pool function
@@ -20,6 +21,71 @@ def test_random_experimentalist():
 
     """
 
+    n_trials = 25  # Number of trails for sampler to select
+
+    # ---Implementation 1 - Pool using Callable via partial function----
+    # Set up pipeline functions with partial
+    pooler_callable = partial(gridsearch_pool, ivs=metadata.independent_variables)
+    sampler = partial(random_sampler, n=n_trials)
+    pipeline_random_samp = make_pipeline(
+        [pooler_callable, weber_filter, sampler],
+    )
+
+    results = pipeline_random_samp.run()
+
+    # ***Checks***
+    # Gridsearch pool is working as expected
+    _, pool = pipeline_random_samp.pipes[0]
+    pool_len = len(list(pool()))
+    pool_len_expected = np.prod(
+        [len(s.allowed_values) for s in metadata.independent_variables]
+    )
+    assert pool_len == pool_len_expected
+
+    # Is sampling the number of trials we expect
+    assert len(results) == n_trials
+
+    # Filter is selecting where IV1 >= IV2
+    assert all([s[0] <= s[1] for s in results])
+
+    # Is sampling randomly. Runs 10 times and checks if consecutive runs are equal.
+    # Assert will fail if all 9 pairs return equal.
+    l_results = [pipeline_random_samp.run() for s in range(10)]
+    assert not np.all(
+        [
+            np.array_equal(l_results[i], l_results[i + 1])
+            for i, s in enumerate(l_results)
+            if i < len(l_results) - 1
+        ]
+    )
+
+
+def test_random_experimentalist_generator(metadata):
+    n_trials = 25  # Number of trails for sampler to select
+
+    pooler_generator = gridsearch_pool(metadata.independent_variables)
+    sampler = partial(random_sampler, n=n_trials)
+    pipeline_random_samp_poolgen = make_pipeline(
+        [pooler_generator, weber_filter, sampler]
+    )
+
+    results_poolgen = list(pipeline_random_samp_poolgen.run())
+
+    # Is sampling the number of trials we expect
+    assert len(results_poolgen) == n_trials
+
+    # Filter is selecting where IV1 >= IV2
+    assert all([s[0] <= s[1] for s in results_poolgen])
+
+    # This will fail
+    # The Generator is exhausted after the first run and the pool is not regenerated when pipeline
+    # is run again. The pool should be set up as a callable if the pipeline is to be rerun.
+    results_poolgen2 = pipeline_random_samp_poolgen.run()
+    assert len(results_poolgen2) == 0
+
+
+@pytest.fixture
+def metadata():
     # Specify independent variables
     iv1 = IV(
         name="S1",
@@ -66,66 +132,7 @@ def test_random_experimentalist():
         dependent_variables=[dv1, dv2],
     )
 
-    n_trials = 25  # Number of trails for sampler to select
-
-    # ---Implementation 1 - Pool using Callable via partial function----
-    # Set up pipeline functions with partial
-    pooler_callable = partial(gridsearch_pool, ivs=metadata.independent_variables)
-    sampler = partial(random_sampler, n=n_trials)
-    pipeline_random_samp = PoolPipeline(
-        pooler_callable,
-        weber_filter,
-        sampler,
-    )
-
-    results = pipeline_random_samp.run()
-
-    # ***Checks***
-    # Gridsearch pool is working as expected
-    pool_len = len(list(pipeline_random_samp.pool()))
-    pool_len_expected = np.prod(
-        [len(s.allowed_values) for s in metadata.independent_variables]
-    )
-    assert pool_len == pool_len_expected
-
-    # Is sampling the number of trials we expect
-    assert len(results) == n_trials
-
-    # Filter is selecting where IV1 >= IV2
-    assert all([s[0] <= s[1] for s in results])
-
-    # Is sampling randomly. Runs 10 times and checks if consecutive runs are equal.
-    # Assert will fail if all 9 pairs return equal.
-    l_results = [pipeline_random_samp.run() for s in range(10)]
-    assert not np.all(
-        [
-            np.array_equal(l_results[i], l_results[i + 1])
-            for i, s in enumerate(l_results)
-            if i < len(l_results) - 1
-        ]
-    )
-
-    # ---Implementation 2 - Pool using Generator----
-    pooler_generator = gridsearch_pool(metadata.independent_variables)
-    pipeline_random_samp_poolgen = PoolPipeline(
-        pooler_generator,
-        weber_filter,
-        sampler,
-    )
-
-    results_poolgen = pipeline_random_samp_poolgen.run()
-
-    # Is sampling the number of trials we expect
-    assert len(results_poolgen) == n_trials
-
-    # Filter is selecting where IV1 >= IV2
-    assert all([s[0] <= s[1] for s in results_poolgen])
-
-    # This will fail
-    # The Generator is exhausted after the first run and the pool is not regenerated when pipeline
-    # is run again. The pool should be set up as a callable if the pipeline is to be rerun.
-    results_poolgen2 = pipeline_random_samp_poolgen.run()
-    assert len(results_poolgen2) > 0
+    return metadata
 
 
 def test_uncertainty_experimentalist():
@@ -186,11 +193,7 @@ def test_uncertainty_experimentalist():
     sampler = partial(uncertainty_sampler, model=logireg_model, n=n_trials)
 
     # Initialize pipeline
-    pipeline = PoolPipeline(
-        pooler_callable,
-        weber_filter,
-        sampler,
-    )
+    pipeline = make_pipeline([pooler_callable, weber_filter, sampler])
     # Run the pipeline
     results = pipeline.run()
 
@@ -202,7 +205,7 @@ def test_uncertainty_experimentalist():
     assert all([s[0] <= s[1] for s in results])
 
     # Uncertainty sampling is behaving as expected by comparing results with manual calculation
-    pipeline_pool_filter = PoolPipeline(pooler_callable, weber_filter)
+    pipeline_pool_filter = make_pipeline([pooler_callable, weber_filter])
     pool = np.array(list(pipeline_pool_filter.run()))  # Create filtered pool
     a_prob = logireg_model.predict_proba(pool)  # Get predicted probabilities
     # Calculate and sort max probability from each condition
@@ -213,8 +216,3 @@ def test_uncertainty_experimentalist():
     results_manual = np.flip(pool[select_idx], axis=0)  # Index conditions from pool
     # Check results from the function match manaual method
     assert np.array_equal(results, results_manual)
-
-
-if __name__ == "__main__":
-    test_random_experimentalist()
-    test_uncertainty_experimentalist()
