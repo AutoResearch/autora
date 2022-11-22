@@ -23,5 +23,12 @@ repos:
     hooks:
       - id: mypy
         additional_dependencies: [types-requests]
+        language_version: python3.8
+      - id: mypy
+        additional_dependencies: [ types-requests ]
+        language_version: python3.9
+      - id: mypy
+        additional_dependencies: [ types-requests ]
+        language_version: python3.10
 default_language_version:
   python: python3
