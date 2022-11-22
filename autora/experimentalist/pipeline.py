@@ -18,6 +18,8 @@ from typing import (
 
 import numpy as np
 
+__all__ = ["Pool", "Pipe", "Pipeline"]
+
 
 class _ExperimentalCondition:
     """An _ExperimentalCondition represents a trial."""

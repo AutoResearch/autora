@@ -4,6 +4,8 @@ from typing import Iterable, Sequence, Union
 import numpy as np
 from alipy.query_strategy.query_labels import QueryInstanceUncertainty
 
+__all__ = ["random_sampler", "uncertainty_sampler"]
+
 
 def random_sampler(conditions: Union[Iterable, Sequence], n: int):
     """
