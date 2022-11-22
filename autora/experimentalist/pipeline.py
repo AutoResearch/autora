@@ -4,6 +4,7 @@ Provides tools to chain functions used to create experiment sequences.
 import copy
 from typing import (
     Any,
+    Dict,
     Iterable,
     List,
     Optional,
@@ -120,7 +121,7 @@ class Pipeline:
     def __init__(
         self,
         pipes: Optional[Sequence[StepType]] = None,
-        params: Optional[dict[str, Any]] = None,
+        params: Optional[Dict[str, Any]] = None,
     ):
         """Initialize the pipeline with a series of Pipe objects."""
         if pipes is None:
@@ -200,7 +201,7 @@ class Pipeline:
     run = __call__
 
 
-def _parse_params_to_nested_dict(params_dict, divider="__"):
+def _parse_params_to_nested_dict(params_dict: Dict, divider: str = "__"):
     nested_dictionary: dict = copy.copy(params_dict)
     for key in params_dict.keys():
         if divider in key:
@@ -221,7 +222,7 @@ def _parse_params_to_nested_dict(params_dict, divider="__"):
 
 def make_pipeline(
     steps: Optional[Sequence[Union[Pool, Pipe]]] = None,
-    params: Optional[dict[str, Any]] = None,
+    params: Optional[Dict[str, Any]] = None,
 ) -> Pipeline:
     """
     A factory function to make pipeline objects.
