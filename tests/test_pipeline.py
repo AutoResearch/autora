@@ -4,7 +4,11 @@ from math import sqrt
 
 import numpy as np
 
-from .pipeline import Pipeline, _parse_params_to_nested_dict, make_pipeline
+from autora.experimentalist.pipeline import (
+    Pipeline,
+    _parse_params_to_nested_dict,
+    make_pipeline,
+)
 
 ##############################################################################
 # Building blocks
