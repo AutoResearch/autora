@@ -6,8 +6,6 @@ import numpy as np
 
 from autora.variable import IV
 
-__all__ = ["grid_pool", "random_pool"]
-
 
 def grid_pool(ivs: List[IV]):
     """Creates exhaustive pool from discrete values using a Cartesian product of sets"""
