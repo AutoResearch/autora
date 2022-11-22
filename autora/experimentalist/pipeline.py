@@ -253,66 +253,66 @@ def make_pipeline(
 
         You can create pipelines with generators as their first elements functions.
         >>> ab_pool_gen = product(range(3), ["a", "b"])
-        >>> pipeline = make_pipeline([ab_pool_gen, even_filter])
-        >>> pipeline # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
+        >>> pl = make_pipeline([ab_pool_gen, even_filter])
+        >>> pl # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
         Pipeline(pipes=[('step', <itertools.product object at 0x...>),
         ('even_filter', <function even_filter at 0x...>)], params={})
-        >>> list(pipeline.run())
+        >>> list(pl.run())
         [(0, 'a'), (0, 'b'), (2, 'a'), (2, 'b')]
 
-        You can pass parameters into the different steps of the pipeline using the "params"
+        You can pass parameters into the different steps of the pl using the "params"
         argument:
         >>> def divisor_filter(x, divisor): return filter(lambda i: i[0] % divisor == 0, x)
-        >>> pipeline = make_pipeline([ab_pool, divisor_filter],
+        >>> pl = make_pipeline([ab_pool, divisor_filter],
         ... params = {"ab_pool": {"maximum":5}, "divisor_filter": {"divisor": 2}})
-        >>> pipeline # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
+        >>> pl # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
         Pipeline(pipes=[('ab_pool', <function ab_pool at 0x...>), \
         ('divisor_filter', <function divisor_filter at 0x...>)], \
         params={'ab_pool': {'maximum': 5}, 'divisor_filter': {'divisor': 2}})
 
         You can evaluate the pipeline means calling its `run` method:
-        >>> list(pipeline.run())
+        >>> list(pl.run())
         [(0, 'a'), (0, 'b'), (2, 'a'), (2, 'b'), (4, 'a'), (4, 'b')]
 
         ... or calling it directly:
-        >>> list(pipeline())
+        >>> list(pl())
         [(0, 'a'), (0, 'b'), (2, 'a'), (2, 'b'), (4, 'a'), (4, 'b')]
 
         You can update the parameters and evaluate again, giving different results:
-        >>> pipeline.params = {"ab_pool": {"maximum": 7}, "divisor_filter": {"divisor": 3}}
-        >>> list(pipeline())
+        >>> pl.params = {"ab_pool": {"maximum": 7}, "divisor_filter": {"divisor": 3}}
+        >>> list(pl())
         [(0, 'a'), (0, 'b'), (3, 'a'), (3, 'b'), (6, 'a'), (6, 'b')]
 
         If the pipeline needs parameters, then removing them will break the pipeline:
-        >>> pipeline.params = {}
-        >>> list(pipeline()) # doctest: +ELLIPSIS
+        >>> pl.params = {}
+        >>> list(pl()) # doctest: +ELLIPSIS
         Traceback (most recent call last):
         ...
         TypeError: divisor_filter() missing 1 required positional argument: 'divisor'
 
         If multiple steps have the same inferred name, then they are given a suffix automatically,
         which has to be reflected in the params if used:
-        >>> pipeline = make_pipeline([ab_pool, divisor_filter, divisor_filter])
-        >>> pipeline.params = {
+        >>> pl = make_pipeline([ab_pool, divisor_filter, divisor_filter])
+        >>> pl.params = {
         ...     "ab_pool": {"maximum": 22},
         ...     "divisor_filter_0": {"divisor": 3},
         ...     "divisor_filter_1": {"divisor": 7}
         ... }
-        >>> list(pipeline())
+        >>> list(pl())
         [(0, 'a'), (0, 'b'), (21, 'a'), (21, 'b')]
 
         You can also use "partial" functions to include Pipes with defaults in the pipeline.
         Because the `partial` function doesn't inherit the __name__ of the original function,
         these steps are renamed to "step".
         >>> from functools import partial
-        >>> pipeline = make_pipeline([partial(ab_pool, maximum=100)])
-        >>> pipeline # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
+        >>> pl = make_pipeline([partial(ab_pool, maximum=100)])
+        >>> pl # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
         Pipeline(pipes=[('step', functools.partial(<function ab_pool at 0x...>, maximum=100))], \
         params={})
 
         If there are multiple steps with the same name, they get suffixes as usual:
-        >>> pipeline = make_pipeline([partial(range, stop=10), partial(divisor_filter, divisor=3)])
-        >>> pipeline # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
+        >>> pl = make_pipeline([partial(range, stop=10), partial(divisor_filter, divisor=3)])
+        >>> pl # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
         Pipeline(pipes=[('step_0', functools.partial(<class 'range'>, stop=10)), \
         ('step_1', functools.partial(<function divisor_filter at 0x...>, divisor=3))], \
         params={})
