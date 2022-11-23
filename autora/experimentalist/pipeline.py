@@ -129,6 +129,7 @@ class Pipeline:
         # Initialize the parameters objects.
         pipeline_params = _parse_params_to_nested_dict(self.params)
         call_params = _parse_params_to_nested_dict(params)
+        merged_params = _merge_dicts(pipeline_params, call_params)
 
         try:
             # Check we have pipes to use
@@ -153,9 +154,7 @@ class Pipeline:
             name, pool = next(pipes_iterator)
             if isinstance(pool, Pool):
                 # Here, the pool is a Pool callable, which we can pass parameters.
-                all_params_for_pool = _get_params_for_name(
-                    name, pipeline_params, call_params
-                )
+                all_params_for_pool = merged_params.get(name, dict())
                 results = [pool(**all_params_for_pool)]
             elif isinstance(pool, Iterable):
                 # Otherwise, the pool should be an iterable which we can just use as is.
@@ -168,9 +167,7 @@ class Pipeline:
         # Run the successive pipes over the last result
         for name, pipe in pipes_iterator:
             assert isinstance(pipe, Pipe)
-            all_params_for_pipe = _get_params_for_name(
-                name, pipeline_params, call_params
-            )
+            all_params_for_pipe = merged_params.get(name, dict())
             results.append(pipe(results[-1], **all_params_for_pipe))
 
         return results[-1]
@@ -226,66 +223,6 @@ def _merge_dicts(a: dict, b: dict):
         else:
             a_[key] = b_[key]
     return a_
-
-
-def _get_params_for_name(key, *params):
-    """Combines subdictionaries of a particular key, if they exist.
-
-    It's useful for merging and accessing subdictionaries
-    of parameter dictionaries used by Pipelines, which accept nested dictionaries
-    which might seek to override each other's values.
-
-    Args:
-        key: the key to search for
-        *params: some dictionaries
-
-    Returns: the combined values of all the dictionaries' "key" values
-
-    Examples:
-        In the simplest case, _get_params_for_name just gets the named subdictionary
-        >>> base_params = {"pool": {"n": 10}}
-        >>> _get_params_for_name("pool", base_params)
-        {'n': 10}
-
-        If we have an "update" dictionary which comes later, then its values get used.
-        >>> update_params = {"pool": {"n": 20}}
-        >>> _get_params_for_name("pool", base_params, update_params)
-        {'n': 20}
-
-        We can have multiple keys which are treated separately.
-        >>> base_params = {"pool": {"n": 10}, "filter": {"divisor": 5}}
-        >>> update_params = {"pool": {"n": 20}}
-        >>> _get_params_for_name("pool", base_params, update_params)
-        {'n': 20}
-        >>> _get_params_for_name("filter", base_params, update_params)
-        {'divisor': 5}
-        >>> _get_params_for_name("not a known key", base_params, update_params)
-        {}
-
-        If we have three layers of data, then we can overwrite only one subdictioary if we want
-        >>> base_params = {"pool": {"start": {"o": 10}, "end":{"r": 7}}}
-        >>> update_params = {"pool": {"end": {"r": 17}}}
-        >>> _get_params_for_name("pool", base_params, update_params)
-        {'start': {'o': 10}, 'end': {'r': 17}}
-
-        ... but subfields aren't merged (the pool.end.t subfield has been lost in the output):
-        >>> base_params = {"pool": {"start": {"o": 10}, "end": {'r': 7, 't': 25}}}
-        >>> update_params = {"pool": {"end": {"r": 17}}}
-        >>> _get_params_for_name("pool", base_params, update_params)
-        {'start': {'o': 10}, 'end': {'r': 17}}
-
-    """
-    out_params = dict()
-
-    # Loop over the input params dictionaries p
-    for p in params:
-        # Get the subdictionary with the key "name", or an empty dict if there isn't that key
-        q = p.get(key, dict())
-
-        # Update the output params
-        out_params.update(**q)
-
-    return out_params
 
 
 def _parse_params_to_nested_dict(params_dict: Dict, divider: str = "__"):
