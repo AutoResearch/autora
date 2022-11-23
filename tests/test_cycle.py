@@ -9,6 +9,10 @@ import pytest
 from autora.cycle import AERCycle
 from autora.variable import Variable, VariableCollection
 
+# Define a simple truth we wish to recover
+def ground_truth(x):
+    return x + 1
+
 
 # Define basic versions of the modules
 def dummy_theorist(data, metadata, search_space):
@@ -33,7 +37,7 @@ def dummy_experimentalist(data, metadata: VariableCollection, theory, n_samples=
 
 
 def dummy_experiment_runner(x_prime):
-    return x_prime.x + 1
+    return ground_truth(x_prime.x)
 
 
 @pytest.fixture
