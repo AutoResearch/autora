@@ -18,8 +18,6 @@ from typing import (
     runtime_checkable,
 )
 
-import numpy as np
-
 
 @runtime_checkable
 class Pool(Protocol):
@@ -41,6 +39,8 @@ _StepType = Tuple[str, Union[Pool, Pipe, Iterable]]
 _StepType.__doc__ = (
     "A Pipeline step's name and generating object, as tuple(name, pipeline_piece)."
 )
+
+PARAM_DIVIDER = "__"
 
 
 class Pipeline:
@@ -127,8 +127,10 @@ class Pipeline:
         """Successively pass the input values through the Pipe."""
 
         # Initialize the parameters objects.
-        pipeline_params = _parse_params_to_nested_dict(self.params)
-        call_params = _parse_params_to_nested_dict(params)
+        pipeline_params = _parse_params_to_nested_dict(
+            self.params, divider=PARAM_DIVIDER
+        )
+        call_params = _parse_params_to_nested_dict(params, divider=PARAM_DIVIDER)
         merged_params = _merge_dicts(pipeline_params, call_params)
 
         try:
@@ -225,7 +227,25 @@ def _merge_dicts(a: dict, b: dict):
     return a_
 
 
-def _parse_params_to_nested_dict(params_dict: Dict, divider: str = "__"):
+def _parse_params_to_nested_dict(params_dict: Dict, divider: str):
+    """
+    Converts a dictionary with a single level to a multi-level nested dictionary.
+
+    Examples:
+        >>> _parse_params_to_nested_dict({"a": 1}, divider="__")
+        {'a': 1}
+        >>> _parse_params_to_nested_dict({"a__b": 1, "a__c": 2}, divider="__")
+        {'a': {'b': 1, 'c': 2}}
+        >>> _parse_params_to_nested_dict(
+        ...     {"a__b__alpha": 1, "a__b__beta": 2, "a__c__gamma": 3},
+        ...     divider="__")
+        {'a': {'b': {'alpha': 1, 'beta': 2}, 'c': {'gamma': 3}}}
+
+        >>> _parse_params_to_nested_dict(
+        ...     {"a:b:alpha": 1, "a:b:beta": 2, "a:c:gamma": 3},
+        ...     divider=":")
+        {'a': {'b': {'alpha': 1, 'beta': 2}, 'c': {'gamma': 3}}}
+    """
     nested_dictionary: dict = copy.copy(params_dict)
     for key in params_dict.keys():
         if divider in key:
@@ -379,9 +399,3 @@ _ExperimentalSequence = Iterable[_ExperimentalCondition]
 _ExperimentalSequence.__doc__ = """
 An _ExperimentalSequence represents a series of trials.
 """
-
-
-def sequence_to_ndarray(sequence: _ExperimentalSequence):
-    """Converts an _ExperimentalSequence to a numpy-ndarray."""
-    ndarray = np.ndarray(list(sequence))
-    return ndarray
