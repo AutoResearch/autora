@@ -6,7 +6,7 @@ import os
 from dataclasses import dataclass, field, replace
 from enum import Enum
 from numbers import Number
-from typing import List, Protocol, Union
+from typing import List, Optional, Protocol, Union
 
 from numpy.typing import ArrayLike
 from transitions import Machine, State, core
@@ -19,12 +19,12 @@ _logger = logging.getLogger(__name__)
 
 @dataclass(frozen=True)
 class SearchSpacePriors:
-    priors: List[str]
+    pass
 
 
 @dataclass(frozen=True)
 class IndependentVariableValues:
-    x: ArrayLike
+    x: ArrayLike = field(default_factory=list)
 
 
 @dataclass(frozen=True)
@@ -40,7 +40,7 @@ class DataSet:
 
 @dataclass(frozen=False)
 class DataSetCollection:
-    datasets: List[DataSet]
+    datasets: List[DataSet] = field(default_factory=list)
 
     def __getitem__(self, item):
         return self.datasets[item]
@@ -67,7 +67,7 @@ class Theory(Protocol):
 
 @dataclass(frozen=False)
 class TheoryCollection:
-    theories: List[Theory]
+    theories: List[Theory] = field(default_factory=list)
 
     def __getitem__(self, item):
         return self.theories[item]
@@ -78,6 +78,8 @@ def combine_theories(a: Union[TheoryCollection, Theory], b: Theory):
         new_collection = TheoryCollection([a, b])
     elif isinstance(a, TheoryCollection):
         new_collection = TheoryCollection(a.theories + [b])
+    else:
+        raise NotImplementedError("Type of ", a, "unknown.")
     return new_collection
 
 
@@ -168,12 +170,12 @@ class AERCycle(object):
         experiment_runner: ExperimentRunner,
         metadata: VariableCollection,
         first_state: str,
-        search_space: List[str] = [],
+        search_space: Optional[SearchSpacePriors] = None,
         max_cycle_count: int = 5,
         cycle_count: int = 0,
-        independent_variable_values: List[Number] = [],
-        data: DataSetCollection = DataSetCollection([]),
-        theories: TheoryCollection = TheoryCollection([]),
+        independent_variable_values: Optional[IndependentVariableValues] = None,
+        data: Optional[List[DataSet]] = None,
+        theories: Optional[List[Theory]] = None,
         name=None,
         add_graphing=True,
     ):
@@ -205,18 +207,27 @@ class AERCycle(object):
             TheoryCollection.
         """
 
+        if search_space is None:
+            search_space = SearchSpacePriors()
+        if data is None:
+            data = []
+        if independent_variable_values is None:
+            independent_variable_values = IndependentVariableValues([])
+        if theories is None:
+            theories = []
+
         # Create a run collection object
         run_container = RunCollection(
             metadata=metadata,
             first_state=AERModule(first_state),
-            search_space=SearchSpacePriors(search_space),
+            search_space=search_space,
             max_cycle_count=max_cycle_count,
             cycle_count=cycle_count,
             independent_variable_values=IndependentVariableValues(
                 independent_variable_values
             ),
-            data=data,
-            theories=theories,
+            data=DataSetCollection(data),
+            theories=TheoryCollection(theories),
         )
 
         self._theorist = theorist

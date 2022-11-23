@@ -18,6 +18,10 @@ def dummy_theorist(data, metadata, search_space):
     return theory
 
 
+def zeroth_theory(x):
+    return 0 * x
+
+
 def dummy_experimentalist(data, metadata: VariableCollection, theory, n_samples=10):
 
     assert metadata.independent_variables[0].value_range is not None
@@ -41,7 +45,37 @@ def metadata():
     return metadata
 
 
-def test_run(metadata):
+def test_run_starting_at_experimentalist(metadata):
+    """
+    This is a prototype closed-loop cycle using the "transitions" package as a state-machine
+    handler.
+    """
+
+    #  Define parameters for run
+    cycle = AERCycle(
+        theorist=dummy_theorist,
+        experimentalist=dummy_experimentalist,
+        experiment_runner=dummy_experiment_runner,
+        metadata=metadata,
+        first_state="experimentalist",
+        theories=[zeroth_theory],
+    )
+    cycle.run()
+    results = cycle.results
+
+    assert results.data.datasets.__len__() == results.max_cycle_count, (
+        f"Number of datasets generated ({results.data.datasets.__len__()}) "
+        f"should equal the max number of cycles ({results.max_cycle_count})."
+    )
+
+    assert results.theories.theories.__len__() == results.max_cycle_count + 1, (
+        f"Number of theories generated ({results.theories.theories.__len__()}) "
+        f"should equal the max number of cycles ({results.max_cycle_count}) "
+        f"plus one because we had a 'seed' initial theory."
+    )
+
+
+def test_run_starting_at_experiment_runner(metadata):
     """
     This is a prototype closed-loop cycle using the "transitions" package as a state-machine
     handler.
@@ -71,9 +105,6 @@ def test_run(metadata):
         f"Number of theories generated ({results.theories.theories.__len__()}) "
         f"should equal the max number of cycles ({results.max_cycle_count})."
     )
-
-    # Other check ideas
-    # Start point checks - need a set-up function
 
 
 def test_graphing(metadata):
