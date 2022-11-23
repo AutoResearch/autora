@@ -68,3 +68,6 @@ dmypy.json
 
 # Material for MkDocs
 site/
+
+# Jupyter Notebook load data
+.ipynb_checkpoints

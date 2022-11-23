@@ -26,13 +26,15 @@ source venv/bin/activate
 
 echo "installing distribution file ${distfile}"
 pip install "${distfile}"
+pip install pytest
 
 echo "Installed version of AutoRA: $(python -c 'import autora; print(autora.__version__)')"
 
 echo "running unit tests:"
-python -m unittest -v
+pytest
 
 echo "Run and test using:"
+echo "cd \"${tempdir}\""
 echo "source ${tempdir}/venv/bin/activate"
 echo "python -c 'import autora; print(autora.__version__)'"
-echo "python -m unittest -v"
+echo "pytest"

@@ -37,5 +37,11 @@ nav:
       - Meta parameters: 'theorist/darts/meta_parameters.md'
       - Search space: 'theorist/darts/search_space.md'
       - Example: 'theorist/darts/example.md'
+  - BMS:
+      - Introduction: 'theorist/bms/introduction.md'
+      - How it works: 'theorist/bms/how_it_works.md'
+      - Meta parameters: 'theorist/bms/meta_parameters.md'
+      - Search space: 'theorist/bms/search_space.md'
+      - Example: 'theorist/bms/example.md'
 - Code Reference: reference/  #
 

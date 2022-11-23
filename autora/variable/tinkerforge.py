@@ -1,5 +1,5 @@
 from abc import abstractmethod
-from typing import Sequence
+from typing import Any, Tuple
 
 from tinkerforge.bricklet_industrial_analog_out_v2 import BrickletIndustrialAnalogOutV2
 from tinkerforge.bricklet_industrial_dual_0_20ma_v2 import BrickletIndustrialDual020mAV2
@@ -28,7 +28,7 @@ class TinkerforgeVariable(Variable):
         name: str = "",
         units: str = "",
         priority: int = 0,
-        value_range: Sequence = (0, 1),
+        value_range: Tuple[Any, Any] = (0, 1),
         type: ValueType = float,
     ):
         """
