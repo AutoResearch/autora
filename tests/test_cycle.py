@@ -4,6 +4,7 @@ Test the closed-loop state-machine with run function implementation.
 """
 
 import numpy as np
+import pytest
 
 from autora.cycle import AERCycle
 from autora.variable import Variable, VariableCollection
@@ -31,7 +32,16 @@ def dummy_experiment_runner(x_prime):
     return x_prime.x + 1
 
 
-def test_run():
+@pytest.fixture
+def metadata():
+    metadata = VariableCollection(
+        independent_variables=[Variable(name="x1", value_range=(-5, 5))],
+        dependent_variables=[Variable(name="y", value_range=(-10, 10))],
+    )
+    return metadata
+
+
+def test_run(metadata):
     """
     This is a prototype closed-loop cycle using the "transitions" package as a state-machine
     handler.
@@ -40,11 +50,6 @@ def test_run():
     #  Define parameters for run
     # Assuming start from experiment runner we create dummy x' values
     x1 = np.linspace(0, 1, 10)  # Seed x' to input into the experiment runner
-    # metadata are value constraints for the experimentalist
-    metadata = VariableCollection(
-        independent_variables=[Variable(name="x1", value_range=(-5, 5))],
-        dependent_variables=[Variable(name="y", value_range=(-10, 10))],
-    )
 
     cycle = AERCycle(
         theorist=dummy_theorist,
@@ -53,13 +58,9 @@ def test_run():
         metadata=metadata,
         first_state="experiment runner",
         independent_variable_values=x1,
-        add_graphing=True,
     )
     cycle.run()
     results = cycle.results
-
-    # Plot diagram, will remove this functionality in production
-    cycle.get_graph().draw("state_machine_diagram.png", prog="dot")
 
     assert results.data.datasets.__len__() == results.max_cycle_count, (
         f"Number of datasets generated ({results.data.datasets.__len__()}) "
@@ -73,3 +74,17 @@ def test_run():
 
     # Other check ideas
     # Start point checks - need a set-up function
+
+
+def test_graphing(metadata):
+    cycle = AERCycle(
+        theorist=dummy_theorist,
+        experimentalist=dummy_experimentalist,
+        experiment_runner=dummy_experiment_runner,
+        metadata=metadata,
+        add_graphing=True,
+        first_state="experimentalist",
+    )
+
+    # Plot diagram, will remove this functionality in production
+    cycle.get_graph().draw("state_machine_diagram.png", prog="dot")
