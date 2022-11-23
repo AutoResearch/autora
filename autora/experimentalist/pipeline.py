@@ -153,8 +153,8 @@ class Pipeline:
             name, pool = next(pipes_iterator)
             if isinstance(pool, Pool):
                 # Here, the pool is a Pool callable, which we can pass parameters.
-                all_params_for_pool = self._get_params_for_name(
-                    pipeline_params, call_params, name
+                all_params_for_pool = _get_params_for_name(
+                    name, pipeline_params, call_params
                 )
                 results = [pool(**all_params_for_pool)]
             elif isinstance(pool, Iterable):
@@ -168,21 +168,58 @@ class Pipeline:
         # Run the successive pipes over the last result
         for name, pipe in pipes_iterator:
             assert isinstance(pipe, Pipe)
-            all_params_for_pipe = self._get_params_for_name(
-                pipeline_params, call_params, name
+            all_params_for_pipe = _get_params_for_name(
+                name, pipeline_params, call_params
             )
             results.append(pipe(results[-1], **all_params_for_pipe))
 
         return results[-1]
 
-    @staticmethod
-    def _get_params_for_name(pipeline_params, call_params, name):
-        pipeline_params_for_pipe = pipeline_params.get(name, dict())
-        call_params_for_pipe = call_params.get(name, dict())
-        all_params_for_pipe = dict(pipeline_params_for_pipe, **call_params_for_pipe)
-        return all_params_for_pipe
-
     run = __call__
+
+
+def _get_params_for_name(key, *params):
+    """Combines subdictionaries of a particular key, if they exist.
+    It's useful for merging and accessing subdictionaries
+    of parameter dictionaries used by Pipelines
+
+    Args:
+        key: the key to search for
+        *params: some dictionaries
+
+    Returns: the combined values of all the dictionaries' "key" values
+
+    Examples:
+        In the simplest case, this just gets the named subdictionary
+        >>> base_params = {"pool": {"n": 10}}
+        >>> _get_params_for_name("pool", base_params)
+        {'n': 10}
+
+        >>> update_params = {"pool": {"n": 20}}
+        >>> _get_params_for_name("pool", base_params, update_params)
+        {'n': 20}
+
+        >>> base_params = {"pool": {"n": 10}, "filter": {"divisor": 5}}
+        >>> update_params = {"pool": {"n": 20}}
+        >>> _get_params_for_name("pool", base_params, update_params)
+        {'n': 20}
+        >>> _get_params_for_name("filter", base_params, update_params)
+        {'divisor': 5}
+        >>> _get_params_for_name("not a known key", base_params, update_params)
+        {}
+
+    """
+    out_params = dict()
+
+    # Loop over the input params dictionaries p
+    for p in params:
+        # Get the subdictionary with the key "name", or an empty dict if there isn't that key
+        q = p.get(key, dict())
+
+        # Update the output params
+        out_params.update(**q)
+
+    return out_params
 
 
 def _parse_params_to_nested_dict(params_dict: Dict, divider: str = "__"):
