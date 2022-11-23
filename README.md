@@ -118,7 +118,7 @@ There are two suggested options for initializing an environment:
 Set up the Virtual environment – an isolated version of `python` and all the packages required to run AutoRA and develop it further – as follows:
 - Open the `<project directory>` in PyCharm.
 - Navigate to PyCharm > Preferences > Project: AutoRA > Python Interpreter
-- Next to the drop-down list of available interpreters, click the "gear" symbol and choose "Add" to initialize a new interpreter. 
+- Next to the drop-down list of available interpreters, click the "Add Interpreter" and choose "Add Local Interpreter" to initialize a new interpreter. 
 - Select "Poetry environment" in the list on the left. Specify the following:  
   - Python executable: select the path to the installed `python` version you wish to use, e.g. 
     `~/.pyenv/versions/3.8.13/bin/python3`
