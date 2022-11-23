@@ -129,6 +129,7 @@ class Pipeline:
         # Initialize the parameters objects.
         pipeline_params = _parse_params_to_nested_dict(self.params)
         call_params = _parse_params_to_nested_dict(params)
+        merged_params = _merge_dicts(pipeline_params, call_params)
 
         try:
             # Check we have pipes to use
@@ -153,9 +154,7 @@ class Pipeline:
             name, pool = next(pipes_iterator)
             if isinstance(pool, Pool):
                 # Here, the pool is a Pool callable, which we can pass parameters.
-                all_params_for_pool = self._get_params_for_name(
-                    pipeline_params, call_params, name
-                )
+                all_params_for_pool = merged_params.get(name, dict())
                 results = [pool(**all_params_for_pool)]
             elif isinstance(pool, Iterable):
                 # Otherwise, the pool should be an iterable which we can just use as is.
@@ -168,21 +167,62 @@ class Pipeline:
         # Run the successive pipes over the last result
         for name, pipe in pipes_iterator:
             assert isinstance(pipe, Pipe)
-            all_params_for_pipe = self._get_params_for_name(
-                pipeline_params, call_params, name
-            )
+            all_params_for_pipe = merged_params.get(name, dict())
             results.append(pipe(results[-1], **all_params_for_pipe))
 
         return results[-1]
 
-    @staticmethod
-    def _get_params_for_name(pipeline_params, call_params, name):
-        pipeline_params_for_pipe = pipeline_params.get(name, dict())
-        call_params_for_pipe = call_params.get(name, dict())
-        all_params_for_pipe = dict(pipeline_params_for_pipe, **call_params_for_pipe)
-        return all_params_for_pipe
-
     run = __call__
+
+
+def _merge_dicts(a: dict, b: dict):
+    """
+    merges b into a.
+
+    Args:
+        a: the "base" dictionary
+        b: the "update" dictionary which takes precendence
+
+    Returns:
+
+    Originally from https://stackoverflow.com/a/7205107, modified for AER to allow overwriting.
+
+    Examples:
+        Non-conflicting dictionaries are merged "side-by-side"
+        >>> _merge_dicts({1:{"a":"A"},2:{"b":"B"}}, {2:{"c":"C"},3:{"d":"D"}})
+        {1: {'a': 'A'}, 2: {'b': 'B', 'c': 'C'}, 3: {'d': 'D'}}
+
+        With conflicting dictionaries, the second dictionary takes precedence
+        >>> _merge_dicts(
+        ...     {"l1_a": {"l2_1": {"l3_alpha": "from_first"}}},
+        ...     {"l1_a": {"l2_1": {"l3_alpha": "from_second"}}})
+        {'l1_a': {'l2_1': {'l3_alpha': 'from_second'}}}
+
+        Again, with non-conflicting dictionaries at the lower level
+        >>> _merge_dicts(
+        ...     {"l1_a": {"l2_1": {"l3_alpha": "from_first"}}},
+        ...     {"l1_a": {"l2_1": {"l3_beta": "from_second"}}})
+        {'l1_a': {'l2_1': {'l3_alpha': 'from_first', 'l3_beta': 'from_second'}}}
+
+        >>> _merge_dicts(
+        ...     {"l1_a": {"l2_1": {"l3_alpha": "from_first", "l3_beta": "from_first"}}},
+        ...     {"l1_a": {"l2_1": {                          "l3_beta": "from_second"}}})
+        {'l1_a': {'l2_1': {'l3_alpha': 'from_first', 'l3_beta': 'from_second'}}}
+
+    """
+    a_, b_ = dict(a), dict(b)
+
+    for key in b_:
+        if key in a_:
+            if isinstance(a_[key], dict) and isinstance(b_[key], dict):
+                a_[key] = _merge_dicts(a_[key], b_[key])
+            elif a_[key] != b_[key]:
+                a_[key] = b_[key]
+            else:
+                pass
+        else:
+            a_[key] = b_[key]
+    return a_
 
 
 def _parse_params_to_nested_dict(params_dict: Dict, divider: str = "__"):
