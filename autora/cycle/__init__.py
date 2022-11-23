@@ -112,22 +112,6 @@ class Experimentalist(Protocol):
         ...
 
 
-class ExperimentalDesign(Protocol):
-    """
-    Transformation of independent variable values
-    given restrictions specified by the experimental design.
-
-    Implementation ideas:
-        - Could be a callable passed to an experimentalist OR
-        - Defined as part of a pipeline after the Experimentalist
-    """
-
-    def __call__(
-        self, ivs: IndependentVariableValues, metadata: VariableCollection
-    ) -> IndependentVariableValues:
-        ...
-
-
 class ExperimentRunner(Protocol):
     """
     experiment_runner(x) -> y
