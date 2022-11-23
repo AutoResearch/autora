@@ -180,12 +180,12 @@ def _merge_dicts(a: dict, b: dict):
     merges b into a.
 
     Args:
-        a:
-        b:
+        a: the "base" dictionary
+        b: the "update" dictionary which takes precendence
 
     Returns:
 
-    Originally from https://stackoverflow.com/a/7205107, modified for AER.
+    Originally from https://stackoverflow.com/a/7205107, modified for AER to allow overwriting.
 
     Examples:
         Non-conflicting dictionaries are merged "side-by-side"
