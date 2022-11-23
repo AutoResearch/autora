@@ -63,13 +63,13 @@ def test_run_starting_at_experimentalist(metadata):
     cycle.run()
     results = cycle.results
 
-    assert results.data.datasets.__len__() == results.max_cycle_count, (
-        f"Number of datasets generated ({results.data.datasets.__len__()}) "
+    assert len(results.data.datasets) == results.max_cycle_count, (
+        f"Number of datasets generated ({len(results.data.datasets)}) "
         f"should equal the max number of cycles ({results.max_cycle_count})."
     )
 
-    assert results.theories.theories.__len__() == results.max_cycle_count + 1, (
-        f"Number of theories generated ({results.theories.theories.__len__()}) "
+    assert len(results.theories.theories) == results.max_cycle_count + 1, (
+        f"Number of theories generated ({len(results.theories.theories)}) "
         f"should equal the max number of cycles ({results.max_cycle_count}) "
         f"plus one because we had a 'seed' initial theory."
     )
@@ -96,13 +96,13 @@ def test_run_starting_at_experiment_runner(metadata):
     cycle.run()
     results = cycle.results
 
-    assert results.data.datasets.__len__() == results.max_cycle_count, (
-        f"Number of datasets generated ({results.data.datasets.__len__()}) "
-        f"should equal the max number of cycles ({results.max_cycle_count})."
+    assert len(results.data.datasets) == results.max_cycle_count, (
+        f"Number of datasets generated ({len(results.data.datasets)}) "
+        f"should equal the max number of cycles ({len(results.max_cycle_count)})."
     )
 
-    assert results.theories.theories.__len__() == results.max_cycle_count, (
-        f"Number of theories generated ({results.theories.theories.__len__()}) "
+    assert len(results.theories.theories) == results.max_cycle_count, (
+        f"Number of theories generated ({len(results.theories.theories)}) "
         f"should equal the max number of cycles ({results.max_cycle_count})."
     )
 
