@@ -246,7 +246,7 @@ class AERCycle(object):
         print("Running Theorist to get new theory from data.")
         # Run Theorist
         new_theory = self._theorist(
-            data=self._run_container.data[-1],
+            data=self._run_container.data,
             metadata=self._run_container.metadata,
             search_space=self._run_container.search_space,
         )
