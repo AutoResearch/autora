@@ -178,7 +178,7 @@ class Pipeline:
     run = __call__
 
 
-def _merge_dicts(a: dict, b: dict, _level=0):
+def _merge_dicts(a: dict, b: dict):
     """
     merges b into a.
 
@@ -188,7 +188,7 @@ def _merge_dicts(a: dict, b: dict, _level=0):
 
     Returns:
 
-    Originally from https://stackoverflow.com/a/7205107.
+    Originally from https://stackoverflow.com/a/7205107, modified for AER.
 
     Examples:
         Non-conflicting dictionaries are merged "side-by-side"
@@ -201,19 +201,24 @@ def _merge_dicts(a: dict, b: dict, _level=0):
         ...     {"l1_a": {"l2_1": {"l3_alpha": "from_second"}}})
         {'l1_a': {'l2_1': {'l3_alpha': 'from_second'}}}
 
+        Again, with non-conflicting dictionaries at the lower level
+        >>> _merge_dicts(
+        ...     {"l1_a": {"l2_1": {"l3_alpha": "from_first"}}},
+        ...     {"l1_a": {"l2_1": {"l3_beta": "from_second"}}})
+        {'l1_a': {'l2_1': {'l3_alpha': 'from_first', 'l3_beta': 'from_second'}}}
+
+        >>> _merge_dicts(
+        ...     {"l1_a": {"l2_1": {"l3_alpha": "from_first", "l3_beta": "from_first"}}},
+        ...     {"l1_a": {"l2_1": {                          "l3_beta": "from_second"}}})
+        {'l1_a': {'l2_1': {'l3_alpha': 'from_first', 'l3_beta': 'from_second'}}}
+
     """
-    if _level == 0:
-        # Create copies of the dictionaries which aren't modified
-        a_, b_ = dict(a), dict(b)
-    else:
-        # we're within the recursive call, so we can just use the dictionaries passed from above
-        # without being worried about side-effects
-        a_, b_ = a, b
+    a_, b_ = dict(a), dict(b)
 
     for key in b_:
         if key in a_:
             if isinstance(a_[key], dict) and isinstance(b_[key], dict):
-                _merge_dicts(a_[key], b_[key], _level=_level + 1)
+                a_[key] = _merge_dicts(a_[key], b_[key])
             elif a_[key] != b_[key]:
                 a_[key] = b_[key]
             else:
