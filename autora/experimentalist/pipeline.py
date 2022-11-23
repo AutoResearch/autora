@@ -178,6 +178,52 @@ class Pipeline:
     run = __call__
 
 
+def _merge_dicts(a: dict, b: dict, _level=0, path=None):
+    """
+    merges b into a.
+
+    Args:
+        a:
+        b:
+
+    Returns:
+
+    Originally from https://stackoverflow.com/a/7205107.
+
+    Examples:
+        Non-conflicting dictionaries are merged "side-by-side"
+        >>> _merge_dicts({1:{"a":"A"},2:{"b":"B"}}, {2:{"c":"C"},3:{"d":"D"}})
+        {1: {'a': 'A'}, 2: {'b': 'B', 'c': 'C'}, 3: {'d': 'D'}}
+
+        With conflicting dictionaries, the second dictionary takes precedence
+        >>> _merge_dicts(
+        ...     {"l1_a": {"l2_1": {"l3_alpha": "from_first"}}},
+        ...     {"l1_a": {"l2_1": {"l3_alpha": "from_second"}}})
+        {'l1_a': {'l2_1': {'l3_alpha': 'from_second'}}}
+
+    """
+    if _level == 0:
+        path = []
+        a_, b_ = dict(a), dict(b)
+    else:
+        path = path
+        a_, b_ = a, b
+
+    for key in b_:
+        if key in a_:
+            if isinstance(a_[key], dict) and isinstance(b_[key], dict):
+                _merge_dicts(
+                    a_[key], b_[key], _level=_level + 1, path=path + [str(key)]
+                )
+            elif a_[key] != b_[key]:
+                a_[key] = b_[key]
+            else:
+                pass
+        else:
+            a_[key] = b_[key]
+    return a_
+
+
 def _get_params_for_name(key, *params):
     """Combines subdictionaries of a particular key, if they exist.
 
