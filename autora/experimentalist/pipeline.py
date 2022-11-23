@@ -178,7 +178,7 @@ class Pipeline:
     run = __call__
 
 
-def _merge_dicts(a: dict, b: dict, _level=0, path=None):
+def _merge_dicts(a: dict, b: dict, _level=0):
     """
     merges b into a.
 
@@ -203,18 +203,17 @@ def _merge_dicts(a: dict, b: dict, _level=0, path=None):
 
     """
     if _level == 0:
-        path = []
+        # Create copies of the dictionaries which aren't modified
         a_, b_ = dict(a), dict(b)
     else:
-        path = path
+        # we're within the recursive call, so we can just use the dictionaries passed from above
+        # without being worried about side-effects
         a_, b_ = a, b
 
     for key in b_:
         if key in a_:
             if isinstance(a_[key], dict) and isinstance(b_[key], dict):
-                _merge_dicts(
-                    a_[key], b_[key], _level=_level + 1, path=path + [str(key)]
-                )
+                _merge_dicts(a_[key], b_[key], _level=_level + 1)
             elif a_[key] != b_[key]:
                 a_[key] = b_[key]
             else:
