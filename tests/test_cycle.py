@@ -58,6 +58,7 @@ def test_run_starting_at_experimentalist(metadata):
 
     #  Define parameters for run
     cycle = AERCycle(
+        max_cycle_count=5,
         theorist=dummy_theorist,
         experimentalist=dummy_experimentalist,
         experiment_runner=dummy_experiment_runner,
@@ -91,6 +92,7 @@ def test_run_starting_at_experiment_runner(metadata):
     x1 = np.linspace(0, 1, 10)  # Seed x' to input into the experiment runner
 
     cycle = AERCycle(
+        max_cycle_count=5,
         theorist=dummy_theorist,
         experimentalist=dummy_experimentalist,
         experiment_runner=dummy_experiment_runner,
@@ -149,6 +151,7 @@ def test_run_starting_at_theorist(metadata):
 
 def test_graphing(metadata):
     cycle = AERCycle(
+        max_cycle_count=5,
         theorist=dummy_theorist,
         experimentalist=dummy_experimentalist,
         experiment_runner=dummy_experiment_runner,
