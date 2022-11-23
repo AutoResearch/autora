@@ -180,8 +180,10 @@ class Pipeline:
 
 def _get_params_for_name(key, *params):
     """Combines subdictionaries of a particular key, if they exist.
+
     It's useful for merging and accessing subdictionaries
-    of parameter dictionaries used by Pipelines
+    of parameter dictionaries used by Pipelines, which accept nested dictionaries
+    which might seek to override each other's values.
 
     Args:
         key: the key to search for
@@ -190,15 +192,17 @@ def _get_params_for_name(key, *params):
     Returns: the combined values of all the dictionaries' "key" values
 
     Examples:
-        In the simplest case, this just gets the named subdictionary
+        In the simplest case, _get_params_for_name just gets the named subdictionary
         >>> base_params = {"pool": {"n": 10}}
         >>> _get_params_for_name("pool", base_params)
         {'n': 10}
 
+        If we have an "update" dictionary which comes later, then its values get used.
         >>> update_params = {"pool": {"n": 20}}
         >>> _get_params_for_name("pool", base_params, update_params)
         {'n': 20}
 
+        We can have multiple keys which are treated separately.
         >>> base_params = {"pool": {"n": 10}, "filter": {"divisor": 5}}
         >>> update_params = {"pool": {"n": 20}}
         >>> _get_params_for_name("pool", base_params, update_params)
@@ -207,6 +211,18 @@ def _get_params_for_name(key, *params):
         {'divisor': 5}
         >>> _get_params_for_name("not a known key", base_params, update_params)
         {}
+
+        If we have three layers of data, then we can overwrite only one subdictioary if we want
+        >>> base_params = {"pool": {"start": {"o": 10}, "end":{"r": 7}}}
+        >>> update_params = {"pool": {"end": {"r": 17}}}
+        >>> _get_params_for_name("pool", base_params, update_params)
+        {'start': {'o': 10}, 'end': {'r': 17}}
+
+        ... but subfields aren't merged (the pool.end.t subfield has been lost in the output):
+        >>> base_params = {"pool": {"start": {"o": 10}, "end": {'r': 7, 't': 25}}}
+        >>> update_params = {"pool": {"end": {"r": 17}}}
+        >>> _get_params_for_name("pool", base_params, update_params)
+        {'start': {'o': 10}, 'end': {'r': 17}}
 
     """
     out_params = dict()
