@@ -4,7 +4,6 @@ Test the closed-loop state-machine with run function implementation.
 """
 
 import numpy as np
-import pytest  # noqa: 401
 
 from autora.cycle import AERCycle
 from autora.variable import Variable, VariableCollection
