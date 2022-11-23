@@ -10,7 +10,7 @@ repos:
         args:
         - "--profile=black"
         - "--filter-files"
-  - repo: https://gitlab.com/pycqa/flake8
+  - repo: https://github.com/pycqa/flake8
     rev: 5.0.4
     hooks:
       - id: flake8
@@ -23,5 +23,6 @@ repos:
     hooks:
       - id: mypy
         additional_dependencies: [types-requests]
+        language_version: python3.8
 default_language_version:
   python: python3
