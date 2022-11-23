@@ -9,6 +9,7 @@ import pytest
 from autora.cycle import AERCycle, DataSet
 from autora.variable import Variable, VariableCollection
 
+
 # Define a simple truth we wish to recover
 def ground_truth(x):
     return x + 1
