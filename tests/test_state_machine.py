@@ -23,8 +23,9 @@ def dummy_theorist(data, metadata, search_space):
 
 
 def dummy_experimentalist(data, metadata: VariableCollection, theory, n_samples=10):
-    low = metadata.independent_variables[0].min
-    high = metadata.independent_variables[0].max
+    assert metadata.independent_variables[0].value_range is not None
+    low = min(metadata.independent_variables[0].value_range)
+    high = max(metadata.independent_variables[0].value_range)
     x_prime = np.random.uniform(low, high, n_samples)
     return x_prime
 
