@@ -1,97 +1,76 @@
-#!/usr/bin/env python
+"""
+Test the closed-loop state-machine with run function implementation.
+
+"""
+
 import numpy as np
 import pytest  # noqa: 401
 
-from autora.cycle import (  # noqa: 401
-    AERModule,
-    DataSetCollection,
-    RunCollection,
-    TheoryCollection,
-    run,
-)
+from autora.cycle import AERCycle
 from autora.variable import Variable, VariableCollection
 
 
-def test_cycle():
+# Define basic versions of the modules
+def dummy_theorist(data, metadata, search_space):
+    def theory(x):
+        return x + 1
+
+    return theory
+
+
+def dummy_experimentalist(data, metadata: VariableCollection, theory, n_samples=10):
+
+    assert metadata.independent_variables[0].value_range is not None
+
+    low = min(metadata.independent_variables[0].value_range)
+    high = max(metadata.independent_variables[0].value_range)
+    x_prime = np.random.uniform(low, high, n_samples)
+    return x_prime
+
+
+def dummy_experiment_runner(x_prime):
+    return x_prime.x + 1
+
+
+def test_run():
     """
-    This test prototypes the design and calling of the closed cycle system starting from
-    different modules of the cycle (>> Experiment Runner > Theorist > Experimentalist >>).
-    This prototype uses simplistic representations of the theorist, experimentalist, and experiment
-    runner.
-
-    theorist: Generates a constant theory of  y = x + 1, independent of inputs.
-    experimentalist: Generates new independent variables (x') to experiment from a uniform random
-                     selection of values from a defined range. Independent of inputs.
-    experiment_runner: Simulates data gained from an experiment that perfectly matches the theory
-                       y = x' + 1
-
-    This test was first conceptualized from the exercise of starting from the experiment runner.
-    Seed x' (Independent variable) values are inputs to experiment runner to start the cycle and
-    create syntheticexperimental data.
-
-    Notes on seed requirements:
-    1. Experiment Runner Start
-        a. Independent variable values
-    2. Theorist Start
-        a. Paired independent variable values and dependent variable values
-    3. Experimentalist Start
-        a. Theory
-        b. Paired independent variable values and dependent variable values
-
+    This is a prototype closed-loop cycle using the "transitions" package as a state-machine
+    handler.
     """
-
-    # Define basic versions of the modules
-    def dummy_theorist(data, metadata, search_space):
-        def theory(x):
-            return x + 1
-
-        return theory
-
-    def dummy_experimentalist(data, metadata: VariableCollection, theory):
-        low = metadata.independent_variables[0].min
-        high = metadata.independent_variables[0].max
-        x_prime = np.random.uniform(low, high, 10)
-        return x_prime
-
-    def dummy_experiment_runner(x_prime):
-        return x_prime + 1
 
     #  Define parameters for run
+    # Assuming start from experiment runner we create dummy x' values
     x1 = np.linspace(0, 1, 10)  # Seed x' to input into the experiment runner
+    # metadata are value constraints for the experimentalist
     metadata = VariableCollection(
         independent_variables=[Variable(name="x1", value_range=(-5, 5))],
         dependent_variables=[Variable(name="y", value_range=(-10, 10))],
     )
 
-    parameters = dict(
-        metadata=metadata,
-        search_space=None,
-        data=DataSetCollection([]),
-        theories=TheoryCollection([lambda x: x + 2]),
-        independent_variable_values=x1,
-        max_cycle_count=10,
-        cycle_count=0,
+    cycle = AERCycle(
         theorist=dummy_theorist,
         experimentalist=dummy_experimentalist,
         experiment_runner=dummy_experiment_runner,
+        metadata=metadata,
+        first_state="experiment runner",
+        independent_variable_values=x1,
+        add_graphing=True,
+    )
+    cycle.run()
+    results = cycle.results
+
+    # Plot diagram, will remove this functionality in production
+    cycle.get_graph().draw("state_machine_diagram.png", prog="dot")
+
+    assert results.data.datasets.__len__() == results.max_cycle_count, (
+        f"Number of datasets generated ({results.data.datasets.__len__()}) "
+        f"should equal the max number of cycles ({results.max_cycle_count})."
     )
 
-    # Run from experiment runner
-    experiment_runner_results_run = run(
-        first_state=AERModule.EXPERIMENT_RUNNER, **parameters
+    assert results.theories.theories.__len__() == results.max_cycle_count, (
+        f"Number of theories generated ({results.theories.theories.__len__()}) "
+        f"should equal the max number of cycles ({results.max_cycle_count})."
     )
-    print(experiment_runner_results_run)
 
-    # Run starting from theorist
-    theorist_results_run = run(first_state=AERModule.THEORIST, **parameters)
-    print(theorist_results_run)
-
-    # Run starting from experimentalist
-    experimentalist_results_run = run(
-        first_state=AERModule.EXPERIMENTALIST, **parameters
-    )
-    print(experimentalist_results_run)
-
-
-if __name__ == "__main__":
-    test_cycle()
+    # Other check ideas
+    # Start point checks - need a set-up function
