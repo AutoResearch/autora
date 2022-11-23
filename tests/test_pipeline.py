@@ -253,7 +253,7 @@ def test_params_parser_zero_level():
         "n": 10,
         "measure": "least_confident",
     }
-    result = _parse_params_to_nested_dict(params)
+    result = _parse_params_to_nested_dict(params, divider="__")
     assert result == params
 
 
@@ -265,7 +265,7 @@ def test_params_parser_one_level():
         "uncertainty_sampler__measure": "least_confident",
     }
 
-    result = _parse_params_to_nested_dict(params)
+    result = _parse_params_to_nested_dict(params, divider="__")
     assert result == {
         "pool": {
             "ivs": "%%independent_variables%%",
@@ -284,7 +284,7 @@ def test_params_parser_recurse_one():
         "filter_pipeline__step1__n_samples": 100,
     }
 
-    result = _parse_params_to_nested_dict(params)
+    result = _parse_params_to_nested_dict(params, divider="__")
     assert result == {"filter_pipeline": {"step1": {"n_samples": 100}}}
 
 
@@ -294,7 +294,7 @@ def test_params_parser_recurse_one_n_levels():
         "a__b__c__d__e__g": 200,
         "a__b__h": 300,
     }
-    result = _parse_params_to_nested_dict(params)
+    result = _parse_params_to_nested_dict(params, divider="__")
     assert result == {"a": {"b": {"c": {"d": {"e": {"f": 100, "g": 200}}}, "h": 300}}}
 
 
@@ -319,7 +319,7 @@ def test_params_parser_recurse():
         "uncertainty_sampler__measure": "least_confident",
     }
 
-    result = _parse_params_to_nested_dict(params)
+    result = _parse_params_to_nested_dict(params, divider="__")
     assert result == {
         "pool": {
             "ivs": "%%independent_variables%%",

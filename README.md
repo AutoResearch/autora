@@ -118,7 +118,7 @@ There are two suggested options for initializing an environment:
 Set up the Virtual environment – an isolated version of `python` and all the packages required to run AutoRA and develop it further – as follows:
 - Open the `<project directory>` in PyCharm.
 - Navigate to PyCharm > Preferences > Project: AutoRA > Python Interpreter
-- Next to the drop-down list of available interpreters, click the "gear" symbol and choose "Add" to initialize a new interpreter. 
+- Next to the drop-down list of available interpreters, click the "Add Interpreter" and choose "Add Local Interpreter" to initialize a new interpreter. 
 - Select "Poetry environment" in the list on the left. Specify the following:  
   - Python executable: select the path to the installed `python` version you wish to use, e.g. 
     `~/.pyenv/versions/3.8.13/bin/python3`
@@ -303,7 +303,7 @@ If your `git commit` fails because of the pre-commit hook, then you should:
    ```
 3. Fix any errors which are reported.
    **Important: Once you've changed the code, re-stage the files it to Git. 
-   This might mean unstaging changes and then adding them again.**
+   This might mean un-staging changes and then adding them again.**
 4. If you have trouble:
    - Do a web-search to see if someone else had a similar error in the past.
    - Check that the tests you've written work correctly.
@@ -393,5 +393,19 @@ docs/         # Directory for static pages to be included in the documentation.
     ...       # Other markdown pages, images and other files.
 autora/          # The directory containing the source code.
 ```
+# Release Process
 
+## PyPI
 
+We use the standard poetry publishing workflow as outlined here: https://python-poetry.org/docs/libraries/#publishing-to-pypi
+
+## Conda
+
+The `conda` directory includes files for packaging the code for the Anaconda package manager `conda`.
+- [`meta.yaml`](conda/recipe/meta.yaml) is the `conda` recipe (configuration file)
+- [`publish-on-anaconda-org.sh`](conda/publish-on-anaconda-org.sh) is a script which runs the packaging and outputs the package into the `./dist` directory, then uploads the files to [anaconda.org](https://anaconda.org).
+
+To create and publish the `conda` package:
+- Update `./meta.yaml` with any changed dependencies, to match `pyproject.toml` and taking into account the dependencies which are actually available on the anaconda channels we use: defaults and pytorch. Commit these changes.
+- 🐛 Bugfix: Until poetry >=1.2 is available on anaconda.org (you should check each time we publish until it is), delete the [tool.poetry.group...] parts of pyproject.toml. These are recognized as incorrect Poetry configuration in poetry 1.1 and below, and will cause the build to fail. Don't commit these changes.  
+- run `publish-on-anaconda-org.sh`
