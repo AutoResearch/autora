@@ -1,4 +1,4 @@
-from ._state import State, StateMachine, Transition
+from autora.cycle._state import State, StateMachine, Transition
 
 
 class _CycleOwnStateMachine:
@@ -13,6 +13,7 @@ class _CycleOwnStateMachine:
         Examples:
             >>> from autora.skl.darts import DARTSRegressor
             >>> from autora.variable import VariableCollection, Variable
+
             >>> metadata = VariableCollection(
             ...    independent_variables=[Variable(name="x1", value_range=(-5, 5))],
             ...    dependent_variables=[Variable(name="y", value_range=(-10, 10))],
@@ -20,9 +21,11 @@ class _CycleOwnStateMachine:
             >>> example_theorist = DARTSRegressor(num_graph_nodes=2, param_updates_per_epoch=1,
             ...     max_epochs=100, primitives=("none", "linear", "add", "subtract"))
             >>> example_experimentalist = make_pipeline([])
-            >>> _CycleOwnStateMachine(theorist=example_theorist,
-            ...     experimentalist=None, \
+            >>> cycle = _CycleOwnStateMachine(theorist=example_theorist,
+            ...     experimentalist=None,
             ...     experiment_runner=None)
+            >>> cycle # doctest: +ELLIPSIS
+            <_cycle._CycleOwnStateMachine object at 0x...>
         """
 
         machine = StateMachine()
