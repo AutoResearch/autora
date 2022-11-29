@@ -68,30 +68,31 @@ class _SimpleCycle:
         >>> from sklearn.linear_model import LinearRegression
         >>> example_theorist = LinearRegression()
 
-        We initialize the Cycle with the theorist, experimentalist and experiment runner,
-        and define the maximum cycle count.
+        We initialize the Cycle with the metadata describing the domain of the theory,
+        the theorist, experimentalist and experiment runner,
+        as well as a monitor which will let us know which cycle we're currently on.
         >>> cycle = _SimpleCycle(
         ...     metadata=study_metadata,
         ...     theorist=example_theorist,
         ...     experimentalist=example_experimentalist,
         ...     experiment_runner=example_synthetic_experiment_runner,
-        ...     monitors=[lambda data: print(f"Generated {len(data.theories)} theory/-ies")],
+        ...     monitor=lambda data: print(f"Generated {len(data.theories)} theory/-ies"),
         ... )
         >>> cycle # doctest: +ELLIPSIS
-        <_cycle._SimpleCycle object at 0x...>
+        <_simple_cycle._SimpleCycle object at 0x...>
 
         We can run the cycle by calling the run method:
         >>> next(cycle) # doctest: +ELLIPSIS
         Generated 1 theory/-ies
-        <_cycle._SimpleCycle object at 0x...>
+        <_simple_cycle._SimpleCycle object at 0x...>
 
         >>> next(cycle) # doctest: +ELLIPSIS
         Generated 2 theory/-ies
-        <_cycle._SimpleCycle object at 0x...>
+        <_simple_cycle._SimpleCycle object at 0x...>
 
         >>> next(cycle) # doctest: +ELLIPSIS
         Generated 3 theory/-ies
-        <_cycle._SimpleCycle object at 0x...>
+        <_simple_cycle._SimpleCycle object at 0x...>
 
         We can now interrogate the results. The first set of conditions which went into the
         experiment runner were:
@@ -142,10 +143,13 @@ class _SimpleCycle:
 
         ... or the precision (here we iterate while the difference between the gradients
         between one cycle and the next is larger than 1x10^-3).
-        >>> _ = list(takewhile(
-        ...         lambda c: np.abs(c.data.theories[-1].coef_.item() -
-        ...                          c.data.theories[-2].coef_.item()) > 1e-3,
-        ...         iter(cycle)))
+        >>> _ = list(
+        ...         takewhile(
+        ...             lambda c: np.abs(c.data.theories[-1].coef_.item() -
+        ...                            c.data.theories[-2].coef_.item()) > 1e-3,
+        ...             iter(cycle)
+        ...         )
+        ...     )
         Generated 7 theory/-ies
         Generated 8 theory/-ies
         Generated 9 theory/-ies
@@ -160,17 +164,13 @@ class _SimpleCycle:
         theorist,
         experimentalist,
         experiment_runner,
-        monitors: Optional[List[Callable[[_SimpleCycleRunCollection], None]]] = None,
+        monitor: Optional[Callable[[_SimpleCycleRunCollection], None]] = None,
     ):
 
         self.theorist = theorist
         self.experimentalist = experimentalist
         self.experiment_runner = experiment_runner
-
-        if monitors is None:
-            monitors = []
-
-        self.monitors = monitors
+        self.monitor = monitor
 
         self.data = _SimpleCycleRunCollection(
             metadata=metadata,
@@ -243,6 +243,5 @@ class _SimpleCycle:
         return data_out
 
     def _monitor_callback(self, data: _SimpleCycleRunCollection):
-        if self.monitors is not None:
-            for m in self.monitors:
-                m(data)
+        if self.monitor is not None:
+            self.monitor(data)
