@@ -54,7 +54,7 @@ class _SimpleCycle:
             The space of allowed x values is the integers between 0 and 10 inclusive,
             and we record the allowed output values as well.
             >>> from autora.variable import VariableCollection, Variable
-            >>> metadata = VariableCollection(
+            >>> study_metadata = VariableCollection(
             ...    independent_variables=[Variable(name="x1", allowed_values=range(11))],
             ...    dependent_variables=[Variable(name="y", value_range=(-20, 20))],
             ...    )
@@ -63,7 +63,7 @@ class _SimpleCycle:
             Since the space of values is so restricted, we can just sample them all each time.
             >>> from autora.experimentalist.pipeline import make_pipeline
             >>> example_experimentalist = make_pipeline(
-            ...     [metadata.independent_variables[0].allowed_values])
+            ...     [study_metadata.independent_variables[0].allowed_values])
 
             When we run a synthetic experiment, we get a reproducible noisy result:
             >>> import numpy as np
@@ -84,7 +84,7 @@ class _SimpleCycle:
             We initialize the Cycle with the theorist, experimentalist and experiment runner,
             and define the maximum cycle count.
             >>> cycle = _SimpleCycle(
-            ...     metadata=metadata,
+            ...     metadata=study_metadata,
             ...     theorist=example_theorist,
             ...     experimentalist=example_experimentalist,
             ...     experiment_runner=example_synthetic_experiment_runner,
