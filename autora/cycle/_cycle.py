@@ -1,10 +1,11 @@
+import copy
 from dataclasses import dataclass, replace
 from typing import Callable, Iterable, List
 
 import numpy as np
-from experimentalist.pipeline import Pipeline
 from sklearn.base import BaseEstimator
 
+from autora.experimentalist.pipeline import Pipeline
 from autora.variable import VariableCollection
 
 
@@ -58,6 +59,12 @@ class _SimpleCycle:
             ...    dependent_variables=[Variable(name="y", value_range=(-20, 20))],
             ...    )
 
+            The experimentalist is used to propose experiments.
+            Since the space of values is so restricted, we can just sample them all each time.
+            >>> from autora.experimentalist.pipeline import make_pipeline
+            >>> example_experimentalist = make_pipeline(
+            ...     [metadata.independent_variables[0].allowed_values])
+
             When we run a synthetic experiment, we get a reproducible noisy result:
             >>> import numpy as np
             >>> def get_example_synthetic_experiment_runner():
@@ -68,12 +75,6 @@ class _SimpleCycle:
             >>> example_synthetic_experiment_runner = get_example_synthetic_experiment_runner()
             >>> example_synthetic_experiment_runner(np.ndarray([1]))
             array([2.04339546])
-
-            The experimentalist is used to propose experiments.
-            Since the space of values is so restricted, we can just sample them all each time.
-            >>> from autora.experimentalist.pipeline import make_pipeline
-            >>> example_experimentalist = make_pipeline(
-            ...     [metadata.independent_variables[0].allowed_values])
 
             The theorist "tries" to work out the best theory.
             We use a trivial scikit-learn regressor.
@@ -99,9 +100,12 @@ class _SimpleCycle:
             Finished cycle 2
             Finished cycle 3
 
+            We can now interrogate the results. The first set of conditions which went into the
+            experiment runner were:
             >>> cycle.data.conditions[0]
             array([ 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10])
 
+            The observations include the conditions and the results:
             >>> cycle.data.observations[0]
             array([[ 0.        ,  0.92675345],
                    [ 1.        ,  1.89519928],
@@ -114,6 +118,21 @@ class _SimpleCycle:
                    [ 8.        ,  9.05735823],
                    [ 9.        , 10.18713406],
                    [10.        , 10.88517906]])
+
+            The best fit theory after the first cycle is:
+            >>> cycle.data.theories[0]
+            LinearRegression()
+
+            >>> def report_linear_fit(m: LinearRegression,  precision=4):
+            ...     s = f"y = {np.round(m.coef_[0].item(), precision)} x " \\
+            ...     f"+ {np.round(m.intercept_.item(), 4)}"
+            ...     return s
+            >>> report_linear_fit(cycle.data.theories[0])
+            'y = 1.0089 x + 0.9589'
+
+            The best fit theory after all the cycles, including all the data, is:
+            >>> report_linear_fit(cycle.data.theories[-1])
+            'y = 0.9989 x + 1.0292'
 
         """
 
@@ -137,7 +156,7 @@ class _SimpleCycle:
         while not (self._stopping_condition(data)):
             data = self._experimentalist_callback(self.experimentalist, data)
             data = self._experiment_runner_callback(self.experiment_runner, data)
-            data = self._theorist_callback(data)
+            data = self._theorist_callback(self.theorist, data)
             self._monitor_callback(data)
 
         self.data = data
@@ -179,8 +198,19 @@ class _SimpleCycle:
         return data_out
 
     @staticmethod
-    def _theorist_callback(data_in: _SimpleCycleRunCollection):
-        data_out = replace(data_in, cycle_count=(data_in.cycle_count + 1))
+    def _theorist_callback(theorist, data_in: _SimpleCycleRunCollection):
+        all_observations = np.row_stack(data_in.observations)
+        n_xs = len(
+            data_in.metadata.independent_variables
+        )  # The number of independent variables
+        x, y = all_observations[:, :n_xs], all_observations[:, n_xs:]
+        new_theorist = copy.copy(theorist)
+        new_theorist.fit(x, y)
+        data_out = replace(
+            data_in,
+            cycle_count=(data_in.cycle_count + 1),
+            theories=data_in.theories + [new_theorist],
+        )
         return data_out
 
     def _monitor_callback(self, data: _SimpleCycleRunCollection):
