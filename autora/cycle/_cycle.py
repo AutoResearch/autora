@@ -4,12 +4,11 @@ from typing import List
 import numpy as np
 from sklearn.base import BaseEstimator
 
-from autora.cycle._state import State, StateMachine, Transition
 from autora.variable import VariableCollection
 
 
 @dataclass(frozen=True)
-class _CycleOwnStateMachineRunCollection:
+class _SimpleCycleRunCollection:
     # Static
     metadata: VariableCollection
 
@@ -26,16 +25,16 @@ class _CycleOwnStateMachineRunCollection:
     theories: List[BaseEstimator]
 
 
-def update_run_collection(
-    run_collection: _CycleOwnStateMachineRunCollection, **changes
-):
-    new_run_collection = replace(run_collection, **changes)
-    return new_run_collection
-
-
-class _CycleOwnStateMachine:
+class _SimpleCycle:
     def __init__(
-        self, metadata, theorist, experimentalist, experiment_runner, max_cycle_count
+        self,
+        metadata,
+        theorist,
+        experimentalist,
+        experiment_runner,
+        max_cycle_count,
+        cycle_count=0,
+        monitors=None,
     ):
         """
 
@@ -82,114 +81,68 @@ class _CycleOwnStateMachine:
 
             We initialize the Cycle with the theorist, experimentalist and experiment runner,
             and define the maximum cycle count.
-            >>> cycle = _CycleOwnStateMachine(
+            >>> cycle = _SimpleCycle(
             ...     metadata=metadata,
             ...     theorist=example_theorist,
             ...     experimentalist=example_experimentalist,
             ...     experiment_runner=example_synthetic_experiment_runner,
-            ...     max_cycle_count=10,
+            ...     max_cycle_count=3,
+            ...     monitors=[lambda data: print(f"Finished cycle {data.cycle_count}")],
             ... )
             >>> cycle # doctest: +ELLIPSIS
-            <_cycle._CycleOwnStateMachine object at 0x...>
+            <_cycle._SimpleCycle object at 0x...>
 
             We can run the cycle by calling the run method:
             >>> cycle.run()
+            Finished cycle 1
+            Finished cycle 2
+            Finished cycle 3
+
+
         """
-        self._machine = self._create_state_machine()
 
         self.theorist = theorist
         self.experimentalist = experimentalist
         self.experiment_runner = experiment_runner
+        self.monitors = monitors
 
-        self.data = _CycleOwnStateMachineRunCollection(
+        self.data = _SimpleCycleRunCollection(
             metadata=metadata,
             max_cycle_count=max_cycle_count,
+            cycle_count=cycle_count,
             independent_variable_values=[],
             data=[],
             theories=[],
         )
 
     def run(self):
-        while True:
-            try:
-                self._machine.step()
-            except StopIteration:
-                return
+        data = self.data
 
-    def _create_state_machine(self):
-        machine = StateMachine()
+        while not (self._stopping_condition(data)):
+            data = self._experimentalist_callback(data)
+            data = self._experiment_runner_callback(data)
+            data = self._theorist_callback(data)
+            self._monitor_callback(data)
 
-        state_start = State("start")
-        state_theorist = State("theorist", callback=self._theorist_callback)
-        state_experimentalist = State(
-            "experimentalist", callback=self._experimentalist_callback
-        )
-        state_experiment_runner = State(
-            "experiment runner", callback=self._experiment_runner_callback
-        )
-        state_end = State("end")
-        machine.states.append(state_start)
-        machine.states.append(state_theorist)
-        machine.states.append(state_experimentalist)
-        machine.states.append(state_experiment_runner)
-        machine.states.append(state_end)
-        transition_start_experimentalist = Transition(
-            state1=state_start,
-            state2=state_experimentalist,
-        )
-        transition_start_experiment_runner = Transition(
-            state1=state_start, state2=state_experiment_runner
-        )
-        transition_start_theorist = Transition(
-            state1=state_start, state2=state_theorist
-        )
-        machine.transitions.append(transition_start_experimentalist)
-        machine.transitions.append(transition_start_experiment_runner)
-        machine.transitions.append(transition_start_theorist)
-        transition_theorist_experimentalist = Transition(
-            state1=state_theorist, state2=state_experimentalist
-        )
-        transition_experimentalist_experiment_runner = Transition(
-            state1=state_experimentalist,
-            state2=state_experiment_runner,
-        )
-        transition_experiment_runner_theorist = Transition(
-            state1=state_experiment_runner,
-            state2=state_theorist,
-        )
-        machine.transitions.append(transition_theorist_experimentalist)
-        machine.transitions.append(transition_experimentalist_experiment_runner)
-        machine.transitions.append(transition_experiment_runner_theorist)
-        transition_experimentalist_end = Transition(
-            state1=state_experimentalist,
-            state2=state_end,
-        )
-        transition_experiment_runner_end = Transition(
-            state1=state_experiment_runner,
-            state2=state_end,
-        )
-        transition_theorist_end = Transition(
-            state1=state_theorist,
-            state2=state_end,
-        )
-        machine.transitions.append(transition_experimentalist_end)
-        machine.transitions.append(transition_experiment_runner_end)
-        machine.transitions.append(transition_theorist_end)
-
-        machine.current_state = state_start
-
-        return machine
-
-    def _theorist_callback(self):
-        self.data = replace(self.data, cycle_count=(self.data.cycle_count + 1))
-        return
-
-    def _experimentalist_callback(self):
-        return
-
-    def _experiment_runner_callback(self):
-        return
+        self.data = data
 
     @staticmethod
-    def _stopping_condition(data: _CycleOwnStateMachineRunCollection):
-        return data.cycle_count > data.max_cycle_count
+    def _theorist_callback(data_in: _SimpleCycleRunCollection):
+        data_out = replace(data_in, cycle_count=(data_in.cycle_count + 1))
+        return data_out
+
+    @staticmethod
+    def _experimentalist_callback(data: _SimpleCycleRunCollection):
+        return data
+
+    @staticmethod
+    def _experiment_runner_callback(data: _SimpleCycleRunCollection):
+        return data
+
+    def _monitor_callback(self, data: _SimpleCycleRunCollection):
+        for m in self.monitors:
+            m(data)
+
+    @staticmethod
+    def _stopping_condition(data: _SimpleCycleRunCollection):
+        return data.cycle_count >= data.max_cycle_count
