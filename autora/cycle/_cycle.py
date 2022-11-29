@@ -72,7 +72,7 @@ class _SimpleCycle:
             The experimentalist is used to propose experiments.
             Since the space of values is so restricted, we can just sample them all each time.
             >>> from autora.experimentalist.pipeline import make_pipeline
-            >>> example_experimentalist = make_pipeline(\
+            >>> example_experimentalist = make_pipeline(
             ...     [metadata.independent_variables[0].allowed_values])
 
             The theorist "tries" to work out the best theory.
@@ -103,9 +103,17 @@ class _SimpleCycle:
             array([ 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10])
 
             >>> cycle.data.observations[0]
-            array([ 0.92675345,  1.89519928,  3.08746571,  3.93023943,  4.95429102,
-                    6.04763988,  7.20770574,  7.85681519,  9.05735823, 10.18713406,
-                   10.88517906])
+            array([[ 0.        ,  0.92675345],
+                   [ 1.        ,  1.89519928],
+                   [ 2.        ,  3.08746571],
+                   [ 3.        ,  3.93023943],
+                   [ 4.        ,  4.95429102],
+                   [ 5.        ,  6.04763988],
+                   [ 6.        ,  7.20770574],
+                   [ 7.        ,  7.85681519],
+                   [ 8.        ,  9.05735823],
+                   [ 9.        , 10.18713406],
+                   [10.        , 10.88517906]])
 
         """
 
@@ -160,7 +168,11 @@ class _SimpleCycle:
     def _experiment_runner_callback(
         experiment_runner: Callable, data_in: _SimpleCycleRunCollection
     ):
-        new_observations = experiment_runner(data_in.conditions[-1])
+        x = data_in.conditions[-1]
+        y = experiment_runner(x)
+
+        new_observations = np.column_stack([x, y])
+
         data_out = replace(
             data_in, observations=data_in.observations + [new_observations]
         )
