@@ -1,5 +1,5 @@
 from dataclasses import dataclass, replace
-from typing import List
+from typing import Callable, Iterable, List, Sequence
 
 import numpy as np
 from experimentalist.pipeline import Pipeline
@@ -19,9 +19,9 @@ class _SimpleCycleRunCollection:
 
     # Aggregates each cycle from the:
     # ... Experimentalist
-    independent_variable_values: List[np.ndarray]
+    conditions: List[np.ndarray]
     # ... Experiment Runner
-    data: List[np.ndarray]
+    observations: List[np.ndarray]
     # ... Theorist
     theories: List[BaseEstimator]
 
@@ -111,8 +111,8 @@ class _SimpleCycle:
             metadata=metadata,
             max_cycle_count=max_cycle_count,
             cycle_count=cycle_count,
-            independent_variable_values=[],
-            data=[],
+            conditions=[],
+            observations=[],
             theories=[],
         )
 
@@ -121,7 +121,7 @@ class _SimpleCycle:
 
         while not (self._stopping_condition(data)):
             data = self._experimentalist_callback(self.experimentalist, data)
-            data = self._experiment_runner_callback(data)
+            data = self._experiment_runner_callback(self.experiment_runner, data)
             data = self._theorist_callback(data)
             self._monitor_callback(data)
 
@@ -131,17 +131,31 @@ class _SimpleCycle:
     def _experimentalist_callback(
         experimentalist: Pipeline, data_in: _SimpleCycleRunCollection
     ):
-        new_independent_variables = experimentalist()
+        new_conditions = experimentalist()
+        if isinstance(new_conditions, Iterable):
+            # If the pipeline gives us an iterable, we need to make it into a concrete array.
+            # We can't move this logic to the Pipeline, because the pipeline doesn't know whether
+            # it's within another pipeline and whether it should convert the iterable to a
+            # concrete array.
+            new_conditions_values = list(new_conditions)
+            new_conditions_array = np.array(new_conditions_values)
+
+        assert isinstance(new_conditions_array, Sequence)  # Check the object is bounded
         data_out = replace(
             data_in,
-            independent_variable_values=data_in.independent_variable_values
-            + [new_independent_variables],
+            conditions=data_in.conditions + [new_conditions_array],
         )
         return data_out
 
     @staticmethod
-    def _experiment_runner_callback(data: _SimpleCycleRunCollection):
-        return data
+    def _experiment_runner_callback(
+        experiment_runner: Callable, data_in: _SimpleCycleRunCollection
+    ):
+        new_observations = experiment_runner(data_in.conditions[-1])
+        data_out = replace(
+            data_in, observations=data_in.observations + [new_observations]
+        )
+        return data_out
 
     @staticmethod
     def _theorist_callback(data_in: _SimpleCycleRunCollection):
