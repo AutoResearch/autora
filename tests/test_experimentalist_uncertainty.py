@@ -67,7 +67,9 @@ def test_uncertainty_experimentalist():
 
     # Set up pipeline functions with partial
     pooler_callable = partial(grid_pool, ivs=metadata.independent_variables)
-    sampler = partial(uncertainty_sampler, model=logireg_model, n=n_trials)
+    sampler = partial(
+        uncertainty_sampler, model=logireg_model, n=n_trials, measure="least_confident"
+    )
 
     # Initialize pipeline
     pipeline = make_pipeline([pooler_callable, weber_filter, sampler])
@@ -90,6 +92,6 @@ def test_uncertainty_experimentalist():
     select_idx = s_max_prob.index[
         0:n_trials
     ].to_list()  # Get index of lowest probabilities
-    results_manual = np.flip(pool[select_idx], axis=0)  # Index conditions from pool
+    results_manual = pool[select_idx]  # Index conditions from pool
     # Check results from the function match manaual method
     assert np.array_equal(results, results_manual)
