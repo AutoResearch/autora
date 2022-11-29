@@ -10,7 +10,10 @@ from autora.variable import VariableCollection
 
 
 @dataclass(frozen=True)
-class _SimpleCycleRunCollection:
+class _SimpleCycleData:
+    """An object passed between processing steps in the _SimpleCycle which holds all the
+    data which can be updated."""
+
     # Static
     metadata: VariableCollection
 
@@ -33,6 +36,7 @@ class _SimpleCycle:
         experiment_runner:
 
     Examples:
+
         Aim: Use the Cycle to recover a simple ground truth theory from noisy data.
 
         >>> def ground_truth(x):
@@ -76,22 +80,16 @@ class _SimpleCycle:
         ...     theorist=example_theorist,
         ...     experimentalist=example_experimentalist,
         ...     experiment_runner=example_synthetic_experiment_runner,
-        ...     monitor=lambda data: print(f"Generated {len(data.theories)} theory/-ies"),
+        ...     monitor=lambda data: print(f"Generated {len(data.theories)} theories"),
         ... )
         >>> cycle # doctest: +ELLIPSIS
         <_simple_cycle._SimpleCycle object at 0x...>
 
         We can run the cycle by calling the run method:
-        >>> next(cycle) # doctest: +ELLIPSIS
-        Generated 1 theory/-ies
-        <_simple_cycle._SimpleCycle object at 0x...>
-
-        >>> next(cycle) # doctest: +ELLIPSIS
-        Generated 2 theory/-ies
-        <_simple_cycle._SimpleCycle object at 0x...>
-
-        >>> next(cycle) # doctest: +ELLIPSIS
-        Generated 3 theory/-ies
+        >>> cycle.run(num_cycles=3)  # doctest: +ELLIPSIS
+        Generated 1 theories
+        Generated 2 theories
+        Generated 3 theories
         <_simple_cycle._SimpleCycle object at 0x...>
 
         We can now interrogate the results. The first set of conditions which went into the
@@ -114,7 +112,7 @@ class _SimpleCycle:
                [10.        , 10.88517906]])
 
         In the third cycle (index = 2) the first and last values are different again:
-        >>> cycle.data.observations[2][[0,10]]
+        >>> cycle.data.observations[2][[0,-1]]
         array([[ 0.        ,  1.08559827],
                [10.        , 11.08179553]])
 
@@ -133,16 +131,29 @@ class _SimpleCycle:
         >>> report_linear_fit(cycle.data.theories[-1])
         'y = 0.9989 x + 1.0292'
 
+        We can also run the cycle with more control over the execution flow:
+        >>> next(cycle) # doctest: +ELLIPSIS
+        Generated 4 theories
+        <_simple_cycle._SimpleCycle object at 0x...>
+
+        >>> next(cycle) # doctest: +ELLIPSIS
+        Generated 5 theories
+        <_simple_cycle._SimpleCycle object at 0x...>
+
+        >>> next(cycle) # doctest: +ELLIPSIS
+        Generated 6 theories
+        <_simple_cycle._SimpleCycle object at 0x...>
+
         We can continue to run the cycle as long as we like,
         with a simple arbitrary stopping condition like the number of theories generated:
         >>> from itertools import takewhile
-        >>> _ = list(takewhile(lambda c: len(c.data.theories) < 6, iter(cycle)))
-        Generated 4 theory/-ies
-        Generated 5 theory/-ies
-        Generated 6 theory/-ies
+        >>> _ = list(takewhile(lambda c: len(c.data.theories) < 9, iter(cycle)))
+        Generated 7 theories
+        Generated 8 theories
+        Generated 9 theories
 
-        ... or the precision (here we iterate while the difference between the gradients
-        between one cycle and the next is larger than 1x10^-3).
+        ... or the precision (here we keep iterating while the difference between the gradients
+        between the second-last and last cycle is larger than 1x10^-3).
         >>> _ = list(
         ...         takewhile(
         ...             lambda c: np.abs(c.data.theories[-1].coef_.item() -
@@ -150,11 +161,14 @@ class _SimpleCycle:
         ...             iter(cycle)
         ...         )
         ...     )
-        Generated 7 theory/-ies
-        Generated 8 theory/-ies
-        Generated 9 theory/-ies
-        Generated 10 theory/-ies
-        Generated 11 theory/-ies
+        Generated 10 theories
+        Generated 11 theories
+
+        ... or continue to run as long as we like:
+        >>> _ = cycle.run(num_cycles=100) # doctest: +ELLIPSIS
+        Generated 12 theories
+        ...
+        Generated 111 theories
 
     """
 
@@ -164,7 +178,7 @@ class _SimpleCycle:
         theorist,
         experimentalist,
         experiment_runner,
-        monitor: Optional[Callable[[_SimpleCycleRunCollection], None]] = None,
+        monitor: Optional[Callable[[_SimpleCycleData], None]] = None,
     ):
 
         self.theorist = theorist
@@ -172,12 +186,17 @@ class _SimpleCycle:
         self.experiment_runner = experiment_runner
         self.monitor = monitor
 
-        self.data = _SimpleCycleRunCollection(
+        self.data = _SimpleCycleData(
             metadata=metadata,
             conditions=[],
             observations=[],
             theories=[],
         )
+
+    def run(self, num_cycles: int = 1):
+        for i in range(num_cycles):
+            next(self)
+        return self
 
     def __next__(self):
         data = self.data
@@ -192,9 +211,7 @@ class _SimpleCycle:
         return self
 
     @staticmethod
-    def _experimentalist_callback(
-        experimentalist: Pipeline, data_in: _SimpleCycleRunCollection
-    ):
+    def _experimentalist_callback(experimentalist: Pipeline, data_in: _SimpleCycleData):
         new_conditions = experimentalist()
         if isinstance(new_conditions, Iterable):
             # If the pipeline gives us an iterable, we need to make it into a concrete array.
@@ -203,6 +220,8 @@ class _SimpleCycle:
             # concrete array.
             new_conditions_values = list(new_conditions)
             new_conditions_array = np.array(new_conditions_values)
+        else:
+            raise NotImplementedError(f"Object {new_conditions} can't be handled yet.")
 
         assert isinstance(
             new_conditions_array, np.ndarray
@@ -215,20 +234,18 @@ class _SimpleCycle:
 
     @staticmethod
     def _experiment_runner_callback(
-        experiment_runner: Callable, data_in: _SimpleCycleRunCollection
+        experiment_runner: Callable, data_in: _SimpleCycleData
     ):
         x = data_in.conditions[-1]
         y = experiment_runner(x)
-
         new_observations = np.column_stack([x, y])
-
         data_out = replace(
             data_in, observations=data_in.observations + [new_observations]
         )
         return data_out
 
     @staticmethod
-    def _theorist_callback(theorist, data_in: _SimpleCycleRunCollection):
+    def _theorist_callback(theorist, data_in: _SimpleCycleData):
         all_observations = np.row_stack(data_in.observations)
         n_xs = len(
             data_in.metadata.independent_variables
@@ -242,6 +259,6 @@ class _SimpleCycle:
         )
         return data_out
 
-    def _monitor_callback(self, data: _SimpleCycleRunCollection):
+    def _monitor_callback(self, data: _SimpleCycleData):
         if self.monitor is not None:
             self.monitor(data)
