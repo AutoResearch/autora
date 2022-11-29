@@ -166,6 +166,10 @@ class _SimpleCycle:
         self.theorist = theorist
         self.experimentalist = experimentalist
         self.experiment_runner = experiment_runner
+
+        if monitors is None:
+            monitors = []
+
         self.monitors = monitors
 
         self.data = _SimpleCycleRunCollection(
