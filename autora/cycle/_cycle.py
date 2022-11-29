@@ -2,6 +2,7 @@ from dataclasses import dataclass, replace
 from typing import List
 
 import numpy as np
+from experimentalist.pipeline import Pipeline
 from sklearn.base import BaseEstimator
 
 from autora.variable import VariableCollection
@@ -119,7 +120,7 @@ class _SimpleCycle:
         data = self.data
 
         while not (self._stopping_condition(data)):
-            data = self._experimentalist_callback(data)
+            data = self._experimentalist_callback(self.experimentalist, data)
             data = self._experiment_runner_callback(data)
             data = self._theorist_callback(data)
             self._monitor_callback(data)
@@ -127,17 +128,25 @@ class _SimpleCycle:
         self.data = data
 
     @staticmethod
-    def _theorist_callback(data_in: _SimpleCycleRunCollection):
-        data_out = replace(data_in, cycle_count=(data_in.cycle_count + 1))
+    def _experimentalist_callback(
+        experimentalist: Pipeline, data_in: _SimpleCycleRunCollection
+    ):
+        new_independent_variables = experimentalist()
+        data_out = replace(
+            data_in,
+            independent_variable_values=data_in.independent_variable_values
+            + [new_independent_variables],
+        )
         return data_out
-
-    @staticmethod
-    def _experimentalist_callback(data: _SimpleCycleRunCollection):
-        return data
 
     @staticmethod
     def _experiment_runner_callback(data: _SimpleCycleRunCollection):
         return data
+
+    @staticmethod
+    def _theorist_callback(data_in: _SimpleCycleRunCollection):
+        data_out = replace(data_in, cycle_count=(data_in.cycle_count + 1))
+        return data_out
 
     def _monitor_callback(self, data: _SimpleCycleRunCollection):
         for m in self.monitors:
