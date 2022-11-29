@@ -14,10 +14,6 @@ class _SimpleCycleRunCollection:
     # Static
     metadata: VariableCollection
 
-    # Updates each cycle
-    max_cycle_count: int
-    cycle_count: int
-
     # Aggregates each cycle from the:
     # ... Experimentalist
     conditions: List[np.ndarray]
@@ -208,7 +204,6 @@ class _SimpleCycle:
         new_theorist.fit(x, y)
         data_out = replace(
             data_in,
-            cycle_count=(data_in.cycle_count + 1),
             theories=data_in.theories + [new_theorist],
         )
         return data_out
@@ -216,7 +211,3 @@ class _SimpleCycle:
     def _monitor_callback(self, data: _SimpleCycleRunCollection):
         for m in self.monitors:
             m(data)
-
-    @staticmethod
-    def _stopping_condition(data: _SimpleCycleRunCollection):
-        return data.cycle_count >= data.max_cycle_count
