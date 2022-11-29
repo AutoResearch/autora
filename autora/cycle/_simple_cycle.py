@@ -131,6 +131,8 @@ class _SimpleCycle:
         >>> report_linear_fit(cycle.data.theories[-1])
         'y = 0.9989 x + 1.0292'
 
+        This is close to the ground truth theory of x -> (x + 1)
+
         We can also run the cycle with more control over the execution flow:
         >>> next(cycle) # doctest: +ELLIPSIS
         Generated 4 theories
@@ -169,6 +171,9 @@ class _SimpleCycle:
         Generated 12 theories
         ...
         Generated 111 theories
+
+
+
 
     """
 
