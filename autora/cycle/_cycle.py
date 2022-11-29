@@ -1,5 +1,5 @@
 from dataclasses import dataclass, replace
-from typing import Callable, Iterable, List, Sequence
+from typing import Callable, Iterable, List
 
 import numpy as np
 from experimentalist.pipeline import Pipeline
@@ -72,8 +72,8 @@ class _SimpleCycle:
             The experimentalist is used to propose experiments.
             Since the space of values is so restricted, we can just sample them all each time.
             >>> from autora.experimentalist.pipeline import make_pipeline
-            >>> from autora.experimentalist.pool import grid_pool
-            >>> example_experimentalist = make_pipeline([grid_pool(metadata.independent_variables)])
+            >>> example_experimentalist = make_pipeline(\
+            ...     [metadata.independent_variables[0].allowed_values])
 
             The theorist "tries" to work out the best theory.
             We use a trivial scikit-learn regressor.
@@ -99,6 +99,13 @@ class _SimpleCycle:
             Finished cycle 2
             Finished cycle 3
 
+            >>> cycle.data.conditions[0]
+            array([ 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10])
+
+            >>> cycle.data.observations[0]
+            array([ 0.92675345,  1.89519928,  3.08746571,  3.93023943,  4.95429102,
+                    6.04763988,  7.20770574,  7.85681519,  9.05735823, 10.18713406,
+                   10.88517906])
 
         """
 
@@ -140,7 +147,9 @@ class _SimpleCycle:
             new_conditions_values = list(new_conditions)
             new_conditions_array = np.array(new_conditions_values)
 
-        assert isinstance(new_conditions_array, Sequence)  # Check the object is bounded
+        assert isinstance(
+            new_conditions_array, np.ndarray
+        )  # Check the object is bounded
         data_out = replace(
             data_in,
             conditions=data_in.conditions + [new_conditions_array],
