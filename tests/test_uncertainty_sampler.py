@@ -94,3 +94,18 @@ def test_uncertainty_entropy(synthetic_lr_model, data_to_test):
     manual_samples = X[idx]
 
     assert np.array_equal(samples, manual_samples)
+
+
+def test_uncertainty_entropy_vs_margin(synthetic_lr_model, data_to_test):
+    """
+    Test data should yield different results. Condition [0.4, 0.3, 0.2] should have the greatest
+    entropy but less margin than conditions [0.4, 0.4, 0.2] and [0.5, 0.5, 0. ].
+    """
+    model = synthetic_lr_model
+    X = data_to_test
+
+    # Run uncertainty sampler with entropy and margin measures to compare
+    samples_entropy = uncertainty_sampler(X, model, 5, measure="entropy")
+    samples_margin = uncertainty_sampler(X, model, 5, measure="margin")
+
+    assert not np.array_equal(samples_entropy, samples_margin)
