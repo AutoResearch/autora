@@ -12,7 +12,7 @@ from autora.experimentalist.sampler import uncertainty_sampler
 from autora.variable import DV, IV, ValueType, VariableCollection
 
 
-def test_uncertainty_experimentalist():
+def test_experimentalist_uncertainty():
     """
     Tests the implementation of the experimentalist pipeline with an exhaustive pool of discrete
     values, Weber filter, uncertainty sampler. A logistic regression model is trained using
