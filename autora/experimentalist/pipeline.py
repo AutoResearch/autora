@@ -67,13 +67,13 @@ class Pipeline:
 
         >>> from itertools import product
         >>> Pipeline([("pool", lambda: product(range(5), ["a", "b"]))]) # doctest: +ELLIPSIS
-        Pipeline(pipes=[('pool', <function <lambda> at 0x...>)], params={})
+        Pipeline(steps=[('pool', <function <lambda> at 0x...>)], params={})
 
         >>> Pipeline([
         ... ("pool", lambda: product(range(5), ["a", "b"])),
         ... ("filter", lambda values: filter(lambda i: i[0] % 2 == 0, values))
         ... ]) # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
-        Pipeline(pipes=[('pool', <function <lambda> at 0x...>), \
+        Pipeline(steps=[('pool', <function <lambda> at 0x...>), \
         ('filter', <function <lambda> at 0x...>)], \
         params={})
 
@@ -83,7 +83,7 @@ class Pipeline:
         ... ] ,
         ... params = {"pool": {"maximum":5}, "filter": {"divisor": 2}})
         >>> pipeline # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
-        Pipeline(pipes=[('pool', <function <lambda> at 0x...>), \
+        Pipeline(steps=[('pool', <function <lambda> at 0x...>), \
         ('filter', <function <lambda> at 0x...>)], \
         params={'pool': {'maximum': 5}, 'filter': {'divisor': 2}})
         >>> list(pipeline.run())
@@ -104,20 +104,20 @@ class Pipeline:
 
     def __init__(
         self,
-        pipes: Optional[Sequence[_StepType]] = None,
+        steps: Optional[Sequence[_StepType]] = None,
         params: Optional[Dict[str, Any]] = None,
     ):
         """Initialize the pipeline with a series of Pipe objects."""
-        if pipes is None:
-            pipes = list()
-        self.pipes = pipes
+        if steps is None:
+            steps = list()
+        self.steps = steps
 
         if params is None:
             params = dict()
         self.params = params
 
     def __repr__(self):
-        return f"Pipeline(pipes={self.pipes}, params={self.params})"
+        return f"Pipeline(steps={self.steps}, params={self.params})"
 
     def __call__(
         self,
@@ -134,10 +134,10 @@ class Pipeline:
         merged_params = _merge_dicts(pipeline_params, call_params)
 
         try:
-            # Check we have pipes to use
-            assert len(self.pipes) > 0
+            # Check we have steps to use
+            assert len(self.steps) > 0
         except AssertionError:
-            # If the pipeline doesn't have any pipes...
+            # If the pipeline doesn't have any steps...
             if ex is not None:
                 # ...the output is the input
                 return ex
@@ -145,13 +145,13 @@ class Pipeline:
                 # ... unless the input was None, in which case it's an emtpy list
                 return []
 
-        # Make an iterator from the pipes, so that we can be sure to only go through them once
+        # Make an iterator from the steps, so that we can be sure to only go through them once
         # (Otherwise if we handle the "pool" as a special case, we have to track our starting point)
-        pipes_iterator = iter(self.pipes)
+        pipes_iterator = iter(self.steps)
 
         # Initialize our results object
         if ex is None:
-            # ... there's no input, so presumably the first element in the pipes is a pool
+            # ... there's no input, so presumably the first element in the steps is a pool
             # which should generate our initial values.
             name, pool = next(pipes_iterator)
             if isinstance(pool, Pool):
@@ -166,7 +166,7 @@ class Pipeline:
             # ... there's some input, so we can use that as the initial value
             results = [ex]
 
-        # Run the successive pipes over the last result
+        # Run the successive steps over the last result
         for name, pipe in pipes_iterator:
             assert isinstance(pipe, Pipe)
             all_params_for_pipe = merged_params.get(name, dict())
@@ -286,20 +286,20 @@ def make_pipeline(
         You can create pipelines using purely anonymous functions:
         >>> from itertools import product
         >>> make_pipeline([lambda: product(range(5), ["a", "b"])]) # doctest: +ELLIPSIS
-        Pipeline(pipes=[('<lambda>', <function <lambda> at 0x...>)], params={})
+        Pipeline(steps=[('<lambda>', <function <lambda> at 0x...>)], params={})
 
         You can create pipelines with normal functions.
         >>> def ab_pool(maximum=5): return product(range(maximum), ["a", "b"])
         >>> def even_filter(values): return filter(lambda i: i[0] % 2 == 0, values)
         >>> make_pipeline([ab_pool, even_filter]) # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
-        Pipeline(pipes=[('ab_pool', <function ab_pool at 0x...>), \
+        Pipeline(steps=[('ab_pool', <function ab_pool at 0x...>), \
         ('even_filter', <function even_filter at 0x...>)], params={})
 
         You can create pipelines with generators as their first elements functions.
         >>> ab_pool_gen = product(range(3), ["a", "b"])
         >>> pl = make_pipeline([ab_pool_gen, even_filter])
         >>> pl # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
-        Pipeline(pipes=[('step', <itertools.product object at 0x...>),
+        Pipeline(steps=[('step', <itertools.product object at 0x...>),
         ('even_filter', <function even_filter at 0x...>)], params={})
         >>> list(pl.run())
         [(0, 'a'), (0, 'b'), (2, 'a'), (2, 'b')]
@@ -310,7 +310,7 @@ def make_pipeline(
         >>> pl = make_pipeline([ab_pool, divisor_filter],
         ... params = {"ab_pool": {"maximum":5}, "divisor_filter": {"divisor": 2}})
         >>> pl # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
-        Pipeline(pipes=[('ab_pool', <function ab_pool at 0x...>), \
+        Pipeline(steps=[('ab_pool', <function ab_pool at 0x...>), \
         ('divisor_filter', <function divisor_filter at 0x...>)], \
         params={'ab_pool': {'maximum': 5}, 'divisor_filter': {'divisor': 2}})
 
@@ -351,13 +351,13 @@ def make_pipeline(
         >>> from functools import partial
         >>> pl = make_pipeline([partial(ab_pool, maximum=100)])
         >>> pl # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
-        Pipeline(pipes=[('step', functools.partial(<function ab_pool at 0x...>, maximum=100))], \
+        Pipeline(steps=[('step', functools.partial(<function ab_pool at 0x...>, maximum=100))], \
         params={})
 
         If there are multiple steps with the same name, they get suffixes as usual:
         >>> pl = make_pipeline([partial(range, stop=10), partial(divisor_filter, divisor=3)])
         >>> pl # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
-        Pipeline(pipes=[('step_0', functools.partial(<class 'range'>, stop=10)), \
+        Pipeline(steps=[('step_0', functools.partial(<class 'range'>, stop=10)), \
         ('step_1', functools.partial(<function divisor_filter at 0x...>, divisor=3))], \
         params={})
 
