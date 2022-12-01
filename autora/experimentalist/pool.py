@@ -30,9 +30,6 @@ def random_pool(*args, n=1, duplicates=True):
         n: Number of samples to sample
         duplicates: Boolean if duplicate value are allowed.
 
-    Examples:
-        >>> random_pool(
-
     """
     l_samples = []
     # Create list of pools of values sample from
