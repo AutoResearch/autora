@@ -9,13 +9,19 @@ def uncertainty_sampler(X, model, n, measure="least_confident"):
 
     Args:
         X: pool of IV conditions to evaluate uncertainty
-        model: Scikitlearn model, must have `predict_proba` method.
+        model: Scikit-learn model, must have `predict_proba` method.
         n: number of samples to select
         measure: method to evaluate uncertainty. Options:
-        --'least_confident' x* = argmax 1-P(y_hat|x) ,where y_hat = argmax P(yi|x)
-        --'margin' x* = argmax P(y_hat1|x) - P(y_hat2|x), where y_hat1 and y_hat2 are the first and
-            second most probable class labels under the model, respectively.
-        --'entropy' x* = argmax -sum(P(yi|x)logP(yi|x))
+
+            - `'least_confident'`: $x* = \\operatorname{argmax} \\left( 1-P(\\hat{y}|x) \\right)$,
+              where $\\hat{y} = \\operatorname{argmax} P(y_i|x)$
+            - `'margin'`:
+              $x* = \\operatorname{argmax} \\left( P(\\hat{y}_1|x) - P(\\hat{y}_2|x) \\right)$,
+              where $\\hat{y}_1$ and $\\hat{y}_2$ are the first and second most probable
+              class labels under the model, respectively.
+            - `'entropy'`:
+              $x* = \\operatorname{argmax} \\left( - \\sum P(y_i|x)
+              \\operatorname{log} P(y_i|x) \\right)$
 
     Returns: Sampled pool
 
