@@ -54,9 +54,3 @@ def random_pool(*args, n=1, duplicates=True):
             l_samples = [*set(l_samples)]
 
     return iter(l_samples)
-
-
-if __name__ == "__main__":
-    gen = random_pool([1, 2, 3], [4, 5, 6], n=5)
-
-    print(gen)
