@@ -31,7 +31,7 @@ def data_to_test():
             [0.7, 0.3, 0],
             [0.6, 0.4, 0],
             [0.5, 0.5, 0],
-            [0.4, 0.3, 0.2],
+            [0.4, 0.3, 0.2],  # doesn't sum to 1
             [0.4, 0.4, 0.2],
         ]
     )
@@ -46,15 +46,22 @@ def test_uncertainty_least_confident(synthetic_lr_model, data_to_test):
     # Run uncertainty sampler with least confident measure
     samples = uncertainty_sampler(X, model, 5, measure="least_confident")
 
-    # Manual Calculation - Uses slightly different method than the function by using pandas Series
-    # and index instead of pure numpy
-    mat_prob = model.predict_proba(X)
-    a_uncert = 1 - mat_prob.max(axis=1)
-    s_uncert = pd.Series(a_uncert).sort_values(ascending=False)
-    idx = s_uncert.index.values[0:5]
-    manual_samples = X[idx]
-
-    assert np.array_equal(samples, manual_samples)
+    assert np.array_equal(
+        samples,
+        np.array(
+            [
+                # Least confident because 0.4s are equal
+                # and 0.2 is different again
+                [0.4, 0.4, 0.2],
+                [0.5, 0.5, 0],
+                [0.4, 0.3, 0.2],
+                [0.6, 0.4, 0],
+                # Most confident of the least-confident 5 because 0.7 is higher
+                # than all the other highest probabilities
+                [0.7, 0.3, 0],
+            ]
+        ),
+    )
 
 
 def test_uncertainty_margin(synthetic_lr_model, data_to_test):
@@ -64,17 +71,26 @@ def test_uncertainty_margin(synthetic_lr_model, data_to_test):
     # Run uncertainty sampler with margin measure
     samples = uncertainty_sampler(X, model, 5, measure="margin")
 
-    # Manual Calculation
-    mat_prob = model.predict_proba(X)
-    l_margins = []
-    for l_prob in mat_prob:
-        l_sort = np.sort(l_prob)
-        l_margins.append(l_sort[-1] - l_sort[-2])
-    s_margins = pd.Series(l_margins).sort_values(ascending=True)
-    idx = s_margins.index.values[0:5]
-    manual_samples = X[idx]
-
-    assert np.array_equal(samples, manual_samples)
+    assert np.array_equal(
+        samples,
+        np.array(
+            [
+                [
+                    0.4,
+                    0.4,
+                    0.2,
+                ],  # For numerical reasons, this comes out first even though ...
+                [
+                    0.5,
+                    0.5,
+                    0,
+                ],  # ... the margin between class 0 and 1 in *this* case is also zero
+                [0.4, 0.3, 0.2],
+                [0.6, 0.4, 0],
+                [0.7, 0.3, 0],
+            ]
+        ),
+    )
 
 
 def test_uncertainty_entropy(synthetic_lr_model, data_to_test):
@@ -105,7 +121,8 @@ def test_uncertainty_entropy_vs_margin(synthetic_lr_model, data_to_test):
     X = data_to_test
 
     # Run uncertainty sampler with entropy and margin measures to compare
-    samples_entropy = uncertainty_sampler(X, model, 5, measure="entropy")
-    samples_margin = uncertainty_sampler(X, model, 5, measure="margin")
+    samples_entropy = uncertainty_sampler(X, model, 1, measure="entropy")
+    samples_margin = uncertainty_sampler(X, model, 2, measure="margin")
 
-    assert not np.array_equal(samples_entropy, samples_margin)
+    assert np.array_equal(samples_entropy, np.array([[0.4, 0.3, 0.2]]))
+    assert np.array_equal(samples_margin, np.array([[0.4, 0.4, 0.2], [0.5, 0.5, 0.0]]))
