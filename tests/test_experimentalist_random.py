@@ -32,7 +32,7 @@ def test_random_experimentalist(metadata):
 
     # ***Checks***
     # Gridsearch pool is working as expected
-    _, pool = pipeline_random_samp.pipes[0]
+    _, pool = pipeline_random_samp.steps[0]
     pool_len = len(list(pool()))
     pool_len_expected = np.prod(
         [len(s.allowed_values) for s in metadata.independent_variables]
