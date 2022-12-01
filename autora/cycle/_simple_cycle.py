@@ -149,7 +149,7 @@ class _SimpleCycle:
         We can continue to run the cycle as long as we like,
         with a simple arbitrary stopping condition like the number of theories generated:
         >>> from itertools import takewhile
-        >>> _ = list(takewhile(lambda c: len(c.data.theories) < 9, iter(cycle)))
+        >>> _ = list(takewhile(lambda c: len(c.data.theories) < 9, cycle))
         Generated 7 theories
         Generated 8 theories
         Generated 9 theories
@@ -160,7 +160,7 @@ class _SimpleCycle:
         ...         takewhile(
         ...             lambda c: np.abs(c.data.theories[-1].coef_.item() -
         ...                            c.data.theories[-2].coef_.item()) > 1e-3,
-        ...             iter(cycle)
+        ...             cycle
         ...         )
         ...     )
         Generated 10 theories
