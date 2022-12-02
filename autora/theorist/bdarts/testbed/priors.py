@@ -37,6 +37,10 @@ for op in OPS.keys():
 
 arch_priors = dict()
 
+# exp: 400
+# logistic: 200
+# tanh: 400
+#
 for primitive in OPS:
     arch_priors["w_" + primitive + "_auto_loc"] = w_loc_prior
     arch_priors["w_" + primitive + "_auto_scale"] = w_scale_prior

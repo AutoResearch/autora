@@ -1,20 +1,45 @@
+from numpyro.infer import Predictive
 import numpyro
 import numpyro.distributions as dist
-from bdarts_operations import OPS
-from data_generators import *
-from matplotlib import pyplot as plt
 from numpyro.diagnostics import hpdi
-from numpyro.infer import Predictive
-import pyro
+from matplotlib import pyplot as plt
+from theorist.bdarts.testbed.data_generators import *
+from theorist.bdarts.testbed.bdarts_operations import OPS
+from theorist.bdarts.testbed.priors import guide_coeff_init, guide_arch_init, arch_priors, coeff_priors
 
-from priors import guide_coeff_init, guide_arch_init, arch_priors, coeff_priors
-
+# TODO:
+# (1) try test_numpyro_linear_basic with guide
+# (2) try with bilevel optimization
+#    x try more complex test case with coefficients, i.e. -1 + exp(0.5 * x + 1)
+#    x consider re-initializing coefficient svi at every architecture step
+#    x try reducing coeff update steps (should plot learning curve)
+#    x rewrite so that coefficients are gneralized to a dictionary of coefficients
+#    x try different seeds
+#    x get final coefficient fitting to work
+#    x move coefficient b into coeff model
+#    x pass full ach params to coeff_model
+#    x pass full coeff params to arch_model
+#    x add functionality for sampling final architecture from posterior
+#    x get to work with basic operations exp and tanh
+#    x get to work with linear tanh
+#    x generalize guide prior specification
+#    x try add zero operation
+#    - write predict method for visualizing final model output against data
+#    - classify
+#    - generalize to N nodes
+#    - add coefficient for each operation
+#    - make coefficients optional
+#    - make sure to include priors for coefficients in operator file, separated by operation
+#    - implement (optional) hierarchical fitting of coefficients
+#    - try implementing torch version
+#    -
 
 # SIMULATION PARAMETERS
 debug = False
 
 seed = 0
 
+use_softmax = True
 primitive_test = "linear_relu"
 primitive_coeff_a = 5
 primitive_coeff_b = 1
@@ -53,6 +78,12 @@ PRIMITIVES = (
     "linear_inverse",
 )
 
+ops = list()
+for primitive in PRIMITIVES:
+    # OPS returns an nn module for a given primitive (defines as a string)
+    op = OPS[primitive]
+    ops.append(op)
+
 # DEFINE MODEL
 
 def softmax(target_primitive, arch_weights):
@@ -69,8 +100,8 @@ def coeff_model(x, y, arch_params, fixed_architecture = False, priors = None):
 
     # set up parameters
     if fixed_architecture:
-        # arch_params = sample_architecture(arch_params, sampling_strategy="max")
-        for arch_label in arch_params:
+        sampled_arch_weights = sample_architecture(arch_params, sampling_strategy="max")
+        for arch_label in sampled_arch_weights:
             arch_label_primitive = arch_label.removeprefix("w_").removesuffix("_auto_loc")
             if "linear" in arch_label and "loc" in arch_label and arch_label_primitive in PRIMITIVES:
                 a_label = "a_" + arch_label.removeprefix("w_").removesuffix("_auto_loc")
@@ -104,6 +135,12 @@ def coeff_model(x, y, arch_params, fixed_architecture = False, priors = None):
                 primitive = arch_label.removeprefix("w_").removesuffix("_auto_loc")
                 coeff_weights[primitive] = (numpyro.sample(a_label, dist.Normal(a_mean, a_sd)),
                                             numpyro.sample(b_label, dist.Normal(b_mean, b_sd)))
+
+        # if len(coeff_weights) == 0:
+        #     raise Warning("Architecture has no coefficients")
+        #     return
+        # a_exp = numpyro.sample("a_linear_exp", dist.Normal(1., 1.))
+        # b_exp = numpyro.sample("b_linear_exp", dist.Normal(0., 1.))
 
     else:
         for primitive in PRIMITIVES:
@@ -140,6 +177,12 @@ def coeff_model(x, y, arch_params, fixed_architecture = False, priors = None):
                 coeff_weights[primitive] = (numpyro.sample(a_label, dist.Normal(a_mean, a_sd)),
                                             numpyro.sample(b_label, dist.Normal(b_mean, b_sd)))
 
+    # a_exp = numpyro.sample("a_exp", dist.Normal(1., 1.))
+    # a_tanh = numpyro.sample("a_tanh", dist.Normal(1., 1.))
+    #
+    # b_exp = numpyro.sample("b_exp", dist.Normal(0., 1.))
+    # b_tanh = numpyro.sample("b_tanh", dist.Normal(0., 1.))
+
     # select priors for offset
     b_label = 'b'
     b_label_loc = b_label + "_auto_loc"
@@ -165,6 +208,7 @@ def coeff_model(x, y, arch_params, fixed_architecture = False, priors = None):
                 continue
 
     if fixed_architecture:
+        # mean += OPS["linear_exp"](x, a_exp, b_exp)
         for primitive in PRIMITIVES:
             if primitive in coeff_weights.keys():
                 mean += OPS[primitive](x, coeff_weights[primitive][0], coeff_weights[primitive][1])
@@ -172,17 +216,32 @@ def coeff_model(x, y, arch_params, fixed_architecture = False, priors = None):
     else:
         for primitive in PRIMITIVES:
             primitive_label = "w_" + primitive + "_auto_loc"
-            if primitive in coeff_weights.keys():
-                mean += softmax(primitive_label, arch_weights) * OPS[primitive](x, coeff_weights[primitive][0], coeff_weights[primitive][1])
+            if use_softmax:
+                if primitive in coeff_weights.keys():
+                    mean += softmax(primitive_label, arch_weights) * OPS[primitive](x, coeff_weights[primitive][0], coeff_weights[primitive][1])
+                else:
+                    mean += softmax(primitive_label, arch_weights) * OPS[primitive](x)
+                # if primitive == "exp":
+                #     mean += softmax(primitive, arch_weights) * OPS[primitive](a_exp * x + b_exp)
+                # elif primitive == "tanh":
+                #     mean += softmax(primitive, arch_weights) * OPS[primitive](a_tanh * x + b_tanh)
+                # else:
+                #     mean += softmax(primitive, arch_weights) * OPS[primitive](x)
             else:
-                mean += softmax(primitive_label, arch_weights) * OPS[primitive](x)
-
+                if primitive in coeff_weights.keys():
+                    mean += arch_weights[primitive_label]  * OPS[primitive](x, coeff_weights[primitive][0], coeff_weights[primitive][1])
+                else:
+                    mean += arch_weights[primitive_label]  * OPS[primitive](x)
+                # if primitive == "exp":
+                #     mean += arch_weights[primitive] * OPS[primitive](a_exp * x)
+                # else:
+                #     mean += arch_weights[primitive] * OPS[primitive](a_tanh * x)
 
     with numpyro.plate("data", len(x)):
         numpyro.sample("obs", dist.Normal(mean, sigma), obs=y)
 
 def sample_architecture(arch_weights, sampling_strategy = "max"):
-    sampled_arch_weights = dict()
+    sampled_arch_weights = list()
 
     if sampling_strategy == "max":
         weights = list()
@@ -228,7 +287,7 @@ def sample_architecture(arch_weights, sampling_strategy = "max"):
 
     # get index from highest weight
     primitive = arch_labels[np.argmax(weights)]
-    sampled_arch_weights[primitive] = 1.0
+    sampled_arch_weights.append(primitive)
 
     return sampled_arch_weights
 
@@ -253,16 +312,30 @@ def arch_model(x, y, coeff_params, priors = None): # a_exp, a_tanh, b_exp, b_tan
     for primitive in PRIMITIVES:
         primitive_label_a = "a_" + primitive + "_auto_loc"
         primitive_label_b = "b_" + primitive + "_auto_loc"
-        if primitive_label_a in coeff_params.keys() and primitive_label_b in coeff_params.keys():
-            mean += softmax(primitive, arch_weights) * \
-                    OPS[primitive](x, coeff_params[primitive_label_a],
-                                   coeff_params[primitive_label_b])
+        if use_softmax:
+            if primitive_label_a in coeff_params.keys() and primitive_label_b in coeff_params.keys():
+                mean += softmax(primitive, arch_weights) * \
+                        OPS[primitive](x, coeff_params[primitive_label_a], coeff_params[primitive_label_b])
+            else:
+                mean += softmax(primitive, arch_weights) * OPS[primitive](x)
+
+            # if primitive == "exp":
+            #     mean += softmax(primitive, arch_weights) * OPS[primitive](a_exp * x + b_exp)
+            # elif primitive == "tanh":
+            #     mean += softmax(primitive, arch_weights) * OPS[primitive](a_tanh * x + b_tanh)
+            # else:
+            #     mean += softmax(primitive, arch_weights) * OPS[primitive](x)
         else:
             if primitive_label_a in coeff_params.keys() and primitive_label_b in coeff_params.keys():
                 mean += arch_weights[primitive] * \
                         OPS[primitive](x, coeff_params[primitive_label_a], coeff_params[primitive_label_b])
             else:
                 mean += arch_weights[primitive] * OPS[primitive](x)
+
+            # if primitive == "exp":
+            #     mean += arch_weights[primitive] * OPS[primitive](a_exp * x)
+            # else:
+            #     mean += arch_weights[primitive] * OPS[primitive](a_tanh * x)
 
     with numpyro.plate("data", len(x)):
         numpyro.sample("obs", dist.Normal(mean, sigma), obs=y)
@@ -321,11 +394,13 @@ coeff_state = coeff_svi.init(random.PRNGKey(seed), x, y, arch_params, False, coe
 
 # warm up
 
+# priors = dict()
+# priors["w_linear_exp_auto_loc"] = 1.
+# priors["w_linear_tanh_auto_loc"] = 1.
+
 # warmup_steps = 1000
 # for i in range(warmup_steps):
 #     coeff_state, loss = coeff_svi.update(coeff_state, x, y, arch_params)
-
-print('Initiating search')
 
 for i in range(arch_inference_steps):
     arch_state, loss = arch_svi.update(arch_state, x, y, coeff_params, arch_priors)
@@ -356,12 +431,25 @@ for i in range(arch_inference_steps):
                                         coeff_params["b_" + primitive + "_auto_loc"])
     coeff_weights['b'] = coeff_params["b_auto_loc"]
 
+    # a_exp = coeff_params["a_linear_exp_auto_loc"]
+    # a_tanh = coeff_params["a_linear_tanh_auto_loc"]
+    # b_exp = coeff_params["b_linear_exp_auto_loc"]
+    # b_tanh = coeff_params["b_linear_tanh_auto_loc"]
+
     for primitive in PRIMITIVES:
         log["w_" + primitive].append(arch_weights[primitive])
         if "linear" in primitive:
             log["a_" + primitive].append(coeff_weights[primitive][0])
             log["b_" + primitive].append(coeff_weights[primitive][1])
     log["b"].append(coeff_weights['b'])
+
+    # log["w_exp"].append(arch_weights["linear_exp"])
+    # log["w_tanh"].append(arch_weights["linear_tanh"])
+    # log["a_exp"].append(a_exp)
+    # log["a_tanh"].append(a_tanh)
+    # log["b_exp"].append(b_exp)
+    # log["b_tanh"].append(b_tanh)
+    # log["b"].append(b)
 
     print_str = "arch step: " + str(i) + ", coeff step: " + str(j) + ", loss: " + str(loss)
     for primitive in PRIMITIVES:
@@ -378,13 +466,18 @@ for i in range(arch_inference_steps):
     print_str += ", b: " + str(coeff_weights['b'])
     print(print_str)
 
+    # print(str(i) + ": loss = " + str(loss) + ", w_exp = " + str(
+    #     arch_weights["linear_exp"]) + ", w_tanh = " + str(arch_weights["linear_tanh"]) + ", b = " + str(b) +
+    #       ", a_exp = " + str(a_exp) + ", a_tanh = " + str(a_tanh) +
+    #       ", b_exp = " + str(b_exp) + ", b_tanh = " + str(b_tanh))
+
 arch_params = arch_svi.get_params(arch_state)
 coeff_params = arch_svi.get_params(coeff_state)
 
 # SAMPLE FINAL MODEL
 
-coeff_sampled_optimizer = numpyro.optim.Adam(step_size=post_sampling_lr)
 coeff_sampled_guide = numpyro.infer.autoguide.AutoNormal(coeff_model)
+coeff_sampled_optimizer = numpyro.optim.Adam(step_size=post_sampling_lr)
 
 coeff_priors = coeff_params
 coeff_sampled_svi = numpyro.infer.SVI(coeff_model,
@@ -392,22 +485,20 @@ coeff_sampled_svi = numpyro.infer.SVI(coeff_model,
           coeff_sampled_optimizer,
           loss=numpyro.infer.Trace_ELBO())
 
-arch_weights_sampled = sample_architecture(arch_params, sampling_strategy="max")
-svi_result = coeff_sampled_svi.run(random.PRNGKey(0), coeff_fitting_steps, x, y, arch_weights_sampled,
+
+svi_result = coeff_sampled_svi.run(random.PRNGKey(0), coeff_fitting_steps, x, y, arch_params,
                                    fixed_architecture = True,
                                    priors = coeff_priors)
 
+arch_weights_sampled = sample_architecture(arch_params)
 arch_labels = list()
-for arch_label in arch_weights_sampled.keys():
+for arch_label in arch_weights_sampled:
     arch_labels.append(arch_label.removeprefix("w_").removesuffix("_auto_loc"))
 
 coeff_sampled_params = svi_result.params
 coeff_sampled_losses = svi_result.losses
 b = coeff_sampled_params["b_auto_loc"]
-keys = list()
-for key in coeff_sampled_params.keys():
-    keys.append(key)
-if "linear" in keys[0]:
+if "linear" in arch_weights_sampled[0]:
     print("FINAL MODEL: " +
           str(b) + " + " +
           arch_labels[0] + "(" +
@@ -420,10 +511,10 @@ else:
 
 # GET PREDICTIONS
 
-samples = coeff_guide.sample_posterior(random.PRNGKey(1), coeff_params, (10000,))
+samples = coeff_guide.sample_posterior(random.PRNGKey(1), coeff_params, (100,))
 # prior_predictive = Predictive(coeff_model, num_samples=200)
 prior_predictive = Predictive(coeff_model, samples)
-prior_samples = prior_predictive(random.PRNGKey(1), x, None, arch_weights_sampled, True, coeff_priors)
+prior_samples = prior_predictive(random.PRNGKey(1), x, None, arch_params, True, coeff_priors)
 
 mean_mu = jnp.mean(prior_samples['obs'], axis=0)
 hpdi_mu = hpdi(prior_samples['obs'], 0.9, 0)
@@ -436,8 +527,6 @@ plt.plot(x.T, mean_mu.T)
 plt.plot(x.T, y.T, 'o')
 plt.fill_between(x.flatten().T, hpdi_mu[0].flatten().T, hpdi_mu[1].flatten().T, alpha=0.3, interpolate=True)
 plt.title("prediction")
-plt.ylabel('y')
-plt.xlabel('x')
 plt.show()
 
 # plot losses
@@ -497,13 +586,23 @@ arch_weights = dict()
 for primitive in PRIMITIVES:
     arch_weights[primitive] = arch_params['w_' + primitive + '_auto_loc']
 
+if use_softmax:
+    for primitive in PRIMITIVES:
+        print("softmax of " + primitive + " is " + str(softmax(primitive, arch_weights)))
 
-for primitive in PRIMITIVES:
-    print("softmax of " + primitive + " is " + str(softmax(primitive, arch_weights)))
+    # print("w_exp: {0}".format(softmax("exp", arch_weights)))
+    # print("w_tanh: {0}".format(softmax("tanh", arch_weights)))
+else:
+    for primitive in PRIMITIVES:
+        print(primitive + " is " + str(arch_weights[primitive]))
 
 for primitive in PRIMITIVES:
     print(primitive + " is " + str(arch_weights[primitive]))
 
-graph = numpyro.render_model(arch_model, model_args=(x, y, coeff_params, arch_priors), filename='arch_model.pdf')
-graph = numpyro.render_model(coeff_model, model_args=(x, y, arch_params, True, coeff_priors), filename='coeff_model.pdf')
 
+
+# print("### MCMC Inference")
+# nuts_kernel = NUTS(model)
+# mcmc = MCMC(nuts_kernel, num_samples=1000, num_warmup=500)
+# mcmc.run(x, y)
+# mcmc.print_summary()

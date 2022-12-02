@@ -314,3 +314,5 @@ def test_label_getter():
     )
     assert estimator1._get_input_labels() == ("input_x1", "input_x2")
     assert estimator1._get_output_labels() == ("output_y1", "output_y2")
+
+test_execution_monitor()

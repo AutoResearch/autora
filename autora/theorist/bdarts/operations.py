@@ -1,5 +1,5 @@
-import jax.numpy as jnp
 import jax as jx
+import jax.numpy as jnp
 
 # DEFINE PRIMITIVES
 
@@ -22,7 +22,7 @@ OPS = {
     "subtract": lambda x: -x,
     "mult": lambda x, a: a * x,
     "exp": jnp.exp,
-    "logistic": lambda x: jnp.divide(1, 1 + jnp.exp(-x)) ,
+    "logistic": lambda x: jnp.divide(1, 1 + jnp.exp(-x)),
     "relu": jx.nn.relu,
     "sin": jnp.sin,
     "cos": jnp.cos,
@@ -31,7 +31,7 @@ OPS = {
     "inverse": lambda x: jnp.divide(1, x),
     "linear": lambda x, a, b: a * x + b,
     "linear_exp": lambda x, a, b: jnp.exp(a * x + b),
-    "linear_logistic": lambda x, a, b: jx.nn.softmax(a * x + b),
+    "linear_logistic": lambda x, a, b: jx.nn.softmax(a * x + b), # TODO: change to logistic
     "linear_relu": lambda x, a, b: jx.nn.relu(a * x + b),
     "linear_sin": lambda x, a, b: jnp.sin(a * x + b),
     "linear_cos": lambda x, a, b: jnp.cos(a * x + b),

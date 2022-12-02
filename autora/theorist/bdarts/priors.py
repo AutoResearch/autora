@@ -3,31 +3,31 @@ from operations import OPS
 # PARAMETERS
 
 # used for initializing guide
-a_init_loc = 1.
-b_init_loc = 0.
+a_init_loc = 1.0
+b_init_loc = 0.0
 
 # used for coefficient priors
-a_loc_prior = 1.
-a_scale_prior = 1.
-b_loc_prior = 0.
+a_loc_prior = 1.0
+a_scale_prior = 1.0
+b_loc_prior = 0.0
 b_scale_prior = 0.1
 
 # used for architecture priors
-w_loc_prior = 0.
-w_scale_prior = 1.
+w_loc_prior = 0.0
+w_scale_prior = 1.0
 
 # INITIAL VALUES FOR ARCHITECTURE GUIDE
 
 guide_arch_init = dict()
 
 for op in OPS.keys():
-    guide_arch_init["w_" + op] = 0.
+    guide_arch_init["w_" + op] = 0.0
 # guide_arch_init["w_linear_tanh"] = -10.
 
 # INITIAL VALUES FOR COEFFICIENT GUIDE
 
 guide_coeff_init = dict()
-guide_coeff_init["b"] = 0.
+guide_coeff_init["b"] = 0.0
 for op in OPS.keys():
     if "linear" in op:
         guide_coeff_init["a_" + op] = a_init_loc
@@ -52,7 +52,4 @@ for primitive in OPS:
         coeff_priors["a_" + primitive + "_auto_scale"] = a_scale_prior
         coeff_priors["b_" + primitive + "_auto_loc"] = b_loc_prior
         coeff_priors["b_" + primitive + "_auto_scale"] = b_scale_prior
-coeff_priors["b_auto_loc"] = 0.
-
-
-
+coeff_priors["b_auto_loc"] = 0.0

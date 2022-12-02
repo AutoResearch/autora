@@ -2,10 +2,13 @@ from dataclasses import dataclass
 from typing import Any, Callable, Dict, List
 
 import numpy as np
+import matplotlib.pyplot as plt
+import jax.numpy as jnp
+from numpyro.diagnostics import hpdi
 
 from autora.theorist.bdarts.architect import Architect
 from autora.theorist.bdarts.model import Model
-from autora.theorist.bdarts.operations import OPS, PRIMITIVES
+from autora.theorist.bdarts.operations import OPS, PRIMITIVES, softmax
 from autora.theorist.bdarts.priors import (
     arch_priors,
     coeff_priors,
@@ -76,17 +79,6 @@ def _general_bdarts(
 
     # PREPARE LOGGING
 
-    arch_losses = list()
-    coeff_losses = list()
-    log = dict()
-
-    for primitive in PRIMITIVES:
-        log["w_" + primitive] = list()
-        if "linear" in primitive:
-            log["a_" + primitive] = list()
-            log["b_" + primitive] = list()
-    log["b"] = list()
-
     coeff_weights = dict()
     coeff_weights["b"] = 0
     for primitive in OPS:
@@ -97,7 +89,6 @@ def _general_bdarts(
 
         # update architecture
         arch_loss, arch_params = architect.update(X, y, coeff_weights)
-        arch_losses.append(arch_loss)
 
         if epoch == 0:
             coeff_inference_steps = coeff_inference_steps_init
@@ -107,13 +98,12 @@ def _general_bdarts(
         for j in range(coeff_inference_steps):
             # update coefficients
             coeff_loss, coeff_params = model.update(X, y, arch_params)
-            coeff_losses.append(coeff_loss)
 
         log = _log_general_darts(log, arch_params, coeff_params, epoch, arch_loss)
 
-        execution_monitor(model, architect, epoch)
+        execution_monitor(model, architect, epoch, arch_loss, coeff_loss)
 
-        _print_status(primitives, arch_params, coeff_params, arch_loss)
+        _print_status(epoch, primitives, arch_params, coeff_params, arch_loss)
 
     # SAMPLE FINAL MODEL
 
@@ -139,7 +129,7 @@ def _general_bdarts(
     return results
 
 
-def _print_status(primitives, arch_params, coeff_params, loss):
+def _print_status(epoch, primitives, arch_params, coeff_params, loss):
 
     arch_weights = dict()
     coeff_weights = dict()
@@ -160,8 +150,9 @@ def _print_status(primitives, arch_params, coeff_params, loss):
     coeff_weights["b"] = coeff_params["b_auto_loc"]
 
     print_str = (
-        "arch step: " + str(i) + ", coeff step: " + str(j) + ", loss: " + str(loss)
+        "arch step: " + str(epoch) + ", loss: " + str(loss)
     )
+
     for primitive in PRIMITIVES:
         prim_str = primitive.removeprefix("linear_")
         print_str += ", " + prim_str + ": " + str(arch_weights[primitive])
@@ -203,50 +194,6 @@ def _print_model(arch_weights, coeff_params):
         print("FINAL MODEL: " + str(b) + " + " + arch_labels[0] + "(x)")
 
 
-def _log_general_darts(log, arch_params, coeff_params, i, loss, verbose=True):
-
-    arch_weights = dict()
-    coeff_weights = dict()
-    coeff_weights["b"] = 0
-    for primitive in OPS:
-        if "linear" in primitive:
-            coeff_weights[primitive] = [1, 0]
-
-    for primitive in PRIMITIVES:
-        arch_weights[primitive] = arch_params["w_" + primitive + "_auto_loc"]
-        if primitive in coeff_weights.keys():
-            coeff_weights[primitive] = (
-                coeff_params["a_" + primitive + "_auto_loc"],
-                coeff_params["b_" + primitive + "_auto_loc"],
-            )
-    coeff_weights["b"] = coeff_params["b_auto_loc"]
-
-    for primitive in PRIMITIVES:
-        log["w_" + primitive].append(arch_weights[primitive])
-        if "linear" in primitive:
-            log["a_" + primitive].append(coeff_weights[primitive][0])
-            log["b_" + primitive].append(coeff_weights[primitive][1])
-    log["b"].append(coeff_weights["b"])
-
-    if verbose:
-        print_str = "arch step: " + str(i) + ", loss: " + str(loss)
-        for primitive in PRIMITIVES:
-            prim_str = primitive.removeprefix("linear_")
-            print_str += ", " + prim_str + ": " + str(arch_weights[primitive])
-        for primitive in PRIMITIVES:
-            if "linear" in primitive:
-                prim_str = primitive.removeprefix("linear_")
-                print_str += ", a_" + prim_str + ": " + str(coeff_weights[primitive][0])
-        for primitive in PRIMITIVES:
-            if "linear" in primitive:
-                prim_str = primitive.removeprefix("linear_")
-                print_str += ", b_" + prim_str + ": " + str(coeff_weights[primitive][1])
-        print_str += ", b: " + str(coeff_weights["b"])
-        print(print_str)
-
-    return log
-
-
 class BDARTSExecutionMonitor:
     """
     A monitor of the execution of the DARTS algorithm.
@@ -279,6 +226,9 @@ class BDARTSExecutionMonitor:
             if "linear" in primitive:
                 pass
 
+        self.model = None
+        self.architect = None
+
     def execution_monitor(
         self,
         model: Model,
@@ -297,6 +247,9 @@ class BDARTSExecutionMonitor:
             **kwargs: other parameters which may be passed from the DARTS optimizer
         """
 
+        self.model = model
+        self.architect = architect
+
         # collect data for visualization
         self.epoch_history.append(epoch)
         # nd array (1, 6, 5) (5 primitives, 6 edges)
@@ -307,6 +260,7 @@ class BDARTSExecutionMonitor:
         coeff_params = model.params
 
         for primitive in PRIMITIVES:
+            # arch_weights[primitive] = arch_params["w_" + primitive + "_auto_loc"]
             if primitive in self.coeff_weights.keys():
                 self.coeff_weights[primitive] = (
                     coeff_params["a_" + primitive + "_auto_loc"],
@@ -327,97 +281,59 @@ class BDARTSExecutionMonitor:
         self.param_loss_history.append(model.current_loss)
         self.primitives = model.primitives
 
-    def display(self):
+    def display(self, x: np.ndarray = None, y: np.ndarray = None):
         """
-        A function to display the execution monitor. This function will generate two plots:
-        (1) A plot of the training loss vs. epoch,
-        (2) a plot of the architecture weights vs. epoch, divided into subplots by each edge
-        in the mixture architecture.
+        A function to display the execution monitor. This function will generate some plots.
         """
 
-        # TODO: check what is stored in the log function. technically, all of that logging
-        #  should happen in the call of the execution monitor
-        # TODO: first make sure that all information available is either in the init or the call
-        # to execution monitor
-        # TODO: then run through display function and relplace with own variables
+        if self.model is None or self.architect is None:
+            raise Exception("The execution monitor has not been initialized with a model. " +\
+                            "It requires at least one call for logging.")
 
-        arch_labels = list()
-        for arch_label in arch_weights_sampled.keys():
-            arch_labels.append(arch_label.removeprefix("w_").removesuffix("_auto_loc"))
-
-        coeff_sampled_params = svi_result.params
-        coeff_sampled_losses = svi_result.losses
-        b = coeff_sampled_params["b_auto_loc"]
-        keys = list()
-        for key in coeff_sampled_params.keys():
-            keys.append(key)
-        if "linear" in keys[0]:
-            print(
-                "FINAL MODEL: "
-                + str(b)
-                + " + "
-                + arch_labels[0]
-                + "("
-                + str(coeff_sampled_params["a_" + arch_labels[0] + "_auto_loc"])
-                + "x + "
-                + str(coeff_sampled_params["b_" + arch_labels[0] + "_auto_loc"])
-                + ")"
-            )
-        else:
-            print("FINAL MODEL: " + str(b) + " + " + arch_labels[0] + "(x)")
-
-        # GET PREDICTIONS
-        # RAPLACE THIS WITH FUNCTION CALL OF MODEL CLASS
-
-        samples = coeff_guide.sample_posterior(
-            random.PRNGKey(1), coeff_params, (10000,)
-        )
-        # prior_predictive = Predictive(coeff_model, num_samples=200)
-        prior_predictive = Predictive(coeff_model, samples)
-        prior_samples = prior_predictive(
-            random.PRNGKey(1), x, None, arch_weights_sampled, True, coeff_priors
-        )
-
-        mean_mu = jnp.mean(prior_samples["obs"], axis=0)
-        hpdi_mu = hpdi(prior_samples["obs"], 0.9, 0)
-
-        # PLOT RESULTS
+        arch_params = self.architect.params
 
         # plot prediction
-        plt.plot(x.T, mean_mu.T)
-        plt.plot(x.T, y.T, "o")
-        plt.fill_between(
-            x.flatten().T,
-            hpdi_mu[0].flatten().T,
-            hpdi_mu[1].flatten().T,
-            alpha=0.3,
-            interpolate=True,
-        )
-        plt.title("prediction")
-        plt.show()
+
+        if x is not None and y is not None:
+            posterior_samples = self.model.get_posterior_samples(x,
+                                                                 arch_params=self.architect.params)
+
+            mean_mu = jnp.mean(posterior_samples["obs"], axis=0)
+            hpdi_mu = hpdi(posterior_samples["obs"], 0.9, 0)
+
+
+            plt.plot(x.T, mean_mu.T)
+            plt.plot(x.T, y.T, "o")
+            plt.fill_between(
+                x.flatten().T,
+                hpdi_mu[0].flatten().T,
+                hpdi_mu[1].flatten().T,
+                alpha=0.3,
+                interpolate=True,
+            )
+            plt.title("prediction")
+            plt.show()
 
         # plot losses
-        plt.plot(arch_losses)
+        plt.plot(self.arch_loss_history)
         plt.title("architecture loss over architecture search")
         plt.show()
 
         # plot losses
-        plt.plot(coeff_losses)
+        plt.plot(self.coeff_loss_history)
         plt.title("coefficient loss over architecture search")
         plt.show()
 
-        # plot losses
-        plt.plot(coeff_sampled_losses)
-        plt.title("coeff losses over coefficient fitting")
-        plt.show()
+        # # plot losses
+        # plt.plot(coeff_sampled_losses)
+        # plt.title("coeff losses over coefficient fitting")
+        # plt.show()
 
         # plot architecture weights
         fig, ax = plt.subplots()
         lines = list()
         for primitive in PRIMITIVES:
-            lines.append(ax.plot(log["w_" + primitive], label=primitive)[0])
-        # line1, = ax.plot(log["w_exp"], label='w_exp')
-        # line2, = ax.plot(log["w_tanh"], label='w_tanh')
+            lines.append(ax.plot(self.log["w_" + primitive], label=primitive)[0])
         ax.set_xlabel("architecture epoch")
         ax.set_title("architecture weights")
         ax.set_ylabel("weight")
@@ -429,7 +345,7 @@ class BDARTSExecutionMonitor:
         lines = list()
         for primitive in PRIMITIVES:
             if "linear" in primitive:
-                lines.append(ax.plot(log["a_" + primitive], label="a_" + primitive)[0])
+                lines.append(ax.plot(self.log["a_" + primitive], label="a_" + primitive)[0])
         ax.set_xlabel("architecture epoch")
         ax.set_title("coefficients")
         ax.set_ylabel("weight")
@@ -441,8 +357,8 @@ class BDARTSExecutionMonitor:
         lines = list()
         for primitive in PRIMITIVES:
             if "linear" in primitive:
-                lines.append(ax.plot(log["b_" + primitive], label="b_" + primitive)[0])
-        lines.append(ax.plot(log["b"], label="b")[0])
+                lines.append(ax.plot(self.log["b_" + primitive], label="b_" + primitive)[0])
+        lines.append(ax.plot(self.log["b"], label="b")[0])
         ax.set_xlabel("architecture epoch")
         ax.set_title("offsets")
         ax.set_ylabel("weight")
@@ -463,3 +379,6 @@ class BDARTSExecutionMonitor:
 
         for primitive in PRIMITIVES:
             print(primitive + " is " + str(arch_weights[primitive]))
+
+# TODO: write function call to general_bdarts with the execution monitor
+# TODO: debug and compare step-by-step with bilevel_clean.py
