@@ -1,20 +1,18 @@
-import numpyro
-from numpyro.infer import MCMC, NUTS, Predictive
-import numpyro.distributions as dist
-from jax import random
-import jax.numpy as jnp
-import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
-from sklearn.preprocessing import LabelEncoder
 import arviz as az
+import jax.numpy as jnp
+import matplotlib.pyplot as plt
+import numpy as np
+import numpyro
+import numpyro.distributions as dist
+import pandas as pd
+import seaborn as sns
+from jax import random
+from numpyro.infer import MCMC, NUTS, Predictive
+from sklearn.preprocessing import LabelEncoder
 
-
-train = pd.read_csv(
-    "osic_pulmonary_fibrosis.csv"
-)
+train = pd.read_csv("osic_pulmonary_fibrosis.csv")
 print(train.head())
+
 
 def chart_patient(patient_id, ax):
     data = train[train["Patient"] == patient_id]
@@ -49,6 +47,7 @@ def model(patient_code, Weeks, FVC_obs=None):
     with numpyro.plate("data", len(patient_code)):
         numpyro.sample("obs", dist.Normal(FVC_est, σ), obs=FVC_obs)
 
+
 patient_encoder = LabelEncoder()
 train["patient_code"] = patient_encoder.fit_transform(train["Patient"].values)
 
@@ -67,5 +66,3 @@ posterior_samples = mcmc.get_samples()
 data = az.from_numpyro(mcmc)
 az.plot_trace(data, compact=True, figsize=(15, 25))
 plt.show()
-
-

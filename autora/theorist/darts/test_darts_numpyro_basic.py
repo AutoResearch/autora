@@ -1,12 +1,11 @@
-import pandas
-from numpyro.infer import MCMC, NUTS, Predictive
-import numpyro
-from jax import random
-import jax.numpy as jnp
 import jax as jx
+import jax.numpy as jnp
 import numpy as np
-import numpy as np
+import numpyro
 import numpyro.distributions as dist
+import pandas
+from jax import random
+from numpyro.infer import MCMC, NUTS, Predictive
 
 # TODO:
 # x eventually we may likely want to move back to torch,
@@ -25,49 +24,61 @@ inference_steps = 5000
 
 # PREPARE DATA
 
+
 def generate_x(start=-1, stop=1, num=500):
     x = np.expand_dims(np.linspace(start=start, stop=stop, num=num), 1)
     return x
 
+
 def transform_through_primitive_exp(x: np.ndarray):
-    y = - 1 + np.exp(x) + random.normal(random.PRNGKey(0), ([len(x)]))
+    y = -1 + np.exp(x) + random.normal(random.PRNGKey(0), ([len(x)]))
     return y
 
+
 def transform_through_primitive_tanh(x: np.ndarray):
-    y = - 1 + np.tanh(x) + random.normal(random.PRNGKey(0), ([len(x)]))
+    y = -1 + np.tanh(x) + random.normal(random.PRNGKey(0), ([len(x)]))
     return y
+
 
 def transform_through_primitive_none(x: np.ndarray):
     y = 0 + random.normal(random.PRNGKey(0), ([len(x)]))
     return y
 
+
 def transform_through_primitive_add(x: np.ndarray):
     y = x + random.normal(random.PRNGKey(0), ([len(x)]))
     return y
 
+
 def transform_through_primitive_subtract(x: np.ndarray):
-    y = - x + random.normal(random.PRNGKey(0), ([len(x)]))
+    y = -x + random.normal(random.PRNGKey(0), ([len(x)]))
     return y
+
 
 def transform_through_primitive_logistic(x: np.ndarray):
     y = jx.nn.softmax(x) + random.normal(random.PRNGKey(0), ([len(x)]))
     return y
 
+
 def transform_through_primitive_relu(x: np.ndarray):
     y = jx.nn.relu(x) + random.normal(random.PRNGKey(0), ([len(x)]))
     return y
+
 
 def transform_through_primitive_sin(x: np.ndarray):
     y = jnp.sin(x) + random.normal(random.PRNGKey(0), ([len(x)]))
     return y
 
+
 def transform_through_primitive_cos(x: np.ndarray):
     y = jnp.cos(x) + random.normal(random.PRNGKey(0), ([len(x)]))
     return y
 
+
 def transform_through_primitive_ln(x: np.ndarray):
     y = jx.lax.log(x + 0.0000001) + random.normal(random.PRNGKey(0), ([len(x)]))
     return y
+
 
 def transform_through_primitive_inverse(x: np.ndarray):
     y = jnp.divide(1, x) + random.normal(random.PRNGKey(0), ([len(x)]))
@@ -88,7 +99,7 @@ GENERATORS = {
     "inverse": transform_through_primitive_inverse,
 }
 
-x = generate_x(num = 1000)
+x = generate_x(num=1000)
 y = GENERATORS[primitive_test](x)
 
 # DEFINE PRIMITIVES
@@ -103,7 +114,7 @@ OPS = {
     "sin": jnp.sin,
     "cos": jnp.cos,
     # "ln": lambda x: jx.lax.log(x + 0.0001),
-    "inverse": lambda x: jnp.divide(1, x)
+    "inverse": lambda x: jnp.divide(1, x),
 }
 
 PRIMITIVES = (
@@ -128,6 +139,7 @@ for primitive in PRIMITIVES:
 
 # DEFINE MODEL
 
+
 def softmax(target_primitive, arch_weights):
 
     sum = 0
@@ -136,17 +148,20 @@ def softmax(target_primitive, arch_weights):
 
     return jnp.divide(jnp.exp(arch_weights[target_primitive]), sum)
 
+
 def model(x, y):
 
     arch_weights = dict()
     for primitive in PRIMITIVES:
-        arch_weights[primitive] = numpyro.sample("w_" + primitive, dist.Normal(-1., 1.))
+        arch_weights[primitive] = numpyro.sample(
+            "w_" + primitive, dist.Normal(-1.0, 1.0)
+        )
 
     # w_1 = numpyro.sample("w_exp", dist.Normal(0., 1.))
     # w_2 = numpyro.sample("w_tanh", dist.Normal(0., 1.))
-    b = numpyro.sample("b", dist.Normal(0., 1.))
-    sigma = numpyro.sample("sigma", dist.Uniform(0., 10.))
-    mean = b # + softmax(w_1, w_2) * jnp.exp(x) + softmax(w_2, w_1) * jnp.tanh(x)
+    b = numpyro.sample("b", dist.Normal(0.0, 1.0))
+    sigma = numpyro.sample("sigma", dist.Uniform(0.0, 10.0))
+    mean = b  # + softmax(w_1, w_2) * jnp.exp(x) + softmax(w_2, w_1) * jnp.tanh(x)
 
     for primitive in PRIMITIVES:
         if use_softmax:
@@ -157,25 +172,25 @@ def model(x, y):
     with numpyro.plate("data", len(x)):
         numpyro.sample("obs", dist.Normal(mean, sigma), obs=y)
 
+
 # INFERENCE
 
 guide = numpyro.infer.autoguide.AutoNormal(model)
 optimizer = numpyro.optim.Adam(step_size=0.05)
 
-svi = numpyro.infer.SVI(model,
-          guide,
-          optimizer,
-          loss=numpyro.infer.Trace_ELBO())
+svi = numpyro.infer.SVI(model, guide, optimizer, loss=numpyro.infer.Trace_ELBO())
 
 svi_result = svi.run(random.PRNGKey(0), inference_steps, x, y)
 
 arch_weights = dict()
 for primitive in PRIMITIVES:
-    arch_weights[primitive] = svi_result.params['w_' + primitive + '_auto_loc']
+    arch_weights[primitive] = svi_result.params["w_" + primitive + "_auto_loc"]
 
 if use_softmax:
     for primitive in PRIMITIVES:
-        print("softmax of " + primitive + " is " + str(softmax(primitive, arch_weights)))
+        print(
+            "softmax of " + primitive + " is " + str(softmax(primitive, arch_weights))
+        )
 
     # print("w_exp: {0}".format(softmax("exp", arch_weights)))
     # print("w_tanh: {0}".format(softmax("tanh", arch_weights)))
@@ -185,4 +200,3 @@ else:
 
 for primitive in PRIMITIVES:
     print(primitive + " is " + str(arch_weights[primitive]))
-

@@ -2,29 +2,31 @@ import warnings
 
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
-import pandas as pd
-
 import jax.numpy as jnp
-from jax import random
-
 import numpyro
 import numpyro.distributions as dist
 import numpyro.optim as optim
-from numpyro.infer import SVI, Trace_ELBO, Predictive
+import pandas as pd
+from jax import random
+from numpyro.infer import SVI, Predictive, Trace_ELBO
 from numpyro.infer.autoguide import AutoNormal
 
 # INFO: load data for problems from the official repo
-data_uri = "https://raw.githubusercontent.com/rmcelreath/rethinking/master/data/Howell1.csv"
+data_uri = (
+    "https://raw.githubusercontent.com/rmcelreath/rethinking/master/data/Howell1.csv"
+)
 df_dev = pd.read_csv(data_uri, sep=";")
 df_dev = df_dev[df_dev["age"] >= 18]
+
 
 def model(df_dev):
     alpha = numpyro.sample("alpha", dist.Normal(60, 10))
     beta = numpyro.sample("beta", dist.LogNormal(0, 1))
     sigma = numpyro.sample("sigma", dist.Uniform(0, 10))
-    mu = numpyro.deterministic("mu", alpha + beta * (df_dev["height"] - df_dev["height"].mean()).values)
+    mu = numpyro.deterministic(
+        "mu", alpha + beta * (df_dev["height"] - df_dev["height"].mean()).values
+    )
     numpyro.sample("W", dist.Normal(mu, sigma), obs=df_dev["weight"].values)
-
 
 
 # quadratic approximation part

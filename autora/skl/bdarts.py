@@ -1,9 +1,9 @@
 from dataclasses import dataclass
 from typing import Any, Callable, Dict, List
 
-import numpy as np
-import matplotlib.pyplot as plt
 import jax.numpy as jnp
+import matplotlib.pyplot as plt
+import numpy as np
 from numpyro.diagnostics import hpdi
 
 from autora.theorist.bdarts.architect import Architect
@@ -149,9 +149,7 @@ def _print_status(epoch, primitives, arch_params, coeff_params, loss):
             )
     coeff_weights["b"] = coeff_params["b_auto_loc"]
 
-    print_str = (
-        "arch step: " + str(epoch) + ", loss: " + str(loss)
-    )
+    print_str = "arch step: " + str(epoch) + ", loss: " + str(loss)
 
     for primitive in PRIMITIVES:
         prim_str = primitive.removeprefix("linear_")
@@ -287,20 +285,22 @@ class BDARTSExecutionMonitor:
         """
 
         if self.model is None or self.architect is None:
-            raise Exception("The execution monitor has not been initialized with a model. " +\
-                            "It requires at least one call for logging.")
+            raise Exception(
+                "The execution monitor has not been initialized with a model. "
+                + "It requires at least one call for logging."
+            )
 
         arch_params = self.architect.params
 
         # plot prediction
 
         if x is not None and y is not None:
-            posterior_samples = self.model.get_posterior_samples(x,
-                                                                 arch_params=self.architect.params)
+            posterior_samples = self.model.get_posterior_samples(
+                x, arch_params=self.architect.params
+            )
 
             mean_mu = jnp.mean(posterior_samples["obs"], axis=0)
             hpdi_mu = hpdi(posterior_samples["obs"], 0.9, 0)
-
 
             plt.plot(x.T, mean_mu.T)
             plt.plot(x.T, y.T, "o")
@@ -345,7 +345,9 @@ class BDARTSExecutionMonitor:
         lines = list()
         for primitive in PRIMITIVES:
             if "linear" in primitive:
-                lines.append(ax.plot(self.log["a_" + primitive], label="a_" + primitive)[0])
+                lines.append(
+                    ax.plot(self.log["a_" + primitive], label="a_" + primitive)[0]
+                )
         ax.set_xlabel("architecture epoch")
         ax.set_title("coefficients")
         ax.set_ylabel("weight")
@@ -357,7 +359,9 @@ class BDARTSExecutionMonitor:
         lines = list()
         for primitive in PRIMITIVES:
             if "linear" in primitive:
-                lines.append(ax.plot(self.log["b_" + primitive], label="b_" + primitive)[0])
+                lines.append(
+                    ax.plot(self.log["b_" + primitive], label="b_" + primitive)[0]
+                )
         lines.append(ax.plot(self.log["b"], label="b")[0])
         ax.set_xlabel("architecture epoch")
         ax.set_title("offsets")
@@ -379,6 +383,7 @@ class BDARTSExecutionMonitor:
 
         for primitive in PRIMITIVES:
             print(primitive + " is " + str(arch_weights[primitive]))
+
 
 # TODO: write function call to general_bdarts with the execution monitor
 # TODO: debug and compare step-by-step with bilevel_clean.py

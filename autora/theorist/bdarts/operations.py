@@ -31,7 +31,9 @@ OPS = {
     "inverse": lambda x: jnp.divide(1, x),
     "linear": lambda x, a, b: a * x + b,
     "linear_exp": lambda x, a, b: jnp.exp(a * x + b),
-    "linear_logistic": lambda x, a, b: jx.nn.softmax(a * x + b), # TODO: change to logistic
+    "linear_logistic": lambda x, a, b: jx.nn.softmax(
+        a * x + b
+    ),  # TODO: change to logistic
     "linear_relu": lambda x, a, b: jx.nn.relu(a * x + b),
     "linear_sin": lambda x, a, b: jnp.sin(a * x + b),
     "linear_cos": lambda x, a, b: jnp.cos(a * x + b),

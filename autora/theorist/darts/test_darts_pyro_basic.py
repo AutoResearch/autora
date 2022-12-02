@@ -1,55 +1,60 @@
-import pyro.optim as optim
-from pyro.infer import SVI, Trace_ELBO, MCMC, NUTS
 import os
 
-import torch
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import seaborn as sns
-from pyro.infer import Predictive
-
 import pyro
 import pyro.distributions as dist
+import pyro.optim as optim
+import seaborn as sns
+import torch
+from pyro.infer import MCMC, NUTS, SVI, Predictive, Trace_ELBO
 
 # SIMULATION PARAMETERS
 num_samples = 1000
 svi_iters = 5000
-svi_lr = .05
+svi_lr = 0.05
 
 plot_posterios = False
 run_mcmc_sampling = False
 
 # PREPARE DATA
 
+
 def generate_x(start=-5, stop=5, num=1000):
     x = np.expand_dims(np.linspace(start=start, stop=stop, num=num), 1)
     return x
+
 
 def transform_through_primitive_exp(x: np.ndarray):
     y = -1 + np.exp(x) + torch.randn(x.shape)
     return y
 
-x = torch.tensor(generate_x(num = num_samples).flatten())
+
+x = torch.tensor(generate_x(num=num_samples).flatten())
 y = torch.tensor(transform_through_primitive_exp(x)).flatten()
+
 
 def softmax(x1, x2):
     return torch.divide(torch.exp(x1), (torch.exp(x1) + torch.exp(x2)))
 
+
 # DEFINE MODEL
+
 
 def model(x, y):
     # a = pyro.sample("a", dist.Normal(0., 1.))
-    b = pyro.sample("b", dist.Normal(0., 1.))
-    w_1 = pyro.sample("w_exp", dist.Normal(0., 1.))
-    w_2 = pyro.sample("w_tanh", dist.Normal(0., 1.))
-    sigma = pyro.sample("sigma", dist.Uniform(0., 10.))
+    b = pyro.sample("b", dist.Normal(0.0, 1.0))
+    w_1 = pyro.sample("w_exp", dist.Normal(0.0, 1.0))
+    w_2 = pyro.sample("w_tanh", dist.Normal(0.0, 1.0))
+    sigma = pyro.sample("sigma", dist.Uniform(0.0, 10.0))
     # mean = a + torch.exp(b * x)
     mean = b + softmax(w_1, w_2) * torch.exp(x) + softmax(w_2, w_1) * torch.tanh(x)
     # mean = b + w_1 * torch.exp(x) + w_2 * torch.tanh(x)
 
     with pyro.plate("data", len(x)):
         pyro.sample("obs", dist.Normal(mean, sigma), obs=y)
+
 
 # DEFINE GUIDE
 
@@ -71,11 +76,14 @@ def model(x, y):
 # INFERENCE VIA STOCHASTIC VARIATIONAL INFERENCE
 
 guide = pyro.infer.autoguide.AutoNormal(model)
-optimizer = pyro.optim.ClippedAdam({"lr": svi_lr,
-                                    "clip_norm": 1.0,
-                                   "betas": (0.5, 0.999),
-                                    "weight_decay": 0,
-                                    })
+optimizer = pyro.optim.ClippedAdam(
+    {
+        "lr": svi_lr,
+        "clip_norm": 1.0,
+        "betas": (0.5, 0.999),
+        "weight_decay": 0,
+    }
+)
 
 # optimizer = pyro.optim.AdagradRMSProp({"eta": 1.0,
 #                                       "delta": 1e-4,
@@ -84,13 +92,10 @@ optimizer = pyro.optim.ClippedAdam({"lr": svi_lr,
 
 optimizer = pyro.optim.Adam({"lr": svi_lr})
 
-svi = pyro.infer.SVI(model,
-          guide,
-          optimizer,
-          loss=pyro.infer.Trace_ELBO())
+svi = pyro.infer.SVI(model, guide, optimizer, loss=pyro.infer.Trace_ELBO())
 
 pyro.clear_param_store()
-smoke_test = ('CI' in os.environ)
+smoke_test = "CI" in os.environ
 num_iters = svi_iters if not smoke_test else 2
 for i in range(num_iters):
     elbo = svi.step(x, y)
@@ -99,18 +104,25 @@ for i in range(num_iters):
 
 num_samples = 1000
 predictive = Predictive(model, guide=guide, num_samples=num_samples)
-svi_samples = {k: v.reshape(num_samples).detach().cpu().numpy()
-               for k, v in predictive(y, x).items()
-               if k != "obs"}
+svi_samples = {
+    k: v.reshape(num_samples).detach().cpu().numpy()
+    for k, v in predictive(y, x).items()
+    if k != "obs"
+}
 
 # Utility function to print latent sites' quantile information.
 def summary(samples):
     site_stats = {}
     for site_name, values in samples.items():
         marginal_site = pd.DataFrame(values)
-        describe = marginal_site.describe(percentiles=[.05, 0.25, 0.5, 0.75, 0.95]).transpose()
-        site_stats[site_name] = describe[["mean", "std", "5%", "25%", "50%", "75%", "95%"]]
+        describe = marginal_site.describe(
+            percentiles=[0.05, 0.25, 0.5, 0.75, 0.95]
+        ).transpose()
+        site_stats[site_name] = describe[
+            ["mean", "std", "5%", "25%", "50%", "75%", "95%"]
+        ]
     return site_stats
+
 
 for site, values in summary(svi_samples).items():
     print("Site: {}".format(site))
@@ -143,7 +155,7 @@ if plot_posterios:
             sns.distplot(hmc_samples[site], ax=ax, label="HMC")
         ax.set_title(site)
     handles, labels = ax.get_legend_handles_labels()
-    fig.legend(handles, labels, loc='upper right')
+    fig.legend(handles, labels, loc="upper right")
     plt.show()
 
 if run_mcmc_sampling:
@@ -151,10 +163,18 @@ if run_mcmc_sampling:
     fig.suptitle("Cross-section of the Posterior Distribution", fontsize=16)
     sns.kdeplot(hmc_samples["a"], hmc_samples["b"], ax=axs[0], shade=True, label="HMC")
     sns.kdeplot(svi_samples["a"], svi_samples["b"], ax=axs[0], label="SVI (DiagNormal)")
-    x_lim = (summary(hmc_samples)['a']['mean'].array[0] - 3 *  summary(hmc_samples)['a']['std'].array[0],
-            summary(hmc_samples)['a']['mean'].array[0] + 3 *  summary(hmc_samples)['a']['std'].array[0])
-    y_lim = (summary(hmc_samples)['b']['mean'].array[0] - 3 *  summary(hmc_samples)['b']['std'].array[0],
-            summary(hmc_samples)['b']['mean'].array[0] + 3 *  summary(hmc_samples)['b']['std'].array[0])
+    x_lim = (
+        summary(hmc_samples)["a"]["mean"].array[0]
+        - 3 * summary(hmc_samples)["a"]["std"].array[0],
+        summary(hmc_samples)["a"]["mean"].array[0]
+        + 3 * summary(hmc_samples)["a"]["std"].array[0],
+    )
+    y_lim = (
+        summary(hmc_samples)["b"]["mean"].array[0]
+        - 3 * summary(hmc_samples)["b"]["std"].array[0],
+        summary(hmc_samples)["b"]["mean"].array[0]
+        + 3 * summary(hmc_samples)["b"]["std"].array[0],
+    )
     axs[0].set(xlabel="a", ylabel="b", xlim=x_lim, ylim=y_lim)
     # sns.kdeplot(hmc_samples["bR"], hmc_samples["bAR"], ax=axs[1], shade=True, label="HMC")
     # sns.kdeplot(svi_samples["bR"], svi_samples["bAR"], ax=axs[1], label="SVI (DiagNormal)")
