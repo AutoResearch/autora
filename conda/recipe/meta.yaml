@@ -48,6 +48,12 @@ requirements:
 test:
   imports:
     - autora
+    - autora.cycle
+    - autora.experimentalist
+    - autora.experimentalist.sampler
+    - autora.experimentalist.filter
+    - autora.experimentalist.pipeline
+    - autora.experimentalist.pool
     - autora.skl
     - autora.skl.darts
     - autora.skl.bms

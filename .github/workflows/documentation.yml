@@ -1,8 +1,7 @@
 name: documentation
 on:
-  push:
-    branches:
-      - main
+  release:
+    types: [released]
 jobs:
   deploy:
     runs-on: ubuntu-latest
