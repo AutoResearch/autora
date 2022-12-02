@@ -47,6 +47,33 @@ def train_test_filter(seed=180, train_p=0.5):
         >>> list(test_filter_regenerated(range(20)))
         [1, 7, 8, 13, 14]
 
+
+        It also works on tuple-valued lists:
+        >>> from itertools import product
+        >>> train_filter_tuple, test_filter_tuple = train_test_filter(train_p=0.3, seed=42)
+        >>> list(test_filter_tuple(product(["a", "b"], [1, 2, 3])))
+        [('a', 1), ('a', 2), ('a', 3), ('b', 1), ('b', 3)]
+
+        >>> list(train_filter_tuple(product(["a","b"], [1,2,3])))
+        [('b', 2)]
+
+        >>> from itertools import count, takewhile
+        >>> train_filter_unbounded, test_filter_unbounded = train_test_filter(train_p=0.5, seed=21)
+
+        >>> list(takewhile(lambda s: s < 90, count(79)))
+        [79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89]
+
+        >>> train_pool = train_filter_unbounded(count(79))
+        >>> list(takewhile(lambda s: s < 90, train_pool))
+        [82, 85, 86, 89]
+
+        >>> test_pool = test_filter_unbounded(count(79))
+        >>> list(takewhile(lambda s: s < 90, test_pool))
+        [79, 80, 81, 83, 84, 87, 88]
+
+        >>> list(takewhile(lambda s: s < 110, test_pool))
+        [91, 93, 94, 97, 100, 105, 106, 109]
+
     """
 
     test_p = 1 - train_p
