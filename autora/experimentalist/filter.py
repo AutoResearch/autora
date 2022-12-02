@@ -1,3 +1,5 @@
+from enum import Enum
+
 import numpy as np
 
 
@@ -49,10 +51,12 @@ def train_test_filter(seed=180, train_p=0.5):
 
     test_p = 1 - train_p
 
+    _TrainTest = Enum("_TrainTest", ["train", "test"])
+
     def _train_test_stream():
         rng = np.random.default_rng(seed)
         while True:
-            yield rng.choice(["train", "test"], p=(train_p, test_p)).item()
+            yield rng.choice([_TrainTest.train, _TrainTest.test], p=(train_p, test_p))
 
     def _factory(allow):
         _stream = _train_test_stream()
@@ -64,4 +68,4 @@ def train_test_filter(seed=180, train_p=0.5):
 
         return _generator
 
-    return _factory("train"), _factory("test")
+    return _factory(_TrainTest.train), _factory(_TrainTest.test)
