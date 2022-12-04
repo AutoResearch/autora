@@ -14,7 +14,7 @@ XLABS = [
     "S2",
 ]
 
-raw_data = pd.read_csv("experiment_0_data.csv")
+raw_data = pd.read_csv("weber_data.csv")
 x, y = raw_data[XLABS], raw_data["difference_detected"]
 
 # initialize model
