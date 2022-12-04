@@ -133,7 +133,7 @@ def poppernet_pooler(
 
         import matplotlib.pyplot as plt
 
-        if len(popper_input.shape) > 0:
+        if popper_input.shape[1] > 1:
             plot_input = popper_input[:, 0]
             plt.scatter(plot_input, popper_target.detach().numpy(), label="target")
             plt.scatter(
