@@ -18,6 +18,8 @@ def train_test_filter(
 
     This isn't a great method for small datasets, as it doesn't guarantee producing training
     and test sets which are as close as possible to the specified desired proportions.
+    Consider using the scikit-learn `train_test_split` for cases where it's practical to
+    enumerate the full dataset in advance.
 
     Args:
         seed: random number generator seeding value
