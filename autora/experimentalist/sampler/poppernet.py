@@ -171,10 +171,10 @@ def poppernet_pooler(
                     dist_to_max = np.abs(iv_value - np.max(iv_limits))
                     repulsion_from_min = limit_repulsion / (dist_to_min**2)
                     repulsion_from_max = limit_repulsion / (dist_to_max**2)
-                    IV_value_repulsed = (
+                    iv_value_repulsed = (
                         iv_value + repulsion_from_min - repulsion_from_max
                     )
-                    popper_input[idx] = IV_value_repulsed
+                    popper_input[idx] = iv_value_repulsed
 
                 # now add gradient for theory loss maximization
                 delta = -optimization_lr * popper_input.grad
