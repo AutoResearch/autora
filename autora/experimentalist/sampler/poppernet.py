@@ -10,8 +10,8 @@ from autora.variable import ValueType, VariableCollection
 
 def poppernet_pooler(
     model,
-    X_train: np.ndarray,
-    Y_train: np.ndarray,
+    x_train: np.ndarray,
+    y_train: np.ndarray,
     meta_data: VariableCollection,
     num_samples: int = 100,
     training_epochs: int = 1000,
@@ -33,8 +33,8 @@ def poppernet_pooler(
 
     Args:
         model: Scikit-learn model, could be either a classification or regression model
-        X_train: data that the model was trained on
-        Y_train: labels that the model was trained on
+        x_train: data that the model was trained on
+        y_train: labels that the model was trained on
         meta_data: Meta-data about the dependent and independent variables
         num_samples: number of samples to return
         training_epochs: number of epochs to train the popper network for approximating the
@@ -56,22 +56,22 @@ def poppernet_pooler(
 
     # format input
 
-    X_train = np.array(X_train)
-    if len(X_train.shape) == 1:
-        X_train = X_train.reshape(-1, 1)
+    x_train = np.array(x_train)
+    if len(x_train.shape) == 1:
+        x_train = x_train.reshape(-1, 1)
 
-    X = np.empty([num_samples, X_train.shape[1]])
+    X = np.empty([num_samples, x_train.shape[1]])
 
-    Y_train = np.array(Y_train)
-    if len(Y_train.shape) == 1:
-        Y_train = Y_train.reshape(-1, 1)
+    y_train = np.array(y_train)
+    if len(y_train.shape) == 1:
+        y_train = y_train.reshape(-1, 1)
 
     if meta_data.dependent_variables[0].type == ValueType.CLASS:
-        # find all unique values in Y_train
-        num_classes = len(np.unique(Y_train))
-        Y_train = class_to_onehot(Y_train, n_classes=num_classes)
+        # find all unique values in y_train
+        num_classes = len(np.unique(y_train))
+        y_train = class_to_onehot(y_train, n_classes=num_classes)
 
-    X_train_tensor = torch.from_numpy(X_train).float()
+    X_train_tensor = torch.from_numpy(x_train).float()
 
     # create list of IV limits
     IVs = meta_data.independent_variables
@@ -88,7 +88,7 @@ def poppernet_pooler(
     n_output = len(meta_data.dependent_variables)
 
     # get input pattern for popper net
-    popper_input = Variable(torch.from_numpy(X_train), requires_grad=False).float()
+    popper_input = Variable(torch.from_numpy(x_train), requires_grad=False).float()
 
     # get target pattern for popper net
     model_predict = getattr(model, "predict_proba", None)
@@ -98,10 +98,10 @@ def poppernet_pooler(
     if callable(model_predict) is False or model_predict is None:
         raise Exception("Model must have `predict` or `predict_proba` method.")
 
-    model_prediction = model_predict(X_train)
+    model_prediction = model_predict(x_train)
 
     criterion = nn.MSELoss()
-    model_loss = (model_prediction - Y_train) ** 2 * mse_scale
+    model_loss = (model_prediction - y_train) ** 2 * mse_scale
     model_loss = np.mean(model_loss, axis=1)
     model_loss = torch.from_numpy(model_loss).float()
     popper_target = Variable(model_loss, requires_grad=False)
@@ -236,10 +236,10 @@ def plot_popper_diagnostics(losses, popper_input, popper_prediction, popper_targ
 
 
 def poppernet_sampler(
-    X,
+    x,
     model,
-    X_train,
-    Y_train,
+    x_train,
+    y_train,
     meta_data,
     num_samples: int = 100,
     training_epochs: int = 1000,
@@ -258,10 +258,10 @@ def poppernet_sampler(
     that are closest to those ideal samples.
 
     Args:
-        X: pool of IV conditions to sample from
+        x: pool of IV conditions to sample from
         model: Scikit-learn model, could be either a classification or regression model
-        X_train: data that the model was trained on
-        Y_train: labels that the model was trained on
+        x_train: data that the model was trained on
+        y_train: labels that the model was trained on
         meta_data: Meta-data about the dependent and independent variables
         num_samples: number of samples to return
         training_epochs: number of epochs to train the popper network for approximating the
@@ -281,19 +281,19 @@ def poppernet_sampler(
 
     """
 
-    if isinstance(X, Iterable):
-        X = np.array(list(X))
+    if isinstance(x, Iterable):
+        x = np.array(list(x))
 
-    if len(X.shape) == 1:
-        X = X.reshape(-1, 1)
+    if len(x.shape) == 1:
+        x = x.reshape(-1, 1)
 
-    if X.shape[0] <= num_samples:
-        raise Exception("More samples requested than samples available in the pool X.")
+    if x.shape[0] <= num_samples:
+        raise Exception("More samples requested than samples available in the pool x.")
 
     samples = poppernet_pooler(
         model=model,
-        X_train=X_train,
-        Y_train=Y_train,
+        x_train=x_train,
+        y_train=y_train,
         meta_data=meta_data,
         num_samples=num_samples,
         training_epochs=training_epochs,
@@ -305,16 +305,16 @@ def poppernet_sampler(
         limit_repulsion=limit_repulsion,
     )
 
-    X_new = np.empty((num_samples, X.shape[1]))
+    x_new = np.empty((num_samples, x.shape[1]))
 
-    # get index of row in X that is closest to each sample
+    # get index of row in x that is closest to each sample
     for row, sample in enumerate(samples):
-        dist = np.linalg.norm(X - sample, axis=1)
+        dist = np.linalg.norm(x - sample, axis=1)
         idx = np.argmin(dist)
-        X_new[row, :] = X[idx, :]
-        X = np.delete(X, idx, axis=0)
+        x_new[row, :] = x[idx, :]
+        x = np.delete(x, idx, axis=0)
 
-    return X_new
+    return x_new
 
 
 # define the network
