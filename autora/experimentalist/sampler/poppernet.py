@@ -181,7 +181,7 @@ def poppernet_pooler(
                 popper_input += delta
                 popper_input.grad.zero_()
 
-                # finally, clip input variable from it's limits
+                # finally, clip input variable from its limits
                 for idx in range(len(input_sample)):
                     iv_raw_value = input_sample[idx]
                     iv_limits = iv_limit_list[idx]
