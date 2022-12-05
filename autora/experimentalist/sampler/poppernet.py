@@ -291,18 +291,18 @@ def poppernet_sampler(
         raise Exception("More samples requested than samples available in the pool X.")
 
     samples = poppernet_pooler(
-        model,
-        X_train,
-        Y_train,
-        meta_data,
-        num_samples,
-        training_epochs,
-        optimization_epochs,
-        training_lr,
-        optimization_lr,
-        mse_scale,
-        limit_offset,
-        limit_repulsion,
+        model=model,
+        X_train=X_train,
+        Y_train=Y_train,
+        meta_data=meta_data,
+        num_samples=num_samples,
+        training_epochs=training_epochs,
+        optimization_epochs=optimization_epochs,
+        training_lr=training_lr,
+        optimization_lr=optimization_lr,
+        mse_scale=mse_scale,
+        limit_offset=limit_offset,
+        limit_repulsion=limit_repulsion,
     )
 
     X_new = np.empty((num_samples, X.shape[1]))
