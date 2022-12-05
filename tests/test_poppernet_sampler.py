@@ -1,8 +1,9 @@
 import numpy as np
 import pytest
+from experimentalist.pipeline import Pipeline
 from sklearn.linear_model import LinearRegression, LogisticRegression
 
-from autora.experimentalist.sampler.poppernet import poppernet_sampler
+from autora.experimentalist.sampler.poppernet import poppernet_pooler, poppernet_sampler
 from autora.variable import DV, IV, ValueType, VariableCollection
 
 
@@ -92,22 +93,28 @@ def test_poppernet_classification(synthetic_logr_model, classification_data_to_t
     )
 
     # Run popper net sampler
-    samples = poppernet_sampler(
-        X,
-        model,
-        X_train,
-        Y_train,
-        metadata,
-        num_samples=2,
-        training_epochs=1000,
-        optimization_epochs=1000,
-        training_lr=1e-3,
-        optimization_lr=1e-3,
-        mse_scale=1,
-        limit_offset=10**-10,
-        limit_repulsion=0,
-        verbose=True,
+    poppernet_pipeline = Pipeline(
+        [("pool", poppernet_pooler), ("sampler", poppernet_sampler)],
+        params={
+            "pool": dict(
+                model=model,
+                x_train=X_train,
+                y_train=Y_train,
+                metadata=metadata,
+                num_samples=2,
+                training_epochs=1000,
+                optimization_epochs=1000,
+                training_lr=1e-3,
+                optimization_lr=1e-3,
+                mse_scale=1,
+                limit_offset=10**-10,
+                limit_repulsion=0,
+            ),
+            "sampler": {"allowed_values": X},
+        },
     )
+
+    samples = poppernet_pipeline.run()
 
     print(samples)
     # Check that at least one of the resulting samples is the one that is
@@ -163,7 +170,6 @@ def test_poppernet_regression(synthetic_linr_model, regression_data_to_test):
         mse_scale=1,
         limit_offset=10**-10,
         limit_repulsion=0,
-        verbose=True,
     )
 
     # the first value should be close to one of the local maxima of the
