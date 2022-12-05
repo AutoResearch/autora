@@ -71,17 +71,17 @@ def poppernet_pooler(
         num_classes = len(np.unique(y_train))
         y_train = class_to_onehot(y_train, n_classes=num_classes)
 
-    X_train_tensor = torch.from_numpy(x_train).float()
+    x_train_tensor = torch.from_numpy(x_train).float()
 
     # create list of IV limits
-    IVs = meta_data.independent_variables
-    IV_limit_list = list()
-    for IV in IVs:
-        if hasattr(IV, "value_range"):
-            value_range = cast(Tuple, IV.value_range)
+    ivs = meta_data.independent_variables
+    iv_limit_list = list()
+    for iv in ivs:
+        if hasattr(iv, "value_range"):
+            value_range = cast(Tuple, iv.value_range)
             lower_bound = value_range[0]
             upper_bound = value_range[1]
-            IV_limit_list.append(([lower_bound, upper_bound]))
+            iv_limit_list.append(([lower_bound, upper_bound]))
 
     # get dimensions of input and output
     n_input = len(meta_data.independent_variables)
@@ -143,7 +143,7 @@ def poppernet_pooler(
     for condition in range(num_samples):
 
         index = transform_category.sample()
-        input_sample = torch.flatten(X_train_tensor[index, :])
+        input_sample = torch.flatten(x_train_tensor[index, :])
         popper_input = Variable(input_sample, requires_grad=True)
 
         # invert the popper network to determine optimal experiment conditions
@@ -166,7 +166,7 @@ def poppernet_pooler(
                 # first add repulsion from variable limits
                 for idx in range(len(input_sample)):
                     IV_value = input_sample[idx]
-                    IV_limits = IV_limit_list[idx]
+                    IV_limits = iv_limit_list[idx]
                     dist_to_min = np.abs(IV_value - np.min(IV_limits))
                     dist_to_max = np.abs(IV_value - np.max(IV_limits))
                     repulsion_from_min = limit_repulsion / (dist_to_min**2)
@@ -184,7 +184,7 @@ def poppernet_pooler(
                 # finally, clip input variable from it's limits
                 for idx in range(len(input_sample)):
                     IV_raw_value = input_sample[idx]
-                    IV_limits = IV_limit_list[idx]
+                    IV_limits = iv_limit_list[idx]
                     IV_clipped_value = np.min(
                         [IV_raw_value, np.max(IV_limits) - limit_offset]
                     )
@@ -198,7 +198,7 @@ def poppernet_pooler(
 
         # add condition to new experiment sequence
         for idx in range(len(input_sample)):
-            IV_limits = IV_limit_list[idx]
+            IV_limits = iv_limit_list[idx]
 
             # first clip value
             IV_clipped_value = np.min([IV_raw_value, np.max(IV_limits) - limit_offset])
