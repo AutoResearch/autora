@@ -206,9 +206,9 @@ def poppernet_pooler(
                 [iv_clipped_value, np.min(iv_limits) + limit_offset]
             )
             # make sure to convert variable to original scale
-            iv_clipped_sclaled_value = iv_clipped_value
+            iv_clipped_scaled_value = iv_clipped_value
 
-            X[condition, idx] = iv_clipped_sclaled_value
+            X[condition, idx] = iv_clipped_scaled_value
 
     return X
 
