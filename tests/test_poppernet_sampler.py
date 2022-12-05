@@ -155,22 +155,28 @@ def test_poppernet_regression(synthetic_linr_model, regression_data_to_test):
         dependent_variables=[dv],
     )
 
-    # Run popper net sampler
-    sample = poppernet_sampler(
-        X,
-        model,
-        X_train,
-        Y_train,
-        metadata,
-        num_samples=5,
-        training_epochs=1000,
-        optimization_epochs=1000,
-        training_lr=1e-3,
-        optimization_lr=1e-3,
-        mse_scale=1,
-        limit_offset=10**-10,
-        limit_repulsion=0,
+    poppernet_pipeline = Pipeline(
+        [("pool", poppernet_pooler), ("sampler", poppernet_sampler)],
+        params={
+            "pool": dict(
+                model=model,
+                x_train=X_train,
+                y_train=Y_train,
+                metadata=metadata,
+                num_samples=5,
+                training_epochs=1000,
+                optimization_epochs=1000,
+                training_lr=1e-3,
+                optimization_lr=1e-3,
+                mse_scale=1,
+                limit_offset=10**-10,
+                limit_repulsion=0,
+            ),
+            "sampler": {"allowed_values": X},
+        },
     )
+
+    sample = poppernet_pipeline.run()
 
     # the first value should be close to one of the local maxima of the
     # sine function
