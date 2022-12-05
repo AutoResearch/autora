@@ -75,9 +75,7 @@ class BMSRegressor(BaseEstimator, RegressorMixin):
         self.cache_: List = []
         self.variables: List = []
 
-    def fit(
-        self, X: np.ndarray, y: np.ndarray, num_param: int = 1, out: int = 1
-    ) -> BMSRegressor:
+    def fit(self, X: np.ndarray, y: np.ndarray, num_param: int = 1) -> BMSRegressor:
         """
         Runs the optimization for a given set of `X`s and `y`s.
 
@@ -113,7 +111,7 @@ class BMSRegressor(BaseEstimator, RegressorMixin):
             prior_par=self.prior_par,
         )
         self.model_, self.loss_, self.cache_ = utils.run(self.pms, self.epochs)
-        self.models_ = list(self.pms.trees.values())[:out]
+        self.models_ = list(self.pms.trees.values())
 
         _logger.info("BMS fitting finished")
         self.X_, self.y_ = X, y
