@@ -49,7 +49,7 @@ class Parallel:
         Ts.sort()
         self.Ts = [str(T) for T in Ts]
         self.trees = {
-            "1": Tree(
+            "1.0": Tree(
                 ops=ops,
                 variables=deepcopy(variables),
                 parameters=deepcopy(parameters),
@@ -60,7 +60,7 @@ class Parallel:
                 BT=1,
             )
         }
-        self.t1 = self.trees["1"]
+        self.t1 = self.trees["1.0"]
         for BT in [T for T in self.Ts if T != 1]:
             treetmp = Tree(
                 ops=ops,
@@ -87,7 +87,7 @@ class Parallel:
         for T, tree in list(self.trees.items()):
             # MCMC step
             tree.mcmc_step(verbose=verbose, p_rr=p_rr, p_long=p_long)
-        self.t1 = self.trees["1"]
+        self.t1 = self.trees["1.0"]
 
     # -------------------------------------------------------------------------
     def tree_swap(self) -> Tuple[Optional[str], Optional[str]]:
@@ -119,7 +119,7 @@ class Parallel:
             self.trees[self.Ts[nT2]] = t1
             t1.BT = BT2
             t2.BT = BT1
-            self.t1 = self.trees["1"]
+            self.t1 = self.trees["1.0"]
             return self.Ts[nT1], self.Ts[nT2]
         else:
             return None, None
@@ -140,7 +140,7 @@ class Parallel:
             t.BT *= factor
         for kk in range(n):
             print(
-                "# Annealing heating at %g: %d / %d" % (self.trees["1"].BT, kk, n),
+                "# Annealing heating at %g: %d / %d" % (self.trees["1.0"].BT, kk, n),
                 file=sys.stderr,
             )
             self.mcmc_step()
@@ -150,7 +150,8 @@ class Parallel:
             t.BT = float(BT)
         for kk in range(2 * n):
             print(
-                "# Annealing cooling at %g: %d / %d" % (self.trees["1"].BT, kk, 2 * n),
+                "# Annealing cooling at %g: %d / %d"
+                % (self.trees["1.0"].BT, kk, 2 * n),
                 file=sys.stderr,
             )
             self.mcmc_step()
