@@ -165,14 +165,14 @@ def poppernet_pooler(
 
                 # first add repulsion from variable limits
                 for idx in range(len(input_sample)):
-                    IV_value = input_sample[idx]
-                    IV_limits = iv_limit_list[idx]
-                    dist_to_min = np.abs(IV_value - np.min(IV_limits))
-                    dist_to_max = np.abs(IV_value - np.max(IV_limits))
+                    iv_value = input_sample[idx]
+                    iv_limits = iv_limit_list[idx]
+                    dist_to_min = np.abs(iv_value - np.min(iv_limits))
+                    dist_to_max = np.abs(iv_value - np.max(iv_limits))
                     repulsion_from_min = limit_repulsion / (dist_to_min**2)
                     repulsion_from_max = limit_repulsion / (dist_to_max**2)
                     IV_value_repulsed = (
-                        IV_value + repulsion_from_min - repulsion_from_max
+                        iv_value + repulsion_from_min - repulsion_from_max
                     )
                     popper_input[idx] = IV_value_repulsed
 
@@ -184,26 +184,26 @@ def poppernet_pooler(
                 # finally, clip input variable from it's limits
                 for idx in range(len(input_sample)):
                     IV_raw_value = input_sample[idx]
-                    IV_limits = iv_limit_list[idx]
+                    iv_limits = iv_limit_list[idx]
                     IV_clipped_value = np.min(
-                        [IV_raw_value, np.max(IV_limits) - limit_offset]
+                        [IV_raw_value, np.max(iv_limits) - limit_offset]
                     )
                     IV_clipped_value = np.max(
                         [
                             IV_clipped_value,
-                            np.min(IV_limits) + limit_offset,
+                            np.min(iv_limits) + limit_offset,
                         ]
                     )
                     popper_input[idx] = IV_clipped_value
 
         # add condition to new experiment sequence
         for idx in range(len(input_sample)):
-            IV_limits = iv_limit_list[idx]
+            iv_limits = iv_limit_list[idx]
 
             # first clip value
-            IV_clipped_value = np.min([IV_raw_value, np.max(IV_limits) - limit_offset])
+            IV_clipped_value = np.min([IV_raw_value, np.max(iv_limits) - limit_offset])
             IV_clipped_value = np.max(
-                [IV_clipped_value, np.min(IV_limits) + limit_offset]
+                [IV_clipped_value, np.min(iv_limits) + limit_offset]
             )
             # make sure to convert variable to original scale
             IV_clipped_sclaled_value = IV_clipped_value
