@@ -99,15 +99,21 @@ def train_test_filter(
 
     _TrainTest = Enum("_TrainTest", ["train", "test"])
 
-    def _train_test_stream():
+    def train_test_stream():
+        """Generates a pseudorandom stream of _TrainTest.train and _TrainTest.test."""
         rng = np.random.default_rng(seed)
         while True:
             yield rng.choice([_TrainTest.train, _TrainTest.test], p=(train_p, test_p))
 
     def _factory(allow):
-        _stream = _train_test_stream()
+        """Factory to make complementary generators which split their input
+        corresponding to the values of the pseudorandom train_test_stream."""
+        _stream = train_test_stream()
 
         def _generator(values):
+            """Generator which yields items from the `values` depending on
+            whether the corresponding item from the `_stream`
+            matches the `allow` parameter."""
             for v, train_test in zip(values, _stream):
                 if train_test == allow:
                     yield v
