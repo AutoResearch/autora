@@ -7,20 +7,34 @@ def weber_filter(values):
     return filter(lambda s: s[0] <= s[1], values)
 
 
-def train_test_filter(seed=180, train_p=0.5):
+def train_test_filter(seed: int = 180, train_p: float = 0.5):
     """
     A pipeline filter which pseudorandomly assigns values from the input into "train" or "test"
-    groups.
+    groups. This is particularly useful when working with streams of data of potentially
+    unbounded length.
+
+    This isn't a great method for small datasets, as it doesn't guarantee producing training
+    and test sets which are as close as possible to the specified desired proportions.
+
+    Args:
+        seed: random number generator seeding value
+        train_p: proportion of data which go into the training set. A float between 0 and 1.
+
+    Returns:
+        a tuple of callables `(train_filter, test_filter)` which split the input data
+          into two complementary streams.
+
 
     Examples:
         We can create complementary train and test filters using the function:
         >>> train_filter, test_filter = train_test_filter(train_p=0.6, seed=180)
 
-        The train filter generates a sequence of 60% of the input list.
+        The `train_filter` generates a sequence of ~60% of the input list –
+        in this case, 15 of 20 datapoints.
         >>> list(train_filter(range(20)))
         [0, 2, 3, 4, 5, 6, 9, 10, 11, 12, 15, 16, 17, 18, 19]
 
-        When we run the test_filter, it fills in the gaps.
+        When we run the `test_filter`, it fills in the gaps, giving us the remaining 5 values:
         >>> list(test_filter(range(20)))
         [1, 7, 8, 13, 14]
 
@@ -32,6 +46,9 @@ def train_test_filter(seed=180, train_p=0.5):
         ... and some more.
         >>> list(train_filter(range(40, 50)))
         [41, 42, 44, 45, 46, 49]
+
+        As the number of samples grows, the fraction in the train and test sets
+        will approach `train_p` and `1 - train_p`.
 
         The test_filter fills in the gaps again.
         >>> list(test_filter(range(20, 30)))
@@ -46,7 +63,6 @@ def train_test_filter(seed=180, train_p=0.5):
         >>> _, test_filter_regenerated = train_test_filter(train_p=0.6, seed=180)
         >>> list(test_filter_regenerated(range(20)))
         [1, 7, 8, 13, 14]
-
 
         It also works on tuple-valued lists:
         >>> from itertools import product
