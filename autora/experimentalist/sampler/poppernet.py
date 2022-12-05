@@ -12,7 +12,7 @@ def poppernet_pooler(
     model,
     x_train: np.ndarray,
     y_train: np.ndarray,
-    meta_data: VariableCollection,
+    metadata: VariableCollection,
     num_samples: int = 100,
     training_epochs: int = 1000,
     optimization_epochs: int = 1000,
@@ -35,7 +35,7 @@ def poppernet_pooler(
         model: Scikit-learn model, could be either a classification or regression model
         x_train: data that the model was trained on
         y_train: labels that the model was trained on
-        meta_data: Meta-data about the dependent and independent variables
+        metadata: Meta-data about the dependent and independent variables
         num_samples: number of samples to return
         training_epochs: number of epochs to train the popper network for approximating the
         error fo the model
@@ -66,7 +66,7 @@ def poppernet_pooler(
     if len(y_train.shape) == 1:
         y_train = y_train.reshape(-1, 1)
 
-    if meta_data.dependent_variables[0].type == ValueType.CLASS:
+    if metadata.dependent_variables[0].type == ValueType.CLASS:
         # find all unique values in y_train
         num_classes = len(np.unique(y_train))
         y_train = class_to_onehot(y_train, n_classes=num_classes)
@@ -74,7 +74,7 @@ def poppernet_pooler(
     x_train_tensor = torch.from_numpy(x_train).float()
 
     # create list of IV limits
-    ivs = meta_data.independent_variables
+    ivs = metadata.independent_variables
     iv_limit_list = list()
     for iv in ivs:
         if hasattr(iv, "value_range"):
@@ -84,8 +84,8 @@ def poppernet_pooler(
             iv_limit_list.append(([lower_bound, upper_bound]))
 
     # get dimensions of input and output
-    n_input = len(meta_data.independent_variables)
-    n_output = len(meta_data.dependent_variables)
+    n_input = len(metadata.independent_variables)
+    n_output = len(metadata.dependent_variables)
 
     # get input pattern for popper net
     popper_input = Variable(torch.from_numpy(x_train), requires_grad=False).float()
@@ -236,20 +236,8 @@ def plot_popper_diagnostics(losses, popper_input, popper_prediction, popper_targ
 
 
 def poppernet_sampler(
-    x,
-    model,
-    x_train,
-    y_train,
-    meta_data,
-    num_samples: int = 100,
-    training_epochs: int = 1000,
-    optimization_epochs=1000,
-    training_lr: float = 1e-3,
-    optimization_lr: float = 1e-3,
-    mse_scale: float = 1,
-    limit_offset: float = 10**-10,
-    limit_repulsion: float = 0.000001,
-    verbose: bool = False,
+    samples,
+    allowed_values,
 ):
     """
     A sampler that returns selected samples for independent variables
@@ -258,61 +246,33 @@ def poppernet_sampler(
     that are closest to those ideal samples.
 
     Args:
-        x: pool of IV conditions to sample from
-        model: Scikit-learn model, could be either a classification or regression model
-        x_train: data that the model was trained on
-        y_train: labels that the model was trained on
-        meta_data: Meta-data about the dependent and independent variables
-        num_samples: number of samples to return
-        training_epochs: number of epochs to train the popper network for approximating the
-        error fo the model
-        optimization_epochs: number of epochs to optimize the samples based on the trained
-        popper network
-        training_lr: learning rate for training the popper network
-        optimization_lr: learning rate for optimizing the samples
-        mse_scale: scale factor for the MSE loss
-        limit_offset: a limited offset to prevent the samples from being too close to the value
-        boundaries
-        limit_repulsion: a limited repulsion to prevent the samples from being too close to the
-        allowed value boundaries
-        verbose: print out the prediction of the popper network as well as its training loss
+        samples: output from the poppernet_pooler
+        allowed_samples: allowed values of IVs conditions to sample from
 
     Returns:
+        the nearest values from `allowed_samples` to the `samples`
 
     """
 
-    if isinstance(x, Iterable):
-        x = np.array(list(x))
+    if isinstance(allowed_values, Iterable):
+        allowed_values = np.array(list(allowed_values))
 
-    if len(x.shape) == 1:
-        x = x.reshape(-1, 1)
+    if len(allowed_values.shape) == 1:
+        allowed_values = allowed_values.reshape(-1, 1)
 
-    if x.shape[0] <= num_samples:
+    num_samples = samples.shape[0]
+
+    if allowed_values.shape[0] <= num_samples:
         raise Exception("More samples requested than samples available in the pool x.")
 
-    samples = poppernet_pooler(
-        model=model,
-        x_train=x_train,
-        y_train=y_train,
-        meta_data=meta_data,
-        num_samples=num_samples,
-        training_epochs=training_epochs,
-        optimization_epochs=optimization_epochs,
-        training_lr=training_lr,
-        optimization_lr=optimization_lr,
-        mse_scale=mse_scale,
-        limit_offset=limit_offset,
-        limit_repulsion=limit_repulsion,
-    )
-
-    x_new = np.empty((num_samples, x.shape[1]))
+    x_new = np.empty((num_samples, allowed_values.shape[1]))
 
     # get index of row in x that is closest to each sample
     for row, sample in enumerate(samples):
-        dist = np.linalg.norm(x - sample, axis=1)
+        dist = np.linalg.norm(allowed_values - sample, axis=1)
         idx = np.argmin(dist)
-        x_new[row, :] = x[idx, :]
-        x = np.delete(x, idx, axis=0)
+        x_new[row, :] = allowed_values[idx, :]
+        allowed_values = np.delete(allowed_values, idx, axis=0)
 
     return x_new
 
