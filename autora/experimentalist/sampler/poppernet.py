@@ -60,7 +60,7 @@ def poppernet_pooler(
     if len(x_train.shape) == 1:
         x_train = x_train.reshape(-1, 1)
 
-    X = np.empty([num_samples, x_train.shape[1]])
+    x = np.empty([num_samples, x_train.shape[1]])
 
     y_train = np.array(y_train)
     if len(y_train.shape) == 1:
@@ -208,9 +208,9 @@ def poppernet_pooler(
             # make sure to convert variable to original scale
             iv_clipped_scaled_value = iv_clipped_value
 
-            X[condition, idx] = iv_clipped_scaled_value
+            x[condition, idx] = iv_clipped_scaled_value
 
-    return X
+    return x
 
 
 def plot_popper_diagnostics(losses, popper_input, popper_prediction, popper_target):
