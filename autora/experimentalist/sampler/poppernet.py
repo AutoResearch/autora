@@ -119,7 +119,7 @@ def poppernet_pooler(
 
     # train the network
     losses = []
-    for epoch in range(training_epochs):  # train for 10 epochs
+    for epoch in range(training_epochs):
         popper_prediction = popper_net(popper_input)
         loss = criterion(popper_prediction, popper_target.reshape(-1, 1))
         popper_optimizer.zero_grad()
