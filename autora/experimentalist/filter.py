@@ -1,4 +1,5 @@
 from enum import Enum
+from typing import Callable, Iterable, Tuple
 
 import numpy as np
 
@@ -7,7 +8,9 @@ def weber_filter(values):
     return filter(lambda s: s[0] <= s[1], values)
 
 
-def train_test_filter(seed: int = 180, train_p: float = 0.5):
+def train_test_filter(
+    seed: int = 180, train_p: float = 0.5
+) -> Tuple[Callable[[Iterable], Iterable], Callable[[Iterable], Iterable]]:
     """
     A pipeline filter which pseudorandomly assigns values from the input into "train" or "test"
     groups. This is particularly useful when working with streams of data of potentially
@@ -22,7 +25,7 @@ def train_test_filter(seed: int = 180, train_p: float = 0.5):
 
     Returns:
         a tuple of callables `(train_filter, test_filter)` which split the input data
-          into two complementary streams.
+            into two complementary streams.
 
 
     Examples:
