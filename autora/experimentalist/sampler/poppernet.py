@@ -235,19 +235,17 @@ def plot_popper_diagnostics(losses, popper_input, popper_prediction, popper_targ
     plt.show()
 
 
-def poppernet_sampler(
+def nearest_values_sampler(
     samples,
     allowed_values,
 ):
     """
-    A sampler that returns selected samples for independent variables
-    that predict the highest loss of the model. The sampler leverages the Popper Net Pooler to
-    generate a list of ideal samples and then selects samples from the pool X (without replacement)
-    that are closest to those ideal samples.
+    A sampler which returns the nearest values between the input samples and the allowed values,
+    without replacement.
 
     Args:
-        samples: output from the poppernet_pooler
-        allowed_samples: allowed values of IVs conditions to sample from
+        samples: input conditions
+        allowed_samples: allowed conditions to sample from
 
     Returns:
         the nearest values from `allowed_samples` to the `samples`

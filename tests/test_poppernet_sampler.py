@@ -3,7 +3,10 @@ import pytest
 from experimentalist.pipeline import Pipeline
 from sklearn.linear_model import LinearRegression, LogisticRegression
 
-from autora.experimentalist.sampler.poppernet import poppernet_pooler, poppernet_sampler
+from autora.experimentalist.sampler.poppernet import (
+    nearest_values_sampler,
+    poppernet_pooler,
+)
 from autora.variable import DV, IV, ValueType, VariableCollection
 
 
@@ -94,7 +97,7 @@ def test_poppernet_classification(synthetic_logr_model, classification_data_to_t
 
     # Run popper net sampler
     poppernet_pipeline = Pipeline(
-        [("pool", poppernet_pooler), ("sampler", poppernet_sampler)],
+        [("pool", poppernet_pooler), ("sampler", nearest_values_sampler)],
         params={
             "pool": dict(
                 model=model,
@@ -156,7 +159,7 @@ def test_poppernet_regression(synthetic_linr_model, regression_data_to_test):
     )
 
     poppernet_pipeline = Pipeline(
-        [("pool", poppernet_pooler), ("sampler", poppernet_sampler)],
+        [("pool", poppernet_pooler), ("sampler", nearest_values_sampler)],
         params={
             "pool": dict(
                 model=model,
