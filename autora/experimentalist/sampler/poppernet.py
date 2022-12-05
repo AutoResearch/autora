@@ -21,7 +21,6 @@ def poppernet_pooler(
     mse_scale: float = 1,
     limit_offset: float = 10**-10,
     limit_repulsion: float = 0,
-    verbose: bool = False,
 ):
     """
     A pooler that generates samples for independent variables with the objective of maximizing the
@@ -128,32 +127,6 @@ def poppernet_pooler(
         popper_optimizer.step()
         losses.append(loss.item())
 
-    if verbose:
-        print("Finished training Popper Network...")
-
-        import matplotlib.pyplot as plt
-
-        if len(popper_input.shape) > 0:
-            plot_input = popper_input[:, 0]
-            plt.scatter(plot_input, popper_target.detach().numpy(), label="target")
-            plt.scatter(
-                plot_input, popper_prediction.detach().numpy(), label="prediction"
-            )
-        else:
-            plot_input = popper_input
-            plt.plot(plot_input, popper_target.detach().numpy(), label="target")
-            plt.plot(plot_input, popper_prediction.detach().numpy(), label="prediction")
-
-        plt.xlabel("x")
-        plt.ylabel("y")
-        plt.legend()
-        plt.show()
-
-        plt.plot(losses)
-        plt.xlabel("epoch")
-        plt.ylabel("loss")
-        plt.show()
-
     # now that the popper network is trained we can sample new data points
     # to sample data points we need to provide the popper network with an initial condition
     # we will sample those initial conditions proportional to the loss of the current model
@@ -240,6 +213,28 @@ def poppernet_pooler(
     return X
 
 
+def plot_popper_diagnostics(losses, popper_input, popper_prediction, popper_target):
+    print("Finished training Popper Network...")
+    import matplotlib.pyplot as plt
+
+    if len(popper_input.shape) > 0:
+        plot_input = popper_input[:, 0]
+        plt.scatter(plot_input, popper_target.detach().numpy(), label="target")
+        plt.scatter(plot_input, popper_prediction.detach().numpy(), label="prediction")
+    else:
+        plot_input = popper_input
+        plt.plot(plot_input, popper_target.detach().numpy(), label="target")
+        plt.plot(plot_input, popper_prediction.detach().numpy(), label="prediction")
+    plt.xlabel("x")
+    plt.ylabel("y")
+    plt.legend()
+    plt.show()
+    plt.plot(losses)
+    plt.xlabel("epoch")
+    plt.ylabel("loss")
+    plt.show()
+
+
 def poppernet_sampler(
     X,
     model,
@@ -308,7 +303,6 @@ def poppernet_sampler(
         mse_scale,
         limit_offset,
         limit_repulsion,
-        verbose,
     )
 
     X_new = np.empty((num_samples, X.shape[1]))
