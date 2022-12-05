@@ -71,3 +71,5 @@ site/
 
 # Jupyter Notebook load data
 .ipynb_checkpoints
+/tests/progress.dat
+/tests/trace.dat
