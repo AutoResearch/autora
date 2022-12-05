@@ -131,7 +131,7 @@ def poppernet_pooler(
     # to sample data points we need to provide the popper network with an initial condition
     # we will sample those initial conditions proportional to the loss of the current model
 
-    # feed avarage model losses through softmax
+    # feed average model losses through softmax
     # model_loss_avg= torch.from_numpy(np.mean(model_loss.detach().numpy(), axis=1)).float()
     softmax_func = torch.nn.Softmax(dim=0)
     probabilities = softmax_func(model_loss)
