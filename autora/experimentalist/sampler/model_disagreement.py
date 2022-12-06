@@ -43,8 +43,7 @@ def model_disagreement_sampler(X: np.array, models: List, num_samples: int = 1):
         y_a = model_a_predict(X_predict)
         y_b = model_b_predict(X_predict)
 
-        if y_a.shape != y_b.shape:
-            raise Exception("Models must have same output shape.")
+        assert y_a.shape == y_b.shape, "Models must have same output shape."
 
         # determine the disagreement between the two models in terms of mean-squared error
         if len(y_a.shape) == 1:
