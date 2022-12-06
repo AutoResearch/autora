@@ -4,8 +4,15 @@ import numpy as np
 from sklearn.metrics import DistanceMetric
 
 
+from typing import Literal
+AllowedMetrics = Literal['euclidean', 'manhattan', 'chebyshev',
+             'minkowski', 'wminkowski', 'seuclidean', 'mahalanobis', 'haversine',
+             'hamming', 'canberra', 'braycurtis', 'matching', 'jaccard', 'dice',
+             'kulsinski', 'rogerstanimoto', 'russellrao', 'sokalmichener',
+             'sokalsneath', 'yule']
+
 def summed_dissimilarity_sampler(
-    X: np.ndarray, X_ref: np.ndarray, n: int = 1, metric: str = "euclidean"
+    X: np.ndarray, X_ref: np.ndarray, n: int = 1, metric: AllowedMetrics = "euclidean"
 ) -> np.ndarray:
     """
     This dissimilarity samples re-arranges the pool of IV conditions according to their
