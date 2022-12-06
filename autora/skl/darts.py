@@ -931,8 +931,8 @@ class DARTSClassifier(DARTSRegressor, ClassifierMixin):
 
         params = self.get_params()
 
-        self.X_ = X.astype(np.float)
-        self.y_ = y.astype(int)
+        self.X_ = X
+        self.y_ = y
 
         fit_results = _general_darts(
             X=self.X_, y=self.y_, network=self.network_, **params
