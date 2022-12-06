@@ -60,7 +60,7 @@ def model_disagreement_sampler(X: np.array, models: List, num_samples: int = 1):
     # sum up all model disagreements
     summed_disagreement = np.sum(model_disagreement, axis=0)
 
-    # sort the summed disagreements
+    # sort the summed disagreements and select the top n
     idx = (-summed_disagreement).argsort()[:num_samples]
 
     return X[idx]
