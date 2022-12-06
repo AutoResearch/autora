@@ -37,10 +37,11 @@ def model_disagreement_sampler(X: np.array, models: List, num_samples: int = 1):
             model_A_predict = getattr(model_A, "predict_proba", None)
             if callable(model_A_predict) is False:
                 model_A_predict = getattr(model_A, "predict", None)
-
-            model_B_predict = getattr(model_B, "predict_proba", None)
-            if callable(model_B_predict) is False:
                 model_B_predict = getattr(model_B, "predict", None)
+            else:
+                model_B_predict = getattr(model_B, "predict_proba", None)
+                if callable(model_B_predict) is False:
+                    raise Exception("Models must have the same prediction method.")
 
             if model_A_predict is None or model_B_predict is None:
                 raise Exception("Model must have `predict` or `predict_proba` method.")
