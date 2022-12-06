@@ -4,8 +4,6 @@ import numpy as np
 import pandas as pd
 import pytest
 import torch
-from sklearn.model_selection import GridSearchCV, train_test_split
-
 from autora.skl.darts import (
     PRIMITIVES,
     DARTSExecutionMonitor,
@@ -13,6 +11,7 @@ from autora.skl.darts import (
     DARTSType,
     ValueType,
 )
+from sklearn.model_selection import GridSearchCV, train_test_split
 
 
 def generate_noisy_constant_data(
@@ -129,8 +128,10 @@ def test_primitive_selection():
 
     DARTSRegressor(primitives=["add", "subtract", "none"], **kwargs).fit(X, y)
     DARTSRegressor(primitives=PRIMITIVES, **kwargs).fit(X, y)
-    with pytest.raises(KeyError):
-        KeyError, DARTSRegressor(primitives=["doesnt_exist"], **kwargs).fit(X, y)
+    with pytest.raises(NotImplementedError):
+        NotImplementedError, DARTSRegressor(primitives=["doesnt_exist"], **kwargs).fit(
+            X, y
+        )
 
 
 def test_fit_with_fixed_architecture():
