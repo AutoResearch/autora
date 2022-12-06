@@ -12,7 +12,7 @@ import torch.nn.utils
 import torch.utils.data
 import tqdm
 from matplotlib import pyplot as plt
-from sklearn.base import BaseEstimator, RegressorMixin
+from sklearn.base import BaseEstimator, ClassifierMixin, RegressorMixin
 from sklearn.utils.validation import check_array, check_is_fitted, check_X_y
 
 from autora.theorist.darts import (
@@ -43,6 +43,7 @@ IMPLEMENTED_OUTPUT_TYPES = Literal[
     "probability",
     "probability_sample",
     "probability_distribution",
+    "class",
 ]
 
 
@@ -775,6 +776,198 @@ class DARTSRegressor(BaseEstimator, RegressorMixin):
 
         model_repr_ = "\n".join(["Model:"] + edge_list)
         return model_repr_
+
+
+class DARTSClassifier(DARTSRegressor, ClassifierMixin):
+    """
+    Differentiable ARchiTecture Search Classifier.
+
+    DARTS finds a composition of functions and coefficients to minimize a loss function suitable for
+    the dependent variable.
+
+    This class is intended to be compatible with the
+    [Scikit-Learn Estimator API](https://scikit-learn.org/stable/developers/develop.html).
+
+    Examples:
+
+        TODO: add example
+
+
+    Attributes:
+        network_: represents the optimized network for the architecture search, without the
+            output function
+        model_: represents the best-fit model including the output function
+            after sampling of the network to pick a single computation graph.
+            By default, this is the computation graph with the maximum weights,
+            but can be set to a graph based on a sample on the edge weights
+            by running the `resample_model(sample_strategy="sample")` method.
+            It can be reset by running the `resample_model(sample_strategy="max")` method.
+
+
+
+    """
+
+    def __init__(
+        self,
+        batch_size: int = 64,
+        num_graph_nodes: int = 2,
+        output_type: IMPLEMENTED_OUTPUT_TYPES = "class",
+        classifier_weight_decay: float = 1e-2,
+        darts_type: IMPLEMENTED_DARTS_TYPES = "original",
+        init_weights_function: Optional[Callable] = None,
+        param_updates_per_epoch: int = 10,
+        param_updates_for_sampled_model: int = 100,
+        param_learning_rate_max: float = 2.5e-2,
+        param_learning_rate_min: float = 0.01,
+        param_momentum: float = 9e-1,
+        param_weight_decay: float = 3e-4,
+        arch_updates_per_epoch: int = 1,
+        arch_learning_rate_max: float = 3e-3,
+        arch_weight_decay: float = 1e-4,
+        arch_weight_decay_df: float = 3e-4,
+        arch_weight_decay_base: float = 0.0,
+        arch_momentum: float = 9e-1,
+        fair_darts_loss_weight: int = 1,
+        max_epochs: int = 10,
+        grad_clip: float = 5,
+        primitives: Sequence[str] = PRIMITIVES,
+        train_classifier_coefficients: bool = False,
+        train_classifier_bias: bool = False,
+        execution_monitor: Callable = (lambda *args, **kwargs: None),
+        sampling_strategy: SAMPLING_STRATEGIES = "max",
+    ) -> None:
+        """
+        Initializes the DARTSRegressor.
+
+        Arguments:
+            batch_size: Batch size for the data loader.
+            num_graph_nodes: Number of nodes in the desired computation graph.
+            output_type: Type of output function to use. This function is applied to transform
+                the output of the mixture architecture.
+            classifier_weight_decay: Weight decay for the classifier.
+            darts_type: Type of DARTS to use ('original' or 'fair').
+            init_weights_function: Function to initialize the parameters of each operation.
+            param_updates_per_epoch: Number of updates to perform per epoch.
+                for the operation parameters.
+            param_learning_rate_max: Initial (maximum) learning rate for the operation parameters.
+            param_learning_rate_min: Final (minimum) learning rate for the operation parameters.
+            param_momentum: Momentum for the operation parameters.
+            param_weight_decay: Weight decay for the operation parameters.
+            arch_updates_per_epoch: Number of architecture weight updates to perform per epoch.
+            arch_learning_rate_max: Initial (maximum) learning rate for the architecture.
+            arch_weight_decay: Weight decay for the architecture weights.
+            arch_weight_decay_df: An additional weight decay that scales with the number of
+                parameters (degrees of freedom) in the operation. The higher this weight decay,
+                the more DARTS will prefer simple operations.
+            arch_weight_decay_base: A base weight decay that is added to the scaled weight decay.
+                arch_momentum: Momentum for the architecture weights.
+            fair_darts_loss_weight: Weight of the loss in fair darts which forces architecture
+                weights to become either 0 or 1.
+            max_epochs: Maximum number of epochs to train for.
+            grad_clip: Gradient clipping value for updating the parameters of the operations.
+            primitives: List of primitives (operations) to use.
+            train_classifier_coefficients: Whether to train the coefficients of the classifier.
+            train_classifier_bias: Whether to train the bias of the classifier.
+            execution_monitor: Function to monitor the execution of the model.
+            primitives: list of primitive operations used in the DARTS network,
+                e.g., 'add', 'subtract', 'none'. For details, see
+                [`autora.theorist.darts.operations`][autora.theorist.darts.operations]
+        """
+
+        self.batch_size = batch_size
+
+        self.num_graph_nodes = num_graph_nodes
+        self.classifier_weight_decay = classifier_weight_decay
+        self.darts_type = darts_type
+        self.init_weights_function = init_weights_function
+
+        self.param_updates_per_epoch = param_updates_per_epoch
+        self.param_updates_for_sampled_model = param_updates_for_sampled_model
+
+        self.param_learning_rate_max = param_learning_rate_max
+        self.param_learning_rate_min = param_learning_rate_min
+        self.param_momentum = param_momentum
+        self.arch_momentum = arch_momentum
+        self.param_weight_decay = param_weight_decay
+
+        self.arch_updates_per_epoch = arch_updates_per_epoch
+        self.arch_weight_decay = arch_weight_decay
+        self.arch_weight_decay_df = arch_weight_decay_df
+        self.arch_weight_decay_base = arch_weight_decay_base
+        self.arch_learning_rate_max = arch_learning_rate_max
+        self.fair_darts_loss_weight = fair_darts_loss_weight
+
+        self.max_epochs = max_epochs
+        self.grad_clip = grad_clip
+
+        self.primitives = primitives
+
+        self.output_type = output_type
+        self.darts_type = darts_type
+
+        self.X_: Optional[np.ndarray] = None
+        self.y_: Optional[np.ndarray] = None
+        self.network_: Optional[Network] = None
+        self.model_: Optional[Network] = None
+
+        self.train_classifier_coefficients = train_classifier_coefficients
+        self.train_classifier_bias = train_classifier_bias
+
+        self.execution_monitor = execution_monitor
+
+        self.sampling_strategy = sampling_strategy
+
+    def fit(self, X: np.ndarray, y: np.ndarray):
+        """
+        Runs the optimization for a given set of `X`s and `y`s.
+
+        Arguments:
+            X: independent variables in an n-dimensional array
+            y: dependent variables in an n-dimensional array
+
+        Returns:
+            self (DARTSRegressor): the fitted estimator
+        """
+
+        params = self.get_params()
+
+        self.X_ = X.astype(np.float)
+        self.y_ = y.astype(int)
+
+        fit_results = _general_darts(
+            X=self.X_, y=self.y_, network=self.network_, **params
+        )
+        self.network_ = fit_results.network
+        self.model_ = fit_results.model
+        return self
+
+    def predict(self, X: np.ndarray) -> np.ndarray:
+        """
+        Applies the fitted model to a set of independent variables `X`,
+        to give predictions for the dependent variable `y`.
+
+        Arguments:
+            X: independent variables in an n-dimensional array
+
+        Returns:
+            y: predicted dependent variable values
+        """
+        X_ = check_array(X)
+
+        # First run the checks using the scikit-learn API, listing the key parameters
+        check_is_fitted(self, attributes=["model_"])
+
+        # Since self.model_ is initialized as None, mypy throws an error if we
+        # just call self.model_(X) in the predict method, as it could still be none.
+        # MyPy doesn't understand that the sklearn check_is_fitted function
+        # ensures the self.model_ parameter is initialized and otherwise throws an error,
+        # so we check that explicitly here and pass the model which can't be None.
+        assert self.model_ is not None
+
+        y_ = self.model_(torch.as_tensor(X_).long())
+        y = y_.detach().numpy()
+
+        return y
 
 
 class DARTSExecutionMonitor:
