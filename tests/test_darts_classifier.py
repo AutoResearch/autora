@@ -1,9 +1,10 @@
 import pytest
 import torch
-from skl.darts import DARTSClassifier
 from sklearn.datasets import make_classification
 from sklearn.gaussian_process import GaussianProcessClassifier
 from sklearn.model_selection import train_test_split
+
+from autora.skl.darts import DARTSClassifier
 
 torch.set_default_dtype(torch.double)
 
