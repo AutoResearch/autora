@@ -1,4 +1,4 @@
-from typing import Iterable, Tuple, cast
+from typing import Iterable, Optional, Tuple, cast
 
 import numpy as np
 import torch
@@ -312,7 +312,7 @@ class PopperNet(nn.Module):
             param.requires_grad = False
 
 
-def class_to_onehot(y: np.array, n_classes: int = None):
+def class_to_onehot(y: np.array, n_classes: Optional[int] = None):
     """Converts a class vector (integers) to binary class matrix.
 
     E.g. for use with categorical_crossentropy.
