@@ -66,7 +66,7 @@ def darts_dataset_from_ndarray(
     """
 
     obj = DARTSDataset(
-        torch.tensor(input_data, dtype=torch.get_default_dtype()),
-        torch.tensor(output_data, dtype=torch.get_default_dtype()),
+        torch.tensor(input_data),
+        torch.tensor(output_data),
     )
     return obj
