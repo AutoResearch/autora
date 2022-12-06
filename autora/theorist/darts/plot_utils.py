@@ -1,5 +1,6 @@
 import os
 import typing
+from typing import Optional
 
 import imageio
 import matplotlib
@@ -33,9 +34,9 @@ def generate_darts_summary_figures(
     y_limit: typing.List[float],
     best_model_name: str,
     figure_size: typing.Tuple[int, int],
-    y_reference: typing.List[float] = None,
+    y_reference: Optional[typing.List[float]] = None,
     y_reference_label: str = "",
-    arch_samp_filter: str = None,
+    arch_samp_filter: Optional[str] = None,
 ):
     """
     Generates a summary figure for a given DARTS study.
@@ -118,22 +119,22 @@ def plot_darts_summary(
     y_label: str = "",
     x1_label: str = "",
     x2_label: str = "",
-    y_sem_name: str = None,
+    y_sem_name: Optional[str] = None,
     metric: str = "min",
-    y_reference: typing.List[float] = None,
+    y_reference: Optional[typing.List[float]] = None,
     y_reference_label: str = "",
-    figure_dimensions: typing.Tuple[int, int] = None,
+    figure_dimensions: Optional[typing.Tuple[int, int]] = None,
     title: str = "",
     legend_loc: int = 0,
     legend_font_size: int = 8,
     axis_font_size: int = 10,
     title_font_size: int = 10,
     show_legend: bool = True,
-    y_limit: typing.List[float] = None,
-    x_limit: typing.List[float] = None,
-    theorist_filter: str = None,
-    arch_samp_filter: str = None,
-    best_model_name: str = None,
+    y_limit: Optional[typing.List[float]] = None,
+    x_limit: Optional[typing.List[float]] = None,
+    theorist_filter: Optional[str] = None,
+    arch_samp_filter: Optional[str] = None,
+    best_model_name: Optional[str] = None,
     save: bool = False,
     figure_name: str = "figure",
 ):
@@ -996,18 +997,18 @@ class DebugWindow:
 
     def update(
         self,
-        train_error: np.array = None,
-        valid_error: np.array = None,
-        weights: np.array = None,
-        BIC: np.array = None,
-        AIC: np.array = None,
-        model_graph: str = None,
-        range_input1: np.array = None,
-        range_input2: np.array = None,
-        range_target: np.array = None,
-        range_prediction: np.array = None,
-        target: np.array = None,
-        prediction: np.array = None,
+        train_error: Optional[np.array] = None,
+        valid_error: Optional[np.array] = None,
+        weights: Optional[np.array] = None,
+        BIC: Optional[np.array] = None,
+        AIC: Optional[np.array] = None,
+        model_graph: Optional[str] = None,
+        range_input1: Optional[np.array] = None,
+        range_input2: Optional[np.array] = None,
+        range_target: Optional[np.array] = None,
+        range_prediction: Optional[np.array] = None,
+        target: Optional[np.array] = None,
+        prediction: Optional[np.array] = None,
     ):
         """
         Update the debug plot with new data.
