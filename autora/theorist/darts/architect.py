@@ -1,3 +1,5 @@
+from typing import Optional
+
 import numpy as np
 import torch
 import torch.nn.functional as F
@@ -150,8 +152,8 @@ class Architect(object):
         target_valid: torch.Tensor,
         network_optimizer: torch.optim.Optimizer,
         unrolled: bool,
-        input_train: torch.Tensor = None,
-        target_train: torch.Tensor = None,
+        input_train: Optional[torch.Tensor] = None,
+        target_train: Optional[torch.Tensor] = None,
         eta: float = 1,
     ):
         """
