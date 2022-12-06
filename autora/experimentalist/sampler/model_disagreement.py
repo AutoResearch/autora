@@ -27,33 +27,33 @@ def model_disagreement_sampler(X: np.array, models: List, num_samples: int = 1):
     model_disagreement = list()
 
     # collect diagreements for each model apir
-    for model_A, model_B in itertools.combinations(models, 2):
+    for model_a, model_b in itertools.combinations(models, 2):
 
         # determine the prediction method
-        model_A_predict = getattr(model_A, "predict_proba", None)
-        if callable(model_A_predict) is False:
-            model_A_predict = getattr(model_A, "predict", None)
-            model_B_predict = getattr(model_B, "predict", None)
+        model_a_predict = getattr(model_a, "predict_proba", None)
+        if callable(model_a_predict) is False:
+            model_a_predict = getattr(model_a, "predict", None)
+            model_b_predict = getattr(model_b, "predict", None)
         else:
-            model_B_predict = getattr(model_B, "predict_proba", None)
-            if callable(model_B_predict) is False:
+            model_b_predict = getattr(model_b, "predict_proba", None)
+            if callable(model_b_predict) is False:
                 raise Exception("Models must have the same prediction method.")
 
-        if model_A_predict is None or model_B_predict is None:
+        if model_a_predict is None or model_b_predict is None:
             raise Exception("Model must have `predict` or `predict_proba` method.")
 
         # get predictions from both models
-        Y_A = model_A_predict(X_predict)
-        Y_B = model_B_predict(X_predict)
+        y_a = model_a_predict(X_predict)
+        y_b = model_b_predict(X_predict)
 
-        if Y_A.shape != Y_B.shape:
+        if y_a.shape != y_b.shape:
             raise Exception("Models must have same output shape.")
 
         # determine the disagreement between the two models in terms of mean-squared error
-        if len(Y_A.shape) == 1:
-            disagreement = (Y_A - Y_B) ** 2
+        if len(y_a.shape) == 1:
+            disagreement = (y_a - y_b) ** 2
         else:
-            disagreement = np.mean((Y_A - Y_B) ** 2, axis=1)
+            disagreement = np.mean((y_a - y_b) ** 2, axis=1)
 
         model_disagreement.append(disagreement)
 
