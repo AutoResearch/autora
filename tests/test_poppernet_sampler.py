@@ -59,7 +59,6 @@ def classification_data_to_test():
 
 @pytest.fixture
 def regression_data_to_test():
-    # data = np.linspace(0, 2 * np.pi, 5)
     data = [-10, 0, 1.5, 3, 4.5, 6, 10]
     return data
 
