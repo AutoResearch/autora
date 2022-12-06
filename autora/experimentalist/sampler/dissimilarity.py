@@ -1,15 +1,31 @@
-from typing import Iterable
+from typing import Iterable, Literal
 
 import numpy as np
 from sklearn.metrics import DistanceMetric
 
+AllowedMetrics = Literal[
+    "euclidean",
+    "manhattan",
+    "chebyshev",
+    "minkowski",
+    "wminkowski",
+    "seuclidean",
+    "mahalanobis",
+    "haversine",
+    "hamming",
+    "canberra",
+    "braycurtis",
+    "matching",
+    "jaccard",
+    "dice",
+    "kulsinski",
+    "rogerstanimoto",
+    "russellrao",
+    "sokalmichener",
+    "sokalsneath",
+    "yule",
+]
 
-from typing import Literal
-AllowedMetrics = Literal['euclidean', 'manhattan', 'chebyshev',
-             'minkowski', 'wminkowski', 'seuclidean', 'mahalanobis', 'haversine',
-             'hamming', 'canberra', 'braycurtis', 'matching', 'jaccard', 'dice',
-             'kulsinski', 'rogerstanimoto', 'russellrao', 'sokalmichener',
-             'sokalsneath', 'yule']
 
 def summed_dissimilarity_sampler(
     X: np.ndarray, X_ref: np.ndarray, n: int = 1, metric: AllowedMetrics = "euclidean"
@@ -61,8 +77,8 @@ def summed_dissimilarity_sampler(
     # create a list to store the summed distances for each row in matrix1
     summed_distances = []
 
-    # loop over each row in matrix1
-    for i, row in enumerate(X):
+    # loop over each row in first matrix
+    for row in X:
         # calculate the distances between the current row in matrix1 and all other rows in matrix2
 
         row_distances = []
