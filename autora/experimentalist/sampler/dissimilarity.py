@@ -49,34 +49,7 @@ def summed_dissimilarity_sampler(
             f"X must have at least {n} rows matching the number of requested samples."
         )
 
-    valid_metrics = [
-        "euclidean",
-        "manhattan",
-        "chebyshev",
-        "minkowski",
-        "wminkowski",
-        "seuclidean",
-        "mahalanobis",
-        "haversine",
-        "hamming",
-        "canberra",
-        "braycurtis",
-        "matching",
-        "dice",
-        "kulsinski",
-        "rogerstanimoto",
-        "russellrao",
-        "sokalmichener",
-        "sokalsneath",
-        "yule",
-    ]
-
-    if metric not in valid_metrics:
-        raise ValueError(
-            f"Unsupported metric: '{metric}'\n" f"Only {valid_metrics} is supported."
-        )
-    else:
-        dist = DistanceMetric.get_metric(metric)
+    dist = DistanceMetric.get_metric(metric)
 
     # create a list to store the summed distances for each row in matrix1
     summed_distances = []
