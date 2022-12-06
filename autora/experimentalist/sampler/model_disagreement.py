@@ -55,8 +55,7 @@ def model_disagreement_sampler(X: np.array, models: List, num_samples: int = 1):
 
         model_disagreement.append(disagreement)
 
-    if len(model_disagreement) == 0:
-        raise Exception("No models to compare.")
+    assert len(model_disagreement) >= 1, "No disagreements to compare."
 
     # sum up all model disagreements
     summed_disagreement = np.sum(model_disagreement, axis=0)
