@@ -10,9 +10,9 @@ from autora.variable import ValueType, VariableCollection
 
 def poppernet_pooler(
     model,
-    X_train: np.ndarray,
-    Y_train: np.ndarray,
-    meta_data: VariableCollection,
+    x_train: np.ndarray,
+    y_train: np.ndarray,
+    metadata: VariableCollection,
     num_samples: int = 100,
     training_epochs: int = 1000,
     optimization_epochs: int = 1000,
@@ -21,7 +21,6 @@ def poppernet_pooler(
     mse_scale: float = 1,
     limit_offset: float = 10**-10,
     limit_repulsion: float = 0,
-    verbose: bool = False,
 ):
     """
     A pooler that generates samples for independent variables with the objective of maximizing the
@@ -34,9 +33,9 @@ def poppernet_pooler(
 
     Args:
         model: Scikit-learn model, could be either a classification or regression model
-        X_train: data that the model was trained on
-        Y_train: labels that the model was trained on
-        meta_data: Meta-data about the dependent and independent variables
+        x_train: data that the model was trained on
+        y_train: labels that the model was trained on
+        metadata: Meta-data about the dependent and independent variables
         num_samples: number of samples to return
         training_epochs: number of epochs to train the popper network for approximating the
         error fo the model
@@ -57,39 +56,39 @@ def poppernet_pooler(
 
     # format input
 
-    X_train = np.array(X_train)
-    if len(X_train.shape) == 1:
-        X_train = X_train.reshape(-1, 1)
+    x_train = np.array(x_train)
+    if len(x_train.shape) == 1:
+        x_train = x_train.reshape(-1, 1)
 
-    X = np.empty([num_samples, X_train.shape[1]])
+    x = np.empty([num_samples, x_train.shape[1]])
 
-    Y_train = np.array(Y_train)
-    if len(Y_train.shape) == 1:
-        Y_train = Y_train.reshape(-1, 1)
+    y_train = np.array(y_train)
+    if len(y_train.shape) == 1:
+        y_train = y_train.reshape(-1, 1)
 
-    if meta_data.dependent_variables[0].type == ValueType.CLASS:
-        # find all unique values in Y_train
-        num_classes = len(np.unique(Y_train))
-        Y_train = class_to_onehot(Y_train, n_classes=num_classes)
+    if metadata.dependent_variables[0].type == ValueType.CLASS:
+        # find all unique values in y_train
+        num_classes = len(np.unique(y_train))
+        y_train = class_to_onehot(y_train, n_classes=num_classes)
 
-    X_train_tensor = torch.from_numpy(X_train).float()
+    x_train_tensor = torch.from_numpy(x_train).float()
 
     # create list of IV limits
-    IVs = meta_data.independent_variables
-    IV_limit_list = list()
-    for IV in IVs:
-        if hasattr(IV, "value_range"):
-            value_range = cast(Tuple, IV.value_range)
+    ivs = metadata.independent_variables
+    iv_limit_list = list()
+    for iv in ivs:
+        if hasattr(iv, "value_range"):
+            value_range = cast(Tuple, iv.value_range)
             lower_bound = value_range[0]
             upper_bound = value_range[1]
-            IV_limit_list.append(([lower_bound, upper_bound]))
+            iv_limit_list.append(([lower_bound, upper_bound]))
 
     # get dimensions of input and output
-    n_input = len(meta_data.independent_variables)
-    n_output = len(meta_data.dependent_variables)
+    n_input = len(metadata.independent_variables)
+    n_output = len(metadata.dependent_variables)
 
     # get input pattern for popper net
-    popper_input = Variable(torch.from_numpy(X_train), requires_grad=False).float()
+    popper_input = Variable(torch.from_numpy(x_train), requires_grad=False).float()
 
     # get target pattern for popper net
     model_predict = getattr(model, "predict_proba", None)
@@ -99,10 +98,10 @@ def poppernet_pooler(
     if callable(model_predict) is False or model_predict is None:
         raise Exception("Model must have `predict` or `predict_proba` method.")
 
-    model_prediction = model_predict(X_train)
+    model_prediction = model_predict(x_train)
 
     criterion = nn.MSELoss()
-    model_loss = (model_prediction - Y_train) ** 2 * mse_scale
+    model_loss = (model_prediction - y_train) ** 2 * mse_scale
     model_loss = np.mean(model_loss, axis=1)
     model_loss = torch.from_numpy(model_loss).float()
     popper_target = Variable(model_loss, requires_grad=False)
@@ -120,7 +119,7 @@ def poppernet_pooler(
 
     # train the network
     losses = []
-    for epoch in range(training_epochs):  # train for 10 epochs
+    for epoch in range(training_epochs):
         popper_prediction = popper_net(popper_input)
         loss = criterion(popper_prediction, popper_target.reshape(-1, 1))
         popper_optimizer.zero_grad()
@@ -128,37 +127,11 @@ def poppernet_pooler(
         popper_optimizer.step()
         losses.append(loss.item())
 
-    if verbose:
-        print("Finished training Popper Network...")
-
-        import matplotlib.pyplot as plt
-
-        if popper_input.shape[1] > 1:
-            plot_input = popper_input[:, 0]
-            plt.scatter(plot_input, popper_target.detach().numpy(), label="target")
-            plt.scatter(
-                plot_input, popper_prediction.detach().numpy(), label="prediction"
-            )
-        else:
-            plot_input = popper_input
-            plt.plot(plot_input, popper_target.detach().numpy(), label="target")
-            plt.plot(plot_input, popper_prediction.detach().numpy(), label="prediction")
-
-        plt.xlabel("x")
-        plt.ylabel("y")
-        plt.legend()
-        plt.show()
-
-        plt.plot(losses)
-        plt.xlabel("epoch")
-        plt.ylabel("loss")
-        plt.show()
-
     # now that the popper network is trained we can sample new data points
     # to sample data points we need to provide the popper network with an initial condition
     # we will sample those initial conditions proportional to the loss of the current model
 
-    # feed avarage model losses through softmax
+    # feed average model losses through softmax
     # model_loss_avg= torch.from_numpy(np.mean(model_loss.detach().numpy(), axis=1)).float()
     softmax_func = torch.nn.Softmax(dim=0)
     probabilities = softmax_func(model_loss)
@@ -170,7 +143,7 @@ def poppernet_pooler(
     for condition in range(num_samples):
 
         index = transform_category.sample()
-        input_sample = torch.flatten(X_train_tensor[index, :])
+        input_sample = torch.flatten(x_train_tensor[index, :])
         popper_input = Variable(input_sample, requires_grad=True)
 
         # invert the popper network to determine optimal experiment conditions
@@ -192,135 +165,114 @@ def poppernet_pooler(
 
                 # first add repulsion from variable limits
                 for idx in range(len(input_sample)):
-                    IV_value = input_sample[idx]
-                    IV_limits = IV_limit_list[idx]
-                    dist_to_min = np.abs(IV_value - np.min(IV_limits))
-                    dist_to_max = np.abs(IV_value - np.max(IV_limits))
+                    iv_value = input_sample[idx]
+                    iv_limits = iv_limit_list[idx]
+                    dist_to_min = np.abs(iv_value - np.min(iv_limits))
+                    dist_to_max = np.abs(iv_value - np.max(iv_limits))
                     repulsion_from_min = limit_repulsion / (dist_to_min**2)
                     repulsion_from_max = limit_repulsion / (dist_to_max**2)
-                    IV_value_repulsed = (
-                        IV_value + repulsion_from_min - repulsion_from_max
+                    iv_value_repulsed = (
+                        iv_value + repulsion_from_min - repulsion_from_max
                     )
-                    popper_input[idx] = IV_value_repulsed
+                    popper_input[idx] = iv_value_repulsed
 
                 # now add gradient for theory loss maximization
                 delta = -optimization_lr * popper_input.grad
                 popper_input += delta
                 popper_input.grad.zero_()
 
-                # finally, clip input variable from it's limits
+                # finally, clip input variable from its limits
                 for idx in range(len(input_sample)):
-                    IV_raw_value = input_sample[idx]
-                    IV_limits = IV_limit_list[idx]
-                    IV_clipped_value = np.min(
-                        [IV_raw_value, np.max(IV_limits) - limit_offset]
+                    iv_raw_value = input_sample[idx]
+                    iv_limits = iv_limit_list[idx]
+                    iv_clipped_value = np.min(
+                        [iv_raw_value, np.max(iv_limits) - limit_offset]
                     )
-                    IV_clipped_value = np.max(
+                    iv_clipped_value = np.max(
                         [
-                            IV_clipped_value,
-                            np.min(IV_limits) + limit_offset,
+                            iv_clipped_value,
+                            np.min(iv_limits) + limit_offset,
                         ]
                     )
-                    popper_input[idx] = IV_clipped_value
+                    popper_input[idx] = iv_clipped_value
 
         # add condition to new experiment sequence
         for idx in range(len(input_sample)):
-            IV_limits = IV_limit_list[idx]
+            iv_limits = iv_limit_list[idx]
 
             # first clip value
-            IV_clipped_value = np.min([IV_raw_value, np.max(IV_limits) - limit_offset])
-            IV_clipped_value = np.max(
-                [IV_clipped_value, np.min(IV_limits) + limit_offset]
+            iv_clipped_value = np.min([iv_raw_value, np.max(iv_limits) - limit_offset])
+            iv_clipped_value = np.max(
+                [iv_clipped_value, np.min(iv_limits) + limit_offset]
             )
             # make sure to convert variable to original scale
-            IV_clipped_sclaled_value = IV_clipped_value
+            iv_clipped_scaled_value = iv_clipped_value
 
-            X[condition, idx] = IV_clipped_sclaled_value
+            x[condition, idx] = iv_clipped_scaled_value
 
-    return X
+    return x
 
 
-def poppernet_sampler(
-    X,
-    model,
-    X_train,
-    Y_train,
-    meta_data,
-    num_samples: int = 100,
-    training_epochs: int = 1000,
-    optimization_epochs=1000,
-    training_lr: float = 1e-3,
-    optimization_lr: float = 1e-3,
-    mse_scale: float = 1,
-    limit_offset: float = 10**-10,
-    limit_repulsion: float = 0.000001,
-    verbose: bool = False,
+def plot_popper_diagnostics(losses, popper_input, popper_prediction, popper_target):
+    print("Finished training Popper Network...")
+    import matplotlib.pyplot as plt
+
+    if popper_input.shape[1] > 1:
+        plot_input = popper_input[:, 0]
+        plt.scatter(plot_input, popper_target.detach().numpy(), label="target")
+        plt.scatter(plot_input, popper_prediction.detach().numpy(), label="prediction")
+    else:
+        plot_input = popper_input
+        plt.plot(plot_input, popper_target.detach().numpy(), label="target")
+        plt.plot(plot_input, popper_prediction.detach().numpy(), label="prediction")
+    plt.xlabel("x")
+    plt.ylabel("y")
+    plt.legend()
+    plt.show()
+    plt.plot(losses)
+    plt.xlabel("epoch")
+    plt.ylabel("loss")
+    plt.show()
+
+
+def nearest_values_sampler(
+    samples,
+    allowed_values,
 ):
     """
-    A sampler that returns selected samples for independent variables
-    that predict the highest loss of the model. The sampler leverages the Popper Net Pooler to
-    generate a list of ideal samples and then selects samples from the pool X (without replacement)
-    that are closest to those ideal samples.
+    A sampler which returns the nearest values between the input samples and the allowed values,
+    without replacement.
 
     Args:
-        X: pool of IV conditions to sample from
-        model: Scikit-learn model, could be either a classification or regression model
-        X_train: data that the model was trained on
-        Y_train: labels that the model was trained on
-        meta_data: Meta-data about the dependent and independent variables
-        num_samples: number of samples to return
-        training_epochs: number of epochs to train the popper network for approximating the
-        error fo the model
-        optimization_epochs: number of epochs to optimize the samples based on the trained
-        popper network
-        training_lr: learning rate for training the popper network
-        optimization_lr: learning rate for optimizing the samples
-        mse_scale: scale factor for the MSE loss
-        limit_offset: a limited offset to prevent the samples from being too close to the value
-        boundaries
-        limit_repulsion: a limited repulsion to prevent the samples from being too close to the
-        allowed value boundaries
-        verbose: print out the prediction of the popper network as well as its training loss
+        samples: input conditions
+        allowed_samples: allowed conditions to sample from
 
     Returns:
+        the nearest values from `allowed_samples` to the `samples`
 
     """
 
-    if isinstance(X, Iterable):
-        X = np.array(list(X))
+    if isinstance(allowed_values, Iterable):
+        allowed_values = np.array(list(allowed_values))
 
-    if len(X.shape) == 1:
-        X = X.reshape(-1, 1)
+    if len(allowed_values.shape) == 1:
+        allowed_values = allowed_values.reshape(-1, 1)
 
-    if X.shape[0] <= num_samples:
-        raise Exception("More samples requested than samples available in the pool X.")
+    num_samples = samples.shape[0]
 
-    samples = poppernet_pooler(
-        model,
-        X_train,
-        Y_train,
-        meta_data,
-        num_samples,
-        training_epochs,
-        optimization_epochs,
-        training_lr,
-        optimization_lr,
-        mse_scale,
-        limit_offset,
-        limit_repulsion,
-        verbose,
-    )
+    if allowed_values.shape[0] <= num_samples:
+        raise Exception("More samples requested than samples available in the pool x.")
 
-    X_new = np.empty((num_samples, X.shape[1]))
+    x_new = np.empty((num_samples, allowed_values.shape[1]))
 
-    # get index of row in X that is closest to each sample
+    # get index of row in x that is closest to each sample
     for row, sample in enumerate(samples):
-        dist = np.linalg.norm(X - sample, axis=1)
+        dist = np.linalg.norm(allowed_values - sample, axis=1)
         idx = np.argmin(dist)
-        X_new[row, :] = X[idx, :]
-        X = np.delete(X, idx, axis=0)
+        x_new[row, :] = allowed_values[idx, :]
+        allowed_values = np.delete(allowed_values, idx, axis=0)
 
-    return X_new
+    return x_new
 
 
 # define the network
