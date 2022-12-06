@@ -127,11 +127,17 @@ def _general_darts(
 
     _logger.info("Starting fit initialization")
 
-    data_loader, input_dimensions, output_dimensions = _get_data_loader(
+    data_loader = _get_data_loader(
         X=X,
         y=y,
         batch_size=batch_size,
     )
+
+    input_dimensions = X.shape[1]
+    if output_type == ValueType.CLASS:
+        output_dimensions = len(np.unique(y))
+    else:
+        output_dimensions = y.shape[1]
 
     criterion = get_loss_function(ValueType(output_type))
     output_function = get_output_format(ValueType(output_type))
@@ -321,9 +327,6 @@ def _get_data_loader(
     if y_.ndim == 1:
         y_ = y_.reshape((y_.size, 1))
 
-    input_dimensions = X_.shape[1]
-    output_dimensions = y_.shape[1]
-
     experimental_data = darts_dataset_from_ndarray(X_, y_)
 
     data_loader = torch.utils.data.DataLoader(
@@ -333,7 +336,7 @@ def _get_data_loader(
         pin_memory=True,
         num_workers=0,
     )
-    return data_loader, input_dimensions, output_dimensions
+    return data_loader
 
 
 def _get_data_iterator(data_loader: torch.utils.data.DataLoader) -> Iterator:
@@ -953,18 +956,35 @@ class DARTSClassifier(DARTSRegressor, ClassifierMixin):
         """
         X_ = check_array(X)
 
-        # First run the checks using the scikit-learn API, listing the key parameters
         check_is_fitted(self, attributes=["model_"])
 
-        # Since self.model_ is initialized as None, mypy throws an error if we
-        # just call self.model_(X) in the predict method, as it could still be none.
-        # MyPy doesn't understand that the sklearn check_is_fitted function
-        # ensures the self.model_ parameter is initialized and otherwise throws an error,
-        # so we check that explicitly here and pass the model which can't be None.
         assert self.model_ is not None
 
-        y_ = self.model_(torch.as_tensor(X_).long())
-        y = y_.detach().numpy()
+        probabilities = self.model_(torch.as_tensor(X_))
+        classes = torch.argmax(probabilities, dim=1)
+        y = classes.detach().numpy()
+
+        return y
+
+    def predict_proba(self, X: np.ndarray) -> np.ndarray:
+        """
+        Applies the fitted model to a set of independent variables `X`,
+        to give predictions for the dependent variable `y`.
+
+        Arguments:
+            X: independent variables in an n-dimensional array
+
+        Returns:
+            y: predicted dependent variable values
+        """
+        X_ = check_array(X)
+
+        check_is_fitted(self, attributes=["model_"])
+
+        assert self.model_ is not None
+
+        probabilities = self.model_(torch.as_tensor(X_))
+        y = probabilities.detach().numpy()
 
         return y
 
