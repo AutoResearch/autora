@@ -35,7 +35,8 @@ def train_test_filter(
         >>> train_filter, test_filter = train_test_filter(train_p=0.6, seed=180)
 
         The `train_filter` generates a sequence of ~60% of the input list –
-        in this case, 15 of 20 datapoints.
+        in this case, 15 of 20 datapoints. Note that the correct split would be 12 of 20 data points. Again, 
+        for data with bounded length it is advisable to use scikit-learn `train_test_split` instead.
         >>> list(train_filter(range(20)))
         [0, 2, 3, 4, 5, 6, 9, 10, 11, 12, 15, 16, 17, 18, 19]
 
