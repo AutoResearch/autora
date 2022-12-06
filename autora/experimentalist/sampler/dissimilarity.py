@@ -5,7 +5,7 @@ from sklearn.metrics import DistanceMetric
 
 
 def summed_dissimilarity_sampler(
-    X: np.ndarray, X_base: np.ndarray, n: int = 1, metric: str = "euclidean"
+    X: np.ndarray, X_ref: np.ndarray, n: int = 1, metric: str = "euclidean"
 ) -> np.ndarray:
     """
     This dissimilarity samples re-arranges the pool of IV conditions according to their
@@ -14,7 +14,7 @@ def summed_dissimilarity_sampler(
 
     Args:
         X: pool of IV conditions to evaluate dissimilarity
-        X_base: reference pool of IV conditions
+        X_ref: reference pool of IV conditions
         n: number of samples to select
         metric: dissimilarity measure. Options: 'euclidean', 'manhattan', 'chebyshev',
             'minkowski', 'wminkowski', 'seuclidean', 'mahalanobis', 'haversine',
@@ -29,11 +29,25 @@ def summed_dissimilarity_sampler(
     if isinstance(X, Iterable):
         X = np.array(list(X))
 
-    if isinstance(X_base, Iterable):
-        X_base = np.array(list(X_base))
+    if isinstance(X_ref, Iterable):
+        X_ref = np.array(list(X_ref))
+
+    if X.ndim == 1:
+        X = X.reshape(-1, 1)
+
+    if X_ref.ndim == 1:
+        X_ref = X_ref.reshape(-1, 1)
+
+    if X.shape[1] != X_ref.shape[1]:
+        raise ValueError(
+            f"X and X_ref must have the same number of columns.\n"
+            f"X has {X.shape[1]} columns, while X_ref has {X_ref.shape[1]} columns."
+        )
 
     if X.shape[0] < n:
-        raise ValueError(f"X must have at least {n} rows.")
+        raise ValueError(
+            f"X must have at least {n} rows matching the number of requested samples."
+        )
 
     valid_metrics = [
         "euclidean",
@@ -72,11 +86,9 @@ def summed_dissimilarity_sampler(
         # calculate the distances between the current row in matrix1 and all other rows in matrix2
 
         row_distances = []
-        for X_base_row in X_base:
+        for X_ref_row in X_ref:
 
-            distance = dist.pairwise([row, X_base_row])[
-                0, 1
-            ]  # np.sum(np.abs(row - X_base_row))
+            distance = dist.pairwise([row, X_ref_row])[0, 1]
             row_distances.append(distance)
 
         # calculate the summed distance for the current row
