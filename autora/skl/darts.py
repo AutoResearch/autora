@@ -30,7 +30,6 @@ from autora.theorist.darts import (
 )
 from autora.variable import ValueType
 
-torch.set_default_dtype(torch.float64)
 _logger = logging.getLogger(__name__)
 
 _progress_indicator = tqdm.auto.tqdm
