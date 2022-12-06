@@ -1,7 +1,7 @@
 import random
 import warnings
 from enum import Enum
-from typing import Callable, List, Literal, Sequence, Tuple
+from typing import Callable, List, Literal, Optional, Sequence, Tuple
 
 import numpy as np
 import torch
@@ -400,7 +400,9 @@ class Network(nn.Module):
         return self._arch_parameters
 
     # fixes architecture
-    def fix_architecture(self, switch: bool, new_weights: torch.Tensor = None):
+    def fix_architecture(
+        self, switch: bool, new_weights: Optional[torch.Tensor] = None
+    ):
         """
         Freezes or unfreezes the architecture weights.
 
