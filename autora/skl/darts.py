@@ -954,15 +954,9 @@ class DARTSClassifier(DARTSRegressor, ClassifierMixin):
         Returns:
             y: predicted dependent variable values
         """
-        X_ = check_array(X)
-
-        check_is_fitted(self, attributes=["model_"])
-
-        assert self.model_ is not None
-
-        probabilities = self.model_(torch.as_tensor(X_))
-        classes = torch.argmax(probabilities, dim=1)
-        y = classes.detach().numpy()
+        probabilities = self.predict_proba(X)
+        classes = np.argmax(probabilities, axis=1)
+        y = classes
 
         return y
 
