@@ -1,8 +1,8 @@
 import numpy as np
 import pytest
-from experimentalist.pipeline import Pipeline
 from sklearn.linear_model import LinearRegression, LogisticRegression
 
+from autora.experimentalist.pipeline import Pipeline
 from autora.experimentalist.sampler.poppernet import (
     nearest_values_sampler,
     poppernet_pooler,
