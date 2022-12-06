@@ -4,6 +4,8 @@ import numpy as np
 import pandas as pd
 import pytest
 import torch
+from sklearn.model_selection import GridSearchCV, train_test_split
+
 from autora.skl.darts import (
     PRIMITIVES,
     DARTSExecutionMonitor,
@@ -11,7 +13,6 @@ from autora.skl.darts import (
     DARTSType,
     ValueType,
 )
-from sklearn.model_selection import GridSearchCV, train_test_split
 
 
 def generate_noisy_constant_data(
