@@ -10,6 +10,7 @@ repos:
         args:
         - "--profile=black"
         - "--filter-files"
+        - "--project=autora"
   - repo: https://github.com/pycqa/flake8
     rev: 5.0.4
     hooks:
