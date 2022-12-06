@@ -456,7 +456,7 @@ class DARTSRegressor(BaseEstimator, RegressorMixin):
         >>> estimator = DARTSRegressor(num_graph_nodes=1)
         >>> estimator = estimator.fit(X, y)
         >>> estimator.predict([[0.5]])
-        array([[15.051043]], dtype=float32)
+        array([[15.051043]])
 
 
     Attributes:
