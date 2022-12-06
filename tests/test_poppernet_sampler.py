@@ -69,7 +69,6 @@ def test_poppernet_classification(synthetic_logr_model, classification_data_to_t
     X_train, Y_train = get_xor_data()
     X = classification_data_to_test
     model = synthetic_logr_model
-    # specify meta data
 
     # Specify independent variables
     iv1 = IV(
