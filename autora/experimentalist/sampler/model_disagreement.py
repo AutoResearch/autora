@@ -26,7 +26,7 @@ def model_disagreement_sampler(X: np.array, models: List, num_samples: int = 1):
 
     model_disagreement = list()
 
-    # collect diagreements for each model apir
+    # collect diagreements for each model pair
     for model_a, model_b in itertools.combinations(models, 2):
 
         # determine the prediction method
@@ -37,7 +37,9 @@ def model_disagreement_sampler(X: np.array, models: List, num_samples: int = 1):
             model_a_predict = model_a.predict
             model_b_predict = model_b.predict
         else:
-            raise AttributeError("Models must both have `predict_proba` or `predict` method.")
+            raise AttributeError(
+                "Models must both have `predict_proba` or `predict` method."
+            )
 
         # get predictions from both models
         y_a = model_a_predict(X_predict)
