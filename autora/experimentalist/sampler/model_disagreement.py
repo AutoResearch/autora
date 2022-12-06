@@ -30,17 +30,14 @@ def model_disagreement_sampler(X: np.array, models: List, num_samples: int = 1):
     for model_a, model_b in itertools.combinations(models, 2):
 
         # determine the prediction method
-        model_a_predict = getattr(model_a, "predict_proba", None)
-        if callable(model_a_predict) is False:
-            model_a_predict = getattr(model_a, "predict", None)
-            model_b_predict = getattr(model_b, "predict", None)
+        if hasattr(model_a, "predict_proba") and hasattr(model_b, "predict_proba"):
+            model_a_predict = model_a.predict_proba
+            model_b_predict = model_b.predict_proba
+        elif hasattr(model_a, "predict") and hasattr(model_b, "predict"):
+            model_a_predict = model_a.predict
+            model_b_predict = model_b.predict
         else:
-            model_b_predict = getattr(model_b, "predict_proba", None)
-            if callable(model_b_predict) is False:
-                raise Exception("Models must have the same prediction method.")
-
-        if model_a_predict is None or model_b_predict is None:
-            raise Exception("Model must have `predict` or `predict_proba` method.")
+            raise AttributeError("Models must both have `predict_proba` or `predict` method.")
 
         # get predictions from both models
         y_a = model_a_predict(X_predict)
