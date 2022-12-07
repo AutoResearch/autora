@@ -10,7 +10,7 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build:
+  test:
     strategy:
       fail-fast: true
       matrix:
@@ -33,7 +33,7 @@ jobs:
         pip install poetry
     - name: Install dependencies
       run: |
-        poetry install --with dev
+        poetry install --with test
     - name: Test with pytest
       run: |
         poetry run pytest
