@@ -5,13 +5,21 @@ from sklearn.metrics import mean_absolute_error as mae
 from sklearn.metrics import mean_squared_error as mse
 
 
-def assumption_sampler(X, model, n, y=None, loss=True, theory=None):
+def assumption_sampler(X, y, model, n, loss=True, theorist=None):
     """
+    Assumption Sampler challenges assumptions made by the Theorist.
+    It identifies points whose error are most dependent on the assumption made.
+    Assumptions take the form of hard-coding, which may be hyperparameters or arbitrarily chosen
+    sub-algorithms e.g. loss function
+    Because it samples with respect to a Theorist, this sampler cannot be used on the first cycle
 
     Args:
         X: pool of IV conditions to sample from
+        y: experimental results from most recent iteration
         model: Scikit-learn model, must have `predict_proba` method.
         n: number of samples to select
+        loss: assumption to test: identify points that are most affected by choice of loss function
+        theory: the Theorist Object, which employs the theory it has been hard-coded to demonstrate
 
     Returns: Sampled pool
 
@@ -21,8 +29,8 @@ def assumption_sampler(X, model, n, y=None, loss=True, theory=None):
         X = np.array(list(X))
 
     current = None
-    if theory:
-        pass  # add code to extract loss function used from theory object
+    if theorist:
+        pass  # add code to extract loss function from theorist object
     idx = range(len(X))
 
     if y is not None:
