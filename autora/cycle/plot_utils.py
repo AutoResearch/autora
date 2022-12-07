@@ -147,6 +147,7 @@ def plot_results_panel(
     dv_name: Optional[str] = None,
     steps: int = 50,
     wrap: int = 4,
+    spines: bool = False,
     **kwargs,
 ):
     """
@@ -163,6 +164,7 @@ def plot_results_panel(
         steps: Number of steps to define the condition space to plot the theory.
         wrap: Number of panels to appear in a row. Example: 9 panels with wrap=3 results in a
                 3x3 grid.
+        spines: Show axis spines for 2D plots, default False.
         **kwargs:
 
         TODO: 1. 3D Plotting - Plotting with 2 IVs
@@ -197,14 +199,15 @@ def plot_results_panel(
         shape = (1, n_cycles)
     else:
         shape = (int(np.ceil(n_cycles / wrap)), wrap)
+
     if threedim:
         kwargs["projection"] = "3d"
-    fig, axs = plt.subplots(*shape, **kwargs)
+    fig, axs = plt.subplots(*shape, gridspec_kw={"bottom": 0.16}, **kwargs)
 
     # Loop by panel
     for i, ax in enumerate(axs.flat):
         if i + 1 <= n_cycles:
-            ax.set_title(f"Cycle {i}")
+            ax.text(0.05, 1, f"Cycle {i}", ha="left", va="top", transform=ax.transAxes)
 
             # ---Plot observed data---
             # Independent variable values
@@ -224,6 +227,11 @@ def plot_results_panel(
             l_condition = [condition_space[:, s[0]] for s in ivs]
             if not threedim:
                 ax.plot(*l_condition, d_predictions[i], label="Theory")
+
+                if not spines:
+                    ax.spines.right.set_visible(False)
+                    ax.spines.top.set_visible(False)
+
             else:  # 3D Plotting
                 ax.plot_surface(
                     *l_condition, d_predictions[i], alpha=0.5, label="Theory"
@@ -238,15 +246,15 @@ def plot_results_panel(
 
     # Super Labels for 2D Plots
     if not threedim:
-        fig.supxlabel(iv_labels[0])
+        fig.supxlabel(iv_labels[0], y=0.07)
         fig.supylabel(dv_label)
 
     # Legend
     fig.legend(
         ["Previous Data", "New Data", "Theory"],
         ncols=3,
-        bbox_to_anchor=(0.5, -0.025),
-        loc="center",
+        bbox_to_anchor=(0.5, 0),
+        loc="lower center",
     )
 
     return fig

@@ -71,7 +71,13 @@ def test_2d_plot(dummy_cycle):
     """
     dummy_cycle.run(8)
     steps = 51
-    fig = plot_results_panel(dummy_cycle, steps=steps, sharex=True, sharey=True, wrap=3)
+    fig = plot_results_panel(
+        dummy_cycle,
+        steps=steps,
+        wrap=3,
+        sharex=True,
+        sharey=True,
+    )
 
     # Should have 9 axes, 8 with data and the last turned off
     assert len(fig.axes) == 9
