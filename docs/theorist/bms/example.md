@@ -1,4 +1,4 @@
-# 
+# Bayesian Machine Scientist
 
 ## Example
 
