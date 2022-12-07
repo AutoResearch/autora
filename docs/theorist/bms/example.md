@@ -21,9 +21,9 @@ Now let us choose a prior over the primitives. In this case, we will use priors 
 prior = "Guimera2020"
 ```
 
-## Set up the BMS Regresssor
+## Set up the BMS Regressor
 
-We will use the BMS Regresssor to predict the outcomes. There are a number of parameters that determine how the architecture search is performed. The most important ones are listed below:
+We will use the BMS Regressor to predict the outcomes. There are a number of parameters that determine how the architecture search is performed. The most important ones are listed below:
 
 - **`epochs`**: The number of epochs to run BMS. This corresponds to the total number of equation mutations - one mcmc step for each parallel-tempered equation and one tree swap between a pair of parallel-tempered equations.
 - **`prior_par`**: A dictionary of priors for each operation. The keys correspond to operations and the respective values correspond to prior probabilities of those operations. The model comes with a default.  
