@@ -30,12 +30,18 @@ We will use the BMS Regressor to predict the outcomes. There are a number of par
 - **`ts`**: A list of temperature values. The machine scientist creates an equation tree for each of these values. Higher temperature trees are harder to fit, and thus they help prevent overfitting of the model.
 
 
-Let's set up the BMS regressor with default parameters.
+Let's use the same priors over primitives that we specified on the previous page as well as an illustrative set of temperatures to set up the BMS regressor with default parameters.
 
 ```python
 from autora.skl.bms import BMSRegressor
 
-bms_estimator = BMSRegressor()
+temperatures = [1.0] + [1.04**k for k in range(1, 20)] 
+
+bms_estimator = BMSRegressor(
+    epochs=1500,
+    prior_par=primitives,
+    ts=temperatures,
+)
 ```
 
 Now we have everything to fit and verify the model.
