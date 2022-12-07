@@ -18,6 +18,7 @@ def dummy_cycle():
     def ground_truth(xs):
         return xs + 1.0
 
+    # Variable Metadata
     study_metadata = VariableCollection(
         independent_variables=[
             Variable(name="x1", allowed_values=np.linspace(0, 1, 100))
@@ -25,6 +26,10 @@ def dummy_cycle():
         dependent_variables=[Variable(name="y", value_range=(-20, 20))],
     )
 
+    # Theorist
+    lm = LinearRegression()
+
+    # Experimentalist
     grid_pool(study_metadata.independent_variables)
     example_experimentalist = Pipeline(
         [
@@ -38,6 +43,7 @@ def dummy_cycle():
         },
     )
 
+    # Experiment Runner
     def get_example_synthetic_experiment_runner():
         rng = np.random.default_rng(seed=180)
 
@@ -47,8 +53,8 @@ def dummy_cycle():
         return runner
 
     example_synthetic_experiment_runner = get_example_synthetic_experiment_runner()
-    lm = LinearRegression()
 
+    # Initialize Cycle
     cycle = Cycle(
         metadata=study_metadata,
         theorist=lm,
