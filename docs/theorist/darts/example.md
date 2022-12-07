@@ -29,9 +29,9 @@ primitives = [
 ]
 ```
 
-## Set up the DARTS Regresssor
+## Set up the DARTS Regressor
 
-We will use the DARTS Regresssor to predict the outcomes. There are a number of parameters that determine how the architecture search is performed. The most important ones are listed below:
+We will use the DARTS Regressor to predict the outcomes. There are a number of parameters that determine how the architecture search is performed. The most important ones are listed below:
 
 - **num_graph_nodes**: The number of latent variables used to represent the model.
 - **arch_updates_per_epoch**: The number of architecture updates per training epoch. These updates affect the architecture weights $\alpha$ indicating the relative contribution of each operation for a given computation step.
