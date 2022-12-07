@@ -34,10 +34,12 @@ jupyter = "^1.0.0"
 ipython = "^8.4.0"
 ipywidgets = "^7.7.1"
 flake8 = "^5.0.4"
-pre-commit = "^2.20.0"
 
 [tool.poetry.group.test.dependencies]
 pytest = "^7.2.0"
+
+[tool.poetry.group.pre-commit.dependencies]
+pre-commit = "^2.20.0"
 
 [tool.poetry.group.docs.dependencies]
 mkdocs-material = "^8.5.10"
