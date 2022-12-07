@@ -20,6 +20,6 @@ def test_bms_models(curve_to_fit):
 
     print(regressor.models_)
 
-    assert len(regressor.models_) == 20  # Currently hardcoded
+    assert len(regressor.models_) == len(regressor.ts)  # Currently hardcoded
     for model in regressor.models_:
         assert isinstance(model, Tree)
