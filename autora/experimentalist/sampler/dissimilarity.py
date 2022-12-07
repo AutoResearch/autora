@@ -32,8 +32,8 @@ def summed_dissimilarity_sampler(
 ) -> np.ndarray:
     """
     This dissimilarity samples re-arranges the pool of IV conditions according to their
-    dissimilarity with respect to a reference pool X_base. The default dissimilarity is calculated
-    as the average of the pairwise distances between the conditions in X and X_base.
+    dissimilarity with respect to a reference pool X_ref. The default dissimilarity is calculated
+    as the average of the pairwise distances between the conditions in X and X_ref.
 
     Args:
         X: pool of IV conditions to evaluate dissimilarity
