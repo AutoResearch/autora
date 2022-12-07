@@ -1,5 +1,5 @@
 from itertools import product
-from typing import List, Sequence, Union
+from typing import List, Optional, Sequence, Union
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -9,7 +9,9 @@ from autora.cycle import Cycle
 
 
 def parse_dv_iv(
-    cycle: Cycle, iv_names: Union[str, List[str]] = None, dv_name: str = None
+    cycle: Cycle,
+    iv_names: Optional[Union[str, List[str]]] = None,
+    dv_name: Optional[str] = None,
 ):
     """
     Selects the independent (IV) and dependent (DV) variables defined in cycle based from optional
@@ -141,8 +143,8 @@ def theory_predict(cycle: Cycle, conditions: Sequence):
 
 def plot_results_panel(
     cycle: Cycle,
-    iv_names: Union[str, List[str]] = None,
-    dv_name: str = None,
+    iv_names: Optional[Union[str, List[str]]] = None,
+    dv_name: Optional[str] = None,
     steps: int = 50,
     wrap: int = 4,
     **kwargs,
