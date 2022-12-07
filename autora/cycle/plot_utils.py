@@ -12,6 +12,10 @@ def parse_dv_iv(
     cycle: Cycle, iv_names: Union[str, List[str]] = None, dv_name: str = None
 ):
     """
+    Selects the independent (IV) and dependent (DV) variables defined in cycle based from optional
+    user input. Returns a list of IV tuples (index, IV) single DV tuple (index, Variable). The index
+    is in reference to the column in which the variable appears in the cycle's observed data
+    structures.
 
     Args:
         cycle: AER Cycle object that has been run
@@ -20,7 +24,8 @@ def parse_dv_iv(
         dv_name: Single DV name. Name should match the names instantiated in the cycle object.
                     Default will select the first DV
 
-    Returns:
+    Returns: List of independent variable tuples (index, Variable) and single dependent variable
+    tuple (index, Variable).
 
     """
 
