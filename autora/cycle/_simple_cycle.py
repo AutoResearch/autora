@@ -1,6 +1,6 @@
 import copy
 from dataclasses import dataclass, replace
-from typing import Callable, Iterable, List, Optional, Dict
+from typing import Callable, Dict, Iterable, List, Optional
 
 import numpy as np
 from sklearn.base import BaseEstimator
@@ -173,7 +173,32 @@ class _SimpleCycle:
         Generated 111 theories
 
 
+        It's easy to pass parameters to the cycle components, if there are any needed.
+        Here we have an experimentalist which takes a parameter:
+        >>> uniform_random_rng = np.random.default_rng(180)
+        >>> def uniform_random_sampler(num_samples):
+        ...     return uniform_random_rng.uniform(low=0, high=11, size=num_samples)
+        >>> example_experimentalist_with_parameters = make_pipeline([uniform_random_sampler])
 
+        The cycle can handle that using the `params` keyword:
+        >>> cycle_with_parameters = _SimpleCycle(
+        ...     metadata=study_metadata,
+        ...     theorist=example_theorist,
+        ...     experimentalist=example_experimentalist_with_parameters,
+        ...     experiment_runner=example_synthetic_experiment_runner,
+        ...     params={"experimentalist": {"uniform_random_sampler": {"num_samples": 7}}}
+        ... )
+        >>> _ = cycle_with_parameters.run()
+        >>> cycle_with_parameters.data.conditions[-1].flatten()
+        array([6.33661987, 7.34916618, 6.08596494, 2.28566582, 1.9553974 ,
+               5.80023149, 3.27007909])
+
+        For the next cycle, if we wish, we can change the parameter value:
+        >>> cycle_with_parameters.params["experimentalist"]["uniform_random_sampler"]\\
+        ...     ["num_samples"] = 2
+        >>> _ = cycle_with_parameters.run()
+        >>> cycle_with_parameters.data.conditions[-1].flatten()
+        array([10.5838232 ,  9.45666031])
 
     """
 
@@ -208,23 +233,33 @@ class _SimpleCycle:
         return self
 
     def __next__(self):
-        assert "experiment_runner" not in self.params, "experiment_runner cannot yet accept cycle parameters"
-        assert "theorist" not in self.params, "theorist cannot yet accept cycle parameters"
+        assert (
+            "experiment_runner" not in self.params
+        ), "experiment_runner cannot yet accept cycle parameters"
+        assert (
+            "theorist" not in self.params
+        ), "theorist cannot yet accept cycle parameters"
 
         data = self.data
 
-        data = self._experimentalist_callback(self.experimentalist, data, self.params.get("experimentalist", dict()))
+        data = self._experimentalist_callback(
+            self.experimentalist, data, self.params.get("experimentalist", dict())
+        )
         data = self._experiment_runner_callback(self.experiment_runner, data)
         data = self._theorist_callback(self.theorist, data)
         self._monitor_callback(data)
         self.data = data
+
+        # params = _resolve_magic_params(self.params, _get_magic_values(self.data)) #move back up to top of function
         return self
 
     def __iter__(self):
         return self
 
     @staticmethod
-    def _experimentalist_callback(experimentalist: Pipeline, data_in: _SimpleCycleData, params: dict):
+    def _experimentalist_callback(
+        experimentalist: Pipeline, data_in: _SimpleCycleData, params: dict
+    ):
         new_conditions = experimentalist(**params)
         if isinstance(new_conditions, Iterable):
             # If the pipeline gives us an iterable, we need to make it into a concrete array.
