@@ -538,85 +538,115 @@ class Softminus(nn.Module):
 
 
 # defines all the operations. affine is turned off for cuda (optimization prposes)
-OPS = {
-    "none": Zero(1),
-    "add": nn.Sequential(Identity()),
-    "subtract": nn.Sequential(NegIdentity()),
-    "mult": nn.Sequential(
-        nn.Linear(1, 1, bias=False),
-    ),
-    "linear": nn.Sequential(nn.Linear(1, 1, bias=True)),
-    "relu": nn.Sequential(
-        nn.ReLU(inplace=False),
-    ),
-    "linear_relu": nn.Sequential(
-        nn.Linear(1, 1, bias=True),
-        nn.ReLU(inplace=False),
-    ),
-    "logistic": nn.Sequential(
-        nn.Sigmoid(),
-    ),
-    "linear_logistic": nn.Sequential(
-        nn.Linear(1, 1, bias=True),
-        nn.Sigmoid(),
-    ),
-    "exp": nn.Sequential(
-        Exponential(),
-    ),
-    "linear_exp": nn.Sequential(
-        nn.Linear(1, 1, bias=True),
-        Exponential(),
-    ),
-    "cos": nn.Sequential(
-        Cosine(),
-    ),
-    "linear_cos": nn.Sequential(
-        nn.Linear(1, 1, bias=True),
-        Cosine(),
-    ),
-    "sin": nn.Sequential(
-        Sine(),
-    ),
-    "linear_sin": nn.Sequential(
-        nn.Linear(1, 1, bias=True),
-        Sine(),
-    ),
-    "tanh": nn.Sequential(
-        Tangens_Hyperbolicus(),
-    ),
-    "linear_tanh": nn.Sequential(
-        nn.Linear(1, 1, bias=True),
-        Tangens_Hyperbolicus(),
-    ),
-    "reciprocal": nn.Sequential(
-        MultInverse(),
-    ),
-    "linear_reciprocal": nn.Sequential(
-        nn.Linear(1, 1, bias=False),
-        MultInverse(),
-    ),
-    "ln": nn.Sequential(
-        NatLogarithm(),
-    ),
-    "linear_ln": nn.Sequential(
-        nn.Linear(1, 1, bias=False),
-        NatLogarithm(),
-    ),
-    "softplus": nn.Sequential(
-        Softplus(),
-    ),
-    "linear_softplus": nn.Sequential(
-        nn.Linear(1, 1, bias=False),
-        Softplus(),
-    ),
-    "softminus": nn.Sequential(
-        Softminus(),
-    ),
-    "linear_softminus": nn.Sequential(
-        nn.Linear(1, 1, bias=False),
-        Softminus(),
-    ),
-}
+
+
+def operation_factory(name):
+
+    if name == "none":
+        return Zero(1)
+    elif name == "add":
+        return nn.Sequential(Identity())
+    elif name == "subtract":
+        return nn.Sequential(NegIdentity())
+    elif name == "mult":
+        return nn.Sequential(
+            nn.Linear(1, 1, bias=False),
+        )
+    elif name == "linear":
+        return nn.Sequential(nn.Linear(1, 1, bias=True))
+    elif name == "relu":
+        return nn.Sequential(
+            nn.ReLU(inplace=False),
+        )
+    elif name == "linear_relu":
+        return nn.Sequential(
+            nn.Linear(1, 1, bias=True),
+            nn.ReLU(inplace=False),
+        )
+    elif name == "logistic":
+        return nn.Sequential(
+            nn.Sigmoid(),
+        )
+    elif name == "linear_logistic":
+        return nn.Sequential(
+            nn.Linear(1, 1, bias=True),
+            nn.Sigmoid(),
+        )
+    elif name == "exp":
+        return nn.Sequential(
+            Exponential(),
+        )
+    elif name == "linear_exp":
+        return nn.Sequential(
+            nn.Linear(1, 1, bias=True),
+            Exponential(),
+        )
+    elif name == "cos":
+        return nn.Sequential(
+            Cosine(),
+        )
+    elif name == "linear_cos":
+        return nn.Sequential(
+            nn.Linear(1, 1, bias=True),
+            Cosine(),
+        )
+    elif name == "sin":
+        return nn.Sequential(
+            Sine(),
+        )
+    elif name == "linear_sin":
+        return nn.Sequential(
+            nn.Linear(1, 1, bias=True),
+            Sine(),
+        )
+    elif name == "tanh":
+        return nn.Sequential(
+            Tangens_Hyperbolicus(),
+        )
+    elif name == "linear_tanh":
+        return nn.Sequential(
+            nn.Linear(1, 1, bias=True),
+            Tangens_Hyperbolicus(),
+        )
+    elif name == "reciprocal":
+        return nn.Sequential(
+            MultInverse(),
+        )
+    elif name == "linear_reciprocal":
+        return nn.Sequential(
+            nn.Linear(1, 1, bias=False),
+            MultInverse(),
+        )
+    elif name == "ln":
+        return nn.Sequential(
+            NatLogarithm(),
+        )
+    elif name == "linear_ln":
+        return nn.Sequential(
+            nn.Linear(1, 1, bias=False),
+            NatLogarithm(),
+        )
+    elif name == "softplus":
+        return nn.Sequential(
+            Softplus(),
+        )
+    elif name == "linear_softplus":
+        return nn.Sequential(
+            nn.Linear(1, 1, bias=False),
+            Softplus(),
+        )
+    elif name == "softminus":
+        return nn.Sequential(
+            Softminus(),
+        )
+    elif name == "linear_softminus":
+        return nn.Sequential(
+            nn.Linear(1, 1, bias=False),
+            Softminus(),
+        )
+    else:
+        raise NotImplementedError(f"operation {name=} it not implemented")
+
 
 # this is the list of primitives actually used,
 # and it should be a set of names contained in the OPS dictionary
@@ -632,4 +662,4 @@ PRIMITIVES = (
 
 # make sure that every primitive is in the OPS dictionary
 for name in PRIMITIVES:
-    assert name in OPS
+    assert operation_factory(name) is not None

@@ -11,11 +11,11 @@ from torch.autograd import Variable
 
 from autora.theorist.darts.fan_out import Fan_Out
 from autora.theorist.darts.operations import (
-    OPS,
     PRIMITIVES,
     Genotype,
     get_operation_label,
     isiterable,
+    operation_factory,
 )
 
 
@@ -58,7 +58,7 @@ class MixedOp(nn.Module):
         # loop through all the 8 primitive operations
         for primitive in primitives:
             # OPS returns an nn module for a given primitive (defines as a string)
-            op = OPS[primitive]
+            op = operation_factory(primitive)
 
             # add the operation
             self._ops.append(op)
