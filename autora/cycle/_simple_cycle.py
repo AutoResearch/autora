@@ -421,7 +421,9 @@ def _resolve_magic_params(params: Dict, magics: Mapping):
     for key, value in params_.items():
         if isinstance(value, dict):
             params_[key] = _resolve_magic_params(value, magics)
-        elif value in magics:  # the value appears as a key in the magics dictionary
+        elif (
+            isinstance(value, str) and value in magics
+        ):  # value is a key in the magics dictionary
             params_[key] = magics[value]
         else:
             pass  # no change needed
