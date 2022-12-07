@@ -217,15 +217,16 @@ def plot_results_panel(
                 df_observed["cycle"] != i, df_observed[dv[0]]
             )
             # Plotting scatter
-            ax.scatter(*l_x, dv_previous, s=2, marker="x", label="Previous Data")
+            ax.scatter(*l_x, dv_previous, s=2, alpha=0.6, label="Previous Data")
             ax.scatter(*l_x, dv_current, c="orange", s=2, alpha=0.6, label="New Data")
 
             # ---Plot Theory---
+            l_condition = [condition_space[:, s[0]] for s in ivs]
             if not threedim:
-                ax.plot(condition_space, d_predictions[i], label="Theory")
+                ax.plot(*l_condition, d_predictions[i], label="Theory")
             else:  # 3D Plotting
                 ax.plot_surface(
-                    *condition_space, d_predictions[i], alpha=0.5, label="Theory"
+                    *l_condition, d_predictions[i], alpha=0.5, label="Theory"
                 )
                 # Axis labels
                 ax.set_xlabel(iv_labels[0])
