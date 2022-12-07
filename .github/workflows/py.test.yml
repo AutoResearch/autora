@@ -19,21 +19,10 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
     - uses: actions/checkout@v3
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
+    - run: pipx install poetry
+    - uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
-    - name: Cache Packages
-      uses: actions/cache@v3
-      with:
-        path: ~/.local
-        key: poetry-packages|${{ env.pythonLocation }}|${{ runner.os }}|${{ hashFiles('**/poetry.lock') }}
-    - name: Install poetry
-      run: |
-        pip install poetry
-    - name: Install dependencies
-      run: |
-        poetry install --with test
-    - name: Test with pytest
-      run: |
-        poetry run pytest
+        cache: "poetry"
+    - run: poetry install --with test
+    - run: poetry run pytest
