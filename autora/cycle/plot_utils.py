@@ -16,8 +16,9 @@ def parse_dv_iv(
     Args:
         cycle: AER Cycle object that has been run
         iv_names: List of up to 2 independent variable names. Names should match the names
-                    instantiated in the cycle object.
+                    instantiated in the cycle object. Default will select up to the first two.
         dv_name: Single DV name. Name should match the names instantiated in the cycle object.
+                    Default will select the first DV
 
     Returns:
 
@@ -149,8 +150,9 @@ def plot_results_panel(
     Args:
         cycle: AER Cycle object that has been run
         iv_names: List of up to 2 independent variable names. Names should match the names
-                    instantiated in the cycle object.
+                    instantiated in the cycle object. Default will select up to the first two.
         dv_name: Single DV name. Name should match the names instantiated in the cycle object.
+                    Default will select the first DV
         steps: Number of steps to define the condition space to plot the theory.
         wrap: Number of panels to appear in a row. Example: 9 panels with wrap=3 results in a
                 3x3 grid.
