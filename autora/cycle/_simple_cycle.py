@@ -1,4 +1,5 @@
 import copy
+from collections.abc import Mapping
 from dataclasses import dataclass, replace
 from typing import Callable, Dict, Iterable, List, Optional
 
@@ -200,6 +201,80 @@ class _SimpleCycle:
         >>> cycle_with_parameters.data.conditions[-1].flatten()
         array([10.5838232 ,  9.45666031])
 
+
+         In the case we have an experimentalist which needs variables such as
+        - the current best theory
+        - all the existing observational data
+        to generate its next values, we can use magic parameters:
+        >>> magics_metadata = VariableCollection(
+        ...    independent_variables=[Variable(name="x1", allowed_values=range(10))],
+        ...    dependent_variables=[Variable(name="y")],
+        ...    )
+        >>> random_sampler_rng = np.random.default_rng(seed=180)
+        >>> def custom_random_sampler(conditions, n):
+        ...     sampled_conditions = random_sampler_rng.choice(conditions, size=n, replace=False)
+        ...     return sampled_conditions
+        >>> def exclude_conditions(conditions, excluded_conditions):
+        ...     remaining_conditions = list(set(conditions) - set(excluded_conditions.flatten()))
+        ...     return remaining_conditions
+        >>> unobserved_data_experimentalist = make_pipeline([
+        ...     magics_metadata.independent_variables[0].allowed_values,
+        ...     exclude_conditions,
+        ...     custom_random_sampler
+        ...     ]
+        ... )
+        >>> magics_cycle = _SimpleCycle(
+        ...     metadata=magics_metadata,
+        ...     theorist=example_theorist,
+        ...     experimentalist=unobserved_data_experimentalist,
+        ...     experiment_runner=example_synthetic_experiment_runner,
+        ...     params={
+        ...         "experimentalist": {
+        ...             "exclude_conditions": {"excluded_conditions": "%observations.ivs%"},
+        ...             "custom_random_sampler": {"n": 1}
+        ...         }
+        ...     }
+        ... )
+
+        Now we can run the cycler to generate conditions and run experiments. The first time round,
+        we have the full set of 10 possible conditions to select from, and we select "2" at random:
+        >>> _ = magics_cycle.run()
+        >>> magics_cycle.data.conditions[-1]
+        array([2])
+
+        We can continue to run the cycler, each time we add more to the list of "excluded" options:
+        >>> _ = magics_cycle.run(num_cycles=5)
+        >>> magics_cycle.data.conditions
+        [array([2]), array([6]), array([5]), array([7]), array([3]), array([4])]
+
+        By using the monitor callback, we can investigate what's going on with the magic parameters:
+        >>> magics_cycle.monitor = lambda data: print(
+        ...     _get_magic_values(data)["%observations.ivs%"].flatten()
+        ... )
+
+        The monitor evaluates at the end of each cycle
+        and shows that we've added a new observed IV each step
+        >>> _ = magics_cycle.run()
+        [2. 6. 5. 7. 3. 4. 9.]
+        >>> _ = magics_cycle.run()
+        [2. 6. 5. 7. 3. 4. 9. 0.]
+
+        We deactivate the monitor by making it "None" again.
+        >>> magics_cycle.monitor = None
+
+        We can continue until we've sampled all of the options:
+        >>> _ = magics_cycle.run(num_cycles=2)
+        >>> magics_cycle.data.conditions # doctest: +NORMALIZE_WHITESPACE
+        [array([2]), array([6]), array([5]), array([7]), array([3]), \
+        array([4]), array([9]), array([0]), array([8]), array([1])]
+
+        If we try to evaluate it again, the experimentalist fails, as there aren't any more
+        conditions which are available:
+        >>> magics_cycle.run()  # doctest: +ELLIPSIS
+        Traceback (most recent call last):
+        ...
+        ValueError: a cannot be empty unless no samples are taken
+
     """
 
     def __init__(
@@ -241,16 +316,20 @@ class _SimpleCycle:
         ), "theorist cannot yet accept cycle parameters"
 
         data = self.data
+        params_with_magics = _resolve_magic_params(
+            self.params, _get_magic_values(self.data)
+        )
 
         data = self._experimentalist_callback(
-            self.experimentalist, data, self.params.get("experimentalist", dict())
+            self.experimentalist,
+            data,
+            params_with_magics.get("experimentalist", dict()),
         )
         data = self._experiment_runner_callback(self.experiment_runner, data)
         data = self._theorist_callback(self.theorist, data)
         self._monitor_callback(data)
         self.data = data
 
-        # params = _resolve_magic_params(self.params, _get_magic_values(self.data)) #move back up to top of function
         return self
 
     def __iter__(self):
@@ -310,3 +389,95 @@ class _SimpleCycle:
     def _monitor_callback(self, data: _SimpleCycleData):
         if self.monitor is not None:
             self.monitor(data)
+
+
+def _resolve_magic_params(params: Dict, magics: Mapping):
+    """
+    Resolve "magic values" in a nested dictionary.
+
+    In this context, a "magic value" is a string which is meant to be replaced by a different value
+    before the dictionary is accessed.
+
+    Args:
+        params: a (nested) dictionary of keys and values, where some values might be "magic"
+        magics: a dictionary of "magic values" (keys) and "real values" (values)
+
+    Returns: a (nested) dictionary where "magic values" are replaced by the "real values"
+
+    Examples:
+
+        >>> params_0 = {"key": "%magic_number%"}
+        >>> magics_0 = {"%magic_number%": 180}
+        >>> _resolve_magic_params(params_0, magics_0)
+        {'key': 180}
+
+        >>> params_1 = {"key": "%magic_number_0%", "nested_dict": {"inner_key": "%magic_number_1%"}}
+        >>> magics_1 = {"%magic_number_0%": 1, "%magic_number_1%": 2}
+        >>> _resolve_magic_params(params_1, magics_1)
+        {'key': 1, 'nested_dict': {'inner_key': 2}}
+
+    """
+    params_ = copy.copy(params)
+    for key, value in params_.items():
+        if isinstance(value, dict):
+            params_[key] = _resolve_magic_params(value, magics)
+        elif value in magics:  # the value appears as a key in the magics dictionary
+            params_[key] = magics[value]
+        else:
+            pass  # no change needed
+
+    return params_
+
+
+class LazyDict(Mapping):
+    """Inspired by https://gist.github.com/gyli/9b50bb8537069b4e154fec41a4b5995a"""
+
+    def __init__(self, *args, **kw):
+        self._raw_dict = dict(*args, **kw)
+
+    def __getitem__(self, key):
+        func = self._raw_dict.__getitem__(key)
+        return func()
+
+    def __iter__(self):
+        return iter(self._raw_dict)
+
+    def __len__(self):
+        return len(self._raw_dict)
+
+
+def _get_magic_values(data: _SimpleCycleData):
+    """
+    Examples:
+        Even with an empty data object, we can initialize the dictionary,
+        >>> magic_results = _get_magic_values(_SimpleCycleData(metadata=None, conditions=[],
+        ...     observations=[], theories=[]))
+
+        ... but it will raise an exception if a value isn't yet available when we try to use it
+        >>> magic_results["%theories[-1]%"] # doctest: +ELLIPSIS
+        Traceback (most recent call last):
+        ...
+        IndexError: list index out of range
+
+        Nevertheless, we can iterate through its keys no problem:
+        >>> [key for key in magic_results.keys()] # doctest: +NORMALIZE_WHITESPACE
+        ['%observations.ivs[-1]%', '%observations.dvs[-1]%', '%observations.ivs%',
+        '%observations.dvs%', '%theories[-1]%', '%theories%']
+
+    """
+
+    n_ivs = len(data.metadata.independent_variables)
+    n_dvs = len(data.metadata.dependent_variables)
+    magic_dict = LazyDict(
+        {
+            "%observations.ivs[-1]%": lambda: data.observations[-1][:, 0:n_ivs],
+            "%observations.dvs[-1]%": lambda: data.observations[-1][:, n_ivs:],
+            "%observations.ivs%": lambda: np.row_stack(
+                [np.empty([0, n_ivs + n_dvs])] + data.observations
+            )[:, 0:n_ivs],
+            "%observations.dvs%": lambda: np.row_stack(data.observations)[:, n_ivs:],
+            "%theories[-1]%": lambda: data.theories[-1],
+            "%theories%": lambda: data.theories,
+        }
+    )
+    return magic_dict
