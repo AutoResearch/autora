@@ -1,7 +1,7 @@
 # This workflow will install Python dependencies, run tests and lint with a variety of Python versions
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
 
-name: Python package
+name: Run tests
 
 on:
   push:
@@ -33,15 +33,7 @@ jobs:
         pip install poetry
     - name: Install dependencies
       run: |
-        poetry install --with ci
-    - name: Load pre-commit cache
-      uses: actions/cache@v3
-      with:
-        path: ~/.cache/pre-commit
-        key: pre-commit-3|${{ env.pythonLocation }}|${{ runner.os }}|${{ hashFiles('.pre-commit-config.yaml') }}
-    - name: Run pre-commit hooks
-      run: |
-        poetry run pre-commit run --all-files --show-diff-on-failure --color=always
+        poetry install --with dev
     - name: Test with pytest
       run: |
         poetry run pytest
