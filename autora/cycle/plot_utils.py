@@ -1,11 +1,28 @@
 from itertools import product
+from typing import List, Sequence, Union
 
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
+from autora.cycle import Cycle
 
-def parse_dv_iv(cycle, iv_names=None, dv_name=None):
+
+def parse_dv_iv(
+    cycle: Cycle, iv_names: Union[str, List[str]] = None, dv_name: str = None
+):
+    """
+
+    Args:
+        cycle: AER Cycle object that has been run
+        iv_names: List of up to 2 independent variable names. Names should match the names
+                    instantiated in the cycle object.
+        dv_name: Single DV name. Name should match the names instantiated in the cycle object.
+
+    Returns:
+
+    """
+
     l_iv = cycle.data.metadata.independent_variables
     l_dv = cycle.data.metadata.dependent_variables
     n_iv = len(l_iv)
@@ -16,6 +33,8 @@ def parse_dv_iv(cycle, iv_names=None, dv_name=None):
 
     # Select independent variables to plot
     if iv_names:  # If user supplies names
+        # TODO deal with order of ivs if specified, currently plots x1,x2 in the order
+        #  specified in the cycle metadata.
         assert (
             len(iv_names) <= 2
         ), f"Cannot plot more than two IVs; got {len(iv_names)}."
@@ -25,8 +44,6 @@ def parse_dv_iv(cycle, iv_names=None, dv_name=None):
             "Check that iv_names keyword matches model IV "
             "names."
         )
-        # TODO deal with order of ivs if specified, currently plots x,y in the order
-        #  specified in the cycle metadata
     else:  # If not specified take up to the first 2 IVs
         l_iv_to_plot = [(i, s) for i, s in enumerate(l_iv[:2])]
 
@@ -49,12 +66,12 @@ def parse_dv_iv(cycle, iv_names=None, dv_name=None):
     return l_iv_to_plot, dv_to_plot
 
 
-def observed_to_df(cycle):
+def observed_to_df(cycle: Cycle):
     """
     Concatenates observation data of cycles into a single dataframe with a field "cycle" with the
     cycle index.
     Args:
-        cycle: autora.cycle._simple_cycle._SimpleCycle
+        cycle: AER Cycle object that has been run
 
     Returns: Dataframe
 
@@ -68,7 +85,16 @@ def observed_to_df(cycle):
     return pd.concat(l_agg)
 
 
-def generate_condition_space(cycle, steps=50):
+def generate_condition_space(cycle: Cycle, steps: int = 50):
+    """
+    Generates condition space based on the minimum and maximum of all observed data in AER Cycle.
+    Args:
+        cycle: AER Cycle object that has been run
+        steps: Number of steps to define the condition space
+
+    Returns:
+
+    """
     iv_index = range(len(cycle.data.metadata.independent_variables))
     l_observations = cycle.data.observations
     l_space = []
@@ -90,17 +116,16 @@ def generate_condition_space(cycle, steps=50):
         return l_space[0].reshape(-1, 1)
 
 
-def check_shape_reshape(array, n):
-    # This might only be needed for single IV problems. Could just move this to the return of
-    # the generate condition space function.
-    if len(array.shape) != n:
-        array_reshaped = array.reshape(-1, n)
-        return array_reshaped
-    else:
-        return array
+def theory_predict(cycle: Cycle, conditions: Sequence):
+    """
+    Gets theory predictions over conditions space and saves results of each cycle to a dictionary.
+    Args:
+        cycle: AER Cycle object that has been run
+        conditions: Condition space. Should be an array of grouped conditions.
 
+    Returns:
 
-def theory_predict(cycle, conditions):
+    """
     d_predictions = {}
     for i, theory in enumerate(cycle.data.theories):
         d_predictions[i] = theory.predict(conditions)
@@ -108,7 +133,38 @@ def theory_predict(cycle, conditions):
     return d_predictions
 
 
-def plot_results_panel(cycle, iv_names=None, dv_name=None, steps=50, wrap=4, **kwargs):
+def plot_results_panel(
+    cycle: Cycle,
+    iv_names: Union[str, List[str]] = None,
+    dv_name: str = None,
+    steps: int = 50,
+    wrap: int = 4,
+    **kwargs,
+):
+    """
+    Generates a multi-panel plot with each panel showing results of an AER cycle. Observed data
+    is plotted as a scatter plot with the current cycle colored differently than observed data from
+    previous cycles. The current cycle's theory is plotted as a line over the range of the observed
+    data.
+    Args:
+        cycle: AER Cycle object that has been run
+        iv_names: List of up to 2 independent variable names. Names should match the names
+                    instantiated in the cycle object.
+        dv_name: Single DV name. Name should match the names instantiated in the cycle object.
+        steps: Number of steps to define the condition space to plot the theory.
+        wrap: Number of panels to appear in a row. Example: 9 panels with wrap=3 results in a
+                3x3 grid.
+        **kwargs:
+
+        TODO: 1. 3D Plotting - Plotting with 2 IVs
+              2. Ability to supply different optional kwargs for matplotlib subplot (subplot_kw,
+                 gridspec_kw, fig_kw) so user can better tune figure layout paramters.
+              3. Optional keywords to plotting calls to adjust appearance of points, lines/planes.
+              4. Save to file feature.
+
+    Returns: matplotlib figure
+
+    """
     n_cycles = len(cycle.data.theories)
     threedim = False
 
@@ -128,7 +184,6 @@ def plot_results_panel(cycle, iv_names=None, dv_name=None, steps=50, wrap=4, **k
     d_predictions = theory_predict(cycle, condition_space)
 
     # Subplot configurations
-    # TODO function to define subplot subplot_kw, gridspec_kw, fig_kw
     if n_cycles < wrap:
         shape = (1, n_cycles)
     else:
@@ -163,7 +218,7 @@ def plot_results_panel(cycle, iv_names=None, dv_name=None, steps=50, wrap=4, **k
                 ax.plot_surface(
                     *condition_space, d_predictions[i], alpha=0.5, label="Theory"
                 )
-                # ---Labeling---
+                # Axis labels
                 ax.set_xlabel(iv_labels[0])
                 ax.set_ylabel(iv_labels[1])
                 ax.set_zlabel(dv_label)

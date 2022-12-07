@@ -4,8 +4,7 @@ import numpy as np
 import pytest
 from sklearn.linear_model import LinearRegression
 
-from autora.cycle import Cycle
-from autora.cycle.plot import plot_results_panel
+from autora.cycle import Cycle, plot_results_panel
 from autora.experimentalist.pipeline import Pipeline
 from autora.experimentalist.pool import grid_pool
 from autora.experimentalist.sampler import random_sampler
@@ -61,6 +60,9 @@ def dummy_cycle():
 
 
 def test_2d_plot(dummy_cycle):
+    """
+    Tests the 2d plotting functionality of plot_results_panel.
+    """
     dummy_cycle.run(8)
     steps = 51
     fig = plot_results_panel(dummy_cycle, steps=steps, sharex=True, sharey=True, wrap=3)
