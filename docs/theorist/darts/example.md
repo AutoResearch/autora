@@ -35,9 +35,9 @@ We will use the DARTS Regressor to predict the outcomes. There are a number of p
 
 - **num_graph_nodes**: The number of latent variables used to represent the model.
 - **arch_updates_per_epoch**: The number of architecture updates per training epoch. These updates affect the architecture weights $\alpha$ indicating the relative contribution of each operation for a given computation step.
-- **arch_learning_rate_max**: The initial learning rate of the architecture weight optimizier.
+- **arch_learning_rate_max**: The initial learning rate of the architecture weight optimizer.
 - **param_updates_per_epoch**: The number of parameter updates per epoch. Once the architecture updates are complete, the parameters associated with each operation are updated.
-- **param_momentum**: The momentum of the parameter optimizier.
+- **param_momentum**: The momentum of the parameter optimizer.
 - **max_epochs**: The maximum number of epochs to run DARTS.
 - **output_type**: The type of output to produce. In our case, we treat the outcome as a real variable, i.e., "real".
 
