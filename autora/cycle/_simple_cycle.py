@@ -1,6 +1,6 @@
 import copy
 from dataclasses import dataclass, replace
-from typing import Callable, Iterable, List, Optional
+from typing import Callable, Iterable, List, Optional, Dict
 
 import numpy as np
 from sklearn.base import BaseEstimator
@@ -184,12 +184,16 @@ class _SimpleCycle:
         experimentalist,
         experiment_runner,
         monitor: Optional[Callable[[_SimpleCycleData], None]] = None,
+        params: Optional[Dict] = None,
     ):
 
         self.theorist = theorist
         self.experimentalist = experimentalist
         self.experiment_runner = experiment_runner
         self.monitor = monitor
+        if params is None:
+            params = dict()
+        self.params = params
 
         self.data = _SimpleCycleData(
             metadata=metadata,
@@ -204,8 +208,12 @@ class _SimpleCycle:
         return self
 
     def __next__(self):
+        assert "experiment_runner" not in self.params, "experiment_runner cannot yet accept cycle parameters"
+        assert "theorist" not in self.params, "theorist cannot yet accept cycle parameters"
+
         data = self.data
-        data = self._experimentalist_callback(self.experimentalist, data)
+
+        data = self._experimentalist_callback(self.experimentalist, data, self.params.get("experimentalist", dict()))
         data = self._experiment_runner_callback(self.experiment_runner, data)
         data = self._theorist_callback(self.theorist, data)
         self._monitor_callback(data)
@@ -216,8 +224,8 @@ class _SimpleCycle:
         return self
 
     @staticmethod
-    def _experimentalist_callback(experimentalist: Pipeline, data_in: _SimpleCycleData):
-        new_conditions = experimentalist()
+    def _experimentalist_callback(experimentalist: Pipeline, data_in: _SimpleCycleData, params: dict):
+        new_conditions = experimentalist(**params)
         if isinstance(new_conditions, Iterable):
             # If the pipeline gives us an iterable, we need to make it into a concrete array.
             # We can't move this logic to the Pipeline, because the pipeline doesn't know whether
