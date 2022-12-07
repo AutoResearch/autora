@@ -9,7 +9,7 @@ def assumption_sampler(X, model, n, y=None, loss=True, theory=None):
     """
 
     Args:
-        X: pool of IV conditions to evaluate uncertainty
+        X: pool of IV conditions to sample from
         model: Scikit-learn model, must have `predict_proba` method.
         n: number of samples to select
 
