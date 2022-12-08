@@ -63,8 +63,6 @@ def test_experimentalist_assumption():
     model_loss = model_loss_function(
         y_true=y.reshape(1, -1), y_pred=y_pred.reshape(1, -1), multioutput="raw_values"
     )
-    alternative_model = RidgeCV(scoring="neg_mean_absolute_error")
-    alternative_model.fit(X, y)
     # alternative_model_loss_function =
     # get_scorer(scoring=alternative_model.get_params()['scoring'])
     alternative_model_loss_function = mean_absolute_error
