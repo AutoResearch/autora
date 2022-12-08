@@ -63,8 +63,7 @@ def test_experimentalist_assumption():
     model_loss = model_loss_function(
         y_true=y.reshape(1, -1), y_pred=y_pred.reshape(1, -1), multioutput="raw_values"
     )
-    # alternative_model_loss_function =
-    # get_scorer(scoring=alternative_model.get_params()['scoring'])
+    # calculate model loss on an alternative loss function
     alternative_model_loss_function = mean_absolute_error
     alternative_model_loss = alternative_model_loss_function(
         y_true=y.reshape(1, -1), y_pred=y_pred.reshape(1, -1), multioutput="raw_values"
