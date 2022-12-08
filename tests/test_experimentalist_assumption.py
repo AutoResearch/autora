@@ -25,7 +25,7 @@ def test_experimentalist_assumption():
     X = np.array(range(11)).reshape(-1, 1)
     y = np.array([x for x in ground_truth(X)])
 
-    # Train logistic regression model
+    # Train ridge regression model
     model = RidgeCV(scoring="neg_mean_squared_error")
     model.fit(X, y)
 
