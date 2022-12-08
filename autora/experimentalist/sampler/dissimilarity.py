@@ -39,11 +39,11 @@ def summed_dissimilarity_sampler(
         X: pool of IV conditions to evaluate dissimilarity
         X_ref: reference pool of IV conditions
         n: number of samples to select
-        metric: dissimilarity measure. Options: 'euclidean', 'manhattan', 'chebyshev',
+        metric (str): dissimilarity measure. Options: 'euclidean', 'manhattan', 'chebyshev',
             'minkowski', 'wminkowski', 'seuclidean', 'mahalanobis', 'haversine',
             'hamming', 'canberra', 'braycurtis', 'matching', 'jaccard', 'dice',
             'kulsinski', 'rogerstanimoto', 'russellrao', 'sokalmichener',
-            'sokalsneath', 'yule'. See `sklearn.metrics.DistanceMetric` for more details.
+            'sokalsneath', 'yule'. See [sklearn.metrics.DistanceMetric][] for more details.
 
     Returns:
         Sampled pool
