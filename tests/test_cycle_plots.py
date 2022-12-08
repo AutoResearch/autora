@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 from sklearn.linear_model import LinearRegression
 
-from autora.cycle import Cycle, plot_results_panel
+from autora.cycle import Cycle, plot_results_panel_2d  # plot_results_panel_3d
 from autora.experimentalist.pipeline import Pipeline
 from autora.experimentalist.pool import grid_pool
 from autora.experimentalist.sampler import random_sampler
@@ -12,7 +12,7 @@ from autora.variable import Variable, VariableCollection
 
 
 @pytest.fixture
-def dummy_cycle():
+def cycle_lr():
     random.seed(1)
 
     def ground_truth(xs):
@@ -30,7 +30,6 @@ def dummy_cycle():
     lm = LinearRegression()
 
     # Experimentalist
-    grid_pool(study_metadata.independent_variables)
     example_experimentalist = Pipeline(
         [
             ("pool", grid_pool),
@@ -65,18 +64,69 @@ def dummy_cycle():
     return cycle
 
 
-def test_2d_plot(dummy_cycle):
+@pytest.fixture
+def cycle_multi_lr():
+    random.seed(1)
+
+    def ground_truth(X):
+        return X[:, 0] + (0.5 * X[:, 1]) + (0.25 * X[:, 2]) + 1.0
+
+    # Variable Metadata
+    study_metadata = VariableCollection(
+        independent_variables=[
+            Variable(name="x1", allowed_values=np.linspace(0, 1, 10)),
+            Variable(name="x2", allowed_values=np.linspace(0, 1, 10)),
+            Variable(name="x3", allowed_values=np.linspace(0, 1, 10)),
+        ],
+        dependent_variables=[Variable(name="y", value_range=(-20, 20))],
+    )
+
+    # Theorist
+    lm = LinearRegression()
+
+    # Experimentalist
+    example_experimentalist = Pipeline(
+        [
+            ("pool", grid_pool),
+            ("sampler", random_sampler),
+            ("transform", lambda x: np.array(x)),
+        ],
+        params={
+            "pool": {"ivs": study_metadata.independent_variables},
+            "sampler": {"n": 10},
+        },
+    )
+
+    # Experiment Runner
+    def get_example_synthetic_experiment_runner():
+        rng = np.random.default_rng(seed=180)
+
+        def runner(xs):
+            return ground_truth(xs) + rng.normal(0, 0.1, xs.shape[0])
+
+        return runner
+
+    example_synthetic_experiment_runner = get_example_synthetic_experiment_runner()
+
+    # Initialize Cycle
+    cycle = Cycle(
+        metadata=study_metadata,
+        theorist=lm,
+        experimentalist=example_experimentalist,
+        experiment_runner=example_synthetic_experiment_runner,
+    )
+
+    return cycle
+
+
+def test_2d_plot(cycle_lr):
     """
     Tests the 2d plotting functionality of plot_results_panel.
     """
-    dummy_cycle.run(8)
+    cycle_lr.run(8)
     steps = 51
-    fig = plot_results_panel(
-        dummy_cycle,
-        steps=steps,
-        wrap=3,
-        sharex=True,
-        sharey=True,
+    fig = plot_results_panel_2d(
+        cycle_lr, steps=steps, wrap=3, subplot_kw={"sharex": True, "sharey": True}
     )
 
     # Should have 9 axes, 8 with data and the last turned off
@@ -108,3 +158,15 @@ def test_2d_plot(dummy_cycle):
     for axes in fig.axes[:-1]:
         assert len(axes.lines[0].get_xdata()) == steps
         assert len(axes.lines[0].get_ydata()) == steps
+
+
+# def test_3d_plot(cycle_multi_lr):
+#     cycle_multi_lr.run(3)
+#     steps = 20
+#     fig = plot_results_panel_3d(
+#         cycle_multi_lr,
+#         steps=steps,
+#         wrap=2,
+#         sharex=True,
+#         sharey=True,
+#     )
