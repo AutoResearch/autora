@@ -1,5 +1,6 @@
 import logging
 import typing
+from typing import Optional
 
 from graphviz import Digraph
 
@@ -12,12 +13,12 @@ def plot(
     genotype: Genotype,
     filename: str,
     file_format: str = "pdf",
-    view_file: bool = None,
+    view_file: Optional[bool] = None,
     full_label: bool = False,
     param_list: typing.Tuple = (),
     input_labels: typing.Tuple = (),
-    out_dim: int = None,
-    out_fnc: str = None,
+    out_dim: Optional[int] = None,
+    out_fnc: Optional[str] = None,
 ):
     """
     Generates a graphviz plot for a DARTS model based on the genotype of the model.
@@ -58,8 +59,8 @@ def darts_model_plot(
     full_label: bool = False,
     param_list: typing.Sequence = (),
     input_labels: typing.Sequence = (),
-    out_dim: int = None,
-    out_fnc: str = None,
+    out_dim: Optional[int] = None,
+    out_fnc: Optional[str] = None,
     decimals_to_display: int = 2,
 ) -> Digraph:
     """
