@@ -16,10 +16,10 @@ def assumption_sampler(X, y, model, n, loss=True, theorist=None):
     Args:
         X: pool of IV conditions to sample from
         y: experimental results from most recent iteration
-        model: Scikit-learn model, must have `predict_proba` method.
+        model: Scikit-learn model, must have `predict` method.
         n: number of samples to select
         loss: assumption to test: identify points that are most affected by choice of loss function
-        theory: the Theorist Object, which employs the theory it has been hard-coded to demonstrate
+        theorist: the Theorist, which employs the theory it has been hard-coded to demonstrate
 
     Returns: Sampled pool
 
@@ -27,7 +27,6 @@ def assumption_sampler(X, y, model, n, loss=True, theorist=None):
 
     if isinstance(X, Iterable):
         X = np.array(list(X))
-
     current = None
     if theorist:
         pass  # add code to extract loss function from theorist object
@@ -43,13 +42,25 @@ def assumption_sampler(X, y, model, n, loss=True, theorist=None):
                     )
                 )
             y_pred = model.predict(X)
-            current_loss = current(y_true=y, y_pred=y_pred, multioutput="raw_values")
+            print(y_pred.shape)
+            print(y.shape)
+            print(X.shape)
+            current_loss = current(
+                y_true=y.reshape(1, -1),
+                y_pred=y_pred.reshape(1, -1),
+                multioutput="raw_values",
+            )
+            print(current_loss)
             alternative = mae
             alternative_loss = alternative(
-                y_true=y, y_pred=y_pred, multioutput="raw_values"
+                y_true=y.reshape(1, -1),
+                y_pred=y_pred.reshape(1, -1),
+                multioutput="raw_values",
             )
             loss_delta = alternative_loss - current_loss
-            idx = np.flip(loss_delta.argsort()[-n:])
+            print(loss_delta)
+            idx = np.flip(loss_delta.argsort()[:n])
+            print(idx)
     else:
         raise TypeError(
             "Experiment results are required to run the assumption experimentalist"
