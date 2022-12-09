@@ -1,5 +1,5 @@
 from itertools import product
-from typing import List, Optional, Sequence, Union
+from typing import List, Optional, Sequence, Tuple, Union
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -105,6 +105,31 @@ def observed_to_df(cycle: Cycle):
     return pd.concat(l_agg)
 
 
+def min_max_observations(cycle: Cycle) -> List[Tuple[float, float]]:
+    """
+    Returns minimum and maximum of observed values for each independent variable.
+    Args:
+        cycle: AER Cycle object that has been run
+
+    Returns: List of tuples
+
+    """
+    l_return = []
+    iv_index = range(len(cycle.data.metadata.independent_variables))
+    l_observations = cycle.data.observations
+    # Get min and max of observation data
+    # Min and max by cycle - All IVs
+    l_mins = [np.min(s, axis=0) for s in l_observations]  # Arrays by columns
+    l_maxs = [np.max(s, axis=0) for s in l_observations]
+    # Min and max for all cycles by IVs
+    for idx in iv_index:
+        glob_min = np.min([s[idx] for s in l_mins])
+        glob_max = np.max([s[idx] for s in l_maxs])
+        l_return.append((glob_min, glob_max))
+
+    return l_return
+
+
 def generate_condition_space(cycle: Cycle, steps: int = 50):
     """
     Generates condition space based on the minimum and maximum of all observed data in AER Cycle.
@@ -115,19 +140,11 @@ def generate_condition_space(cycle: Cycle, steps: int = 50):
     Returns:
 
     """
-    iv_index = range(len(cycle.data.metadata.independent_variables))
-    l_observations = cycle.data.observations
+    l_min_max = min_max_observations(cycle)
     l_space = []
 
-    # Get min and max of observation data
-    # Min and max by cycle - All IVs
-    l_mins = [np.min(s, axis=0) for s in l_observations]  # Arrays by columns
-    l_maxs = [np.max(s, axis=0) for s in l_observations]
-    # Min and max for all cycles by IVs
-    for idx in iv_index:
-        glob_min = np.min([s[idx] for s in l_mins])
-        glob_max = np.max([s[idx] for s in l_maxs])
-        l_space.append(np.linspace(glob_min, glob_max, steps))
+    for min_max in l_min_max:
+        l_space.append(np.linspace(min_max[0], min_max[1], steps))
 
     if len(l_space) > 1:
         # TODO Check if this outputs the correct shape
@@ -241,7 +258,7 @@ def plot_results_panel_2d(
         [subplot_kw, scatter_kw1, scatter_kw2, line_kw],
         ["subplot_kw", "scatter_kw1", "scatter_kw2", "line_kw"],
     ):
-        d_kw[key] = check_replace_default_kw(d1, d2)
+        d_kw[key] = check_replace_default_kw(d1, d2)  # type: ignore
 
     # ---Extract IVs and DV metadata and indexes---
     ivs, dvs = get_variable_index(cycle)
