@@ -80,15 +80,12 @@ def summed_dissimilarity_sampler(
     # loop over each row in first matrix
     for row in X:
         # calculate the distances between the current row in matrix1 and all other rows in matrix2
+        summed_distance = 0
 
-        row_distances = []
         for X_ref_row in X_ref:
 
             distance = dist.pairwise([row, X_ref_row])[0, 1]
-            row_distances.append(distance)
-
-        # calculate the summed distance for the current row
-        summed_distance = np.sum(row_distances)
+            summed_distance += distance
 
         # store the summed distance for the current row
         summed_distances.append(summed_distance)
