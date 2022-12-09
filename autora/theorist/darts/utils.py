@@ -2,7 +2,7 @@ import csv
 import glob
 import os
 import shutil
-from typing import Callable, List, Tuple
+from typing import Callable, List, Optional, Tuple
 
 import numpy as np
 import torch
@@ -14,11 +14,11 @@ from autora.variable import ValueType
 
 def create_output_file_name(
     file_prefix: str,
-    log_version: int = None,
-    weight_decay: float = None,
-    k: int = None,
-    seed: int = None,
-    theorist: str = None,
+    log_version: Optional[int] = None,
+    weight_decay: Optional[float] = None,
+    k: Optional[int] = None,
+    seed: Optional[int] = None,
+    theorist: Optional[str] = None,
 ) -> str:
     """
     Creates a file name for the output file of a theorist study.
@@ -278,7 +278,7 @@ def count_parameters_in_MB(model: Network) -> int:
     )
 
 
-def save(model: torch.nn.Module, model_path: str, exp_folder: str = None):
+def save(model: torch.nn.Module, model_path: str, exp_folder: Optional[str] = None):
     """
     Saves a model to a file.
 
@@ -303,9 +303,9 @@ def load(model: torch.nn.Module, model_path: str):
 
 def create_exp_dir(
     path: str,
-    scripts_to_save: List = None,
+    scripts_to_save: Optional[List] = None,
     parent_folder: str = "exps",
-    results_folder: str = None,
+    results_folder: Optional[str] = None,
 ):
     """
     Creates an experiment directory and saves all necessary scripts and files.
