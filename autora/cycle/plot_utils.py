@@ -1,9 +1,10 @@
 from itertools import product
-from typing import List, Optional, Sequence, Tuple, Union
+from typing import List, Optional, Sequence, Tuple
 
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from matplotlib.patches import Patch
 
 from autora.cycle import Cycle
 
@@ -87,6 +88,25 @@ def generate_condition_space(cycle: Cycle, steps: int = 50):
         return l_space[0].reshape(-1, 1)
 
 
+def generate_mesh_grid(cycle: Cycle, steps: int = 50):
+    """
+    Generates a mesh grid based on the minimum and maximum of all observed data in AER Cycle.
+    Args:
+        cycle: AER Cycle object that has been run
+        steps: Number of steps to define the condition space
+
+    Returns:
+
+    """
+    l_min_max = min_max_observations(cycle)
+    l_space = []
+
+    for min_max in l_min_max:
+        l_space.append(np.linspace(min_max[0], min_max[1], steps))
+
+    return np.meshgrid(*l_space)
+
+
 def theory_predict(cycle: Cycle, conditions: Sequence):
     """
     Gets theory predictions over conditions space and saves results of each cycle to a dictionary.
@@ -104,14 +124,13 @@ def theory_predict(cycle: Cycle, conditions: Sequence):
     return d_predictions
 
 
-def check_replace_default_kw(default: dict, user: dict):
+def check_replace_default_kw(default: dict, user: dict) -> dict:
     """
     Combines the key/value pairs of two dictionaries, a default and user dictionary. Unique pairs
     are selected and user pairs take precedent over default pairs if matching keywords. Also works
     with nested dictionaries.
 
     Returns: dictionary
-
     """
     # Copy dict 1 to return dict
     d_return = default.copy()
@@ -141,9 +160,9 @@ def plot_results_panel_2d(
     wrap: int = 4,
     spines: bool = False,
     subplot_kw: dict = {},
-    line_kw: dict = {},
     scatter_kw1: dict = {},
     scatter_kw2: dict = {},
+    line_kw: dict = {},
 ):
     """
     Generates a multi-panel plot with each panel showing results of an AER cycle. Observed data
@@ -161,12 +180,12 @@ def plot_results_panel_2d(
                 3x3 grid.
         spines: Show axis spines for 2D plots, default False.
         subplot_kw: Dictionary of keywords to pass to matplotlib 'subplot' function
-        line_kw: Dictionary of keywords to pass to matplotlib 'plot' function that plots the theory
-                 line.
         scatter_kw1: Dictionary of keywords to pass to matplotlib 'scatter' function that plots the
                     data points from previous cycles.
         scatter_kw2: Dictionary of keywords to pass to matplotlib 'scatter' function that plots the
                     data points from the current cycle.
+        line_kw: Dictionary of keywords to pass to matplotlib 'plot' function that plots the theory
+                 line.
 
         TODO: 1. Save to file feature.
 
@@ -194,7 +213,9 @@ def plot_results_panel_2d(
         [subplot_kw, scatter_kw1, scatter_kw2, line_kw],
         ["subplot_kw", "scatter_kw1", "scatter_kw2", "line_kw"],
     ):
-        d_kw[key] = check_replace_default_kw(d1, d2)  # type: ignore
+        assert isinstance(d1, dict)
+        assert isinstance(d2, dict)
+        d_kw[key] = check_replace_default_kw(d1, d2)
 
     # ---Extract IVs and DV metadata and indexes---
     ivs, dvs = get_variable_index(cycle)
@@ -273,12 +294,15 @@ def plot_results_panel_2d(
 
 def plot_results_panel_3d(
     cycle: Cycle,
-    iv_names: Optional[Union[str, List[str]]] = None,
+    iv_names: Optional[List[str]] = None,
     dv_name: Optional[str] = None,
     steps: int = 50,
     wrap: int = 4,
-    spines: bool = False,
-    **kwargs,
+    view: Optional[Tuple[float, float]] = None,
+    subplot_kw: dict = {},
+    scatter_kw1: dict = {},
+    scatter_kw2: dict = {},
+    surface_kw: dict = {},
 ):
     """
     Generates a multi-panel plot with each panel showing results of an AER cycle. Observed data
@@ -286,6 +310,7 @@ def plot_results_panel_3d(
     previous cycles. The current cycle's theory is plotted as a line over the range of the observed
     data.
     Args:
+
         cycle: AER Cycle object that has been run
         iv_names: List of up to 2 independent variable names. Names should match the names
                     instantiated in the cycle object. Default will select up to the first two.
@@ -294,41 +319,67 @@ def plot_results_panel_3d(
         steps: Number of steps to define the condition space to plot the theory.
         wrap: Number of panels to appear in a row. Example: 9 panels with wrap=3 results in a
                 3x3 grid.
-        spines: Show axis spines for 2D plots, default False.
-        **kwargs:
-
-        TODO: 1. 3D Plotting - Plotting with 2 IVs
-              2. Ability to supply different optional kwargs for matplotlib subplot (subplot_kw,
-                 gridspec_kw, fig_kw) so user can better tune figure layout paramters.
-              3. Optional keywords to plotting calls to adjust appearance of points, lines/planes.
-              4. Save to file feature.
+        view: Tuple of elevation angle and azimuth to change the viewing angle of the plot.
+        subplot_kw: Dictionary of keywords to pass to matplotlib 'subplot' function
+        scatter_kw1: Dictionary of keywords to pass to matplotlib 'scatter' function that plots the
+                    data points from previous cycles.
+        scatter_kw2: Dictionary of keywords to pass to matplotlib 'scatter' function that plots the
+                    data points from the current cycle.
+        surface_kw: Dictionary of keywords to pass to matplotlib 'plot_surface' function that plots
+                    the theory plane.
 
     Returns: matplotlib figure
 
     """
     n_cycles = len(cycle.data.theories)
-    threedim = False
+
+    # ---Figure and plot params---
+    # Set defaults, check and add user supplied keywords
+    # Default keywords
+    subplot_kw_defaults = {
+        "gridspec_kw": {"bottom": 0.16},
+        "subplot_kw": {"projection": "3d"},
+    }
+    scatter_kw1_defaults = {"s": 2, "label": "Previous Data"}
+    scatter_kw2_defaults = {"s": 2, "label": "New Data"}
+    surface_kw_defaults = {"alpha": 0.5, "label": "Theory"}
+    # Combine default and user supplied keywords
+    d_kw = {}
+    for d1, d2, key in zip(
+        [
+            subplot_kw_defaults,
+            scatter_kw1_defaults,
+            scatter_kw2_defaults,
+            surface_kw_defaults,
+        ],
+        [subplot_kw, scatter_kw1, scatter_kw2, surface_kw],
+        ["subplot_kw", "scatter_kw1", "scatter_kw2", "surface_kw"],
+    ):
+        assert isinstance(d1, dict)
+        assert isinstance(d2, dict)
+        d_kw[key] = check_replace_default_kw(d1, d2)
 
     # ---Extract IVs and DV metadata and indexes---
     ivs, dvs = get_variable_index(cycle)
     if iv_names:
         iv = [s for s in ivs if s[1] == iv_names]
     else:
-        iv = ivs[0]
+        iv = ivs[:2]
     if dv_name:
         dv = [s for s in dvs if s[1] == dv_name]
     else:
         dv = dvs[0]
-    iv_labels = f"{iv[1]} {iv[2]}"
+    iv_labels = [f"{s[1]} {s[2]}" for s in iv]
     dv_label = f"{dv[1]} {dv[2]}"
 
     # Create a dataframe of observed data from cycle
     df_observed = observed_to_df(cycle)
 
-    # Generate IV space
-    condition_space = generate_condition_space(cycle, steps=steps)
+    # Generate IV Mesh Grid
+    x1, x2 = generate_mesh_grid(cycle, steps=steps)
+
     # Get theory predictions over space
-    d_predictions = theory_predict(cycle, condition_space)
+    d_predictions = theory_predict(cycle, np.column_stack((x1.ravel(), x2.ravel())))
 
     # Subplot configurations
     if n_cycles < wrap:
@@ -336,9 +387,7 @@ def plot_results_panel_3d(
     else:
         shape = (int(np.ceil(n_cycles / wrap)), wrap)
 
-    if threedim:
-        kwargs["subplot_kw"] = {"projection": "3d"}
-    fig, axs = plt.subplots(*shape, gridspec_kw={"bottom": 0.16}, **kwargs)
+    fig, axs = plt.subplots(*shape, **d_kw["subplot_kw"])
 
     # Loop by panel
     for i, ax in enumerate(axs.flat):
@@ -355,45 +404,36 @@ def plot_results_panel_3d(
                 df_observed["cycle"] != i, df_observed[dv[0]]
             )
             # Plotting scatter
-            ax.scatter(*l_x, dv_previous, s=2, alpha=0.6, label="Previous Data")
-            ax.scatter(*l_x, dv_current, c="orange", s=2, alpha=0.6, label="New Data")
+            ax.scatter(*l_x, dv_previous, **d_kw["scatter_kw1"])
+            ax.scatter(*l_x, dv_current, **d_kw["scatter_kw2"])
 
             # ---Plot Theory---
-            l_condition = [condition_space[:, s[0]] for s in ivs]
-            if not threedim:
-                ax.plot(*l_condition, d_predictions[i], label="Theory")
 
-                # Label Panels
-                ax.text(
-                    0.05, 1, f"Cycle {i}", ha="left", va="top", transform=ax.transAxes
-                )
+            ax.plot_surface(
+                x1, x2, d_predictions[i].reshape(x1.shape), **d_kw["surface_kw"]
+            )
+            # Axis labels
+            ax.set_xlabel(iv_labels[0])
+            ax.set_ylabel(iv_labels[1])
+            ax.set_zlabel(dv_label)
 
-                if not spines:
-                    ax.spines.right.set_visible(False)
-                    ax.spines.top.set_visible(False)
-
-            else:  # 3D Plotting
-                X, Y = np.meshgrid(*l_condition)
-
-                ax.plot_surface(
-                    *l_condition, d_predictions[i], alpha=0.5, label="Theory"
-                )
-                # Axis labels
-                ax.set_xlabel(iv_labels[0])
-                ax.set_ylabel(iv_labels[1])
-                ax.set_zlabel(dv_label)
+            # Viewing angle
+            if view:
+                ax.view_init(*view)
 
         else:
             ax.axis("off")
 
-    # Super Labels for 2D Plots
-    if not threedim:
-        fig.supxlabel(iv_labels[0], y=0.07)
-        fig.supylabel(dv_label)
-
     # Legend
+    handles, labels = axs.flatten()[0].get_legend_handles_labels()
+    legend_elements = [
+        handles[0],
+        handles[1],
+        Patch(facecolor=handles[2].get_facecolors()[0]),
+    ]
     fig.legend(
-        ["Previous Data", "New Data", "Theory"],
+        handles=legend_elements,
+        labels=labels,
         ncols=3,
         bbox_to_anchor=(0.5, 0),
         loc="lower center",
