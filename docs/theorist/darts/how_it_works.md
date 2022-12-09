@@ -4,7 +4,7 @@
 
 Regular DARTS treats the architecture of a neural network as a directed acyclic computation graph (DAG), containing $N$ nodes in sequential order.
 
-![Comptuation Graph](img/darts_computation_graph.jpg)
+![Computation Graph](img/darts_computation_graph.jpg)
 
 Each node $x_i$ corresponds to a latent representation of the input space. Each directed edge $e_{i, j}$ is associated with some operation  $o_{i,j}$ that transforms the representation of the preceding node $i$, and feeds it to node $j$. Each intermediate node is computed by integrating over its transformed predecessors:
 

@@ -46,6 +46,6 @@ We can then pass these primitives directly to the BMS regressor as follows:
 from autora.skl.bms import BMSRegressor
 
 bms_estimator = BMSRegressor(
-    prior=primitives
+    prior_par=primitives
 )
 ```
