@@ -20,6 +20,7 @@ def assumption_sampler(X, y, model, n, loss=True, theorist=None, confirmation_bi
         n: number of samples to select
         loss: assumption to test: identify points that are most affected by choice of loss function
         theorist: the Theorist, which employs the theory it has been hard-coded to demonstrate
+        confirmation_bias: whether to find evidence to support or oppose the theory
 
     Returns: Sampled pool
 
