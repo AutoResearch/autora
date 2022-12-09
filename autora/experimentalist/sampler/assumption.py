@@ -56,7 +56,6 @@ def assumption_sampler(X, y, model, n, loss=True, theorist=None):
             )
             loss_delta = alternative_loss - current_loss
             idx = np.flip(loss_delta.argsort()[:n])
-            print(idx)
     else:
         raise TypeError(
             "Experiment results are required to run the assumption experimentalist"
