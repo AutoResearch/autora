@@ -7,71 +7,6 @@ import pandas as pd
 
 from autora.cycle import Cycle
 
-# def parse_dv_iv(
-#     cycle: Cycle,
-#     iv_names: Optional[Union[str, List[str]]] = None,
-#     dv_name: Optional[str] = None,
-# ):
-#     """
-#     Selects the independent (IV) and dependent (DV) variables defined in cycle based from optional
-#     user input. Returns a list of IV tuples (index, IV) single DV tuple (index, Variable). The
-#     index is in reference to the column in which the variable appears in the cycle's observed data
-#     structures.
-#
-#     Args:
-#         cycle: AER Cycle object that has been run
-#         iv_names: List of up to 2 independent variable names. Names should match the names
-#                     instantiated in the cycle object. Default will select up to the first two.
-#         dv_name: Single DV name. Name should match the names instantiated in the cycle object.
-#                     Default will select the first DV
-#
-#     Returns: List of independent variable tuples (index, Variable) and single dependent variable
-#     tuple (index, Variable).
-#
-#     """
-#
-#     l_iv = cycle.data.metadata.independent_variables
-#     l_dv = cycle.data.metadata.dependent_variables
-#     n_iv = len(l_iv)
-#
-#     # Input conversion
-#     if isinstance(iv_names, str):
-#         iv_names = [iv_names]
-#
-#     # Select independent variables to plot
-#     if iv_names:  # If user supplies names
-#         # TODO deal with order of ivs if specified, currently plots x1,x2 in the order
-#         #  specified in the cycle metadata.
-#         assert (
-#             len(iv_names) <= 2
-#         ), f"Cannot plot more than two IVs; got {len(iv_names)}."
-#         l_iv_to_plot = [(i, s) for i, s in enumerate(l_iv) if s.name in iv_names]
-#         assert len(l_iv_to_plot) == len(iv_names), (
-#             "Invalid IV name(s) detected. "
-#             "Check that iv_names keyword matches model IV "
-#             "names."
-#         )
-#     else:  # If not specified take up to the first 2 IVs
-#         l_iv_to_plot = [(i, s) for i, s in enumerate(l_iv[:2])]
-#
-#     # Select dependent variable to plot
-#     # In the data structure DVs are after IVs. The number of IVs is added to get the DV index.
-#     if dv_name:
-#         try:
-#             dv_to_plot = [
-#                 (i + n_iv, s) for i, s in enumerate(l_dv) if s.name == dv_name
-#             ][0]
-#         except IndexError:
-#             raise IndexError(
-#                 f'Dependent variable "{dv_name}" was not found in the model. '
-#                 f"Check DV name."
-#             )
-#
-#     else:
-#         dv_to_plot = (n_iv, l_dv[0])
-#
-#     return l_iv_to_plot, dv_to_plot
-
 
 def get_variable_index(cycle: Cycle):
     l_iv = [
@@ -147,7 +82,6 @@ def generate_condition_space(cycle: Cycle, steps: int = 50):
         l_space.append(np.linspace(min_max[0], min_max[1], steps))
 
     if len(l_space) > 1:
-        # TODO Check if this outputs the correct shape
         return np.array(list(product(*l_space)))
     else:
         return l_space[0].reshape(-1, 1)
@@ -175,22 +109,24 @@ def check_replace_default_kw(default: dict, user: dict):
     Combines the key/value pairs of two dictionaries, a default and user dictionary. Unique pairs
     are selected and user pairs take precedent over default pairs if matching keywords. Also works
     with nested dictionaries.
-    Args:
-        default:
-        user:
 
     Returns: dictionary
 
     """
+    # Copy dict 1 to return dict
     d_return = default.copy()
+    # Loop by keys in dict 2
     for key in user.keys():
+        # If not in dict 1 add to the return dict
         if key not in default.keys():
             d_return.update({key: user[key]})
         else:
+            # If value is a dict, recurse to check nested dict
             if isinstance(user[key], dict):
                 d_return.update(
                     {key: check_replace_default_kw(default[key], user[key])}
                 )
+            # If not a dict update the default value with the value from dict 2
             else:
                 d_return.update({key: user[key]})
 
