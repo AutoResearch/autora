@@ -102,7 +102,7 @@ def test_poppernet_classification(synthetic_logr_model, classification_data_to_t
                 x_train=X_train,
                 y_train=Y_train,
                 metadata=metadata,
-                num_samples=2,
+                n=2,
                 training_epochs=1000,
                 optimization_epochs=1000,
                 training_lr=1e-3,
