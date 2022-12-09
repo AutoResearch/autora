@@ -42,7 +42,6 @@ def assumption_sampler(X, y, model, n, loss=True, theorist=None):
                     )
                 )
             y_pred = model.predict(X)
-            print(X.shape)
             current_loss = current(
                 y_true=y.reshape(1, -1),
                 y_pred=y_pred.reshape(1, -1),
