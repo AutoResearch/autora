@@ -9,7 +9,19 @@ from matplotlib.patches import Patch
 from autora.cycle import Cycle
 
 
-def get_variable_index(cycle: Cycle):
+def get_variable_index(
+    cycle: Cycle,
+) -> Tuple[List[Tuple[int, str, str]], List[Tuple[int, str, str]]]:
+    """
+    Extracts information about independent and dependent variables from the cycle object.
+    Returns a list of tuples of (index, name, units). The index is in reference to the column number
+    in the observed value arrays.
+    Args:
+        cycle: AER Cycle object that has been run
+
+    Returns: Tuple of 2 lists of tuples
+
+    """
     l_iv = [
         (i, s.name, s.units)
         for i, s in enumerate(cycle.data.metadata.independent_variables)
@@ -22,7 +34,7 @@ def get_variable_index(cycle: Cycle):
     return l_iv, l_dv
 
 
-def observed_to_df(cycle: Cycle):
+def observed_to_df(cycle: Cycle) -> pd.DataFrame:
     """
     Concatenates observation data of cycles into a single dataframe with a field "cycle" with the
     cycle index.
@@ -66,14 +78,14 @@ def min_max_observations(cycle: Cycle) -> List[Tuple[float, float]]:
     return l_return
 
 
-def generate_condition_space(cycle: Cycle, steps: int = 50):
+def generate_condition_space(cycle: Cycle, steps: int = 50) -> np.array:
     """
     Generates condition space based on the minimum and maximum of all observed data in AER Cycle.
     Args:
         cycle: AER Cycle object that has been run
         steps: Number of steps to define the condition space
 
-    Returns:
+    Returns: np.array
 
     """
     l_min_max = min_max_observations(cycle)
@@ -88,14 +100,14 @@ def generate_condition_space(cycle: Cycle, steps: int = 50):
         return l_space[0].reshape(-1, 1)
 
 
-def generate_mesh_grid(cycle: Cycle, steps: int = 50):
+def generate_mesh_grid(cycle: Cycle, steps: int = 50) -> np.ndarray:
     """
     Generates a mesh grid based on the minimum and maximum of all observed data in AER Cycle.
     Args:
         cycle: AER Cycle object that has been run
         steps: Number of steps to define the condition space
 
-    Returns:
+    Returns: np.ndarray
 
     """
     l_min_max = min_max_observations(cycle)
@@ -107,14 +119,14 @@ def generate_mesh_grid(cycle: Cycle, steps: int = 50):
     return np.meshgrid(*l_space)
 
 
-def theory_predict(cycle: Cycle, conditions: Sequence):
+def theory_predict(cycle: Cycle, conditions: Sequence) -> dict:
     """
     Gets theory predictions over conditions space and saves results of each cycle to a dictionary.
     Args:
         cycle: AER Cycle object that has been run
         conditions: Condition space. Should be an array of grouped conditions.
 
-    Returns:
+    Returns: dict
 
     """
     d_predictions = {}
@@ -130,7 +142,7 @@ def check_replace_default_kw(default: dict, user: dict) -> dict:
     are selected and user pairs take precedent over default pairs if matching keywords. Also works
     with nested dictionaries.
 
-    Returns: dictionary
+    Returns: dict
     """
     # Copy dict 1 to return dict
     d_return = default.copy()
@@ -163,7 +175,7 @@ def plot_results_panel_2d(
     scatter_kw1: dict = {},
     scatter_kw2: dict = {},
     line_kw: dict = {},
-):
+) -> plt.figure:
     """
     Generates a multi-panel plot with each panel showing results of an AER cycle. Observed data
     is plotted as a scatter plot with the current cycle colored differently than observed data from
@@ -222,11 +234,11 @@ def plot_results_panel_2d(
     if iv_name:
         iv = [s for s in ivs if s[1] == iv_name]
     else:
-        iv = ivs[0]
+        iv = [ivs[0]]
     if dv_name:
         dv = [s for s in dvs if s[1] == dv_name]
     else:
-        dv = dvs[0]
+        dv = [dvs[0]]
     iv_label = f"{iv[1]} {iv[2]}"
     dv_label = f"{dv[1]} {dv[2]}"
 
@@ -303,7 +315,7 @@ def plot_results_panel_3d(
     scatter_kw1: dict = {},
     scatter_kw2: dict = {},
     surface_kw: dict = {},
-):
+) -> plt.figure:
     """
     Generates a multi-panel plot with each panel showing results of an AER cycle. Observed data
     is plotted as a scatter plot with the current cycle colored differently than observed data from
@@ -368,7 +380,7 @@ def plot_results_panel_3d(
     if dv_name:
         dv = [s for s in dvs if s[1] == dv_name]
     else:
-        dv = dvs[0]
+        dv = [dvs[0]]
     iv_labels = [f"{s[1]} {s[2]}" for s in iv]
     dv_label = f"{dv[1]} {dv[2]}"
 
