@@ -55,7 +55,6 @@ def assumption_sampler(X, y, model, n, loss=True, theorist=None):
                 multioutput="raw_values",
             )
             loss_delta = alternative_loss - current_loss
-            print(loss_delta)
             idx = np.flip(loss_delta.argsort()[:n])
             print(idx)
     else:
