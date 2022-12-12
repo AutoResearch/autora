@@ -363,7 +363,6 @@ def plot_results_panel_3d(
     # Set defaults, check and add user supplied keywords
     # Default keywords
     subplot_kw_defaults = {
-        "gridspec_kw": {"bottom": 0.16},
         "subplot_kw": {"projection": "3d"},
     }
     scatter_kw1_defaults = {"color": "black", "s": 2, "label": "Previous Data"}
@@ -434,11 +433,14 @@ def plot_results_panel_3d(
             ax.scatter(*l_x, dv_current, **d_kw["scatter_kw2"])
 
             # ---Plot Theory---
-
             ax.plot_surface(
                 x1, x2, d_predictions[i].reshape(x1.shape), **d_kw["surface_kw"]
             )
-            # Axis labels
+            # ---Labels---
+            # Title
+            ax.set_title(f"Cycle {i}")
+
+            # Axis
             ax.set_xlabel(iv_labels[0])
             ax.set_ylabel(iv_labels[1])
             ax.set_zlabel(dv_label)
