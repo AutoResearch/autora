@@ -249,7 +249,7 @@ class _SimpleCycle:
 
         By using the monitor callback, we can investigate what's going on with the magic parameters:
         >>> cycle_with_magic_parameters.monitor = lambda data: print(
-        ...     _get_magic_values(data)["%observations.ivs%"].flatten()
+        ...     _get_cycle_properties(data)["%observations.ivs%"].flatten()
         ... )
 
         The monitor evaluates at the end of each cycle
@@ -317,7 +317,7 @@ class _SimpleCycle:
 
         data = self.data
         params_with_magics = _resolve_magic_params(
-            self.params, _get_magic_values(self.data)
+            self.params, _get_cycle_properties(self.data)
         )
 
         data = self._experimentalist_callback(
@@ -448,21 +448,21 @@ class LazyDict(Mapping):
         return len(self._raw_dict)
 
 
-def _get_magic_values(data: _SimpleCycleData):
+def _get_cycle_properties(data: _SimpleCycleData):
     """
     Examples:
         Even with an empty data object, we can initialize the dictionary,
-        >>> magic_results = _get_magic_values(_SimpleCycleData(metadata=None, conditions=[],
+        >>> cycle_properties = _get_cycle_properties(_SimpleCycleData(metadata=None, conditions=[],
         ...     observations=[], theories=[]))
 
         ... but it will raise an exception if a value isn't yet available when we try to use it
-        >>> magic_results["%theories[-1]%"] # doctest: +ELLIPSIS
+        >>> cycle_properties["%theories[-1]%"] # doctest: +ELLIPSIS
         Traceback (most recent call last):
         ...
         IndexError: list index out of range
 
         Nevertheless, we can iterate through its keys no problem:
-        >>> [key for key in magic_results.keys()] # doctest: +NORMALIZE_WHITESPACE
+        >>> [key for key in cycle_properties.keys()] # doctest: +NORMALIZE_WHITESPACE
         ['%observations.ivs[-1]%', '%observations.dvs[-1]%', '%observations.ivs%',
         '%observations.dvs%', '%theories[-1]%', '%theories%']
 
@@ -470,7 +470,7 @@ def _get_magic_values(data: _SimpleCycleData):
 
     n_ivs = len(data.metadata.independent_variables)
     n_dvs = len(data.metadata.dependent_variables)
-    magic_dict = LazyDict(
+    cycle_property_dict = LazyDict(
         {
             "%observations.ivs[-1]%": lambda: data.observations[-1][:, 0:n_ivs],
             "%observations.dvs[-1]%": lambda: data.observations[-1][:, n_ivs:],
@@ -482,4 +482,4 @@ def _get_magic_values(data: _SimpleCycleData):
             "%theories%": lambda: data.theories,
         }
     )
-    return magic_dict
+    return cycle_property_dict
