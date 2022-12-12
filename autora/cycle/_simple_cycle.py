@@ -247,7 +247,7 @@ class _SimpleCycle:
         >>> cycle_with_cycle_properties.data.conditions
         [array([2]), array([6]), array([5]), array([7]), array([3]), array([4])]
 
-        By using the monitor callback, we can investigate what's going on with the magic parameters:
+        By using the monitor callback, we can investigate what's going on with the cycle properties:
         >>> cycle_with_cycle_properties.monitor = lambda data: print(
         ...     _get_cycle_properties(data)["%observations.ivs%"].flatten()
         ... )
@@ -316,14 +316,14 @@ class _SimpleCycle:
         ), "theorist cannot yet accept cycle parameters"
 
         data = self.data
-        params_with_magics = _resolve_cycle_properties(
+        params_with_cycle_properties = _resolve_cycle_properties(
             self.params, _get_cycle_properties(self.data)
         )
 
         data = self._experimentalist_callback(
             self.experimentalist,
             data,
-            params_with_magics.get("experimentalist", dict()),
+            params_with_cycle_properties.get("experimentalist", dict()),
         )
         data = self._experiment_runner_callback(self.experiment_runner, data)
         data = self._theorist_callback(self.theorist, data)
