@@ -210,8 +210,18 @@ def plot_results_panel_2d(
     # Set defaults, check and add user supplied keywords
     # Default keywords
     subplot_kw_defaults = {"gridspec_kw": {"bottom": 0.16}}
-    scatter_kw1_defaults = {"s": 2, "alpha": 0.6, "label": "Previous Data"}
-    scatter_kw2_defaults = {"s": 2, "alpha": 0.6, "label": "New Data"}
+    scatter_kw1_defaults = {
+        "color": "black",
+        "s": 2,
+        "alpha": 0.6,
+        "label": "Previous Data",
+    }
+    scatter_kw2_defaults = {
+        "color": "tab:orange",
+        "s": 2,
+        "alpha": 0.6,
+        "label": "New Data",
+    }
     line_kw_defaults = {"label": "Theory"}
     # Combine default and user supplied keywords
     d_kw = {}
@@ -352,8 +362,8 @@ def plot_results_panel_3d(
         "gridspec_kw": {"bottom": 0.16},
         "subplot_kw": {"projection": "3d"},
     }
-    scatter_kw1_defaults = {"s": 2, "label": "Previous Data"}
-    scatter_kw2_defaults = {"s": 2, "label": "New Data"}
+    scatter_kw1_defaults = {"color": "black", "s": 2, "label": "Previous Data"}
+    scatter_kw2_defaults = {"color": "tab:orange", "s": 2, "label": "New Data"}
     surface_kw_defaults = {"alpha": 0.5, "label": "Theory"}
     # Combine default and user supplied keywords
     d_kw = {}
