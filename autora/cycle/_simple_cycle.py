@@ -393,10 +393,10 @@ class _SimpleCycle:
 
 def _resolve_cycle_properties(params: Dict, cycle_properties: Mapping):
     """
-    Resolve "magic values" inside a nested dictionary.
+    Resolve "cycle properties" inside a nested dictionary.
 
-    In this context, a "magic value" is a string which is meant to be replaced by a different value
-    before the dictionary is accessed.
+    In this context, a "cycle property" is a string which is meant to be replaced by a
+    different value before the dictionary is used.
 
     Args:
         params: a (nested) dictionary of keys and values, where some values might be
