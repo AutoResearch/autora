@@ -316,7 +316,7 @@ class _SimpleCycle:
         ), "theorist cannot yet accept cycle parameters"
 
         data = self.data
-        params_with_magics = _resolve_magic_params(
+        params_with_magics = _resolve_cycle_properties(
             self.params, _get_cycle_properties(self.data)
         )
 
@@ -391,7 +391,7 @@ class _SimpleCycle:
             self.monitor(data)
 
 
-def _resolve_magic_params(params: Dict, magics: Mapping):
+def _resolve_cycle_properties(params: Dict, cycle_properties: Mapping):
     """
     Resolve "magic values" inside a nested dictionary.
 
@@ -399,32 +399,33 @@ def _resolve_magic_params(params: Dict, magics: Mapping):
     before the dictionary is accessed.
 
     Args:
-        params: a (nested) dictionary of keys and values, where some values might be "magic"
-        magics: a dictionary of "magic values" (keys) and "real values" (values)
+        params: a (nested) dictionary of keys and values, where some values might be
+            "cycle property names"
+        cycle_properties: a dictionary of "cycle property names" and their "real values"
 
-    Returns: a (nested) dictionary where "magic values" are replaced by the "real values"
+    Returns: a (nested) dictionary where "cycle property names" are replaced by the "real values"
 
     Examples:
 
-        >>> params_0 = {"key": "%magic_number%"}
-        >>> magics_0 = {"%magic_number%": 180}
-        >>> _resolve_magic_params(params_0, magics_0)
+        >>> params_0 = {"key": "%foo%"}
+        >>> cycle_properties_0 = {"%foo%": 180}
+        >>> _resolve_cycle_properties(params_0, cycle_properties_0)
         {'key': 180}
 
-        >>> params_1 = {"key": "%magic_number_0%", "nested_dict": {"inner_key": "%magic_number_1%"}}
-        >>> magics_1 = {"%magic_number_0%": 1, "%magic_number_1%": 2}
-        >>> _resolve_magic_params(params_1, magics_1)
+        >>> params_1 = {"key": "%bar%", "nested_dict": {"inner_key": "%foobar%"}}
+        >>> cycle_properties_1 = {"%bar%": 1, "%foobar%": 2}
+        >>> _resolve_cycle_properties(params_1, cycle_properties_1)
         {'key': 1, 'nested_dict': {'inner_key': 2}}
 
     """
     params_ = copy.copy(params)
     for key, value in params_.items():
         if isinstance(value, dict):
-            params_[key] = _resolve_magic_params(value, magics)
+            params_[key] = _resolve_cycle_properties(value, cycle_properties)
         elif (
-            isinstance(value, str) and value in magics
-        ):  # value is a key in the magics dictionary
-            params_[key] = magics[value]
+            isinstance(value, str) and value in cycle_properties
+        ):  # value is a key in the cycle_properties dictionary
+            params_[key] = cycle_properties[value]
         else:
             pass  # no change needed
 
