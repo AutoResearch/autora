@@ -453,8 +453,8 @@ def _get_cycle_properties(data: _SimpleCycleData):
     """
     Examples:
         Even with an empty data object, we can initialize the dictionary,
-        >>> cycle_properties = _get_cycle_properties(_SimpleCycleData(metadata=None, conditions=[],
-        ...     observations=[], theories=[]))
+        >>> cycle_properties = _get_cycle_properties(_SimpleCycleData(metadata=VariableCollection(),
+        ...     conditions=[], observations=[], theories=[]))
 
         ... but it will raise an exception if a value isn't yet available when we try to use it
         >>> cycle_properties["%theories[-1]%"] # doctest: +ELLIPSIS
