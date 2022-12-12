@@ -393,7 +393,7 @@ class _SimpleCycle:
 
 def _resolve_magic_params(params: Dict, magics: Mapping):
     """
-    Resolve "magic values" in a nested dictionary.
+    Resolve "magic values" inside a nested dictionary.
 
     In this context, a "magic value" is a string which is meant to be replaced by a different value
     before the dictionary is accessed.
