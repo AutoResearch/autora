@@ -1258,9 +1258,7 @@ def newProp(
     [oldRoot, Root, lnPointers, change, Q, Qinv, last_a, last_b, cnode] = Prop(
         Root, n_feature, Ops, Op_weights, Op_type, beta, sigma_a, sigma_b
     )
-    # print("change:",change)
-    # display(genList(Root))
-    # allcal(Root,X)
+
     sig = 4
     new_sigma = invgamma.rvs(sig)
 
@@ -1298,7 +1296,6 @@ def newProp(
             old_outputs[:, i] = temp
 
     if np.linalg.matrix_rank(new_outputs) < K:
-        Root = oldRoot
         return [False, sigma, copy.deepcopy(oldRoot), sigma_a, sigma_b]
 
     if change == "shrinkage":
@@ -1335,11 +1332,7 @@ def newProp(
             + np.log(max(1e-5, hratio))
             + np.log(max(1e-5, detjacob))
         )
-        logR = (
-            logR
-            + np.log(invgamma.pdf(new_sigma, sig))
-            - np.log(invgamma.pdf(sigma, sig))
-        )
+        logR += np.log(invgamma.pdf(new_sigma, sig)) - np.log(invgamma.pdf(sigma, sig))
         # print("logR:",logR)
 
     elif change == "expansion":
@@ -1371,11 +1364,7 @@ def newProp(
             + np.log(max(1e-5, hratio))
             + np.log(max(1e-5, detjacob))
         )
-        logR = (
-            logR
-            + np.log(invgamma.pdf(new_sigma, sig))
-            - np.log(invgamma.pdf(sigma, sig))
-        )
+        logR += np.log(invgamma.pdf(new_sigma, sig)) - np.log(invgamma.pdf(sigma, sig))
 
     else:  # no dimension jump
         # contribution of f(y|S,Theta,x)
@@ -1399,17 +1388,11 @@ def newProp(
 
         # R
         logR = log_yratio + log_strucratio + log_qratio
-        logR = (
-            logR
-            + np.log(invgamma.pdf(new_sigma, sig))
-            - np.log(invgamma.pdf(sigma, sig))
-        )
+        logR += np.log(invgamma.pdf(new_sigma, sig)) - np.log(invgamma.pdf(sigma, sig))
 
     alpha = min(logR, 0)
     test = np.random.uniform(low=0, high=1, size=1)[0]
     if np.log(test) >= alpha:  # no accept
-        # print("no accept")
         return [False, sigma, copy.deepcopy(oldRoot), sigma_a, sigma_b]
-    else:
-        # print("||||||accepted||||||")
+    else: # accept
         return [True, new_sigma, copy.deepcopy(Root), new_sa2, new_sb2]

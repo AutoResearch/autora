@@ -130,8 +130,8 @@ class BSRRegressor(BaseEstimator, RegressorMixin):
 
         ones = np.ones((n_test, 1))
         tree_outs = np.concatenate((ones, tree_outs), axis=1)
-        beta = self.betas_[-self.last_idx]
-        output = np.matmul(tree_outs, beta)
+        _beta = self.betas_[-self.last_idx]
+        output = np.matmul(tree_outs, _beta)
 
         return output
 
@@ -183,6 +183,7 @@ class BSRRegressor(BaseEstimator, RegressorMixin):
                 # grow a tree from the root node
                 if self.show_log:
                     _logger.info("Grow a tree from the root node")
+
                 grow(root, n_feature, ops, op_weights, op_type, beta, sigma_a, sigma_b)
                 # Tree = genList(root)
 
@@ -211,11 +212,11 @@ class BSRRegressor(BaseEstimator, RegressorMixin):
             )  # add to the matrix to prevent singular matrrix
             yy = np.array(y)
             yy.shape = (yy.shape[0], 1)
-            beta = np.linalg.inv(np.matmul(tree_outputs.transpose(), tree_outputs) + epsilon)
-            beta = np.matmul(beta, np.matmul(tree_outputs.transpose(), yy))
-            output = np.matmul(tree_outputs, beta)
+            _beta = np.linalg.inv(np.matmul(tree_outputs.transpose(), tree_outputs) + epsilon)
+            _beta = np.matmul(_beta, np.matmul(tree_outputs.transpose(), yy))
+            output = np.matmul(tree_outputs, _beta)
             # rescale the beta, above we scale tree_outputs for calculation by fwl
-            beta /= scale
+            _beta /= scale
 
             total = 0
             accepted = 0
@@ -231,7 +232,7 @@ class BSRRegressor(BaseEstimator, RegressorMixin):
                 curr_roots = []  # list of current components
 
                 switch_label = False
-                for count in np.arange(k):
+                for count in range(k):
                     curr_roots = []  # list of current components
                     for i in np.arange(k):
                         curr_roots.append(root_lists[i][-1])
@@ -265,15 +266,15 @@ class BSRRegressor(BaseEstimator, RegressorMixin):
                     sigma_a_list[count] = sigma_a
                     sigma_b_list[count] = sigma_b
 
-                    if res is True:
+                    if res:
                         # flag = False
                         accepted += 1
                         # record newly accepted root
                         root_lists[count].append(copy.deepcopy(root))
 
                         node_sums = 0
-                        for k in np.arange(0, k):
-                            node_sums += getNum(root_lists[k][-1])
+                        for i in np.arange(k):
+                            node_sums += getNum(root_lists[i][-1])
                         node_counts.append(node_sums)
 
                         tree_outputs = np.zeros((n_train, k))
@@ -292,13 +293,12 @@ class BSRRegressor(BaseEstimator, RegressorMixin):
                         )  # add to prevent singular matrix
                         yy = np.array(y)
                         yy.shape = (yy.shape[0], 1)
-                        beta = np.linalg.inv(np.matmul(tree_outputs.transpose(), tree_outputs) + epsilon)
-                        beta = np.matmul(beta, np.matmul(tree_outputs.transpose(), yy))
+                        _beta = np.linalg.inv(np.matmul(tree_outputs.transpose(), tree_outputs) + epsilon)
+                        _beta = np.matmul(_beta, np.matmul(tree_outputs.transpose(), yy))
 
-                        output = np.matmul(tree_outputs, beta)
-                        beta = (
-                            beta / scale
-                        )  # rescale the beta, above we scale tree_outputs for calculation
+                        output = np.matmul(tree_outputs, _beta)
+                        # rescale the beta, above we scale tree_outputs for calculation
+                        _beta /= scale
 
                         error = 0
                         for i in np.arange(0, n_train):
@@ -312,12 +312,13 @@ class BSRRegressor(BaseEstimator, RegressorMixin):
                         total_list.append(total)
                         total = 0
 
-                    lapses = min(10, len(errs))
-                    converge_ratio = 1 - np.min(errs[-lapses:]) / np.mean(errs[-lapses:])
-                    if lapses > 100 and converge_ratio < 0.05:
-                        # converged
-                        switch_label = True
-                        break
+                    if len(errs) > 100:
+                        lapses = min(10, len(errs))
+                        converge_ratio = 1 - np.min(errs[-lapses:]) / np.mean(errs[-lapses:])
+                        if converge_ratio < 0.05:
+                            # converged
+                            switch_label = True
+                            break
                 if switch_label:
                     break
 
@@ -334,7 +335,7 @@ class BSRRegressor(BaseEstimator, RegressorMixin):
 
             train_errs.append(errs)
             roots.append(curr_roots)
-            betas.append(beta)
+            betas.append(_beta)
 
         self.roots_ = roots
         self.train_errs_ = train_errs
