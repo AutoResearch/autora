@@ -1302,6 +1302,12 @@ class Tree:
 
         Returns: predicted y values
         """
+        if isinstance(x, np.ndarray):
+            columns = list()
+            for col in range(x.shape[1]):
+                columns.append("X" + str(col))
+            x = pd.DataFrame(x, columns=columns)
+
         if isinstance(x, pd.DataFrame):
             this_x = {"d0": x}
             input_type = "df"
