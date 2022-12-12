@@ -232,13 +232,13 @@ def plot_results_panel_2d(
     # ---Extract IVs and DV metadata and indexes---
     ivs, dvs = get_variable_index(cycle)
     if iv_name:
-        iv = [s for s in ivs if s[1] == iv_name]
+        iv = [s for s in ivs if s[1] == iv_name][0]
     else:
-        iv = [ivs[0]]
+        iv = [ivs[0]][0]
     if dv_name:
-        dv = [s for s in dvs if s[1] == dv_name]
+        dv = [s for s in dvs if s[1] == dv_name][0]
     else:
-        dv = [dvs[0]]
+        dv = [dvs[0]][0]
     iv_label = f"{iv[1]} {iv[2]}"
     dv_label = f"{dv[1]} {dv[2]}"
 
@@ -378,9 +378,9 @@ def plot_results_panel_3d(
     else:
         iv = ivs[:2]
     if dv_name:
-        dv = [s for s in dvs if s[1] == dv_name]
+        dv = [s for s in dvs if s[1] == dv_name][0]
     else:
-        dv = [dvs[0]]
+        dv = [dvs[0]][0]
     iv_labels = [f"{s[1]} {s[2]}" for s in iv]
     dv_label = f"{dv[1]} {dv[2]}"
 
@@ -407,7 +407,7 @@ def plot_results_panel_3d(
 
             # ---Plot observed data---
             # Independent variable values
-            l_x = [df_observed.loc[:, s[0]] for s in ivs]
+            l_x = [df_observed.loc[:, s[0]] for s in iv]
             # Dependent values masked by current cycle vs previous data
             dv_previous = np.ma.masked_where(
                 df_observed["cycle"] >= i, df_observed[dv[0]]
