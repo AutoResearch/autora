@@ -209,7 +209,11 @@ def plot_results_panel_2d(
     # ---Figure and plot params---
     # Set defaults, check and add user supplied keywords
     # Default keywords
-    subplot_kw_defaults = {"gridspec_kw": {"bottom": 0.16}}
+    subplot_kw_defaults = {
+        "gridspec_kw": {"bottom": 0.16},
+        "sharex": True,
+        "sharey": True,
+    }
     scatter_kw1_defaults = {
         "color": "black",
         "s": 2,
