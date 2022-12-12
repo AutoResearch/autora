@@ -46,7 +46,7 @@ class _SimpleCycle:
         The space of allowed x values is the integers between 0 and 10 inclusive,
         and we record the allowed output values as well.
         >>> from autora.variable import VariableCollection, Variable
-        >>> study_metadata = VariableCollection(
+        >>> metadata_0 = VariableCollection(
         ...    independent_variables=[Variable(name="x1", allowed_values=range(11))],
         ...    dependent_variables=[Variable(name="y", value_range=(-20, 20))],
         ...    )
@@ -55,7 +55,7 @@ class _SimpleCycle:
         Since the space of values is so restricted, we can just sample them all each time.
         >>> from autora.experimentalist.pipeline import make_pipeline
         >>> example_experimentalist = make_pipeline(
-        ...     [study_metadata.independent_variables[0].allowed_values])
+        ...     [metadata_0.independent_variables[0].allowed_values])
 
         When we run a synthetic experiment, we get a reproducible noisy result:
         >>> import numpy as np
@@ -77,7 +77,7 @@ class _SimpleCycle:
         the theorist, experimentalist and experiment runner,
         as well as a monitor which will let us know which cycle we're currently on.
         >>> cycle = _SimpleCycle(
-        ...     metadata=study_metadata,
+        ...     metadata=metadata_0,
         ...     theorist=example_theorist,
         ...     experimentalist=example_experimentalist,
         ...     experiment_runner=example_synthetic_experiment_runner,
@@ -183,7 +183,7 @@ class _SimpleCycle:
 
         The cycle can handle that using the `params` keyword:
         >>> cycle_with_parameters = _SimpleCycle(
-        ...     metadata=study_metadata,
+        ...     metadata=metadata_0,
         ...     theorist=example_theorist,
         ...     experimentalist=example_experimentalist_with_parameters,
         ...     experiment_runner=example_synthetic_experiment_runner,
@@ -206,7 +206,7 @@ class _SimpleCycle:
         - the current best theory
         - all the existing observational data
         to generate its next values, we can use magic parameters:
-        >>> magics_metadata = VariableCollection(
+        >>> metadata_1 = VariableCollection(
         ...    independent_variables=[Variable(name="x1", allowed_values=range(10))],
         ...    dependent_variables=[Variable(name="y")],
         ...    )
@@ -218,13 +218,13 @@ class _SimpleCycle:
         ...     remaining_conditions = list(set(conditions) - set(excluded_conditions.flatten()))
         ...     return remaining_conditions
         >>> unobserved_data_experimentalist = make_pipeline([
-        ...     magics_metadata.independent_variables[0].allowed_values,
+        ...     metadata_1.independent_variables[0].allowed_values,
         ...     exclude_conditions,
         ...     custom_random_sampler
         ...     ]
         ... )
-        >>> magics_cycle = _SimpleCycle(
-        ...     metadata=magics_metadata,
+        >>> cycle_with_magic_parameters = _SimpleCycle(
+        ...     metadata=metadata_1,
         ...     theorist=example_theorist,
         ...     experimentalist=unobserved_data_experimentalist,
         ...     experiment_runner=example_synthetic_experiment_runner,
@@ -238,39 +238,39 @@ class _SimpleCycle:
 
         Now we can run the cycler to generate conditions and run experiments. The first time round,
         we have the full set of 10 possible conditions to select from, and we select "2" at random:
-        >>> _ = magics_cycle.run()
-        >>> magics_cycle.data.conditions[-1]
+        >>> _ = cycle_with_magic_parameters.run()
+        >>> cycle_with_magic_parameters.data.conditions[-1]
         array([2])
 
         We can continue to run the cycler, each time we add more to the list of "excluded" options:
-        >>> _ = magics_cycle.run(num_cycles=5)
-        >>> magics_cycle.data.conditions
+        >>> _ = cycle_with_magic_parameters.run(num_cycles=5)
+        >>> cycle_with_magic_parameters.data.conditions
         [array([2]), array([6]), array([5]), array([7]), array([3]), array([4])]
 
         By using the monitor callback, we can investigate what's going on with the magic parameters:
-        >>> magics_cycle.monitor = lambda data: print(
+        >>> cycle_with_magic_parameters.monitor = lambda data: print(
         ...     _get_magic_values(data)["%observations.ivs%"].flatten()
         ... )
 
         The monitor evaluates at the end of each cycle
         and shows that we've added a new observed IV each step
-        >>> _ = magics_cycle.run()
+        >>> _ = cycle_with_magic_parameters.run()
         [2. 6. 5. 7. 3. 4. 9.]
-        >>> _ = magics_cycle.run()
+        >>> _ = cycle_with_magic_parameters.run()
         [2. 6. 5. 7. 3. 4. 9. 0.]
 
         We deactivate the monitor by making it "None" again.
-        >>> magics_cycle.monitor = None
+        >>> cycle_with_magic_parameters.monitor = None
 
         We can continue until we've sampled all of the options:
-        >>> _ = magics_cycle.run(num_cycles=2)
-        >>> magics_cycle.data.conditions # doctest: +NORMALIZE_WHITESPACE
+        >>> _ = cycle_with_magic_parameters.run(num_cycles=2)
+        >>> cycle_with_magic_parameters.data.conditions # doctest: +NORMALIZE_WHITESPACE
         [array([2]), array([6]), array([5]), array([7]), array([3]), \
         array([4]), array([9]), array([0]), array([8]), array([1])]
 
         If we try to evaluate it again, the experimentalist fails, as there aren't any more
         conditions which are available:
-        >>> magics_cycle.run()  # doctest: +ELLIPSIS
+        >>> cycle_with_magic_parameters.run()  # doctest: +ELLIPSIS
         Traceback (most recent call last):
         ...
         ValueError: a cannot be empty unless no samples are taken
