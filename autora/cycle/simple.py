@@ -11,9 +11,8 @@ from autora.variable import VariableCollection
 
 
 @dataclass(frozen=True)
-class _SimpleCycleData:
-    """An object passed between processing steps in the _SimpleCycle which holds all the
-    data which can be updated."""
+class SimpleCycleData:
+    """An object passed between and updated by  processing steps in the SimpleCycle."""
 
     # Static
     metadata: VariableCollection
@@ -27,7 +26,7 @@ class _SimpleCycleData:
     theories: List[BaseEstimator]
 
 
-class _SimpleCycle:
+class SimpleCycle:
     """
     Runs an experimentalist, theorist and experiment runner in a loop.
 
@@ -60,7 +59,7 @@ class _SimpleCycle:
 
         ### Basic Usage
 
-        Aim: Use the Cycle to recover a simple ground truth theory from noisy data.
+        Aim: Use the SimpleCycle to recover a simple ground truth theory from noisy data.
 
         >>> def ground_truth(x):
         ...     return x + 1
@@ -95,10 +94,10 @@ class _SimpleCycle:
         >>> from sklearn.linear_model import LinearRegression
         >>> example_theorist = LinearRegression()
 
-        We initialize the Cycle with the metadata describing the domain of the theory,
+        We initialize the SimpleCycle with the metadata describing the domain of the theory,
         the theorist, experimentalist and experiment runner,
         as well as a monitor which will let us know which cycle we're currently on.
-        >>> cycle = _SimpleCycle(
+        >>> cycle = SimpleCycle(
         ...     metadata=metadata_0,
         ...     theorist=example_theorist,
         ...     experimentalist=example_experimentalist,
@@ -205,7 +204,7 @@ class _SimpleCycle:
         >>> example_experimentalist_with_parameters = make_pipeline([uniform_random_sampler])
 
         The cycle can handle that using the `params` keyword:
-        >>> cycle_with_parameters = _SimpleCycle(
+        >>> cycle_with_parameters = SimpleCycle(
         ...     metadata=metadata_0,
         ...     theorist=example_theorist,
         ...     experimentalist=example_experimentalist_with_parameters,
@@ -224,7 +223,7 @@ class _SimpleCycle:
         >>> cycle_with_parameters.data.conditions[-1].flatten()
         array([10.5838232 ,  9.45666031])
 
-        ### Accessing "Cycle Properties"
+        ### Accessing "SimpleCycle Properties"
 
          Some experimentalists, experiment runners and theorists require access to the values
             created during the cycle execution, e.g. experimentalists which require access
@@ -265,7 +264,7 @@ class _SimpleCycle:
         ...     custom_random_sampler
         ...     ]
         ... )
-        >>> cycle_with_cycle_properties = _SimpleCycle(
+        >>> cycle_with_cycle_properties = SimpleCycle(
         ...     metadata=metadata_1,
         ...     theorist=example_theorist,
         ...     experimentalist=unobserved_data_experimentalist,
@@ -325,7 +324,7 @@ class _SimpleCycle:
         theorist,
         experimentalist,
         experiment_runner,
-        monitor: Optional[Callable[[_SimpleCycleData], None]] = None,
+        monitor: Optional[Callable[[SimpleCycleData], None]] = None,
         params: Optional[Dict] = None,
     ):
         """
@@ -351,7 +350,7 @@ class _SimpleCycle:
             params = dict()
         self.params = params
 
-        self.data = _SimpleCycleData(
+        self.data = SimpleCycleData(
             metadata=metadata,
             conditions=[],
             observations=[],
@@ -393,7 +392,7 @@ class _SimpleCycle:
 
     @staticmethod
     def _experimentalist_callback(
-        experimentalist: Pipeline, data_in: _SimpleCycleData, params: dict
+        experimentalist: Pipeline, data_in: SimpleCycleData, params: dict
     ):
         new_conditions = experimentalist(**params)
         if isinstance(new_conditions, Iterable):
@@ -417,7 +416,7 @@ class _SimpleCycle:
 
     @staticmethod
     def _experiment_runner_callback(
-        experiment_runner: Callable, data_in: _SimpleCycleData
+        experiment_runner: Callable, data_in: SimpleCycleData
     ):
         x = data_in.conditions[-1]
         y = experiment_runner(x)
@@ -428,7 +427,7 @@ class _SimpleCycle:
         return data_out
 
     @staticmethod
-    def _theorist_callback(theorist, data_in: _SimpleCycleData):
+    def _theorist_callback(theorist, data_in: SimpleCycleData):
         all_observations = np.row_stack(data_in.observations)
         n_xs = len(
             data_in.metadata.independent_variables
@@ -442,7 +441,7 @@ class _SimpleCycle:
         )
         return data_out
 
-    def _monitor_callback(self, data: _SimpleCycleData):
+    def _monitor_callback(self, data: SimpleCycleData):
         if self.monitor is not None:
             self.monitor(data)
 
@@ -505,11 +504,11 @@ class LazyDict(Mapping):
         return len(self._raw_dict)
 
 
-def _get_cycle_properties(data: _SimpleCycleData):
+def _get_cycle_properties(data: SimpleCycleData):
     """
     Examples:
         Even with an empty data object, we can initialize the dictionary,
-        >>> cycle_properties = _get_cycle_properties(_SimpleCycleData(metadata=VariableCollection(),
+        >>> cycle_properties = _get_cycle_properties(SimpleCycleData(metadata=VariableCollection(),
         ...     conditions=[], observations=[], theories=[]))
 
         ... but it will raise an exception if a value isn't yet available when we try to use it

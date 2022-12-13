@@ -1,1 +1,1 @@
-from ._simple_cycle import _SimpleCycle as Cycle
+from .simple import SimpleCycle as DefaultCycle
