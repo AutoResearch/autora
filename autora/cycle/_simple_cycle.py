@@ -13,7 +13,7 @@ from autora.variable import VariableCollection
 
 @dataclass(frozen=True)
 class SimpleCycleData:
-    """An object passed between and updated by  processing steps in the SimpleCycle."""
+    """An object passed between and updated by processing steps in the SimpleCycle."""
 
     # Static
     metadata: VariableCollection
