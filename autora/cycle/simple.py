@@ -27,6 +27,43 @@ class SimpleCycleData:
     theories: List[BaseEstimator]
 
 
+def _get_cycle_properties(data: SimpleCycleData):
+    """
+    Examples:
+        Even with an empty data object, we can initialize the dictionary,
+        >>> cycle_properties = _get_cycle_properties(SimpleCycleData(metadata=VariableCollection(),
+        ...     conditions=[], observations=[], theories=[]))
+
+        ... but it will raise an exception if a value isn't yet available when we try to use it
+        >>> cycle_properties["%theories[-1]%"] # doctest: +ELLIPSIS
+        Traceback (most recent call last):
+        ...
+        IndexError: list index out of range
+
+        Nevertheless, we can iterate through its keys no problem:
+        >>> [key for key in cycle_properties.keys()] # doctest: +NORMALIZE_WHITESPACE
+        ['%observations.ivs[-1]%', '%observations.dvs[-1]%', '%observations.ivs%',
+        '%observations.dvs%', '%theories[-1]%', '%theories%']
+
+    """
+
+    n_ivs = len(data.metadata.independent_variables)
+    n_dvs = len(data.metadata.dependent_variables)
+    cycle_property_dict = LazyDict(
+        {
+            "%observations.ivs[-1]%": lambda: data.observations[-1][:, 0:n_ivs],
+            "%observations.dvs[-1]%": lambda: data.observations[-1][:, n_ivs:],
+            "%observations.ivs%": lambda: np.row_stack(
+                [np.empty([0, n_ivs + n_dvs])] + data.observations
+            )[:, 0:n_ivs],
+            "%observations.dvs%": lambda: np.row_stack(data.observations)[:, n_ivs:],
+            "%theories[-1]%": lambda: data.theories[-1],
+            "%theories%": lambda: data.theories,
+        }
+    )
+    return cycle_property_dict
+
+
 class SimpleCycle:
     """
     Runs an experimentalist, theorist and experiment runner in a loop.
@@ -486,40 +523,3 @@ def _resolve_cycle_properties(params: Dict, cycle_properties: Mapping):
             pass  # no change needed
 
     return params_
-
-
-def _get_cycle_properties(data: SimpleCycleData):
-    """
-    Examples:
-        Even with an empty data object, we can initialize the dictionary,
-        >>> cycle_properties = _get_cycle_properties(SimpleCycleData(metadata=VariableCollection(),
-        ...     conditions=[], observations=[], theories=[]))
-
-        ... but it will raise an exception if a value isn't yet available when we try to use it
-        >>> cycle_properties["%theories[-1]%"] # doctest: +ELLIPSIS
-        Traceback (most recent call last):
-        ...
-        IndexError: list index out of range
-
-        Nevertheless, we can iterate through its keys no problem:
-        >>> [key for key in cycle_properties.keys()] # doctest: +NORMALIZE_WHITESPACE
-        ['%observations.ivs[-1]%', '%observations.dvs[-1]%', '%observations.ivs%',
-        '%observations.dvs%', '%theories[-1]%', '%theories%']
-
-    """
-
-    n_ivs = len(data.metadata.independent_variables)
-    n_dvs = len(data.metadata.dependent_variables)
-    cycle_property_dict = LazyDict(
-        {
-            "%observations.ivs[-1]%": lambda: data.observations[-1][:, 0:n_ivs],
-            "%observations.dvs[-1]%": lambda: data.observations[-1][:, n_ivs:],
-            "%observations.ivs%": lambda: np.row_stack(
-                [np.empty([0, n_ivs + n_dvs])] + data.observations
-            )[:, 0:n_ivs],
-            "%observations.dvs%": lambda: np.row_stack(data.observations)[:, n_ivs:],
-            "%theories[-1]%": lambda: data.theories[-1],
-            "%theories%": lambda: data.theories,
-        }
-    )
-    return cycle_property_dict
