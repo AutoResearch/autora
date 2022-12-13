@@ -29,14 +29,36 @@ class _SimpleCycleData:
 
 class _SimpleCycle:
     """
+    Runs an experimentalist, theorist and experiment runner in a loop.
 
-    Args:
-        metadata:
-        theorist:
-        experimentalist:
-        experiment_runner:
+    Once initialized, the `cycle` can be started using the `cycle.run` method
+        or by calling `next(cycle)`.
+
+    The `.data` attribute is updated with the results.
+
+    Attributes:
+        data (dataclass): an object which is updated during the cycle and has the following
+            properties:
+
+            - `metadata`
+            - `conditions`: a list of np.ndarrays representing all of the IVs proposed by the
+                experimentalist
+            - `observations`: a list of np.ndarrays representing all of the IVs and DVs returned by
+                the experiment runner
+            - `theories`: a list of all the fitted theories (scikit-learn compatible estimators)
+
+        params (dict): a nested dictionary with parameters for the cycle parts.
+
+                `{
+                    "experimentalist": {<experimentalist params...>},
+                    "theorist": {<theorist params...>},
+                    "experiment_runner": {<experiment_runner params...>}
+                }`
+
 
     Examples:
+
+        ### Basic Usage
 
         Aim: Use the Cycle to recover a simple ground truth theory from noisy data.
 
@@ -173,6 +195,7 @@ class _SimpleCycle:
         ...
         Generated 111 theories
 
+        ### Passing Static Parameters
 
         It's easy to pass parameters to the cycle components, if there are any needed.
         Here we have an experimentalist which takes a parameter:
@@ -201,11 +224,30 @@ class _SimpleCycle:
         >>> cycle_with_parameters.data.conditions[-1].flatten()
         array([10.5838232 ,  9.45666031])
 
+        ### Accessing "Cycle Properties"
 
-         In the case we have an experimentalist which needs variables such as
-        - the current best theory
-        - all the existing observational data
-        to generate its next values, we can use "cycle properties":
+         Some experimentalists, experiment runners and theorists require access to the values
+            created during the cycle execution, e.g. experimentalists which require access
+            to the current best theory or the observed data. These data update each cycle, and
+            so cannot easily be set using simple `params`.
+
+        For this case, it is possible to use "cycle properties" in the `params` dictionary. These
+            are the following strings, which will be replaced during execution by their respective
+            current values:
+
+        - `"%observations.ivs[-1]%"`: the last observed independent variables
+        - `"%observations.dvs[-1]%"`: the last observed dependent variables
+        - `"%observations.ivs%"`: all the observed independent variables,
+            concatenated into a single array
+        - `"%observations.dvs%"`: all the observed dependent variables,
+            concatenated into a single array
+        - `"%theories[-1]%"`: the last fitted theorist
+        - `"%theories%"`: all the fitted theorists
+
+        In the following example, we use the `"observations.ivs"` cycle property for an
+            experimentalist which excludes conditions based on which conditions have
+            already been seen.
+
         >>> metadata_1 = VariableCollection(
         ...    independent_variables=[Variable(name="x1", allowed_values=range(10))],
         ...    dependent_variables=[Variable(name="y")],
@@ -286,6 +328,20 @@ class _SimpleCycle:
         monitor: Optional[Callable[[_SimpleCycleData], None]] = None,
         params: Optional[Dict] = None,
     ):
+        """
+        Args:
+            metadata: a description of the dependent and independent variables
+            theorist: a scikit-learn-compatible estimator
+            experimentalist: an autora.experimentalist.Pipeline
+            experiment_runner: a function to map independent variables onto observed dependent
+                variables
+            monitor: a function which gets read-only access to the `data` attribute at the end of
+                each cycle.
+            params: a nested dictionary with parameters to be passed to the parts of the cycle.
+                E.g. if the experimentalist had a step named "pool" which took an argument "n",
+                which you wanted to set to the value 30, then params would be set to this:
+                `{"experimentalist": {"pool": {"n": 30}}}`
+        """
 
         self.theorist = theorist
         self.experimentalist = experimentalist
@@ -310,10 +366,10 @@ class _SimpleCycle:
     def __next__(self):
         assert (
             "experiment_runner" not in self.params
-        ), "experiment_runner cannot yet accept cycle parameters"
+        ), "experiment_runner cannot yet accept cycle properties"
         assert (
             "theorist" not in self.params
-        ), "theorist cannot yet accept cycle parameters"
+        ), "theorist cannot yet accept cycle properties"
 
         data = self.data
         params_with_cycle_properties = _resolve_cycle_properties(
