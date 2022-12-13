@@ -177,8 +177,8 @@ class _SimpleCycle:
         It's easy to pass parameters to the cycle components, if there are any needed.
         Here we have an experimentalist which takes a parameter:
         >>> uniform_random_rng = np.random.default_rng(180)
-        >>> def uniform_random_sampler(num_samples):
-        ...     return uniform_random_rng.uniform(low=0, high=11, size=num_samples)
+        >>> def uniform_random_sampler(n):
+        ...     return uniform_random_rng.uniform(low=0, high=11, size=n)
         >>> example_experimentalist_with_parameters = make_pipeline([uniform_random_sampler])
 
         The cycle can handle that using the `params` keyword:
@@ -187,7 +187,7 @@ class _SimpleCycle:
         ...     theorist=example_theorist,
         ...     experimentalist=example_experimentalist_with_parameters,
         ...     experiment_runner=example_synthetic_experiment_runner,
-        ...     params={"experimentalist": {"uniform_random_sampler": {"num_samples": 7}}}
+        ...     params={"experimentalist": {"uniform_random_sampler": {"n": 7}}}
         ... )
         >>> _ = cycle_with_parameters.run()
         >>> cycle_with_parameters.data.conditions[-1].flatten()
@@ -196,7 +196,7 @@ class _SimpleCycle:
 
         For the next cycle, if we wish, we can change the parameter value:
         >>> cycle_with_parameters.params["experimentalist"]["uniform_random_sampler"]\\
-        ...     ["num_samples"] = 2
+        ...     ["n"] = 2
         >>> _ = cycle_with_parameters.run()
         >>> cycle_with_parameters.data.conditions[-1].flatten()
         array([10.5838232 ,  9.45666031])
