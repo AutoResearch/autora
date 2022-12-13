@@ -282,7 +282,7 @@ class SimpleCycle:
         - `"%theories%"`: all the fitted theorists
 
         In the following example, we use the `"observations.ivs"` cycle property for an
-            experimentalist which excludes conditions based on which conditions have
+            experimentalist which excludes those conditions which have
             already been seen.
 
         >>> metadata_1 = VariableCollection(
