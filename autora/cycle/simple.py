@@ -261,7 +261,7 @@ class SimpleCycle:
         >>> cycle_with_parameters.data.conditions[-1].flatten()
         array([10.5838232 ,  9.45666031])
 
-        ### Accessing "SimpleCycle Properties"
+        ### Accessing "Cycle Properties"
 
          Some experimentalists, experiment runners and theorists require access to the values
             created during the cycle execution, e.g. experimentalists which require access
