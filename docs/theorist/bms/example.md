@@ -1,4 +1,4 @@
-# 
+# Bayesian Machine Scientist
 
 ## Example
 
@@ -21,21 +21,27 @@ Now let us choose a prior over the primitives. In this case, we will use priors 
 prior = "Guimera2020"
 ```
 
-## Set up the BMS Regresssor
+## Set up the BMS Regressor
 
-We will use the BMS Regresssor to predict the outcomes. There are a number of parameters that determine how the architecture search is performed. The most important ones are listed below:
+We will use the BMS Regressor to predict the outcomes. There are a number of parameters that determine how the architecture search is performed. The most important ones are listed below:
 
 - **`epochs`**: The number of epochs to run BMS. This corresponds to the total number of equation mutations - one mcmc step for each parallel-tempered equation and one tree swap between a pair of parallel-tempered equations.
 - **`prior_par`**: A dictionary of priors for each operation. The keys correspond to operations and the respective values correspond to prior probabilities of those operations. The model comes with a default.  
 - **`ts`**: A list of temperature values. The machine scientist creates an equation tree for each of these values. Higher temperature trees are harder to fit, and thus they help prevent overfitting of the model.
 
 
-Let's set up the BMS regressor with default parameters.
+Let's use the same priors over primitives that we specified on the previous page as well as an illustrative set of temperatures to set up the BMS regressor with default parameters.
 
 ```python
 from autora.skl.bms import BMSRegressor
 
-bms_estimator = BMSRegressor()
+temperatures = [1.0] + [1.04**k for k in range(1, 20)] 
+
+bms_estimator = BMSRegressor(
+    epochs=1500,
+    prior_par=primitives,
+    ts=temperatures,
+)
 ```
 
 Now we have everything to fit and verify the model.
