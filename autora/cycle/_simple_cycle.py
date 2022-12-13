@@ -215,7 +215,7 @@ class SimpleCycle:
         Generated 9 theories
 
         ... or the precision (here we keep iterating while the difference between the gradients
-        between the second-last and last cycle is larger than 1x10^-3).
+        of the second-last and last cycle is larger than 1x10^-3).
         >>> _ = list(
         ...         takewhile(
         ...             lambda c: np.abs(c.data.theories[-1].coef_.item() -
