@@ -246,8 +246,8 @@ def run_experiment(X: np.ndarray, IVs: List[str], DVs: List[str], id: int=1):
     session_ID = 1
     host = '192.168.178.76'
     port = 47778
-    # exp_client = Experiment_Client(session_ID, host=host, port=port)
-    # exp_client.submit_job(experiment_name + ".exp", clear_sessions=True)
+    exp_client = Experiment_Client(session_ID, host=host, port=port)
+    exp_client.submit_job(experiment_name + ".exp", clear_sessions=True)
 
     data_file = experiment_name + "_data.csv"
     # read CSV into pandas data file

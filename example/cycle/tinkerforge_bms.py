@@ -11,7 +11,9 @@ from autora.experiment_runner.tinkerforge.experiment_client import run_experimen
 
 # meta parameters
 ground_truth_resolution = 1000
-samples_per_cycle = 6
+samples_per_cycle = 5 # 6
+num_popper_cycles = 5 # 1
+bms_epochs = 500
 value_range = (0, 3.5)
 allowed_values = np.linspace(value_range[0], value_range[1], ground_truth_resolution)
 
@@ -86,7 +88,7 @@ seed_experimentalist = Pipeline(
 )
 
 # define theorist
-bms_theorist = BMSRegressor(epochs=500)
+bms_theorist = BMSRegressor(epochs=bms_epochs)
 
 # define seed cycle
 # we will use this cycle to collect initial data and initialize the BMS model
@@ -100,44 +102,57 @@ seed_cycle = Cycle(
 # run seed cycle
 seed_cycle.run(num_cycles=1)
 
-# retrieve model
-seed_model = seed_cycle.data.theories[0].model_
-seed_x = seed_cycle.data.conditions[0]
-seed_y = seed_cycle.data.observations[0][:, 1]
+for cycle in range(num_popper_cycles):
+    if cycle == 0:
+        # retrieve model
+        model_seed = seed_cycle.data.theories[0].model_
+        x_seed = seed_cycle.data.conditions[0]
+        y_seed = seed_cycle.data.observations[0][:, 1]
 
-# now we define the poppernet experimentalist which takes into account
-# the seed data and the seed model
-popper_experimentalist = Pipeline(
-    [
-        ("popper_pool", poppernet_pool),
-        ("nearest_values_sampler", nearest_values_sampler),
-    ],
-    {
-        "popper_pool": {
-            "metadata": study_metadata,
-            "model": seed_model,
-            "x_train": seed_x,
-            "y_train": seed_y,
-            "n": samples_per_cycle,
-            "plot": True,
+    # now we define the poppernet experimentalist which takes into account
+    # the seed data and the seed model
+    popper_experimentalist = Pipeline(
+        [
+            ("popper_pool", poppernet_pool),
+            ("nearest_values_sampler", nearest_values_sampler),
+        ],
+        {
+            "popper_pool": {
+                "metadata": study_metadata,
+                "model": model_seed,
+                "x_train": x_seed,
+                "y_train": y_seed,
+                "n": samples_per_cycle,
+                "plot": True,
+            },
+            "nearest_values_sampler": {
+                "allowed_values": allowed_values,
+                "n": samples_per_cycle,
+            },
         },
-        "nearest_values_sampler": {
-            "allowed_values": allowed_values,
-            "n": samples_per_cycle,
-        },
-    },
-)
+    )
 
-# running a new cycle taking into account the seed data and model
-# TODO: need to find a way to incorporate the seed data into the cycle
-cycle = Cycle(
-    metadata=study_metadata,
-    theorist=bms_theorist,
-    experimentalist=popper_experimentalist,
-    experiment_runner=tinkerforge_experiment_runner,
-)
-cycle.run(num_cycles=1)
+    # running a new cycle taking into account the seed data and model
+    popper_cycle = Cycle(
+        metadata=study_metadata,
+        theorist=bms_theorist,
+        experimentalist=popper_experimentalist,
+        experiment_runner=tinkerforge_experiment_runner,
+    )
 
+    popper_cycle.data.observations.append(np.column_stack([x_seed, y_seed]))
+
+    popper_cycle.run(num_cycles=1)
+
+    model_seed = popper_cycle.data.theories[0].model_
+    # append x_seed with new x
+    x_seed = np.vstack([x_seed, popper_cycle.data.conditions[-1]])
+    # append y_seed with new y
+    y_seed = np.hstack([y_seed, popper_cycle.data.observations[-1][:, 1]])
+
+all_obs = np.row_stack(popper_cycle.data.observations)
+x_obs, y_obs = all_obs[:, 0], all_obs[:, 1]
+plt.scatter(x_obs, y_obs, s=10, label="collected data")
 
 # plot output of architecture search
 all_obs = np.row_stack(seed_cycle.data.observations)
@@ -148,8 +163,10 @@ x_pred = np.array(study_metadata.independent_variables[0].allowed_values).reshap
     ground_truth_resolution, 1
 )
 y_pred_seed = seed_cycle.data.theories[0].predict(x_pred)
-y_pred_final = cycle.data.theories[0].predict(x_pred)
+y_pred_final = popper_cycle.data.theories[0].predict(x_pred)
 plt.plot(x_pred, y_pred_seed, color="blue", label="seed model")
 plt.plot(x_pred, y_pred_final, color="red", label="final model")
+plt.xlabel("Source Voltage (V)")
+plt.ylabel("Current (mA)")
 plt.legend()
 plt.show()
