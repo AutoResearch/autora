@@ -19,10 +19,10 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
     - uses: actions/checkout@v3
-    - run: pipx install poetry
     - uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
         cache: "poetry"
+    - run: pipx install poetry
     - run: poetry install --with test
     - run: poetry run pytest
