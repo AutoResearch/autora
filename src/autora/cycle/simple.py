@@ -100,7 +100,7 @@ class SimpleCycle:
         Aim: Use the SimpleCycle to recover a simple ground truth theory from noisy data.
 
         >>> def ground_truth(x):
-        ...     return x + 1
+        ...     return x + 1.0
 
         The space of allowed x values is the integers between 0 and 10 inclusive,
         and we record the allowed output values as well.
@@ -124,7 +124,7 @@ class SimpleCycle:
         ...         return ground_truth(x) + rng.normal(0, 0.1, x.shape)
         ...     return runner
         >>> example_synthetic_experiment_runner = get_example_synthetic_experiment_runner()
-        >>> example_synthetic_experiment_runner(np.ndarray([1]))
+        >>> example_synthetic_experiment_runner(np.array([1.0]))
         array([2.04339546])
 
         The theorist "tries" to work out the best theory.
