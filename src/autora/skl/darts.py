@@ -450,11 +450,11 @@ class DARTSRegressor(BaseEstimator, RegressorMixin):
         >>> import numpy as np
         >>> num_samples = 1000
         >>> X = np.linspace(start=0, stop=1, num=num_samples).reshape(-1, 1)
-        >>> y = 15. * np.ones(num_samples)
+        >>> y = 15.5 * np.ones(num_samples)
         >>> estimator = DARTSRegressor(num_graph_nodes=1)
         >>> estimator = estimator.fit(X, y)
-        >>> estimator.predict([[0.5]])
-        array([[15.051043]], dtype=float32)
+        >>> estimator.predict([[0.5]]) # doctest: +ELLIPSIS
+        array([[15...]], dtype=float32)
 
 
     Attributes:
