@@ -13,7 +13,7 @@ from autora.variable import VariableCollection
 
 @dataclass(frozen=True)
 class SimpleCycleData:
-    """An object passed between and updated by  processing steps in the SimpleCycle."""
+    """An object passed between and updated by processing steps in the SimpleCycle."""
 
     # Static
     metadata: VariableCollection
@@ -215,7 +215,7 @@ class SimpleCycle:
         Generated 9 theories
 
         ... or the precision (here we keep iterating while the difference between the gradients
-        between the second-last and last cycle is larger than 1x10^-3).
+        of the second-last and last cycle is larger than 1x10^-3).
         >>> _ = list(
         ...         takewhile(
         ...             lambda c: np.abs(c.data.theories[-1].coef_.item() -
@@ -282,7 +282,7 @@ class SimpleCycle:
         - `"%theories%"`: all the fitted theorists
 
         In the following example, we use the `"observations.ivs"` cycle property for an
-            experimentalist which excludes conditions based on which conditions have
+            experimentalist which excludes those conditions which have
             already been seen.
 
         >>> metadata_1 = VariableCollection(
