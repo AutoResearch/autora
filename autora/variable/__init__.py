@@ -21,7 +21,7 @@ class Variable:
     """Describes an experimental variable: name, type, range, units, and value of a variable."""
 
     name: str = ""
-    value_range: Optional[Tuple[Any, Any]] = (0, 1)
+    value_range: Optional[Tuple[Any, Any]] = None
     allowed_values: Optional[Sequence] = None
     units: str = ""
     type: ValueType = ValueType.REAL
