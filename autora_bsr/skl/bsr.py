@@ -9,14 +9,14 @@ from sklearn.base import BaseEstimator, RegressorMixin
 from sklearn.utils.validation import check_is_fitted
 
 from autora_bsr.funcs import (
-    Express,
+    get_expression,
     Node,
-    allcal,
+    all_cal,
     display,
-    genList,
-    getNum,
+    gen_list,
+    get_num,
     grow,
-    newProp,
+    new_prop,
 )
 
 from typing import Union, Optional, List
@@ -91,7 +91,7 @@ class BSRRegressor(BaseEstimator, RegressorMixin):
     def model(self, last_ind: int = 1) -> List[str]:
         models = []
         for i in range(self.tree_num):
-            models.append(Express(self.roots_[-last_ind][i]))
+            models.append(get_expression(self.roots_[-last_ind][i]))
         return models
 
     def complexity(self) -> int:
@@ -99,7 +99,7 @@ class BSRRegressor(BaseEstimator, RegressorMixin):
         cps = []
         for i in range(self.tree_num):
             root_node = self.roots_[-1][i]
-            num = getNum(root_node)
+            num = get_num(root_node)
             cps.append(num)
             cp = cp + num
         return cp
@@ -124,7 +124,7 @@ class BSRRegressor(BaseEstimator, RegressorMixin):
         tree_outs = np.zeros((n_test, k))
 
         for i in np.arange(k):
-            tree_out = allcal(self.roots_[-self.last_idx][i], X)
+            tree_out = all_cal(self.roots_[-self.last_idx][i], X)
             tree_out.shape = tree_out.shape[0]
             tree_outs[:, i] = tree_out
 
@@ -185,7 +185,7 @@ class BSRRegressor(BaseEstimator, RegressorMixin):
                     _logger.info("Grow a tree from the root node")
 
                 grow(root, n_feature, ops, op_weights, op_type, beta, sigma_a, sigma_b)
-                # Tree = genList(root)
+                # Tree = gen_list(root)
 
                 # put the root into list
                 root_lists[count].append(copy.deepcopy(root))
@@ -199,7 +199,7 @@ class BSRRegressor(BaseEstimator, RegressorMixin):
             tree_outputs = np.zeros((n_train, k))
 
             for count in np.arange(k):
-                temp = allcal(root_lists[count][-1], X)
+                temp = all_cal(root_lists[count][-1], X)
                 temp.shape = temp.shape[0]
                 tree_outputs[:, count] = temp
 
@@ -242,8 +242,8 @@ class BSRRegressor(BaseEstimator, RegressorMixin):
 
                     # the returned root is a new copy
                     if self.show_log:
-                        _logger.info("newProp...")
-                    res, sigma, root, sigma_a, sigma_b = newProp(
+                        _logger.info("new_prop...")
+                    res, sigma, root, sigma_a, sigma_b = new_prop(
                         curr_roots,
                         count,
                         sigma,
@@ -259,7 +259,7 @@ class BSRRegressor(BaseEstimator, RegressorMixin):
                     )
                     if self.show_log:
                         _logger.info("res:", res)
-                        display(genList(root))
+                        display(gen_list(root))
 
                     total += 1
                     # update sigma_a and sigma_b
@@ -274,13 +274,13 @@ class BSRRegressor(BaseEstimator, RegressorMixin):
 
                         node_sums = 0
                         for i in np.arange(k):
-                            node_sums += getNum(root_lists[i][-1])
+                            node_sums += get_num(root_lists[i][-1])
                         node_counts.append(node_sums)
 
                         tree_outputs = np.zeros((n_train, k))
 
                         for i in np.arange(k):
-                            temp = allcal(root_lists[count][-1], X)
+                            temp = all_cal(root_lists[count][-1], X)
                             temp.shape = temp.shape[0]
                             tree_outputs[:, i] = temp
 
