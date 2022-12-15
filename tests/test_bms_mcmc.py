@@ -45,7 +45,7 @@ def test_tree_mcmc_stepping(
     )
 
     # MCMC
-    t.mcmc(burnin=200, thin=10, samples=samples, verbose=True)
+    t.mcmc(burnin=200, thin=10, samples=samples, verbose=False)
 
     # Predict
     print(t.predict(x))
