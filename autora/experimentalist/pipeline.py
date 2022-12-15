@@ -6,6 +6,7 @@ from __future__ import annotations
 import copy
 from typing import (
     Any,
+    Callable,
     Dict,
     Iterable,
     List,
@@ -13,26 +14,24 @@ from typing import (
     Protocol,
     Sequence,
     Tuple,
+    TypeVar,
     Union,
     get_args,
     runtime_checkable,
 )
 
-
-@runtime_checkable
-class Pool(Protocol):
-    """Creates an experimental sequence from scratch."""
-
-    def __call__(self) -> _ExperimentalSequence:
-        ...
+_ExperimentalCondition = TypeVar("_ExperimentalCondition")
+"""An _ExperimentalCondition represents a trial."""
 
 
-@runtime_checkable
-class Pipe(Protocol):
-    """Takes in an _ExperimentalSequence and modifies it before returning it."""
+_ExperimentalSequence = Iterable[_ExperimentalCondition]
+"""An _ExperimentalSequence represents a series of trials."""
 
-    def __call__(self, ex: _ExperimentalSequence) -> _ExperimentalSequence:
-        ...
+
+Pool = Callable[..., _ExperimentalSequence]
+
+Pipe = Callable[[_ExperimentalSequence, ...], _ExperimentalSequence]
+"""Takes in an _ExperimentalSequence and modifies it before returning it."""
 
 
 _StepType = Tuple[str, Union[Pool, Pipe, Iterable]]
@@ -387,15 +386,3 @@ def make_pipeline(
     pipeline = Pipeline(steps_, params=params)
 
     return pipeline
-
-
-class _ExperimentalCondition:
-    """An _ExperimentalCondition represents a trial."""
-
-    pass
-
-
-_ExperimentalSequence = Iterable[_ExperimentalCondition]
-_ExperimentalSequence.__doc__ = """
-An _ExperimentalSequence represents a series of trials.
-"""

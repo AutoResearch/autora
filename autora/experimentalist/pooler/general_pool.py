@@ -4,6 +4,7 @@ from typing import List
 
 import numpy as np
 
+from autora.experimentalist.pipeline import Pool
 from autora.variable import IV
 
 
@@ -20,6 +21,9 @@ def grid_pool(ivs: List[IV]):
 
     # Return Cartesian product of all IV values
     return product(*l_iv_values)
+
+
+a: Pool = grid_pool
 
 
 def random_pool(*args, n=1, duplicates=True):
