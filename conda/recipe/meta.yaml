@@ -53,7 +53,7 @@ test:
     - autora.experimentalist.sampler
     - autora.experimentalist.filter
     - autora.experimentalist.pipeline
-    - autora.experimentalist.pool
+    - autora.experimentalist.pooler
     - autora.skl
     - autora.skl.darts
     - autora.skl.bms
