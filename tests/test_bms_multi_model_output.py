@@ -1,8 +1,8 @@
 import numpy as np
 import pytest
-from theorist.bms import Tree
 
 from autora.skl.bms import BMSRegressor
+from autora.theorist.bms import Tree
 
 
 @pytest.fixture
