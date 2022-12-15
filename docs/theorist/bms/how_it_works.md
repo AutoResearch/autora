@@ -46,7 +46,7 @@ Bayesian inference via MCMC is then applied to navigate the search space efficie
 
 The search space is very rugged, and local minima are difficult to escape, so BMS employs parallel tempering to overcome this.
 
-![Comptuation Graph](img/BMSTempering.png)
+![Parallel_Tempering](img/BMSTempering.png)
 
 One incremental unit of search in this approach involves two steps:
 
@@ -57,7 +57,7 @@ I) Markov chain Monte Carlo Sampling:
     c) Choosing a specific variable or parameter value is random.
     d) Accepting or rejecting the mutation depends on Metropolis' rule.
     
-![Comptuation Graph](img/BMSEquationTreeOps.png)
+![Tree_Mutations](img/BMSEquationTreeOps.png)
 
 II) Parallel Tree Swap:
 
