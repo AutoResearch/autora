@@ -849,7 +849,7 @@ class DARTSClassifier(DARTSRegressor, ClassifierMixin):
             classifier_weight_decay: Weight decay for the classifier.
             darts_type: Type of DARTS to use ('original' or 'fair').
             init_weights_function: Function to initialize the parameters of each operation.
-            param_updates_per_epoch: Number of updates to perform per epoch.
+            param_updates_per_epoch: Number of updates to perform per epoch
                 for the operation parameters.
             param_learning_rate_max: Initial (maximum) learning rate for the operation parameters.
             param_learning_rate_min: Final (minimum) learning rate for the operation parameters.
