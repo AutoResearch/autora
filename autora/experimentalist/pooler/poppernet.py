@@ -1,26 +1,28 @@
-from typing import Iterable, Optional, Tuple, cast
+from typing import Optional, Tuple, cast
 
 import numpy as np
 import torch
+from sklearn.preprocessing import StandardScaler
 from torch import nn
 from torch.autograd import Variable
 
 from autora.variable import ValueType, VariableCollection
 
 
-def poppernet_pooler(
+def poppernet_pool(
     model,
     x_train: np.ndarray,
     y_train: np.ndarray,
     metadata: VariableCollection,
-    num_samples: int = 100,
+    n: int = 100,
     training_epochs: int = 1000,
     optimization_epochs: int = 1000,
     training_lr: float = 1e-3,
     optimization_lr: float = 1e-3,
     mse_scale: float = 1,
-    limit_offset: float = 10**-10,
+    limit_offset: float = 0,  # 10**-10,
     limit_repulsion: float = 0,
+    plot: bool = False,
 ):
     """
     A pooler that generates samples for independent variables with the objective of maximizing the
@@ -36,7 +38,7 @@ def poppernet_pooler(
         x_train: data that the model was trained on
         y_train: labels that the model was trained on
         metadata: Meta-data about the dependent and independent variables
-        num_samples: number of samples to return
+        n: number of samples to return
         training_epochs: number of epochs to train the popper network for approximating the
         error fo the model
         optimization_epochs: number of epochs to optimize the samples based on the trained
@@ -48,7 +50,7 @@ def poppernet_pooler(
         boundaries
         limit_repulsion: a limited repulsion to prevent the samples from being too close to the
         allowed value boundaries
-        verbose: print out the prediction of the popper network as well as its training loss
+        plot: print out the prediction of the popper network as well as its training loss
 
     Returns: Sampled pool
 
@@ -60,7 +62,7 @@ def poppernet_pooler(
     if len(x_train.shape) == 1:
         x_train = x_train.reshape(-1, 1)
 
-    x = np.empty([num_samples, x_train.shape[1]])
+    x = np.empty([n, x_train.shape[1]])
 
     y_train = np.array(y_train)
     if len(y_train.shape) == 1:
@@ -99,10 +101,22 @@ def poppernet_pooler(
         raise Exception("Model must have `predict` or `predict_proba` method.")
 
     model_prediction = model_predict(x_train)
+    if isinstance(model_prediction, np.ndarray) is False:
+        try:
+            model_prediction = np.array(model_prediction)
+        except Exception:
+            raise Exception("Model prediction must be convertable to numpy array.")
+    if model_prediction.ndim == 1:
+        model_prediction = model_prediction.reshape(-1, 1)
 
     criterion = nn.MSELoss()
     model_loss = (model_prediction - y_train) ** 2 * mse_scale
     model_loss = np.mean(model_loss, axis=1)
+
+    # standardize the loss
+    scaler = StandardScaler()
+    model_loss = scaler.fit_transform(model_loss.reshape(-1, 1)).flatten()
+
     model_loss = torch.from_numpy(model_loss).float()
     popper_target = Variable(model_loss, requires_grad=False)
 
@@ -127,6 +141,24 @@ def poppernet_pooler(
         popper_optimizer.step()
         losses.append(loss.item())
 
+    if plot:
+        popper_input_full = np.linspace(
+            iv_limit_list[0][0], iv_limit_list[0][1], 1000
+        ).reshape(-1, 1)
+        popper_input_full = Variable(
+            torch.from_numpy(popper_input_full), requires_grad=False
+        ).float()
+        popper_prediction = popper_net(popper_input_full)
+        plot_popper_diagnostics(
+            losses,
+            popper_input,
+            popper_input_full,
+            popper_prediction,
+            popper_target,
+            model_prediction,
+            y_train,
+        )
+
     # now that the popper network is trained we can sample new data points
     # to sample data points we need to provide the popper network with an initial condition
     # we will sample those initial conditions proportional to the loss of the current model
@@ -140,7 +172,7 @@ def poppernet_pooler(
 
     popper_net.freeze_weights()
 
-    for condition in range(num_samples):
+    for condition in range(n):
 
         index = transform_category.sample()
         input_sample = torch.flatten(x_train_tensor[index, :])
@@ -165,10 +197,13 @@ def poppernet_pooler(
 
                 # first add repulsion from variable limits
                 for idx in range(len(input_sample)):
-                    iv_value = input_sample[idx]
+                    iv_value = popper_input[idx]
                     iv_limits = iv_limit_list[idx]
                     dist_to_min = np.abs(iv_value - np.min(iv_limits))
                     dist_to_max = np.abs(iv_value - np.max(iv_limits))
+                    # deal with boundary case where distance is 0 or very small
+                    dist_to_min = np.max([dist_to_min, 0.00000001])
+                    dist_to_max = np.max([dist_to_max, 0.00000001])
                     repulsion_from_min = limit_repulsion / (dist_to_min**2)
                     repulsion_from_max = limit_repulsion / (dist_to_max**2)
                     iv_value_repulsed = (
@@ -179,7 +214,6 @@ def poppernet_pooler(
                 # now add gradient for theory loss maximization
                 delta = -optimization_lr * popper_input.grad
                 popper_input += delta
-                popper_input.grad.zero_()
 
                 # finally, clip input variable from its limits
                 for idx in range(len(input_sample)):
@@ -195,6 +229,7 @@ def poppernet_pooler(
                         ]
                     )
                     popper_input[idx] = iv_clipped_value
+                popper_input.grad.zero_()
 
         # add condition to new experiment sequence
         for idx in range(len(input_sample)):
@@ -210,69 +245,63 @@ def poppernet_pooler(
 
             x[condition, idx] = iv_clipped_scaled_value
 
-    return x
+    return iter(x)
 
 
-def plot_popper_diagnostics(losses, popper_input, popper_prediction, popper_target):
+def plot_popper_diagnostics(
+    losses,
+    popper_input,
+    popper_input_full,
+    popper_prediction,
+    popper_target,
+    model_prediction,
+    target,
+):
     print("Finished training Popper Network...")
     import matplotlib.pyplot as plt
 
     if popper_input.shape[1] > 1:
         plot_input = popper_input[:, 0]
-        plt.scatter(plot_input, popper_target.detach().numpy(), label="target")
-        plt.scatter(plot_input, popper_prediction.detach().numpy(), label="prediction")
     else:
         plot_input = popper_input
-        plt.plot(plot_input, popper_target.detach().numpy(), label="target")
-        plt.plot(plot_input, popper_prediction.detach().numpy(), label="prediction")
+
+    if model_prediction.ndim > 1:
+        if model_prediction.shape[1] > 1:
+            model_prediction = model_prediction[:, 0]
+            target = target[:, 0]
+
+    # PREDICTED MODEL ERROR PLOT
+    plot_input_order = np.argsort(np.array(plot_input).flatten())
+    plot_input = plot_input[plot_input_order]
+    popper_target = popper_target[plot_input_order]
+    # popper_prediction = popper_prediction[plot_input_order]
+    plt.plot(popper_input_full, popper_prediction.detach().numpy(), label="prediction")
+    plt.scatter(
+        plot_input, popper_target.detach().numpy(), s=20, c="red", label="target"
+    )
     plt.xlabel("x")
-    plt.ylabel("y")
+    plt.ylabel("model MSE")
+    plt.title("popper network prediction")
     plt.legend()
     plt.show()
+
+    # CONVERGENCE PLOT
     plt.plot(losses)
     plt.xlabel("epoch")
     plt.ylabel("loss")
+    plt.title("loss for popper network")
     plt.show()
 
-
-def nearest_values_sampler(
-    samples,
-    allowed_values,
-):
-    """
-    A sampler which returns the nearest values between the input samples and the allowed values,
-    without replacement.
-
-    Args:
-        samples: input conditions
-        allowed_samples: allowed conditions to sample from
-
-    Returns:
-        the nearest values from `allowed_samples` to the `samples`
-
-    """
-
-    if isinstance(allowed_values, Iterable):
-        allowed_values = np.array(list(allowed_values))
-
-    if len(allowed_values.shape) == 1:
-        allowed_values = allowed_values.reshape(-1, 1)
-
-    num_samples = samples.shape[0]
-
-    if allowed_values.shape[0] <= num_samples:
-        raise Exception("More samples requested than samples available in the pool x.")
-
-    x_new = np.empty((num_samples, allowed_values.shape[1]))
-
-    # get index of row in x that is closest to each sample
-    for row, sample in enumerate(samples):
-        dist = np.linalg.norm(allowed_values - sample, axis=1)
-        idx = np.argmin(dist)
-        x_new[row, :] = allowed_values[idx, :]
-        allowed_values = np.delete(allowed_values, idx, axis=0)
-
-    return x_new
+    # MODEL PREDICTION PLOT
+    model_prediction = model_prediction[plot_input_order]
+    target = target[plot_input_order]
+    plt.plot(plot_input, model_prediction, label="model prediction")
+    plt.scatter(plot_input, target, s=20, c="red", label="target")
+    plt.xlabel("x")
+    plt.ylabel("y")
+    plt.title("model prediction vs. target")
+    plt.legend()
+    plt.show()
 
 
 # define the network
