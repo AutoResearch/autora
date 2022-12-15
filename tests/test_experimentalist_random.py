@@ -2,10 +2,10 @@ from functools import partial
 
 import numpy as np
 import pytest
-from experimentalist.pooler.general_pool import grid_pool
 
 from autora.experimentalist.filter import weber_filter
 from autora.experimentalist.pipeline import make_pipeline
+from autora.experimentalist.pooler.general_pool import grid_pool
 from autora.experimentalist.sampler import random_sampler
 from autora.variable import DV, IV, ValueType, VariableCollection
 
