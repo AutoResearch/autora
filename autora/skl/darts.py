@@ -801,7 +801,7 @@ class DARTSClassifier(DARTSRegressor, ClassifierMixin):
         model_: represents the best-fit model including the output function
             after sampling of the network to pick a single computation graph.
             By default, this is the computation graph with the maximum weights,
-            but can be set to a graph based on a sample on the edge weights
+            but can be set to a graph based on a sample of the edge weights
             by running the `resample_model(sample_strategy="sample")` method.
             It can be reset by running the `resample_model(sample_strategy="max")` method.
 
