@@ -47,8 +47,8 @@ synthetic_experiment_runner = get_synthetic_experiment_runner()
 # Initialize the experimentalist
 random_experimentalist = Pipeline(
     [
-        ("grid_pool", grid_pool),
-        ("nearest_values_sampler", nearest_values_sampler),
+        ("grid_pool", grid_pool),  # type: ignore
+        ("nearest_values_sampler", nearest_values_sampler),  # type: ignore
     ],
     {
         "grid_pool": {"ivs": study_metadata.independent_variables},
@@ -85,8 +85,8 @@ seed_y = seed_cycle.data.observations[0][:, 1]
 # the seed data and the seed model
 popper_experimentalist = Pipeline(
     [
-        ("popper_pool", poppernet_pool),
-        ("nearest_values_sampler", nearest_values_sampler),
+        ("popper_pool", poppernet_pool),  # type: ignore
+        ("nearest_values_sampler", nearest_values_sampler),  # type: ignore
     ],
     {
         "popper_pool": {
