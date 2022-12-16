@@ -127,11 +127,7 @@ class Pipeline:
         """Successively pass the input values through the Pipe."""
 
         # Initialize the parameters objects.
-        pipeline_params = _parse_params_to_nested_dict(
-            self.params, divider=PARAM_DIVIDER
-        )
-        call_params = _parse_params_to_nested_dict(params, divider=PARAM_DIVIDER)
-        merged_params = _merge_dicts(pipeline_params, call_params)
+        merged_params = self._merge_params_with_self_params(params)
 
         try:
             # Check we have steps to use
@@ -173,6 +169,14 @@ class Pipeline:
             results.append(pipe(results[-1], **all_params_for_pipe))
 
         return results[-1]
+
+    def _merge_params_with_self_params(self, params):
+        pipeline_params = _parse_params_to_nested_dict(
+            self.params, divider=PARAM_DIVIDER
+        )
+        call_params = _parse_params_to_nested_dict(params, divider=PARAM_DIVIDER)
+        merged_params = _merge_dicts(pipeline_params, call_params)
+        return merged_params
 
     run = __call__
 
