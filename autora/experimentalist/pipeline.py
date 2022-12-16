@@ -4,6 +4,7 @@ Provides tools to chain functions used to create experiment sequences.
 from __future__ import annotations
 
 import copy
+from itertools import chain
 from typing import (
     Any,
     Dict,
@@ -403,3 +404,58 @@ _ExperimentalSequence = Iterable[_ExperimentalCondition]
 _ExperimentalSequence.__doc__ = """
 An _ExperimentalSequence represents a series of trials.
 """
+
+
+class ParallelPipeline(Pipeline):
+    """
+    Run several Pipes in parallel and concatenate all their results.
+
+    Examples:
+        You can use the ParallelPipeline to parallelize a series of poolers:
+        >>> parallel_pipeline_0 = ParallelPipeline([
+        ...      ("pool_1", make_pipeline([range(5)])),
+        ...      ("pool_2", make_pipeline([range(25, 30)])),
+        ...     ]
+        ... )
+        >>> list(parallel_pipeline_0.run())
+        [0, 1, 2, 3, 4, 25, 26, 27, 28, 29]
+
+        >>> parallel_pipeline_1 = ParallelPipeline([
+        ...      ("pool_1", range(5)),
+        ...      ("pool_2", range(25, 30)),
+        ...     ]
+        ... )
+        >>> list(parallel_pipeline_1.run())
+        [0, 1, 2, 3, 4, 25, 26, 27, 28, 29]
+
+    """
+
+    def __call__(
+        self,
+        ex: Optional[_ExperimentalSequence] = None,
+        **params,
+    ) -> _ExperimentalSequence:
+        """Pass the input values in parallel through the steps."""
+
+        # Initialize the parameters objects.
+        merged_params = self._merge_params_with_self_params(params)
+
+        parallel_results = []
+
+        # Run the parallel steps over the input
+        for name, pipe in self.steps:
+            all_params_for_step = merged_params.get(name, dict())
+            if ex is None:
+                if isinstance(pipe, Pool):
+                    parallel_results.append(pipe(**all_params_for_step))
+                elif isinstance(pipe, Iterable):
+                    parallel_results.append(pipe)
+            else:
+                assert isinstance(pipe, Pipe)
+                parallel_results.append(pipe(ex, **all_params_for_step))
+
+        concatenated_results = chain.from_iterable(parallel_results)
+
+        return concatenated_results
+
+    run = __call__
