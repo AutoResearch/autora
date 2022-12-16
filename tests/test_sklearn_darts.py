@@ -17,6 +17,9 @@ from autora.skl.darts import (
 
 @pytest.fixture
 def seed():
+    """
+    Ensures that the results are the same each time the tests are run.
+    """
     torch.manual_seed(180)
     return
 

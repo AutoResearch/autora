@@ -11,6 +11,9 @@ from autora.variable import DV, IV, ValueType, VariableCollection
 
 @pytest.fixture
 def seed():
+    """
+    Ensures that the results are the same each time the tests are run.
+    """
     torch.manual_seed(180)
     return
 
