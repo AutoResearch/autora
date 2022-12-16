@@ -331,3 +331,20 @@ def test_params_parser_recurse():
             "measure": "least_confident",
         },
     }
+
+
+##############################################################################
+# Parallel Pipelines
+##############################################################################
+
+
+def test_parallelpipeline_run():
+    pl = make_pipeline([range(3), range(10, 13)], kind="parallel")
+    assert list(pl.run()) == [0, 1, 2, 10, 11, 12]
+
+
+def test_parallelpipeline_many_steps():
+    pl = make_pipeline([range(0, 5) for _ in range(1000)], kind="parallel")
+    results = list(pl.run())
+    assert len(results) == 5000
+    assert results[0:10] == [0, 1, 2, 3, 4, 0, 1, 2, 3, 4]
