@@ -9,7 +9,7 @@ from matplotlib.patches import Patch
 from autora.cycle import Cycle
 
 
-def get_variable_index(
+def _get_variable_index(
     cycle: Cycle,
 ) -> Tuple[List[Tuple[int, str, str]], List[Tuple[int, str, str]]]:
     """
@@ -34,7 +34,7 @@ def get_variable_index(
     return l_iv, l_dv
 
 
-def observed_to_df(cycle: Cycle) -> pd.DataFrame:
+def _observed_to_df(cycle: Cycle) -> pd.DataFrame:
     """
     Concatenates observation data of cycles into a single dataframe with a field "cycle" with the
     cycle index.
@@ -53,7 +53,7 @@ def observed_to_df(cycle: Cycle) -> pd.DataFrame:
     return pd.concat(l_agg)
 
 
-def min_max_observations(cycle: Cycle) -> List[Tuple[float, float]]:
+def _min_max_observations(cycle: Cycle) -> List[Tuple[float, float]]:
     """
     Returns minimum and maximum of observed values for each independent variable.
     Args:
@@ -78,7 +78,7 @@ def min_max_observations(cycle: Cycle) -> List[Tuple[float, float]]:
     return l_return
 
 
-def generate_condition_space(cycle: Cycle, steps: int = 50) -> np.array:
+def _generate_condition_space(cycle: Cycle, steps: int = 50) -> np.array:
     """
     Generates condition space based on the minimum and maximum of all observed data in AER Cycle.
     Args:
@@ -88,7 +88,7 @@ def generate_condition_space(cycle: Cycle, steps: int = 50) -> np.array:
     Returns: np.array
 
     """
-    l_min_max = min_max_observations(cycle)
+    l_min_max = _min_max_observations(cycle)
     l_space = []
 
     for min_max in l_min_max:
@@ -100,7 +100,7 @@ def generate_condition_space(cycle: Cycle, steps: int = 50) -> np.array:
         return l_space[0].reshape(-1, 1)
 
 
-def generate_mesh_grid(cycle: Cycle, steps: int = 50) -> np.ndarray:
+def _generate_mesh_grid(cycle: Cycle, steps: int = 50) -> np.ndarray:
     """
     Generates a mesh grid based on the minimum and maximum of all observed data in AER Cycle.
     Args:
@@ -110,7 +110,7 @@ def generate_mesh_grid(cycle: Cycle, steps: int = 50) -> np.ndarray:
     Returns: np.ndarray
 
     """
-    l_min_max = min_max_observations(cycle)
+    l_min_max = _min_max_observations(cycle)
     l_space = []
 
     for min_max in l_min_max:
@@ -119,7 +119,7 @@ def generate_mesh_grid(cycle: Cycle, steps: int = 50) -> np.ndarray:
     return np.meshgrid(*l_space)
 
 
-def theory_predict(cycle: Cycle, conditions: Sequence) -> dict:
+def _theory_predict(cycle: Cycle, conditions: Sequence) -> dict:
     """
     Gets theory predictions over conditions space and saves results of each cycle to a dictionary.
     Args:
@@ -136,7 +136,7 @@ def theory_predict(cycle: Cycle, conditions: Sequence) -> dict:
     return d_predictions
 
 
-def check_replace_default_kw(default: dict, user: dict) -> dict:
+def _check_replace_default_kw(default: dict, user: dict) -> dict:
     """
     Combines the key/value pairs of two dictionaries, a default and user dictionary. Unique pairs
     are selected and user pairs take precedent over default pairs if matching keywords. Also works
@@ -155,7 +155,7 @@ def check_replace_default_kw(default: dict, user: dict) -> dict:
             # If value is a dict, recurse to check nested dict
             if isinstance(user[key], dict):
                 d_return.update(
-                    {key: check_replace_default_kw(default[key], user[key])}
+                    {key: _check_replace_default_kw(default[key], user[key])}
                 )
             # If not a dict update the default value with the value from dict 2
             else:
@@ -241,10 +241,10 @@ def plot_results_panel_2d(
     ):
         assert isinstance(d1, dict)
         assert isinstance(d2, dict)
-        d_kw[key] = check_replace_default_kw(d1, d2)
+        d_kw[key] = _check_replace_default_kw(d1, d2)
 
     # ---Extract IVs and DV metadata and indexes---
-    ivs, dvs = get_variable_index(cycle)
+    ivs, dvs = _get_variable_index(cycle)
     if iv_name:
         iv = [s for s in ivs if s[1] == iv_name][0]
     else:
@@ -257,12 +257,12 @@ def plot_results_panel_2d(
     dv_label = f"{dv[1]} {dv[2]}"
 
     # Create a dataframe of observed data from cycle
-    df_observed = observed_to_df(cycle)
+    df_observed = _observed_to_df(cycle)
 
     # Generate IV space
-    condition_space = generate_condition_space(cycle, steps=steps)
+    condition_space = _generate_condition_space(cycle, steps=steps)
     # Get theory predictions over space
-    d_predictions = theory_predict(cycle, condition_space)
+    d_predictions = _theory_predict(cycle, condition_space)
 
     # Subplot configurations
     if n_cycles < wrap:
@@ -382,10 +382,10 @@ def plot_results_panel_3d(
     ):
         assert isinstance(d1, dict)
         assert isinstance(d2, dict)
-        d_kw[key] = check_replace_default_kw(d1, d2)
+        d_kw[key] = _check_replace_default_kw(d1, d2)
 
     # ---Extract IVs and DV metadata and indexes---
-    ivs, dvs = get_variable_index(cycle)
+    ivs, dvs = _get_variable_index(cycle)
     if iv_names:
         iv = [s for s in ivs if s[1] == iv_names]
     else:
@@ -398,13 +398,13 @@ def plot_results_panel_3d(
     dv_label = f"{dv[1]} {dv[2]}"
 
     # Create a dataframe of observed data from cycle
-    df_observed = observed_to_df(cycle)
+    df_observed = _observed_to_df(cycle)
 
     # Generate IV Mesh Grid
-    x1, x2 = generate_mesh_grid(cycle, steps=steps)
+    x1, x2 = _generate_mesh_grid(cycle, steps=steps)
 
     # Get theory predictions over space
-    d_predictions = theory_predict(cycle, np.column_stack((x1.ravel(), x2.ravel())))
+    d_predictions = _theory_predict(cycle, np.column_stack((x1.ravel(), x2.ravel())))
 
     # Subplot configurations
     if n_cycles < wrap:
