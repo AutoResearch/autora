@@ -5,7 +5,7 @@ import pytest
 from sklearn.linear_model import LinearRegression
 
 from autora.cycle import Cycle, plot_results_panel_2d, plot_results_panel_3d
-from autora.cycle.plot_utils import check_replace_default_kw
+from autora.cycle.plot_utils import _check_replace_default_kw
 from autora.experimentalist.pipeline import Pipeline
 from autora.experimentalist.pool import grid_pool
 from autora.experimentalist.sampler import random_sampler
@@ -129,7 +129,7 @@ def test_check_replace_default_kw():
         "subplot_kw": {"sharey": False},
         "gridspec_kw": {"bottom": 0.2, "top": 0.9},
     }
-    d_result = check_replace_default_kw(default, user)
+    d_result = _check_replace_default_kw(default, user)
 
     assert d_result == {
         "subplot_kw": {"sharex": True, "sharey": False},
