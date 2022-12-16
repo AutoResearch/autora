@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from typing import Union, Dict, Callable
+from typing import Union, Dict, Callable, Optional
 from enum import Enum
 
 
@@ -31,42 +31,42 @@ class Node:
     ):
         # tree structure attributes
         self.depth = depth
-        self._node_type = node_type
-        self._left = left
-        self._right = right
-        self._parent = parent
+        self.node_type = node_type
+        self.left = left
+        self.right = right
+        self.parent = parent
 
         # a function that does the actual calculation, see definitions below
-        self._operator = operator
-        self._op_name = op_name
-        self._op_arity = op_arity
+        self.operator = operator
+        self.op_name = op_name
+        self.op_arity = op_arity
 
         # holding temporary calculation result, see `evaluate()`
         self.result = None
         # params for additional inputs into `operator`
-        self._params = {}
+        self.params = {}
 
     def setup(
             self,
-            op_name: str,
-            operator: Callable,
-            op_arity: int,
+            op_name: str = "",
+            operator: Optional[Callable] = None,
+            op_arity: int = 0,
             **params: Dict
     ):
-        self._op_name = op_name
-        self._operator = operator
-        self._op_arity = op_arity
-        self._params = params
+        self.op_name = op_name
+        self.operator = operator
+        self.op_arity = op_arity
+        self.params = params
 
-        if self._op_arity == 0:
-            self._node_type = NodeType.LEAF
-        elif self._op_arity == 1:
-            self._left = Node(depth=self.depth + 1, parent=self)
-            self._node_type = NodeType.UNARY
-        elif self._op_arity == 2:
-            self._left = Node(depth=self.depth + 1, parent=self)
-            self._right = Node(depth=self.depth + 1, parent=self)
-            self._node_type = NodeType.BINARY
+        if self.op_arity == 0:
+            self.node_type = NodeType.LEAF
+        elif self.op_arity == 1:
+            self.left = Node(depth=self.depth + 1, parent=self)
+            self.node_type = NodeType.UNARY
+        elif self.op_arity == 2:
+            self.left = Node(depth=self.depth + 1, parent=self)
+            self.right = Node(depth=self.depth + 1, parent=self)
+            self.node_type = NodeType.BINARY
         else:
             raise ValueError(
                 "operation arity should be either 0, 1, 2; get {} instead".format(self._op_arity))
@@ -76,12 +76,12 @@ class Node:
             raise TypeError("input data X is non-existing")
         if isinstance(X, np.ndarray):
             X = pd.DataFrame(X)
-        if self.type == NodeType.LEAF:
-            result = np.array(X.iloc[:, self._params["feature"]])
-        elif self.type == NodeType.UNARY:
-            result = self.operator(self.left.evaluate(X), **self._params)
-        elif self.type == NodeType.BINARY:
-            result = self.operator(self.left.evaluate(X), self.right.evaluate(X), **self._params)
+        if self.node_type == NodeType.LEAF:
+            result = np.array(X.iloc[:, self.params["feature"]])
+        elif self.node_type == NodeType.UNARY:
+            result = self.operator(self.left.evaluate(X), **self.params)
+        elif self.node_type == NodeType.BINARY:
+            result = self.operator(self.left.evaluate(X), self.right.evaluate(X), **self.params)
         else:
             raise NotImplementedError("node evaluated before being setup")
         if store_result:

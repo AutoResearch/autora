@@ -1,16 +1,16 @@
-import numpy as np
-from operation import *
+from autora_bsr.utils.operation import *
 from scipy.stats import norm
 from typing import Dict, Union, Callable
-from misc import normalize_prior_dict
+from autora_bsr.utils.misc import normalize_prior_dict
 
 
 def __get_ops_with_arity():
     """
-    Get the arity (number of operands) of each operator.
+    Get the operator function and arity (number of operands) of each operator.
 
     Returns:
-        ops_fn_and_arity: a dictionary that maps operator name to the number of
+        ops_fn_and_arity: a dictionary that maps operator name to a list, where
+            the first item is the operator function and the second is the number of
             operands that it takes.
     """
     ops_fn_and_arity = {
@@ -106,14 +106,15 @@ def get_prior_dict(prior_name="Uniform"):
     ops_init = __get_ops_init()
     ops_fn_and_arity = __get_ops_with_arity()
 
+    ops_name_lst = list(ops_prior.keys())
+    ops_weight_lst = list(ops_prior.values())
     prior_dict = {k: {
-        "weight": ops_prior[k],
         "init": ops_init.get(k, None),
         "fn": ops_fn_and_arity[k][0],
         "arity": ops_fn_and_arity[k][1],
     } for k in ops_prior}
 
-    return prior_dict
+    return ops_name_lst, ops_weight_lst, prior_dict
 
 
 def get_prior_list(prior_name="Uniform"):

@@ -1,4 +1,5 @@
-from autora_bsr.node import *
+from autora_bsr.utils.node import Node, NodeType
+from autora_bsr.utils.operation import inv_op
 import numpy as np
 
 
@@ -12,3 +13,4 @@ def test_basic_inv_operation():
     test_x = np.array([[1, 2, 3], [4, 5, 6]])
     test_y = 1 / test_x[:, 0]
     assert (test_y - root.evaluate(test_x) < 1e-5).all()
+
