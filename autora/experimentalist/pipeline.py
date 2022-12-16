@@ -233,38 +233,38 @@ def _merge_dicts(a: dict, b: dict):
     return a_
 
 
-class ParallelPipeline(Pipeline):
+class PipelineUnion(Pipeline):
     """
     Run several Pipes in parallel and concatenate all their results.
 
     Examples:
         You can use the ParallelPipeline to parallelize a group of poolers:
-        >>> parallel_pipeline_0 = ParallelPipeline([
+        >>> union_pipeline_0 = PipelineUnion([
         ...      ("pool_1", make_pipeline([range(5)])),
         ...      ("pool_2", make_pipeline([range(25, 30)])),
         ...     ]
         ... )
-        >>> list(parallel_pipeline_0.run())
+        >>> list(union_pipeline_0.run())
         [0, 1, 2, 3, 4, 25, 26, 27, 28, 29]
 
-        >>> parallel_pipeline_1 = ParallelPipeline([
+        >>> union_pipeline_1 = PipelineUnion([
         ...      ("pool_1", range(5)),
         ...      ("pool_2", range(25, 30)),
         ...     ]
         ... )
-        >>> list(parallel_pipeline_1.run())
+        >>> list(union_pipeline_1.run())
         [0, 1, 2, 3, 4, 25, 26, 27, 28, 29]
 
         You can use the ParallelPipeline to parallelize a group of pipes – each of which gets
         the same input.
-        >>> pipeline_with_embedded_parallel = Pipeline([
+        >>> pipeline_with_embedded_union = Pipeline([
         ...      ("pool", range(22)),
-        ...      ("filters",  ParallelPipeline([
+        ...      ("filters",  PipelineUnion([
         ...          ("div_5_filter", lambda x: filter(lambda i: i % 5 == 0, x)),
         ...          ("div_7_filter", lambda x: filter(lambda i: i % 7 == 0, x))
         ...         ]))
         ... ])
-        >>> list(pipeline_with_embedded_parallel.run())
+        >>> list(pipeline_with_embedded_union.run())
         [0, 5, 10, 15, 20, 0, 7, 14, 21]
 
     """
@@ -291,7 +291,7 @@ class ParallelPipeline(Pipeline):
                     parallel_results.append(pipe)
                 else:
                     raise NotImplementedError(
-                        f"{pipe=} cannot be used in the ParallelPipeline"
+                        f"{pipe=} cannot be used in the PipelineUnion"
                     )
             else:
                 assert isinstance(
@@ -447,7 +447,7 @@ def make_pipeline(
         It is possible to create parallel pipelines too:
         >>> pl = make_pipeline([range(5), range(10,15)], kind="union")
         >>> pl
-        ParallelPipeline(steps=[('step_0', range(0, 5)), ('step_1', range(10, 15))], params={})
+        PipelineUnion(steps=[('step_0', range(0, 5)), ('step_1', range(10, 15))], params={})
 
         >>> list(pl.run())
         [0, 1, 2, 3, 4, 10, 11, 12, 13, 14]
@@ -476,7 +476,7 @@ def make_pipeline(
     if kind == "serial":
         pipeline = Pipeline(steps_, params=params)
     elif kind == "union":
-        pipeline = ParallelPipeline(steps_, params=params)
+        pipeline = PipelineUnion(steps_, params=params)
     else:
         raise NotImplementedError(f"{kind=} is not implemented")
 
