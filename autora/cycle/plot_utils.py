@@ -50,7 +50,9 @@ def _observed_to_df(cycle: Cycle) -> pd.DataFrame:
     for i, data in enumerate(l_observations):
         l_agg.append(pd.DataFrame(data).assign(cycle=i))
 
-    return pd.concat(l_agg)
+    df_return = pd.concat(l_agg)
+
+    return df_return
 
 
 def _min_max_observations(cycle: Cycle) -> List[Tuple[float, float]]:
