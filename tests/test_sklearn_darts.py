@@ -74,7 +74,7 @@ def test_constant_model(seed):
     assert estimator is not None
 
     for y_pred_i in np.nditer(estimator.predict(X_test)):
-        (const - (5.0 * epsilon)) <= y_pred_i <= (const + (5.0 * epsilon))
+        assert (const - (5.0 * epsilon)) <= y_pred_i <= (const + (5.0 * epsilon))
 
     print(estimator.network_)
 
