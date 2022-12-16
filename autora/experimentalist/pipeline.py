@@ -117,7 +117,7 @@ class Pipeline:
         self.params = params
 
     def __repr__(self):
-        return f"Pipeline(steps={self.steps}, params={self.params})"
+        return f"{self.__class__.__name__}(steps={self.steps}, params={self.params})"
 
     def __call__(
         self,
