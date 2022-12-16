@@ -346,7 +346,7 @@ def _parse_params_to_nested_dict(params_dict: Dict, divider: str):
 def make_pipeline(
     steps: Optional[Sequence[Union[Pool, Pipe]]] = None,
     params: Optional[Dict[str, Any]] = None,
-    kind: Literal["serial", "parallel"] = "serial",
+    kind: Literal["serial", "union"] = "serial",
 ) -> Pipeline:
     """
     A factory function to make pipeline objects.
@@ -442,7 +442,7 @@ def make_pipeline(
         params={})
 
         It is possible to create parallel pipelines too:
-        >>> pl = make_pipeline([range(5), range(10,15)], kind="parallel")
+        >>> pl = make_pipeline([range(5), range(10,15)], kind="union")
         >>> pl
         ParallelPipeline(steps=[('step_0', range(0, 5)), ('step_1', range(10, 15))], params={})
 
@@ -472,7 +472,7 @@ def make_pipeline(
 
     if kind == "serial":
         pipeline = Pipeline(steps_, params=params)
-    elif kind == "parallel":
+    elif kind == "union":
         pipeline = ParallelPipeline(steps_, params=params)
     else:
         raise NotImplementedError(f"{kind=} is not implemented")
