@@ -279,16 +279,16 @@ class PipelineUnion(Pipeline):
         # Initialize the parameters objects.
         merged_params = self._merge_params_with_self_params(params)
 
-        parallel_results = []
+        results = []
 
         # Run the parallel steps over the input
         for name, pipe in self.steps:
             all_params_for_step = merged_params.get(name, dict())
             if ex is None:
                 if isinstance(pipe, Pool):
-                    parallel_results.append(pipe(**all_params_for_step))
+                    results.append(pipe(**all_params_for_step))
                 elif isinstance(pipe, Iterable):
-                    parallel_results.append(pipe)
+                    results.append(pipe)
                 else:
                     raise NotImplementedError(
                         f"{pipe=} cannot be used in the PipelineUnion"
@@ -297,11 +297,11 @@ class PipelineUnion(Pipeline):
                 assert isinstance(
                     pipe, Pipe
                 ), f"{pipe=} is incompatible with the Pipe interface"
-                parallel_results.append(pipe(ex, **all_params_for_step))
+                results.append(pipe(ex, **all_params_for_step))
 
-        concatenated_results = chain.from_iterable(parallel_results)
+        union_results = chain.from_iterable(results)
 
-        return concatenated_results
+        return union_results
 
     run = __call__
 
