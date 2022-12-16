@@ -232,6 +232,79 @@ def _merge_dicts(a: dict, b: dict):
     return a_
 
 
+class ParallelPipeline(Pipeline):
+    """
+    Run several Pipes in parallel and concatenate all their results.
+
+    Examples:
+        You can use the ParallelPipeline to parallelize a group of poolers:
+        >>> parallel_pipeline_0 = ParallelPipeline([
+        ...      ("pool_1", make_pipeline([range(5)])),
+        ...      ("pool_2", make_pipeline([range(25, 30)])),
+        ...     ]
+        ... )
+        >>> list(parallel_pipeline_0.run())
+        [0, 1, 2, 3, 4, 25, 26, 27, 28, 29]
+
+        >>> parallel_pipeline_1 = ParallelPipeline([
+        ...      ("pool_1", range(5)),
+        ...      ("pool_2", range(25, 30)),
+        ...     ]
+        ... )
+        >>> list(parallel_pipeline_1.run())
+        [0, 1, 2, 3, 4, 25, 26, 27, 28, 29]
+
+        You can use the ParallelPipeline to parallelize a group of pipes – each of which gets
+        the same input.
+        >>> pipeline_with_embedded_parallel = Pipeline([
+        ...      ("pool", range(22)),
+        ...      ("filters",  ParallelPipeline([
+        ...          ("div_5_filter", lambda x: filter(lambda i: i % 5 == 0, x)),
+        ...          ("div_7_filter", lambda x: filter(lambda i: i % 7 == 0, x))
+        ...         ]))
+        ... ])
+        >>> list(pipeline_with_embedded_parallel.run())
+        [0, 5, 10, 15, 20, 0, 7, 14, 21]
+
+    """
+
+    def __call__(
+        self,
+        ex: Optional[_ExperimentalSequence] = None,
+        **params,
+    ) -> _ExperimentalSequence:
+        """Pass the input values in parallel through the steps."""
+
+        # Initialize the parameters objects.
+        merged_params = self._merge_params_with_self_params(params)
+
+        parallel_results = []
+
+        # Run the parallel steps over the input
+        for name, pipe in self.steps:
+            all_params_for_step = merged_params.get(name, dict())
+            if ex is None:
+                if isinstance(pipe, Pool):
+                    parallel_results.append(pipe(**all_params_for_step))
+                elif isinstance(pipe, Iterable):
+                    parallel_results.append(pipe)
+                else:
+                    raise NotImplementedError(
+                        f"{pipe=} cannot be used in the ParallelPipeline"
+                    )
+            else:
+                assert isinstance(
+                    pipe, Pipe
+                ), f"{pipe=} is incompatible with the Pipe interface"
+                parallel_results.append(pipe(ex, **all_params_for_step))
+
+        concatenated_results = chain.from_iterable(parallel_results)
+
+        return concatenated_results
+
+    run = __call__
+
+
 def _parse_params_to_nested_dict(params_dict: Dict, divider: str):
     """
     Converts a dictionary with a single level to a multi-level nested dictionary.
@@ -404,76 +477,3 @@ _ExperimentalSequence = Iterable[_ExperimentalCondition]
 _ExperimentalSequence.__doc__ = """
 An _ExperimentalSequence represents a series of trials.
 """
-
-
-class ParallelPipeline(Pipeline):
-    """
-    Run several Pipes in parallel and concatenate all their results.
-
-    Examples:
-        You can use the ParallelPipeline to parallelize a group of poolers:
-        >>> parallel_pipeline_0 = ParallelPipeline([
-        ...      ("pool_1", make_pipeline([range(5)])),
-        ...      ("pool_2", make_pipeline([range(25, 30)])),
-        ...     ]
-        ... )
-        >>> list(parallel_pipeline_0.run())
-        [0, 1, 2, 3, 4, 25, 26, 27, 28, 29]
-
-        >>> parallel_pipeline_1 = ParallelPipeline([
-        ...      ("pool_1", range(5)),
-        ...      ("pool_2", range(25, 30)),
-        ...     ]
-        ... )
-        >>> list(parallel_pipeline_1.run())
-        [0, 1, 2, 3, 4, 25, 26, 27, 28, 29]
-
-        You can use the ParallelPipeline to parallelize a group of pipes – each of which gets
-        the same input.
-        >>> pipeline_with_embedded_parallel = Pipeline([
-        ...      ("pool", range(22)),
-        ...      ("filters",  ParallelPipeline([
-        ...          ("div_5_filter", lambda x: filter(lambda i: i % 5 == 0, x)),
-        ...          ("div_7_filter", lambda x: filter(lambda i: i % 7 == 0, x))
-        ...         ]))
-        ... ])
-        >>> list(pipeline_with_embedded_parallel.run())
-        [0, 5, 10, 15, 20, 0, 7, 14, 21]
-
-    """
-
-    def __call__(
-        self,
-        ex: Optional[_ExperimentalSequence] = None,
-        **params,
-    ) -> _ExperimentalSequence:
-        """Pass the input values in parallel through the steps."""
-
-        # Initialize the parameters objects.
-        merged_params = self._merge_params_with_self_params(params)
-
-        parallel_results = []
-
-        # Run the parallel steps over the input
-        for name, pipe in self.steps:
-            all_params_for_step = merged_params.get(name, dict())
-            if ex is None:
-                if isinstance(pipe, Pool):
-                    parallel_results.append(pipe(**all_params_for_step))
-                elif isinstance(pipe, Iterable):
-                    parallel_results.append(pipe)
-                else:
-                    raise NotImplementedError(
-                        f"{pipe=} cannot be used in the ParallelPipeline"
-                    )
-            else:
-                assert isinstance(
-                    pipe, Pipe
-                ), f"{pipe=} is incompatible with the Pipe interface"
-                parallel_results.append(pipe(ex, **all_params_for_step))
-
-        concatenated_results = chain.from_iterable(parallel_results)
-
-        return concatenated_results
-
-    run = __call__
