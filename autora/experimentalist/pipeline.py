@@ -10,6 +10,7 @@ from typing import (
     Dict,
     Iterable,
     List,
+    Literal,
     Optional,
     Protocol,
     Sequence,
@@ -345,6 +346,7 @@ def _parse_params_to_nested_dict(params_dict: Dict, divider: str):
 def make_pipeline(
     steps: Optional[Sequence[Union[Pool, Pipe]]] = None,
     params: Optional[Dict[str, Any]] = None,
+    kind: Literal["serial", "parallel"] = "serial",
 ) -> Pipeline:
     """
     A factory function to make pipeline objects.
@@ -439,7 +441,13 @@ def make_pipeline(
         ('step_1', functools.partial(<function divisor_filter at 0x...>, divisor=3))], \
         params={})
 
+        It is possible to create parallel pipelines too:
+        >>> pl = make_pipeline([range(5), range(10,15)], kind="parallel")
+        >>> pl
+        ParallelPipeline(steps=[('step_0', range(0, 5)), ('step_1', range(10, 15))], params={})
 
+        >>> list(pl.run())
+        [0, 1, 2, 3, 4, 10, 11, 12, 13, 14]
 
     """
 
@@ -462,7 +470,12 @@ def make_pipeline(
 
         steps_.append((name_in_pipeline, pipe))
 
-    pipeline = Pipeline(steps_, params=params)
+    if kind == "serial":
+        pipeline = Pipeline(steps_, params=params)
+    elif kind == "parallel":
+        pipeline = ParallelPipeline(steps_, params=params)
+    else:
+        raise NotImplementedError(f"{kind=} is not implemented")
 
     return pipeline
 
