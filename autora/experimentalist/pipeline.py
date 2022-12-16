@@ -411,7 +411,7 @@ class ParallelPipeline(Pipeline):
     Run several Pipes in parallel and concatenate all their results.
 
     Examples:
-        You can use the ParallelPipeline to parallelize a series of poolers:
+        You can use the ParallelPipeline to parallelize a group of poolers:
         >>> parallel_pipeline_0 = ParallelPipeline([
         ...      ("pool_1", make_pipeline([range(5)])),
         ...      ("pool_2", make_pipeline([range(25, 30)])),
@@ -427,6 +427,18 @@ class ParallelPipeline(Pipeline):
         ... )
         >>> list(parallel_pipeline_1.run())
         [0, 1, 2, 3, 4, 25, 26, 27, 28, 29]
+
+        You can use the ParallelPipeline to parallelize a group of pipes – each of which gets
+        the same input.
+        >>> pipeline_with_embedded_parallel = Pipeline([
+        ...      ("pool", range(22)),
+        ...      ("filters",  ParallelPipeline([
+        ...          ("div_5_filter", lambda x: filter(lambda i: i % 5 == 0, x)),
+        ...          ("div_7_filter", lambda x: filter(lambda i: i % 7 == 0, x))
+        ...         ]))
+        ... ])
+        >>> list(pipeline_with_embedded_parallel.run())
+        [0, 5, 10, 15, 20, 0, 7, 14, 21]
 
     """
 
