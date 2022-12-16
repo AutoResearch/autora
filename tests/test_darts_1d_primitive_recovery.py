@@ -3,7 +3,8 @@ from typing import Callable, Sequence
 
 import matplotlib.pyplot as plt
 import numpy as np
-import pytest  # noqa: 401
+import pytest
+import torch
 
 from autora.skl.darts import DARTSRegressor
 
@@ -18,6 +19,15 @@ non_interchangeable_primitives = [
     "sin",
     "tanh",
 ]
+
+
+@pytest.fixture
+def seed():
+    """
+    Ensures that the results are the same each time the tests are run.
+    """
+    torch.manual_seed(180)
+    return
 
 
 def generate_x(start=-1, stop=1, num=500):
@@ -166,7 +176,7 @@ def report_weights(X, expected_primitive, primitives, regressor, y):
     print(regressor.model_[0]._arch_parameters[0].data)
 
 
-def test_primitive_fitting_restricted_none():
+def test_primitive_fitting_restricted_none(seed):
     run_test_primitive_fitting(
         generate_x(),
         transform_through_primitive_none,
@@ -175,7 +185,7 @@ def test_primitive_fitting_restricted_none():
     )
 
 
-def test_primitive_fitting_restricted_add():
+def test_primitive_fitting_restricted_add(seed):
     run_test_primitive_fitting(
         generate_x(),
         transform_through_primitive_add,
@@ -184,7 +194,7 @@ def test_primitive_fitting_restricted_add():
     )
 
 
-def test_primitive_fitting_restricted_subtract():
+def test_primitive_fitting_restricted_subtract(seed):
     run_test_primitive_fitting(
         generate_x(),
         transform_through_primitive_subtract,
@@ -193,7 +203,7 @@ def test_primitive_fitting_restricted_subtract():
     )
 
 
-def test_primitive_fitting_none():
+def test_primitive_fitting_none(seed):
     run_test_primitive_fitting(
         generate_x(),
         transform_through_primitive_none,
@@ -202,7 +212,7 @@ def test_primitive_fitting_none():
     )
 
 
-def test_primitive_fitting_add():
+def test_primitive_fitting_add(seed):
     run_test_primitive_fitting(
         generate_x(),
         transform_through_primitive_add,
@@ -211,7 +221,7 @@ def test_primitive_fitting_add():
     )
 
 
-def test_primitive_fitting_subtract():
+def test_primitive_fitting_subtract(seed):
     run_test_primitive_fitting(
         generate_x(),
         transform_through_primitive_subtract,
@@ -220,7 +230,7 @@ def test_primitive_fitting_subtract():
     )
 
 
-def test_primitive_fitting_relu():
+def test_primitive_fitting_relu(seed):
     run_test_primitive_fitting(
         generate_x(),
         transform_through_primitive_relu,
@@ -229,7 +239,7 @@ def test_primitive_fitting_relu():
     )
 
 
-def test_primitive_fitting_sigmoid():
+def test_primitive_fitting_sigmoid(seed):
     run_test_primitive_fitting(
         generate_x(-10, +10),
         transform_through_primitive_sigmoid,
@@ -239,7 +249,7 @@ def test_primitive_fitting_sigmoid():
     )
 
 
-def test_primitive_fitting_exp():
+def test_primitive_fitting_exp(seed):
     run_test_primitive_fitting(
         generate_x(),
         transform_through_primitive_exp,
@@ -248,7 +258,7 @@ def test_primitive_fitting_exp():
     )
 
 
-def test_primitive_fitting_cos():
+def test_primitive_fitting_cos(seed):
     run_test_primitive_fitting(
         generate_x(start=-3 * np.pi, stop=3 * np.pi),
         transform_through_primitive_cos,
@@ -259,7 +269,7 @@ def test_primitive_fitting_cos():
     )
 
 
-def test_primitive_fitting_sin():
+def test_primitive_fitting_sin(seed):
     run_test_primitive_fitting(
         generate_x(start=0, stop=2 * np.pi),
         transform_through_primitive_sin,
@@ -268,7 +278,7 @@ def test_primitive_fitting_sin():
     )
 
 
-def test_primitive_fitting_tanh():
+def test_primitive_fitting_tanh(seed):
     run_test_primitive_fitting(
         generate_x(start=0, stop=2 * np.pi),
         transform_through_primitive_tanh,
