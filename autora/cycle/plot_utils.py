@@ -177,10 +177,12 @@ def plot_results_panel_2d(
     line_kw: dict = {},
 ) -> plt.figure:
     """
-    Generates a multi-panel plot with each panel showing results of an AER cycle. Observed data
-    is plotted as a scatter plot with the current cycle colored differently than observed data from
-    previous cycles. The current cycle's theory is plotted as a line over the range of the observed
-    data.
+    Generates a multi-panel figure with 2D plots showing results of one AER cycle.
+
+    Observed data is plotted as a scatter plot with the current cycle colored differently than
+    observed data from previous cycles. The current cycle's theory is plotted as a line over the
+    range of the observed data.
+
     Args:
         cycle: AER Cycle object that has been run
         iv_name: Independent variable name. Name should match the name instantiated in the cycle
