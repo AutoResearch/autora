@@ -199,8 +199,6 @@ def plot_results_panel_2d(
         line_kw: Dictionary of keywords to pass to matplotlib 'plot' function that plots the theory
                  line.
 
-        TODO: 1. Save to file feature.
-
     Returns: matplotlib figure
 
     """
