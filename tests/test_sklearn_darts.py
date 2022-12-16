@@ -15,6 +15,12 @@ from autora.skl.darts import (
 )
 
 
+@pytest.fixture
+def seed():
+    torch.manual_seed(180)
+    return
+
+
 def generate_noisy_constant_data(
     const: float = 0.5, epsilon: float = 0.01, num: int = 1000, seed: int = 42
 ):
@@ -53,7 +59,7 @@ def generate_noisy_linear_data(
     )
 
 
-def test_constant_model():
+def test_constant_model(seed):
 
     X, y, const, epsilon = generate_noisy_constant_data()
 
