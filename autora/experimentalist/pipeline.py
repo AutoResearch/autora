@@ -462,8 +462,14 @@ class ParallelPipeline(Pipeline):
                     parallel_results.append(pipe(**all_params_for_step))
                 elif isinstance(pipe, Iterable):
                     parallel_results.append(pipe)
+                else:
+                    raise NotImplementedError(
+                        f"{pipe=} cannot be used in the ParallelPipeline"
+                    )
             else:
-                assert isinstance(pipe, Pipe)
+                assert isinstance(
+                    pipe, Pipe
+                ), f"{pipe=} is incompatible with the Pipe interface"
                 parallel_results.append(pipe(ex, **all_params_for_step))
 
         concatenated_results = chain.from_iterable(parallel_results)
