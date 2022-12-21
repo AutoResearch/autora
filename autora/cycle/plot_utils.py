@@ -174,9 +174,9 @@ def plot_results_panel_2d(
     wrap: int = 4,
     spines: bool = False,
     subplot_kw: dict = {},
-    scatter_kw1: dict = {},
-    scatter_kw2: dict = {},
-    line_kw: dict = {},
+    scatter_previous_kw: dict = {},
+    scatter_current_kw: dict = {},
+    plot_theory_kw: dict = {},
 ) -> plt.figure:
     """
     Generates a multi-panel figure with 2D plots showing results of one AER cycle.
@@ -196,12 +196,12 @@ def plot_results_panel_2d(
                 3x3 grid.
         spines: Show axis spines for 2D plots, default False.
         subplot_kw: Dictionary of keywords to pass to matplotlib 'subplot' function
-        scatter_kw1: Dictionary of keywords to pass to matplotlib 'scatter' function that plots the
-                    data points from previous cycles.
-        scatter_kw2: Dictionary of keywords to pass to matplotlib 'scatter' function that plots the
-                    data points from the current cycle.
-        line_kw: Dictionary of keywords to pass to matplotlib 'plot' function that plots the theory
-                 line.
+        scatter_previous_kw: Dictionary of keywords to pass to matplotlib 'scatter' function that
+                    plots the data points from previous cycles.
+        scatter_current_kw: Dictionary of keywords to pass to matplotlib 'scatter' function that
+                    plots the data points from the current cycle.
+        plot_theory_kw: Dictionary of keywords to pass to matplotlib 'plot' function that plots the
+                    theory line.
 
     Returns: matplotlib figure
 
@@ -216,13 +216,13 @@ def plot_results_panel_2d(
         "sharex": True,
         "sharey": True,
     }
-    scatter_kw1_defaults = {
+    scatter_previous_defaults = {
         "color": "black",
         "s": 2,
         "alpha": 0.6,
         "label": "Previous Data",
     }
-    scatter_kw2_defaults = {
+    scatter_current_defaults = {
         "color": "tab:orange",
         "s": 2,
         "alpha": 0.6,
@@ -234,12 +234,12 @@ def plot_results_panel_2d(
     for d1, d2, key in zip(
         [
             subplot_kw_defaults,
-            scatter_kw1_defaults,
-            scatter_kw2_defaults,
+            scatter_previous_defaults,
+            scatter_current_defaults,
             line_kw_defaults,
         ],
-        [subplot_kw, scatter_kw1, scatter_kw2, line_kw],
-        ["subplot_kw", "scatter_kw1", "scatter_kw2", "line_kw"],
+        [subplot_kw, scatter_previous_kw, scatter_current_kw, plot_theory_kw],
+        ["subplot_kw", "scatter_previous_kw", "scatter_current_kw", "plot_theory_kw"],
     ):
         assert isinstance(d1, dict)
         assert isinstance(d2, dict)
@@ -288,12 +288,12 @@ def plot_results_panel_2d(
                 df_observed["cycle"] != i, df_observed[dv[0]]
             )
             # Plotting scatter
-            ax.scatter(x_vals, dv_previous, **d_kw["scatter_kw1"])
-            ax.scatter(x_vals, dv_current, **d_kw["scatter_kw2"])
+            ax.scatter(x_vals, dv_previous, **d_kw["scatter_previous_kw"])
+            ax.scatter(x_vals, dv_current, **d_kw["scatter_current_kw"])
 
             # ---Plot Theory---
             conditions = condition_space[:, iv[0]]
-            ax.plot(conditions, d_predictions[i], **d_kw["line_kw"])
+            ax.plot(conditions, d_predictions[i], **d_kw["plot_theory_kw"])
 
             # Label Panels
             ax.text(0.05, 1, f"Cycle {i}", ha="left", va="top", transform=ax.transAxes)
@@ -328,8 +328,8 @@ def plot_results_panel_3d(
     wrap: int = 4,
     view: Optional[Tuple[float, float]] = None,
     subplot_kw: dict = {},
-    scatter_kw1: dict = {},
-    scatter_kw2: dict = {},
+    scatter_previous_kw: dict = {},
+    scatter_current_kw: dict = {},
     surface_kw: dict = {},
 ) -> plt.figure:
     """
@@ -351,10 +351,10 @@ def plot_results_panel_3d(
                 3x3 grid.
         view: Tuple of elevation angle and azimuth to change the viewing angle of the plot.
         subplot_kw: Dictionary of keywords to pass to matplotlib 'subplot' function
-        scatter_kw1: Dictionary of keywords to pass to matplotlib 'scatter' function that plots the
-                    data points from previous cycles.
-        scatter_kw2: Dictionary of keywords to pass to matplotlib 'scatter' function that plots the
-                    data points from the current cycle.
+        scatter_previous_kw: Dictionary of keywords to pass to matplotlib 'scatter' function that
+                    plots the data points from previous cycles.
+        scatter_current_kw: Dictionary of keywords to pass to matplotlib 'scatter' function that
+                    plots the data points from the current cycle.
         surface_kw: Dictionary of keywords to pass to matplotlib 'plot_surface' function that plots
                     the theory plane.
 
@@ -369,20 +369,20 @@ def plot_results_panel_3d(
     subplot_kw_defaults = {
         "subplot_kw": {"projection": "3d"},
     }
-    scatter_kw1_defaults = {"color": "black", "s": 2, "label": "Previous Data"}
-    scatter_kw2_defaults = {"color": "tab:orange", "s": 2, "label": "New Data"}
+    scatter_previous_defaults = {"color": "black", "s": 2, "label": "Previous Data"}
+    scatter_current_defaults = {"color": "tab:orange", "s": 2, "label": "New Data"}
     surface_kw_defaults = {"alpha": 0.5, "label": "Theory"}
     # Combine default and user supplied keywords
     d_kw = {}
     for d1, d2, key in zip(
         [
             subplot_kw_defaults,
-            scatter_kw1_defaults,
-            scatter_kw2_defaults,
+            scatter_previous_defaults,
+            scatter_current_defaults,
             surface_kw_defaults,
         ],
-        [subplot_kw, scatter_kw1, scatter_kw2, surface_kw],
-        ["subplot_kw", "scatter_kw1", "scatter_kw2", "surface_kw"],
+        [subplot_kw, scatter_previous_kw, scatter_current_kw, surface_kw],
+        ["subplot_kw", "scatter_previous_kw", "scatter_current_kw", "surface_kw"],
     ):
         assert isinstance(d1, dict)
         assert isinstance(d2, dict)
@@ -433,8 +433,8 @@ def plot_results_panel_3d(
                 df_observed["cycle"] != i, df_observed[dv[0]]
             )
             # Plotting scatter
-            ax.scatter(*l_x, dv_previous, **d_kw["scatter_kw1"])
-            ax.scatter(*l_x, dv_current, **d_kw["scatter_kw2"])
+            ax.scatter(*l_x, dv_previous, **d_kw["scatter_previous_kw"])
+            ax.scatter(*l_x, dv_current, **d_kw["scatter_current_kw"])
 
             # ---Plot Theory---
             ax.plot_surface(
