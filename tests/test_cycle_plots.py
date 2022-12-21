@@ -7,7 +7,7 @@ from sklearn.linear_model import LinearRegression
 from autora.cycle import Cycle, plot_results_panel_2d, plot_results_panel_3d
 from autora.cycle.plot_utils import _check_replace_default_kw
 from autora.experimentalist.pipeline import Pipeline
-from autora.experimentalist.pool import grid_pool
+from autora.experimentalist.pooler.general_pool import grid_pool
 from autora.experimentalist.sampler import random_sampler
 from autora.variable import Variable, VariableCollection
 
