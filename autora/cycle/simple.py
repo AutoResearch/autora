@@ -471,6 +471,8 @@ class SimpleCycle:
             data_in.metadata.independent_variables
         )  # The number of independent variables
         x, y = all_observations[:, :n_xs], all_observations[:, n_xs:]
+        if y.shape[1] == 1:
+            y = y.ravel()
         new_theorist = copy.deepcopy(theorist)
         new_theorist.fit(x, y)
         data_out = replace(
