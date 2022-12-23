@@ -472,3 +472,8 @@ def plot_results_panel_3d(
     )
 
     return fig
+
+
+def cycle_default_score(aer_cycle, x_vals, y_true):
+    l_scores = [s.score(x_vals, y_true) for s in aer_cycle.data.theories]
+    return l_scores
