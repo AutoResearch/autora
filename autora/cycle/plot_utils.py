@@ -482,17 +482,17 @@ def plot_results_panel_3d(
     return fig
 
 
-def cycle_default_score(aer_cycle, x_vals, y_true):
-    l_scores = [s.score(x_vals, y_true) for s in aer_cycle.data.theories]
+def cycle_default_score(cycle, x_vals, y_true):
+    l_scores = [s.score(x_vals, y_true) for s in cycle.data.theories]
     return l_scores
 
 
-def cycle_specified_score(scorer, aer_cycle, x_vals, y_true, **kwargs):
+def cycle_specified_score(scorer, cycle, x_vals, y_true, **kwargs):
     # Get predictions
     if "y_pred" in inspect.signature(scorer).parameters.keys():
-        d_y_pred = _theory_predict(aer_cycle, x_vals, predict_proba=False)
+        d_y_pred = _theory_predict(cycle, x_vals, predict_proba=False)
     elif "y_score" in inspect.signature(scorer).parameters.keys():
-        d_y_pred = _theory_predict(aer_cycle, x_vals, predict_proba=True)
+        d_y_pred = _theory_predict(cycle, x_vals, predict_proba=True)
 
     # Score each cycle
     l_scores = []
@@ -503,7 +503,7 @@ def cycle_specified_score(scorer, aer_cycle, x_vals, y_true, **kwargs):
 
 
 def plot_cycle_score(
-    aer_cycle,
+    cycle: Cycle,
     X,
     y_true,
     scorer: Optional[Callable] = None,
@@ -516,13 +516,13 @@ def plot_cycle_score(
 
     # Use estimator's default scoring method if specific scorer is not supplied
     if scorer is None:
-        l_scores = cycle_default_score(aer_cycle, X, y_true)
+        l_scores = cycle_default_score(cycle, X, y_true)
     else:
-        l_scores = cycle_specified_score(scorer, aer_cycle, X, y_true, **scorer_kw)
+        l_scores = cycle_specified_score(scorer, cycle, X, y_true, **scorer_kw)
 
     # Plotting
     fig, ax = plt.subplots(figsize=figsize)
-    ax.plot(np.arange(len(aer_cycle.data.theories)), l_scores, **plot_kw)
+    ax.plot(np.arange(len(cycle.data.theories)), l_scores, **plot_kw)
 
     # Labeling
     ax.set_xlabel(x_label)
