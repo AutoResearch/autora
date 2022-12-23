@@ -1,3 +1,4 @@
+import inspect
 from itertools import product
 from typing import List, Optional, Sequence, Tuple
 
@@ -476,4 +477,19 @@ def plot_results_panel_3d(
 
 def cycle_default_score(aer_cycle, x_vals, y_true):
     l_scores = [s.score(x_vals, y_true) for s in aer_cycle.data.theories]
+    return l_scores
+
+
+def cycle_specified_score(scorer, aer_cycle, x_vals, y_true, **kwargs):
+    # Get predictions
+    if "y_pred" in inspect.signature(scorer).parameters.keys():
+        d_y_pred = _theory_predict(aer_cycle, x_vals, predict_proba=False)
+    elif "y_score" in inspect.signature(scorer).parameters.keys():
+        d_y_pred = _theory_predict(aer_cycle, x_vals, predict_proba=True)
+
+    # Score each cycle
+    l_scores = []
+    for i, y_pred in d_y_pred.items():
+        l_scores.append(scorer(y_true, y_pred, **kwargs))
+
     return l_scores
