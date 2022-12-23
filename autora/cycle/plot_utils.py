@@ -482,12 +482,36 @@ def plot_results_panel_3d(
     return fig
 
 
-def cycle_default_score(cycle, x_vals, y_true):
+def cycle_default_score(cycle: Cycle, x_vals: np.ndarray, y_true: np.ndarray):
+    """
+    Calculates score for each cycle using the estimator's default scorer.
+    Args:
+        cycle: AER Cycle object that has been run
+        x_vals: Test dataset independent values
+        y_true: Test dataset dependent values
+
+    Returns:
+        List of scores by cycle
+    """
     l_scores = [s.score(x_vals, y_true) for s in cycle.data.theories]
     return l_scores
 
 
-def cycle_specified_score(scorer, cycle, x_vals, y_true, **kwargs):
+def cycle_specified_score(
+    scorer: Callable, cycle: Cycle, x_vals: np.ndarray, y_true: np.ndarray, **kwargs
+):
+    """
+    Calculates score for each cycle using specified sklearn scoring function.
+    Args:
+        scorer: sklearn scoring function
+        cycle: AER Cycle object that has been run
+        x_vals: Test dataset independent values
+        y_true: Test dataset dependent values
+        **kwargs: Keyword arguments to send to scoring function
+
+    Returns:
+
+    """
     # Get predictions
     if "y_pred" in inspect.signature(scorer).parameters.keys():
         d_y_pred = _theory_predict(cycle, x_vals, predict_proba=False)
@@ -504,8 +528,8 @@ def cycle_specified_score(scorer, cycle, x_vals, y_true, **kwargs):
 
 def plot_cycle_score(
     cycle: Cycle,
-    X,
-    y_true,
+    X: np.ndarray,
+    y_true: np.ndarray,
     scorer: Optional[Callable] = None,
     x_label: str = "Cycle",
     y_label: Optional[str] = None,
@@ -513,6 +537,22 @@ def plot_cycle_score(
     scorer_kw: dict = {},
     plot_kw: dict = {},
 ) -> plt.Figure:
+    """
+    Plots scoring metrics of cycle's theories given test data.
+    Args:
+        cycle: AER Cycle object that has been run
+        X: Test dataset independent values
+        y_true: Test dataset dependent values
+        scorer: sklearn scoring function (optional)
+        x_label: Label for x-axis
+        y_label: Label for y-axis
+        figsize: Figure size tuple in inches
+        scorer_kw: Dictionary of keywords for scoring function if scorer is supplied.
+        plot_kw: Dictionary of keywords to pass to matplotlib 'plot' function.
+
+    Returns:
+        matplotlib.figure.Figure
+    """
 
     # Use estimator's default scoring method if specific scorer is not supplied
     if scorer is None:
