@@ -10,7 +10,7 @@ from autora.variable import Variable, VariableCollection
 
 
 def test_skpipe_theory_copy():
-    """Checks that a deep copy is performed. When the autora.Cycle is copying the theorist."""
+    """Checks that a deep copy is performed when the autora.Cycle is copying the theorist."""
 
     X = np.linspace(0, 1, 10)
 
