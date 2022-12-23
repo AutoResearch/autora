@@ -1,11 +1,12 @@
 import inspect
 from itertools import product
-from typing import List, Optional, Sequence, Tuple
+from typing import Callable, List, Optional, Sequence, Tuple
 
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from matplotlib.patches import Patch
+from matplotlib.ticker import MaxNLocator
 
 from autora.cycle import Cycle
 
@@ -122,19 +123,25 @@ def _generate_mesh_grid(cycle: Cycle, steps: int = 50) -> np.ndarray:
     return np.meshgrid(*l_space)
 
 
-def _theory_predict(cycle: Cycle, conditions: Sequence) -> dict:
+def _theory_predict(
+    cycle: Cycle, conditions: Sequence, predict_proba: bool = False
+) -> dict:
     """
     Gets theory predictions over conditions space and saves results of each cycle to a dictionary.
     Args:
         cycle: AER Cycle object that has been run
         conditions: Condition space. Should be an array of grouped conditions.
+        predict_proba: Use estimator.predict_proba method instead of estimator.predict.
 
     Returns: dict
 
     """
     d_predictions = {}
     for i, theory in enumerate(cycle.data.theories):
-        d_predictions[i] = theory.predict(conditions)
+        if not predict_proba:
+            d_predictions[i] = theory.predict(conditions)
+        else:
+            d_predictions[i] = theory.predict_proba(conditions)
 
     return d_predictions
 
@@ -493,3 +500,42 @@ def cycle_specified_score(scorer, aer_cycle, x_vals, y_true, **kwargs):
         l_scores.append(scorer(y_true, y_pred, **kwargs))
 
     return l_scores
+
+
+def plot_cycle_score(
+    aer_cycle,
+    X,
+    y_true,
+    scorer: Optional[Callable] = None,
+    x_label: str = "Cycle",
+    y_label: Optional[str] = None,
+    figsize: Tuple[float, float] = (6.4, 4.8),
+    scorer_kw: dict = {},
+    plot_kw: dict = {},
+) -> plt.Figure:
+
+    # Use estimator's default scoring method if specific scorer is not supplied
+    if scorer is None:
+        l_scores = cycle_default_score(aer_cycle, X, y_true)
+    else:
+        l_scores = cycle_specified_score(scorer, aer_cycle, X, y_true, **scorer_kw)
+
+    # Plotting
+    fig, ax = plt.subplots(figsize=figsize)
+    ax.plot(np.arange(len(aer_cycle.data.theories)), l_scores, **plot_kw)
+
+    # Labeling
+    ax.set_xlabel(x_label)
+    if y_label is None:
+        if scorer is not None:
+            y_label = scorer.__name__
+        else:
+            y_label = "Score"
+    ax.set_ylabel(y_label)
+    ax.xaxis.set_major_locator(MaxNLocator(integer=True))
+
+    # Turn off spines
+    ax.spines.right.set_visible(False)
+    ax.spines.top.set_visible(False)
+
+    return fig
