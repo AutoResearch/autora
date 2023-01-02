@@ -17,6 +17,7 @@ Module constants:
 import json
 import logging
 import sys
+import warnings
 from copy import deepcopy
 from itertools import permutations, product
 from random import choice, random
@@ -32,6 +33,8 @@ from sympy import lambdify, latex, log, sympify
 from .prior import get_priors, relu
 
 _logger = logging.getLogger(__name__)
+
+warnings.filterwarnings("ignore")
 
 
 class Node:
