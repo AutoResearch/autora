@@ -1,4 +1,5 @@
 import random
+import numpy as np
 from typing import Iterable, Sequence, Union
 
 
@@ -18,4 +19,4 @@ def random_sampler(conditions: Union[Iterable, Sequence], n: int):
     random.shuffle(conditions)
     samples = conditions[0:n]
 
-    return samples
+    return np.array(samples)

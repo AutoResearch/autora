@@ -4,7 +4,7 @@ from typing import Iterable, List
 import numpy as np
 
 
-def model_disagreement_sampler(X: np.array, models: List, num_samples: int = 1):
+def model_disagreement_sampler(X: np.array, models: List, n: int = 1):
     """
     A sampler that returns selected samples for independent variables
     for which the models disagree the most in terms of their predictions.
@@ -12,7 +12,7 @@ def model_disagreement_sampler(X: np.array, models: List, num_samples: int = 1):
     Args:
         X: pool of IV conditions to evaluate in terms of model disagreement
         models: List of Scikit-learn (regression or classification) models to compare
-        num_samples: number of samples to select
+        n: number of samples to select
 
     Returns: Sampled pool
     """
@@ -61,6 +61,6 @@ def model_disagreement_sampler(X: np.array, models: List, num_samples: int = 1):
     summed_disagreement = np.sum(model_disagreement, axis=0)
 
     # sort the summed disagreements and select the top n
-    idx = (-summed_disagreement).argsort()[:num_samples]
+    idx = (-summed_disagreement).argsort()[:n]
 
     return X[idx]
