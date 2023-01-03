@@ -10,8 +10,8 @@ num_cycles = 5                  # number of cycles
 samples_for_seed = 10           # number of seed data points
 samples_per_cycle = 10           # number of data points chosen per cycle
 theorist_epochs = 500            # number of epochs for BMS
-repetitions = 5                 # specifies how many times to repeat the study
-test_size = 0.33                # proportion of test set size to training set size
+repetitions = 10                 # specifies how many times to repeat the study
+test_size = 0.20                # proportion of test set size to training set size
 
 # SELECT THEORIST
 # OPTIONS: BMS, DARTS
@@ -24,9 +24,9 @@ ground_truth_name = "weber_fechner"
 # SELECT EXPERIMENTALIST
 # OPTIONS: random, dissimilarity, popper, model disagreement
 experimentalists = ['random',
-                    #'dissimilarity',
-                    #'popper',
-                    #'model disagreement',
+                    # 'dissimilarity',
+                    # 'popper',
+                    # 'model disagreement',
                     ]
 
 
@@ -95,7 +95,15 @@ for experimentalist_name in experimentalists:
             y = np.row_stack([y, y_new])
 
             # fit theory
-            theorist.fit(X, y)
+            found_theory = False
+
+            while not found_theory:
+                try:
+                    theorist.fit(X, y)
+                    found_theory = True
+                except Exception as err:
+                    print(f"Unexpected {err=}, {type(err)=}")
+                    print("Trying again....")
 
             # evaluate theory fit
             MSE_log.append(get_MSE(theorist.model_, X_test, y_test))
