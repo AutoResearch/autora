@@ -22,7 +22,7 @@ for file in os.listdir(path):
     # append the loaded data to the list of loaded pickles
     loaded_pickles.append(pickle_data)
 
-df_validation = pd.DataFrame(columns=['theorist', 'experimentalist', 'repetition', 'MSE'])
+df_validation = pd.DataFrame()
 
 # print the list of loaded pickles
 for pickle in loaded_pickles:
@@ -35,9 +35,9 @@ for pickle in loaded_pickles:
 
     for idx in range(len(MSE_log)):
         row = dict()
-        row["theorist"] = configuration["theorist_name"]
+        row["Theorist"] = configuration["theorist_name"]
         row["Experimentalist"] = configuration["experimentalist_name"]
-        row["repetition"] = repetition_log[idx]
+        row["Repetition"] = repetition_log[idx]
         row["Data Collection Cycle"] = cycle_log[idx]
         row["Mean Squared Error"] = MSE_log[idx]
         df_validation = df_validation.append(row, ignore_index=True)
