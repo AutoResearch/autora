@@ -50,6 +50,24 @@ def get_experimentalist(experimentalist_name, X, y, X_allowed, metadata, theoris
              "nearest_values__n": num_samples}
         )
 
+    elif experimentalist_name == "popper_dissimilarity":
+        experimentalist = Pipeline(
+            [
+                ("pool", poppernet_pool),
+                ("dissimilarity", summed_dissimilarity_sampler),
+                ("nearest_values", nearest_values_sampler),
+            ],
+            {"pool__model": theorist.model_,
+             "pool__x_train": X,
+             "pool__y_train": y,
+             "pool__metadata": metadata,
+             "pool__n": num_samples*10,
+             "dissimilarity__X_ref": X,
+             "dissimilarity__n": num_samples,
+             "nearest_values__allowed_values": X_allowed,
+             "nearest_values__n": num_samples}
+        )
+
     # random experimentalist
     elif experimentalist_name == "random":
         experimentalist = Pipeline(
