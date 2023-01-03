@@ -64,7 +64,14 @@ for experimentalist_name in experimentalists:
         theorist = get_theorist(theorist_name, theorist_epochs)
 
         # derive seed model
-        theorist.fit(X, y)
+        found_theory = False
+        while not found_theory:
+            try:
+                theorist.fit(X, y)
+                found_theory = True
+            except Exception as err:
+                print(f"Unexpected {err=}, {type(err)=}")
+                print("Trying again....")
 
         # log initial performance
         MSE_log.append(get_MSE(theorist.model_, X_test, y_test))
