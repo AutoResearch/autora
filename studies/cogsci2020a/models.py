@@ -1,7 +1,13 @@
 import numpy as np
 from autora.variable import DV, IV, ValueType, VariableCollection
 
-ground_truth_resolution = 10
+# general meta parameters
+ground_truth_resolution = 100
+added_noise = 0.1
+
+# model specific parameters
+weber_constant = 1.0
+
 
 def weber_fechner_data(metadata):
 
@@ -16,7 +22,9 @@ def weber_fechner_data(metadata):
 
     return X, y
 
-def weber_fechner_experiment(X: np.ndarray, weber_constant: float = 1.0, std = 0.1):
+def weber_fechner_experiment(X: np.ndarray,
+                             weber_constant: float = weber_constant,
+                             std = added_noise):
     Y = np.zeros((X.shape[0],1))
     for idx, x in enumerate(X):
         # jnd =  np.min(x) * weber_constant
