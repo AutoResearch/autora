@@ -5,7 +5,9 @@ from sklearn.metrics import mean_absolute_error as mae
 from sklearn.metrics import mean_squared_error as mse
 
 
-def assumption_sampler(X, y, model, n, loss=True, theorist=None, confirmation_bias=False):
+def assumption_sampler(
+    X, y, model, n, loss=True, theorist=None, confirmation_bias=False
+):
     """
     Assumption Sampler challenges assumptions made by the Theorist.
     It identifies points whose error are most dependent on the assumption made.
