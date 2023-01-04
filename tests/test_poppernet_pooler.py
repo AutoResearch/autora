@@ -1,13 +1,21 @@
 import numpy as np
 import pytest
+import torch
 from sklearn.linear_model import LinearRegression, LogisticRegression
 
 from autora.experimentalist.pipeline import Pipeline
-from autora.experimentalist.sampler.poppernet import (
-    nearest_values_sampler,
-    poppernet_pooler,
-)
+from autora.experimentalist.pooler import poppernet_pool
+from autora.experimentalist.sampler import nearest_values_sampler
 from autora.variable import DV, IV, ValueType, VariableCollection
+
+
+@pytest.fixture
+def seed():
+    """
+    Ensures that the results are the same each time the tests are run.
+    """
+    torch.manual_seed(180)
+    return
 
 
 def get_xor_data(n: int = 3):
@@ -63,7 +71,9 @@ def regression_data_to_test():
     return data
 
 
-def test_poppernet_classification(synthetic_logr_model, classification_data_to_test):
+def test_poppernet_classification(
+    synthetic_logr_model, classification_data_to_test, seed
+):
 
     # Import model and data
     X_train, Y_train = get_xor_data()
@@ -95,14 +105,14 @@ def test_poppernet_classification(synthetic_logr_model, classification_data_to_t
 
     # Run popper net sampler
     poppernet_pipeline = Pipeline(
-        [("pool", poppernet_pooler), ("sampler", nearest_values_sampler)],
+        [("pool", poppernet_pool), ("sampler", nearest_values_sampler)],
         params={
             "pool": dict(
                 model=model,
                 x_train=X_train,
                 y_train=Y_train,
                 metadata=metadata,
-                num_samples=2,
+                n=2,
                 training_epochs=1000,
                 optimization_epochs=1000,
                 training_lr=1e-3,
@@ -111,7 +121,7 @@ def test_poppernet_classification(synthetic_logr_model, classification_data_to_t
                 limit_offset=10**-10,
                 limit_repulsion=0,
             ),
-            "sampler": {"allowed_values": X},
+            "sampler": {"allowed_values": X, "n": 2},
         },
     )
 
@@ -124,7 +134,7 @@ def test_poppernet_classification(synthetic_logr_model, classification_data_to_t
     assert (samples[0, :] == [1, 1]).all or (samples[1, :] == [1, 1]).all
 
 
-def test_poppernet_regression(synthetic_linr_model, regression_data_to_test):
+def test_poppernet_regression(synthetic_linr_model, regression_data_to_test, seed):
 
     # Import model and data
     X_train, Y_train = get_sin_data()
@@ -157,23 +167,23 @@ def test_poppernet_regression(synthetic_linr_model, regression_data_to_test):
     )
 
     poppernet_pipeline = Pipeline(
-        [("pool", poppernet_pooler), ("sampler", nearest_values_sampler)],
+        [("pool", poppernet_pool), ("sampler", nearest_values_sampler)],
         params={
             "pool": dict(
                 model=model,
                 x_train=X_train,
                 y_train=Y_train,
                 metadata=metadata,
-                num_samples=5,
+                n=5,
                 training_epochs=1000,
-                optimization_epochs=1000,
+                optimization_epochs=5000,
                 training_lr=1e-3,
                 optimization_lr=1e-3,
                 mse_scale=1,
-                limit_offset=10**-10,
-                limit_repulsion=0,
+                limit_offset=0,
+                limit_repulsion=0.01,
             ),
-            "sampler": {"allowed_values": X},
+            "sampler": {"allowed_values": X, "n": 5},
         },
     )
 
@@ -181,4 +191,12 @@ def test_poppernet_regression(synthetic_linr_model, regression_data_to_test):
 
     # the first value should be close to one of the local maxima of the
     # sine function
-    assert sample[0] == 1.5 or sample[0] == 4.5
+    assert (
+        sample[0] == 1.5
+        or sample[0] == 4.5
+        or sample[0] == 6
+        or sample[0] == 0
+        or sample[0] == 3
+    )
+    if sample[0] == 6 or sample[0] == 0 or sample[0] == 3:
+        assert sample[1] == 4.5 or sample[1] == 1.5

@@ -5,6 +5,9 @@ site_name: Autonomous Empirical Research
 theme:
   name: material
 
+watch:
+  - autora/
+
 plugins:
   - search
   - gen-files:
@@ -14,8 +17,11 @@ plugins:
         nav_file: SUMMARY.md
   - section-index
   - mkdocstrings:
-      watch:
-        - autora/
+      handlers:
+        python:
+          import:
+            - https://scikit-learn.org/stable/objects.inv
+
 
 markdown_extensions:
   - pymdownx.arithmatex:
