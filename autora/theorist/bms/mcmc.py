@@ -135,6 +135,7 @@ class Tree:
         max_size=50,
         root_value=None,
         fixed_root=False,
+        custom_ops={},
     ):
         """
         Initialises the tree object
@@ -170,6 +171,7 @@ class Tree:
                 self.root = Node(root_value, offspring=[], parent=None)
         # The possible operations
         self.ops = ops
+        self.custom_ops = custom_ops
         # The possible orders of the operations, move types, and move
         # type probabilities
         self.op_orders = list(set([0] + [n for n in list(ops.values())]))
@@ -590,7 +592,7 @@ class Tree:
                         "fac": scipy.special.factorial,
                         "sig": scipy.special.expit,
                         "relu": relu,
-                    },
+                    }.update(self.custom_ops),
                 ],
             )
         except (SyntaxError, KeyError):
@@ -1337,7 +1339,7 @@ class Tree:
                     "fac": scipy.special.factorial,
                     "sig": scipy.special.expit,
                     "relu": relu,
-                },
+                }.update(self.custom_ops),
             ],
         )
         # Loop over datasets

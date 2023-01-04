@@ -157,3 +157,6 @@ class BMSRegressor(BaseEstimator, RegressorMixin):
         assert self.cache_ is not None
 
         utils.present_results(self.model_, self.loss_, self.cache_)
+
+    def add_primitive(self, primitive):
+        self.pms.add_primitive(primitive)

@@ -1,7 +1,8 @@
 import sys
 from copy import deepcopy
+from inspect import signature
 from random import randint, random
-from typing import Optional, Tuple
+from typing import Callable, Dict, Optional, Tuple
 
 import numpy as np
 from numpy import exp
@@ -47,6 +48,11 @@ class Parallel:
             y: dependent variable of dataset
             root: fixed root of the tree
         """
+        self.prior_par = prior_par
+        self.ops = ops
+        self.custom_primitives: Dict = dict()
+        if root not in self.ops.keys():
+            self.add_primitive(root)
         # All trees are initialized to the same tree but with different BT
         Ts.sort()
         self.Ts = [str(T) for T in Ts]
@@ -62,6 +68,7 @@ class Parallel:
                 BT=1,
                 root_value=root,
                 fixed_root=True if root is not None else False,
+                custom_ops=self.custom_primitives,
             )
         }
         self.t1 = self.trees["1.0"]
@@ -75,6 +82,7 @@ class Parallel:
                 y=y,
                 root_value=str(self.t1),
                 fixed_root=self.t1.fixed_root,
+                custom_ops=self.custom_primitives,
                 max_size=max_size,
                 BT=float(BT),
             )
@@ -161,3 +169,10 @@ class Parallel:
             )
             self.mcmc_step()
             self.tree_swap()
+
+    # -------------------------------------------------------------------------
+
+    def add_primitive(self, primitive: Callable):
+        self.custom_primitives.update({primitive.__name__: primitive})
+        self.ops.update({primitive.__name__: len(signature(primitive).parameters)})
+        self.prior_par.update({"Nopi_" + primitive.__name__: 1})
