@@ -31,6 +31,7 @@ class Parallel:
         prior_par=get_priors()[0],
         x=None,
         y=None,
+        root=None,
     ) -> None:
         """
         Initialises Parallel Machine Scientist
@@ -44,6 +45,7 @@ class Parallel:
             prior_par: prior values over ops
             x: independent variables of dataset
             y: dependent variable of dataset
+            root: fixed root of the tree
         """
         # All trees are initialized to the same tree but with different BT
         Ts.sort()
@@ -58,6 +60,8 @@ class Parallel:
                 y=y,
                 max_size=max_size,
                 BT=1,
+                root_value=root,
+                fixed_root=True if root is not None else False,
             )
         }
         self.t1 = self.trees["1.0"]
@@ -70,6 +74,7 @@ class Parallel:
                 x=x,
                 y=y,
                 root_value=str(self.t1),
+                fixed_root=self.t1.fixed_root,
                 max_size=max_size,
                 BT=float(BT),
             )

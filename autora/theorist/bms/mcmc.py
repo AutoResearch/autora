@@ -134,6 +134,7 @@ class Tree:
         PT=1.0,
         max_size=50,
         root_value=None,
+        fixed_root=False,
     ):
         """
         Initialises the tree object
@@ -157,12 +158,16 @@ class Tree:
             for p in parameters
         ]
         # The root
+        self.fixed_root = fixed_root
         if root_value is None:
             self.root = Node(
                 choice(self.variables + self.parameters), offspring=[], parent=None
             )
         else:
-            self.root = Node(root_value, offspring=[], parent=None)
+            if fixed_root:
+                self.root = Node(root_value, offspring=[], parent=None, fixed=True)
+            else:
+                self.root = Node(root_value, offspring=[], parent=None)
         # The possible operations
         self.ops = ops
         # The possible orders of the operations, move types, and move
