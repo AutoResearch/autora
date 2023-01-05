@@ -215,14 +215,14 @@ class Architect(object):
             )
 
         loss.backward()
-        print("loss")
-        print(self.model._loss(input_valid, target_valid))
+        # print("loss")
+        # print(self.model._loss(input_valid, target_valid))
         # print(input_valid)
         # print(target_valid)
-        print("alphas")
-        print(self.model.arch_parameters()[0])
-        print("betas")
-        print(self.model.arch_parameters()[1])
+        # print("alphas")
+        # print(self.model.arch_parameters()[0])
+        # print("betas")
+        # print(self.model.arch_parameters()[1])
         self.current_loss = loss.item()
 
         alpha_parameters = self.model.arch_parameters()[0]

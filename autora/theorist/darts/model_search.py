@@ -141,7 +141,11 @@ class Cell(nn.Module):
                 self._ops.append(op)
 
     def forward(
-        self, input_states: List, weights: torch.Tensor, weights_mixt: torch.Tensor
+        self,
+        input_states: List,
+        weights: torch.Tensor,
+        weights_mixt: torch.Tensor,
+        mask: torch.Tensor,
     ):
         """
         Computes the output of a cell given a list of input states
@@ -153,6 +157,7 @@ class Cell(nn.Module):
             weights: matrix specifying architecture weights, i.e. the weights associated
                 with each operation for each edge
             weights_mixt: [steps x steps] matrix specifying the weight of each subset previous nodes
+            mask: require grad only for some tensor elements
         """
         # initialize states (activities of each node in the cell)
         states = list()
@@ -169,16 +174,18 @@ class Cell(nn.Module):
         # for each hidden node, compute edge between existing states (input
         # nodes / previous hidden) nodes and current node
         # print(self._steps)
+        # TODO set requires_grad = 0 for elements that dont have corresponding subsets
         for i in range(self._steps):
             # compute the state for each hidden node, first hidden node is
             # sum of input nodes, second is sum of input and first hidden
             s = 0
             set = np.arange(len(states))
             subsets = powerset(set)
-            prod = 1
+            # prod = 1
             for (index, subset) in enumerate(subsets):
                 if len(subset) > 0:
                     index -= 1
+                    prod = 1
                     for j in subset:
                         # print("OPS")
                         # print(self._ops[offset + j])
@@ -192,6 +199,7 @@ class Cell(nn.Module):
                             states[j], weights[offset + j]
                         )  # edge j->i
                     # print(i, index)
+                    mask[i][index] = 1
                     s = s + weights_mixt[i][index] * prod
                     # s = s + 1 * prod
 
@@ -201,6 +209,9 @@ class Cell(nn.Module):
         # concatenates the states of the last n (self._multiplier) intermediate
         # nodes to get the output of a cell
         result = torch.cat(states[-self._multiplier :], dim=1)
+        # print("first result", result)
+        # result = torch.cat(states[-1 :], dim=1)
+        # print("second result", result)
         # print(weights)
         # print(weights_mixt)
         return result
@@ -274,6 +285,7 @@ class Network(nn.Module):
 
         # set parameters
         self._dim_output = self._steps
+        # self._dim_output = 1  # the output is the last intermediate node
         self._architecture_fixed = architecture_fixed
         self._classifier_weight_decay = classifier_weight_decay
 
@@ -287,7 +299,9 @@ class Network(nn.Module):
         # generate a cell that undergoes architecture search
         self.cells = Cell(steps, self._n_input_states, self.primitives)
 
+        print("DIM output", self._dim_output)
         # last layer is a linear classifier (e.g. with 10 CIFAR classes)
+        # TODO
         self.classifier = nn.Linear(
             self._dim_output, num_classes
         )  # make this the number of input states
@@ -343,6 +357,8 @@ class Network(nn.Module):
         # compute stem first
         input_states = self.stem(x)
 
+        mask = self.mask
+
         # get architecture weights
         if self._architecture_fixed:
             weights = self.alphas_normal
@@ -362,7 +378,7 @@ class Network(nn.Module):
                 )
 
         # then apply cell with weights
-        cell_output = self.cells(input_states, weights, weights_mixt)
+        cell_output = self.cells(input_states, weights, weights_mixt, mask)
 
         # compute logits
         logits = self.classifier(cell_output.view(cell_output.size(0), -1))
@@ -370,6 +386,7 @@ class Network(nn.Module):
         # output layer)
 
         return logits
+        # return cell_output[:, 1]
 
     def _loss(self, input: torch.Tensor, target: torch.Tensor) -> torch.Tensor:
         """
@@ -427,6 +444,7 @@ class Network(nn.Module):
         self.max_k = 2**self.max_set_size - 1
 
         self.betas = Variable(torch.ones(self._steps, self.max_k), requires_grad=True)
+        self.mask = torch.zeros((self._steps, self.max_k), requires_grad=False)
 
         # self.betas = torch.tensor([[0]])
 
@@ -552,7 +570,7 @@ class Network(nn.Module):
         Returns:
             alphas_normal_sample: sampled architecture weights.
         """
-        betas_normal = self.betas.clone()
+        betas_normal = self.betas.clone() * self.mask
         betas_normal_sample = Variable(torch.zeros(betas_normal.data.shape))
 
         for i in range(betas_normal.data.shape[0]):  # interactions including node i

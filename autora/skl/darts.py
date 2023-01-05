@@ -485,7 +485,7 @@ class DARTSRegressor(BaseEstimator, RegressorMixin):
         darts_type: IMPLEMENTED_DARTS_TYPES = "original",
         init_weights_function: Optional[Callable] = None,
         param_updates_per_epoch: int = 10,
-        param_updates_for_sampled_model: int = 100,
+        param_updates_for_sampled_model: int = 1000,  # TODO 1000
         param_learning_rate_max: float = 2.5e-2,
         param_learning_rate_min: float = 0.01,
         param_momentum: float = 9e-1,
