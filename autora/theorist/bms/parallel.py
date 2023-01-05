@@ -25,6 +25,7 @@ class Parallel:
         self,
         Ts: list,
         ops=get_priors()[1],
+        custom_ops={},
         variables=["x"],
         parameters=["a"],
         max_size=50,
@@ -62,6 +63,7 @@ class Parallel:
                 BT=1,
                 root_value=root,
                 fixed_root=True if root is not None else False,
+                custom_ops=custom_ops,
             )
         }
         self.t1 = self.trees["1.0"]
@@ -75,6 +77,7 @@ class Parallel:
                 y=y,
                 root_value=str(self.t1),
                 fixed_root=self.t1.fixed_root,
+                custom_ops=custom_ops,
                 max_size=max_size,
                 BT=float(BT),
             )
