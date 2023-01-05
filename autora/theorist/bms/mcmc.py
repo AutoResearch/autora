@@ -18,6 +18,7 @@ import json
 import logging
 import sys
 from copy import deepcopy
+from inspect import signature
 from itertools import permutations, product
 from random import choice, random
 from typing import List
@@ -182,6 +183,17 @@ class Tree:
             )
         else:
             self.root = Node(root_value, offspring=[], parent=None)
+            root_order = len(signature(custom_ops[root_value]).parameters)
+            self.root.order = root_order
+            for _ in range(root_order):
+                self.root.offspring.append(
+                    Node(
+                        choice(self.variables + self.parameters),
+                        offspring=[],
+                        parent=self.root,
+                    )
+                )
+
         # The possible operations
         self.ops = ops
         self.custom_ops = custom_ops
@@ -191,7 +203,7 @@ class Tree:
         self.move_types = [p for p in permutations(self.op_orders, 2)]
         # Elementary trees (including leaves), indexed by order
         self.ets = dict([(o, []) for o in self.op_orders])
-        self.ets[0] = [self.root]
+        self.ets[0] = [x for x in self.root.offspring]
         # Distinct parameters used
         self.dist_par = list(
             set([n.value for n in self.ets[0] if n.value in self.parameters])
@@ -210,6 +222,8 @@ class Tree:
         self.num_rr = len(self.rr_space)
         # Number of operations of each type
         self.nops = dict([[o, 0] for o in ops])
+        if root_value is not None:
+            self.nops[self.root.value] += 1
         # The parameters of the prior probability (default: 5 everywhere)
         if prior_par == {}:
             self.prior_par = dict([("Nopi_%s" % t, 10.0) for t in self.ops])
@@ -536,7 +550,7 @@ class Tree:
                 if o not in self.ets[0]:
                     is_parent_et = False
                     break
-            if is_parent_et:
+            if is_parent_et and node.parent is not self.root:
                 self.ets[len(node.parent.offspring)].append(node.parent)
         # Update list of distinct parameters
         self.dist_par = list(

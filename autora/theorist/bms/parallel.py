@@ -48,6 +48,7 @@ class Parallel:
             y: dependent variable of dataset
             root: fixed root of the tree
         """
+        self.root = root
         # All trees are initialized to the same tree but with different BT
         Ts.sort()
         self.Ts = [str(T) for T in Ts]
@@ -61,7 +62,7 @@ class Parallel:
                 y=y,
                 max_size=max_size,
                 BT=1,
-                root_value=root,
+                root_value=root.__name__ if root is not None else None,
                 fixed_root=True if root is not None else False,
                 custom_ops=custom_ops,
             )
@@ -75,7 +76,7 @@ class Parallel:
                 prior_par=deepcopy(prior_par),
                 x=x,
                 y=y,
-                root_value=str(self.t1),
+                root_value=root.__name__ if root is not None else None,
                 fixed_root=self.t1.fixed_root,
                 custom_ops=custom_ops,
                 max_size=max_size,
@@ -92,6 +93,8 @@ class Parallel:
         Perform a MCMC step in each of the trees
         """
         # Loop over all trees
+        if self.root is not None:
+            p_rr = 0.0
         for T, tree in list(self.trees.items()):
             # MCMC step
             tree.mcmc_step(verbose=verbose, p_rr=p_rr, p_long=p_long)

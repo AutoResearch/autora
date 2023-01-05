@@ -126,7 +126,7 @@ class BMSRegressor(BaseEstimator, RegressorMixin):
             prior_par=self.prior_par,
             ops=self.ops,
             custom_ops=self.custom_ops,
-            root=None,
+            root=root,
         )
         self.model_, self.loss_, self.cache_ = utils.run(self.pms, self.epochs)
         self.models_ = list(self.pms.trees.values())
