@@ -59,7 +59,7 @@ class Node:
         self.value: str = value
         self.order: int = len(self.offspring)
 
-    def pr(self, show_pow=False):
+    def pr(self, custom_ops, show_pow=False):
         """
         Converts expression in readable form
 
@@ -67,27 +67,41 @@ class Node:
         """
         if self.offspring == []:
             return "%s" % self.value
-        elif len(self.offspring) == 2:
+        elif len(self.offspring) == 2 and self.value not in custom_ops:
             return "(%s %s %s)" % (
-                self.offspring[0].pr(show_pow=show_pow),
+                self.offspring[0].pr(custom_ops=custom_ops, show_pow=show_pow),
                 self.value,
-                self.offspring[1].pr(show_pow=show_pow),
+                self.offspring[1].pr(custom_ops=custom_ops, show_pow=show_pow),
             )
         else:
             if show_pow:
                 return "%s(%s)" % (
                     self.value,
-                    ",".join([o.pr(show_pow=show_pow) for o in self.offspring]),
+                    ",".join(
+                        [
+                            o.pr(custom_ops=custom_ops, show_pow=show_pow)
+                            for o in self.offspring
+                        ]
+                    ),
                 )
             else:
                 if self.value == "pow2":
-                    return "(%s ** 2)" % (self.offspring[0].pr(show_pow=show_pow))
+                    return "(%s ** 2)" % (
+                        self.offspring[0].pr(custom_ops=custom_ops, show_pow=show_pow)
+                    )
                 elif self.value == "pow3":
-                    return "(%s ** 3)" % (self.offspring[0].pr(show_pow=show_pow))
+                    return "(%s ** 3)" % (
+                        self.offspring[0].pr(custom_ops=custom_ops, show_pow=show_pow)
+                    )
                 else:
                     return "%s(%s)" % (
                         self.value,
-                        ",".join([o.pr(show_pow=show_pow) for o in self.offspring]),
+                        ",".join(
+                            [
+                                o.pr(custom_ops=custom_ops, show_pow=show_pow)
+                                for o in self.offspring
+                            ]
+                        ),
                     )
 
 
@@ -167,10 +181,7 @@ class Tree:
                 choice(self.variables + self.parameters), offspring=[], parent=None
             )
         else:
-            if fixed_root:
-                self.root = Node(root_value, offspring=[], parent=None, fixed=True)
-            else:
-                self.root = Node(root_value, offspring=[], parent=None)
+            self.root = Node(root_value, offspring=[], parent=None)
         # The possible operations
         self.ops = ops
         self.custom_ops = custom_ops
@@ -252,7 +263,7 @@ class Tree:
         Returns: root node representation
 
         """
-        return self.root.pr()
+        return self.root.pr(custom_ops=self.custom_ops)
 
     # -------------------------------------------------------------------------
     def pr(self, show_pow=True):
@@ -262,7 +273,7 @@ class Tree:
         Returns: root node representation
 
         """
-        return self.root.pr(show_pow=show_pow)
+        return self.root.pr(custom_ops=self.custom_ops, show_pow=show_pow)
 
     # -------------------------------------------------------------------------
     def canonical(self, verbose=False):
@@ -584,20 +595,21 @@ class Tree:
         atomd = dict([(a.name, a) for a in ex.atoms() if a.is_Symbol])
         variables = [atomd[v] for v in self.variables if v in list(atomd.keys())]
         parameters = [atomd[p] for p in self.parameters if p in list(atomd.keys())]
+        dic: dict = dict(
+            {
+                "fac": scipy.special.factorial,
+                "sig": scipy.special.expit,
+                "relu": relu,
+            },
+            **self.custom_ops
+        )
         try:
             flam = lambdify(
                 variables + parameters,
                 ex,
                 [
                     "numpy",
-                    dict(
-                        {
-                            "fac": scipy.special.factorial,
-                            "sig": scipy.special.expit,
-                            "relu": relu,
-                        },
-                        **self.custom_ops
-                    ),
+                    dic,
                 ],
             )
         except (SyntaxError, KeyError):
