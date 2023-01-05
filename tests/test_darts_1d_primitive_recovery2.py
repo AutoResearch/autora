@@ -63,6 +63,11 @@ def transform_through_primitive_cos(x: np.ndarray):
     return y
 
 
+def transform_through_primitive_cosplusx(x: np.ndarray):
+    y = np.cos(x)
+    return y + x
+
+
 def transform_through_primitive_sin(x: np.ndarray):
     y = np.sin(x)
     return y
@@ -114,7 +119,7 @@ def run_test_primitive_fitting(
     regressor = DARTSRegressor(
         num_graph_nodes=1,
         param_updates_per_epoch=100,
-        max_epochs=300,
+        max_epochs=400,
         arch_updates_per_epoch=1,
         param_weight_decay=3e-4,
         arch_weight_decay_df=0.001,
@@ -127,19 +132,29 @@ def run_test_primitive_fitting(
         train_classifier_bias=False,
         train_classifier_coefficients=False,
     )
+    # print("XX")
+    # print(X)
+    # print("yy")
+    # print(y)
     regressor.fit(X, y)
 
     if verbose:
         y_predict = regressor.predict(X)
+        # print("y_pred")
+        # print(y_predict)
         report_weights(X, expected_primitive, primitives, regressor, y)
-        plot_results(X, y, y_predict)
+        plot_results(X, y, y_predict, expected_primitive, primitives)
 
     assert get_primitive_from_single_node_model(regressor.model_) == expected_primitive
 
 
-def plot_results(X, y, y_predict):
+def plot_results(X, y, y_predict, expected_primitive, primitives):
     plt.plot(X, y, "o")
     plt.plot(X, y_predict, "-")
+    primitives_string = " ".join(primitives)
+    title = "expected " + expected_primitive + " from: " + primitives_string
+    plt.title(title)
+    # plt.savefig(title+'.png')
     plt.show()
 
 
@@ -193,6 +208,15 @@ def test_primitive_fitting_restricted_subtract():
     )
 
 
+def test_primitive_fitting_restricted_cos():
+    run_test_primitive_fitting(
+        generate_x(),
+        transform_through_primitive_cos,
+        "cos",
+        primitives=["cos", "sin", "subtract"],
+    )
+
+
 def test_primitive_fitting_none():
     run_test_primitive_fitting(
         generate_x(),
@@ -234,8 +258,7 @@ def test_primitive_fitting_sigmoid():
         generate_x(-10, +10),
         transform_through_primitive_sigmoid,
         "logistic",
-        # Restricted group of primitives, as sigmoid function doesn't fit otherwise.
-        primitives=["none", "logistic", "linear", "sin", "tanh"],
+        primitives=non_interchangeable_primitives,
     )
 
 
@@ -250,13 +273,20 @@ def test_primitive_fitting_exp():
 
 def test_primitive_fitting_cos():
     run_test_primitive_fitting(
-        generate_x(start=-3 * np.pi, stop=3 * np.pi),
+        generate_x(start=0, stop=2 * np.pi),
         transform_through_primitive_cos,
         "cos",
-        # Restricted group of primitives, as the code doesn't
-        # find cos in the full set
-        primitives=["none", "cos", "linear", "subtract"],
+        primitives=non_interchangeable_primitives,
     )
+
+
+# def test_primitive_fitting_cosplusx():
+#     run_test_primitive_fitting(
+#         generate_x(start=0, stop=2 * np.pi),
+#         transform_through_primitive_cosplusx,
+#         "cos",
+#         primitives=non_interchangeable_primitives,
+#     )
 
 
 def test_primitive_fitting_sin():
