@@ -63,6 +63,11 @@ def transform_through_primitive_cos(x: np.ndarray):
     return y
 
 
+def transform_through_primitive_cosplusx(x: np.ndarray):
+    y = np.cos(x)
+    return y + x
+
+
 def transform_through_primitive_sin(x: np.ndarray):
     y = np.sin(x)
     return y
@@ -273,6 +278,15 @@ def test_primitive_fitting_cos():
         "cos",
         primitives=non_interchangeable_primitives,
     )
+
+
+# def test_primitive_fitting_cosplusx():
+#     run_test_primitive_fitting(
+#         generate_x(start=0, stop=2 * np.pi),
+#         transform_through_primitive_cosplusx,
+#         "cos",
+#         primitives=non_interchangeable_primitives,
+#     )
 
 
 def test_primitive_fitting_sin():
