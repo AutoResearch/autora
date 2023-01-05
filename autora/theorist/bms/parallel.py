@@ -51,7 +51,7 @@ class Parallel:
         self.prior_par = prior_par
         self.ops = ops
         self.custom_primitives: Dict = dict()
-        if root not in self.ops.keys():
+        if (root is not None) and (root not in self.ops.keys()):
             self.add_primitive(root)
         # All trees are initialized to the same tree but with different BT
         Ts.sort()

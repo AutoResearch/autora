@@ -153,6 +153,8 @@ class Tree:
             root_value: algebraic term held at root of equation
         """
         # The variables and parameters
+        if custom_ops is None:
+            custom_ops = dict()
         self.variables = variables
         self.parameters = [
             p if p.startswith("_") and p.endswith("_") else "_%s_" % p
@@ -588,11 +590,14 @@ class Tree:
                 ex,
                 [
                     "numpy",
-                    {
-                        "fac": scipy.special.factorial,
-                        "sig": scipy.special.expit,
-                        "relu": relu,
-                    }.update(self.custom_ops),
+                    dict(
+                        {
+                            "fac": scipy.special.factorial,
+                            "sig": scipy.special.expit,
+                            "relu": relu,
+                        },
+                        **self.custom_ops
+                    ),
                 ],
             )
         except (SyntaxError, KeyError):
@@ -1335,11 +1340,14 @@ class Tree:
             ex,
             [
                 "numpy",
-                {
-                    "fac": scipy.special.factorial,
-                    "sig": scipy.special.expit,
-                    "relu": relu,
-                }.update(self.custom_ops),
+                dict(
+                    {
+                        "fac": scipy.special.factorial,
+                        "sig": scipy.special.expit,
+                        "relu": relu,
+                    },
+                    **self.custom_ops
+                ),
             ],
         )
         # Loop over datasets
