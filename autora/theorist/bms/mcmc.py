@@ -204,6 +204,7 @@ class Tree:
         # Elementary trees (including leaves), indexed by order
         self.ets = dict([(o, []) for o in self.op_orders])
         self.ets[0] = [x for x in self.root.offspring]
+        self.ets[self.root.order] = [self.root]
         # Distinct parameters used
         self.dist_par = list(
             set([n.value for n in self.ets[0] if n.value in self.parameters])
@@ -550,7 +551,7 @@ class Tree:
                 if o not in self.ets[0]:
                     is_parent_et = False
                     break
-            if is_parent_et and node.parent is not self.root:
+            if is_parent_et:
                 self.ets[len(node.parent.offspring)].append(node.parent)
         # Update list of distinct parameters
         self.dist_par = list(
@@ -1213,16 +1214,18 @@ class Tree:
 
         # Elementary tree (short-range) move
         else:
-            # Choose a feasible move (doable and keeping size<=max_size)
-            while True:
-                oini, ofin = choice(self.move_types)
-                if len(self.ets[oini]) > 0 and (
-                    self.size - oini + ofin <= self.max_size
-                ):
-                    break
-            # target and new ETs
-            target = choice(self.ets[oini])
-            new = choice(self.et_space[ofin])
+            target = None
+            while target is None or self.fixed_root and target is self.root:
+                # Choose a feasible move (doable and keeping size<=max_size)
+                while True:
+                    oini, ofin = choice(self.move_types)
+                    if len(self.ets[oini]) > 0 and (
+                        self.size - oini + ofin <= self.max_size
+                    ):
+                        break
+                # target and new ETs
+                target = choice(self.ets[oini])
+                new = choice(self.et_space[ofin])
             # omegai and omegaf
             omegai = len(self.ets[oini])
             omegaf = len(self.ets[ofin]) + 1
