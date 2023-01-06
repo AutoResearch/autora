@@ -131,7 +131,7 @@ def run_test_primitive_fitting(
 ):
     y = transformer(X)
     regressor = DARTSRegressor(
-        num_graph_nodes=3,
+        num_graph_nodes=2,
         param_updates_per_epoch=1000,
         max_epochs=500,
         arch_updates_per_epoch=1,
@@ -167,7 +167,7 @@ def plot_results(X, y, y_predict, expected_primitive):
     plt.plot(X, y, "o")
     plt.plot(X, y_predict, "-")
     # plt.title(str(expected_primitive))
-    # plt.savefig('xsigmoid.png')
+    # plt.savefig('xsquared.png')
     plt.show()
 
 

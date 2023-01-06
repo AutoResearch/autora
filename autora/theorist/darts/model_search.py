@@ -130,12 +130,22 @@ class Cell(nn.Module):
         self._ops = nn.ModuleList()
         # iterate over edges: edges between each hidden node and input nodes +
         # prev hidden nodes
-        for i in range(self._steps):  # hidden nodes
-            for j in range(self._n_input_states + i):  # 2 refers to the 2 input nodes
-                # defines the stride for link between cells
-                # adds a mixed operation (derived from architecture parameters alpha)
-                # for 4 intermediate nodes, a total of 14 connections
-                # (MixedOps) is added
+        # for i in range(self._steps):  # hidden nodes
+        #     for j in range(self._n_input_states + i):  # 2 refers to the 2 input nodes
+        #         # defines the stride for link between cells
+        #         # adds a mixed operation (derived from architecture parameters alpha)
+        #         # for 4 intermediate nodes, a total of 14 connections
+        #         # (MixedOps) is added
+        #         op = MixedOp(primitives)
+        #         # appends cell with mixed operation
+        #         self._ops.append(op)
+        #
+        # max_set_size = self._n_input_states + self._steps - 1
+        # # max_k = 2**self.max_set_size - 1
+        for i in range(self._steps):
+            num_prev_nodes = self._n_input_states + i
+            max_k = 2**num_prev_nodes - 1
+            for j in range(max_k):
                 op = MixedOp(primitives)
                 # appends cell with mixed operation
                 self._ops.append(op)
@@ -187,24 +197,19 @@ class Cell(nn.Module):
                     index -= 1
                     prod = 1
                     for j in subset:
-                        # print("OPS")
-                        # print(self._ops[offset + j])
-                        # print("weights alphas for individual op")
-                        # print(weights[offset + j])
-                        # print("state of parent node")
-                        # print(states[j])
-                        # print("result of ops")
-                        # print(self._ops[offset + j](states[j], weights[offset + j]))
-                        prod = prod * self._ops[offset + j](
-                            states[j], weights[offset + j]
-                        )  # edge j->i
+                        prod = prod * states[j]
+                        # prod = prod * self._ops[offset + j](
+                        #     states[j], weights[offset + j]
+                        # )  # edge j->i
                     # print(i, index)
                     mask[i][index] = 1
-                    s = s + weights_mixt[i][index] * prod
+                    s = s + self._ops[offset + j](
+                        weights_mixt[i][index] * prod, weights[offset + j]
+                    )
                     # s = s + 1 * prod
 
             # add edges from all previous nodes (input + prev hidden) to next hidden node i + 1
-            offset += len(states)
+            offset += 2 ** (len(set)) - 1
             states.append(s)
         # concatenates the states of the last n (self._multiplier) intermediate
         # nodes to get the output of a cell
@@ -426,18 +431,22 @@ class Network(nn.Module):
         Initializes the architecture weights.
         """
         # compute the number of possible connections between nodes
-        k = sum(1 for i in range(self._steps) for n in range(self._n_input_states + i))
-        # number of available primitive operations (8 different types for a
-        # conv net)
+        # k = sum(1 for i in range(self._steps) for n in range(self._n_input_states + i))
+        # # number of available primitive operations (8 different types for a
+        # # conv net)
         num_ops = len(self.primitives)
+        k = 0
+        for i in range(self._steps):
+            num_prev_nodes = self._n_input_states + i
+            max_k = 2**num_prev_nodes - 1
+            for j in range(max_k):
+                k += 1
 
         # e.g., generate 14 (number of available edges) by 8 (operations)
         # weight matrix for normal alphas of the architecture
         self.alphas_normal = Variable(
             1e-3 * torch.randn(k, num_ops), requires_grad=True
         )
-
-        # self.alphas_normal = torch.tensor([[0, 1, 0]])
 
     def _initialize_betas(self):
         self.max_set_size = self._n_input_states + self._steps - 1
