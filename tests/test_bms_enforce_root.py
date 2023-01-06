@@ -26,6 +26,10 @@ def run_test_primitive_fitting_2d(
     y = transformer(X)
     regressor = BMSRegressor(epochs=30)
     regressor.fit(X, y.ravel(), custom_ops=[custom_primitive], root=root)
+    # root is none or is in custom ops
+    assert root is None or root in regressor.custom_ops.values()
+    # root is none or it is the root of the fitted model
+    assert root is None or root is regressor.custom_ops[regressor.model_.root.value]
     if verbose:
         print(regressor.model_)
         print(regressor.pms.trees)

@@ -40,6 +40,20 @@ def run_test_primitive_fitting(
     y = transformer(X)
     regressor = BMSRegressor(epochs=30)
     regressor.fit(X, y.ravel(), custom_ops=[custom_primitive])
+    # custom primitive is none or it is in bms' custom ops
+    assert custom_primitive is None or custom_primitive in regressor.custom_ops.values()
+    # custom primitive is none or its name is in bms' ops
+    assert custom_primitive is None or custom_primitive.__name__ in regressor.ops.keys()
+    # custom primitive is none or it is in the fitted models' custom ops
+    assert (
+        custom_primitive is None
+        or custom_primitive in regressor.model_.custom_ops.values()
+    )
+    # custom primitive is none or its name is in the fitted models' ops
+    assert (
+        custom_primitive is None
+        or custom_primitive.__name__ in regressor.model_.ops.keys()
+    )
     if verbose:
         y_predict = regressor.predict(X)
         for x_i in X.T[
@@ -66,6 +80,20 @@ def run_test_primitive_fitting_2d(
     y = transformer(X)
     regressor = BMSRegressor(epochs=30)
     regressor.fit(X, y.ravel(), custom_ops=[custom_primitive])
+    # custom primitive is none or it is in bms' custom ops
+    assert custom_primitive is None or custom_primitive in regressor.custom_ops.values()
+    # custom primitive is none or its name is in bms' ops
+    assert custom_primitive is None or custom_primitive.__name__ in regressor.ops.keys()
+    # custom primitive is none or it is in the fitted models' custom ops
+    assert (
+        custom_primitive is None
+        or custom_primitive in regressor.model_.custom_ops.values()
+    )
+    # custom primitive is none or its name is in the fitted models' ops
+    assert (
+        custom_primitive is None
+        or custom_primitive.__name__ in regressor.model_.ops.keys()
+    )
     if verbose:
         print(regressor.model_)
         print(regressor.pms.trees)
