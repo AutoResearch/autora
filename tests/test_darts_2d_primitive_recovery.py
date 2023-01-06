@@ -167,7 +167,7 @@ def plot_results(X, y, y_predict, expected_primitive):
     plt.plot(X, y, "o")
     plt.plot(X, y_predict, "-")
     # plt.title(str(expected_primitive))
-    # plt.savefig('xsigmoid.png')
+    plt.savefig("xsigmoid.png")
     plt.show()
 
 

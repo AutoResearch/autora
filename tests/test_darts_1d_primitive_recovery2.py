@@ -151,10 +151,10 @@ def run_test_primitive_fitting(
 def plot_results(X, y, y_predict, expected_primitive, primitives):
     plt.plot(X, y, "o")
     plt.plot(X, y_predict, "-")
-    primitives_string = " ".join(primitives)
-    title = "expected " + expected_primitive + " from: " + primitives_string
-    plt.title(title)
-    # plt.savefig(title+'.png')
+    # primitives_string = " ".join(primitives)
+    # title = "expected " + expected_primitive + " from: " + primitives_string
+    # plt.title(title)
+    plt.savefig("tanh.png")
     plt.show()
 
 
