@@ -112,7 +112,6 @@ class BMSRegressor(BaseEstimator, RegressorMixin):
         X = pd.DataFrame(X, columns=self.variables)
         y = pd.Series(y)
         _logger.info("BMS fitting started")
-        print(custom_ops)
         for op in custom_ops:
             self.add_primitive(op)
         if (root is not None) and (root not in self.ops.keys()):
