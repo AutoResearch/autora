@@ -574,7 +574,7 @@ class Network(nn.Module):
         betas_normal_sample = Variable(torch.zeros(betas_normal.data.shape))
 
         for i in range(betas_normal.data.shape[0]):  # interactions including node i
-            row = betas_normal[i]
+            row = abs(betas_normal[i])
             max_idx = np.argmax(row.data)
             betas_normal_sample[i, max_idx] = 1
 

@@ -131,7 +131,7 @@ def run_test_primitive_fitting(
 ):
     y = transformer(X)
     regressor = DARTSRegressor(
-        num_graph_nodes=3,
+        num_graph_nodes=2,
         param_updates_per_epoch=1000,
         max_epochs=500,
         arch_updates_per_epoch=1,
