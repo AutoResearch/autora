@@ -64,7 +64,7 @@ class BMSRegressor(BaseEstimator, RegressorMixin):
             ts: contains a list of the temperatures that the parallel ms works at
         """
         self.ts = ts
-        self.prior_par = get_priors()[0]
+        self.prior_par = prior_par
         self.epochs = epochs
         self.pms: Parallel = Parallel(Ts=ts)
         self.ops = get_priors()[1]
