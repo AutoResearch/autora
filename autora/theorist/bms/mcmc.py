@@ -259,7 +259,7 @@ class Tree:
         self.bic = self.get_bic()
         self.E, self.EB, self.EP = self.get_energy()
         # To control formula degeneracy (i.e. different trees that
-        # correspond to the same cannoninal formula), we store the
+        # correspond to the same canonical formula), we store the
         # representative tree for each canonical formula
         self.representative = {}
         self.representative[self.canonical()] = (
