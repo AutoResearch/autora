@@ -584,7 +584,8 @@ class Network(nn.Module):
 
         for i in range(betas_normal.data.shape[0]):  # interactions including node i
             row = betas_normal[i]
-            max_idx = np.argmax(row.data)
+            row_nonzero = row[row != 0]
+            max_idx = np.argmax(row_nonzero.data)
             betas_normal_sample[i, max_idx] = 1
 
         return betas_normal_sample
