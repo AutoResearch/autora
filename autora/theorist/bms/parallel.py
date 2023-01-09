@@ -3,7 +3,6 @@ from copy import deepcopy
 from random import randint, random
 from typing import Optional, Tuple
 
-import numpy as np
 from numpy import exp
 
 from .mcmc import Tree
