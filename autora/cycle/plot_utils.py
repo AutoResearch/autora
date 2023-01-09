@@ -5,6 +5,7 @@ from typing import Callable, List, Optional, Sequence, Tuple
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from matplotlib import rcParams
 from matplotlib.patches import Patch
 from matplotlib.ticker import MaxNLocator
 
@@ -533,7 +534,7 @@ def plot_cycle_score(
     scorer: Optional[Callable] = None,
     x_label: str = "Cycle",
     y_label: Optional[str] = None,
-    figsize: Tuple[float, float] = (6.4, 4.8),
+    figsize: Tuple[float, float] = rcParams["figure.figsize"],
     scorer_kw: dict = {},
     plot_kw: dict = {},
 ) -> plt.Figure:
