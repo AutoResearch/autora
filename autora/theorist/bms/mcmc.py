@@ -1172,9 +1172,14 @@ class Tree:
                     self.EP += dEP
 
         # Long-range move
-        elif topDice < (p_rr + p_long):
+        elif topDice < (p_rr + p_long) and not (
+            self.fixed_root and len(self.nodes) == 1
+        ):
             # Choose a random node in the tree, and a random new operation
             target = choice(self.nodes)
+            if self.fixed_root:
+                while target is self.root:
+                    target = choice(self.nodes)
             nready = False
             while not nready:
                 if len(target.offspring) == 0:
