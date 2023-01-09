@@ -4,11 +4,13 @@ Provides tools to chain functions used to create experiment sequences.
 from __future__ import annotations
 
 import copy
+from itertools import chain
 from typing import (
     Any,
     Dict,
     Iterable,
     List,
+    Literal,
     Optional,
     Protocol,
     Sequence,
@@ -117,7 +119,7 @@ class Pipeline:
         self.params = params
 
     def __repr__(self):
-        return f"Pipeline(steps={self.steps}, params={self.params})"
+        return f"{self.__class__.__name__}(steps={self.steps}, params={self.params})"
 
     def __call__(
         self,
@@ -127,11 +129,7 @@ class Pipeline:
         """Successively pass the input values through the Pipe."""
 
         # Initialize the parameters objects.
-        pipeline_params = _parse_params_to_nested_dict(
-            self.params, divider=PARAM_DIVIDER
-        )
-        call_params = _parse_params_to_nested_dict(params, divider=PARAM_DIVIDER)
-        merged_params = _merge_dicts(pipeline_params, call_params)
+        merged_params = self._merge_params_with_self_params(params)
 
         try:
             # Check we have steps to use
@@ -173,6 +171,14 @@ class Pipeline:
             results.append(pipe(results[-1], **all_params_for_pipe))
 
         return results[-1]
+
+    def _merge_params_with_self_params(self, params):
+        pipeline_params = _parse_params_to_nested_dict(
+            self.params, divider=PARAM_DIVIDER
+        )
+        call_params = _parse_params_to_nested_dict(params, divider=PARAM_DIVIDER)
+        merged_params = _merge_dicts(pipeline_params, call_params)
+        return merged_params
 
     run = __call__
 
@@ -227,6 +233,79 @@ def _merge_dicts(a: dict, b: dict):
     return a_
 
 
+class PipelineUnion(Pipeline):
+    """
+    Run several Pipes in parallel and concatenate all their results.
+
+    Examples:
+        You can use the ParallelPipeline to parallelize a group of poolers:
+        >>> union_pipeline_0 = PipelineUnion([
+        ...      ("pool_1", make_pipeline([range(5)])),
+        ...      ("pool_2", make_pipeline([range(25, 30)])),
+        ...     ]
+        ... )
+        >>> list(union_pipeline_0.run())
+        [0, 1, 2, 3, 4, 25, 26, 27, 28, 29]
+
+        >>> union_pipeline_1 = PipelineUnion([
+        ...      ("pool_1", range(5)),
+        ...      ("pool_2", range(25, 30)),
+        ...     ]
+        ... )
+        >>> list(union_pipeline_1.run())
+        [0, 1, 2, 3, 4, 25, 26, 27, 28, 29]
+
+        You can use the ParallelPipeline to parallelize a group of pipes – each of which gets
+        the same input.
+        >>> pipeline_with_embedded_union = Pipeline([
+        ...      ("pool", range(22)),
+        ...      ("filters",  PipelineUnion([
+        ...          ("div_5_filter", lambda x: filter(lambda i: i % 5 == 0, x)),
+        ...          ("div_7_filter", lambda x: filter(lambda i: i % 7 == 0, x))
+        ...         ]))
+        ... ])
+        >>> list(pipeline_with_embedded_union.run())
+        [0, 5, 10, 15, 20, 0, 7, 14, 21]
+
+    """
+
+    def __call__(
+        self,
+        ex: Optional[_ExperimentalSequence] = None,
+        **params,
+    ) -> _ExperimentalSequence:
+        """Pass the input values in parallel through the steps."""
+
+        # Initialize the parameters objects.
+        merged_params = self._merge_params_with_self_params(params)
+
+        results = []
+
+        # Run the parallel steps over the input
+        for name, pipe in self.steps:
+            all_params_for_step = merged_params.get(name, dict())
+            if ex is None:
+                if isinstance(pipe, Pool):
+                    results.append(pipe(**all_params_for_step))
+                elif isinstance(pipe, Iterable):
+                    results.append(pipe)
+                else:
+                    raise NotImplementedError(
+                        f"{pipe=} cannot be used in the PipelineUnion"
+                    )
+            else:
+                assert isinstance(
+                    pipe, Pipe
+                ), f"{pipe=} is incompatible with the Pipe interface"
+                results.append(pipe(ex, **all_params_for_step))
+
+        union_results = chain.from_iterable(results)
+
+        return union_results
+
+    run = __call__
+
+
 def _parse_params_to_nested_dict(params_dict: Dict, divider: str):
     """
     Converts a dictionary with a single level to a multi-level nested dictionary.
@@ -267,6 +346,7 @@ def _parse_params_to_nested_dict(params_dict: Dict, divider: str):
 def make_pipeline(
     steps: Optional[Sequence[Union[Pool, Pipe]]] = None,
     params: Optional[Dict[str, Any]] = None,
+    kind: Literal["serial", "union"] = "serial",
 ) -> Pipeline:
     """
     A factory function to make pipeline objects.
@@ -277,6 +357,9 @@ def make_pipeline(
     Args:
         steps: a sequence of Pipe-compatible objects
         params: a dictionary of parameters passed to each Pipe by its inferred name
+        kind: whether the steps should run in "serial", passing data from one to the next,
+            or in "union", where all the steps get the same data and the output is the union
+            of all the results.
 
     Returns:
         A pipeline object
@@ -361,7 +444,13 @@ def make_pipeline(
         ('step_1', functools.partial(<function divisor_filter at 0x...>, divisor=3))], \
         params={})
 
+        It is possible to create parallel pipelines too:
+        >>> pl = make_pipeline([range(5), range(10,15)], kind="union")
+        >>> pl
+        PipelineUnion(steps=[('step_0', range(0, 5)), ('step_1', range(10, 15))], params={})
 
+        >>> list(pl.run())
+        [0, 1, 2, 3, 4, 10, 11, 12, 13, 14]
 
     """
 
@@ -384,7 +473,12 @@ def make_pipeline(
 
         steps_.append((name_in_pipeline, pipe))
 
-    pipeline = Pipeline(steps_, params=params)
+    if kind == "serial":
+        pipeline = Pipeline(steps_, params=params)
+    elif kind == "union":
+        pipeline = PipelineUnion(steps_, params=params)
+    else:
+        raise NotImplementedError(f"{kind=} is not implemented")
 
     return pipeline
 

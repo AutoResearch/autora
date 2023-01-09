@@ -15,6 +15,15 @@ from autora.skl.darts import (
 )
 
 
+@pytest.fixture
+def seed():
+    """
+    Ensures that the results are the same each time the tests are run.
+    """
+    torch.manual_seed(180)
+    return
+
+
 def generate_noisy_constant_data(
     const: float = 0.5, epsilon: float = 0.01, num: int = 1000, seed: int = 42
 ):
@@ -53,7 +62,7 @@ def generate_noisy_linear_data(
     )
 
 
-def test_constant_model():
+def test_constant_model(seed):
 
     X, y, const, epsilon = generate_noisy_constant_data()
 
@@ -68,7 +77,7 @@ def test_constant_model():
     assert estimator is not None
 
     for y_pred_i in np.nditer(estimator.predict(X_test)):
-        (const - (5.0 * epsilon)) <= y_pred_i <= (const + (5.0 * epsilon))
+        assert (const - (5.0 * epsilon)) <= y_pred_i <= (const + (5.0 * epsilon))
 
     print(estimator.network_)
 
