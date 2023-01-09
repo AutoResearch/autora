@@ -5,7 +5,7 @@ from sklearn.linear_model import RidgeCV
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 
 from autora.experimentalist.pipeline import make_pipeline
-from autora.experimentalist.pool import grid_pool
+from autora.experimentalist.pooler import grid_pool
 from autora.experimentalist.sampler import assumption_sampler
 from autora.variable import Variable, VariableCollection
 
