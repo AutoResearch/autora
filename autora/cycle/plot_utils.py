@@ -535,6 +535,8 @@ def plot_cycle_score(
     x_label: str = "Cycle",
     y_label: Optional[str] = None,
     figsize: Tuple[float, float] = rcParams["figure.figsize"],
+    ylim: Optional[Tuple[float, float]] = None,
+    xlim: Optional[Tuple[float, float]] = None,
     scorer_kw: dict = {},
     plot_kw: dict = {},
 ) -> plt.Figure:
@@ -547,7 +549,9 @@ def plot_cycle_score(
         scorer: sklearn scoring function (optional)
         x_label: Label for x-axis
         y_label: Label for y-axis
-        figsize: Figure size tuple in inches
+        figsize: Optional figure size tuple in inches
+        ylim: Optional limits for the y-axis as a tuple (lower, upper)
+        xlim: Optional limits for the x-axis as a tuple (lower, upper)
         scorer_kw: Dictionary of keywords for scoring function if scorer is supplied.
         plot_kw: Dictionary of keywords to pass to matplotlib 'plot' function.
 
@@ -564,6 +568,12 @@ def plot_cycle_score(
     # Plotting
     fig, ax = plt.subplots(figsize=figsize)
     ax.plot(np.arange(len(cycle.data.theories)), l_scores, **plot_kw)
+
+    # Adjusting axis limits
+    if ylim:
+        ax.set_ylim(*ylim)
+    if xlim:
+        ax.set_xlim(*xlim)
 
     # Labeling
     ax.set_xlabel(x_label)
