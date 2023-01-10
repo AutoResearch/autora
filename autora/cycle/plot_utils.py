@@ -11,6 +11,10 @@ from matplotlib.ticker import MaxNLocator
 
 from autora.cycle import Cycle
 
+# Change default plot styles
+rcParams["axes.spines.top"] = False
+rcParams["axes.spines.right"] = False
+
 
 def _get_variable_index(
     cycle: Cycle,
@@ -181,7 +185,6 @@ def plot_results_panel_2d(
     dv_name: Optional[str] = None,
     steps: int = 50,
     wrap: int = 4,
-    spines: bool = False,
     subplot_kw: dict = {},
     scatter_previous_kw: dict = {},
     scatter_current_kw: dict = {},
@@ -203,7 +206,6 @@ def plot_results_panel_2d(
         steps: Number of steps to define the condition space to plot the theory.
         wrap: Number of panels to appear in a row. Example: 9 panels with wrap=3 results in a
                 3x3 grid.
-        spines: Show axis spines for 2D plots, default False.
         subplot_kw: Dictionary of keywords to pass to matplotlib 'subplot' function
         scatter_previous_kw: Dictionary of keywords to pass to matplotlib 'scatter' function that
                     plots the data points from previous cycles.
@@ -306,10 +308,6 @@ def plot_results_panel_2d(
 
             # Label Panels
             ax.text(0.05, 1, f"Cycle {i}", ha="left", va="top", transform=ax.transAxes)
-
-            if not spines:
-                ax.spines.right.set_visible(False)
-                ax.spines.top.set_visible(False)
 
         else:
             ax.axis("off")
@@ -584,9 +582,5 @@ def plot_cycle_score(
             y_label = "Score"
     ax.set_ylabel(y_label)
     ax.xaxis.set_major_locator(MaxNLocator(integer=True))
-
-    # Turn off spines
-    ax.spines.right.set_visible(False)
-    ax.spines.top.set_visible(False)
 
     return fig
