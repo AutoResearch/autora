@@ -87,7 +87,7 @@ def get_experimentalist(experimentalist_name, X, y, X_allowed, metadata, theoris
             ],
             {
                 "grid__ivs": metadata.independent_variables,
-                "dissimilarity__X_ref": X,
+                "dissimilarity__X_ref": X_allowed,
                 "dissimilarity__n": num_samples,
              }
         )
