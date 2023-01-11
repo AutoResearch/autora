@@ -245,7 +245,7 @@ def test_score_functions(cycle_lr, ground_truth_1d):
     scores_default = cycle_default_score(cycle_lr, X_test, y_test)
     scores_specified = cycle_specified_score(r2_score, cycle_lr, X_test, y_test)
 
-    # Check scores the expected values
+    # Check scores are the expected values
     score_values = [
         0.98950589,
         0.99352993,
