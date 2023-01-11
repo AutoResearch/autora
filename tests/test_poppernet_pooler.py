@@ -1,11 +1,21 @@
 import numpy as np
 import pytest
+import torch
 from sklearn.linear_model import LinearRegression, LogisticRegression
 
 from autora.experimentalist.pipeline import Pipeline
 from autora.experimentalist.pooler import poppernet_pool
 from autora.experimentalist.sampler import nearest_values_sampler
 from autora.variable import DV, IV, ValueType, VariableCollection
+
+
+@pytest.fixture
+def seed():
+    """
+    Ensures that the results are the same each time the tests are run.
+    """
+    torch.manual_seed(180)
+    return
 
 
 def get_xor_data(n: int = 3):
@@ -61,7 +71,9 @@ def regression_data_to_test():
     return data
 
 
-def test_poppernet_classification(synthetic_logr_model, classification_data_to_test):
+def test_poppernet_classification(
+    synthetic_logr_model, classification_data_to_test, seed
+):
 
     # Import model and data
     X_train, Y_train = get_xor_data()
@@ -122,7 +134,7 @@ def test_poppernet_classification(synthetic_logr_model, classification_data_to_t
     assert (samples[0, :] == [1, 1]).all or (samples[1, :] == [1, 1]).all
 
 
-def test_poppernet_regression(synthetic_linr_model, regression_data_to_test):
+def test_poppernet_regression(synthetic_linr_model, regression_data_to_test, seed):
 
     # Import model and data
     X_train, Y_train = get_sin_data()
