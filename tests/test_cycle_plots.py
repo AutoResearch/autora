@@ -363,8 +363,6 @@ def test_2d_plot_slicing(cycle_lr):
     """
     Tests the 2d plotting functionality of plot_results_panel.
     """
-    # l_test = list(np.arange(100))
-
     cycle_lr.run(10)
     steps = 51
 
