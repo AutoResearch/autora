@@ -3,7 +3,6 @@ from copy import deepcopy
 from random import randint, random
 from typing import Optional, Tuple
 
-import numpy as np
 from numpy import exp
 
 from .mcmc import Tree
@@ -25,12 +24,14 @@ class Parallel:
         self,
         Ts: list,
         ops=get_priors()[1],
+        custom_ops={},
         variables=["x"],
         parameters=["a"],
         max_size=50,
         prior_par=get_priors()[0],
         x=None,
         y=None,
+        root=None,
     ) -> None:
         """
         Initialises Parallel Machine Scientist
@@ -44,7 +45,9 @@ class Parallel:
             prior_par: prior values over ops
             x: independent variables of dataset
             y: dependent variable of dataset
+            root: fixed root of the tree
         """
+        self.root = root
         # All trees are initialized to the same tree but with different BT
         Ts.sort()
         self.Ts = [str(T) for T in Ts]
@@ -58,6 +61,9 @@ class Parallel:
                 y=y,
                 max_size=max_size,
                 BT=1,
+                root_value=root.__name__ if root is not None else None,
+                fixed_root=True if root is not None else False,
+                custom_ops=custom_ops,
             )
         }
         self.t1 = self.trees["1.0"]
@@ -69,7 +75,9 @@ class Parallel:
                 prior_par=deepcopy(prior_par),
                 x=x,
                 y=y,
-                root_value=str(self.t1),
+                root_value=root.__name__ if root is not None else None,
+                fixed_root=self.t1.fixed_root,
+                custom_ops=custom_ops,
                 max_size=max_size,
                 BT=float(BT),
             )
@@ -84,6 +92,8 @@ class Parallel:
         Perform a MCMC step in each of the trees
         """
         # Loop over all trees
+        if self.root is not None:
+            p_rr = 0.0
         for T, tree in list(self.trees.items()):
             # MCMC step
             tree.mcmc_step(verbose=verbose, p_rr=p_rr, p_long=p_long)
@@ -106,7 +116,7 @@ class Parallel:
         BT1, BT2 = t1.BT, t2.BT
         EB1, EB2 = t1.EB, t2.EB
         # The energy change
-        DeltaE = np.float(EB1) * (1.0 / BT2 - 1.0 / BT1) + np.float(EB2) * (
+        DeltaE = float(EB1) * (1.0 / BT2 - 1.0 / BT1) + float(EB2) * (
             1.0 / BT1 - 1.0 / BT2
         )
         if DeltaE > 0:
