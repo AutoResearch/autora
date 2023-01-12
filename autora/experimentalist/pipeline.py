@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import collections
 import copy
+from functools import partial
 from itertools import chain
 from typing import (
     Any,
@@ -346,15 +347,48 @@ def _parse_params_to_nested_dict(params_dict: Dict, divider: str):
     return nested_dictionary
 
 
-class ArrayPipeline(Pipeline):
+class ArrayPipelineWrapper(Pipeline):
     """
-    A pipeline which uses arrays as its internal representation of data.
+    A pipeline which uses arrays as its internal representation of data, and accepts/ouputs
+    sequences.
 
     This is useful when Pipes which expect finite arrays as input and produce arrays as output,
     rather than a (potentially unbounded) iterable of experimental conditions.
 
-    This means that this type of pipeline only accepts bounded Sequences as inputs.
+    This type of pipeline only accepts bounded Sequences as inputs.
+
+    Examples:
+        The empty ArrayPipelineWrapper just returns the input sequence as arrays
+        >>> p0 = ArrayPipelineWrapper([])
+        >>> list(p0.run(zip(range(5), range(5,15))))
+        [(0, 5), (1, 6), (2, 7), (3, 8), (4, 9)]
+
+        The intermediate pipe steps can use Numpy functionality by default:
+        >>> p1 = ArrayPipelineWrapper([
+        ...     ("mask", lambda cs: cs[[True, False, True, True, False]])
+        ... ])
+        >>> p1.run(range(5))
+        this doesn't seem to be working properly – why not?
     """
+
+    def __init__(
+        self,
+        steps: Optional[Sequence[_StepType]] = None,
+        params: Optional[Dict[str, Any]] = None,
+        array_type: Literal["numpy.array", "numpy.rec.array"] = "numpy.rec.array",
+    ):
+        if steps is None:
+            steps = []
+
+        steps_with_wrappers = list(
+            chain(
+                [("sequence_to_array", partial(sequence_to_array, type=array_type))],
+                steps,
+                [("array_to_sequence", partial(array_to_sequence))],
+            )
+        )
+        super().__init__(steps=steps_with_wrappers, params=params)
+        return
 
 
 def sequence_to_array(
@@ -371,6 +405,10 @@ def sequence_to_array(
         >>> sequence_to_array(range(5), type="numpy.array") # doctest: +NORMALIZE_WHITESPACE
         array([[0], [1], [2], [3], [4]])
 
+        An alternative representation is the record array, also of dimension 2:
+        >>> sequence_to_array(range(5), type="numpy.rec.array") # doctest: +NORMALIZE_WHITESPACE
+        rec.array([(0,), (1,), (2,), (3,), (4,)], dtype=[('f0', '<i8')])
+
         For mixed datatypes, it is sensible to use a record array:
         >>> sequence_to_array(zip(range(5), "abcde"), type="numpy.rec.array"
         ...     )  # doctest: +NORMALIZE_WHITESPACE
@@ -382,14 +420,31 @@ def sequence_to_array(
         ...     )  # doctest: +NORMALIZE_WHITESPACE
         array([['0', 'a'], ['1', 'b'], ['2', 'c'], ['3', 'd'], ['4', 'e']],  dtype='<U21')
 
+        Single strings are broken into characters:
+        >>> sequence_to_array("abcde", type="numpy.rec.array")  # doctest: +NORMALIZE_WHITESPACE
+        rec.array([('a',), ('b',), ('c',), ('d',), ('e',)], dtype=[('f0', '<U1')])
+
+        >>> sequence_to_array("abcde", type="numpy.array")  # doctest: +NORMALIZE_WHITESPACE
+        array([['a'], ['b'], ['c'], ['d'], ['e']], dtype='<U1')
+
+        Multiple strings are treated as individual entries:
+        >>> sequence_to_array(["abc", "de"], type="numpy.rec.array"
+        ... )  # doctest: +NORMALIZE_WHITESPACE
+        rec.array([('abc',), ('de',)], dtype=[('f0', '<U3')])
+
+        >>> sequence_to_array(["abc", "de"], type="numpy.array")  # doctest: +NORMALIZE_WHITESPACE
+        array([['abc'], ['de']], dtype='<U3')
+
     """
     deque = collections.deque(input)
-    n_conditions = len(deque)
 
     if type == "numpy.array":
-        return np.array(deque).reshape((n_conditions, -1))
+        return np.array(deque).reshape((len(deque), -1))
     if type == "numpy.rec.array":
-        return np.core.records.fromrecords(deque)
+        if isinstance(deque[0], (str, int, float, complex)):
+            return np.core.records.fromrecords([(d,) for d in deque])
+        else:
+            return np.core.records.fromrecords(deque)
     else:
         raise NotImplementedError(f"{type=} not implemented")
 
