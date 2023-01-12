@@ -86,68 +86,132 @@ class ArrayPipelineWrapper(Pipeline):
 
 
 def sequence_to_array(
-    input: _ExperimentalSequence, type: Literal["numpy.array", "numpy.rec.array"]
+    input: _ExperimentalSequence, array_type: Literal["numpy.array", "numpy.rec.array"]
 ):
     """
     Converts a finite sequence of experimental conditions into a 2D array.
 
-    See also: [array_to_sequence][autora.experimentalist.pipeline.array_to_sequence]
+    See also: [array_to_sequence][autora.experimentalist.utils.array_to_sequence]
 
     Examples:
 
         A simple range object can be converted into an array of dimension 2:
-        >>> sequence_to_array(range(5), type="numpy.array") # doctest: +NORMALIZE_WHITESPACE
+        >>> sequence_to_array(range(5),array_type="numpy.array") # doctest: +NORMALIZE_WHITESPACE
         array([[0], [1], [2], [3], [4]])
 
         An alternative representation is the record array, also of dimension 2:
-        >>> sequence_to_array(range(5), type="numpy.rec.array") # doctest: +NORMALIZE_WHITESPACE
+        >>> sequence_to_array(range(5),array_type="numpy.rec.array"
+        ...     ) # doctest: +NORMALIZE_WHITESPACE
         rec.array([(0,), (1,), (2,), (3,), (4,)], dtype=[('f0', '<i8')])
 
         For mixed datatypes, it is sensible to use a record array:
-        >>> sequence_to_array(zip(range(5), "abcde"), type="numpy.rec.array"
+        >>> sequence_to_array(zip(range(5), "abcde"),array_type="numpy.rec.array"
         ...     )  # doctest: +NORMALIZE_WHITESPACE
         rec.array([(0, 'a'), (1, 'b'), (2, 'c'), (3, 'd'), (4, 'e')],
             dtype=[('f0', '<i8'), ('f1', '<U1')])
 
         ... otherwise, the highest-level type common to all the inputs will be used:
-        >>> sequence_to_array(zip(range(5), "abcde"), type="numpy.array"
+        >>> sequence_to_array(zip(range(5), "abcde"),array_type="numpy.array"
         ...     )  # doctest: +NORMALIZE_WHITESPACE
         array([['0', 'a'], ['1', 'b'], ['2', 'c'], ['3', 'd'], ['4', 'e']],  dtype='<U21')
 
         Single strings are broken into characters:
-        >>> sequence_to_array("abcde", type="numpy.rec.array")  # doctest: +NORMALIZE_WHITESPACE
+        >>> sequence_to_array("abcde",array_type="numpy.rec.array"
+        ...     )  # doctest: +NORMALIZE_WHITESPACE
         rec.array([('a',), ('b',), ('c',), ('d',), ('e',)], dtype=[('f0', '<U1')])
 
-        >>> sequence_to_array("abcde", type="numpy.array")  # doctest: +NORMALIZE_WHITESPACE
+        >>> sequence_to_array("abcde",array_type="numpy.array"
+        ...     )  # doctest: +NORMALIZE_WHITESPACE
         array([['a'], ['b'], ['c'], ['d'], ['e']], dtype='<U1')
 
         Multiple strings are treated as individual entries:
-        >>> sequence_to_array(["abc", "de"], type="numpy.rec.array"
-        ... )  # doctest: +NORMALIZE_WHITESPACE
+        >>> sequence_to_array(["abc", "de"],array_type="numpy.rec.array"
+        ...     )  # doctest: +NORMALIZE_WHITESPACE
         rec.array([('abc',), ('de',)], dtype=[('f0', '<U3')])
 
-        >>> sequence_to_array(["abc", "de"], type="numpy.array")  # doctest: +NORMALIZE_WHITESPACE
+        >>> sequence_to_array(["abc", "de"],array_type="numpy.array"
+        ...     )  # doctest: +NORMALIZE_WHITESPACE
         array([['abc'], ['de']], dtype='<U3')
 
     """
-    deque = collections.deque(input)
-
-    if type == "numpy.array":
-        return np.array(deque).reshape((len(deque), -1))
-    if type == "numpy.rec.array":
-        if isinstance(deque[0], (str, int, float, complex)):
-            return np.core.records.fromrecords([(d,) for d in deque])
-        else:
-            return np.core.records.fromrecords(deque)
+    if array_type == "numpy.array":
+        return _sequence_to_array(input)
+    if array_type == "numpy.rec.array":
+        return _sequence_to_recarray(input)
     else:
-        raise NotImplementedError(f"{type=} not implemented")
+        raise NotImplementedError(f"{array_type=} not implemented")
+
+
+def _sequence_to_array(iterable):
+    """
+    Converts a finite sequence of experimental conditions into a 2D array.
+
+    See also: [array_to_sequence][autora.experimentalist.utils.array_to_sequence]
+
+    Examples:
+
+        A simple range object can be converted into an array of dimension 2:
+        >>> _sequence_to_array(range(5)) # doctest: +NORMALIZE_WHITESPACE
+        array([[0], [1], [2], [3], [4]])
+
+        For mixed datatypes, the highest-level type common to all the inputs will be used, so
+        consider using [_sequence_to_recarray][autora.experimentalist.utils._sequence_to_recarray]
+        instead.
+        >>> _sequence_to_array(zip(range(5), "abcde"))  # doctest: +NORMALIZE_WHITESPACE
+        array([['0', 'a'], ['1', 'b'], ['2', 'c'], ['3', 'd'], ['4', 'e']],  dtype='<U21')
+
+        Single strings are broken into characters:
+        >>> sequence_to_array("abcde",array_type="numpy.array")  # doctest: +NORMALIZE_WHITESPACE
+        array([['a'], ['b'], ['c'], ['d'], ['e']], dtype='<U1')
+
+        Multiple strings are treated as individual entries:
+        >>> sequence_to_array(["abc", "de"],array_type="numpy.array"
+        ...     )  # doctest: +NORMALIZE_WHITESPACE
+        array([['abc'], ['de']], dtype='<U3')
+
+    """
+    deque = collections.deque(iterable)
+    return np.array(deque).reshape((len(deque), -1))
+
+
+def _sequence_to_recarray(iterable):
+    """
+    Converts a finite sequence of experimental conditions into a 2D array.
+
+    See also: [array_to_sequence][autora.experimentalist.utils.array_to_sequence]
+
+    Examples:
+
+        A simple range object is converted into a recarray of dimension 2:
+        >>> _sequence_to_recarray(range(5)) # doctest: +NORMALIZE_WHITESPACE
+        rec.array([(0,), (1,), (2,), (3,), (4,)], dtype=[('f0', '<i8')])
+
+        Mixed datatypes lead to multiple output types:
+        >>> _sequence_to_recarray(zip(range(5), "abcde"))  # doctest: +NORMALIZE_WHITESPACE
+        rec.array([(0, 'a'), (1, 'b'), (2, 'c'), (3, 'd'), (4, 'e')],
+            dtype=[('f0', '<i8'), ('f1', '<U1')])
+
+        Single strings are broken into characters:
+        >>> _sequence_to_recarray("abcde")  # doctest: +NORMALIZE_WHITESPACE
+        rec.array([('a',), ('b',), ('c',), ('d',), ('e',)], dtype=[('f0', '<U1')])
+
+        Multiple strings are treated as individual entries:
+        >>> _sequence_to_recarray(["abc", "de"])  # doctest: +NORMALIZE_WHITESPACE
+        rec.array([('abc',), ('de',)], dtype=[('f0', '<U3')])
+
+    """
+    deque = collections.deque(iterable)
+    if isinstance(deque[0], (str, int, float, complex)):
+        return np.core.records.fromrecords([(d,) for d in deque])
+    else:
+        return np.core.records.fromrecords(deque)
 
 
 def array_to_sequence(input: Union[np.array, np.recarray]):
     """
     Convert an array of experimental conditions into an iterable of smaller arrays.
 
-    See also: [sequence_to_array][autora.experimentalist.pipeline.sequence_to_array]
+    See also: [sequence_to_array][autora.experimentalist.utils.sequence_to_array]
 
     Examples:
 
