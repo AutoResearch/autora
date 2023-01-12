@@ -36,7 +36,7 @@ def _get_variable_index(
 
 def _observed_to_df(cycle: Cycle) -> pd.DataFrame:
     """
-    Concatenates observation data of cycles into a single dataframe with a field "cycle" with the
+    Concatenates observation data_closed_loop of cycles into a single dataframe with a field "cycle" with the
     cycle index.
     Args:
         cycle: AER Cycle object that has been run
@@ -67,7 +67,7 @@ def _min_max_observations(cycle: Cycle) -> List[Tuple[float, float]]:
     l_return = []
     iv_index = range(len(cycle.data.metadata.independent_variables))
     l_observations = cycle.data.observations
-    # Get min and max of observation data
+    # Get min and max of observation data_closed_loop
     # Min and max by cycle - All IVs
     l_mins = [np.min(s, axis=0) for s in l_observations]  # Arrays by columns
     l_maxs = [np.max(s, axis=0) for s in l_observations]
@@ -82,7 +82,7 @@ def _min_max_observations(cycle: Cycle) -> List[Tuple[float, float]]:
 
 def _generate_condition_space(cycle: Cycle, steps: int = 50) -> np.array:
     """
-    Generates condition space based on the minimum and maximum of all observed data in AER Cycle.
+    Generates condition space based on the minimum and maximum of all observed data_closed_loop in AER Cycle.
     Args:
         cycle: AER Cycle object that has been run
         steps: Number of steps to define the condition space
@@ -104,7 +104,7 @@ def _generate_condition_space(cycle: Cycle, steps: int = 50) -> np.array:
 
 def _generate_mesh_grid(cycle: Cycle, steps: int = 50) -> np.ndarray:
     """
-    Generates a mesh grid based on the minimum and maximum of all observed data in AER Cycle.
+    Generates a mesh grid based on the minimum and maximum of all observed data_closed_loop in AER Cycle.
     Args:
         cycle: AER Cycle object that has been run
         steps: Number of steps to define the condition space
@@ -181,9 +181,9 @@ def plot_results_panel_2d(
     """
     Generates a multi-panel figure with 2D plots showing results of one AER cycle.
 
-    Observed data is plotted as a scatter plot with the current cycle colored differently than
-    observed data from previous cycles. The current cycle's theory is plotted as a line over the
-    range of the observed data.
+    Observed data_closed_loop is plotted as a scatter plot with the current cycle colored differently than
+    observed data_closed_loop from previous cycles. The current cycle's theory is plotted as a line over the
+    range of the observed data_closed_loop.
 
     Args:
         cycle: AER Cycle object that has been run
@@ -197,9 +197,9 @@ def plot_results_panel_2d(
         spines: Show axis spines for 2D plots, default False.
         subplot_kw: Dictionary of keywords to pass to matplotlib 'subplot' function
         scatter_previous_kw: Dictionary of keywords to pass to matplotlib 'scatter' function that
-                    plots the data points from previous cycles.
+                    plots the data_closed_loop points from previous cycles.
         scatter_current_kw: Dictionary of keywords to pass to matplotlib 'scatter' function that
-                    plots the data points from the current cycle.
+                    plots the data_closed_loop points from the current cycle.
         plot_theory_kw: Dictionary of keywords to pass to matplotlib 'plot' function that plots the
                     theory line.
 
@@ -258,7 +258,7 @@ def plot_results_panel_2d(
     iv_label = f"{iv[1]} {iv[2]}"
     dv_label = f"{dv[1]} {dv[2]}"
 
-    # Create a dataframe of observed data from cycle
+    # Create a dataframe of observed data_closed_loop from cycle
     df_observed = _observed_to_df(cycle)
 
     # Generate IV space
@@ -277,10 +277,10 @@ def plot_results_panel_2d(
     for i, ax in enumerate(axs.flat):
         if i + 1 <= n_cycles:
 
-            # ---Plot observed data---
+            # ---Plot observed data_closed_loop---
             # Independent variable values
             x_vals = df_observed.loc[:, iv[0]]
-            # Dependent values masked by current cycle vs previous data
+            # Dependent values masked by current cycle vs previous data_closed_loop
             dv_previous = np.ma.masked_where(
                 df_observed["cycle"] >= i, df_observed[dv[0]]
             )
@@ -335,9 +335,9 @@ def plot_results_panel_3d(
     """
     Generates a multi-panel figure with 3D plots showing results of one AER cycle.
 
-    Observed data is plotted as a scatter plot with the current cycle colored differently than
-    observed data from previous cycles. The current cycle's theory is plotted as a line over the
-    range of the observed data.
+    Observed data_closed_loop is plotted as a scatter plot with the current cycle colored differently than
+    observed data_closed_loop from previous cycles. The current cycle's theory is plotted as a line over the
+    range of the observed data_closed_loop.
 
     Args:
 
@@ -352,9 +352,9 @@ def plot_results_panel_3d(
         view: Tuple of elevation angle and azimuth to change the viewing angle of the plot.
         subplot_kw: Dictionary of keywords to pass to matplotlib 'subplot' function
         scatter_previous_kw: Dictionary of keywords to pass to matplotlib 'scatter' function that
-                    plots the data points from previous cycles.
+                    plots the data_closed_loop points from previous cycles.
         scatter_current_kw: Dictionary of keywords to pass to matplotlib 'scatter' function that
-                    plots the data points from the current cycle.
+                    plots the data_closed_loop points from the current cycle.
         surface_kw: Dictionary of keywords to pass to matplotlib 'plot_surface' function that plots
                     the theory plane.
 
@@ -401,7 +401,7 @@ def plot_results_panel_3d(
     iv_labels = [f"{s[1]} {s[2]}" for s in iv]
     dv_label = f"{dv[1]} {dv[2]}"
 
-    # Create a dataframe of observed data from cycle
+    # Create a dataframe of observed data_closed_loop from cycle
     df_observed = _observed_to_df(cycle)
 
     # Generate IV Mesh Grid
@@ -422,10 +422,10 @@ def plot_results_panel_3d(
     for i, ax in enumerate(axs.flat):
         if i + 1 <= n_cycles:
 
-            # ---Plot observed data---
+            # ---Plot observed data_closed_loop---
             # Independent variable values
             l_x = [df_observed.loc[:, s[0]] for s in iv]
-            # Dependent values masked by current cycle vs previous data
+            # Dependent values masked by current cycle vs previous data_closed_loop
             dv_previous = np.ma.masked_where(
                 df_observed["cycle"] >= i, df_observed[dv[0]]
             )

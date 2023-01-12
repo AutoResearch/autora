@@ -252,13 +252,13 @@ def plot_darts_summary(
             plot_dict[y_name].extend(data[y_name][valid_data])
         else:
             raise Exception(
-                'Could not find key "' + y_name + '" in the data file: ' + str(file)
+                'Could not find key "' + y_name + '" in the data_closed_loop file: ' + str(file)
             )
         if x1_name in data.keys():
             plot_dict[x1_name].extend(data[x1_name][valid_data])
         else:
             raise Exception(
-                'Could not find key "' + x1_name + '" in the data file: ' + str(file)
+                'Could not find key "' + x1_name + '" in the data_closed_loop file: ' + str(file)
             )
         if x2_name != "":
             if x2_name in data.keys():
@@ -267,7 +267,7 @@ def plot_darts_summary(
                 raise Exception(
                     'Could not find key "'
                     + x2_name
-                    + '" in the data file: '
+                    + '" in the data_closed_loop file: '
                     + str(file)
                 )
         if y_sem_name is not None:
@@ -288,7 +288,7 @@ def plot_darts_summary(
                 raise Exception(
                     'Could not find key "'
                     + y_sem_name
-                    + '" in the data file: '
+                    + '" in the data_closed_loop file: '
                     + str(file)
                 )
 
@@ -574,7 +574,7 @@ def plot_darts_summary(
 
         # generate legend
         # ax.scatter(x1_plot, y_plot, marker='.', c='r')
-        # g = sns.relplot(data=data_plot, x=x1_label, y=y_label, ax=ax)
+        # g = sns.relplot(data_closed_loop=data_plot, x=x1_label, y=y_label, ax=ax)
         # g._legend.remove()
         if y_reference is not None:
             ax.axhline(
@@ -1011,7 +1011,7 @@ class DebugWindow:
         prediction: Optional[np.array] = None,
     ):
         """
-        Update the debug plot with new data.
+        Update the debug plot with new data_closed_loop.
 
         Arguments:
             train_error: training error

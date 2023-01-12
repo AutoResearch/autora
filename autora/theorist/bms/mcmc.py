@@ -126,8 +126,8 @@ class Tree:
         et_space: space of all possible leaves and elementary trees
         rr_space: space of all possible root replacement trees
         num_rr: number of possible root replacement trees
-        x: independent variable data
-        y: depedent variable data
+        x: independent variable data_closed_loop
+        y: depedent variable data_closed_loop
         par_values: The values of the model parameters (one set of values for each dataset)
         fit_par: past successful parameter fittings
         sse: sum of squared errors (measure of goodness of fit)
@@ -161,7 +161,7 @@ class Tree:
         Args:
             ops: allowed operations to compose equation
             variables: dependent variable names
-            parameters: parameters that can be used to better fit the equation to the data
+            parameters: parameters that can be used to better fit the equation to the data_closed_loop
             prior_par: hyperparameter values over operations within ops
             x: dependent variables
             y: independent variables
@@ -598,11 +598,11 @@ class Tree:
     def get_sse(self, fit=True, verbose=False):
         """
         Get the sum of squared errors, fitting the expression represented by the Tree
-        to the existing data, if specified (by default, yes)
+        to the existing data_closed_loop, if specified (by default, yes)
 
         Returns: sum of square errors (sse)
         """
-        # Return 0 if there is no data
+        # Return 0 if there is no data_closed_loop
         if list(self.x.values())[0].empty or list(self.y.values())[0].empty:
             self.sse = 0
             return 0
@@ -706,7 +706,7 @@ class Tree:
     def get_bic(self, reset=True, fit=False, verbose=False):
         """
         Calculate the Bayesian information criterion (BIC) of the current expression,
-        given the data. If reset==False, the value of self.bic will not be updated
+        given the data_closed_loop. If reset==False, the value of self.bic will not be updated
         (by default, it will)
 
         Returns: Bayesian information criterion (BIC)
@@ -735,12 +735,12 @@ class Tree:
     def get_energy(self, bic=False, reset=False, verbose=False):
         """
         Calculate the "energy" of a given formula, that is, approximate minus log-posterior
-        of the formula given the data (the approximation coming from the use of the BIC
+        of the formula given the data_closed_loop (the approximation coming from the use of the BIC
         instead of the exactly integrated likelihood)
 
         Returns: Energy of formula (as E, EB, and EP)
         """
-        # Contribution of the data (recalculating BIC if necessary)
+        # Contribution of the data_closed_loop (recalculating BIC if necessary)
         if bic:
             EB = self.get_bic(reset=reset, verbose=verbose) / 2.0
         else:
@@ -1344,9 +1344,9 @@ class Tree:
     # -------------------------------------------------------------------------
     def predict(self, x):
         """
-        Calculate the value of the formula at the given data x. The data x
-        must have the same format as the training data and, in particular, it
-        it must specify to which dataset the example data belongs, if multiple
+        Calculate the value of the formula at the given data_closed_loop x. The data_closed_loop x
+        must have the same format as the training data_closed_loop and, in particular, it
+        it must specify to which dataset the example data_closed_loop belongs, if multiple
         datasets where used for training.
 
         Returns: predicted y values
@@ -1492,7 +1492,7 @@ class Tree:
 
 
 def test3(num_points=10, samples=100000):
-    # Create the data
+    # Create the data_closed_loop
     x = pd.DataFrame(
         dict([("x%d" % i, np.random.uniform(0, 10, num_points)) for i in range(5)])
     )
@@ -1526,7 +1526,7 @@ def test3(num_points=10, samples=100000):
 
 
 def test4(num_points=10, samples=1000):
-    # Create the data
+    # Create the data_closed_loop
     x = pd.DataFrame(
         dict([("x%d" % i, np.random.uniform(0, 10, num_points)) for i in range(5)])
     )

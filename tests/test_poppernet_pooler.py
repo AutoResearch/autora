@@ -33,7 +33,7 @@ def get_sin_data(n: int = 100):
 @pytest.fixture
 def synthetic_logr_model():
     """
-    Creates logistic regression classifier for 3 classes based on synthetic data.
+    Creates logistic regression classifier for 3 classes based on synthetic data_closed_loop.
     """
     X, y = get_xor_data()
     model = LogisticRegression()
@@ -44,7 +44,7 @@ def synthetic_logr_model():
 @pytest.fixture
 def synthetic_linr_model():
     """
-    Creates linear regression based on synthetic data.
+    Creates linear regression based on synthetic data_closed_loop.
     """
     x, y = get_sin_data()
     model = LinearRegression()
@@ -75,7 +75,7 @@ def test_poppernet_classification(
     synthetic_logr_model, classification_data_to_test, seed
 ):
 
-    # Import model and data
+    # Import model and data_closed_loop
     X_train, Y_train = get_xor_data()
     X = classification_data_to_test
     model = synthetic_logr_model
@@ -129,19 +129,19 @@ def test_poppernet_classification(
 
     print(samples)
     # Check that at least one of the resulting samples is the one that is
-    # underrepresented in the data used for model training
+    # underrepresented in the data_closed_loop used for model training
 
     assert (samples[0, :] == [1, 1]).all or (samples[1, :] == [1, 1]).all
 
 
 def test_poppernet_regression(synthetic_linr_model, regression_data_to_test, seed):
 
-    # Import model and data
+    # Import model and data_closed_loop
     X_train, Y_train = get_sin_data()
     X = regression_data_to_test
     model = synthetic_linr_model
 
-    # specify meta data
+    # specify meta data_closed_loop
 
     # Specify independent variables
     iv = IV(

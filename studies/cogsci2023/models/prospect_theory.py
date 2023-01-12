@@ -1,13 +1,13 @@
 import numpy as np
 from studies.cogsci2023.models.expected_value import expected_value_theory_metadata
 # general meta parameters
-added_noise = 0.1
+added_noise = 0
 
 # prospect theory parameters
 # parameters taken from:
 # D. Kahneman, A. Tversky, Prospect theory: An analysis of decision under risk. Econometrica
 # 47, 263–292 (1979). doi:10.2307/1914185
-prospect_theory_choice_temperature = 10.0
+prospect_theory_choice_temperature = 0.1
 prospect_theory_value_alpha = 0.88
 prospect_theory_value_beta = 0.88
 prospect_theory_value_lambda = 2.25
@@ -107,8 +107,8 @@ def plot_prospect_theory(model = None):
     import matplotlib.pyplot as plt
     metadata = prospect_theory_metadata()
 
-    v_a_list = [500, 1000, 1500]
-    v_b = 1000
+    v_a_list = [-0.5, 0.5, 1]
+    v_b = 0.5
     p_b = 0.5
     p_a = np.linspace(0, 1, 100)
 
@@ -138,7 +138,7 @@ def plot_prospect_theory(model = None):
     plt.title("Prospect Theory", fontsize="x-large")
     plt.show()
 
-#plot_prospect_theory()
+# plot_prospect_theory()
 
 # value_alpha = 0.88
 # value_beta = 0.88

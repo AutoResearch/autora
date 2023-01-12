@@ -126,7 +126,7 @@ def compute_BIC(
         for idx in range(len(target_flattened)):
             lik = prediction[idx, target_flattened[idx]]
             llik += np.log(lik)
-        n = len(target_flattened)  # number of data points
+        n = len(target_flattened)  # number of data_closed_loop points
 
         BIC = np.log(n) * k - 2 * llik
         BIC = BIC
@@ -148,7 +148,7 @@ def compute_BIC(
             else:
                 raise Exception("Target must contain either zeros or ones.")
             llik += np.log(lik)
-        n = len(target)  # number of data points
+        n = len(target)  # number of data_closed_loop points
 
         BIC = np.log(n) * k - 2 * llik
         BIC = BIC[0]
@@ -180,9 +180,9 @@ def compute_BIC_AIC(
 
     lik = np.sum(
         np.multiply(soft_prediction, soft_targets), axis=1
-    )  # likelihood of data given model
+    )  # likelihood of data_closed_loop given model
     llik = np.sum(np.log(lik))  # log likelihood
-    n = len(lik)  # number of data points
+    n = len(lik)  # number of data_closed_loop points
     k, _, _ = model.count_parameters()  # for most likely architecture
 
     BIC = np.log(n) * k - 2 * llik

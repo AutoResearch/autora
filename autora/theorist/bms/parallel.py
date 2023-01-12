@@ -17,7 +17,7 @@ class Parallel:
     Attributes:
         Ts: list of parallel temperatures
         trees: list of parallel trees, corresponding to each parallel temperature
-        t1: equation tree which best describes the data
+        t1: equation tree which best describes the data_closed_loop
     """
 
     # -------------------------------------------------------------------------
@@ -40,7 +40,7 @@ class Parallel:
         Args:
             Ts: list of temperature values
             ops: allowed operations for the search task
-            variables: independent variables from data
+            variables: independent variables from data_closed_loop
             parameters: settable values to improve model fit
             max_size: maximum size (number of nodes) in a tree
             prior_par: prior values over ops

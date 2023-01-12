@@ -30,7 +30,19 @@ def uncertainty_sampler(X, model, n, measure="least_confident"):
     if isinstance(X, Iterable):
         X = np.array(list(X))
 
-    a_prob = model.predict_proba(X)
+    model_predict = getattr(model, "predict_proba", None)
+    if callable(model_predict) is False:
+        Warning("Model does not have `predict_proba` method. Using `predict` instead and "
+                "will assume that the model output is a probability.")
+        model_predict = getattr(model, "predict", None)
+
+    a_prob = model_predict(X)
+
+    if a_prob.shape[1] == 1:
+        a_prob_extended = np.zeros((a_prob.shape[0], 2))
+        a_prob_extended[:, 0] = a_prob[:, 0]
+        a_prob_extended[:, 1] = 1 - a_prob[:, 0]
+        a_prob = a_prob_extended
 
     if measure == "least_confident":
         # Calculate uncertainty of max probability class

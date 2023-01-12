@@ -60,7 +60,7 @@ class BMSRegressor(BaseEstimator, RegressorMixin):
         """
         Arguments:
             prior_par: a dictionary of the prior probabilities of different functions based on
-                wikipedia data scraping
+                wikipedia data_closed_loop scraping
             ts: contains a list of the temperatures that the parallel ms works at
         """
         self.ts = ts

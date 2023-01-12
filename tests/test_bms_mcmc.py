@@ -10,13 +10,13 @@ def test_tree_mcmc_stepping(
 ) -> Tree:
     """
     Testing the basic MCMC capacity. Note that even though an option (`show_plot`) is
-    offered to compare the actual data (`y`) against the prediction, this test does not
+    offered to compare the actual data_closed_loop (`y`) against the prediction, this test does not
     try to assess the prediction accuracy; it only ensures that the MCMC functionality
     can work bug-free.
 
     Parameters:
         num_points:
-            the number of data points in each dimension of the synthetic data
+            the number of data_closed_loop points in each dimension of the synthetic data_closed_loop
         samples:
             the number of MCMC samples we want to get. The total MCMC iteration can be
             calculated as `burnin` + `samples`
@@ -27,7 +27,7 @@ def test_tree_mcmc_stepping(
         the expression tree obtained from running the MCMC algorithm
     """
 
-    # Create the data
+    # Create the data_closed_loop
     x = pd.DataFrame(
         dict([("x%d" % i, np.random.uniform(0, 10, num_points)) for i in range(5)])
     )

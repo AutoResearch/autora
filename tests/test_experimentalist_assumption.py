@@ -14,10 +14,10 @@ def test_experimentalist_assumption():
     """
     Tests the implementation of the experimentalist pipeline with an exhaustive pool of discrete
     values, no filter, assumption sampler. A ridge regression model is trained using
-    synthetic data generated from a ground_truth function for use.
+    synthetic data_closed_loop generated from a ground_truth function for use.
 
     """
-    # Make the data
+    # Make the data_closed_loop
     def ground_truth(xs):
         return (xs**2.0) + xs + 1.0
 

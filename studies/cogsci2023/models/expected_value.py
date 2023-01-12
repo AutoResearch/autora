@@ -5,11 +5,11 @@ from autora.variable import DV, IV, ValueType, VariableCollection
 added_noise = 0
 
 # expected value theory with linear value function
-expected_value_choice_temperature = 10.0
+expected_value_choice_temperature = 0.1
 expected_value_lambda = 0.5
 expected_value_resolution = 10
-expected_value_minimum_value = -100
-expected_value_maximum_value = 100
+expected_value_minimum_value = -1
+expected_value_maximum_value = 1
 
 # basic expected value theory
 
@@ -113,8 +113,8 @@ def plot_expected_value(model = None):
     import matplotlib.pyplot as plt
     metadata = expected_value_theory_metadata()
 
-    v_a_list = [500, 1000, 1500]
-    v_b = 1000
+    v_a_list = [-1, 0.5, 1]
+    v_b = 0.5
     p_b = 0.5
     p_a = np.linspace(0, 1, 100)
 
@@ -144,4 +144,4 @@ def plot_expected_value(model = None):
     plt.title("Expected Value Theory", fontsize="x-large")
     plt.show()
 
-#plot_expected_value()
+# plot_expected_value()

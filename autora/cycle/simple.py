@@ -30,7 +30,7 @@ class SimpleCycleData:
 def _get_cycle_properties(data: SimpleCycleData):
     """
     Examples:
-        Even with an empty data object, we can initialize the dictionary,
+        Even with an empty data_closed_loop object, we can initialize the dictionary,
         >>> cycle_properties = _get_cycle_properties(SimpleCycleData(metadata=VariableCollection(),
         ...     conditions=[], observations=[], theories=[]))
 
@@ -71,7 +71,7 @@ class SimpleCycle:
     Once initialized, the `cycle` can be started using the `cycle.run` method
         or by calling `next(cycle)`.
 
-    The `.data` attribute is updated with the results.
+    The `.data_closed_loop` attribute is updated with the results.
 
     Attributes:
         data (dataclass): an object which is updated during the cycle and has the following
@@ -97,7 +97,7 @@ class SimpleCycle:
 
         ### Basic Usage
 
-        Aim: Use the SimpleCycle to recover a simple ground truth theory from noisy data.
+        Aim: Use the SimpleCycle to recover a simple ground truth theory from noisy data_closed_loop.
 
         >>> def ground_truth(x):
         ...     return x + 1
@@ -140,7 +140,7 @@ class SimpleCycle:
         ...     theorist=example_theorist,
         ...     experimentalist=example_experimentalist,
         ...     experiment_runner=example_synthetic_experiment_runner,
-        ...     monitor=lambda data: print(f"Generated {len(data.theories)} theories"),
+        ...     monitor=lambda data_closed_loop: print(f"Generated {len(data_closed_loop.theories)} theories"),
         ... )
         >>> cycle # doctest: +ELLIPSIS
         <simple.SimpleCycle object at 0x...>
@@ -154,11 +154,11 @@ class SimpleCycle:
 
         We can now interrogate the results. The first set of conditions which went into the
         experiment runner were:
-        >>> cycle.data.conditions[0]
+        >>> cycle.data_closed_loop.conditions[0]
         array([ 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10])
 
         The observations include the conditions and the results:
-        >>> cycle.data.observations[0]
+        >>> cycle.data_closed_loop.observations[0]
         array([[ 0.        ,  0.92675345],
                [ 1.        ,  1.89519928],
                [ 2.        ,  3.08746571],
@@ -172,23 +172,23 @@ class SimpleCycle:
                [10.        , 10.88517906]])
 
         In the third cycle (index = 2) the first and last values are different again:
-        >>> cycle.data.observations[2][[0,-1]]
+        >>> cycle.data_closed_loop.observations[2][[0,-1]]
         array([[ 0.        ,  1.08559827],
                [10.        , 11.08179553]])
 
         The best fit theory after the first cycle is:
-        >>> cycle.data.theories[0]
+        >>> cycle.data_closed_loop.theories[0]
         LinearRegression()
 
         >>> def report_linear_fit(m: LinearRegression,  precision=4):
         ...     s = f"y = {np.round(m.coef_[0].item(), precision)} x " \\
         ...     f"+ {np.round(m.intercept_.item(), 4)}"
         ...     return s
-        >>> report_linear_fit(cycle.data.theories[0])
+        >>> report_linear_fit(cycle.data_closed_loop.theories[0])
         'y = 1.0089 x + 0.9589'
 
-        The best fit theory after all the cycles, including all the data, is:
-        >>> report_linear_fit(cycle.data.theories[-1])
+        The best fit theory after all the cycles, including all the data_closed_loop, is:
+        >>> report_linear_fit(cycle.data_closed_loop.theories[-1])
         'y = 0.9989 x + 1.0292'
 
         This is close to the ground truth theory of x -> (x + 1)
@@ -209,7 +209,7 @@ class SimpleCycle:
         We can continue to run the cycle as long as we like,
         with a simple arbitrary stopping condition like the number of theories generated:
         >>> from itertools import takewhile
-        >>> _ = list(takewhile(lambda c: len(c.data.theories) < 9, cycle))
+        >>> _ = list(takewhile(lambda c: len(c.data_closed_loop.theories) < 9, cycle))
         Generated 7 theories
         Generated 8 theories
         Generated 9 theories
@@ -218,8 +218,8 @@ class SimpleCycle:
         of the second-last and last cycle is larger than 1x10^-3).
         >>> _ = list(
         ...         takewhile(
-        ...             lambda c: np.abs(c.data.theories[-1].coef_.item() -
-        ...                            c.data.theories[-2].coef_.item()) > 1e-3,
+        ...             lambda c: np.abs(c.data_closed_loop.theories[-1].coef_.item() -
+        ...                            c.data_closed_loop.theories[-2].coef_.item()) > 1e-3,
         ...             cycle
         ...         )
         ...     )
@@ -250,7 +250,7 @@ class SimpleCycle:
         ...     params={"experimentalist": {"uniform_random_sampler": {"n": 7}}}
         ... )
         >>> _ = cycle_with_parameters.run()
-        >>> cycle_with_parameters.data.conditions[-1].flatten()
+        >>> cycle_with_parameters.data_closed_loop.conditions[-1].flatten()
         array([6.33661987, 7.34916618, 6.08596494, 2.28566582, 1.9553974 ,
                5.80023149, 3.27007909])
 
@@ -258,14 +258,14 @@ class SimpleCycle:
         >>> cycle_with_parameters.params["experimentalist"]["uniform_random_sampler"]\\
         ...     ["n"] = 2
         >>> _ = cycle_with_parameters.run()
-        >>> cycle_with_parameters.data.conditions[-1].flatten()
+        >>> cycle_with_parameters.data_closed_loop.conditions[-1].flatten()
         array([10.5838232 ,  9.45666031])
 
         ### Accessing "Cycle Properties"
 
          Some experimentalists, experiment runners and theorists require access to the values
             created during the cycle execution, e.g. experimentalists which require access
-            to the current best theory or the observed data. These data update each cycle, and
+            to the current best theory or the observed data_closed_loop. These data_closed_loop update each cycle, and
             so cannot easily be set using simple `params`.
 
         For this case, it is possible to use "cycle properties" in the `params` dictionary. These
@@ -318,17 +318,17 @@ class SimpleCycle:
         Now we can run the cycler to generate conditions and run experiments. The first time round,
         we have the full set of 10 possible conditions to select from, and we select "2" at random:
         >>> _ = cycle_with_cycle_properties.run()
-        >>> cycle_with_cycle_properties.data.conditions[-1]
+        >>> cycle_with_cycle_properties.data_closed_loop.conditions[-1]
         array([2])
 
         We can continue to run the cycler, each time we add more to the list of "excluded" options:
         >>> _ = cycle_with_cycle_properties.run(num_cycles=5)
-        >>> cycle_with_cycle_properties.data.conditions
+        >>> cycle_with_cycle_properties.data_closed_loop.conditions
         [array([2]), array([6]), array([5]), array([7]), array([3]), array([4])]
 
         By using the monitor callback, we can investigate what's going on with the cycle properties:
-        >>> cycle_with_cycle_properties.monitor = lambda data: print(
-        ...     _get_cycle_properties(data)["%observations.ivs%"].flatten()
+        >>> cycle_with_cycle_properties.monitor = lambda data_closed_loop: print(
+        ...     _get_cycle_properties(data_closed_loop)["%observations.ivs%"].flatten()
         ... )
 
         The monitor evaluates at the end of each cycle
@@ -343,7 +343,7 @@ class SimpleCycle:
 
         We can continue until we've sampled all of the options:
         >>> _ = cycle_with_cycle_properties.run(num_cycles=2)
-        >>> cycle_with_cycle_properties.data.conditions # doctest: +NORMALIZE_WHITESPACE
+        >>> cycle_with_cycle_properties.data_closed_loop.conditions # doctest: +NORMALIZE_WHITESPACE
         [array([2]), array([6]), array([5]), array([7]), array([3]), \
         array([4]), array([9]), array([0]), array([8]), array([1])]
 
@@ -372,7 +372,7 @@ class SimpleCycle:
             experimentalist: an autora.experimentalist.Pipeline
             experiment_runner: a function to map independent variables onto observed dependent
                 variables
-            monitor: a function which gets read-only access to the `data` attribute at the end of
+            monitor: a function which gets read-only access to the `data_closed_loop` attribute at the end of
                 each cycle.
             params: a nested dictionary with parameters to be passed to the parts of the cycle.
                 E.g. if the experimentalist had a step named "pool" which took an argument "n",

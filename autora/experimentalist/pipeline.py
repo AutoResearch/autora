@@ -357,8 +357,8 @@ def make_pipeline(
     Args:
         steps: a sequence of Pipe-compatible objects
         params: a dictionary of parameters passed to each Pipe by its inferred name
-        kind: whether the steps should run in "serial", passing data from one to the next,
-            or in "union", where all the steps get the same data and the output is the union
+        kind: whether the steps should run in "serial", passing data_closed_loop from one to the next,
+            or in "union", where all the steps get the same data_closed_loop and the output is the union
             of all the results.
 
     Returns:

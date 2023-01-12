@@ -267,7 +267,7 @@ def plot_stroop_model(model = None):
 
     original_model = Stroop_Model(stroop_choice_temperature)
 
-    # collect plot data for orignal model
+    # collect plot data_closed_loop for orignal model
     (output_col_cong, output_col_incong, output_col_control,
      output_wrd_cong, output_wrd_incong, output_wrd_control) = run_exp(original_model)
 
@@ -282,7 +282,7 @@ def plot_stroop_model(model = None):
     y_data_col = [err_col_control.detach().numpy() * 100, err_col_incong.detach().numpy() * 100, err_col_cong.detach().numpy() * 100]
     y_data_wrd = [err_wrd_control.detach().numpy() * 100, err_wrd_incong.detach().numpy() * 100, err_wrd_cong.detach().numpy() * 100]
 
-    # collect plot data for recovered model
+    # collect plot data_closed_loop for recovered model
     if model is not None:
         (output_col_cong, output_col_incong, output_col_control,
          output_wrd_cong, output_wrd_incong, output_wrd_control) = run_exp(model)

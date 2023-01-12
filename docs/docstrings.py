@@ -81,7 +81,7 @@ def curve_fitting_function(
     """
     Fits a first order linear model of form y = m x + c using the modified Powell method,
     and ensuring that the fitted model only includes as much precision as is sensible
-    from the data.
+    from the data_closed_loop.
 
     Arguments:
         x: input x-values
@@ -99,7 +99,7 @@ def curve_fitting_function(
         FirstOrderLinearModel(c=1.2, m=5.7)
     """
 
-    # The data sometimes have large outliers, making the L2-norm less useful.
+    # The data_closed_loop sometimes have large outliers, making the L2-norm less useful.
     # We use the L1-norm to be more robust to outliers.
     def l1(params):
         l1_norm = np.sum(np.abs(y - first_order_linear(x, c=params[0], m=params[1])))
@@ -115,7 +115,7 @@ def curve_fitting_function(
     # The results of the minimizer are floats with a very high precision,
     # potentially much higher than we would be confident reporting.
     # A rule of thumb is that we get one significant figure of precision for each step of 10x
-    # in the dataset size. We round the data to that precision.
+    # in the dataset size. We round the data_closed_loop to that precision.
     significant_figures = np.round(np.log10(x.shape[0])).astype(int)
 
     model = FirstOrderLinearModel(
