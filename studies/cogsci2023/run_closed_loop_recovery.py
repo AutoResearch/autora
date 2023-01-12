@@ -11,8 +11,6 @@ from studies.cogsci2023.utils import (
     get_seed_experimentalist,
 )
 
-# TODO: add small level of noise to models (e.g., 0.01)
-
 # META PARAMETERS
 num_cycles = 20  # number of cycles (20)
 samples_for_seed = 20  # number of seed data_closed_loop points (20)
