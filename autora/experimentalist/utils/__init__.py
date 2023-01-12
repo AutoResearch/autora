@@ -127,8 +127,7 @@ def array_to_sequence(input: Union[np.array, np.recarray]):
         <class 'numpy.record'>
 
     """
-    if isinstance(input, (np.ndarray, np.recarray)):
-        for a in input:
-            yield a
-    else:
-        raise NotImplementedError(f"{type(input)} not supported")
+    assert isinstance(input, (np.ndarray, np.recarray))
+
+    for a in input:
+        yield a
