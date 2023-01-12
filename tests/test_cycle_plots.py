@@ -336,3 +336,24 @@ def test_cycle_score_plot_multi_lr(cycle_multi_lr, ground_truth_2d):
     )
     y_plotted = axis.lines[0].get_ydata()
     assert np.array_equal(np.around(y_plotted, 8), np.around(y_values, 8))
+
+
+def test_2d_plot_indexing(cycle_lr):
+    """
+    Tests the 2d plotting functionality of plot_results_panel.
+    """
+    # l_test = list(np.arange(100))
+
+    cycle_lr.run(8)
+    steps = 51
+    fig = plot_results_panel_2d(
+        cycle_lr,
+        steps=steps,
+        wrap=2,
+        query=[0, 3, 7],
+        subplot_kw={"sharex": True, "sharey": True},
+    )
+
+    # Should have 4 axes, 3 with data and the last turned off
+    assert len(fig.axes) == 4
+    assert sum([s.axison for s in fig.axes]) == 3
