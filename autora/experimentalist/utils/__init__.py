@@ -35,7 +35,8 @@ def sequence_to_array(iterable):
 
     """
     deque = collections.deque(iterable)
-    return np.array(deque).reshape((len(deque), -1))
+    array = np.array(deque).reshape((len(deque), -1))
+    return array
 
 
 def sequence_to_recarray(iterable):
@@ -65,10 +66,13 @@ def sequence_to_recarray(iterable):
 
     """
     deque = collections.deque(iterable)
+
     if isinstance(deque[0], (str, int, float, complex)):
-        return np.core.records.fromrecords([(d,) for d in deque])
+        recarray = np.core.records.fromrecords([(d,) for d in deque])
     else:
-        return np.core.records.fromrecords(deque)
+        recarray = np.core.records.fromrecords(deque)
+
+    return recarray
 
 
 def array_to_sequence(input: Union[np.array, np.recarray]):
