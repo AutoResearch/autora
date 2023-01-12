@@ -367,8 +367,20 @@ class ArrayPipelineWrapper(Pipeline):
         >>> p1 = ArrayPipelineWrapper([
         ...     ("mask", lambda cs: cs[[True, False, True, True, False]])
         ... ])
-        >>> p1.run(range(5))
-        this doesn't seem to be working properly – why not?
+        >>> list(p1.run(range(5)))
+        [(0,), (2,), (3,)]
+
+        >>> def echo(x):
+        ...     print(f"within the pipeline, x is a numpy.array: {x=}")
+        ...     return x
+        >>> p2 = ArrayPipelineWrapper([
+        ...     ("mask", lambda x: x[[True, False, True, True, False]]),
+        ...     ("echo", echo)
+        ... ], array_type="numpy.array")
+        >>> list(p2.run(range(5)))  # doctest: +NORMALIZE_WHITESPACE
+        within pipeline: x=array([[0], [2], [3]])
+        [array([0]), array([2]), array([3])]
+
     """
 
     def __init__(
