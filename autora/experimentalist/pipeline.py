@@ -363,22 +363,25 @@ def sequence_to_array(
     """
     Converts a finite sequence of experimental conditions into a 2D array.
 
+    See also: [array_to_sequence][autora.experimentalist.pipeline.array_to_sequence]
+
     Examples:
-        >>> s0 = range(5)
-        >>> a0 = sequence_to_array(s0, type="numpy.array")
-        >>> a0   # doctest: +NORMALIZE_WHITESPACE
+
+        A simple range object can be converted into an array of dimension 2:
+        >>> sequence_to_array(range(5), type="numpy.array") # doctest: +NORMALIZE_WHITESPACE
         array([[0], [1], [2], [3], [4]])
 
-        >>> s1 = zip(range(5), "abcde")
-        >>> a1 = sequence_to_array(iter(s1), type="numpy.array")
-        >>> a1   # doctest: +NORMALIZE_WHITESPACE
-        array([['0', 'a'], ['1', 'b'], ['2', 'c'], ['3', 'd'], ['4', 'e']],  dtype='<U21')
-
-        >>> s2 = zip(range(5), "abcde")
-        >>> a2 = sequence_to_array(s2, type="numpy.rec.array")
-        >>> a2  # doctest: +NORMALIZE_WHITESPACE
+        For mixed datatypes, it is sensible to use a record array:
+        >>> sequence_to_array(zip(range(5), "abcde"), type="numpy.rec.array"
+        ...     )  # doctest: +NORMALIZE_WHITESPACE
         rec.array([(0, 'a'), (1, 'b'), (2, 'c'), (3, 'd'), (4, 'e')],
             dtype=[('f0', '<i8'), ('f1', '<U1')])
+
+        ... otherwise, the highest-level type common to all the inputs will be used:
+        >>> sequence_to_array(zip(range(5), "abcde"), type="numpy.array"
+        ...     )  # doctest: +NORMALIZE_WHITESPACE
+        array([['0', 'a'], ['1', 'b'], ['2', 'c'], ['3', 'd'], ['4', 'e']],  dtype='<U21')
+
     """
     deque = collections.deque(input)
     n_conditions = len(deque)
@@ -389,6 +392,63 @@ def sequence_to_array(
         return np.core.records.fromrecords(deque)
     else:
         raise NotImplementedError(f"{type=} not implemented")
+
+
+def array_to_sequence(input: Union[np.array, np.recarray]):
+    """
+    Convert an array of experimental conditions into an iterable of smaller arrays.
+
+    See also: [sequence_to_array][autora.experimentalist.pipeline.sequence_to_array]
+
+    Examples:
+
+        We start with an array:
+        >>> a0 = np.arange(10).reshape(-1,2)
+        >>> a0
+        array([[0, 1],
+               [2, 3],
+               [4, 5],
+               [6, 7],
+               [8, 9]])
+
+        The sequence is created as a generator object
+        >>> array_to_sequence(a0)  # doctest: +ELLIPSIS
+        <generator object array_to_sequence at 0x...>
+
+        To see the sequence, we can convert it into a list:
+        >>> l0 = list(array_to_sequence(a0))
+        >>> l0
+        [array([0, 1]), array([2, 3]), array([4, 5]), array([6, 7]), array([8, 9])]
+
+        The individual rows are themselves 1-dimensional arrays:
+        >>> l0[0]
+        array([0, 1])
+
+        The rows can be subscripted as usual:
+        >>> l0[2][1]
+        5
+
+        We can also use a record array:
+        >>> a1 = np.rec.fromarrays([range(5), list("abcde")])
+        >>> a1
+        rec.array([(0, 'a'), (1, 'b'), (2, 'c'), (3, 'd'), (4, 'e')],
+                  dtype=[('f0', '<i8'), ('f1', '<U1')])
+
+        This is converted into records:
+        >>> l1 = list(array_to_sequence(a1))
+        >>> l1
+        [(0, 'a'), (1, 'b'), (2, 'c'), (3, 'd'), (4, 'e')]
+
+        The elements of the list are numpy.records
+        >>> type(l1[0])
+        <class 'numpy.record'>
+
+    """
+    if isinstance(input, (np.ndarray, np.recarray)):
+        for a in input:
+            yield a
+    else:
+        raise NotImplementedError(f"{type(input)} not supported")
 
 
 def make_pipeline(
