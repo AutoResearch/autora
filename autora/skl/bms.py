@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 import logging
-from typing import List, Optional
+from inspect import signature
+from typing import Callable, Dict, List, Optional
 
 import numpy as np
 import pandas as pd
@@ -59,14 +60,15 @@ class BMSRegressor(BaseEstimator, RegressorMixin):
         """
         Arguments:
             prior_par: a dictionary of the prior probabilities of different functions based on
-                wikipedia data scraping
+                wikipedia data_closed_loop scraping
             ts: contains a list of the temperatures that the parallel ms works at
         """
         self.ts = ts
         self.prior_par = prior_par
         self.epochs = epochs
         self.pms: Parallel = Parallel(Ts=ts)
-
+        self.ops = get_priors()[1]
+        self.custom_ops: Dict[str, Callable] = dict()
         self.X_: Optional[np.ndarray] = None
         self.y_: Optional[np.ndarray] = None
         self.model_: Tree = Tree()
@@ -75,7 +77,14 @@ class BMSRegressor(BaseEstimator, RegressorMixin):
         self.cache_: List = []
         self.variables: List = []
 
-    def fit(self, X: np.ndarray, y: np.ndarray, num_param: int = 1) -> BMSRegressor:
+    def fit(
+        self,
+        X: np.ndarray,
+        y: np.ndarray,
+        num_param: int = 1,
+        root=None,
+        custom_ops=None,
+    ) -> BMSRegressor:
         """
         Runs the optimization for a given set of `X`s and `y`s.
 
@@ -83,6 +92,8 @@ class BMSRegressor(BaseEstimator, RegressorMixin):
             X: independent variables in an n-dimensional array
             y: dependent variables in an n-dimensional array
             num_param: number of parameters
+            root: fixed root of the tree
+            custom_ops: user-defined functions to additionally treated as primitives
 
         Returns:
             self (BMS): the fitted estimator
@@ -101,7 +112,11 @@ class BMSRegressor(BaseEstimator, RegressorMixin):
         X = pd.DataFrame(X, columns=self.variables)
         y = pd.Series(y)
         _logger.info("BMS fitting started")
-
+        if custom_ops is not None:
+            for op in custom_ops:
+                self.add_primitive(op)
+        if (root is not None) and (root not in self.ops.keys()):
+            self.add_primitive(root)
         self.pms = Parallel(
             Ts=self.ts,
             variables=self.variables,
@@ -109,6 +124,9 @@ class BMSRegressor(BaseEstimator, RegressorMixin):
             x=X,
             y=y,
             prior_par=self.prior_par,
+            ops=self.ops,
+            custom_ops=self.custom_ops,
+            root=root,
         )
         self.model_, self.loss_, self.cache_ = utils.run(self.pms, self.epochs)
         self.models_ = list(self.pms.trees.values())
@@ -153,3 +171,8 @@ class BMSRegressor(BaseEstimator, RegressorMixin):
         assert self.cache_ is not None
 
         utils.present_results(self.model_, self.loss_, self.cache_)
+
+    def add_primitive(self, op: Callable):
+        self.custom_ops.update({op.__name__: op})
+        self.ops.update({op.__name__: len(signature(op).parameters)})
+        self.prior_par.update({"Nopi_" + op.__name__: 1})

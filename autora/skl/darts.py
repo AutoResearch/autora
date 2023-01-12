@@ -85,12 +85,12 @@ def _general_darts(
     sampling_strategy: SAMPLING_STRATEGIES = "max",
 ) -> _DARTSResult:
     """
-    Function to implement the DARTS optimization, given a fixed architecture and input data.
+    Function to implement the DARTS optimization, given a fixed architecture and input data_closed_loop.
 
     Arguments:
-        X: Input data.
-        y: Target data.
-        batch_size: Batch size for the data loader.
+        X: Input data_closed_loop.
+        y: Target data_closed_loop.
+        batch_size: Batch size for the data_closed_loop loader.
         num_graph_nodes: Number of nodes in the desired computation graph.
         output_type: Type of output function to use. This function is applied to transform
         the output of the mixture architecture.
@@ -241,7 +241,7 @@ def _optimize_coefficients(
     Arguments:
         network: The DARTS Network to optimize the coefficients of.
         criterion: The loss function to use.
-        data_loader: The data loader to use for the optimization.
+        data_loader: The data_closed_loop loader to use for the optimization.
         grad_clip: Whether to clip the gradients.
         param_update_steps: The number of parameter update steps to perform.
         param_learning_rate_max: Initial (maximum) learning rate for the operation parameters.
@@ -304,15 +304,15 @@ def _get_data_loader(
     y: np.ndarray,
     batch_size: int,
 ) -> torch.utils.data.DataLoader:
-    """Construct a minimal torch.utils.data.DataLoader for the input data.
+    """Construct a minimal torch.utils.data_closed_loop.DataLoader for the input data_closed_loop.
 
     Arguments:
-        X: The input data.
-        y: The target data.
+        X: The input data_closed_loop.
+        y: The target data_closed_loop.
         batch_size: The batch size to use.
 
     Returns:
-        A torch.utils.data.DataLoader for the input data.
+        A torch.utils.data_closed_loop.DataLoader for the input data_closed_loop.
     """
 
     X_, y_ = check_X_y(X, y, ensure_2d=True, multi_output=True)
@@ -336,13 +336,13 @@ def _get_data_loader(
 
 
 def _get_data_iterator(data_loader: torch.utils.data.DataLoader) -> Iterator:
-    """Get an iterator for the data loader.
+    """Get an iterator for the data_closed_loop loader.
 
     Arguments:
-        data_loader: The data loader to get the iterator for.
+        data_loader: The data_closed_loop loader to get the iterator for.
 
     Returns:
-        An iterator for the data loader.
+        An iterator for the data_closed_loop loader.
     """
     data_iterator = cycle(iter(data_loader))
     return data_iterator
@@ -352,13 +352,13 @@ def _get_next_input_target(
     data_iterator: Iterator, criterion: torch.nn.Module
 ) -> Tuple[torch.Tensor, torch.Tensor]:
     """
-    Get the next input and target from the data iterator.
+    Get the next input and target from the data_closed_loop iterator.
     Args:
-        data_iterator: The data iterator to get the next input and target from.
+        data_iterator: The data_closed_loop iterator to get the next input and target from.
         criterion: The loss function to use.
 
     Returns:
-        The next input and target from the data iterator.
+        The next input and target from the data_closed_loop iterator.
 
     """
     input_search, target_search = next(data_iterator)
@@ -479,11 +479,11 @@ class DARTSRegressor(BaseEstimator, RegressorMixin):
         classifier_weight_decay: float = 1e-2,
         darts_type: IMPLEMENTED_DARTS_TYPES = "original",
         init_weights_function: Optional[Callable] = None,
-        param_updates_per_epoch: int = 10,
-        param_updates_for_sampled_model: int = 100,
-        param_learning_rate_max: float = 2.5e-2,
+        param_updates_per_epoch: int = 500,
+        param_updates_for_sampled_model: int = 1000,
+        param_learning_rate_max: float = 0.025,
         param_learning_rate_min: float = 0.01,
-        param_momentum: float = 9e-1,
+        param_momentum: float = 0.9,
         param_weight_decay: float = 3e-4,
         arch_updates_per_epoch: int = 1,
         arch_learning_rate_max: float = 3e-3,
@@ -492,7 +492,7 @@ class DARTSRegressor(BaseEstimator, RegressorMixin):
         arch_weight_decay_base: float = 0.0,
         arch_momentum: float = 9e-1,
         fair_darts_loss_weight: int = 1,
-        max_epochs: int = 10,
+        max_epochs: int = 1000,
         grad_clip: float = 5,
         primitives: Sequence[str] = PRIMITIVES,
         train_classifier_coefficients: bool = False,
@@ -504,7 +504,7 @@ class DARTSRegressor(BaseEstimator, RegressorMixin):
         Initializes the DARTSRegressor.
 
         Arguments:
-            batch_size: Batch size for the data loader.
+            batch_size: Batch size for the data_closed_loop loader.
             num_graph_nodes: Number of nodes in the desired computation graph.
             output_type: Type of output function to use. This function is applied to transform
                 the output of the mixture architecture.
@@ -707,7 +707,7 @@ class DARTSRegressor(BaseEstimator, RegressorMixin):
         Returns the labels for the model.
 
         Arguments:
-            data: data to get labels for
+            data: data_closed_loop to get labels for
             default_label: default label to use if no labels are provided
 
         Returns:
@@ -808,7 +808,7 @@ class DARTSExecutionMonitor:
             **kwargs: other parameters which may be passed from the DARTS optimizer
         """
 
-        # collect data for visualization
+        # collect data_closed_loop for visualization
         self.epoch_history.append(epoch)
         self.arch_weight_history.append(
             network.arch_parameters()[0].detach().numpy().copy()[np.newaxis, :]

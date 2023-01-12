@@ -28,7 +28,8 @@ AllowedMetrics = Literal[
 
 
 def summed_dissimilarity_sampler(
-    X: np.ndarray, X_ref: np.ndarray, n: int = 1, metric: AllowedMetrics = "euclidean"
+    X: np.ndarray, X_ref: np.ndarray, n: int = 1, metric: AllowedMetrics = "euclidean",
+    inverse: bool = False
 ) -> np.ndarray:
     """
     This dissimilarity samples re-arranges the pool of IV conditions according to their
@@ -72,25 +73,36 @@ def summed_dissimilarity_sampler(
             f"X must have at least {n} rows matching the number of requested samples."
         )
 
+    # normalize all independent variables
+    X_full = np.vstack((X, X_ref))
+    X_full_norm = (X_full - X_full.mean(axis=0)) / X_full.std(axis=0)
+    X_norm = X_full_norm[:X.shape[0]]
+    X_ref_norm = X_full_norm[-X_ref.shape[0]:]
+
     dist = DistanceMetric.get_metric(metric)
 
     # create a list to store the summed distances for each row in matrix1
     summed_distances = []
 
     # loop over each row in first matrix
-    for row in X:
+    for row in X_norm:
         # calculate the distances between the current row in matrix1 and all other rows in matrix2
         summed_distance = 0
 
-        for X_ref_row in X_ref:
+        for X_ref_row in X_ref_norm:
 
             distance = dist.pairwise([row, X_ref_row])[0, 1]
+            if inverse:
+                distance = 1/distance
             summed_distance += distance
 
         # store the summed distance for the current row
         summed_distances.append(summed_distance)
 
     # sort the rows in matrix1 by their summed distances
-    sorted_X = X[np.argsort(summed_distances)[::-1]]
+    if inverse:
+        sorted_X = X[np.argsort(summed_distances)]
+    else:
+        sorted_X = X[np.argsort(summed_distances)[::-1]]
 
     return sorted_X[:n]

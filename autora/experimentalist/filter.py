@@ -13,7 +13,7 @@ def train_test_filter(
 ) -> Tuple[Callable[[Iterable], Iterable], Callable[[Iterable], Iterable]]:
     """
     A pipeline filter which pseudorandomly assigns values from the input into "train" or "test"
-    groups. This is particularly useful when working with streams of data of potentially
+    groups. This is particularly useful when working with streams of data_closed_loop of potentially
     unbounded length.
 
     This isn't a great method for small datasets, as it doesn't guarantee producing training
@@ -23,10 +23,10 @@ def train_test_filter(
 
     Args:
         seed: random number generator seeding value
-        train_p: proportion of data which go into the training set. A float between 0 and 1.
+        train_p: proportion of data_closed_loop which go into the training set. A float between 0 and 1.
 
     Returns:
-        a tuple of callables `(train_filter, test_filter)` which split the input data
+        a tuple of callables `(train_filter, test_filter)` which split the input data_closed_loop
             into two complementary streams.
 
 
@@ -36,8 +36,8 @@ def train_test_filter(
 
         The `train_filter` generates a sequence of ~60% of the input list –
         in this case, 15 of 20 datapoints.
-        Note that the correct split would be 12 of 20 data points.
-        Again, for data with bounded length it is advisable
+        Note that the correct split would be 12 of 20 data_closed_loop points.
+        Again, for data_closed_loop with bounded length it is advisable
         to use scikit-learn `train_test_split` instead.
         >>> list(train_filter(range(20)))
         [0, 2, 3, 4, 5, 6, 9, 10, 11, 12, 15, 16, 17, 18, 19]

@@ -65,7 +65,7 @@ random_experimentalist = Pipeline(
 bms_theorist = BMSRegressor(epochs=100)
 
 # define seed cycle
-# we will use this cycle to collect initial data and initialize the BMS model
+# we will use this cycle to collect initial data_closed_loop and initialize the BMS model
 seed_cycle = Cycle(
     metadata=study_metadata,
     theorist=bms_theorist,
@@ -82,7 +82,7 @@ seed_y = seed_cycle.data.observations[0][:, 1]
 
 
 # now we define the poppernet experimentalist which takes into account
-# the seed data and the seed model
+# the seed data_closed_loop and the seed model
 popper_experimentalist = Pipeline(
     [
         ("popper_pool", poppernet_pool),  # type: ignore
@@ -104,8 +104,8 @@ popper_experimentalist = Pipeline(
     },
 )
 
-# running a new cycle taking into account the seed data and model
-# TODO: need to find a way to incorporate the seed data into the cycle
+# running a new cycle taking into account the seed data_closed_loop and model
+# TODO: need to find a way to incorporate the seed data_closed_loop into the cycle
 cycle = Cycle(
     metadata=study_metadata,
     theorist=bms_theorist,
@@ -117,11 +117,11 @@ cycle.run(num_cycles=1)
 # plot output of architecture search
 all_obs = np.row_stack(seed_cycle.data.observations)
 x_obs, y_obs = all_obs[:, 0], all_obs[:, 1]
-plt.scatter(x_obs, y_obs, s=10, label="seed data")
+plt.scatter(x_obs, y_obs, s=10, label="seed data_closed_loop")
 
 all_obs = np.row_stack(cycle.data.observations)
 x_obs, y_obs = all_obs[:, 0], all_obs[:, 1]
-plt.scatter(x_obs, y_obs, s=10, label="collected data")
+plt.scatter(x_obs, y_obs, s=10, label="collected data_closed_loop")
 
 x_pred = np.array(study_metadata.independent_variables[0].allowed_values).reshape(
     ground_truth_resolution, 1

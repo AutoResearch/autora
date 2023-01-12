@@ -30,7 +30,7 @@ def show_results_complete(
     label=None,
 ):
     """
-    Function to plot input data (x_, y_) and the predictions of an estimator for the same x_.
+    Function to plot input data_closed_loop (x_, y_) and the predictions of an estimator for the same x_.
     """
     if projection == "2d":
         plt.figure()
@@ -55,11 +55,11 @@ def show_results_complete(
     return
 
 
-# %% Load the data
+# %% Load the data_closed_loop
 datafile_path = pathlib.Path(__file__).parent.joinpath("./weber_data.csv")
 data = pd.read_csv(datafile_path)
 show_results = partial(show_results_complete, data_=data, projection="3d")
-show_results(label="input data")
+show_results(label="input data_closed_loop")
 X = data[["S1", "S2"]]
 y = data["difference_detected"]
 
@@ -68,7 +68,7 @@ first_order_linear_estimator = LinearRegression()
 first_order_linear_estimator.fit(X, y)
 show_results(estimator=first_order_linear_estimator, label="1st order linear")
 
-# %% Fit using a 0-3 order polynomial, getting the best fit for the data.
+# %% Fit using a 0-3 order polynomial, getting the best fit for the data_closed_loop.
 polynomial_estimator = GridSearchCV(
     make_pipeline(PolynomialFeatures(), LinearRegression(fit_intercept=False)),
     param_grid=dict(polynomialfeatures__degree=range(4)),

@@ -170,7 +170,7 @@ def test_fit_with_fixed_architecture():
     equation_initial = regressor.model_repr()
     print(equation_initial)
 
-    # Refit by setting epochs to one and arch updates to zero, and fit some different data
+    # Refit by setting epochs to one and arch updates to zero, and fit some different data_closed_loop
     regressor.set_params(
         max_epochs=0,
         param_updates_for_sampled_model=1000,

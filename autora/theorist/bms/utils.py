@@ -24,7 +24,7 @@ def run(
         thinning: number of epochs between recording model loss to the trace
 
     Returns:
-        model: The equation which best describes the data
+        model: The equation which best describes the data_closed_loop
         model_len: (defined as description length) loss function score
         desc_len: Record of loss function score over time
 
@@ -47,7 +47,7 @@ def present_results(model: Tree, model_len: float, desc_len: List[float]) -> Non
     along with a plot of how this has progressed over the course of the search tasks
 
     Args:
-        model: The equation which best describes the data
+        model: The equation which best describes the data_closed_loop
         model_len: The equation loss (defined as description length)
         desc_len: Record of equation loss over time
 
@@ -66,12 +66,12 @@ def present_results(model: Tree, model_len: float, desc_len: List[float]) -> Non
 
 def predict(model: Tree, x: pd.DataFrame, y: pd.DataFrame) -> dict:
     """
-    Maps independent variable data onto expected dependent variable data
+    Maps independent variable data_closed_loop onto expected dependent variable data_closed_loop
 
     Args:
         model: The equation / function that best maps x onto y
-        x: The independent variables of the data
-        y: The dependent variable of the data
+        x: The independent variables of the data_closed_loop
+        y: The dependent variable of the data_closed_loop
 
     Returns: Predicted values for y given x and the model as trained
     """

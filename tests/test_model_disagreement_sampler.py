@@ -32,8 +32,8 @@ def get_polynomial_data(n: int = 100):
 @pytest.fixture
 def synthetic_lr_models():
     """
-    Creates two logistic regression classifier for 2 classes based on synthetic data.
-    Each classifier is trained on a different data set and thus should yield different predictions.
+    Creates two logistic regression classifier for 2 classes based on synthetic data_closed_loop.
+    Each classifier is trained on a different data_closed_loop set and thus should yield different predictions.
     """
     X, y_A, y_B = get_classification_data()
     model_A = LogisticRegression()
@@ -48,7 +48,7 @@ def synthetic_lr_models():
 @pytest.fixture
 def synthetic_linr_model():
     """
-    Creates linear regression based on synthetic data.
+    Creates linear regression based on synthetic data_closed_loop.
     """
     x, y = get_polynomial_data()
     model = LinearRegression()
@@ -59,7 +59,7 @@ def synthetic_linr_model():
 @pytest.fixture
 def synthetic_poly_model():
     """
-    Creates polynomial regression based on synthetic data.
+    Creates polynomial regression based on synthetic data_closed_loop.
     """
     x, y = get_polynomial_data()
 
@@ -68,7 +68,7 @@ def synthetic_poly_model():
         (
             "poly",
             PolynomialFeatures(degree=3),
-        ),  # transform input data into polynomial features
+        ),  # transform input data_closed_loop into polynomial features
         ("lr", LinearRegression()),  # fit a linear regression model
     ]
     # create the pipeline
@@ -99,7 +99,7 @@ def test_model_disagreement_classification(
 
     num_requested_samples = 10
 
-    # Import model and data
+    # Import model and data_closed_loop
     X = classification_data_to_test
     models = synthetic_lr_models
 
@@ -117,7 +117,7 @@ def test_model_disagreement_regression(
 
     num_requested_samples = 2
 
-    # Import model and data
+    # Import model and data_closed_loop
     X = regression_data_to_test
     model_A = synthetic_linr_model
     model_B = synthetic_poly_model

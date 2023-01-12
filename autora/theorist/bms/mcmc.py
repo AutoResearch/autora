@@ -19,6 +19,7 @@ import logging
 import sys
 import warnings
 from copy import deepcopy
+from inspect import signature
 from itertools import permutations, product
 from random import choice, random
 from typing import List
@@ -62,7 +63,7 @@ class Node:
         self.value: str = value
         self.order: int = len(self.offspring)
 
-    def pr(self, show_pow=False):
+    def pr(self, custom_ops, show_pow=False):
         """
         Converts expression in readable form
 
@@ -70,27 +71,41 @@ class Node:
         """
         if self.offspring == []:
             return "%s" % self.value
-        elif len(self.offspring) == 2:
+        elif len(self.offspring) == 2 and self.value not in custom_ops:
             return "(%s %s %s)" % (
-                self.offspring[0].pr(show_pow=show_pow),
+                self.offspring[0].pr(custom_ops=custom_ops, show_pow=show_pow),
                 self.value,
-                self.offspring[1].pr(show_pow=show_pow),
+                self.offspring[1].pr(custom_ops=custom_ops, show_pow=show_pow),
             )
         else:
             if show_pow:
                 return "%s(%s)" % (
                     self.value,
-                    ",".join([o.pr(show_pow=show_pow) for o in self.offspring]),
+                    ",".join(
+                        [
+                            o.pr(custom_ops=custom_ops, show_pow=show_pow)
+                            for o in self.offspring
+                        ]
+                    ),
                 )
             else:
                 if self.value == "pow2":
-                    return "(%s ** 2)" % (self.offspring[0].pr(show_pow=show_pow))
+                    return "(%s ** 2)" % (
+                        self.offspring[0].pr(custom_ops=custom_ops, show_pow=show_pow)
+                    )
                 elif self.value == "pow3":
-                    return "(%s ** 3)" % (self.offspring[0].pr(show_pow=show_pow))
+                    return "(%s ** 3)" % (
+                        self.offspring[0].pr(custom_ops=custom_ops, show_pow=show_pow)
+                    )
                 else:
                     return "%s(%s)" % (
                         self.value,
-                        ",".join([o.pr(show_pow=show_pow) for o in self.offspring]),
+                        ",".join(
+                            [
+                                o.pr(custom_ops=custom_ops, show_pow=show_pow)
+                                for o in self.offspring
+                            ]
+                        ),
                     )
 
 
@@ -111,8 +126,8 @@ class Tree:
         et_space: space of all possible leaves and elementary trees
         rr_space: space of all possible root replacement trees
         num_rr: number of possible root replacement trees
-        x: independent variable data
-        y: depedent variable data
+        x: independent variable data_closed_loop
+        y: depedent variable data_closed_loop
         par_values: The values of the model parameters (one set of values for each dataset)
         fit_par: past successful parameter fittings
         sse: sum of squared errors (measure of goodness of fit)
@@ -137,6 +152,8 @@ class Tree:
         PT=1.0,
         max_size=50,
         root_value=None,
+        fixed_root=False,
+        custom_ops={},
     ):
         """
         Initialises the tree object
@@ -144,7 +161,7 @@ class Tree:
         Args:
             ops: allowed operations to compose equation
             variables: dependent variable names
-            parameters: parameters that can be used to better fit the equation to the data
+            parameters: parameters that can be used to better fit the equation to the data_closed_loop
             prior_par: hyperparameter values over operations within ops
             x: dependent variables
             y: independent variables
@@ -154,27 +171,43 @@ class Tree:
             root_value: algebraic term held at root of equation
         """
         # The variables and parameters
+        if custom_ops is None:
+            custom_ops = dict()
         self.variables = variables
         self.parameters = [
             p if p.startswith("_") and p.endswith("_") else "_%s_" % p
             for p in parameters
         ]
         # The root
+        self.fixed_root = fixed_root
         if root_value is None:
             self.root = Node(
                 choice(self.variables + self.parameters), offspring=[], parent=None
             )
         else:
             self.root = Node(root_value, offspring=[], parent=None)
+            root_order = len(signature(custom_ops[root_value]).parameters)
+            self.root.order = root_order
+            for _ in range(root_order):
+                self.root.offspring.append(
+                    Node(
+                        choice(self.variables + self.parameters),
+                        offspring=[],
+                        parent=self.root,
+                    )
+                )
+
         # The possible operations
         self.ops = ops
+        self.custom_ops = custom_ops
         # The possible orders of the operations, move types, and move
         # type probabilities
         self.op_orders = list(set([0] + [n for n in list(ops.values())]))
         self.move_types = [p for p in permutations(self.op_orders, 2)]
         # Elementary trees (including leaves), indexed by order
         self.ets = dict([(o, []) for o in self.op_orders])
-        self.ets[0] = [self.root]
+        self.ets[0] = [x for x in self.root.offspring]
+        self.ets[self.root.order] = [self.root]
         # Distinct parameters used
         self.dist_par = list(
             set([n.value for n in self.ets[0] if n.value in self.parameters])
@@ -193,6 +226,8 @@ class Tree:
         self.num_rr = len(self.rr_space)
         # Number of operations of each type
         self.nops = dict([[o, 0] for o in ops])
+        if root_value is not None:
+            self.nops[self.root.value] += 1
         # The parameters of the prior probability (default: 5 everywhere)
         if prior_par == {}:
             self.prior_par = dict([("Nopi_%s" % t, 10.0) for t in self.ops])
@@ -227,7 +262,7 @@ class Tree:
         self.bic = self.get_bic()
         self.E, self.EB, self.EP = self.get_energy()
         # To control formula degeneracy (i.e. different trees that
-        # correspond to the same cannoninal formula), we store the
+        # correspond to the same canonical formula), we store the
         # representative tree for each canonical formula
         self.representative = {}
         self.representative[self.canonical()] = (
@@ -246,7 +281,7 @@ class Tree:
         Returns: root node representation
 
         """
-        return self.root.pr()
+        return self.root.pr(custom_ops=self.custom_ops)
 
     # -------------------------------------------------------------------------
     def pr(self, show_pow=True):
@@ -256,7 +291,7 @@ class Tree:
         Returns: root node representation
 
         """
-        return self.root.pr(show_pow=show_pow)
+        return self.root.pr(custom_ops=self.custom_ops, show_pow=show_pow)
 
     # -------------------------------------------------------------------------
     def canonical(self, verbose=False):
@@ -563,11 +598,11 @@ class Tree:
     def get_sse(self, fit=True, verbose=False):
         """
         Get the sum of squared errors, fitting the expression represented by the Tree
-        to the existing data, if specified (by default, yes)
+        to the existing data_closed_loop, if specified (by default, yes)
 
         Returns: sum of square errors (sse)
         """
-        # Return 0 if there is no data
+        # Return 0 if there is no data_closed_loop
         if list(self.x.values())[0].empty or list(self.y.values())[0].empty:
             self.sse = 0
             return 0
@@ -578,17 +613,21 @@ class Tree:
         atomd = dict([(a.name, a) for a in ex.atoms() if a.is_Symbol])
         variables = [atomd[v] for v in self.variables if v in list(atomd.keys())]
         parameters = [atomd[p] for p in self.parameters if p in list(atomd.keys())]
+        dic: dict = dict(
+            {
+                "fac": scipy.special.factorial,
+                "sig": scipy.special.expit,
+                "relu": relu,
+            },
+            **self.custom_ops
+        )
         try:
             flam = lambdify(
                 variables + parameters,
                 ex,
                 [
                     "numpy",
-                    {
-                        "fac": scipy.special.factorial,
-                        "sig": scipy.special.expit,
-                        "relu": relu,
-                    },
+                    dic,
                 ],
             )
         except (SyntaxError, KeyError):
@@ -667,7 +706,7 @@ class Tree:
     def get_bic(self, reset=True, fit=False, verbose=False):
         """
         Calculate the Bayesian information criterion (BIC) of the current expression,
-        given the data. If reset==False, the value of self.bic will not be updated
+        given the data_closed_loop. If reset==False, the value of self.bic will not be updated
         (by default, it will)
 
         Returns: Bayesian information criterion (BIC)
@@ -696,12 +735,12 @@ class Tree:
     def get_energy(self, bic=False, reset=False, verbose=False):
         """
         Calculate the "energy" of a given formula, that is, approximate minus log-posterior
-        of the formula given the data (the approximation coming from the use of the BIC
+        of the formula given the data_closed_loop (the approximation coming from the use of the BIC
         instead of the exactly integrated likelihood)
 
         Returns: Energy of formula (as E, EB, and EP)
         """
-        # Contribution of the data (recalculating BIC if necessary)
+        # Contribution of the data_closed_loop (recalculating BIC if necessary)
         if bic:
             EB = self.get_bic(reset=reset, verbose=verbose) / 2.0
         else:
@@ -1136,9 +1175,14 @@ class Tree:
                     self.EP += dEP
 
         # Long-range move
-        elif topDice < (p_rr + p_long):
+        elif topDice < (p_rr + p_long) and not (
+            self.fixed_root and len(self.nodes) == 1
+        ):
             # Choose a random node in the tree, and a random new operation
             target = choice(self.nodes)
+            if self.fixed_root:
+                while target is self.root:
+                    target = choice(self.nodes)
             nready = False
             while not nready:
                 if len(target.offspring) == 0:
@@ -1178,16 +1222,18 @@ class Tree:
 
         # Elementary tree (short-range) move
         else:
-            # Choose a feasible move (doable and keeping size<=max_size)
-            while True:
-                oini, ofin = choice(self.move_types)
-                if len(self.ets[oini]) > 0 and (
-                    self.size - oini + ofin <= self.max_size
-                ):
-                    break
-            # target and new ETs
-            target = choice(self.ets[oini])
-            new = choice(self.et_space[ofin])
+            target = None
+            while target is None or self.fixed_root and target is self.root:
+                # Choose a feasible move (doable and keeping size<=max_size)
+                while True:
+                    oini, ofin = choice(self.move_types)
+                    if len(self.ets[oini]) > 0 and (
+                        self.size - oini + ofin <= self.max_size
+                    ):
+                        break
+                # target and new ETs
+                target = choice(self.ets[oini])
+                new = choice(self.et_space[ofin])
             # omegai and omegaf
             omegai = len(self.ets[oini])
             omegaf = len(self.ets[ofin]) + 1
@@ -1298,9 +1344,9 @@ class Tree:
     # -------------------------------------------------------------------------
     def predict(self, x):
         """
-        Calculate the value of the formula at the given data x. The data x
-        must have the same format as the training data and, in particular, it
-        it must specify to which dataset the example data belongs, if multiple
+        Calculate the value of the formula at the given data_closed_loop x. The data_closed_loop x
+        must have the same format as the training data_closed_loop and, in particular, it
+        it must specify to which dataset the example data_closed_loop belongs, if multiple
         datasets where used for training.
 
         Returns: predicted y values
@@ -1331,11 +1377,14 @@ class Tree:
             ex,
             [
                 "numpy",
-                {
-                    "fac": scipy.special.factorial,
-                    "sig": scipy.special.expit,
-                    "relu": relu,
-                },
+                dict(
+                    {
+                        "fac": scipy.special.factorial,
+                        "sig": scipy.special.expit,
+                        "relu": relu,
+                    },
+                    **self.custom_ops
+                ),
             ],
         )
         # Loop over datasets
@@ -1443,7 +1492,7 @@ class Tree:
 
 
 def test3(num_points=10, samples=100000):
-    # Create the data
+    # Create the data_closed_loop
     x = pd.DataFrame(
         dict([("x%d" % i, np.random.uniform(0, 10, num_points)) for i in range(5)])
     )
@@ -1477,7 +1526,7 @@ def test3(num_points=10, samples=100000):
 
 
 def test4(num_points=10, samples=1000):
-    # Create the data
+    # Create the data_closed_loop
     x = pd.DataFrame(
         dict([("x%d" % i, np.random.uniform(0, 10, num_points)) for i in range(5)])
     )

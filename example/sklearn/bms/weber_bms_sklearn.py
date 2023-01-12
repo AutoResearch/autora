@@ -8,7 +8,7 @@ from autora.theorist.bms import get_priors
 warnings.filterwarnings("ignore")
 
 
-# load data
+# load data_closed_loop
 XLABS = [
     "S1",
     "S2",

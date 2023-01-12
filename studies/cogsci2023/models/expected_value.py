@@ -1,40 +1,46 @@
 import numpy as np
+
 from autora.variable import DV, IV, ValueType, VariableCollection
 
 # general meta parameters
 added_noise = 0
 
 # expected value theory with linear value function
-expected_value_choice_temperature = 10.0
+expected_value_choice_temperature = 0.1
 expected_value_lambda = 0.5
 expected_value_resolution = 10
-expected_value_minimum_value = -100
-expected_value_maximum_value = 100
+expected_value_minimum_value = -1
+expected_value_maximum_value = 1
 
 # basic expected value theory
+
 
 def expected_value_theory_metadata():
 
     v_a = IV(
         name="V_A",
-        allowed_values=np.linspace(expected_value_minimum_value,
-                                   expected_value_maximum_value,
-                                   expected_value_resolution),
+        allowed_values=np.linspace(
+            expected_value_minimum_value,
+            expected_value_maximum_value,
+            expected_value_resolution,
+        ),
         value_range=(expected_value_minimum_value, expected_value_maximum_value),
         units="dollar",
         variable_label="Value of Option A",
-        type=ValueType.REAL
+        type=ValueType.REAL,
     )
 
     v_b = IV(
         name="V_B",
-        allowed_values=np.linspace(expected_value_minimum_value,
-                                   expected_value_maximum_value,
-                                   expected_value_resolution),
+        allowed_values=np.linspace(
+            expected_value_minimum_value,
+            expected_value_maximum_value,
+            expected_value_resolution,
+        ),
         value_range=(expected_value_minimum_value, expected_value_maximum_value),
         units="dollar",
         variable_label="Value of Option B",
-        type=ValueType.REAL
+        type=ValueType.REAL,
     )
 
     p_a = IV(
@@ -43,7 +49,7 @@ def expected_value_theory_metadata():
         value_range=(0, 1),
         units="probability",
         variable_label="Probability of Option A",
-        type=ValueType.REAL
+        type=ValueType.REAL,
     )
 
     p_b = IV(
@@ -52,7 +58,7 @@ def expected_value_theory_metadata():
         value_range=(0, 1),
         units="probability",
         variable_label="Probability of Option B",
-        type=ValueType.REAL
+        type=ValueType.REAL,
     )
 
     dv1 = DV(
@@ -60,7 +66,7 @@ def expected_value_theory_metadata():
         value_range=(0, 1),
         units="probability",
         variable_label="Probability of Choosing Option A",
-        type=ValueType.PROBABILITY
+        type=ValueType.PROBABILITY,
     )
 
     metadata = VariableCollection(
@@ -70,12 +76,15 @@ def expected_value_theory_metadata():
 
     return metadata
 
-def expected_value_theory_experiment(X: np.ndarray,
-                                choice_temperature: float = expected_value_choice_temperature,
-                                value_lambda = expected_value_lambda,
-                                std = added_noise):
 
-    Y = np.zeros((X.shape[0],1))
+def expected_value_theory_experiment(
+    X: np.ndarray,
+    choice_temperature: float = expected_value_choice_temperature,
+    value_lambda=expected_value_lambda,
+    std=added_noise,
+):
+
+    Y = np.zeros((X.shape[0], 1))
     for idx, x in enumerate(X):
 
         value_A = value_lambda * x[0]
@@ -88,13 +97,15 @@ def expected_value_theory_experiment(X: np.ndarray,
         expected_value_B = value_B * probability_b + np.random.normal(0, std)
 
         # compute probability of choosing option A
-        p_choose_A = np.exp(expected_value_A / choice_temperature) / \
-                        (np.exp(expected_value_A / choice_temperature) +
-                         np.exp(expected_value_B / choice_temperature))
+        p_choose_A = np.exp(expected_value_A / choice_temperature) / (
+            np.exp(expected_value_A / choice_temperature)
+            + np.exp(expected_value_B / choice_temperature)
+        )
 
         Y[idx] = p_choose_A
 
     return Y
+
 
 def expected_value_theory_data(metadata):
 
@@ -103,18 +114,20 @@ def expected_value_theory_data(metadata):
     v_b = metadata.independent_variables[2].allowed_values
     p_b = metadata.independent_variables[3].allowed_values
 
-    X = np.array(np.meshgrid(v_a, p_a, v_b, p_b)).T.reshape(-1,4)
+    X = np.array(np.meshgrid(v_a, p_a, v_b, p_b)).T.reshape(-1, 4)
 
     y = expected_value_theory_experiment(X, std=0)
 
     return X, y
 
-def plot_expected_value(model = None):
+
+def plot_expected_value(model=None):
     import matplotlib.pyplot as plt
+
     metadata = expected_value_theory_metadata()
 
-    v_a_list = [500, 1000, 1500]
-    v_b = 1000
+    v_a_list = [-1, 0.5, 1]
+    v_b = 0.5
     p_b = 0.5
     p_a = np.linspace(0, 1, 100)
 
@@ -144,4 +157,5 @@ def plot_expected_value(model = None):
     plt.title("Expected Value Theory", fontsize="x-large")
     plt.show()
 
-#plot_expected_value()
+
+# plot_expected_value()

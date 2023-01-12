@@ -17,7 +17,7 @@ class Parallel:
     Attributes:
         Ts: list of parallel temperatures
         trees: list of parallel trees, corresponding to each parallel temperature
-        t1: equation tree which best describes the data
+        t1: equation tree which best describes the data_closed_loop
     """
 
     # -------------------------------------------------------------------------
@@ -25,12 +25,14 @@ class Parallel:
         self,
         Ts: list,
         ops=get_priors()[1],
+        custom_ops={},
         variables=["x"],
         parameters=["a"],
         max_size=50,
         prior_par=get_priors()[0],
         x=None,
         y=None,
+        root=None,
     ) -> None:
         """
         Initialises Parallel Machine Scientist
@@ -38,13 +40,15 @@ class Parallel:
         Args:
             Ts: list of temperature values
             ops: allowed operations for the search task
-            variables: independent variables from data
+            variables: independent variables from data_closed_loop
             parameters: settable values to improve model fit
             max_size: maximum size (number of nodes) in a tree
             prior_par: prior values over ops
             x: independent variables of dataset
             y: dependent variable of dataset
+            root: fixed root of the tree
         """
+        self.root = root
         # All trees are initialized to the same tree but with different BT
         Ts.sort()
         self.Ts = [str(T) for T in Ts]
@@ -58,6 +62,9 @@ class Parallel:
                 y=y,
                 max_size=max_size,
                 BT=1,
+                root_value=root.__name__ if root is not None else None,
+                fixed_root=True if root is not None else False,
+                custom_ops=custom_ops,
             )
         }
         self.t1 = self.trees["1.0"]
@@ -69,7 +76,9 @@ class Parallel:
                 prior_par=deepcopy(prior_par),
                 x=x,
                 y=y,
-                root_value=str(self.t1),
+                root_value=root.__name__ if root is not None else None,
+                fixed_root=self.t1.fixed_root,
+                custom_ops=custom_ops,
                 max_size=max_size,
                 BT=float(BT),
             )
@@ -84,6 +93,8 @@ class Parallel:
         Perform a MCMC step in each of the trees
         """
         # Loop over all trees
+        if self.root is not None:
+            p_rr = 0.0
         for T, tree in list(self.trees.items()):
             # MCMC step
             tree.mcmc_step(verbose=verbose, p_rr=p_rr, p_long=p_long)

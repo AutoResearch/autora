@@ -11,7 +11,7 @@ from autora.experimentalist.sampler import uncertainty_sampler
 @pytest.fixture
 def synthetic_lr_model():
     """
-    Creates logistic regression classifier for 3 classes based on synthetic data.
+    Creates logistic regression classifier for 3 classes based on synthetic data_closed_loop.
     """
     n = 100
     X = ([[1, 0, 0]] * n) + ([[0, 1, 0]] * n) + ([[0, 0, 1]] * n)
@@ -39,7 +39,7 @@ def data_to_test():
 
 
 def test_uncertainty_least_confident(synthetic_lr_model, data_to_test):
-    # Import model and data
+    # Import model and data_closed_loop
     model = synthetic_lr_model
     X = data_to_test
 
@@ -114,7 +114,7 @@ def test_uncertainty_entropy(synthetic_lr_model, data_to_test):
 
 def test_uncertainty_entropy_vs_margin(synthetic_lr_model, data_to_test):
     """
-    Test data should yield different results. Condition [0.4, 0.3, 0.2] should have the greatest
+    Test data_closed_loop should yield different results. Condition [0.4, 0.3, 0.2] should have the greatest
     entropy but less margin than conditions [0.4, 0.4, 0.2] and [0.5, 0.5, 0. ].
     """
     model = synthetic_lr_model

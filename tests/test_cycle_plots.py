@@ -148,11 +148,11 @@ def test_2d_plot(cycle_lr):
         cycle_lr, steps=steps, wrap=3, subplot_kw={"sharex": True, "sharey": True}
     )
 
-    # Should have 9 axes, 8 with data and the last turned off
+    # Should have 9 axes, 8 with data_closed_loop and the last turned off
     assert len(fig.axes) == 9
     assert sum([s.axison for s in fig.axes]) == 8
 
-    # Check number of data points on each figure
+    # Check number of data_closed_loop points on each figure
     # Blue dots should start at 0 and augment by 5.
     # Orange should always be 5-this is the condition sampling rate set by the Experimentalist.
     l_counts = []
@@ -194,7 +194,7 @@ def test_3d_plot(cycle_multi_lr):
     assert len(fig.axes) == 6
     assert sum([s._axis3don for s in fig.axes]) == 6
 
-    # Check number of data points on each figure
+    # Check number of data_closed_loop points on each figure
     # Blue dots should start at 0 and augment by 5.
     # Orange should always be 5-this is the condition sampling rate set by the Experimentalist.
     l_counts = []

@@ -121,7 +121,7 @@ class Cell(nn.Module):
         self._steps = steps  # hidden nodes
         self._n_input_states = n_input_states  # input nodes
 
-        # EDIT 11/04/19 SM: adapting to new SimpleNet data (changed from
+        # EDIT 11/04/19 SM: adapting to new SimpleNet data_closed_loop (changed from
         # multiplier to steps)
         self._multiplier = steps
 
@@ -636,7 +636,7 @@ class Network(nn.Module):
         # tmp_param_list = list()
         # for parameter in self.classifier.parameters():
         #   for subparameter in parameter:
-        #     tmp_param_list.append(subparameter.data.numpy().squeeze())
+        #     tmp_param_list.append(subparameter.data_closed_loop.numpy().squeeze())
 
         # get parameters from final linear for each edge
         for edge in range(self._steps):

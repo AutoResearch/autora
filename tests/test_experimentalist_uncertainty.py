@@ -16,10 +16,10 @@ def test_experimentalist_uncertainty():
     """
     Tests the implementation of the experimentalist pipeline with an exhaustive pool of discrete
     values, Weber filter, uncertainty sampler. A logistic regression model is trained using
-    synthetic Weber experiment data for use in Uncertainty sampling.
+    synthetic Weber experiment data_closed_loop for use in Uncertainty sampling.
 
     """
-    # Load the data
+    # Load the data_closed_loop
     datafile_path = pathlib.Path(__file__).parent.parent.joinpath(
         "example/sklearn/darts/weber_data.csv"
     )

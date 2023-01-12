@@ -15,8 +15,8 @@ class DARTSDataset(Dataset):
         Initializes the dataset.
 
         Arguments:
-            input_data: The input data to the dataset.
-            output_data: The output data to the dataset.
+            input_data: The input data_closed_loop to the dataset.
+            output_data: The output data_closed_loop to the dataset.
         """
         assert input_data.shape[0] == output_data.shape[0]
         self.input_data = input_data
@@ -57,8 +57,8 @@ def darts_dataset_from_ndarray(
     A function to create a dataset from numpy arrays.
 
     Arguments:
-        input_data: The input data to the dataset.
-        output_data: The output data to the dataset.
+        input_data: The input data_closed_loop to the dataset.
+        output_data: The output data_closed_loop to the dataset.
 
     Returns:
         The dataset.
