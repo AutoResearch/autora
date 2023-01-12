@@ -2,7 +2,7 @@ import numpy as np
 from autora.variable import DV, IV, ValueType, VariableCollection
 
 # general meta parameters
-added_noise = 0
+added_noise = 0.01
 
 # stevens' power law parameters
 stevens_resolution = 100
@@ -60,12 +60,16 @@ def stevens_power_law_data(metadata):
 
 def plot_stevens_power_law(model = None):
     import matplotlib.pyplot as plt
+    import matplotlib.colors as mcolors
+
+    colors = mcolors.TABLEAU_COLORS
+    col_keys = list(colors.keys())
     metadata = stevens_power_law_metadata()
     X, y = stevens_power_law_data(metadata)
-    plt.plot(X, y, label="Original")
+    plt.plot(X, y, label="Original", c=colors[col_keys[0]])
     if model is not None:
         y = model.predict(X)
-        plt.plot(X, y, label=f"Recovered")
+        plt.plot(X, y, label=f"Recovered", c=colors[col_keys[0]], linestyle="--")
     x_limit = [0, metadata.independent_variables[0].value_range[1]]
     y_limit = [0, 4]
     x_label = "Stimulus Intensity"

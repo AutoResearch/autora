@@ -14,6 +14,8 @@ path = 'data_closed_loop/'
 ground_truth_name = 'prospect_theory' # OPTIONS: see models.py
 experimentalist = 'uncertainty' # for plotting
 
+# todo: for stats compute entropy over observations for each experimentalist
+
 # create an empty list to store the loaded pickle files
 loaded_pickles = []
 
@@ -149,10 +151,26 @@ df.drop(df[df['Labels'] == full_data_label].index, inplace=True)
 
 # T-SNE plot for full data
 custom_palette = sns.color_palette("Greys", len(y.tolist()))
-g = sns.scatterplot(x="Component 1", y="Component 2", hue=full_data_only.y,
+sns.scatterplot(x="Component 1", y="Component 2", hue=full_data_only.y,
                 palette=custom_palette,
                 data=full_data_only,
+                linewidth = 0,
+                #s = 10,
                 legend=False)
+
+
+# x_list = full_data_only["Component 1"]
+# y_list = full_data_only["Component 2"]
+# z_list = full_data_only["y"]
+#
+# from scipy.interpolate import interp2d
+# f = interp2d(x_list, y_list, z_list, kind="linear")
+#
+# x_coords = np.arange(min(x_list), max(x_list) + 1, step=0.01)
+# y_coords = np.arange(min(y_list), max(y_list) + 1, step=0.01)
+# z = f(x_coords, y_coords)
+# plt.pcolormesh(x_coords, y_coords, z, vmin=0, vmax=1, cmap="Greys")
+# plt.show()
 
 # T-SNE Plot for experimentalists
 custom_palette = sns.color_palette("deep", len(set(labels)))

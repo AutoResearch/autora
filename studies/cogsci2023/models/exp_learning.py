@@ -2,7 +2,7 @@ import numpy as np
 from autora.variable import DV, IV, ValueType, VariableCollection
 
 # general meta parameters
-added_noise = 0
+added_noise = 0.01
 
 # exponential learning curve
 exp_learning_resolution = 100
@@ -101,7 +101,7 @@ def plot_exp_learning(model = None):
         plt.plot(trial, y, label=f"$P_0 = {P_0}$ (Original)")
         if model is not None:
             y = model.predict(X)
-            plt.plot(trial, y, label=f"$P_0 = {P_0}$ (Recovered)")
+            plt.plot(trial, y, label=f"$P_0 = {P_0}$ (Recovered)", linestyle="--")
 
     x_limit = [0, metadata.independent_variables[1].value_range[1]]
     y_limit = [0, 1]
