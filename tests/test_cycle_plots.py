@@ -366,6 +366,7 @@ def test_2d_plot_slicing(cycle_lr):
     cycle_lr.run(10)
     steps = 51
 
+    # Using Slice function
     # Cycles 0, 2, 4, 6, 8
     fig = plot_results_panel_2d(
         cycle_lr,
@@ -400,3 +401,27 @@ def test_2d_plot_slicing(cycle_lr):
     # Should have 1 axes
     assert len(fig3.axes) == 1
     assert sum([s.axison for s in fig3.axes]) == 1
+
+    # Using np.s_ Index Expression
+    # Cycles 0, 2, 4, 6, 8
+    fig4 = plot_results_panel_2d(
+        cycle_lr,
+        steps=steps,
+        wrap=3,
+        query=np.s_[0:9:2],
+        subplot_kw={"sharex": True, "sharey": True},
+    )
+    # Should have 6 axes, 5 with data and the last turned off
+    assert len(fig4.axes) == 6
+    assert sum([s.axison for s in fig4.axes]) == 5
+
+    fig5 = plot_results_panel_2d(
+        cycle_lr,
+        steps=steps,
+        wrap=3,
+        query=np.s_[-4:],
+        subplot_kw={"sharex": True, "sharey": True},
+    )
+    # Should have 6 axes, 4 with data
+    assert len(fig5.axes) == 6
+    assert sum([s.axison for s in fig5.axes]) == 4
