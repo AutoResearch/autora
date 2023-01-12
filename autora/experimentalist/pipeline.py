@@ -3,6 +3,7 @@ Provides tools to chain functions used to create experiment sequences.
 """
 from __future__ import annotations
 
+import collections
 import copy
 from itertools import chain
 from typing import (
@@ -19,6 +20,8 @@ from typing import (
     get_args,
     runtime_checkable,
 )
+
+import numpy as np
 
 
 @runtime_checkable
@@ -341,6 +344,51 @@ def _parse_params_to_nested_dict(params_dict: Dict, divider: str):
             )
 
     return nested_dictionary
+
+
+class ArrayPipeline(Pipeline):
+    """
+    A pipeline which uses arrays as its internal representation of data.
+
+    This is useful when Pipes which expect finite arrays as input and produce arrays as output,
+    rather than a (potentially unbounded) iterable of experimental conditions.
+
+    This means that this type of pipeline only accepts bounded Sequences as inputs.
+    """
+
+
+def sequence_to_array(
+    input: _ExperimentalSequence, type: Literal["numpy.array", "numpy.rec.array"]
+):
+    """
+    Converts a finite sequence of experimental conditions into a 2D array.
+
+    Examples:
+        >>> s0 = range(5)
+        >>> a0 = sequence_to_array(s0, type="numpy.array")
+        >>> a0   # doctest: +NORMALIZE_WHITESPACE
+        array([[0], [1], [2], [3], [4]])
+
+        >>> s1 = zip(range(5), "abcde")
+        >>> a1 = sequence_to_array(iter(s1), type="numpy.array")
+        >>> a1   # doctest: +NORMALIZE_WHITESPACE
+        array([['0', 'a'], ['1', 'b'], ['2', 'c'], ['3', 'd'], ['4', 'e']],  dtype='<U21')
+
+        >>> s2 = zip(range(5), "abcde")
+        >>> a2 = sequence_to_array(s2, type="numpy.rec.array")
+        >>> a2  # doctest: +NORMALIZE_WHITESPACE
+        rec.array([(0, 'a'), (1, 'b'), (2, 'c'), (3, 'd'), (4, 'e')],
+            dtype=[('f0', '<i8'), ('f1', '<U1')])
+    """
+    deque = collections.deque(input)
+    n_conditions = len(deque)
+
+    if type == "numpy.array":
+        return np.array(deque).reshape((n_conditions, -1))
+    if type == "numpy.rec.array":
+        return np.core.records.fromrecords(deque)
+    else:
+        raise NotImplementedError(f"{type=} not implemented")
 
 
 def make_pipeline(
