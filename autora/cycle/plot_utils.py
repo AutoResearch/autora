@@ -294,6 +294,9 @@ def plot_results_panel_2d(
     else:
         shape = (int(np.ceil(n_cycles_to_plot / wrap)), wrap)
     fig, axs = plt.subplots(*shape, **d_kw["subplot_kw"])
+    # Place axis object in an array if plotting single panel
+    if shape == (1, 1):
+        axs = np.array([axs])
 
     # Loop by panel
     for i, ax in enumerate(axs.flat):
