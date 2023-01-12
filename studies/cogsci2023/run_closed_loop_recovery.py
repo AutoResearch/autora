@@ -31,12 +31,12 @@ theorist_name = "BMS"
 ground_truth_name = "prospect_theory"  # OPTIONS: see models.py
 
 experimentalists = [
-    # 'random',
+    'random',
     "dissimilarity",
-    "inverse dissimilarity",
-    # 'falsification',
-    # 'model disagreement',
-    # 'least confident',
+    # "inverse dissimilarity",
+    'falsification',
+    'model disagreement',
+    'least confident',
 ]
 
 for experimentalist_name in experimentalists:
