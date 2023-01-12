@@ -1,66 +1,86 @@
-from studies.cogsci2023.models.weber_fechner import *
-from studies.cogsci2023.models.stevens_power_law import *
+from studies.cogsci2023.models.evc_coged import *
+from studies.cogsci2023.models.evc_congruency import *
+from studies.cogsci2023.models.evc_demand_selection import *
+from studies.cogsci2023.models.exp_learning import *
 from studies.cogsci2023.models.expected_value import *
 from studies.cogsci2023.models.prospect_theory import *
-from studies.cogsci2023.models.exp_learning import *
+from studies.cogsci2023.models.shepard_luce_choice import *
+from studies.cogsci2023.models.stevens_power_law import *
 from studies.cogsci2023.models.stroop_model import *
 from studies.cogsci2023.models.task_switching import *
-from studies.cogsci2023.models.evc_coged import *
-from studies.cogsci2023.models.evc_demand_selection import *
-from studies.cogsci2023.models.evc_congruency import *
-from studies.cogsci2023.models.shepard_luce_choice import *
 from studies.cogsci2023.models.tva import *
+from studies.cogsci2023.models.weber_fechner import *
 
 # model inventory
 
 model_inventory = dict()
-model_inventory["weber_fechner"] = (weber_fechner_metadata(),
-                                    weber_fechner_data,
-                                    weber_fechner_experiment)
+model_inventory["weber_fechner"] = (
+    weber_fechner_metadata(),
+    weber_fechner_data,
+    weber_fechner_experiment,
+)
 
-model_inventory["stevens_power_law"] = (stevens_power_law_metadata(),
-                                    stevens_power_law_data,
-                                    stevens_power_law_experiment)
+model_inventory["stevens_power_law"] = (
+    stevens_power_law_metadata(),
+    stevens_power_law_data,
+    stevens_power_law_experiment,
+)
 
-model_inventory["expected_value"] = (expected_value_theory_metadata(),
-                                    expected_value_theory_data,
-                                    expected_value_theory_experiment)
+model_inventory["expected_value"] = (
+    expected_value_theory_metadata(),
+    expected_value_theory_data,
+    expected_value_theory_experiment,
+)
 
-model_inventory["prospect_theory"] = (prospect_theory_metadata(),
-                                    prospect_theory_data,
-                                    prospect_theory_experiment)
+model_inventory["prospect_theory"] = (
+    prospect_theory_metadata(),
+    prospect_theory_data,
+    prospect_theory_experiment,
+)
 
-model_inventory["exp_learning"] = (exp_learning_metadata(),
-                                    exp_learning_data,
-                                    exp_learning_experiment)
+model_inventory["exp_learning"] = (
+    exp_learning_metadata(),
+    exp_learning_data,
+    exp_learning_experiment,
+)
 
-model_inventory["stroop_model"] = (stroop_model_metadata(),
-                                    stroop_model_data,
-                                    stroop_model_experiment)
+model_inventory["stroop_model"] = (
+    stroop_model_metadata(),
+    stroop_model_data,
+    stroop_model_experiment,
+)
 
-model_inventory["task_switching"] = (task_switching_metadata(),
-                                    task_switching_data,
-                                    task_switching_experiment)
+model_inventory["task_switching"] = (
+    task_switching_metadata(),
+    task_switching_data,
+    task_switching_experiment,
+)
 
-model_inventory["evc_coged"] = (evc_coged_metadata(),
-                                    evc_coged_data,
-                                    evc_coged_experiment)
+model_inventory["evc_coged"] = (
+    evc_coged_metadata(),
+    evc_coged_data,
+    evc_coged_experiment,
+)
 
-model_inventory["evc_demand_selection"] = (evc_demand_metadata(),
-                                    evc_demand_data,
-                                    evc_demand_experiment)
+model_inventory["evc_demand_selection"] = (
+    evc_demand_metadata(),
+    evc_demand_data,
+    evc_demand_experiment,
+)
 
-model_inventory["evc_congruency"] = (evc_congruency_metadata(),
-                                    evc_congruency_data,
-                                    evc_congruency_experiment)
+model_inventory["evc_congruency"] = (
+    evc_congruency_metadata(),
+    evc_congruency_data,
+    evc_congruency_experiment,
+)
 
-model_inventory["shepard_luce_choice"] = (shepard_luce_metadata(),
-                                    shepard_luce_data,
-                                    shepard_luce_experiment)
+model_inventory["shepard_luce_choice"] = (
+    shepard_luce_metadata(),
+    shepard_luce_data,
+    shepard_luce_experiment,
+)
 
-model_inventory["tva"] = (tva_metadata(),
-                          tva_data,
-                          tva_experiment)
+model_inventory["tva"] = (tva_metadata(), tva_data, tva_experiment)
 
 plot_inventory = dict()
 plot_inventory["weber_fechner"] = (plot_weber_fechner, "Weber-Fechner Law")
@@ -75,6 +95,3 @@ plot_inventory["evc_demand_selection"] = (plot_evc_demand, "EVC: Demand Selectio
 plot_inventory["evc_congruency"] = (plot_evc_congruency, "EVC: Distractor Effect")
 plot_inventory["shepard_luce_choice"] = (plot_shepard_luce, "Shepard-Luce Choice Ratio")
 plot_inventory["tva"] = (plot_tva, "Visual Attention Model")
-
-
-

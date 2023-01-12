@@ -1,37 +1,43 @@
-from studies.cogsci2023.models.models import model_inventory
-from sklearn.model_selection import train_test_split
-from studies.cogsci2023.utils import fit_theorist, get_seed_experimentalist, get_experimentalist, \
-    get_MSE
-import numpy as np
 import pickle
+
+import numpy as np
+from sklearn.model_selection import train_test_split
+
+from studies.cogsci2023.models.models import model_inventory
+from studies.cogsci2023.utils import (
+    fit_theorist,
+    get_experimentalist,
+    get_MSE,
+    get_seed_experimentalist,
+)
 
 # TODO: add small level of noise to models (e.g., 0.01)
 
 # META PARAMETERS
-num_cycles = 3                  # number of cycles (20)
-samples_for_seed = 20           # number of seed data_closed_loop points (20)
-samples_per_cycle = 20           # number of data_closed_loop points chosen per cycle (20)
-theorist_epochs = 500            # number of epochs for BMS (500)
-repetitions = 1                 # specifies how many times to repeat the study (20)
+num_cycles = 3  # number of cycles (20)
+samples_for_seed = 20  # number of seed data_closed_loop points (20)
+samples_per_cycle = 20  # number of data_closed_loop points chosen per cycle (20)
+theorist_epochs = 500  # number of epochs for BMS (500)
+repetitions = 1  # specifies how many times to repeat the study (20)
 
 # what I learned
 # - increasing model noise doesn't help, it just puts an upper limit on the final validation error
 
 # SELECT THEORIST
 # OPTIONS: BMS, DARTS
-theorist_name  = "BMS"
+theorist_name = "BMS"
 
 # SELECT GROUND TRUTH MODEL
-ground_truth_name = "prospect_theory" # OPTIONS: see models.py
+ground_truth_name = "prospect_theory"  # OPTIONS: see models.py
 
 experimentalists = [
-                    # 'random',
-                    'dissimilarity',
-                    'inverse dissimilarity',
-                    # 'falsification',
-                    # 'model disagreement',
-                    # 'least confident',
-                    ]
+    # 'random',
+    "dissimilarity",
+    "inverse dissimilarity",
+    # 'falsification',
+    # 'model disagreement',
+    # 'least confident',
+]
 
 for experimentalist_name in experimentalists:
 
@@ -57,9 +63,9 @@ for experimentalist_name in experimentalists:
         # Since we know the GT, we can use the full dataset for training
 
         # get seed experimentalist
-        experimentalist_seed = get_seed_experimentalist(X_full,
-                                                        metadata,
-                                                        samples_for_seed)
+        experimentalist_seed = get_seed_experimentalist(
+            X_full, metadata, samples_for_seed
+        )
 
         # generate seed data_closed_loop
         X = experimentalist_seed.run()
@@ -80,13 +86,15 @@ for experimentalist_name in experimentalists:
         for cycle in range(num_cycles):
 
             # generate experimentalist
-            experimentalist = get_experimentalist(experimentalist_name,
-                                                  X,
-                                                  y,
-                                                  X_full,
-                                                  metadata,
-                                                  theorist,
-                                                  samples_per_cycle)
+            experimentalist = get_experimentalist(
+                experimentalist_name,
+                X,
+                y,
+                X_full,
+                metadata,
+                theorist,
+                samples_per_cycle,
+            )
 
             # get new experiment conditions
             X_new = experimentalist.run()
@@ -103,16 +111,24 @@ for experimentalist_name in experimentalists:
 
             # evaluate theory fit
             MSE_log.append(get_MSE(theorist, X_full, y_full))
-            cycle_log.append(cycle+1)
+            cycle_log.append(cycle + 1)
             repetition_log.append(rep)
             theory_log.append(theorist)
             conditions_log.append(X)
             observations_log.append(y)
 
     # save and load pickle file
-    file_name = "data_closed_loop/" + ground_truth_name + "_" + theorist_name +  "_" + experimentalist_name + ".pickle"
+    file_name = (
+        "data_closed_loop/"
+        + ground_truth_name
+        + "_"
+        + theorist_name
+        + "_"
+        + experimentalist_name
+        + ".pickle"
+    )
 
-    with open(file_name, 'wb') as f:
+    with open(file_name, "wb") as f:
         # simulation configuration
         configuration = dict()
         configuration["theorist_name"] = theorist_name
@@ -124,21 +140,14 @@ for experimentalist_name in experimentalists:
         configuration["repetitions"] = repetitions
         # configuration["test_size"] = test_size
 
-        object_list = [configuration,
-                       MSE_log,
-                       cycle_log,
-                       repetition_log,
-                       theory_log,
-                       conditions_log,
-                       observations_log]
+        object_list = [
+            configuration,
+            MSE_log,
+            cycle_log,
+            repetition_log,
+            theory_log,
+            conditions_log,
+            observations_log,
+        ]
 
         pickle.dump(object_list, f)
-
-
-
-
-
-
-
-
-
