@@ -377,9 +377,18 @@ class ArrayPipelineWrapper(Pipeline):
         ...     ("mask", lambda x: x[[True, False, True, True, False]]),
         ...     ("echo", echo)
         ... ], array_type="numpy.array")
-        >>> list(p2.run(range(5)))  # doctest: +NORMALIZE_WHITESPACE
-        within pipeline: x=array([[0], [2], [3]])
+        >>> p2_output = p2.run(range(5))  # doctest: +NORMALIZE_WHITESPACE
+        within the pipeline, x is a numpy.array: x=array([[0], [2], [3]])
+        >>> list(p2_output)
         [array([0]), array([2]), array([3])]
+
+        You can also use this with a pooler which produces arrays:
+        >>> p3 = ArrayPipelineWrapper([
+        ...     ("pool", np.arange(10).reshape(-1, 2)),
+        ...     ("mask", lambda cs: cs[[True, False, True, True, False]])
+        ... ])
+        >>> list(p3.run())
+        [array([0, 1]), array([4, 5]), array([6, 7])]
 
     """
 
@@ -389,16 +398,27 @@ class ArrayPipelineWrapper(Pipeline):
         params: Optional[Dict[str, Any]] = None,
         array_type: Literal["numpy.array", "numpy.rec.array"] = "numpy.rec.array",
     ):
-        if steps is None:
-            steps = []
+        steps_with_wrappers: List[_StepType] = []
 
-        steps_with_wrappers = list(
-            chain(
-                [("sequence_to_array", partial(sequence_to_array, type=array_type))],
-                steps,
-                [("array_to_sequence", partial(array_to_sequence))],
+        if (
+            steps is None
+            or len(steps) == 0
+            or not isinstance(steps[0][1], (np.ndarray, np.recarray))
+        ):
+            steps_with_wrappers.extend(
+                [("sequence_to_array", partial(sequence_to_array, type=array_type))]
             )
-        )
+        else:
+            pass  # we don't need to convert the input – we just assume the first step is a pool
+            # which produces a valid array
+
+        if steps is None:
+            pass
+        else:
+            steps_with_wrappers.extend(steps)
+
+        steps_with_wrappers.extend([("array_to_sequence", partial(array_to_sequence))])
+
         super().__init__(steps=steps_with_wrappers, params=params)
         return
 
