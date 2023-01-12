@@ -28,7 +28,7 @@ repetitions = 20  # specifies how many times to repeat the study (20)
 theorist_name = "BMS"
 
 # SELECT GROUND TRUTH MODEL
-ground_truth_name = "prospect_theory"  # OPTIONS: see models.py
+ground_truth_name = "tva"  # OPTIONS: see models.py
 
 experimentalists = [
     'random',
