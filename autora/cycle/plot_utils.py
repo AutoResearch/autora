@@ -207,7 +207,8 @@ def plot_results_panel_2d(
         steps: Number of steps to define the condition space to plot the theory.
         wrap: Number of panels to appear in a row. Example: 9 panels with wrap=3 results in a
                 3x3 grid.
-        query: List to query the cycles to plot
+        query: Query which cycles to plot with either a List of indexes or a slice. The slice must
+                be constructed with the `slice()` function or `np.s_[]` index expression.
         subplot_kw: Dictionary of keywords to pass to matplotlib 'subplot' function
         scatter_previous_kw: Dictionary of keywords to pass to matplotlib 'scatter' function that
                     plots the data points from previous cycles.
