@@ -9,7 +9,7 @@ from autora.variable import DV, IV, ValueType, VariableCollection
 # Stroop Model
 stroop_stimulus_resolution = 10
 stroop_choice_temperature = 1.0
-added_noise = 0
+added_noise = 0.01
 
 
 def stroop_model_metadata():
@@ -294,7 +294,6 @@ def run_exp(model):
 
 
 def plot_stroop_model(model=None):
-
     original_model = Stroop_Model(stroop_choice_temperature)
 
     # collect plot data for orignal model
@@ -368,12 +367,16 @@ def plot_stroop_model(model=None):
 
     # plot
     import matplotlib.pyplot as plt
+    import matplotlib.colors as mcolors
+
+    colors = mcolors.TABLEAU_COLORS
+    col_keys = list(colors.keys())
 
     plt.plot(x_data, y_data_col, label=legend[0])
     plt.plot(x_data, y_data_wrd, label=legend[1])
     if model is not None:
-        plt.plot(x_data, y_data_col_recovered, "--", label=legend[2])
-        plt.plot(x_data, y_data_wrd_recovered, "--", label=legend[3])
+        plt.plot(x_data, y_data_col_recovered, "--", label=legend[2], c=colors[col_keys[0]])
+        plt.plot(x_data, y_data_wrd_recovered, "--", label=legend[3], c=colors[col_keys[0]])
     plt.xlim(x_limit)
     plt.ylim(y_limit)
     plt.ylabel(y_label, fontsize="large")

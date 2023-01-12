@@ -2,7 +2,7 @@ import numpy as np
 from autora.variable import DV, IV, ValueType, VariableCollection
 
 # general meta parameters
-added_noise = 0
+added_noise = 0.01
 
 # shepard-luce choice parameters
 tva_resolution = 10
@@ -117,6 +117,11 @@ def tva_data(metadata):
 
 def plot_tva(model = None):
     import matplotlib.pyplot as plt
+    import matplotlib.colors as mcolors
+
+    colors = mcolors.TABLEAU_COLORS
+    col_keys = list(colors.keys())
+
     metadata = tva_metadata()
 
     x_similarity_cat_1 = np.linspace(metadata.independent_variables[0].value_range[0],
@@ -126,7 +131,7 @@ def plot_tva(model = None):
     y_similarity_cat_1 = 0.5
     y_similarity_target_list = [0, 5, 10]
 
-    for y_similarity_target in y_similarity_target_list:
+    for idx, y_similarity_target in enumerate(y_similarity_target_list):
 
         X = np.zeros((len(x_similarity_cat_1), 3))
 
@@ -136,12 +141,14 @@ def plot_tva(model = None):
 
         y = tva_experiment(X, std=0)
         plt.plot(x_similarity_cat_1.reshape((len(x_similarity_cat_1), 1)), y,
-                 label=f"Distractor Similarity = {y_similarity_target} (Original)")
+                 label=f"Distractor Similarity = {y_similarity_target} (Original)",
+                 c=colors[col_keys[idx]])
 
         if model is not None:
             y = model.predict(X)
             plt.plot(x_similarity_cat_1.reshape((len(x_similarity_cat_1), 1)), y,
-                     label=f"Distractor Similarity = {y_similarity_target} (Recovered)")
+                     label=f"Distractor Similarity = {y_similarity_target} (Recovered)",
+                     c=colors[col_keys[idx]], linestyle="--")
 
     x_limit = [np.min(x_similarity_cat_1), np.max(x_similarity_cat_1)]
     y_limit = [0, 1]

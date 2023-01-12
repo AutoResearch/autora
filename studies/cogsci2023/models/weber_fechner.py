@@ -2,7 +2,7 @@ import numpy as np
 from autora.variable import DV, IV, ValueType, VariableCollection
 
 # general meta parameters
-added_noise = 0
+added_noise = 0.01
 
 # weber-fechner parameters
 weber_resolution = 100
@@ -73,20 +73,26 @@ def weber_fechner_data(metadata):
 
 def plot_weber_fechner(model = None):
     import matplotlib.pyplot as plt
+    import matplotlib.colors as mcolors
+
+    colors = mcolors.TABLEAU_COLORS
+    col_keys = list(colors.keys())
+
     metadata = weber_fechner_metadata()
 
     S0_list = [1, 2, 4]
     delta_S = np.linspace(0, 5, 100)
 
-    for S0_value in S0_list:
+    for idx, S0_value in enumerate(S0_list):
         S0 = S0_value + np.zeros(delta_S.shape)
         S1 = S0 + delta_S
         X = np.array([S0, S1]).T
         y = weber_fechner_experiment(X, std=0)
-        plt.plot(delta_S, y, label=f"$S_0 = {S0_value}$ (Original)")
+        plt.plot(delta_S, y, label=f"$S_0 = {S0_value}$ (Original)", c=colors[col_keys[idx]])
         if model is not None:
             y = model.predict(X)
-            plt.plot(delta_S, y, label=f"$S_0 = {S0_value}$ (Recovered)")
+            plt.plot(delta_S, y, label=f"$S_0 = {S0_value}$ (Recovered)",
+                     c=colors[col_keys[idx]], linestyle="--")
 
     x_limit = [0, metadata.independent_variables[0].value_range[1]]
     y_limit = [0, 2]

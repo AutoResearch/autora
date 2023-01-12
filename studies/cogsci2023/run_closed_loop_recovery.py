@@ -11,14 +11,12 @@ from studies.cogsci2023.utils import (
     get_seed_experimentalist,
 )
 
-# TODO: add small level of noise to models (e.g., 0.01)
-
 # META PARAMETERS
-num_cycles = 3  # number of cycles (20)
+num_cycles = 20  # number of cycles (20)
 samples_for_seed = 20  # number of seed data_closed_loop points (20)
 samples_per_cycle = 20  # number of data_closed_loop points chosen per cycle (20)
 theorist_epochs = 500  # number of epochs for BMS (500)
-repetitions = 1  # specifies how many times to repeat the study (20)
+repetitions = 20  # specifies how many times to repeat the study (20)
 
 # what I learned
 # - increasing model noise doesn't help, it just puts an upper limit on the final validation error
@@ -28,15 +26,15 @@ repetitions = 1  # specifies how many times to repeat the study (20)
 theorist_name = "BMS"
 
 # SELECT GROUND TRUTH MODEL
-ground_truth_name = "prospect_theory"  # OPTIONS: see models.py
+ground_truth_name = "tva"  # OPTIONS: see models.py
 
 experimentalists = [
-    # 'random',
+    'random',
     "dissimilarity",
-    "inverse dissimilarity",
-    # 'falsification',
-    # 'model disagreement',
-    # 'least confident',
+    # "inverse dissimilarity",
+    'falsification',
+    'model disagreement',
+    'least confident',
 ]
 
 for experimentalist_name in experimentalists:

@@ -2,7 +2,7 @@ import numpy as np
 from autora.variable import DV, IV, ValueType, VariableCollection
 
 # general meta parameters
-added_noise = 0
+added_noise = 0.01
 
 # EVC COGED parameters
 evc_congruency_resolution = 10
@@ -145,6 +145,7 @@ def evc_congruency_data(metadata):
 
 def plot_evc_congruency(model = None):
     import matplotlib.pyplot as plt
+    import matplotlib.colors as mcolors
 
     metadata = evc_congruency_metadata()
 
@@ -153,7 +154,7 @@ def plot_evc_congruency(model = None):
                                   metadata.independent_variables[0].value_range[1], 100)
     motion_coherence = -0.2
 
-    for color_reward in color_rewards:
+    for idx, color_reward in enumerate(color_rewards):
 
         X = np.zeros((len(color_coherence), 3))
         X[:, 0] = color_coherence
@@ -161,12 +162,15 @@ def plot_evc_congruency(model = None):
         X[:, 2] = color_reward
 
         y = evc_congruency_experiment(X, std=0)
+        colors = mcolors.TABLEAU_COLORS
+        col_keys = list(colors.keys())
         plt.plot(color_coherence, y,
-                 label=f"Reward = {color_reward} (Original)")
+                 label=f"Reward = {color_reward} (Original)", c=colors[col_keys[idx]])
         if model is not None:
             y = model.predict(X)
             plt.plot(color_coherence, y,
-                     label=f"Reward = {color_reward} (Recovered)")
+                     label=f"Reward = {color_reward} (Recovered)",
+                     c=colors[col_keys[idx]], linestyle="--")
 
     x_limit = [np.min(color_coherence), np.max(color_coherence)]
     y_limit = [0, 1]

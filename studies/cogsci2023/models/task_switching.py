@@ -7,7 +7,7 @@ priming_default = 0.3  # default for task priming
 choice_temperature = 0.2 # temperature for softmax when computing performance of current task
 minimum_task_control = 0.15 # minimum task control
 c = 1.5  # constant for task activation
-noise_sd = 0.1  # input noise standard deviation for task input
+noise_sd = 0.01  # input noise standard deviation for task input # 0.1
 
 # Task Switching Model by
 # Yeung, N., & Monsell, S. (2003). Task switching and the control of response conflict. Psychological review, 110(4), 769.
@@ -180,11 +180,17 @@ def plot_task_switching(model = None):
 
     # plot
     import matplotlib.pyplot as plt
-    plt.plot(x_data, word_performance, label=legend[0])
-    plt.plot(x_data, color_performance, label=legend[1])
+    import matplotlib.colors as mcolors
+
+    colors = mcolors.TABLEAU_COLORS
+    col_keys = list(colors.keys())
+
+
+    plt.plot(x_data, word_performance, label=legend[0], c=colors[col_keys[0]])
+    plt.plot(x_data, color_performance, label=legend[1], c=colors[col_keys[1]])
     if model is not None:
-        plt.plot(x_data, word_performance_recovered, '--', label=legend[2])
-        plt.plot(x_data, color_performance_recovered, '--', label=legend[3])
+        plt.plot(x_data, word_performance_recovered, '--', label=legend[2], c=colors[col_keys[0]])
+        plt.plot(x_data, color_performance_recovered, '--', label=legend[3], c=colors[col_keys[1]])
     plt.xlim([0.5 , 2.5])
     plt.ylim([0, 50])
     plt.ylabel("Error Rate (%)", fontsize="large")

@@ -2,7 +2,7 @@ import numpy as np
 from autora.variable import DV, IV, ValueType, VariableCollection
 
 # general meta parameters
-added_noise = 0
+added_noise = 0.01
 
 # EVC COGED parameters
 evc_coged_resolution = 20
@@ -152,13 +152,15 @@ def evc_coged_data(metadata):
 
 def plot_evc_coged(model = None):
     import matplotlib.pyplot as plt
+    import matplotlib.colors as mcolors
 
     task_automaticity_low_demand_list = [0.5, 1, 2]
     baseline_reward_high_demand = 1.0
     task_automaticity_high_demand = np.linspace(0,
                                                 0.5, 100)
-
-    for task_automaticity_low_demand in task_automaticity_low_demand_list:
+    colors = mcolors.TABLEAU_COLORS
+    col_keys = list(colors.keys())
+    for idx, task_automaticity_low_demand in enumerate(task_automaticity_low_demand_list):
 
         X = np.zeros((len(task_automaticity_high_demand), 3))
         X[:, 0] = task_automaticity_high_demand
@@ -171,13 +173,15 @@ def plot_evc_coged(model = None):
 
         plt.plot(task_difficulty,
                  subjective_value,
-                 label=f"Automaticity of Easy Task = {task_automaticity_low_demand} (Original)")
+                 label=f"Automaticity of Easy Task = {task_automaticity_low_demand} (Original)",
+                 c=colors[col_keys[idx]])
         if model is not None:
             y = model.predict(X)
             subjective_value = y / baseline_reward_high_demand
             plt.plot(task_difficulty,
                      subjective_value,
-                     label=f"Automaticity of Easy Task = {task_automaticity_low_demand} (Recovered)")
+                     label=f"Automaticity of Easy Task = {task_automaticity_low_demand} (Recovered)",
+                     c=colors[col_keys[idx]], linestyle="--")
 
     x_limit = [np.min(task_difficulty), np.max(task_difficulty)]
     y_limit = [0, 1]

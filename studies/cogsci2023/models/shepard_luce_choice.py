@@ -2,7 +2,7 @@ import numpy as np
 from autora.variable import DV, IV, ValueType, VariableCollection
 
 # general meta parameters
-added_noise = 0
+added_noise = 0.01
 
 # shepard-luce choice parameters
 shepard_luce_resolution = 10
@@ -133,6 +133,8 @@ def shepard_luce_data(metadata):
 
 def plot_shepard_luce(model = None):
     import matplotlib.pyplot as plt
+    import matplotlib.colors as mcolors
+
     metadata = shepard_luce_metadata()
 
     similarity_A1 = np.linspace(metadata.independent_variables[0].value_range[0],
@@ -145,7 +147,9 @@ def plot_shepard_luce(model = None):
     similarity_B2 = 0
     focus = 1.0
 
-    for similarity_B1 in similarity_B1_list:
+    colors = mcolors.TABLEAU_COLORS
+    col_keys = list(colors.keys())
+    for idx, similarity_B1 in enumerate(similarity_B1_list):
         # similarity_B2 = 1 - similarity_B1
         X = np.zeros((len(similarity_A1), 5))
 
@@ -156,11 +160,14 @@ def plot_shepard_luce(model = None):
         X[:,4] = focus
 
         y = shepard_luce_experiment(X, std=0)
-        plt.plot(similarity_A1.reshape((len(similarity_A1), 1)), y, label=f"Similarity to B1 = {similarity_B1} (Original)")
+        plt.plot(similarity_A1.reshape((len(similarity_A1), 1)), y,
+                 label=f"Similarity to B1 = {similarity_B1} (Original)",
+                 c=colors[col_keys[idx]])
 
         if model is not None:
             y = model.predict(X)
-            plt.plot(similarity_A1, y, label=f"Similarity to B1 = {similarity_B1} (Recovered)")
+            plt.plot(similarity_A1, y, label=f"Similarity to B1 = {similarity_B1} (Recovered)",
+                     c=colors[col_keys[idx]])
 
     x_limit = [np.min(similarity_A1), np.max(similarity_A1)]
     y_limit = [0, 1]

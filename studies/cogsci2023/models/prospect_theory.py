@@ -3,7 +3,7 @@ import numpy as np
 from studies.cogsci2023.models.expected_value import expected_value_theory_metadata
 
 # general meta parameters
-added_noise = 0
+added_noise = 0.01
 
 # prospect theory parameters
 # parameters taken from:
@@ -113,15 +113,17 @@ def prospect_theory_data(metadata):
 
 def plot_prospect_theory(model=None):
     import matplotlib.pyplot as plt
+    import matplotlib.colors as mcolors
 
     metadata = prospect_theory_metadata()
 
     v_a_list = [-0.5, 0.5, 1]
-    v_b = 0.5
-    p_b = 0.5
     p_a = np.linspace(0, 1, 100)
 
-    for v_a in v_a_list:
+    v_b = 0.5
+    p_b = 0.5
+
+    for idx, v_a in enumerate(v_a_list):
         X = np.zeros((len(p_a), 4))
         X[:, 0] = v_a
         X[:, 1] = p_a
@@ -129,10 +131,12 @@ def plot_prospect_theory(model=None):
         X[:, 3] = p_b
 
         y = prospect_theory_experiment(X, std=0)
-        plt.plot(p_a, y, label=f"$V(A) = {v_a}$ (Original)")
+        colors = mcolors.TABLEAU_COLORS
+        col_keys = list(colors.keys())
+        plt.plot(p_a, y, label=f"$V(A) = {v_a}$ (Original)", c=colors[col_keys[idx]])
         if model is not None:
             y = model.predict(X)
-            plt.plot(p_a, y, label=f"$V(A) = {v_a}$ (Recovered)")
+            plt.plot(p_a, y, label=f"$V(A) = {v_a}$ (Recovered)", c=colors[col_keys[idx]], linestyle="--")
 
     x_limit = [0, metadata.independent_variables[1].value_range[1]]
     y_limit = [0, 1]

@@ -2,7 +2,7 @@ import numpy as np
 from autora.variable import DV, IV, ValueType, VariableCollection
 
 # general meta parameters
-added_noise = 0
+added_noise = 0.01
 
 # EVC COGED parameters
 evc_demand_resolution = 10
@@ -161,8 +161,9 @@ def evc_demand_data(metadata):
 
 def plot_evc_demand(model = None):
     import matplotlib.pyplot as plt
+    import matplotlib.colors as mcolors
 
-    metadata = evc_coged_metadata()
+    metadata = evc_demand_metadata()
 
     task_A_reward_list = [1, 2, 3]
     task_B_reward = task_A_reward_list[1]
@@ -173,7 +174,7 @@ def plot_evc_demand(model = None):
                           - metadata.independent_variables[0].value_range[0]) / 2
 
 
-    for task_A_reward in task_A_reward_list:
+    for idx, task_A_reward in enumerate(task_A_reward_list):
 
         X = np.zeros((len(task_A_automaticity_list), 4))
         X[:, 0] = task_A_automaticity_list
@@ -182,13 +183,14 @@ def plot_evc_demand(model = None):
         X[:, 3] = task_B_reward
 
         y = evc_demand_experiment(X, std=0)
-
+        colors = mcolors.TABLEAU_COLORS
+        col_keys = list(colors.keys())
         plt.plot(task_A_automaticity_list, y,
-                 label=f"Reward for Task A = {task_A_reward}(Original)")
+                 label=f"Reward for Task A = {task_A_reward}(Original)", c=colors[col_keys[idx]])
         if model is not None:
             y = model.predict(X)
             plt.plot(task_A_automaticity_list, y,
-                     label=f"Reward for Task A = {task_A_reward}(Recovered)")
+                     label=f"Reward for Task A = {task_A_reward}(Recovered)", c=colors[col_keys[idx]], linestyle="--")
 
     x_limit = [np.min(task_A_automaticity_list), np.max(task_A_automaticity_list)]
     y_limit = [0, 1]

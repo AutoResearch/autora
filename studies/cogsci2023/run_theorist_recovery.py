@@ -8,12 +8,12 @@ repetitions = 20                 # specifies how many times to repeat the study 
 test_size = 0.2                # proportion of test set size to training set size
 
 # SELECT GROUND TRUTH MODEL
-ground_truth_name = "prospect_theory" # OPTIONS: see models.py
+ground_truth_name = "stroop_model" # OPTIONS: see models.py
 
 theorists = [
              'MLP',
              # 'DARTS 2 Nodes'
-             # 'DARTS 3 Nodes',
+             'DARTS 3 Nodes',
              'BMS',
              'BMS Fixed Root'
              ]

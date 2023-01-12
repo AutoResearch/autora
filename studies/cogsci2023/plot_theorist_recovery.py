@@ -87,4 +87,5 @@ if ground_truth_name not in model_inventory.keys():
 (metadata, data_fnc, experiment) = model_inventory[ground_truth_name]
 plot_fnc(best_theory)
 
-
+print(best_theory.latex())
+print(best_theory.__repr__())
