@@ -278,7 +278,7 @@ def plot_results_panel_2d(
     condition_space = _generate_condition_space(cycle, steps=steps)
 
     # Get theory predictions over space
-    d_predictions = _theory_predict(cycle, condition_space)
+    l_predictions = _theory_predict(cycle, condition_space)
 
     # Cycle Indexing
     cycle_idx = list(range(len(cycle.data.theories)))
@@ -321,7 +321,7 @@ def plot_results_panel_2d(
 
             # ---Plot Theory---
             conditions = condition_space[:, iv[0]]
-            ax.plot(conditions, d_predictions[i_cycle], **d_kw["plot_theory_kw"])
+            ax.plot(conditions, l_predictions[i_cycle], **d_kw["plot_theory_kw"])
 
             # Label Panels
             ax.text(
