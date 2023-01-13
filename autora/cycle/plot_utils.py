@@ -1,6 +1,6 @@
 import inspect
 from itertools import product
-from typing import Callable, List, Optional, Sequence, Tuple
+from typing import Callable, List, Optional, Sequence, Tuple, Union
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -185,6 +185,7 @@ def plot_results_panel_2d(
     dv_name: Optional[str] = None,
     steps: int = 50,
     wrap: int = 4,
+    query: Optional[Union[List, slice]] = None,
     subplot_kw: dict = {},
     scatter_previous_kw: dict = {},
     scatter_current_kw: dict = {},
@@ -206,6 +207,8 @@ def plot_results_panel_2d(
         steps: Number of steps to define the condition space to plot the theory.
         wrap: Number of panels to appear in a row. Example: 9 panels with wrap=3 results in a
                 3x3 grid.
+        query: Query which cycles to plot with either a List of indexes or a slice. The slice must
+                be constructed with the `slice()` function or `np.s_[]` index expression.
         subplot_kw: Dictionary of keywords to pass to matplotlib 'subplot' function
         scatter_previous_kw: Dictionary of keywords to pass to matplotlib 'scatter' function that
                     plots the data points from previous cycles.
@@ -217,7 +220,6 @@ def plot_results_panel_2d(
     Returns: matplotlib figure
 
     """
-    n_cycles = len(cycle.data.theories)
 
     # ---Figure and plot params---
     # Set defaults, check and add user supplied keywords
@@ -274,29 +276,44 @@ def plot_results_panel_2d(
 
     # Generate IV space
     condition_space = _generate_condition_space(cycle, steps=steps)
+
     # Get theory predictions over space
     d_predictions = _theory_predict(cycle, condition_space)
 
+    # Cycle Indexing
+    cycle_idx = list(range(len(cycle.data.theories)))
+    if query:
+        if isinstance(query, list):
+            cycle_idx = query
+        elif isinstance(query, slice):
+            cycle_idx = cycle_idx[query]
+
     # Subplot configurations
-    if n_cycles < wrap:
-        shape = (1, n_cycles)
+    n_cycles_to_plot = len(cycle_idx)
+    if n_cycles_to_plot < wrap:
+        shape = (1, n_cycles_to_plot)
     else:
-        shape = (int(np.ceil(n_cycles / wrap)), wrap)
+        shape = (int(np.ceil(n_cycles_to_plot / wrap)), wrap)
     fig, axs = plt.subplots(*shape, **d_kw["subplot_kw"])
+    # Place axis object in an array if plotting single panel
+    if shape == (1, 1):
+        axs = np.array([axs])
 
     # Loop by panel
     for i, ax in enumerate(axs.flat):
-        if i + 1 <= n_cycles:
+        if i + 1 <= n_cycles_to_plot:
+            # Get index of cycle to plot
+            i_cycle = cycle_idx[i]
 
             # ---Plot observed data---
             # Independent variable values
             x_vals = df_observed.loc[:, iv[0]]
             # Dependent values masked by current cycle vs previous data
             dv_previous = np.ma.masked_where(
-                df_observed["cycle"] >= i, df_observed[dv[0]]
+                df_observed["cycle"] >= i_cycle, df_observed[dv[0]]
             )
             dv_current = np.ma.masked_where(
-                df_observed["cycle"] != i, df_observed[dv[0]]
+                df_observed["cycle"] != i_cycle, df_observed[dv[0]]
             )
             # Plotting scatter
             ax.scatter(x_vals, dv_previous, **d_kw["scatter_previous_kw"])
@@ -304,10 +321,12 @@ def plot_results_panel_2d(
 
             # ---Plot Theory---
             conditions = condition_space[:, iv[0]]
-            ax.plot(conditions, d_predictions[i], **d_kw["plot_theory_kw"])
+            ax.plot(conditions, d_predictions[i_cycle], **d_kw["plot_theory_kw"])
 
             # Label Panels
-            ax.text(0.05, 1, f"Cycle {i}", ha="left", va="top", transform=ax.transAxes)
+            ax.text(
+                0.05, 1, f"Cycle {i_cycle}", ha="left", va="top", transform=ax.transAxes
+            )
 
         else:
             ax.axis("off")
