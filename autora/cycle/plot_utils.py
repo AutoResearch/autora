@@ -130,25 +130,25 @@ def _generate_mesh_grid(cycle: Cycle, steps: int = 50) -> np.ndarray:
 
 def _theory_predict(
     cycle: Cycle, conditions: Sequence, predict_proba: bool = False
-) -> dict:
+) -> list:
     """
-    Gets theory predictions over conditions space and saves results of each cycle to a dictionary.
+    Gets theory predictions over conditions space and saves results of each cycle to a list.
     Args:
         cycle: AER Cycle object that has been run
         conditions: Condition space. Should be an array of grouped conditions.
         predict_proba: Use estimator.predict_proba method instead of estimator.predict.
 
-    Returns: dict
+    Returns: list
 
     """
-    d_predictions = {}
+    l_predictions = []
     for i, theory in enumerate(cycle.data.theories):
         if not predict_proba:
-            d_predictions[i] = theory.predict(conditions)
+            l_predictions.append(theory.predict(conditions))
         else:
-            d_predictions[i] = theory.predict_proba(conditions)
+            l_predictions.append(theory.predict_proba(conditions))
 
-    return d_predictions
+    return l_predictions
 
 
 def _check_replace_default_kw(default: dict, user: dict) -> dict:
