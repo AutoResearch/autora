@@ -75,6 +75,9 @@ def cycle_lr(ground_truth_1d):
         experiment_runner=example_synthetic_experiment_runner,
     )
 
+    # Run 10 iterations
+    cycle.run(10)
+
     return cycle
 
 
@@ -163,21 +166,20 @@ def test_2d_plot(cycle_lr):
     """
     Tests the 2d plotting functionality of plot_results_panel.
     """
-    cycle_lr.run(8)
     steps = 51
     fig = plot_results_panel_2d(
         cycle_lr, steps=steps, wrap=3, subplot_kw={"sharex": True, "sharey": True}
     )
 
-    # Should have 9 axes, 8 with data and the last turned off
-    assert len(fig.axes) == 9
-    assert sum([s.axison for s in fig.axes]) == 8
+    # Should have 12 axes, 10 with data and the last 2 turned off
+    assert len(fig.axes) == 12
+    assert sum([s.axison for s in fig.axes]) == 10
 
     # Check number of data points on each figure
     # Blue dots should start at 0 and augment by 5.
     # Orange should always be 5-this is the condition sampling rate set by the Experimentalist.
     l_counts = []
-    for axes in fig.axes[:-1]:
+    for axes in fig.axes[:-2]:
         blue_dots = (
             len(axes.collections[0].get_offsets().mask)
             - axes.collections[0].get_offsets().mask.any(axis=1).sum()
@@ -190,12 +192,23 @@ def test_2d_plot(cycle_lr):
     assert np.array_equal(
         np.array(l_counts),
         np.array(
-            [[0, 5], [5, 5], [10, 5], [15, 5], [20, 5], [25, 5], [30, 5], [35, 5]]
+            [
+                [0, 5],
+                [5, 5],
+                [10, 5],
+                [15, 5],
+                [20, 5],
+                [25, 5],
+                [30, 5],
+                [35, 5],
+                [40, 5],
+                [45, 5],
+            ]
         ),
     )
 
     # Test theory line is being plotted
-    for axes in fig.axes[:-1]:
+    for axes in fig.axes[:-2]:
         assert len(axes.lines[0].get_xdata()) == steps
         assert len(axes.lines[0].get_ydata()) == steps
 
@@ -236,7 +249,6 @@ def test_3d_plot(cycle_multi_lr):
 
 
 def test_score_functions(cycle_lr, ground_truth_1d):
-    cycle_lr.run(10)
     X_test = cycle_lr.data.metadata.independent_variables[0].allowed_values.reshape(
         -1, 1
     )
@@ -266,7 +278,6 @@ def test_score_functions(cycle_lr, ground_truth_1d):
 
 
 def test_cycle_score_plot(cycle_lr, ground_truth_1d):
-    cycle_lr.run(20)
     X_test = cycle_lr.data.metadata.independent_variables[0].allowed_values.reshape(
         -1, 1
     )
@@ -278,7 +289,7 @@ def test_cycle_score_plot(cycle_lr, ground_truth_1d):
 
     # Test line is plotted correctly
     axis = fig.axes[0]
-    assert len(axis.lines[0].get_xdata()) == 20
+    assert len(axis.lines[0].get_xdata()) == 10
     y_values = np.array(
         [
             0.98950589,
@@ -291,16 +302,6 @@ def test_cycle_score_plot(cycle_lr, ground_truth_1d):
             0.9848339,
             0.99359794,
             0.99691326,
-            0.99547573,
-            0.995913,
-            0.99711678,
-            0.99841886,
-            0.99737463,
-            0.9972299,
-            0.99772379,
-            0.99838647,
-            0.99853528,
-            0.99798914,
         ]
     )
     y_plotted = axis.lines[0].get_ydata()
@@ -342,9 +343,6 @@ def test_2d_plot_indexing(cycle_lr):
     """
     Tests the 2d plotting functionality of plot_results_panel.
     """
-    # l_test = list(np.arange(100))
-
-    cycle_lr.run(8)
     steps = 51
     fig = plot_results_panel_2d(
         cycle_lr,
@@ -363,7 +361,6 @@ def test_2d_plot_slicing(cycle_lr):
     """
     Tests the 2d plotting functionality of plot_results_panel.
     """
-    cycle_lr.run(10)
     steps = 51
 
     # Using Slice function
