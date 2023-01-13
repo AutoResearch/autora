@@ -21,7 +21,7 @@ from autora.variable import Variable, VariableCollection
 
 
 @pytest.fixture
-def ground_truth_1d():
+def ground_truth_1x():
     def ground_truth(xs):
         return xs + 1.0
 
@@ -29,7 +29,7 @@ def ground_truth_1d():
 
 
 @pytest.fixture
-def cycle_lr(ground_truth_1d):
+def cycle_lr(ground_truth_1x):
     random.seed(1)
 
     # Variable Metadata
@@ -61,7 +61,7 @@ def cycle_lr(ground_truth_1d):
         rng = np.random.default_rng(seed=180)
 
         def runner(xs):
-            return ground_truth_1d(xs) + rng.normal(0, 0.1, xs.shape)
+            return ground_truth_1x(xs) + rng.normal(0, 0.1, xs.shape)
 
         return runner
 
@@ -82,7 +82,7 @@ def cycle_lr(ground_truth_1d):
 
 
 @pytest.fixture
-def ground_truth_2d():
+def ground_truth_2x():
     def ground_truth(X):
         return X[:, 0] + (0.5 * X[:, 1]) + 1.0
 
@@ -90,7 +90,7 @@ def ground_truth_2d():
 
 
 @pytest.fixture
-def cycle_multi_lr(ground_truth_2d):
+def cycle_multi_lr(ground_truth_2x):
     random.seed(1)
 
     # def ground_truth(X):
@@ -126,7 +126,7 @@ def cycle_multi_lr(ground_truth_2d):
         rng = np.random.default_rng(seed=180)
 
         def runner(xs):
-            return ground_truth_2d(xs) + rng.normal(0, 0.25, xs.shape[0])
+            return ground_truth_2x(xs) + rng.normal(0, 0.25, xs.shape[0])
 
         return runner
 
@@ -248,11 +248,11 @@ def test_3d_plot(cycle_multi_lr):
     )
 
 
-def test_score_functions(cycle_lr, ground_truth_1d):
+def test_score_functions(cycle_lr, ground_truth_1x):
     X_test = cycle_lr.data.metadata.independent_variables[0].allowed_values.reshape(
         -1, 1
     )
-    y_test = ground_truth_1d(X_test)
+    y_test = ground_truth_1x(X_test)
 
     scores_default = cycle_default_score(cycle_lr, X_test, y_test)
     scores_specified = cycle_specified_score(r2_score, cycle_lr, X_test, y_test)
@@ -277,11 +277,11 @@ def test_score_functions(cycle_lr, ground_truth_1d):
     assert np.array_equal(scores_default, scores_specified)
 
 
-def test_cycle_score_plot(cycle_lr, ground_truth_1d):
+def test_cycle_score_plot(cycle_lr, ground_truth_1x):
     X_test = cycle_lr.data.metadata.independent_variables[0].allowed_values.reshape(
         -1, 1
     )
-    y_test = ground_truth_1d(X_test)
+    y_test = ground_truth_1x(X_test)
     fig = plot_cycle_score(cycle_lr, X_test, y_test)
 
     # Should have 1 axis
@@ -308,12 +308,12 @@ def test_cycle_score_plot(cycle_lr, ground_truth_1d):
     assert np.array_equal(np.around(y_plotted, 8), np.around(y_values, 8))
 
 
-def test_cycle_score_plot_multi_lr(cycle_multi_lr, ground_truth_2d):
+def test_cycle_score_plot_multi_lr(cycle_multi_lr, ground_truth_2x):
     cycle_multi_lr.run(12)
     X_test = np.array(
         list(grid_pool(cycle_multi_lr.data.metadata.independent_variables))
     )
-    y_test = ground_truth_2d(X_test)
+    y_test = ground_truth_2x(X_test)
     fig = plot_cycle_score(cycle_multi_lr, X_test, y_test)
 
     # Test line is plotted correctly
