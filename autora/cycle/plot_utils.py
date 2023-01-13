@@ -14,6 +14,7 @@ from .simple import SimpleCycle as Cycle
 # Change default plot styles
 rcParams["axes.spines.top"] = False
 rcParams["axes.spines.right"] = False
+rcParams["legend.frameon"] = False
 
 
 def _get_variable_index(
