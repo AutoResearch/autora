@@ -532,13 +532,13 @@ def cycle_specified_score(
     """
     # Get predictions
     if "y_pred" in inspect.signature(scorer).parameters.keys():
-        d_y_pred = _theory_predict(cycle, x_vals, predict_proba=False)
+        l_y_pred = _theory_predict(cycle, x_vals, predict_proba=False)
     elif "y_score" in inspect.signature(scorer).parameters.keys():
-        d_y_pred = _theory_predict(cycle, x_vals, predict_proba=True)
+        l_y_pred = _theory_predict(cycle, x_vals, predict_proba=True)
 
     # Score each cycle
     l_scores = []
-    for i, y_pred in d_y_pred.items():
+    for i, y_pred in l_y_pred:
         l_scores.append(scorer(y_true, y_pred, **kwargs))
 
     return l_scores
