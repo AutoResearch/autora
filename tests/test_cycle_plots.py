@@ -167,7 +167,7 @@ def test_check_replace_default_kw():
 
 def test_2d_plot(cycle_lr):
     """
-    Tests the 2d plotting functionality of plot_results_panel.
+    Tests plotting functionality of plot_results_panel_2d.
     """
     steps = 51
     fig = plot_results_panel_2d(
@@ -217,6 +217,9 @@ def test_2d_plot(cycle_lr):
 
 
 def test_3d_plot(cycle_multi_lr):
+    """
+    Tests plotting functionality of plot_results_panel_3d.
+    """
     steps = 20
     fig = plot_results_panel_3d(
         cycle_multi_lr,
@@ -251,6 +254,9 @@ def test_3d_plot(cycle_multi_lr):
 
 
 def test_score_functions(cycle_lr, ground_truth_1x):
+    """
+    Tests the scoring functions cycle_default_score and cycle_specified_score.
+    """
     X_test = cycle_lr.data.metadata.independent_variables[0].allowed_values.reshape(
         -1, 1
     )
@@ -280,6 +286,9 @@ def test_score_functions(cycle_lr, ground_truth_1x):
 
 
 def test_cycle_score_plot(cycle_lr, ground_truth_1x):
+    """
+    Tests plotting functionality of test_cycle_score_plot with a 2D linear regression.
+    """
     X_test = cycle_lr.data.metadata.independent_variables[0].allowed_values.reshape(
         -1, 1
     )
@@ -311,6 +320,9 @@ def test_cycle_score_plot(cycle_lr, ground_truth_1x):
 
 
 def test_cycle_score_plot_multi_lr(cycle_multi_lr, ground_truth_2x):
+    """
+    Tests plotting functionality of test_cycle_score_plot with multiple linear regression cycle.
+    """
     cycle_multi_lr.run(6)  # Run additional 6 times, total of 12 cycles
     X_test = np.array(
         list(grid_pool(cycle_multi_lr.data.metadata.independent_variables))
@@ -343,7 +355,7 @@ def test_cycle_score_plot_multi_lr(cycle_multi_lr, ground_truth_2x):
 
 def test_2d_plot_indexing(cycle_lr):
     """
-    Tests the 2d plotting functionality of plot_results_panel.
+    Test indexing of 2d plotter.
     """
     steps = 51
     fig = plot_results_panel_2d(
