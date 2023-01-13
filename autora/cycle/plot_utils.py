@@ -284,7 +284,7 @@ def plot_results_panel_2d(
     cycle_idx = list(range(len(cycle.data.theories)))
     if query:
         if isinstance(query, list):
-            cycle_idx = query
+            cycle_idx = [cycle_idx[s] for s in query]
         elif isinstance(query, slice):
             cycle_idx = cycle_idx[query]
 
