@@ -538,7 +538,7 @@ def cycle_specified_score(
 
     # Score each cycle
     l_scores = []
-    for i, y_pred in l_y_pred:
+    for y_pred in l_y_pred:
         l_scores.append(scorer(y_true, y_pred, **kwargs))
 
     return l_scores
