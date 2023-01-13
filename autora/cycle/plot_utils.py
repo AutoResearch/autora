@@ -434,7 +434,7 @@ def plot_results_panel_3d(
     x1, x2 = _generate_mesh_grid(cycle, steps=steps)
 
     # Get theory predictions over space
-    d_predictions = _theory_predict(cycle, np.column_stack((x1.ravel(), x2.ravel())))
+    l_predictions = _theory_predict(cycle, np.column_stack((x1.ravel(), x2.ravel())))
 
     # Subplot configurations
     if n_cycles < wrap:
@@ -464,7 +464,7 @@ def plot_results_panel_3d(
 
             # ---Plot Theory---
             ax.plot_surface(
-                x1, x2, d_predictions[i].reshape(x1.shape), **d_kw["surface_kw"]
+                x1, x2, l_predictions[i].reshape(x1.shape), **d_kw["surface_kw"]
             )
             # ---Labels---
             # Title
