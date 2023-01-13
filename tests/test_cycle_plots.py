@@ -361,7 +361,7 @@ def test_2d_plot_indexing(cycle_lr):
 
 def test_2d_plot_slicing(cycle_lr):
     """
-    Tests the 2d plotting functionality of plot_results_panel.
+    Test slicing of 2d plotter using built-in slice() function.
     """
     steps = 51
 
@@ -390,20 +390,15 @@ def test_2d_plot_slicing(cycle_lr):
     assert len(fig2.axes) == 6
     assert sum([s.axison for s in fig2.axes]) == 4
 
-    # Only final plot
-    fig3 = plot_results_panel_2d(
-        cycle_lr,
-        steps=steps,
-        query=slice(-1, None, None),
-        subplot_kw={"sharex": True, "sharey": True},
-    )
-    # Should have 1 axes
-    assert len(fig3.axes) == 1
-    assert sum([s.axison for s in fig3.axes]) == 1
 
-    # Using np.s_ Index Expression
+def test_2d_plot_slicing_np(cycle_lr):
+    """
+    Test slicing of 2d plotter using np.s_ Index Expression
+    """
+    steps = 51
+
     # Cycles 0, 2, 4, 6, 8
-    fig4 = plot_results_panel_2d(
+    fig1 = plot_results_panel_2d(
         cycle_lr,
         steps=steps,
         wrap=3,
@@ -411,10 +406,10 @@ def test_2d_plot_slicing(cycle_lr):
         subplot_kw={"sharex": True, "sharey": True},
     )
     # Should have 6 axes, 5 with data and the last turned off
-    assert len(fig4.axes) == 6
-    assert sum([s.axison for s in fig4.axes]) == 5
+    assert len(fig1.axes) == 6
+    assert sum([s.axison for s in fig1.axes]) == 5
 
-    fig5 = plot_results_panel_2d(
+    fig2 = plot_results_panel_2d(
         cycle_lr,
         steps=steps,
         wrap=3,
@@ -422,5 +417,42 @@ def test_2d_plot_slicing(cycle_lr):
         subplot_kw={"sharex": True, "sharey": True},
     )
     # Should have 6 axes, 4 with data
-    assert len(fig5.axes) == 6
-    assert sum([s.axison for s in fig5.axes]) == 4
+    assert len(fig2.axes) == 6
+    assert sum([s.axison for s in fig2.axes]) == 4
+
+
+def test_2d_plot_plot_single(cycle_lr):
+    """
+    Test query of 2d plotter for a single cycle.
+    """
+    steps = 51
+
+    # Using index
+    fig1 = plot_results_panel_2d(
+        cycle_lr,
+        steps=steps,
+        query=[9],
+        subplot_kw={"sharex": True, "sharey": True},
+    )
+    assert len(fig1.axes) == 1
+    assert sum([s.axison for s in fig1.axes]) == 1
+
+    # Using slice()
+    fig2 = plot_results_panel_2d(
+        cycle_lr,
+        steps=steps,
+        query=slice(-1, None, None),
+        subplot_kw={"sharex": True, "sharey": True},
+    )
+    assert len(fig2.axes) == 1
+    assert sum([s.axison for s in fig2.axes]) == 1
+
+    # Using np.s_ Index expression
+    fig3 = plot_results_panel_2d(
+        cycle_lr,
+        steps=steps,
+        query=np.s_[-1:],
+        subplot_kw={"sharex": True, "sharey": True},
+    )
+    assert len(fig3.axes) == 1
+    assert sum([s.axison for s in fig3.axes]) == 1
