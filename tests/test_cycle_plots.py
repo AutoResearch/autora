@@ -140,6 +140,9 @@ def cycle_multi_lr(ground_truth_2x):
         experiment_runner=example_synthetic_experiment_runner,
     )
 
+    # Run 6 iterations
+    cycle.run(6)
+
     return cycle
 
 
@@ -214,7 +217,6 @@ def test_2d_plot(cycle_lr):
 
 
 def test_3d_plot(cycle_multi_lr):
-    cycle_multi_lr.run(6)
     steps = 20
     fig = plot_results_panel_3d(
         cycle_multi_lr,
@@ -309,7 +311,7 @@ def test_cycle_score_plot(cycle_lr, ground_truth_1x):
 
 
 def test_cycle_score_plot_multi_lr(cycle_multi_lr, ground_truth_2x):
-    cycle_multi_lr.run(12)
+    cycle_multi_lr.run(6)  # Run additional 6 times, total of 12 cycles
     X_test = np.array(
         list(grid_pool(cycle_multi_lr.data.metadata.independent_variables))
     )
