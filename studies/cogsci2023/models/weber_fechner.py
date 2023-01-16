@@ -106,3 +106,5 @@ def plot_weber_fechner(model = None):
     plt.legend(loc=2, fontsize="medium")
     plt.title("Weber-Fechner Law", fontsize="x-large")
     plt.show()
+
+# X, y = weber_fechner_data(weber_fechner_metadata())

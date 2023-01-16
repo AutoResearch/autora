@@ -84,4 +84,4 @@ def plot_stevens_power_law(model = None):
     plt.show()
 
 
-#plot_stevens_power_law()
+# X, y = stevens_power_law_data(stevens_power_law_metadata())

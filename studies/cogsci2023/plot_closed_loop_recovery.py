@@ -44,6 +44,7 @@ for pickle in loaded_pickles:
     theory_log = pickle[4]
     conditions_log = pickle[5]
     observations_log = pickle[6]
+    experimentalist_log = pickle[7]
 
     for idx in range(len(MSE_log)):
 
@@ -54,7 +55,7 @@ for pickle in loaded_pickles:
         row = dict()
         row["Entry"] = entry
         row["Theorist"] = configuration["theorist_name"]
-        row["Experimentalist"] = configuration["experimentalist_name"]
+        row["Experimentalist"] = experimentalist_log[idx]
         row["Repetition"] = repetition_log[idx]
         row["Data Collection Cycle"] = cycle_log[idx]
         row["Mean Squared Error"] = MSE_log[idx]
