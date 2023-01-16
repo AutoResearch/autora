@@ -16,23 +16,26 @@ num_cycles = 20  # number of cycles (20)
 samples_for_seed = 20  # number of seed data_closed_loop points (20)
 samples_per_cycle = 20  # number of data_closed_loop points chosen per cycle (20)
 theorist_epochs = 500  # number of epochs for BMS (500)
-repetitions = 20  # specifies how many times to repeat the study (20)
+repetitions = 3  # specifies how many times to repeat the study (20)
 
 # what I learned
 # - increasing model noise doesn't help, it just puts an upper limit on the final validation error
 
+# todo: add back noise to prospect theory
+# todo: make sure resolution of all probed models is comparable (and potentially higher)
+
 # SELECT THEORIST
 # OPTIONS: BMS, DARTS
-theorist_name = "BMS"
+theorist_name = "BMS Fixed Root"
 
 # SELECT GROUND TRUTH MODEL
-ground_truth_name = "tva"  # OPTIONS: see models.py
+ground_truth_name = "prospect_theory"  # OPTIONS: see models.py
 
 experimentalists = [
+    'popper',
+    'falsification',
     'random',
     "dissimilarity",
-    # "inverse dissimilarity",
-    'falsification',
     'model disagreement',
     'least confident',
 ]
@@ -70,6 +73,7 @@ for experimentalist_name in experimentalists:
         y = experiment(X)
 
         # set up and fit theorist
+        print("Fitting theorist...")
         theorist = fit_theorist(X, y, theorist_name, metadata, theorist_epochs)
 
         # log initial performance
@@ -95,9 +99,11 @@ for experimentalist_name in experimentalists:
             )
 
             # get new experiment conditions
+            print("Running experimentalist...")
             X_new = experimentalist.run()
 
             # run experiment
+            print("Running experiment...")
             y_new = experiment(X_new)
 
             # combine old and new data_closed_loop
@@ -105,9 +111,11 @@ for experimentalist_name in experimentalists:
             y = np.row_stack([y, y_new])
 
             # fit theory
+            print("Fitting theorist...")
             theorist = fit_theorist(X, y, theorist_name, metadata, theorist_epochs)
 
             # evaluate theory fit
+            print("Evaluating fit...")
             MSE_log.append(get_MSE(theorist, X_full, y_full))
             cycle_log.append(cycle + 1)
             repetition_log.append(rep)

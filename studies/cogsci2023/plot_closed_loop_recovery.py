@@ -1,6 +1,6 @@
 # load data_closed_loop
-import os
 import pickle
+import os
 import numpy as np
 import pandas as pd
 from sklearn.manifold import TSNE
@@ -12,26 +12,26 @@ from studies.cogsci2023.models.models import model_inventory, plot_inventory
 # set the path to the data_closed_loop directory
 path = 'data_closed_loop/'
 ground_truth_name = 'prospect_theory' # OPTIONS: see models.py
-experimentalist = 'uncertainty' # for plotting
-
-# todo: for stats compute entropy over observations for each experimentalist
+experimentalist_name = 'random' # for plotting
 
 # create an empty list to store the loaded pickle files
 loaded_pickles = []
 
 # iterate through all files in the data_closed_loop directory
 for file in os.listdir(path):
-  # check if the file is a pickle file
-  if file.endswith('.pickle') and file.startswith(ground_truth_name):
-    # open the pickle file and load the contents
-    with open(os.path.join(path, file), 'rb') as f:
-      pickle_data = pickle.load(f)
-    # append the loaded data_closed_loop to the list of loaded pickles
-    loaded_pickles.append(pickle_data)
+    # check if the file is a pickle file
+    if file.endswith('.pickle') and file.startswith(ground_truth_name):
+        # open the pickle file and load the contents
+        with open(os.path.join(path, file), 'rb') as f:
+            print(f'Loading {file}')
+            pickle_data = pickle.load(f)
+        # append the loaded data_closed_loop to the list of loaded pickles
+        loaded_pickles.append(pickle_data)
 
 df_validation = pd.DataFrame()
 full_theory_log = []
 full_conditions_log = []
+full_observations_log = []
 entry = 0
 
 # import the loaded pickles into data_closed_loop frame
@@ -47,6 +47,10 @@ for pickle in loaded_pickles:
 
     for idx in range(len(MSE_log)):
 
+        # check if MSE is nan or infinite
+        if np.isnan(MSE_log[idx]) or np.isinf(MSE_log[idx]):
+            continue
+
         row = dict()
         row["Entry"] = entry
         row["Theorist"] = configuration["theorist_name"]
@@ -56,7 +60,9 @@ for pickle in loaded_pickles:
         row["Mean Squared Error"] = MSE_log[idx]
         full_theory_log.append(theory_log[idx])
         full_conditions_log.append(conditions_log[idx])
+        full_observations_log.append(observations_log[idx])
         df_validation = df_validation.append(row, ignore_index=True)
+
         entry = entry + 1
 
 # remove MSE outliers
@@ -66,17 +72,36 @@ for experimenalist in experimentalists:
     for cycle in cycles:
         # compute the mean MSE for each experimentalist in the data_closed_loop frame
         mean_MSE = df_validation[(df_validation["Experimentalist"] == experimenalist) &
-                                 (df_validation["Data Collection Cycle"] == cycle)]["Mean Squared Error"].mean()
+                                 (df_validation["Data Collection Cycle"] == cycle)][
+            "Mean Squared Error"].mean()
         std_MSE = df_validation[(df_validation["Experimentalist"] == experimenalist) &
-                                (df_validation["Data Collection Cycle"] == cycle)]["Mean Squared Error"].std()
+                                (df_validation["Data Collection Cycle"] == cycle)][
+            "Mean Squared Error"].std()
         # remove all rows with MSE above the mean + 3 standard deviations
-        df_validation = df_validation.drop(df_validation[(df_validation["Experimentalist"] == experimenalist) &
-                                                         (df_validation["Data Collection Cycle"] == cycle) &
-                                                         (df_validation["Mean Squared Error"] > mean_MSE + 3 * std_MSE)].index)
+        df_validation = df_validation.drop(
+            df_validation[(df_validation["Experimentalist"] == experimenalist) &
+                          (df_validation["Data Collection Cycle"] == cycle) &
+                          (df_validation["Mean Squared Error"] > mean_MSE + 3 * std_MSE)].index)
 
 
 # print the data_closed_loop frame
 print(df_validation)
+df_validation.to_csv(path + "/" + ground_truth_name + "_MSE.csv")
+
+# copy data set
+df_entropy = df_validation.copy()
+df_entropy = df_entropy.drop(df_entropy[df_entropy["Data Collection Cycle"] != configuration["num_cycles"]].index)
+entropy_log = []
+for index, row in df_entropy.iterrows():
+    # compute entropy of the corresponding observations
+    entry = row["Entry"]
+    y = np.array(full_observations_log[entry])
+    # compute entropy of y
+    entropy = -np.sum(y * np.log(y))
+    entropy_log.append(entropy)
+df_entropy["Entropy"] = entropy_log
+df_validation.to_csv(path + "/" + ground_truth_name + "_entropy.csv")
+
 
 # CYCLE PLOT
 plot_fnc, plot_title = plot_inventory[ground_truth_name]
@@ -97,7 +122,7 @@ plt.show()
 # get the rows of data_closed_loop with the lowest Mean Squared Error for each experimentalist
 df_final_cycle = df_validation[df_validation["Data Collection Cycle"] == df_validation["Data Collection Cycle"].max()]
 df_best_theories = df_final_cycle.loc[df_final_cycle.groupby(['Experimentalist'])['Mean Squared Error'].idxmin()]
-model_entry = df_best_theories[df_best_theories["Experimentalist"] == experimenalist]['Entry'].values
+model_entry = df_best_theories[df_best_theories["Experimentalist"] == experimentalist_name]['Entry'].values
 best_theory = full_theory_log[model_entry[0]]
 
 # get information from the ground truth model
@@ -155,8 +180,9 @@ sns.scatterplot(x="Component 1", y="Component 2", hue=full_data_only.y,
                 palette=custom_palette,
                 data=full_data_only,
                 linewidth = 0,
-                #s = 10,
+                # s = 10,
                 legend=False)
+# plt.show()
 
 
 # x_list = full_data_only["Component 1"]
@@ -177,8 +203,17 @@ custom_palette = sns.color_palette("deep", len(set(labels)))
 # custom_palette[0] = (0.5, 0.5, 0.5)
 sns.scatterplot(x="Component 1", y="Component 2", hue=df.Labels.tolist(),
                 palette=custom_palette,
+                s = 10,
                 data=df).set(title="T-SNE Projection of Probed Experimental Conditions\n(" + plot_title + ")")
+plt.show()
+
+sns.histplot(data=full_data_only, x="y", bins=100)
 plt.show()
 
 # plot best theory
 print(best_theory.model_.latex())
+
+
+
+
+

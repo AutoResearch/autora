@@ -2,6 +2,7 @@ from studies.cogsci2023.models.models import model_inventory
 from sklearn.model_selection import train_test_split
 from studies.cogsci2023.utils import fit_theorist, get_MSE
 import pickle
+import time
 
 # META PARAMETERS
 repetitions = 20                 # specifies how many times to repeat the study (20)
@@ -12,7 +13,7 @@ ground_truth_name = "stroop_model" # OPTIONS: see models.py
 
 theorists = [
              'MLP',
-             # 'DARTS 2 Nodes'
+             'DARTS 2 Nodes'
              'DARTS 3 Nodes',
              'BMS',
              'BMS Fixed Root'
@@ -34,11 +35,16 @@ for rep in range(repetitions):
     MSE_log = list()
     theory_log = list()
     theorist_name_log = list()
+    elapsed_time_log = list()
 
     for theorist_name in theorists:
 
         # fit the theorist
+        st = time.time()
         theorist = fit_theorist(X_train, y_train, theorist_name, metadata)
+        et = time.time()
+        elapsed_time = et - st
+        elapsed_time_log.append(elapsed_time)
 
         MSE_log.append(get_MSE(theorist, X_test, y_test))
         if hasattr(theorist, 'model_'):
@@ -61,6 +67,7 @@ for rep in range(repetitions):
                        MSE_log,
                        theory_log,
                        theorist_name_log,
+                       elapsed_time_log,
                        ]
 
         pickle.dump(object_list, f)

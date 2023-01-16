@@ -27,9 +27,9 @@ AllowedMetrics = Literal[
 ]
 
 
-def summed_dissimilarity_sampler(
+def dissimilarity_sampler(
     X: np.ndarray, X_ref: np.ndarray, n: int = 1, metric: AllowedMetrics = "euclidean",
-    inverse: bool = False
+    inverse: bool = False, integration: str = "sum",
 ) -> np.ndarray:
     """
     This dissimilarity samples re-arranges the pool of IV conditions according to their
@@ -73,36 +73,63 @@ def summed_dissimilarity_sampler(
             f"X must have at least {n} rows matching the number of requested samples."
         )
 
-    # normalize all independent variables
-    X_full = np.vstack((X, X_ref))
-    X_full_norm = (X_full - X_full.mean(axis=0)) / X_full.std(axis=0)
-    X_norm = X_full_norm[:X.shape[0]]
-    X_ref_norm = X_full_norm[-X_ref.shape[0]:]
+    X_new = np.zeros((n, X.shape[1]))
 
-    dist = DistanceMetric.get_metric(metric)
+    for sample in range(n):
 
-    # create a list to store the summed distances for each row in matrix1
-    summed_distances = []
+        # normalize all independent variables
+        X_full = np.vstack((X, X_ref))
+        X_full_norm = (X_full - X_full.mean(axis=0)) / X_full.std(axis=0)
+        X_norm = X_full_norm[:X.shape[0]]
+        X_ref_norm = X_full_norm[-X_ref.shape[0]:]
 
-    # loop over each row in first matrix
-    for row in X_norm:
-        # calculate the distances between the current row in matrix1 and all other rows in matrix2
-        summed_distance = 0
+        dist = DistanceMetric.get_metric(metric)
 
-        for X_ref_row in X_ref_norm:
+        # create a list to store the summed distances for each row in matrix1
+        summed_distances = []
 
-            distance = dist.pairwise([row, X_ref_row])[0, 1]
-            if inverse:
-                distance = 1/distance
-            summed_distance += distance
+        # for each allowed data point
+        for row in X_norm:
+            # calculate the distances between the current row in matrix1 and all other rows in matrix2
+            if integration == "sum":
+                integrated_distance = 0
+            elif integration == "max":
+                integrated_distance = 0
+            elif integration == "min":
+                integrated_distance = 1e16
+            elif integration == "product":
+                integrated_distance = 1
+            else:
+                raise ValueError(f"Integration method {integration} not supported.")
 
-        # store the summed distance for the current row
-        summed_distances.append(summed_distance)
+            for X_ref_row in X_ref_norm:
 
-    # sort the rows in matrix1 by their summed distances
-    if inverse:
-        sorted_X = X[np.argsort(summed_distances)]
-    else:
-        sorted_X = X[np.argsort(summed_distances)[::-1]]
+                distance = dist.pairwise([row, X_ref_row])[0, 1]
+                if inverse:
+                    distance = 1/distance
+
+                if integration == "sum":
+                    integrated_distance += distance
+                elif integration == "max":
+                    integrated_distance = max(integrated_distance, distance)
+                elif integration == "min":
+                    integrated_distance = min(integrated_distance, distance)
+                elif integration == "product":
+                    integrated_distance *= distance
+                else:
+                    raise ValueError(f"Integration method {integration} not supported.")
+
+            # store the summed distance for the current row
+            summed_distances.append(integrated_distance)
+
+        # sort the rows in matrix1 by their summed distances
+        if inverse:
+            sorted_X = X[np.argsort(summed_distances)]
+        else:
+            sorted_X = X[np.argsort(summed_distances)[::-1]]
+
+        X_add = sorted_X[0]
+        X_new[sample] = X_add
+        X = np.vstack((X, X_add))
 
     return sorted_X[:n]

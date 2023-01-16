@@ -7,8 +7,9 @@ from autora.experimentalist.sampler import (
     model_disagreement_sampler,
     nearest_values_sampler,
     random_sampler,
-    summed_dissimilarity_sampler,
+    dissimilarity_sampler,
     uncertainty_sampler,
+    falsification_sampler
 )
 from autora.skl.bms import BMSRegressor
 from autora.skl.darts import DARTSRegressor
@@ -28,7 +29,7 @@ def fit_theorist(X, y, theorist_name, metadata, theorist_epochs=None):
         if theorist_epochs is not None:
             epochs = theorist_epochs
         else:
-            epochs = 1000
+            epochs = 5000
         theorist = BMSRegressor(epochs=epochs)
     elif theorist_name == "DARTS 2 Nodes":
         if theorist_epochs is not None:
@@ -108,7 +109,7 @@ def get_experimentalist(
 ):
 
     # popper experimentalist
-    if experimentalist_name == "falsification":
+    if experimentalist_name == "popper":
         experimentalist = Pipeline(
             [
                 ("pool", poppernet_pool),
@@ -125,11 +126,28 @@ def get_experimentalist(
             },
         )
 
-    elif experimentalist_name == "falsification dissimiarlity":
+    elif experimentalist_name == "falsification":
+        experimentalist = Pipeline(
+            [
+                ("pool", X_allowed),
+                ("random", random_sampler),
+                ("falsification", falsification_sampler),
+            ],
+            {
+                "random__n": X_allowed.shape[0],
+                "falsification__model": theorist,  # theorist.model_
+                "falsification__x_train": X,
+                "falsification__y_train": y,
+                "falsification__metadata": metadata,
+                "falsification__n": num_samples,
+            },
+        )
+
+    elif experimentalist_name == "popper dissimiarlity":
         experimentalist = Pipeline(
             [
                 ("pool", poppernet_pool),
-                ("dissimilarity", summed_dissimilarity_sampler),
+                ("dissimilarity", dissimilarity_sampler),
                 ("nearest_values", nearest_values_sampler),
             ],
             {
@@ -162,14 +180,17 @@ def get_experimentalist(
         experimentalist = Pipeline(
             [
                 ("pool", X_allowed),
-                ("dissimilarity", summed_dissimilarity_sampler),
+                ("random", random_sampler),
+                ("dissimilarity", dissimilarity_sampler),
             ],
             {
+                "random__n": X_allowed.shape[0],
                 "grid__ivs": metadata.independent_variables,
                 "dissimilarity__X_ref": X,
                 "dissimilarity__n": num_samples,
                 "dissimilarity__inverse": False,
                 "dissimilarity__metric": "euclidean",
+                "dissimilarity__integration": "product",
             },
         )
 
@@ -178,10 +199,11 @@ def get_experimentalist(
         experimentalist = Pipeline(
             [
                 ("pool", X_allowed),
-                ("dissimilarity", summed_dissimilarity_sampler),
+                ("random", random_sampler),
+                ("dissimilarity", dissimilarity_sampler),
             ],
             {
-                "grid__ivs": metadata.independent_variables,
+                "random__n": X_allowed.shape[0],
                 "dissimilarity__X_ref": X,
                 "dissimilarity__n": num_samples,
                 "dissimilarity__inverse": True,
@@ -193,9 +215,11 @@ def get_experimentalist(
         experimentalist = Pipeline(
             [
                 ("pool", X_allowed),
+                ("random", random_sampler),
                 ("model_disagreement", model_disagreement_sampler),
             ],
             {
+                "random__n": X_allowed.shape[0],
                 "model_disagreement__models": theorist.models_[0:2],
                 "model_disagreement__n": num_samples,
             },
@@ -212,9 +236,11 @@ def get_experimentalist(
         experimentalist = Pipeline(
             [
                 ("pool", X_allowed),
+                ("random", random_sampler),
                 ("uncertainty", uncertainty_sampler),
             ],
             {
+                "random__n": X_allowed.shape[0],
                 "uncertainty__n": num_samples,
                 "uncertainty__model": theorist,
                 "uncertainty__measure": "least_confident",

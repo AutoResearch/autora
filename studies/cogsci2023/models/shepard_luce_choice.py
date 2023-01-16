@@ -167,7 +167,7 @@ def plot_shepard_luce(model = None):
         if model is not None:
             y = model.predict(X)
             plt.plot(similarity_A1, y, label=f"Similarity to B1 = {similarity_B1} (Recovered)",
-                     c=colors[col_keys[idx]])
+                     c=colors[col_keys[idx]], linestyle="--")
 
     x_limit = [np.min(similarity_A1), np.max(similarity_A1)]
     y_limit = [0, 1]

@@ -3,7 +3,7 @@ import numpy as np
 from studies.cogsci2023.models.expected_value import expected_value_theory_metadata
 
 # general meta parameters
-added_noise = 0.01
+added_noise = 0.00
 
 # prospect theory parameters
 # parameters taken from:
