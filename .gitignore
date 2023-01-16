@@ -72,3 +72,5 @@ site/
 
 # Jupyter Notebook load data
 .ipynb_checkpoints
+.idea/BSR.iml
+.idea/misc.xml
