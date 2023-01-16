@@ -1,4 +1,4 @@
-from .funcs import (  # noqa: F401
+from .funcs_legacy import (  # noqa: F401
     get_expression,
     Node,
     prop,

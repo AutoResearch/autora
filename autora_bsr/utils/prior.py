@@ -56,7 +56,7 @@ def __get_ops_init() -> Dict[str, Union[Callable, Dict]]:
         ops_init: a dictionary that maps operator name to either a parameter
             dict (in the case that the initialization is hard-coded) or an
             initialization function (when it is randomized). The dictionary
-            value will be used in growing the `node` (see `funcs.py`).
+            value will be used in growing the `node` (see `funcs_legacy.py`).
     """
     ops_init = {
         "linear": linear_init,
@@ -109,9 +109,10 @@ def get_prior_dict(prior_name="Uniform"):
     ops_name_lst = list(ops_prior.keys())
     ops_weight_lst = list(ops_prior.values())
     prior_dict = {k: {
-        "init": ops_init.get(k, None),
+        "init": ops_init.get(k, {}),
         "fn": ops_fn_and_arity[k][0],
         "arity": ops_fn_and_arity[k][1],
+        "weight": ops_prior[k],
     } for k in ops_prior}
 
     return ops_name_lst, ops_weight_lst, prior_dict

@@ -8,7 +8,7 @@ from scipy.stats import invgamma
 from sklearn.base import BaseEstimator, RegressorMixin
 from sklearn.utils.validation import check_is_fitted
 
-from autora_bsr.funcs import (
+from autora_bsr.funcs_legacy import (
     get_expression,
     Node,
     all_cal,

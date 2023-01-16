@@ -1,5 +1,5 @@
 from autora_bsr.utils.node import Node
-from autora_bsr.utils.funcs_new import grow, get_expression
+from autora_bsr.utils.funcs import grow, get_expression
 from autora_bsr.utils.prior import get_prior_dict
 from autora_bsr.utils.misc import get_ops_expr
 
