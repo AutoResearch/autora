@@ -1,7 +1,6 @@
 import numpy as np
 import torch
 import torch.nn as nn
-from sweetpea import *
 from torch.autograd import Variable
 
 from autora.variable import DV, IV, ValueType, VariableCollection
