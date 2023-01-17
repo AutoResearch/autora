@@ -5,6 +5,7 @@ from typing import List, Tuple
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from tqdm import tqdm
 
 from .mcmc import Tree
 from .parallel import Parallel
@@ -30,7 +31,7 @@ def run(
 
     """
     desc_len, model, model_len = [], pms.t1, np.inf
-    for n in range(num_steps):
+    for n in tqdm(range(num_steps)):
         pms.mcmc_step()
         pms.tree_swap()
         if num_steps % thinning == 0:  # sample less often if we thin more
