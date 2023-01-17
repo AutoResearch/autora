@@ -1,17 +1,9 @@
 import numpy as np
 from autora.variable import DV, IV, ValueType, VariableCollection
 
-# general meta parameters
-added_noise = 0.01
-
-# weber-fechner parameters
-weber_resolution = 100
-weber_constant = 1.0
-maximum_stimulus_intensity = 5.0
-
-# Weber-Fechner-Law
-
-def weber_fechner_metadata():
+def weber_fechner_metadata(weber_resolution = 100, maximum_stimulus_intensity = 5.0
+):
+    """Weber-Fechner-Law"""
     iv1 = IV(
         name="S1",
         allowed_values=np.linspace(1/weber_resolution, maximum_stimulus_intensity, weber_resolution),
@@ -46,8 +38,8 @@ def weber_fechner_metadata():
     return metadata
 
 def weber_fechner_experiment(X: np.ndarray,
-                             weber_constant: float = weber_constant,
-                             std = added_noise):
+                             weber_constant: float = 1.0,
+                             std = 0.01):
     Y = np.zeros((X.shape[0],1))
     for idx, x in enumerate(X):
         # jnd =  np.min(x) * weber_constant
