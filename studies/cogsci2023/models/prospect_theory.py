@@ -1,5 +1,6 @@
 import numpy as np
 
+from autora.model import register_model
 from .expected_value import expected_value_theory_metadata
 
 # general meta parameters
@@ -183,3 +184,11 @@ def plot_prospect_theory(model=None):
 # import matplotlib.pyplot as plt
 # plt.plot(x_range, y)
 # plt.show()
+
+register_model(
+    "prospect_theory",
+    metadata=prospect_theory_metadata,
+    data=prospect_theory_data,
+    synthetic_experiment_runner=prospect_theory_experiment,
+    name="Prospect Theory",
+)
