@@ -1,5 +1,6 @@
 import pickle
 import time
+from random import seed
 
 import numpy as np
 from sklearn.model_selection import train_test_split
@@ -48,8 +49,17 @@ experimentalists = [
     # 'least confident',
 ]
 
-st = time.time()
-for rep in range(repetitions):
+
+def closed_loop(rep,
+                theorist_name,
+                ground_truth_name,
+                experimentalists,
+                num_cycles,
+                samples_for_seed,
+                samples_per_cycle,
+                theorist_epochs):
+
+    seed(rep)
 
     # SET UP STUDY
     MSE_log = list()
@@ -180,6 +190,17 @@ for rep in range(repetitions):
 
         pickle.dump(object_list, f)
 
+
+st = time.time()
+for rep in range(repetitions):
+    closed_loop(rep,
+                theorist_name,
+                ground_truth_name,
+                experimentalists,
+                num_cycles,
+                samples_for_seed,
+                samples_per_cycle,
+                theorist_epochs)
 et = time.time()
 elapsed_time = et - st
 print(f"Elapsed time: {elapsed_time}")
