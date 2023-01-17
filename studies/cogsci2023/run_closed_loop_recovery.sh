@@ -2,7 +2,7 @@
 #SBATCH --ntasks=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --time=1:00:00
-#SBATCH --array=1-20
+#SBATCH --array=1-10
 
 
 # Print key runtime properties for records
