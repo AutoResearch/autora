@@ -1,5 +1,6 @@
 import numpy as np
 from autora.variable import DV, IV, ValueType, VariableCollection
+from autora.model import register_model
 
 def weber_fechner_metadata(weber_resolution = 100, maximum_stimulus_intensity = 5.0
 ):
@@ -100,3 +101,12 @@ def plot_weber_fechner(model = None):
     plt.show()
 
 # X, y = weber_fechner_data(weber_fechner_metadata())
+
+
+register_model(
+    "weber_fechner",
+    metadata=weber_fechner_metadata,
+    data=weber_fechner_data,
+    synthetic_experiment_runner=weber_fechner_experiment,
+    name="Weber-Fechner Law",
+)
