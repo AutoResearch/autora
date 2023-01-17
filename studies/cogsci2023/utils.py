@@ -15,6 +15,7 @@ from autora.skl.bms import BMSRegressor
 from autora.skl.darts import DARTSRegressor
 from autora.variable import ValueType
 from MLP_theorist import MLP_theorist
+from logit_theorist import LogitRegression
 
 
 def sigmoid(x):
@@ -61,6 +62,8 @@ def fit_theorist(X, y, theorist_name, metadata, theorist_epochs=None):
         else:
             epochs = 5000
         theorist = MLP_theorist(epochs=epochs, output_type=output_type, verbose=True)
+    elif theorist_name == "Logistic Regression":
+        theorist = LogitRegression()
     else:
         raise ValueError(f"Theorist {theorist_name} not implemented.")
 
