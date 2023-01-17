@@ -3,8 +3,8 @@ import time
 
 import numpy as np
 from sklearn.model_selection import train_test_split
-from studies.cogsci2023.models.models import model_inventory
-from studies.cogsci2023.utils import (
+from models.models import model_inventory
+from utils import (
     fit_theorist,
     get_experimentalist,
     get_MSE,
