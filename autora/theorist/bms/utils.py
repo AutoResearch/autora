@@ -38,7 +38,7 @@ def run(
             desc_len.append(pms.t1.E)  # Add the description length to the trace
         if pms.t1.E < model_len:  # Check if this is the MDL expression so far
             model, model_len = deepcopy(pms.t1), pms.t1.E
-        _logger.info("Finish iteration {}".format(n))
+        _logger.debug("Finish iteration {}".format(n))
     return model, model_len, desc_len
 
 
