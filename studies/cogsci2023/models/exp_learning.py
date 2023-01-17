@@ -116,4 +116,4 @@ def plot_exp_learning(model = None):
     plt.title("Exponential Learning", fontsize="x-large")
     plt.show()
 
-#plot_exp_learning()
+# X, y = exp_learning_data(exp_learning_metadata())

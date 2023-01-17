@@ -1,7 +1,6 @@
 import numpy as np
 import torch
 import torch.nn as nn
-from sweetpea import *
 from torch.autograd import Variable
 
 from autora.variable import DV, IV, ValueType, VariableCollection
@@ -221,7 +220,7 @@ class Stroop_Model(nn.Module):
         return output_softmaxed
 
 
-def run_exp(model):
+def run_exp(model, theorist=False):
 
     # color naming - cong
     color_red = 1
@@ -231,7 +230,11 @@ def run_exp(model):
     task_color = 1
     task_word = 0
     input = [color_green, color_red, word_green, word_red, task_color, task_word]
-    output_col_cong = model(input)  # torch.sigmoid(model(input))
+    if theorist is True:
+        input = np.array(input).reshape(1, -1)
+        output_col_cong = model.predict(input)
+    else:
+        output_col_cong = model(input)  # torch.sigmoid(model(input))
 
     # color naming - incong
     color_red = 1
@@ -241,7 +244,11 @@ def run_exp(model):
     task_color = 1
     task_word = 0
     input = [color_green, color_red, word_green, word_red, task_color, task_word]
-    output_col_incong = model(input)
+    if theorist is True:
+        input = np.array(input).reshape(1, -1)
+        output_col_incong = model.predict(input)
+    else:
+        output_col_incong = model(input)
 
     # color naming - control
     color_red = 1
@@ -251,7 +258,11 @@ def run_exp(model):
     task_color = 1
     task_word = 0
     input = [color_green, color_red, word_green, word_red, task_color, task_word]
-    output_col_control = model(input)
+    if theorist is True:
+        input = np.array(input).reshape(1, -1)
+        output_col_control = model.predict(input)
+    else:
+        output_col_control = model(input)
 
     # word reading - cong
     color_red = 1
@@ -261,7 +272,11 @@ def run_exp(model):
     task_color = 0
     task_word = 1
     input = [color_green, color_red, word_green, word_red, task_color, task_word]
-    output_wrd_cong = model(input)
+    if theorist is True:
+        input = np.array(input).reshape(1, -1)
+        output_wrd_cong = model.predict(input)
+    else:
+        output_wrd_cong = model(input)
 
     # word reading - incong
     color_red = 0
@@ -271,7 +286,11 @@ def run_exp(model):
     task_color = 0
     task_word = 1
     input = [color_green, color_red, word_green, word_red, task_color, task_word]
-    output_wrd_incong = model(input)
+    if theorist is True:
+        input = np.array(input).reshape(1, -1)
+        output_wrd_incong = model.predict(input)
+    else:
+        output_wrd_incong = model(input)
 
     # word reading - control
     color_red = 0
@@ -281,7 +300,11 @@ def run_exp(model):
     task_color = 0
     task_word = 1
     input = [color_green, color_red, word_green, word_red, task_color, task_word]
-    output_wrd_control = model(input)
+    if theorist is True:
+        input = np.array(input).reshape(1, -1)
+        output_wrd_control = model.predict(input)
+    else:
+        output_wrd_control = model(input)
 
     return (
         output_col_cong,
@@ -334,29 +357,37 @@ def plot_stroop_model(model=None):
             output_wrd_cong,
             output_wrd_incong,
             output_wrd_control,
-        ) = run_exp(model)
+        ) = run_exp(model, theorist=True)
 
-        err_col_cong = 1 - output_col_cong[0, 1]
-        err_col_incong = 1 - output_col_incong[0, 1]
-        err_col_control = 1 - output_col_control[0, 1]
-        err_wrd_cong = 1 - output_wrd_cong[0, 1]
-        err_wrd_incong = 1 - output_wrd_incong[0, 1]
-        err_wrd_control = 1 - output_wrd_control[0, 1]
+        if output_col_cong.ndim == 1:
+            err_col_cong = 1 - output_col_cong[0]
+            err_col_incong = 1 - output_col_incong[0]
+            err_col_control = 1 - output_col_control[0]
+            err_wrd_cong = 1 - output_wrd_cong[0]
+            err_wrd_incong = 1 - output_wrd_incong[0]
+            err_wrd_control = 1 - output_wrd_control[0]
+        else:
+            err_col_cong = 1 - output_col_cong[0][0]
+            err_col_incong = 1 - output_col_incong[0][0]
+            err_col_control = 1 - output_col_control[0][0]
+            err_wrd_cong = 1 - output_wrd_cong[0][0]
+            err_wrd_incong = 1 - output_wrd_incong[0][0]
+            err_wrd_control = 1 - output_wrd_control[0][0]
 
         x_data = [0, 1, 2]
         y_data_col_recovered = [
-            err_col_control.detach().numpy() * 100,
-            err_col_incong.detach().numpy() * 100,
-            err_col_cong.detach().numpy() * 100,
+            err_col_control * 100,
+            err_col_incong * 100,
+            err_col_cong * 100,
         ]
         y_data_wrd_recovered = [
-            err_wrd_control.detach().numpy() * 100,
-            err_wrd_incong.detach().numpy() * 100,
-            err_wrd_cong.detach().numpy() * 100,
+            err_wrd_control * 100,
+            err_wrd_incong * 100,
+            err_wrd_cong * 100,
         ]
 
     x_limit = [-0.5, 2.5]
-    y_limit = [0, 50]
+    y_limit = [0, 100]
     y_label = "Error Rate (%)"
     legend = (
         "Color Naming (Original)",
@@ -376,7 +407,7 @@ def plot_stroop_model(model=None):
     plt.plot(x_data, y_data_wrd, label=legend[1])
     if model is not None:
         plt.plot(x_data, y_data_col_recovered, "--", label=legend[2], c=colors[col_keys[0]])
-        plt.plot(x_data, y_data_wrd_recovered, "--", label=legend[3], c=colors[col_keys[0]])
+        plt.plot(x_data, y_data_wrd_recovered, "--", label=legend[3], c=colors[col_keys[1]])
     plt.xlim(x_limit)
     plt.ylim(y_limit)
     plt.ylabel(y_label, fontsize="large")

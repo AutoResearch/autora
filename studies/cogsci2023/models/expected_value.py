@@ -162,3 +162,4 @@ def plot_expected_value(model=None):
 
 
 # plot_expected_value()
+# X, y = expected_value_theory_data(expected_value_theory_metadata())

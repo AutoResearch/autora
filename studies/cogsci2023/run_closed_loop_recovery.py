@@ -1,10 +1,10 @@
 import pickle
+import time
 
 import numpy as np
 from sklearn.model_selection import train_test_split
-
-from studies.cogsci2023.models.models import model_inventory
-from studies.cogsci2023.utils import (
+from models.models import model_inventory
+from utils import (
     fit_theorist,
     get_experimentalist,
     get_MSE,
@@ -12,32 +12,44 @@ from studies.cogsci2023.utils import (
 )
 
 # META PARAMETERS
-num_cycles = 20  # number of cycles (20)
-samples_for_seed = 20  # number of seed data_closed_loop points (20)
-samples_per_cycle = 20  # number of data_closed_loop points chosen per cycle (20)
+num_cycles = 200  # number of cycles (20)
+samples_for_seed = 1  # number of seed data_closed_loop points (20)
+samples_per_cycle = 1  # number of data_closed_loop points chosen per cycle (20)
 theorist_epochs = 500  # number of epochs for BMS (500)
-repetitions = 20  # specifies how many times to repeat the study (20)
+repetitions = 5  # specifies how many times to repeat the study (20)
+
+# TODO TO TRY:
+# x increase cycle samples to 100 and cycles to 20
+# - go back to validaiton set approach
+# x try starting from 1 data point and only add one other data point per cycle
+# x try using random experimentalist as seed
+# - increase theorist trainign to 100 epochs
 
 # what I learned
 # - increasing model noise doesn't help, it just puts an upper limit on the final validation error
+# - popper seems to do better than pure falsification due to bound repulsion
+
+# todo: add back noise to prospect theory
+# todo: make sure resolution of all probed models is comparable (and potentially higher)
 
 # SELECT THEORIST
 # OPTIONS: BMS, DARTS
 theorist_name = "BMS"
 
 # SELECT GROUND TRUTH MODEL
-ground_truth_name = "tva"  # OPTIONS: see models.py
+ground_truth_name = "prospect_theory"  # OPTIONS: see models.py
 
 experimentalists = [
+    # 'popper',
+    # 'falsification',
     'random',
-    "dissimilarity",
-    # "inverse dissimilarity",
-    'falsification',
-    'model disagreement',
-    'least confident',
+    # "dissimilarity",
+    # 'model disagreement',
+    # 'least confident',
 ]
 
-for experimentalist_name in experimentalists:
+st = time.time()
+for rep in range(repetitions):
 
     # SET UP STUDY
     MSE_log = list()
@@ -46,39 +58,51 @@ for experimentalist_name in experimentalists:
     theory_log = list()
     conditions_log = list()
     observations_log = list()
-    for rep in range(repetitions):
+    experimentalist_log = list()
 
-        # get information from the ground truth model
-        if ground_truth_name not in model_inventory.keys():
-            raise ValueError(f"Study {ground_truth_name} not found in model inventory.")
-        (metadata, data_fnc, experiment) = model_inventory[ground_truth_name]
+    # get information from the ground truth model
+    if ground_truth_name not in model_inventory.keys():
+        raise ValueError(f"Study {ground_truth_name} not found in model inventory.")
+    (metadata, data_fnc, experiment) = model_inventory[ground_truth_name]
 
-        # split data_closed_loop into training and test sets
-        X_full, y_full = data_fnc(metadata)
-        # X_train, X_test, y_train, y_test = train_test_split(X_full, y_full,
-        #                                                     test_size=test_size,
-        #                                                     random_state=rep)
-        # Since we know the GT, we can use the full dataset for training
+    # split data_closed_loop into training and test sets
+    X_full, y_full = data_fnc(metadata)
+    X_train = X_full.copy()
+    y_train = y_full.copy()
+    X_test = X_full.copy()
+    y_test = y_full.copy()
+    # X_train, X_test, y_train, y_test = train_test_split(X_full, y_full,
+    #                                                     test_size=test_size,
+    #                                                     random_state=rep)
+    # Since we know the GT, we can use the full dataset for training
 
-        # get seed experimentalist
-        experimentalist_seed = get_seed_experimentalist(
-            X_full, metadata, samples_for_seed
-        )
+    # get seed experimentalist
+    experimentalist_seed = get_seed_experimentalist(
+        X_train, metadata, samples_for_seed
+    )
 
-        # generate seed data_closed_loop
-        X = experimentalist_seed.run()
-        y = experiment(X)
+    # generate seed data_closed_loop
+    X_seed = experimentalist_seed.run()
+    y_seed = experiment(X_seed)
 
-        # set up and fit theorist
-        theorist = fit_theorist(X, y, theorist_name, metadata, theorist_epochs)
+    # set up and fit theorist
+    print("Fitting theorist...")
+    theorist_seed = fit_theorist(X_seed, y_seed, theorist_name, metadata, theorist_epochs)
+
+    for experimentalist_name in experimentalists:
 
         # log initial performance
-        MSE_log.append(get_MSE(theorist, X_full, y_full))
+        MSE_log.append(get_MSE(theorist_seed, X_test, y_test))
         cycle_log.append(0)
         repetition_log.append(rep)
-        theory_log.append(theorist)
-        conditions_log.append(X)
-        observations_log.append(y)
+        theory_log.append(theorist_seed)
+        conditions_log.append(X_seed)
+        observations_log.append(y_seed)
+        experimentalist_log.append(experimentalist_name)
+
+        X = X_seed.copy()
+        y = y_seed.copy()
+        theorist = theorist_seed
 
         # now that we have the seed data_closed_loop and model, we can start the recovery loop
         for cycle in range(num_cycles):
@@ -88,16 +112,18 @@ for experimentalist_name in experimentalists:
                 experimentalist_name,
                 X,
                 y,
-                X_full,
+                X_train,
                 metadata,
                 theorist,
                 samples_per_cycle,
             )
 
             # get new experiment conditions
+            print("Running experimentalist...")
             X_new = experimentalist.run()
 
             # run experiment
+            print("Running experiment...")
             y_new = experiment(X_new)
 
             # combine old and new data_closed_loop
@@ -105,15 +131,18 @@ for experimentalist_name in experimentalists:
             y = np.row_stack([y, y_new])
 
             # fit theory
+            print("Fitting theorist...")
             theorist = fit_theorist(X, y, theorist_name, metadata, theorist_epochs)
 
             # evaluate theory fit
-            MSE_log.append(get_MSE(theorist, X_full, y_full))
+            print("Evaluating fit...")
+            MSE_log.append(get_MSE(theorist, X_test, y_test))
             cycle_log.append(cycle + 1)
             repetition_log.append(rep)
             theory_log.append(theorist)
             conditions_log.append(X)
             observations_log.append(y)
+            experimentalist_log.append(experimentalist_name)
 
     # save and load pickle file
     file_name = (
@@ -122,7 +151,7 @@ for experimentalist_name in experimentalists:
         + "_"
         + theorist_name
         + "_"
-        + experimentalist_name
+        + str(rep)
         + ".pickle"
     )
 
@@ -146,6 +175,11 @@ for experimentalist_name in experimentalists:
             theory_log,
             conditions_log,
             observations_log,
+            experimentalist_log
         ]
 
         pickle.dump(object_list, f)
+
+et = time.time()
+elapsed_time = et - st
+print(f"Elapsed time: {elapsed_time}")

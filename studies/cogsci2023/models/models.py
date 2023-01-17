@@ -1,15 +1,28 @@
-from studies.cogsci2023.models.evc_coged import *
-from studies.cogsci2023.models.evc_congruency import *
-from studies.cogsci2023.models.evc_demand_selection import *
-from studies.cogsci2023.models.exp_learning import *
-from studies.cogsci2023.models.expected_value import *
-from studies.cogsci2023.models.prospect_theory import *
-from studies.cogsci2023.models.shepard_luce_choice import *
-from studies.cogsci2023.models.stevens_power_law import *
-from studies.cogsci2023.models.stroop_model import *
-from studies.cogsci2023.models.task_switching import *
-from studies.cogsci2023.models.tva import *
-from studies.cogsci2023.models.weber_fechner import *
+# from studies.cogsci2023.models.evc_coged import *
+# from studies.cogsci2023.models.evc_congruency import *
+# from studies.cogsci2023.models.evc_demand_selection import *
+# from studies.cogsci2023.models.exp_learning import *
+# from studies.cogsci2023.models.expected_value import *
+# from studies.cogsci2023.models.prospect_theory import *
+# from studies.cogsci2023.models.shepard_luce_choice import *
+# from studies.cogsci2023.models.stevens_power_law import *
+# from studies.cogsci2023.models.stroop_model import *
+# from studies.cogsci2023.models.task_switching import *
+# from studies.cogsci2023.models.tva import *
+# from studies.cogsci2023.models.weber_fechner import *
+
+from .evc_coged import *
+from .evc_congruency import *
+from .evc_demand_selection import *
+from .exp_learning import *
+from .expected_value import *
+from .prospect_theory import *
+from .shepard_luce_choice import *
+from .stevens_power_law import *
+from .stroop_model import *
+from .task_switching import *
+from .tva import *
+from .weber_fechner import *
 
 # model inventory
 
