@@ -1,4 +1,5 @@
 import pickle
+import time
 
 import numpy as np
 from sklearn.model_selection import train_test_split
@@ -12,15 +13,18 @@ from studies.cogsci2023.utils import (
 )
 
 # META PARAMETERS
-num_cycles = 20  # number of cycles (20)
-samples_for_seed = 20  # number of seed data_closed_loop points (20)
-samples_per_cycle = 20  # number of data_closed_loop points chosen per cycle (20)
+num_cycles = 200  # number of cycles (20)
+samples_for_seed = 1  # number of seed data_closed_loop points (20)
+samples_per_cycle = 1  # number of data_closed_loop points chosen per cycle (20)
 theorist_epochs = 500  # number of epochs for BMS (500)
 repetitions = 5  # specifies how many times to repeat the study (20)
 
 # TODO TO TRY:
-# - increase cycle samples to 100 and cycles to 20
+# x increase cycle samples to 100 and cycles to 20
 # - go back to validaiton set approach
+# x try starting from 1 data point and only add one other data point per cycle
+# x try using random experimentalist as seed
+# - increase theorist trainign to 100 epochs
 
 # what I learned
 # - increasing model noise doesn't help, it just puts an upper limit on the final validation error
@@ -31,7 +35,7 @@ repetitions = 5  # specifies how many times to repeat the study (20)
 
 # SELECT THEORIST
 # OPTIONS: BMS, DARTS
-theorist_name = "BMS Fixed Root"
+theorist_name = "BMS"
 
 # SELECT GROUND TRUTH MODEL
 ground_truth_name = "prospect_theory"  # OPTIONS: see models.py
@@ -45,6 +49,7 @@ experimentalists = [
     # 'least confident',
 ]
 
+st = time.time()
 for rep in range(repetitions):
 
     # SET UP STUDY
@@ -63,10 +68,10 @@ for rep in range(repetitions):
 
     # split data_closed_loop into training and test sets
     X_full, y_full = data_fnc(metadata)
-    X_train = X_full
-    y_train = y_full
-    X_test = X_full
-    y_test = y_full
+    X_train = X_full.copy()
+    y_train = y_full.copy()
+    X_test = X_full.copy()
+    y_test = y_full.copy()
     # X_train, X_test, y_train, y_test = train_test_split(X_full, y_full,
     #                                                     test_size=test_size,
     #                                                     random_state=rep)
@@ -175,3 +180,7 @@ for rep in range(repetitions):
         ]
 
         pickle.dump(object_list, f)
+
+et = time.time()
+elapsed_time = et - st
+print(f"Elapsed time: {elapsed_time}")

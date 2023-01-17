@@ -81,26 +81,29 @@ def fit_theorist(X, y, theorist_name, metadata, theorist_epochs=None):
 
 
 def get_seed_experimentalist(X_allowed, metadata, num_samples):
-    # set up seed experimentalist
+    # # set up seed experimentalist
+    # experimentalist_seed = Pipeline(
+    #     [
+    #         ("grid", grid_pool),  # generate grid pool based on allowed values for independent variables
+    #         ("random", random_sampler),  # randomly draw samples from the grid
+    #         ("nearest_values", nearest_values_sampler),  # match drawn samples to data_closed_loop points in training set
+    #     ],
+    #     {
+    #         "grid__ivs": metadata.independent_variables,
+    #         "random__n": num_samples,
+    #         "nearest_values__allowed_values": X_allowed,
+    #         "nearest_values__n": num_samples,
+    #     },
+    # )
+
     experimentalist_seed = Pipeline(
         [
-            (
-                "grid",
-                grid_pool,
-            ),  # generate grid pool based on allowed values for independent variables
-            ("random", random_sampler),  # randomly draw samples from the grid
-            (
-                "nearest_values",
-                nearest_values_sampler,
-            ),  # match drawn samples to data_closed_loop points in training set
+            ("pool", X_allowed),
+            ("random", random_sampler),
         ],
-        {
-            "grid__ivs": metadata.independent_variables,
-            "random__n": num_samples,
-            "nearest_values__allowed_values": X_allowed,
-            "nearest_values__n": num_samples,
-        },
+        {"random__n": num_samples},
     )
+
     return experimentalist_seed
 
 
