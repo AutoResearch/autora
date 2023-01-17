@@ -23,7 +23,7 @@ def __build_tree_from_literals(literals: List[Union[str, int]], **hyper_params):
     a binary operation without specifying the features used by its two leaf nodes might cause error.
 
     Arguments:
-        literals: a list of strings or integers that specifies how the tree should be built
+        literals: a list of strings and integers that specifies how the tree should be built
         hyper_params: parameters to initialize certain operations
     Returns:
         root: the root node of the tree
