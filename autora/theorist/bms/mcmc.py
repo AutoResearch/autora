@@ -20,7 +20,7 @@ import sys
 from copy import deepcopy
 from inspect import signature
 from itertools import permutations, product
-from random import choice, random
+from random import choice, random, seed
 from typing import List
 
 import matplotlib.pyplot as plt
@@ -33,6 +33,8 @@ from sympy import lambdify, latex, log, sympify
 from .prior import get_priors, relu
 
 _logger = logging.getLogger(__name__)
+
+seed(1)
 
 
 class Node:
