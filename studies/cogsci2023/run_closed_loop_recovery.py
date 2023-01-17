@@ -3,7 +3,12 @@ import time
 
 import numpy as np
 from sklearn.model_selection import train_test_split
-from models.models import model_inventory
+
+import models.models # noqa: 401  # this line is required to make sure the models get registered
+# properly.
+
+from autora.model import retrieve_model
+
 from utils import (
     fit_theorist,
     get_experimentalist,
@@ -61,9 +66,8 @@ for rep in range(repetitions):
     experimentalist_log = list()
 
     # get information from the ground truth model
-    if ground_truth_name not in model_inventory.keys():
-        raise ValueError(f"Study {ground_truth_name} not found in model inventory.")
-    (metadata, data_fnc, experiment) = model_inventory[ground_truth_name]
+
+    (metadata, data_fnc, experiment) = retrieve_model(ground_truth_name, kind="model")
 
     # split data_closed_loop into training and test sets
     X_full, y_full = data_fnc(metadata)
