@@ -1,3 +1,4 @@
+from autora.model import retrieve
 from studies.cogsci2023.models.models import model_inventory
 from sklearn.model_selection import train_test_split
 from studies.cogsci2023.utils import fit_theorist, get_MSE
@@ -24,7 +25,7 @@ for rep in range(repetitions):
     # get information from the ground truth model
     if ground_truth_name not in model_inventory.keys():
         raise ValueError(f"Study {ground_truth_name} not found in model inventory.")
-    (metadata, data_fnc, experiment) = model_inventory[ground_truth_name]
+    (metadata, data_fnc, experiment) = retrieve(ground_truth_name, kind="model:v0")
 
     # split data_closed_loop into training and test sets
     X_full, y_full = data_fnc(metadata)

@@ -1,18 +1,20 @@
 # load data_closed_loop
-import pickle
 import os
+import pickle
+
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import seaborn as sns
 from sklearn.manifold import TSNE
 
-import seaborn as sns
-import matplotlib.pyplot as plt
+from autora.model import retrieve
 from studies.cogsci2023.models.models import model_inventory, plot_inventory
 
 # set the path to the data_closed_loop directory
-path = 'data_closed_loop/'
-ground_truth_name = 'prospect_theory' # OPTIONS: see models.py
-experimentalist_name = 'random' # for plotting
+path = "data_closed_loop/"
+ground_truth_name = "prospect_theory"  # OPTIONS: see models.py
+experimentalist_name = "random"  # for plotting
 
 plot_performance = True
 plot_model = False
@@ -24,10 +26,10 @@ loaded_pickles = []
 # iterate through all files in the data_closed_loop directory
 for file in os.listdir(path):
     # check if the file is a pickle file
-    if file.endswith('.pickle') and file.startswith(ground_truth_name):
+    if file.endswith(".pickle") and file.startswith(ground_truth_name):
         # open the pickle file and load the contents
-        with open(os.path.join(path, file), 'rb') as f:
-            print(f'Loading {file}')
+        with open(os.path.join(path, file), "rb") as f:
+            print(f"Loading {file}")
             pickle_data = pickle.load(f)
         # append the loaded data_closed_loop to the list of loaded pickles
         loaded_pickles.append(pickle_data)
@@ -76,17 +78,22 @@ cycles = df_validation["Data Collection Cycle"].unique()
 for experimenalist in experimentalists:
     for cycle in cycles:
         # compute the mean MSE for each experimentalist in the data_closed_loop frame
-        mean_MSE = df_validation[(df_validation["Experimentalist"] == experimenalist) &
-                                 (df_validation["Data Collection Cycle"] == cycle)][
-            "Mean Squared Error"].mean()
-        std_MSE = df_validation[(df_validation["Experimentalist"] == experimenalist) &
-                                (df_validation["Data Collection Cycle"] == cycle)][
-            "Mean Squared Error"].std()
+        mean_MSE = df_validation[
+            (df_validation["Experimentalist"] == experimenalist)
+            & (df_validation["Data Collection Cycle"] == cycle)
+        ]["Mean Squared Error"].mean()
+        std_MSE = df_validation[
+            (df_validation["Experimentalist"] == experimenalist)
+            & (df_validation["Data Collection Cycle"] == cycle)
+        ]["Mean Squared Error"].std()
         # remove all rows with MSE above the mean + 3 standard deviations
         df_validation = df_validation.drop(
-            df_validation[(df_validation["Experimentalist"] == experimenalist) &
-                          (df_validation["Data Collection Cycle"] == cycle) &
-                          (df_validation["Mean Squared Error"] > mean_MSE + 3 * std_MSE)].index)
+            df_validation[
+                (df_validation["Experimentalist"] == experimenalist)
+                & (df_validation["Data Collection Cycle"] == cycle)
+                & (df_validation["Mean Squared Error"] > mean_MSE + 3 * std_MSE)
+            ].index
+        )
 
 
 # print the data_closed_loop frame
@@ -95,7 +102,9 @@ df_validation.to_csv(path + "/" + ground_truth_name + "_MSE.csv")
 
 # copy data set
 df_entropy = df_validation.copy()
-df_entropy = df_entropy.drop(df_entropy[df_entropy["Data Collection Cycle"] != configuration["num_cycles"]].index)
+df_entropy = df_entropy.drop(
+    df_entropy[df_entropy["Data Collection Cycle"] != configuration["num_cycles"]].index
+)
 entropy_log = []
 for index, row in df_entropy.iterrows():
     # compute entropy of the corresponding observations
@@ -115,9 +124,12 @@ if plot_performance:
     # plot the performance of different experimentalists as a function of cycle
     sns.set_theme()
     rel = sns.relplot(
-        data=df_validation, kind="line",
-        x="Data Collection Cycle", y="Mean Squared Error",
-        hue="Experimentalist", style="Experimentalist"
+        data=df_validation,
+        kind="line",
+        x="Data Collection Cycle",
+        y="Mean Squared Error",
+        hue="Experimentalist",
+        style="Experimentalist",
     )
     rel.fig.suptitle(plot_title)
     plt.show()
@@ -127,15 +139,22 @@ if plot_performance:
 
 if plot_model:
     # get the rows of data_closed_loop with the lowest Mean Squared Error for each experimentalist
-    df_final_cycle = df_validation[df_validation["Data Collection Cycle"] == df_validation["Data Collection Cycle"].max()]
-    df_best_theories = df_final_cycle.loc[df_final_cycle.groupby(['Experimentalist'])['Mean Squared Error'].idxmin()]
-    model_entry = df_best_theories[df_best_theories["Experimentalist"] == experimentalist_name]['Entry'].values
+    df_final_cycle = df_validation[
+        df_validation["Data Collection Cycle"]
+        == df_validation["Data Collection Cycle"].max()
+    ]
+    df_best_theories = df_final_cycle.loc[
+        df_final_cycle.groupby(["Experimentalist"])["Mean Squared Error"].idxmin()
+    ]
+    model_entry = df_best_theories[
+        df_best_theories["Experimentalist"] == experimentalist_name
+    ]["Entry"].values
     best_theory = full_theory_log[model_entry[0]]
 
     # get information from the ground truth model
     if ground_truth_name not in model_inventory.keys():
         raise ValueError(f"Study {ground_truth_name} not found in model inventory.")
-    (metadata, data_fnc, experiment) = model_inventory[ground_truth_name]
+    (metadata, data_fnc, experiment) = retrieve(ground_truth_name, kind="model:v0")
     plot_fnc(best_theory)
 
 
@@ -154,7 +173,9 @@ if plot_tsne:
 
     # collect data_closed_loop collected by the best-performing experimentalist
     for experimenalist in experimentalists:
-        entry = df_best_theories[df_best_theories["Experimentalist"] == experimenalist]['Entry'].values
+        entry = df_best_theories[df_best_theories["Experimentalist"] == experimenalist][
+            "Entry"
+        ].values
         conditions = full_conditions_log[entry[0]]
         X = np.vstack((X, conditions))
         for i in range(len(conditions)):
@@ -168,30 +189,33 @@ if plot_tsne:
     # create final data_closed_loop frame
     df = pd.DataFrame()
     df["Labels"] = labels
-    df["Component 1"] = z[:,0]
-    df["Component 2"] = z[:,1]
+    df["Component 1"] = z[:, 0]
+    df["Component 2"] = z[:, 1]
     for col in range(X.shape[1]):
-        df[f"Condition {col}"] = X[:,col]
+        df[f"Condition {col}"] = X[:, col]
     df["Cycle"] = cycle_count
 
     # create separate df for full data set
-    full_data_only = df[df["Labels"] == 'full data set']
+    full_data_only = df[df["Labels"] == "full data set"]
     full_data_only["y"] = y
 
     # drop conditions with the seed cycle and full data set
-    df.drop(df[df['Cycle'] == 0].index, inplace=True)
-    df.drop(df[df['Labels'] == full_data_label].index, inplace=True)
+    df.drop(df[df["Cycle"] == 0].index, inplace=True)
+    df.drop(df[df["Labels"] == full_data_label].index, inplace=True)
 
     # T-SNE plot for full data
     custom_palette = sns.color_palette("Greys", len(y.tolist()))
-    sns.scatterplot(x="Component 1", y="Component 2", hue=full_data_only.y,
-                    palette=custom_palette,
-                    data=full_data_only,
-                    linewidth = 0,
-                    # s = 10,
-                    legend=False)
+    sns.scatterplot(
+        x="Component 1",
+        y="Component 2",
+        hue=full_data_only.y,
+        palette=custom_palette,
+        data=full_data_only,
+        linewidth=0,
+        # s = 10,
+        legend=False,
+    )
     # plt.show()
-
 
     # x_list = full_data_only["Component 1"]
     # y_list = full_data_only["Component 2"]
@@ -209,10 +233,16 @@ if plot_tsne:
     # T-SNE Plot for experimentalists
     custom_palette = sns.color_palette("deep", len(set(labels)))
     # custom_palette[0] = (0.5, 0.5, 0.5)
-    sns.scatterplot(x="Component 1", y="Component 2", hue=df.Labels.tolist(),
-                    palette=custom_palette,
-                    s = 10,
-                    data=df).set(title="T-SNE Projection of Probed Experimental Conditions\n(" + plot_title + ")")
+    sns.scatterplot(
+        x="Component 1",
+        y="Component 2",
+        hue=df.Labels.tolist(),
+        palette=custom_palette,
+        s=10,
+        data=df,
+    ).set(
+        title="T-SNE Projection of Probed Experimental Conditions\n(" + plot_title + ")"
+    )
     plt.show()
 
     sns.histplot(data=full_data_only, x="y", bins=100)
@@ -221,8 +251,3 @@ if plot_tsne:
 # plot best theory
 if plot_model:
     print(best_theory.model_.latex())
-
-
-
-
-

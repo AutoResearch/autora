@@ -1,20 +1,15 @@
 import pickle
 import time
 
+import models.models  # noqa: 401  # this line is required to make sure the models get registered
 import numpy as np
 from sklearn.model_selection import train_test_split
+from utils import fit_theorist, get_experimentalist, get_MSE, get_seed_experimentalist
 
-import models.models # noqa: 401  # this line is required to make sure the models get registered
+from autora.model import retrieve
+
 # properly.
 
-from autora.model import retrieve_model
-
-from utils import (
-    fit_theorist,
-    get_experimentalist,
-    get_MSE,
-    get_seed_experimentalist,
-)
 
 # META PARAMETERS
 num_cycles = 200  # number of cycles (20)
@@ -47,7 +42,7 @@ ground_truth_name = "prospect_theory"  # OPTIONS: see models.py
 experimentalists = [
     # 'popper',
     # 'falsification',
-    'random',
+    "random",
     # "dissimilarity",
     # 'model disagreement',
     # 'least confident',
@@ -67,7 +62,7 @@ for rep in range(repetitions):
 
     # get information from the ground truth model
 
-    (metadata, data_fnc, experiment) = retrieve_model(ground_truth_name, kind="model:v0")
+    (metadata, data_fnc, experiment) = retrieve(ground_truth_name, kind="model:v0")
 
     # split data_closed_loop into training and test sets
     X_full, y_full = data_fnc(metadata)
@@ -81,9 +76,7 @@ for rep in range(repetitions):
     # Since we know the GT, we can use the full dataset for training
 
     # get seed experimentalist
-    experimentalist_seed = get_seed_experimentalist(
-        X_train, metadata, samples_for_seed
-    )
+    experimentalist_seed = get_seed_experimentalist(X_train, metadata, samples_for_seed)
 
     # generate seed data_closed_loop
     X_seed = experimentalist_seed.run()
@@ -91,7 +84,9 @@ for rep in range(repetitions):
 
     # set up and fit theorist
     print("Fitting theorist...")
-    theorist_seed = fit_theorist(X_seed, y_seed, theorist_name, metadata, theorist_epochs)
+    theorist_seed = fit_theorist(
+        X_seed, y_seed, theorist_name, metadata, theorist_epochs
+    )
 
     for experimentalist_name in experimentalists:
 
@@ -179,7 +174,7 @@ for rep in range(repetitions):
             theory_log,
             conditions_log,
             observations_log,
-            experimentalist_log
+            experimentalist_log,
         ]
 
         pickle.dump(object_list, f)

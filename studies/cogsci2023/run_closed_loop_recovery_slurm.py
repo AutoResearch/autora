@@ -1,20 +1,17 @@
+import argparse
 import pickle
 import time
-import argparse
-import numpy as np
-from sklearn.model_selection import train_test_split
 
+import numpy as np
 from models.models import model_inventory
-from utils import (
-    fit_theorist,
-    get_experimentalist,
-    get_MSE,
-    get_seed_experimentalist,
-)
+from sklearn.model_selection import train_test_split
+from utils import fit_theorist, get_experimentalist, get_MSE, get_seed_experimentalist
+
+from autora.model import retrieve
 
 # parse arguments
 parser = argparse.ArgumentParser("parser")
-parser.add_argument('--slurm_id', type=int, default=0, help='number of slurm array')
+parser.add_argument("--slurm_id", type=int, default=0, help="number of slurm array")
 args = parser.parse_args()
 rep = args.slurm_id
 
@@ -34,7 +31,7 @@ ground_truth_name = "prospect_theory"  # OPTIONS: see models.py
 experimentalists = [
     # 'popper',
     # 'falsification',
-    'random',
+    "random",
     # "dissimilarity",
     # 'model disagreement',
     # 'least confident',
@@ -54,7 +51,7 @@ experimentalist_log = list()
 # get information from the ground truth model
 if ground_truth_name not in model_inventory.keys():
     raise ValueError(f"Study {ground_truth_name} not found in model inventory.")
-(metadata, data_fnc, experiment) = model_inventory[ground_truth_name]
+(metadata, data_fnc, experiment) = retrieve(ground_truth_name, kind="model:v0")
 
 # split data_closed_loop into training and test sets
 X_full, y_full = data_fnc(metadata)
@@ -68,9 +65,7 @@ y_test = y_full.copy()
 # Since we know the GT, we can use the full dataset for training
 
 # get seed experimentalist
-experimentalist_seed = get_seed_experimentalist(
-    X_train, metadata, samples_for_seed
-)
+experimentalist_seed = get_seed_experimentalist(X_train, metadata, samples_for_seed)
 
 # generate seed data_closed_loop
 X_seed = experimentalist_seed.run()
@@ -166,7 +161,7 @@ with open(file_name, "wb") as f:
         theory_log,
         conditions_log,
         observations_log,
-        experimentalist_log
+        experimentalist_log,
     ]
 
     pickle.dump(object_list, f)
