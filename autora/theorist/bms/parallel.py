@@ -32,6 +32,7 @@ class Parallel:
         x=None,
         y=None,
         root=None,
+        seed=None,
     ) -> None:
         """
         Initialises Parallel Machine Scientist
@@ -64,6 +65,7 @@ class Parallel:
                 root_value=root.__name__ if root is not None else None,
                 fixed_root=True if root is not None else False,
                 custom_ops=custom_ops,
+                seed_value=seed,
             )
         }
         self.t1 = self.trees["1.0"]
@@ -80,6 +82,7 @@ class Parallel:
                 custom_ops=custom_ops,
                 max_size=max_size,
                 BT=float(BT),
+                seed_value=seed,
             )
             self.trees[BT] = treetmp
             # Share fitted parameters and representative with other trees
