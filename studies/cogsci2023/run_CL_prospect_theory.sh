@@ -2,6 +2,7 @@
 
 #SBATCH -J Experimentalists
 #SBATCH --time=23:00:00
+#SBATCH --array=1-20
 #SBATCH --mem=6GB
 #SBATCH -n 1
 

@@ -13,7 +13,7 @@ from utils import (
 )
 
 # META PARAMETERS
-num_cycles = 1  # number of cycles (20)
+num_cycles = 10  # number of cycles (20)
 samples_for_seed = 10  # number of seed data_closed_loop points (20)
 samples_per_cycle = 10  # number of data_closed_loop points chosen per cycle (20)
 theorist_epochs = 500  # number of epochs for theorist (not used for logistic regression)
@@ -36,19 +36,16 @@ experimentalists = [
 st = time.time()
 
 # parse arguments
-# parser = argparse.ArgumentParser("parser")
-# parser.add_argument('--slurm_id', type=int, default=0, help='number of slurm array')
-# args = parser.parse_args()
+parser = argparse.ArgumentParser("parser")
+parser.add_argument('--slurm_id', type=int, default=0, help='number of slurm array')
+args = parser.parse_args()
 
 repetitions = np.arange(num_repetitions)
 experimentalist_ids = np.arange(len(experimentalists))
 conditions = np.array(np.meshgrid(repetitions, experimentalist_ids)).T.reshape(-1,2)
 
-ID = 3
-# rep = conditions[args.slurm_id,0]
-# experimentalist_id = conditions[args.slurm_id,1]
-rep = conditions[ID,0]
-experimentalist_id = conditions[ID,1]
+rep = conditions[args.slurm_id,0]
+experimentalist_id = conditions[args.slurm_id,1]
 experimentalist_name = experimentalists[experimentalist_id]
 seed(rep)
 
