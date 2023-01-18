@@ -118,7 +118,7 @@ for experimentalist_name in experimentalists:
         )
 
         # get new experiment conditions
-        print("Running experimentalist...")
+        print("Running experimentalist..." + experimentalist_name)
         X_new = experimentalist.run()
 
         # run experiment
