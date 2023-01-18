@@ -42,15 +42,14 @@ experimentalists = [
 ]
 
 st = time.time()
-print("hello world")
-# closed_loop(rep,
-#             theorist_name,
-#             ground_truth_name,
-#             experimentalists,
-#             num_cycles,
-#             samples_for_seed,
-#             samples_per_cycle,
-#             theorist_epochs)
+closed_loop(rep,
+            theorist_name,
+            ground_truth_name,
+            experimentalists,
+            num_cycles,
+            samples_for_seed,
+            samples_per_cycle,
+            theorist_epochs)
 et = time.time()
 elapsed_time = et - st
 print(f"Elapsed time: {elapsed_time}")
