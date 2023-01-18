@@ -182,7 +182,7 @@ def get_experimentalist(
         )
 
     # dissimilarity experimentalist
-    elif experimentalist_name == "dissimilarity":
+    elif experimentalist_name == "novelty":
         experimentalist = Pipeline(
             [
                 ("pool", X_allowed),
