@@ -268,3 +268,7 @@ def get_MSE(theorist, x, y_target):
     MSE = np.mean(np.square(y_target - y_prediction))
 
     return MSE
+
+
+def get_DL(theorist):
+    return theorist.model_.E
