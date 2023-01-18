@@ -109,6 +109,8 @@ experimentalist = get_experimentalist(
         samples_per_cycle,
     )
 
+print("Running experimentalist..." + experimentalist_name)
+X_new = experimentalist.run()
 
 #
 # # now that we have the seed data_closed_loop and model, we can start the recovery loop
