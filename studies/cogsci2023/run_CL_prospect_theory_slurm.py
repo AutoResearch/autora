@@ -13,7 +13,7 @@ from utils import (
 )
 
 # META PARAMETERS
-num_cycles = 10  # number of cycles (20)
+num_cycles = 1  # number of cycles (20)
 samples_for_seed = 10  # number of seed data_closed_loop points (20)
 samples_per_cycle = 10  # number of data_closed_loop points chosen per cycle (20)
 theorist_epochs = 500  # number of epochs for theorist (not used for logistic regression)
@@ -112,87 +112,87 @@ experimentalist = get_experimentalist(
 print("Running experimentalist..." + experimentalist_name)
 X_new = experimentalist.run()
 
-#
-# # now that we have the seed data_closed_loop and model, we can start the recovery loop
-# for cycle in range(num_cycles):
-#     print(f"Starting cycle {cycle} of {num_cycles}...")
-#
-#     # generate experimentalist
-#     experimentalist = get_experimentalist(
-#         experimentalist_name,
-#         X,
-#         y,
-#         X_train,
-#         metadata,
-#         theorist,
-#         samples_per_cycle,
-#     )
-#
-#     # get new experiment conditions
-#     print("Running experimentalist..." + experimentalist_name)
-#     X_new = experimentalist.run()
-#
-#     # run experiment
-#     print("Running experiment...")
-#     y_new = experiment(X_new)
-#
-#     # combine old and new data_closed_loop
-#     X = np.row_stack([X, X_new])
-#     y = np.row_stack([y, y_new])
-#
-#     # fit theory
-#     print("Fitting theorist...")
-#     theorist = fit_theorist(X, y, theorist_name, metadata, theorist_epochs)
-#
-#     # evaluate theory fit
-#     print("Evaluating fit...")
-#     MSE_log.append(get_MSE(theorist, X_test, y_test))
-#     cycle_log.append(cycle + 1)
-#     repetition_log.append(rep)
-#     theory_log.append(theorist)
-#     conditions_log.append(X)
-#     observations_log.append(y)
-#     experimentalist_log.append(experimentalist_name)
-#
-# # save and load pickle file
-# file_name = (
-#     "data_closed_loop/"
-#     + ground_truth_name
-#     + "_"
-#     + theorist_name
-#     + "_"
-#     + experimentalist_name
-#     + "_"
-#     + str(rep)
-#     + ".pickle"
-# )
-#
-# with open(file_name, "wb") as f:
-#     # simulation configuration
-#     configuration = dict()
-#     configuration["ground_truth"] = ground_truth_name
-#     configuration["theorist_name"] = theorist_name
-#     configuration["experimentalist_name"] = experimentalist_name
-#     configuration["num_cycles"] = num_cycles
-#     configuration["samples_per_cycle"] = samples_per_cycle
-#     configuration["samples_for_seed"] = samples_for_seed
-#     configuration["theorist_epochs"] = theorist_epochs
-#     configuration["repetitions"] = rep
-#     # configuration["test_size"] = test_size
-#
-#     object_list = [
-#         configuration,
-#         MSE_log,
-#         cycle_log,
-#         repetition_log,
-#         theory_log,
-#         conditions_log,
-#         observations_log,
-#         experimentalist_log
-#     ]
-#
-#     pickle.dump(object_list, f)
-#
-# et = time.time()
-# elapsed_time = et - st
-# print(f"Elapsed time: {elapsed_time}")
+
+# now that we have the seed data_closed_loop and model, we can start the recovery loop
+for cycle in range(num_cycles):
+    print(f"Starting cycle {cycle} of {num_cycles}...")
+
+    # generate experimentalist
+    experimentalist = get_experimentalist(
+        experimentalist_name,
+        X,
+        y,
+        X_train,
+        metadata,
+        theorist,
+        samples_per_cycle,
+    )
+
+    # get new experiment conditions
+    print("Running experimentalist..." + experimentalist_name)
+    X_new = experimentalist.run()
+
+    # run experiment
+    print("Running experiment...")
+    y_new = experiment(X_new)
+
+    # combine old and new data_closed_loop
+    X = np.row_stack([X, X_new])
+    y = np.row_stack([y, y_new])
+
+    # fit theory
+    print("Fitting theorist...")
+    theorist = fit_theorist(X, y, theorist_name, metadata, theorist_epochs)
+
+    # evaluate theory fit
+    print("Evaluating fit...")
+    MSE_log.append(get_MSE(theorist, X_test, y_test))
+    cycle_log.append(cycle + 1)
+    repetition_log.append(rep)
+    theory_log.append(theorist)
+    conditions_log.append(X)
+    observations_log.append(y)
+    experimentalist_log.append(experimentalist_name)
+
+# save and load pickle file
+file_name = (
+    "data_closed_loop/"
+    + ground_truth_name
+    + "_"
+    + theorist_name
+    + "_"
+    + experimentalist_name
+    + "_"
+    + str(rep)
+    + ".pickle"
+)
+
+with open(file_name, "wb") as f:
+    # simulation configuration
+    configuration = dict()
+    configuration["ground_truth"] = ground_truth_name
+    configuration["theorist_name"] = theorist_name
+    configuration["experimentalist_name"] = experimentalist_name
+    configuration["num_cycles"] = num_cycles
+    configuration["samples_per_cycle"] = samples_per_cycle
+    configuration["samples_for_seed"] = samples_for_seed
+    configuration["theorist_epochs"] = theorist_epochs
+    configuration["repetitions"] = rep
+    # configuration["test_size"] = test_size
+
+    object_list = [
+        configuration,
+        MSE_log,
+        cycle_log,
+        repetition_log,
+        theory_log,
+        conditions_log,
+        observations_log,
+        experimentalist_log
+    ]
+
+    pickle.dump(object_list, f)
+
+et = time.time()
+elapsed_time = et - st
+print(f"Elapsed time: {elapsed_time}")
