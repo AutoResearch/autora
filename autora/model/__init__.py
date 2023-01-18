@@ -13,13 +13,6 @@ class Model:
     data: Optional[Callable]
     plotter: Optional[Callable]
 
-    def model_v0(self):
-        assert self.metadata is not None
-        return self.metadata(), self.data, self.synthetic_experiment_runner
-
-    def plotter_v0(self):
-        return self.plotter, self.name
-
 
 class ModelInventory(UserDict):
     pass
@@ -47,10 +40,15 @@ def register_model(
     _INVENTORY[id] = new_model
 
 
-def retrieve_model(id, kind: Literal["model", "plotter"], version="v0"):
+def retrieve_model(
+    id, kind: Optional[Literal["full:v0", "model:v0", "plotter:v0"]] = "full:v0"
+):
     entry: Model = _INVENTORY[id]
-    if version == "v0":
-        if kind == "model":
-            return entry.model_v0()
-        elif kind == "plotter":
-            return entry.plotter_v0()
+
+    if kind == "full:v0":
+        return entry
+    if kind == "model:v0":
+        assert entry.metadata is not None
+        return entry.metadata(), entry.data, entry.synthetic_experiment_runner
+    elif kind == "plotter:v0":
+        return entry.plotter, entry.name
