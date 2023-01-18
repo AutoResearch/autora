@@ -17,7 +17,11 @@ from utils import (
 num_cycles = 20  # number of cycles (20)
 samples_for_seed = 100  # number of seed data_closed_loop points (20)
 samples_per_cycle = 100  # number of data_closed_loop points chosen per cycle (20)
-theorist_epochs = 5000  # number of epochs for BMS (500)
+theorist_epochs = 3000  # number of epochs for BMS (500)
+
+# try next:
+# - move epochs back to 3000
+# - try without cycling but collect all the final data at once
 
 # SELECT THEORIST
 theorist_name = "BMS"
@@ -57,30 +61,54 @@ X = X_seed.copy()
 y = y_seed.copy()
 theorist = theorist_seed
 
-for cycle in range(num_cycles):
-    print(f"Cycle {cycle + 1} of {num_cycles}...")
-    # get experimentalist
-    experimentalist = get_experimentalist(
-        experimentalist_name,
-        X,
-        y,
-        X_train,
-        metadata,
-        theorist,
-        samples_per_cycle,
-    )
+final_samples = samples_per_cycle * num_cycles
 
-    # get new experiment conditions
-    print("Running experimentalist...")
-    X_new = experimentalist.run()
+experimentalist = get_experimentalist(
+    experimentalist_name,
+    X,
+    y,
+    X_train,
+    metadata,
+    theorist,
+    final_samples,
+)
 
-    # run experiment
-    print("Running experiment...")
-    y_new = experiment(X_new)
+# get new experiment conditions
+print("Running experimentalist...")
+X_new = experimentalist.run()
 
-    # combine old and new data_closed_loop
-    X = np.row_stack([X, X_new])
-    y = np.row_stack([y, y_new])
+# run experiment
+print("Running experiment...")
+y_new = experiment(X_new)
+
+# combine old and new data_closed_loop
+X = np.row_stack([X, X_new])
+y = np.row_stack([y, y_new])
+
+# for cycle in range(num_cycles):
+#     print(f"Cycle {cycle + 1} of {num_cycles}...")
+#     # get experimentalist
+#     experimentalist = get_experimentalist(
+#         experimentalist_name,
+#         X,
+#         y,
+#         X_train,
+#         metadata,
+#         theorist,
+#         samples_per_cycle,
+#     )
+#
+#     # get new experiment conditions
+#     print("Running experimentalist...")
+#     X_new = experimentalist.run()
+#
+#     # run experiment
+#     print("Running experiment...")
+#     y_new = experiment(X_new)
+#
+#     # combine old and new data_closed_loop
+#     X = np.row_stack([X, X_new])
+#     y = np.row_stack([y, y_new])
 
 final_theorist = fit_theorist(X, y, theorist_name, metadata, theorist_epochs)
 final_MSE = get_MSE(final_theorist, X_test, y_test)

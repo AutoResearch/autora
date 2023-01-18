@@ -16,7 +16,7 @@ def task_switching_metadata():
 
     current_task_strength = IV(
         name="cur_task_strength",
-        allowed_values=np.linspace(0.05, 1, task_switching_resolution),
+        allowed_values=np.linspace(1/task_switching_resolution, 1, task_switching_resolution), #
         value_range=(0, 1),
         units="intensity",
         variable_label="Strength of Current Task",
@@ -25,7 +25,7 @@ def task_switching_metadata():
 
     alt_task_strength = IV(
         name="alt_task_strength",
-        allowed_values=np.linspace(0.05, 1, task_switching_resolution),
+        allowed_values=np.linspace(1/task_switching_resolution, 1, task_switching_resolution),
         value_range=(0, 1),
         units="intensity",
         variable_label="Strength of Alternative Task",
