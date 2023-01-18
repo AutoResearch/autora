@@ -1,20 +1,20 @@
 import numpy as np
 import scipy
+from MLP_theorist import MLP_theorist
 
 from autora.experimentalist.pipeline import Pipeline
 from autora.experimentalist.pooler import grid_pool, poppernet_pool
 from autora.experimentalist.sampler import (
+    dissimilarity_sampler,
+    falsification_sampler,
     model_disagreement_sampler,
     nearest_values_sampler,
     random_sampler,
-    dissimilarity_sampler,
     uncertainty_sampler,
-    falsification_sampler
 )
 from autora.skl.bms import BMSRegressor
 from autora.skl.darts import DARTSRegressor
 from autora.variable import ValueType
-from MLP_theorist import MLP_theorist
 
 
 def sigmoid(x):
@@ -265,3 +265,12 @@ def get_MSE(theorist, x, y_target):
     MSE = np.mean(np.square(y_target - y_prediction))
 
     return MSE
+
+
+# We can improve this to accommodate any theorist if we:
+#   - additionally pass priors
+#   - can get the theorist model into latex form
+#   - use 100 lines of old mcmc code to build Tree objects from latex strings
+def get_DL(theorist):
+    assert theorist.__name__ == "BMSRegressor"
+    return theorist.model_.E
