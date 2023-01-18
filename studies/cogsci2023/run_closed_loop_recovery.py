@@ -46,7 +46,7 @@ experimentalists = [
     'falsification',
     'random',
     "dissimilarity",
-    'model disagreement',
+    # 'model disagreement',
     'least confident',
 ]
 
