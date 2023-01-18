@@ -3,7 +3,7 @@
 #SBATCH -J Experimentalists
 #SBATCH --time=23:00:00
 #SBATCH --array=1-10
-#SBATCH --mem=16GB
+#SBATCH --mem=4GB
 #SBATCH -n 1
 
 # Print key runtime properties for records

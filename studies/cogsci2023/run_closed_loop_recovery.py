@@ -13,25 +13,29 @@ from utils import (
 )
 
 # META PARAMETERS
-num_cycles = 50  # number of cycles (20)
-samples_for_seed = 10  # number of seed data_closed_loop points (20)
-samples_per_cycle = 10  # number of data_closed_loop points chosen per cycle (20)
+num_cycles = 10  # number of cycles (20)
+samples_for_seed = 100  # number of seed data_closed_loop points (20)
+samples_per_cycle = 100  # number of data_closed_loop points chosen per cycle (20)
 theorist_epochs = 500  # number of epochs for BMS (500)
-repetitions = 50  # specifies how many times to repeat the study (20)
+repetitions = 10  # specifies how many times to repeat the study (20)
 
 # TODO TO TRY:
 # x increase cycle samples to 100 and cycles to 20
-# - go back to validaiton set approach
+# (-) go back to validaiton set approach
 # x try starting from 1 data point and only add one other data point per cycle
 # x try using random experimentalist as seed
-# - increase theorist training to 1500 epochs
-# - try logistic regression and change back to BMS
+# o increase theorist training to 1500 epochs
+# x try logistic regression and change back to BMS
+# x try adding interaction terms to logit regression with
+# - try with noisy prospect theory model and more samples (100 instead of 10)
+# - try logistic regression with stroop model
 
 # what I learned
 # - increasing model noise doesn't help, it just puts an upper limit on the final validation error
 # - popper seems to do better than pure falsification due to bound repulsion
+# - if BMS theorist is fitted over 500 epochs, then error can increase as a function of cycles
+# (but this can be fixed with collecting just one data pointa at a time)
 
-# todo: add back noise to prospect theory
 # todo: make sure resolution of all probed models is comparable (and potentially higher)
 
 # SELECT THEORIST

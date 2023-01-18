@@ -3,7 +3,7 @@ import numpy as np
 from .expected_value import expected_value_theory_metadata
 
 # general meta parameters
-added_noise = 0.00
+added_noise = 0.01
 
 # prospect theory parameters
 # parameters taken from:
@@ -64,7 +64,7 @@ def prospect_theory_experiment(
         # uncertainty. J. Risk Uncertain. 5, 297–323 (1992). doi:10.1007/BF00122574
 
         # compute probability of option A
-        if x[1] >= 0:
+        if x[0] >= 0:
             coefficient = probability_alpha
         else:
             coefficient = probability_beta
@@ -74,7 +74,7 @@ def prospect_theory_experiment(
         ) ** (1 / coefficient)
 
         # compute probability of option B
-        if x[3] >= 0:
+        if x[2] >= 0:
             coefficient = probability_alpha
         else:
             coefficient = probability_beta
@@ -154,31 +154,31 @@ def plot_prospect_theory(model=None):
 
 # plot_prospect_theory()
 
-# value_alpha = 0.88
-# value_beta = 0.88
-# value_lambda = 2.25
-# probability_alpha = 1.0 #0.61
-# probability_beta = 0.69
-#
-# x_range = np.linspace(0, 1, 1000)
+value_alpha = 0.88
+value_beta = 0.88
+value_lambda = 2.25
+probability_alpha = 1.0 #0.61
+probability_beta = 0.69
+
+# x_range = np.linspace(-1, 1, 1000)
 # y = np.zeros((x_range.shape[0],1))
 #
 # for idx, x in enumerate(x_range):
 #
-#     # if x >= 0:
-#     #     value_A = x ** value_alpha
-#     # else:
-#     #     value_A = - value_lambda * (-x) ** (value_beta)
-#
 #     if x >= 0:
-#         coefficient = probability_alpha
+#         value_A = x ** value_alpha
 #     else:
-#         coefficient = probability_beta
+#         value_A = - value_lambda * (-x) ** (value_beta)
 #
-#     probability_a = x ** coefficient / \
-#                     (x ** coefficient + (1 - x) ** coefficient) ** (1 / coefficient)
+#     # if x >= 0:
+#     #     coefficient = probability_alpha
+#     # else:
+#     #     coefficient = probability_beta
+#     #
+#     # probability_a = x ** coefficient / \
+#     #                 (x ** coefficient + (1 - x) ** coefficient) ** (1 / coefficient)
 #
-#     y[idx] = probability_a
+#     y[idx] = value_A
 #
 # import matplotlib.pyplot as plt
 # plt.plot(x_range, y)

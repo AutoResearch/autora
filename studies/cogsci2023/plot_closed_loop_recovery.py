@@ -218,9 +218,10 @@ if plot_tsne:
     sns.histplot(data=full_data_only, x="y", bins=100)
     plt.show()
 
-# plot best theory
+# output best theory
 if plot_model:
-    print(best_theory.model_.latex())
+    if hasattr(best_theory, "model_"):
+        print(best_theory.model_.latex())
 
 
 
