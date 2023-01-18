@@ -15,8 +15,8 @@ ground_truth_name = 'prospect_theory' # OPTIONS: see models.py
 experimentalist_name = 'random' # for plotting
 
 plot_performance = True
-plot_model = False
-plot_tsne = False
+plot_model = True
+plot_tsne = True
 
 # create an empty list to store the loaded pickle files
 loaded_pickles = []
