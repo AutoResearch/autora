@@ -20,7 +20,7 @@ import sys
 from copy import deepcopy
 from inspect import signature
 from itertools import permutations, product
-from random import choice, random
+from random import choice, random, seed
 from typing import List
 
 import matplotlib.pyplot as plt
@@ -151,6 +151,7 @@ class Tree:
         root_value=None,
         fixed_root=False,
         custom_ops={},
+        seed_value=None,
     ):
         """
         Initialises the tree object
@@ -167,6 +168,8 @@ class Tree:
             max_size: maximum size of tree (maximum number of nodes)
             root_value: algebraic term held at root of equation
         """
+        if seed_value is not None:
+            seed(seed_value)
         # The variables and parameters
         if custom_ops is None:
             custom_ops = dict()
