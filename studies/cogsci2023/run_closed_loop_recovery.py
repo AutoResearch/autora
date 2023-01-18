@@ -67,7 +67,7 @@ for rep in range(repetitions):
 
     # get information from the ground truth model
 
-    (metadata, data_fnc, experiment) = retrieve_model(ground_truth_name, kind="model")
+    (metadata, data_fnc, experiment) = retrieve_model(ground_truth_name, kind="model:v0")
 
     # split data_closed_loop into training and test sets
     X_full, y_full = data_fnc(metadata)
