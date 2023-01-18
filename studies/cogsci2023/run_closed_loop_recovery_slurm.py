@@ -3,6 +3,7 @@ import time
 import argparse
 import numpy as np
 from sklearn.model_selection import train_test_split
+from random import seed
 
 from models.models import model_inventory
 from utils import (
@@ -19,10 +20,14 @@ args = parser.parse_args()
 rep = args.slurm_id
 
 # META PARAMETERS
-num_cycles = 100  # number of cycles (20)
+num_cycles = 200  # number of cycles (20)
 samples_for_seed = 1  # number of seed data_closed_loop points (20)
 samples_per_cycle = 1  # number of data_closed_loop points chosen per cycle (20)
 theorist_epochs = 500  # number of epochs for BMS (500)
+
+# next stesp:
+# - up fitting to 3000 epochs (make sure to upp time running)
+# - try with 1 data point per cycle?
 
 # SELECT THEORIST
 # OPTIONS: BMS, DARTS
@@ -41,6 +46,8 @@ experimentalists = [
 ]
 
 st = time.time()
+
+seed(rep)
 
 # SET UP STUDY
 MSE_log = list()
@@ -97,6 +104,7 @@ for experimentalist_name in experimentalists:
 
     # now that we have the seed data_closed_loop and model, we can start the recovery loop
     for cycle in range(num_cycles):
+        print(f"Starting cycle {cycle} of {num_cycles}...")
 
         # generate experimentalist
         experimentalist = get_experimentalist(
@@ -110,7 +118,7 @@ for experimentalist_name in experimentalists:
         )
 
         # get new experiment conditions
-        print("Running experimentalist...")
+        print("Running experimentalist..." + experimentalist_name)
         X_new = experimentalist.run()
 
         # run experiment

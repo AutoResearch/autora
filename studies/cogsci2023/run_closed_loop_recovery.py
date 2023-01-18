@@ -1,5 +1,6 @@
 import pickle
 import time
+from random import seed
 
 import numpy as np
 from sklearn.model_selection import train_test_split
@@ -12,44 +13,51 @@ from utils import (
 )
 
 # META PARAMETERS
-num_cycles = 200  # number of cycles (20)
-samples_for_seed = 1  # number of seed data_closed_loop points (20)
-samples_per_cycle = 1  # number of data_closed_loop points chosen per cycle (20)
+num_cycles = 10  # number of cycles (20)
+samples_for_seed = 100  # number of seed data_closed_loop points (20)
+samples_per_cycle = 100  # number of data_closed_loop points chosen per cycle (20)
 theorist_epochs = 500  # number of epochs for BMS (500)
-repetitions = 5  # specifies how many times to repeat the study (20)
+repetitions = 10  # specifies how many times to repeat the study (20)
 
 # TODO TO TRY:
 # x increase cycle samples to 100 and cycles to 20
-# - go back to validaiton set approach
+# (-) go back to validaiton set approach
 # x try starting from 1 data point and only add one other data point per cycle
 # x try using random experimentalist as seed
-# - increase theorist trainign to 100 epochs
+# o increase theorist training to 1500 epochs
+# x try logistic regression and change back to BMS
+# x try adding interaction terms to logit regression with
+# - try with noisy prospect theory model and more samples (100 instead of 10)
+# - try logistic regression with stroop model
 
 # what I learned
 # - increasing model noise doesn't help, it just puts an upper limit on the final validation error
 # - popper seems to do better than pure falsification due to bound repulsion
+# - if BMS theorist is fitted over 500 epochs, then error can increase as a function of cycles
+# (but this can be fixed with collecting just one data pointa at a time)
 
-# todo: add back noise to prospect theory
 # todo: make sure resolution of all probed models is comparable (and potentially higher)
 
 # SELECT THEORIST
 # OPTIONS: BMS, DARTS
-theorist_name = "BMS"
+theorist_name = "Logistic Regression"
 
 # SELECT GROUND TRUTH MODEL
 ground_truth_name = "prospect_theory"  # OPTIONS: see models.py
 
 experimentalists = [
-    # 'popper',
-    # 'falsification',
+    'popper',
+    'falsification',
     'random',
-    # "dissimilarity",
+    "dissimilarity",
     # 'model disagreement',
-    # 'least confident',
+    'least confident',
 ]
 
 st = time.time()
 for rep in range(repetitions):
+
+    seed(rep)
 
     # SET UP STUDY
     MSE_log = list()
@@ -106,6 +114,7 @@ for rep in range(repetitions):
 
         # now that we have the seed data_closed_loop and model, we can start the recovery loop
         for cycle in range(num_cycles):
+            print(f"Starting cycle {cycle} of {num_cycles}...")
 
             # generate experimentalist
             experimentalist = get_experimentalist(
@@ -119,7 +128,7 @@ for rep in range(repetitions):
             )
 
             # get new experiment conditions
-            print("Running experimentalist...")
+            print("Running experimentalist..." + experimentalist_name)
             X_new = experimentalist.run()
 
             # run experiment

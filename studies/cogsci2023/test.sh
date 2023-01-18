@@ -1,10 +1,10 @@
 #!/bin/sh
 
-#SBATCH -J Experimentalists
+#SBATCH -J Test
 #SBATCH --time=23:00:00
-#SBATCH --array=1-10
 #SBATCH --mem=4GB
 #SBATCH -n 1
+#SBATCH --mail-user=sebastian_musslick@brown.edu
 
 # Print key runtime properties for records
 echo Master process running on `hostname`
@@ -19,4 +19,4 @@ source ~/autora_dev/bin/activate
 cd /users/smusslic/research/AER_repo/studies/cogsci2023
 
 # Run job
-python run_closed_loop_recovery_slurm.py --slurm_id $SLURM_ARRAY_TASK_ID
+python test.py

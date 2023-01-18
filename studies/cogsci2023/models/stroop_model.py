@@ -97,11 +97,11 @@ def stroop_model_experiment(
 
     # Stroop Model according to
     # Cohen, J. D., Dunbar, K. M., McClelland, J. L., & Rohrer, D. (1990). On the control of automatic processes: a parallel distributed processing account of the Stroop effect. Psychological review, 97(3), 332.
-    model = Stroop_Model(choice_temperature)
+    model = Stroop_Model(choice_temperature, std=std)
 
     for idx, x in enumerate(X):
         # compute regular output
-        output_net = model(x).detach().numpy() + std
+        output_net = model(x).detach().numpy()
         p_choose_A = output_net[0][0]
 
         Y[idx] = p_choose_A
@@ -150,10 +150,11 @@ def stroop_model_data(metadata):
 
 
 class Stroop_Model(nn.Module):
-    def __init__(self, choice_temperature):
+    def __init__(self, choice_temperature, std=0):
         super(Stroop_Model, self).__init__()
 
         self.choice_temperature = choice_temperature
+        self.std = std
 
         # define affine transformations
         self.input_color_hidden_color = nn.Linear(2, 2, bias=False)
@@ -211,6 +212,10 @@ class Stroop_Model(nn.Module):
         output = self.hidden_color_output(color_hidden) + self.hidden_word_output(
             word_hidden
         )
+
+        # add noise
+        if self.std > 0:
+            output += torch.randn(output.shape) * self.std
 
         output_softmaxed = torch.exp(output * 1 / self.choice_temperature) / (
             torch.exp(output[:, 0] * 1 / self.choice_temperature)

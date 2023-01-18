@@ -15,8 +15,8 @@ ground_truth_name = 'prospect_theory' # OPTIONS: see models.py
 experimentalist_name = 'random' # for plotting
 
 plot_performance = True
-plot_model = False
-plot_tsne = False
+plot_model = True
+plot_tsne = True
 
 # create an empty list to store the loaded pickle files
 loaded_pickles = []
@@ -218,9 +218,10 @@ if plot_tsne:
     sns.histplot(data=full_data_only, x="y", bins=100)
     plt.show()
 
-# plot best theory
+# output best theory
 if plot_model:
-    print(best_theory.model_.latex())
+    if hasattr(best_theory, "model_"):
+        print(best_theory.model_.latex())
 
 
 

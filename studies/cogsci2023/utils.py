@@ -1,5 +1,6 @@
 import numpy as np
 import scipy
+from logit_theorist import LogitRegression
 from MLP_theorist import MLP_theorist
 
 from autora.experimentalist.pipeline import Pipeline
@@ -61,6 +62,8 @@ def fit_theorist(X, y, theorist_name, metadata, theorist_epochs=None):
         else:
             epochs = 5000
         theorist = MLP_theorist(epochs=epochs, output_type=output_type, verbose=True)
+    elif theorist_name == "Logistic Regression":
+        theorist = LogitRegression()
     else:
         raise ValueError(f"Theorist {theorist_name} not implemented.")
 
@@ -265,12 +268,3 @@ def get_MSE(theorist, x, y_target):
     MSE = np.mean(np.square(y_target - y_prediction))
 
     return MSE
-
-
-# We can improve this to accommodate any theorist if we:
-#   - additionally pass priors
-#   - can get the theorist model into latex form
-#   - use 100 lines of old mcmc code to build Tree objects from latex strings
-def get_DL(theorist):
-    assert theorist.__name__ == "BMSRegressor"
-    return theorist.model_.E
