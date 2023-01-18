@@ -4,6 +4,7 @@
 #SBATCH --time=23:00:00
 #SBATCH --mem=4GB
 #SBATCH -n 1
+#SBATCH --mail-user=sebastian_musslick@brown.edu
 
 # Print key runtime properties for records
 echo Master process running on `hostname`

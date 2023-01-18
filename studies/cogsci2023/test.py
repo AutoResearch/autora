@@ -17,7 +17,7 @@ from utils import (
 num_cycles = 20  # number of cycles (20)
 samples_for_seed = 100  # number of seed data_closed_loop points (20)
 samples_per_cycle = 100  # number of data_closed_loop points chosen per cycle (20)
-theorist_epochs = 1500  # number of epochs for BMS (500)
+theorist_epochs = 3000  # number of epochs for BMS (500)
 
 # SELECT THEORIST
 theorist_name = "BMS"
