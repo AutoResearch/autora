@@ -50,15 +50,8 @@ experimentalists = [
     'least confident',
 ]
 
-
-def closed_loop(rep,
-                theorist_name,
-                ground_truth_name,
-                experimentalists,
-                num_cycles,
-                samples_for_seed,
-                samples_per_cycle,
-                theorist_epochs):
+st = time.time()
+for rep in range(repetitions):
 
     seed(rep)
 
@@ -117,7 +110,6 @@ def closed_loop(rep,
 
         # now that we have the seed data_closed_loop and model, we can start the recovery loop
         for cycle in range(num_cycles):
-
             print(f"Starting cycle {cycle} of {num_cycles}...")
 
             # generate experimentalist
@@ -193,17 +185,6 @@ def closed_loop(rep,
 
         pickle.dump(object_list, f)
 
-
-st = time.time()
-for rep in range(repetitions):
-    closed_loop(rep,
-                theorist_name,
-                ground_truth_name,
-                experimentalists,
-                num_cycles,
-                samples_for_seed,
-                samples_per_cycle,
-                theorist_epochs)
 et = time.time()
 elapsed_time = et - st
 print(f"Elapsed time: {elapsed_time}")
