@@ -13,11 +13,11 @@ from utils import (
 )
 
 # META PARAMETERS
-num_cycles = 2  # number of cycles (20)
+num_cycles = 50  # number of cycles (20)
 samples_for_seed = 10  # number of seed data_closed_loop points (20)
 samples_per_cycle = 10  # number of data_closed_loop points chosen per cycle (20)
 theorist_epochs = 500  # number of epochs for theorist (not used for logistic regression)
-num_repetitions = 5
+num_repetitions = 20
 
 # SELECT THEORIST
 theorist_name = "Logistic Regression"
@@ -96,20 +96,6 @@ experimentalist_log.append(experimentalist_name)
 X = X_seed.copy()
 y = y_seed.copy()
 theorist = theorist_seed
-
-experimentalist = get_experimentalist(
-        experimentalist_name,
-        X,
-        y,
-        X_train,
-        metadata,
-        theorist,
-        samples_per_cycle,
-    )
-
-print("Running experimentalist..." + experimentalist_name)
-X_new = experimentalist.run()
-
 
 # now that we have the seed data_closed_loop and model, we can start the recovery loop
 for cycle in range(num_cycles):
