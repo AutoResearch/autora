@@ -1,6 +1,6 @@
 import numpy as np
 
-from autora.model import register_model
+from autora.model.inventory import register
 from .expected_value import expected_value_theory_metadata
 
 # general meta parameters
@@ -185,7 +185,7 @@ def plot_prospect_theory(model=None):
 # plt.plot(x_range, y)
 # plt.show()
 
-register_model(
+register(
     "prospect_theory",
     metadata=prospect_theory_metadata,
     data=prospect_theory_data,

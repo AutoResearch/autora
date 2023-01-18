@@ -1,4 +1,4 @@
-from autora.model import retrieve
+from autora.model.inventory import retrieve
 from studies.cogsci2023.models.models import model_inventory
 from sklearn.model_selection import train_test_split
 from studies.cogsci2023.utils import fit_theorist, get_MSE
@@ -10,11 +10,11 @@ repetitions = 20                 # specifies how many times to repeat the study 
 test_size = 0.2                # proportion of test set size to training set size
 
 # SELECT GROUND TRUTH MODEL
-ground_truth_name = "stroop_model" # OPTIONS: see models.py
+ground_truth_name = "expected_value" # OPTIONS: see models.py
 
 theorists = [
              'MLP',
-             'DARTS 2 Nodes'
+             'DARTS 2 Nodes',
              'DARTS 3 Nodes',
              'BMS',
              'BMS Fixed Root'

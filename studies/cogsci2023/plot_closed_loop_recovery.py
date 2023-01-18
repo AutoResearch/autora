@@ -8,7 +8,7 @@ import pandas as pd
 import seaborn as sns
 from sklearn.manifold import TSNE
 
-from autora.model import retrieve
+from autora.model.inventory import retrieve
 from studies.cogsci2023.models.models import model_inventory, plot_inventory
 
 # set the path to the data_closed_loop directory

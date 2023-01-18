@@ -6,7 +6,7 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 from utils import fit_theorist, get_experimentalist, get_MSE, get_seed_experimentalist
 
-from autora.model import retrieve
+from autora.model.inventory import retrieve
 
 # properly.
 
