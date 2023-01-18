@@ -25,7 +25,9 @@ samples_for_seed = 100  # number of seed data_closed_loop points (20)
 samples_per_cycle = 100  # number of data_closed_loop points chosen per cycle (20)
 theorist_epochs = 1500  # number of epochs for BMS (500)
 
-# next step: try with 1 data point per cycle?
+# next stesp:
+# - up fitting to 3000 epochs (make sure to upp time running)
+# - try with 1 data point per cycle?
 
 # SELECT THEORIST
 # OPTIONS: BMS, DARTS
