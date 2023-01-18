@@ -1,8 +1,7 @@
 import numpy as np
 
+from autora.model.inventory import register
 from autora.variable import DV, IV, ValueType, VariableCollection
-
-from . import register
 
 
 def weber_fechner_metadata(weber_resolution=100, maximum_stimulus_intensity=5.0):

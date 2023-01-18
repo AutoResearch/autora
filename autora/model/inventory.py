@@ -5,6 +5,8 @@ from typing import Callable, Literal, Optional
 
 @dataclass
 class Model:
+    """Represents a model."""
+
     id: str
     name: Optional[str]
     metadata: Optional[Callable]
