@@ -3,6 +3,7 @@ import time
 import argparse
 import numpy as np
 from sklearn.model_selection import train_test_split
+from random import seed
 
 from models.models import model_inventory
 from utils import (
