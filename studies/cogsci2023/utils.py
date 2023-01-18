@@ -1,21 +1,21 @@
 import numpy as np
 import scipy
+from logit_theorist import LogitRegression
+from MLP_theorist import MLP_theorist
 
 from autora.experimentalist.pipeline import Pipeline
 from autora.experimentalist.pooler import grid_pool, poppernet_pool
 from autora.experimentalist.sampler import (
+    dissimilarity_sampler,
+    falsification_sampler,
     model_disagreement_sampler,
     nearest_values_sampler,
     random_sampler,
-    dissimilarity_sampler,
     uncertainty_sampler,
-    falsification_sampler
 )
 from autora.skl.bms import BMSRegressor
 from autora.skl.darts import DARTSRegressor
 from autora.variable import ValueType
-from MLP_theorist import MLP_theorist
-from logit_theorist import LogitRegression
 
 
 def sigmoid(x):
@@ -268,3 +268,7 @@ def get_MSE(theorist, x, y_target):
     MSE = np.mean(np.square(y_target - y_prediction))
 
     return MSE
+
+
+def get_DL(theorist):
+    return theorist.model_.E
