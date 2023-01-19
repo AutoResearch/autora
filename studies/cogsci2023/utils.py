@@ -270,5 +270,37 @@ def get_MSE(theorist, x, y_target):
     return MSE
 
 
-def get_DL(theorist):
-    return theorist.model_.E
+def get_DL(theorist, x, y_target):
+    # DL = BIC/2 + PRIORS
+    # BIC = n * log(MSE) + k * log(n)
+    k = 0  # number of parameters
+    prior = 0.0
+    prior_par, _ = get_priors()
+    if theorist.__name__ == "BMSRegressor":
+        parameters = set(
+            [p.value for p in theorist.ets[0] if p.value in theorist.parameters]
+        )
+        k = 1 + len(parameters)
+        for op, nop in list(theorist.nops.items()):
+            try:
+                prior += prior_par["Nopi_%s" % op] * nop
+            except KeyError:
+                pass
+            try:
+                prior += prior_par["Nopi2_%s" % op] * nop**2
+            except KeyError:
+                pass
+    elif theorist.__name__ == "LogisticRegression":
+        k = 1 + theorist.n_features_in
+        prior += prior_par["Nopi_/"]
+        prior += prior_par["Nopi_+"]
+        for i in range(k - 1):
+            prior += prior_par["Nopi_+"]
+            prior += prior_par["Nopi_*"]
+            prior += prior_par["Nopi_**"]
+    else:
+        raise
+    n = len(x)  # number of observations
+    mse = get_MSE(theorist, x, y_target)
+    bic = n * np.log(mse) + k * np.log(n)
+    return bic / 2.0 + prior
