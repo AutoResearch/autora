@@ -16,6 +16,7 @@ from autora.experimentalist.sampler import (
 from autora.skl.bms import BMSRegressor
 from autora.skl.darts import DARTSRegressor
 from autora.variable import ValueType
+from autora.theorist.bms.prior import get_priors
 
 
 def sigmoid(x):
