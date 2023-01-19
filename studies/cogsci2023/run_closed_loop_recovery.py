@@ -27,7 +27,7 @@ repetitions = 10  # specifies how many times to repeat the study (20)
 # o increase theorist training to 1500 epochs
 # x try logistic regression and change back to BMS
 # x try adding interaction terms to logit regression with
-# - try with noisy prospect theory model and more samples (100 instead of 10)
+# o try with noisy prospect theory model and more samples (100 instead of 10)
 # - try logistic regression with stroop model
 
 # what I learned
