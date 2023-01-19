@@ -85,3 +85,24 @@ def test_basic_cos_operation():
     test_x = np.array([[1, 2, 3], [4, 5, 6]])
     test_y = np.cos(test_x[:, 0])
     assert (test_y - root.evaluate(test_x) < 1e-5).all()
+
+
+def test_basic_plus_operation():
+    root = __build_tree_from_literals(["+", 0, 1])
+    test_x = np.array([[1, 2, 3], [4, 5, 6]])
+    test_y = np.add(test_x[:, 0], test_x[:, 1])
+    assert (test_y - root.evaluate(test_x) < 1e-5).all()
+
+
+def test_basic_minus_operation():
+    root = __build_tree_from_literals(["-", 0, 1])
+    test_x = np.array([[1, 2, 3], [4, 5, 6]])
+    test_y = np.subtract(test_x[:, 0], test_x[:, 1])
+    assert (test_y - root.evaluate(test_x) < 1e-5).all()
+
+
+def test_basic_multiply_operation():
+    root = __build_tree_from_literals(["*", 0, 1])
+    test_x = np.array([[1, 2, 3], [4, 5, 6]])
+    test_y = np.multiply(test_x[:, 0], test_x[:, 1])
+    assert (test_y - root.evaluate(test_x) < 1e-5).all()
