@@ -1,6 +1,6 @@
 #!/bin/sh
 
-#SBATCH -J ExperimentalistsProspect
+#SBATCH -J ExperimentalistsStroop
 #SBATCH --time=23:00:00
 #SBATCH --array=1-120
 #SBATCH --mem=6GB
@@ -19,4 +19,4 @@ source ~/autora_dev/bin/activate
 cd /users/smusslic/research/AER_repo/studies/cogsci2023
 
 # Run job
-python run_CL_prospect_theory_slurm.py --slurm_id $SLURM_ARRAY_TASK_ID
+python run_CL_stroop_model_slurm.py --slurm_id $SLURM_ARRAY_TASK_ID

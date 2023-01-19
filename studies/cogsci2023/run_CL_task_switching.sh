@@ -19,4 +19,4 @@ source ~/autora_dev/bin/activate
 cd /users/smusslic/research/AER_repo/studies/cogsci2023
 
 # Run job
-python run_CL_prospect_theory_slurm.py --slurm_id $SLURM_ARRAY_TASK_ID
+python run_CL_task_switching_slurm.py --slurm_id $SLURM_ARRAY_TASK_ID

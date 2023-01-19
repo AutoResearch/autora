@@ -23,7 +23,7 @@ num_repetitions = 20
 theorist_name = "Logistic Regression"
 
 # SELECT GROUND TRUTH MODEL
-ground_truth_name = "prospect_theory"  # OPTIONS: see models.py
+ground_truth_name = "stroop_model"  # OPTIONS: see models.py
 
 experimentalists = [
     'popper',

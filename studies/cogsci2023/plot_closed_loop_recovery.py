@@ -17,6 +17,8 @@ experimentalist_name = 'random' # for plotting
 plot_performance = True
 plot_model = True
 plot_tsne = True
+print_model = False
+figure_dim = (5.5, 5.5)
 
 # create an empty list to store the loaded pickle files
 loaded_pickles = []
@@ -91,7 +93,9 @@ for experimenalist in experimentalists:
 
 # print the data_closed_loop frame
 print(df_validation)
-df_validation.to_csv(path + "/" + ground_truth_name + "_MSE.csv")
+df_final_mse = df_validation.copy()
+df_final_mse = df_final_mse.drop(df_final_mse[df_final_mse["Data Collection Cycle"] != configuration["num_cycles"]].index)
+df_final_mse.to_csv(path + "/" + ground_truth_name + "_MSE.csv")
 
 # copy data set
 df_entropy = df_validation.copy()
@@ -105,21 +109,27 @@ for index, row in df_entropy.iterrows():
     entropy = -np.sum(y * np.log(y))
     entropy_log.append(entropy)
 df_entropy["Entropy"] = entropy_log
-df_validation.to_csv(path + "/" + ground_truth_name + "_entropy.csv")
+df_entropy.to_csv(path + "/" + ground_truth_name + "_entropy.csv")
 
+sns.set(rc={'figure.figsize':figure_dim})
 
 # CYCLE PLOT
 if plot_performance:
     plot_fnc, plot_title = plot_inventory[ground_truth_name]
-
     # plot the performance of different experimentalists as a function of cycle
-    sns.set_theme()
+    # sns.set_theme()
     rel = sns.relplot(
         data=df_validation, kind="line",
         x="Data Collection Cycle", y="Mean Squared Error",
-        hue="Experimentalist", style="Experimentalist"
+        hue="Experimentalist", style="Experimentalist", legend=False,
     )
+    rel.fig.subplots_adjust(top=.90)
+    rel.fig.subplots_adjust(bottom=0.2)
     rel.fig.suptitle(plot_title)
+    rel.fig.set_size_inches(figure_dim[0],figure_dim[1]-2)
+    # leg = rel._legend
+    # leg.set_bbox_to_anchor([0.5, 0.5])  # coordinates of lower left of bounding box
+    # leg._loc = 2
     plt.show()
 
 
@@ -184,12 +194,13 @@ if plot_tsne:
 
     # T-SNE plot for full data
     custom_palette = sns.color_palette("Greys", len(y.tolist()))
-    sns.scatterplot(x="Component 1", y="Component 2", hue=full_data_only.y,
+    g = sns.scatterplot(x="Component 1", y="Component 2", hue=full_data_only.y,
                     palette=custom_palette,
                     data=full_data_only,
                     linewidth = 0,
                     # s = 10,
                     legend=False)
+
     # plt.show()
 
 
@@ -219,7 +230,7 @@ if plot_tsne:
     plt.show()
 
 # output best theory
-if plot_model:
+if print_model:
     if hasattr(best_theory, "model_"):
         print(best_theory.model_.latex())
 
