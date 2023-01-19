@@ -1,6 +1,6 @@
 #!/bin/sh
 
-#SBATCH -J ExperimentalistsProspect
+#SBATCH -J ExperimentalistsChoice
 #SBATCH --time=23:00:00
 #SBATCH --array=1-120
 #SBATCH --mem=6GB
