@@ -198,4 +198,5 @@ register(
     data=prospect_theory_data,
     synthetic_experiment_runner=prospect_theory_experiment,
     name="Prospect Theory",
+    plotter=plot_prospect_theory,
 )

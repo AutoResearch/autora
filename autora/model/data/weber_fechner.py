@@ -123,4 +123,5 @@ register(
     data=weber_fechner_data,
     synthetic_experiment_runner=weber_fechner_experiment,
     name="Weber-Fechner Law",
+    plotter=plot_weber_fechner,
 )
