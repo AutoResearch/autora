@@ -52,9 +52,36 @@ def __build_tree_from_literals(literals: List[Union[str, int]], **hyper_params):
     return root
 
 
+def test_basic_exp_operation():
+    root = __build_tree_from_literals(["exp", 0])
+    test_x = np.array([[1, 2, 3], [4, 5, 6]])
+    test_y = np.exp(test_x[:, 0])
+    assert (test_y - root.evaluate(test_x) < 1e-5).all()
+
+
 def test_basic_inv_operation():
     root = __build_tree_from_literals(["inv", 0])
     test_x = np.array([[1, 2, 3], [4, 5, 6]])
     test_y = 1 / test_x[:, 0]
     assert (test_y - root.evaluate(test_x) < 1e-5).all()
 
+
+def test_basic_neg_operation():
+    root = __build_tree_from_literals(["neg", 0])
+    test_x = np.array([[1, 2, 3], [4, 5, 6]])
+    test_y = -test_x[:, 0]
+    assert (test_y - root.evaluate(test_x) < 1e-5).all()
+
+
+def test_basic_sin_operation():
+    root = __build_tree_from_literals(["sin", 0])
+    test_x = np.array([[1, 2, 3], [4, 5, 6]])
+    test_y = np.sin(test_x[:, 0])
+    assert (test_y - root.evaluate(test_x) < 1e-5).all()
+
+
+def test_basic_cos_operation():
+    root = __build_tree_from_literals(["cos", 0])
+    test_x = np.array([[1, 2, 3], [4, 5, 6]])
+    test_y = np.cos(test_x[:, 0])
+    assert (test_y - root.evaluate(test_x) < 1e-5).all()
