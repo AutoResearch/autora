@@ -52,6 +52,13 @@ def __build_tree_from_literals(literals: List[Union[str, int]], **hyper_params):
     return root
 
 
+def test_basic_linear_operation():
+    root = __build_tree_from_literals(["linear", 0])
+    test_x = np.array([[1, 2, 3], [4, 5, 6]])
+    test_y = test_x[:, 0]
+    assert (test_y - root.evaluate(test_x) < 1e-5).all()
+
+
 def test_basic_exp_operation():
     root = __build_tree_from_literals(["exp", 0])
     test_x = np.array([[1, 2, 3], [4, 5, 6]])
