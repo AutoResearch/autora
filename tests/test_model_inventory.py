@@ -1,5 +1,3 @@
-import pytest  # noqa: 401
-
 import autora.synthetic
 from autora.variable import VariableCollection
 
