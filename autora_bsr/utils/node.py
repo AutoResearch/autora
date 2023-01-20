@@ -51,9 +51,9 @@ class Node:
     def init_param(self, **hyper_params):
         # init is a function randomized by some hyper-params
         if callable(self.op_init):
-            self.params.update(self.op_init(**hyper_params))
+            self.params = self.op_init(**hyper_params)
         else:  # init is deterministic dict
-            self.params.update(self.op_init)
+            self.params = self.op_init
 
     def setup(
             self,

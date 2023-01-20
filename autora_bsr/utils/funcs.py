@@ -15,8 +15,10 @@ def check_empty(func: Callable):
     @wraps(func)
     def func_wrapper(*args, **kwargs):
         for arg in args + list(kwargs.values()):
-            if isinstance(arg, Node) and arg.node_type == NodeType.EMPTY:
-                raise TypeError("uninitialized node found in {}".format(func.__name__))
+            if isinstance(arg, Node):
+                if arg.node_type == NodeType.EMPTY:
+                    raise TypeError("uninitialized node found in {}".format(func.__name__))
+                break
         return func(*args, **kwargs)
     return func_wrapper
 
@@ -129,8 +131,8 @@ def calc_tree_ll(
         # contribution of parameters of linear nodes
         # TODO: make sure the below parameter ll calculation is extendable
         if node.op_name == "ln":
-            params_ll -= np.power((node.a - 1), 2) / (2 * sigma_a)
-            params_ll -= np.power(node.b, 2) / (2 * sigma_b)
+            params_ll -= np.power((node.params["a"] - 1), 2) / (2 * sigma_a)
+            params_ll -= np.power(node.params["b"], 2) / (2 * sigma_b)
             params_ll -= 0.5 * np.log(4 * np.pi ** 2 * sigma_a * sigma_b)
     else:  # binary operator
         struct_ll_left, params_ll_left = calc_tree_ll(node.right, ops_priors, n_feature, **hyper_params)
@@ -217,6 +219,9 @@ def de_transform(node: Node) -> Node:
 
     Arguments:
         node: the tree node that gets de-transformed
+
+    Returns:
+        the replaced node when `node` has been de-transformed
     """
     if node.node_type == NodeType.UNARY:
         return node.left
@@ -244,6 +249,20 @@ def transform(
     n_feature: int = 1,
     **hyper_params: Dict
 ):
+    """
+    ACTION 5: Transform inserts a middle node between the picked `node` and its
+    parent. Assign an operation to this middle node using the priors. If the middle
+    node is binary, `grow` its right child. The left child of the middle node is
+    set to `node` and its parent becomes `node.parent`.
+
+    Arguments:
+        node: the tree node that gets transformed
+        ops_name_lst: list of operation names
+        ops_weight_lst: list of operation prior weights
+        ops_priors: the dictionary of operation prior properties
+        n_feature: the number of features in input data
+        hyper_params: hyperparameters for re-initialization
+    """
     assert node.parent is not None
     parent = node.parent
     is_left = node is parent.left
@@ -267,6 +286,61 @@ def transform(
 
 
 @check_empty
+def reassign_op(
+    node: Node,
+    ops_name_lst: List[str],
+    ops_weight_lst: List[float],
+    ops_priors: Dict[str, Dict],
+    n_feature: int = 1,
+    **hyper_params: Dict
+):
+    """
+    ACTION 6: Re-assign action uniformly picks a non-terminal node, and assign a new operator.
+    If the node changes from unary to binary, its original child is taken as the left child,
+    and we grow a new subtree as right child. If the node changes from binary to unary, we
+    preserve the left subtree (this is to make the transition reversible).
+
+    Arguments:
+        node: the tree node that gets re-assigned an operator
+        ops_name_lst: list of operation names
+        ops_weight_lst: list of operation prior weights
+        ops_priors: the dictionary of operation prior properties
+        n_feature: the number of features in input data
+        hyper_params: hyperparameters for re-initialization
+    """
+    # make sure `node` is non-terminal
+    old_type = node.node_type
+    assert old_type != NodeType.LEAF
+
+    # store the original children and re-setup the `node`
+    old_left, old_right = node.left, node.right
+    new_op = np.random.choice(ops_name_lst, 1, ops_weight_lst)[0]
+    node.setup(new_op, ops_priors[new_op], **hyper_params)
+
+    new_type = node.node_type
+
+    node.left = old_left
+    if old_type == new_type:  # binary -> binary & unary -> unary
+        node.right = old_right
+    elif new_type == NodeType.BINARY:  # unary -> binary
+        grow(node.right, ops_name_lst, ops_weight_lst, ops_priors, n_feature, **hyper_params)
+
+
+@check_empty
+def reassign_feat(node: Node, n_feature: int = 1):
+    """
+    ACTION 7: Re-assign feature randomly picks a feature and assign it to `node`.
+
+    Arguments:
+        node: the tree node that gets re-assigned a feature
+        n_feature: the number of features in input data
+    """
+    # make sure we have a leaf node
+    assert node.node_type == NodeType.LEAF
+    node.setup(feature=np.random.randint(0, n_feature, 1))
+
+
+@check_empty
 def prop(node: Node):
     """
     Propose a new tree from an existing tree with root `node`
@@ -283,4 +357,5 @@ def prop(node: Node):
             nterm_nodes.append(n)
         if n.op_name == "ln":
             ln_nodes.append(n)
+    return
 
