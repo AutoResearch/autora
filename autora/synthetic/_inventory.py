@@ -12,7 +12,7 @@ class SyntheticDataCollection:
     name: Optional[str]
     metadata_callable: Optional[Callable[[], VariableCollection]]
     data_callable: Optional[Callable]
-    synthetic_experiment_runner: Optional[Callable]
+    experiment_runner: Optional[Callable]
     plotter: Optional[Callable]
 
 
@@ -32,7 +32,7 @@ def register(
         id=id,
         name=name,
         metadata_callable=metadata_callable,
-        synthetic_experiment_runner=synthetic_experiment_runner,
+        experiment_runner=synthetic_experiment_runner,
         data_callable=data_callable,
         plotter=plotter,
     )
@@ -51,7 +51,7 @@ def retrieve(
         return (
             entry.metadata_callable(),
             entry.data_callable,
-            entry.synthetic_experiment_runner,
+            entry.experiment_runner,
         )
     elif kind == "plotter:v0":
         return entry.plotter, entry.name
