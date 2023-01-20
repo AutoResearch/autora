@@ -1,9 +1,9 @@
 #!/bin/sh
 
-#SBATCH -J ExperimentalistsChoice
+#SBATCH -J ChoiceExperimentalist
 #SBATCH --time=23:00:00
 #SBATCH --array=1-120
-#SBATCH --mem=6GB
+#SBATCH --mem=9GB
 #SBATCH -n 1
 
 # Print key runtime properties for records
