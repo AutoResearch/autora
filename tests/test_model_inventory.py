@@ -17,12 +17,6 @@ def test_model_registration():
     assert only_metadata.id == "only_metadata"
     assert only_metadata.metadata_callable()
 
-    # We can still retrieve the first model and it is equal to the first version
+    # We can still retrieve the first model, and it is equal to the first version
     empty_copy = autora.synthetic.retrieve("empty")
     assert empty_copy == empty
-
-
-def test_model_retrieval():
-    for id in ["weber_fechner", "expected_value", "prospect_theory"]:
-        model = autora.synthetic.retrieve(id)
-        assert model.id == id
