@@ -26,12 +26,12 @@ theorist_name = "Logistic Regression"
 ground_truth_name = "task_switching"  # OPTIONS: see models.py
 
 experimentalists = [
-    'popper',
-    'falsification',
-    'random',
+    # 'popper',
+    # 'falsification',
+    # 'random',
     "dissimilarity",
-    'model disagreement',
-    'least confident',
+    # 'model disagreement',
+    # 'least confident',
 ]
 
 st = time.time()

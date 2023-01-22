@@ -365,19 +365,19 @@ def plot_stroop_model(model=None):
         ) = run_exp(model, theorist=True)
 
         if output_col_cong.ndim == 1:
-            err_col_cong = 1 - output_col_cong[0]
-            err_col_incong = 1 - output_col_incong[0]
-            err_col_control = 1 - output_col_control[0]
-            err_wrd_cong = 1 - output_wrd_cong[0]
-            err_wrd_incong = 1 - output_wrd_incong[0]
-            err_wrd_control = 1 - output_wrd_control[0]
+            err_col_cong = output_col_cong[0]
+            err_col_incong = output_col_incong[0]
+            err_col_control = output_col_control[0]
+            err_wrd_cong = output_wrd_cong[0]
+            err_wrd_incong = output_wrd_incong[0]
+            err_wrd_control = output_wrd_control[0]
         else:
-            err_col_cong = 1 - output_col_cong[0][0]
-            err_col_incong = 1 - output_col_incong[0][0]
-            err_col_control = 1 - output_col_control[0][0]
-            err_wrd_cong = 1 - output_wrd_cong[0][0]
-            err_wrd_incong = 1 - output_wrd_incong[0][0]
-            err_wrd_control = 1 - output_wrd_control[0][0]
+            err_col_cong = output_col_cong[0][0]
+            err_col_incong = output_col_incong[0][0]
+            err_col_control = output_col_control[0][0]
+            err_wrd_cong = output_wrd_cong[0][0]
+            err_wrd_incong = output_wrd_incong[0][0]
+            err_wrd_control = output_wrd_control[0][0]
 
         x_data = [0, 1, 2]
         y_data_col_recovered = [
@@ -392,7 +392,7 @@ def plot_stroop_model(model=None):
         ]
 
     x_limit = [-0.5, 2.5]
-    y_limit = [0, 100]
+    y_limit = [0, 50]
     y_label = "Error Rate (%)"
     legend = (
         "Color Naming (Original)",

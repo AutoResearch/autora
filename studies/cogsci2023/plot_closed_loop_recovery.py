@@ -11,8 +11,8 @@ from studies.cogsci2023.models.models import model_inventory, plot_inventory
 
 # set the path to the data_closed_loop directory
 path = 'data_closed_loop/'
-ground_truth_name = 'prospect_theory' # OPTIONS: see models.py
-experimentalist_name = 'random' # for plotting
+ground_truth_name = 'stroop_model' # OPTIONS: see models.py
+experimentalist_name = 'dissimilarity' # for plotting
 
 plot_performance = True
 plot_model = True
@@ -121,7 +121,7 @@ if plot_performance:
     rel = sns.relplot(
         data=df_validation, kind="line",
         x="Data Collection Cycle", y="Mean Squared Error",
-        hue="Experimentalist", style="Experimentalist", legend=False,
+        hue="Experimentalist", style="Experimentalist", legend=False, # False
     )
     rel.fig.subplots_adjust(top=.90)
     rel.fig.subplots_adjust(bottom=0.2)
@@ -222,7 +222,7 @@ if plot_tsne:
     # custom_palette[0] = (0.5, 0.5, 0.5)
     sns.scatterplot(x="Component 1", y="Component 2", hue=df.Labels.tolist(),
                     palette=custom_palette,
-                    s = 10,
+                    s = 5,
                     data=df).set(title="T-SNE Projection of Probed Experimental Conditions\n(" + plot_title + ")")
     plt.show()
 
