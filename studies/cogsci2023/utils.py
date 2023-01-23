@@ -37,7 +37,7 @@ def fit_theorist(X, y, theorist_name, metadata, theorist_epochs=None):
         if theorist_epochs is not None:
             epochs = theorist_epochs
         else:
-            epochs = 500
+            epochs = 5
         theorist = DARTSRegressor(
             max_epochs=epochs, output_type=output_type, num_graph_nodes=2
         )
@@ -305,7 +305,7 @@ def get_DL(theorist, theorist_name, x, y_target):
         if theorist.pms.root is not None:
             prior -= theorist.model_.prior_par["Nopi_sigmoid"]
     elif theorist_name == "Logit Regression":
-        k = (1 + theorist.n_features_in)*2
+        k = (1 + theorist.models_[1].coef_.shape[0])*2
         prior += prior_par["Nopi_log"]
         prior += prior_par["Nopi_/"]
         prior += prior_par["Nopi_-"]
@@ -313,11 +313,24 @@ def get_DL(theorist, theorist_name, x, y_target):
         prior += prior_par["Nopi_+"] * (k - 1)
         prior += prior_par["Nopi_*"] * (k - 1)
         prior += prior_par["Nopi_**"] * (k - 1)
-        prior += prior_par["Nopi2_+"] * (k - 1)**2
-        prior += prior_par["Nopi2_*"] * (k - 1) ** 2
-        prior += prior_par["Nopi2_**"] * (k - 1) ** 2
+        try:
+            prior += prior_par["Nopi2_+"] * (k - 1)**2
+            prior += prior_par["Nopi2_*"] * (k - 1) ** 2
+            prior += prior_par["Nopi2_**"] * (k - 1) ** 2
+        except KeyError:
+            pass
     elif "DARTS" in theorist_name:
-        ...
+        model_str = theorist.model_repr()
+        k = 1 + model_str.count('.')
+        for op in theorist.primitives:
+            try:
+                prior += prior_par["Nopi_%s" % op] * model_str.count(op)
+            except KeyError:
+                pass
+            try:
+                prior += prior_par["Nopi2_%s" % op] * model_str.count(op)**2
+            except KeyError:
+                pass
     else:
         print(theorist_name)
         raise
