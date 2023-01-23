@@ -1,21 +1,22 @@
 from studies.cogsci2023.models.models import model_inventory
 from sklearn.model_selection import train_test_split
-from studies.cogsci2023.utils import fit_theorist, get_MSE
+from studies.cogsci2023.utils import fit_theorist, get_MSE, get_DL
 import pickle
 import time
 
 # META PARAMETERS
-repetitions = 20                 # specifies how many times to repeat the study (20)
+repetitions = 1                 # specifies how many times to repeat the study (20)
 test_size = 0.2                # proportion of test set size to training set size
 
 # SELECT GROUND TRUTH MODEL
-ground_truth_name = "stroop_model" # OPTIONS: see models.py
+ground_truth_name = "prospect_theory" # OPTIONS: see models.py
 
 theorists = [
              'MLP',
-             'DARTS 2 Nodes'
+             # 'DARTS 2 Nodes'
+             'Logistic Regression',
              'DARTS 3 Nodes',
-             'BMS',
+             # 'BMS',
              'BMS Fixed Root'
              ]
 
@@ -33,6 +34,7 @@ for rep in range(repetitions):
                                                         random_state=rep)
 
     MSE_log = list()
+    DL_log = list()
     theory_log = list()
     theorist_name_log = list()
     elapsed_time_log = list()
@@ -45,6 +47,12 @@ for rep in range(repetitions):
         et = time.time()
         elapsed_time = et - st
         elapsed_time_log.append(elapsed_time)
+
+        if theorist_name == "BMS" or theorist_name == "BMS Fixed Root":
+            DL = get_DL(theorist, X_test, y_test)
+        else:
+            DL = 0
+        DL_log.append(DL)
 
         MSE_log.append(get_MSE(theorist, X_test, y_test))
         if hasattr(theorist, 'model_'):
@@ -68,6 +76,7 @@ for rep in range(repetitions):
                        theory_log,
                        theorist_name_log,
                        elapsed_time_log,
+                       DL_log,
                        ]
 
         pickle.dump(object_list, f)

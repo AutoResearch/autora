@@ -1,8 +1,8 @@
 #!/bin/sh
 
 #SBATCH -J ChoiceExperimentalist
-#SBATCH --time=23:00:00
-#SBATCH --array=1-120
+#SBATCH --time=46:00:00
+#SBATCH --array=0-119
 #SBATCH --mem=9GB
 #SBATCH -n 1
 

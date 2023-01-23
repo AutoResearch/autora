@@ -4,6 +4,8 @@ import numpy as np
 
 class LogitRegression(LinearRegression):
 
+    __name__ = 'Logistic Regression'
+
     def fit(self, x, p, interaction_terms=True):
         p = np.asarray(p)
         self.interaction_terms = interaction_terms
