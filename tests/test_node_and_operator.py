@@ -9,15 +9,19 @@ def __build_tree_from_literals(literals: List[Union[str, int]], **hyper_params):
     Helper testing function that builds up a valid computation tree with a list of str/int inputs
     where a string input represents an operation (e.g. `inv`, `+`) and an integer indicates which
     feature to use in a leaf node. For the list of valid operations, see `priors.py`.
+
     The construction is done level-by-level. For example, the list `["sin", "inv", 1, 0] will render
     the following computation tree
+    
                 sin (root)
                 /       \
              inv      feature 1
              /
         feature 0
+
     Note that for simplicity this function doesn't check the validity of input list; e.g. using
     a binary operation without specifying the features used by its two leaf nodes might cause error.
+
     Arguments:
         literals: a list of strings and integers that specifies how the tree should be built
         hyper_params: parameters to initialize certain operations
@@ -109,4 +113,3 @@ def test_basic_multiply_operation():
     test_x = np.array([[1, 2, 3], [4, 5, 6]])
     test_y = np.multiply(test_x[:, 0], test_x[:, 1])
     assert (test_y - root.evaluate(test_x) < 1e-5).all()
-
