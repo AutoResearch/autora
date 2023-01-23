@@ -15,8 +15,8 @@ from autora.experimentalist.sampler import (
 )
 from autora.skl.bms import BMSRegressor
 from autora.skl.darts import DARTSRegressor
-from autora.variable import ValueType
 from autora.theorist.bms.prior import get_priors
+from autora.variable import ValueType
 
 
 def sigmoid(x):
@@ -63,7 +63,7 @@ def fit_theorist(X, y, theorist_name, metadata, theorist_epochs=None):
         else:
             epochs = 5000
         theorist = MLP_theorist(epochs=epochs, output_type=output_type, verbose=True)
-    elif theorist_name == "Logistic Regression":
+    elif theorist_name == "Logit Regression":
         theorist = LogitRegression()
     else:
         raise ValueError(f"Theorist {theorist_name} not implemented.")
@@ -277,35 +277,49 @@ def get_DL(theorist, theorist_name, x, y_target):
     k = 0  # number of parameters
     prior = 0.0
     prior_par, _ = get_priors()
-    if theorist_name == "BMS" or theorist_name == "BMS Fixed Root":
+    if "BMS" in theorist_name:
         parameters = set(
-            [p.value for p in theorist.model_.ets[0] if p.value in theorist.model_.parameters]
+            [
+                p.value
+                for p in theorist.model_.ets[0]
+                if p.value in theorist.model_.parameters
+            ]
         )
         k = 1 + len(parameters)
         for op, nop in list(theorist.model_.nops.items()):
             try:
-                prior += prior_par["Nopi_%s" % op] * nop
+                if theorist.pms.root is not None and op in ["+", "/", "exp", "-"]:
+                    prior += prior_par["Nopi_%s" % op] * (nop + 1)
+                else:
+                    prior += prior_par["Nopi_%s" % op] * nop
             except KeyError:
                 pass
             try:
-                prior += prior_par["Nopi2_%s" % op] * nop**2
+                if theorist.pms.root is not None and op in ["+", "/", "exp", "-"]:
+                    prior += prior_par["Nopi2_%s" % op] * (nop + 1)**2
+                else:
+                    prior += prior_par["Nopi2_%s" % op] * nop**2
+
             except KeyError:
                 pass
+        if theorist.pms.root is not None:
+            prior -= theorist.model_.prior_par["Nopi_sigmoid"]
     elif theorist_name == "Logit Regression":
-        k = 1 + theorist.n_features_in
+        k = (1 + theorist.n_features_in)*2
+        prior += prior_par["Nopi_log"]
         prior += prior_par["Nopi_/"]
-        prior += prior_par["Nopi_+"]
-        prior += prior_par["Nopi_exp"]
+        prior += prior_par["Nopi_-"]
         # the part raised to the exponential
         prior += prior_par["Nopi_+"] * (k - 1)
         prior += prior_par["Nopi_*"] * (k - 1)
         prior += prior_par["Nopi_**"] * (k - 1)
-        prior += prior_par["Nopi2_+"] * k ** 2  # taking into account the + above
+        prior += prior_par["Nopi2_+"] * (k - 1)**2
         prior += prior_par["Nopi2_*"] * (k - 1) ** 2
         prior += prior_par["Nopi2_**"] * (k - 1) ** 2
-    elif theorist.__name__.contains("DARTS"):
+    elif "DARTS" in theorist_name:
         ...
     else:
+        print(theorist_name)
         raise
     n = len(x)  # number of observations
     mse = get_MSE(theorist, x, y_target)
