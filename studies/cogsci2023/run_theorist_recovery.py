@@ -14,7 +14,7 @@ ground_truth_name = "prospect_theory" # OPTIONS: see models.py
 theorists = [
              'MLP',
              # 'DARTS 2 Nodes'
-             'Logistic Regression',
+             'Logit Regression',
              'DARTS 3 Nodes',
              # 'BMS',
              'BMS Fixed Root'
