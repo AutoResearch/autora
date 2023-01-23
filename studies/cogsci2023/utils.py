@@ -279,10 +279,10 @@ def get_DL(theorist, theorist_name, x, y_target):
     prior_par, _ = get_priors()
     if theorist_name == "BMS" or theorist_name == "BMS Fixed Root":
         parameters = set(
-            [p.value for p in theorist.ets[0] if p.value in theorist.parameters]
+            [p.value for p in theorist.model_.ets[0] if p.value in theorist.model_.parameters]
         )
         k = 1 + len(parameters)
-        for op, nop in list(theorist.nops.items()):
+        for op, nop in list(theorist.model_.nops.items()):
             try:
                 prior += prior_par["Nopi_%s" % op] * nop
             except KeyError:
@@ -291,14 +291,20 @@ def get_DL(theorist, theorist_name, x, y_target):
                 prior += prior_par["Nopi2_%s" % op] * nop**2
             except KeyError:
                 pass
-    elif theorist_name == "Logistic Regression":
+    elif theorist_name == "Logit Regression":
         k = 1 + theorist.n_features_in
         prior += prior_par["Nopi_/"]
         prior += prior_par["Nopi_+"]
-        for i in range(k - 1):
-            prior += prior_par["Nopi_+"]
-            prior += prior_par["Nopi_*"]
-            prior += prior_par["Nopi_**"]
+        prior += prior_par["Nopi_exp"]
+        # the part raised to the exponential
+        prior += prior_par["Nopi_+"] * (k - 1)
+        prior += prior_par["Nopi_*"] * (k - 1)
+        prior += prior_par["Nopi_**"] * (k - 1)
+        prior += prior_par["Nopi2_+"] * k ** 2  # taking into account the + above
+        prior += prior_par["Nopi2_*"] * (k - 1) ** 2
+        prior += prior_par["Nopi2_**"] * (k - 1) ** 2
+    elif theorist.__name__.contains("DARTS"):
+        ...
     else:
         raise
     n = len(x)  # number of observations
