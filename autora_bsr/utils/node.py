@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 from typing import Union, Dict, Callable, Optional
 from enum import Enum
+from funcs import get_expression
 
 
 class NodeType(Enum):
@@ -100,4 +101,4 @@ class Node:
         return result
 
     def __str__(self) -> str:
-        raise NotImplementedError("TODO")
+        return get_expression(self)
