@@ -12,7 +12,7 @@ test_size = 0.2                # proportion of test set size to training set siz
 ground_truth_name = "prospect_theory" # OPTIONS: see models.py
 
 theorists = [
-             # 'MLP',
+             'MLP',
              # 'DARTS 2 Nodes'
              'Logistic Regression',
              'DARTS 3 Nodes',
@@ -48,7 +48,7 @@ for rep in range(repetitions):
         elapsed_time = et - st
         elapsed_time_log.append(elapsed_time)
 
-        if theorist_name == "BMS" or theorist_name == "BMS Fixed Root" or theorist_name == "Logistic Regression":
+        if theorist_name == "BMS" or theorist_name == "BMS Fixed Root":
             DL = get_DL(theorist, X_test, y_test)
         else:
             DL = 0
