@@ -14,7 +14,7 @@ def __get_ops_with_arity():
             operands that it takes.
     """
     ops_fn_and_arity = {
-        "linear": [linear_op, 1],
+        "ln": [linear_op, 1],
         "exp": [exp_op, 1],
         "inv": [inv_op, 1],
         "neg": [neg_op, 1],

@@ -16,7 +16,7 @@ def check_empty(func: Callable):
 
     @wraps(func)
     def func_wrapper(*args, **kwargs):
-        for arg in args + list(kwargs.values()):
+        for arg in args:
             if isinstance(arg, Node):
                 if arg.node_type == NodeType.EMPTY:
                     raise TypeError("uninitialized node found in {}".format(func.__name__))
@@ -344,6 +344,8 @@ def reassign_op(
         node.right = old_right
     elif new_type == NodeType.BINARY:  # unary -> binary
         grow(node.right, ops_name_lst, ops_weight_lst, ops_priors, n_feature, **hyper_params)
+    else:
+        node.right = None
 
 
 @check_empty
