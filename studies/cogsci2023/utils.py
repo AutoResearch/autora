@@ -69,19 +69,19 @@ def fit_theorist(X, y, theorist_name, metadata, theorist_epochs=None):
         raise ValueError(f"Theorist {theorist_name} not implemented.")
 
     found_theory = False
-    while not found_theory:
-        try:
-            DV_type = metadata.dependent_variables[0].type
-            if DV_type == ValueType.PROBABILITY and theorist_name == "BMS Fixed Root":
-                theorist.fit(X, y, root=sigmoid)
-            else:
-                theorist.fit(X, y)
-            found_theory = True
-        except Exception as err:
-            print(X)
-            print(y)
-            print(f"Unexpected {err=}, {type(err)=}")
-            print("Trying again....")
+    # while not found_theory:
+    try:
+        DV_type = metadata.dependent_variables[0].type
+        if DV_type == ValueType.PROBABILITY and theorist_name == "BMS Fixed Root":
+            theorist.fit(X, y, root=sigmoid)
+        else:
+            theorist.fit(X, y)
+        found_theory = True
+    except Exception as err:
+        print(X)
+        print(y)
+        print(f"Unexpected {err=}, {type(err)=}")
+        print("Trying again....")
 
     return theorist
 
