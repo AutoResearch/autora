@@ -63,7 +63,7 @@ def fit_theorist(X, y, theorist_name, metadata, theorist_epochs=None):
         else:
             epochs = 5000
         theorist = MLP_theorist(epochs=epochs, output_type=output_type, verbose=True)
-    elif theorist_name == "Logit Regression":
+    elif theorist_name == "Logit Regression" or theorist_name == "Logistic Regression":
         theorist = LogitRegression()
     else:
         raise ValueError(f"Theorist {theorist_name} not implemented.")
@@ -78,6 +78,8 @@ def fit_theorist(X, y, theorist_name, metadata, theorist_epochs=None):
                 theorist.fit(X, y)
             found_theory = True
         except Exception as err:
+            print(X)
+            print(y)
             print(f"Unexpected {err=}, {type(err)=}")
             print("Trying again....")
 

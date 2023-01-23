@@ -20,7 +20,7 @@ theorist_epochs = 500  # number of epochs for theorist (not used for logistic re
 num_repetitions = 20
 
 # SELECT THEORIST
-theorist_name = "Logistic Regression"
+theorist_name = "Logit Regression"
 
 # SELECT GROUND TRUTH MODEL
 ground_truth_name = "prospect_theory"  # OPTIONS: see models.py

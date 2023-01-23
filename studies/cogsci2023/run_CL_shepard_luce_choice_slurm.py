@@ -20,7 +20,7 @@ theorist_epochs = 500  # number of epochs for theorist (not used for logistic re
 num_repetitions = 20
 
 # SELECT THEORIST
-theorist_name = "Logistic Regression"
+theorist_name = "Logit Regression"
 
 # SELECT GROUND TRUTH MODEL
 ground_truth_name = "shepard_luce_choice"  # OPTIONS: see models.py
@@ -44,9 +44,9 @@ args = parser.parse_args()
 repetitions = np.arange(num_repetitions)
 experimentalist_ids = np.arange(len(experimentalists))
 conditions = np.array(np.meshgrid(repetitions, experimentalist_ids)).T.reshape(-1,2)
-
-rep = conditions[args.slurm_id,0]
-experimentalist_id = conditions[args.slurm_id,1]
+ID=2
+rep = conditions[ID,0] # args.slurm_id
+experimentalist_id = conditions[ID,1]
 experimentalist_name = experimentalists[experimentalist_id]
 seed(rep)
 
