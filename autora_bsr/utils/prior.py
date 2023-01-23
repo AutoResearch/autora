@@ -79,7 +79,7 @@ def __get_prior(prior_name: str, prob: bool = True) -> Dict[str, float]:
             "*": 1.0,
             "-": 1.0,
             "inv": 1.0,
-            "linear": 1.0,
+            "ln": 1.0,
         },
         "Guimera2020": {
             "neg": 3.350846072163632,
@@ -92,7 +92,7 @@ def __get_prior(prior_name: str, prob: bool = True) -> Dict[str, float]:
             "*": 5.002213595420244,
             "-": 1.0,  # set arbitrarily now,
             "inv": 1.0,  # set arbitrarily now,
-            "linear": 1.0,  # set arbitrarily now,
+            "ln": 1.0,  # set arbitrarily now,
         },
     }
     assert prior_dict[prior_name] is not None, "prior key not recognized"
