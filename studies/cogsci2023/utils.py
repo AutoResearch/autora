@@ -31,7 +31,7 @@ def fit_theorist(X, y, theorist_name, metadata, theorist_epochs=None):
         if theorist_epochs is not None:
             epochs = theorist_epochs
         else:
-            epochs = 5000
+            epochs = 3000
         theorist = BMSRegressor(epochs=epochs)
     elif theorist_name == "DARTS 2 Nodes":
         if theorist_epochs is not None:
@@ -291,7 +291,7 @@ def get_DL(theorist, x, y_target):
                 prior += prior_par["Nopi2_%s" % op] * nop**2
             except KeyError:
                 pass
-    elif theorist.__name__ == "LogisticRegression":
+    elif theorist.__name__ == "Logistic Regression":
         k = 1 + theorist.n_features_in
         prior += prior_par["Nopi_/"]
         prior += prior_par["Nopi_+"]

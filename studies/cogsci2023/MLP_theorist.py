@@ -17,6 +17,7 @@ class MLP_theorist(BaseEstimator, RegressorMixin):
         self.output_type = output_type
         self.verbose = verbose
         self.network = None
+        self.__name__ = 'MLP'
 
     def fit(self, X, y):
 
