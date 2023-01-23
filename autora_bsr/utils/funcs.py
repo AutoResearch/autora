@@ -1,9 +1,12 @@
 import copy
 
 import numpy as np
+import pandas as pd
+
+from autora_bsr.utils.misc import get_ops_expr
 from autora_bsr.utils.node import Node, NodeType
 from typing import Dict, List, Optional, Callable, Tuple, Union
-from scipy.stats import invgamma
+from scipy.stats import invgamma, norm
 from functools import wraps
 from enum import Enum
 
@@ -56,9 +59,11 @@ def update_depth(node: Node, depth: int):
 
 def get_expression(
         node: Node,
-        ops_expr: Dict[str, str],
+        ops_expr: Dict[str, str] = None,
         feature_names: Optional[List[str]] = None,
 ) -> str:
+    if not ops_expr:
+        ops_expr = get_ops_expr()
     if node.node_type == NodeType.LEAF:
         if feature_names:
             return feature_names[node.params["feature"]]
@@ -144,7 +149,7 @@ def calc_tree_ll(
         struct_ll += struct_ll_left
         params_ll += params_ll_left
         # contribution of parameters of linear nodes
-        # TODO: make sure the below parameter ll calculation is extendable
+        # make sure the below parameter ll calculation is extendable
         if node.op_name == "ln":
             params_ll -= np.power((node.params["a"] - 1), 2) / (2 * sigma_a)
             params_ll -= np.power(node.params["b"], 2) / (2 * sigma_b)
@@ -162,6 +167,32 @@ def calc_tree_ll(
         struct_ll += np.log((1 + depth)) * beta + np.log(op_weight)
 
     return struct_ll, params_ll
+
+
+def calc_y_ll(y: np.ndarray, outputs: Union[np.ndarray, pd.DataFrame], sigma_y: float):
+    """
+    Calculate the log likelihood f(y|S,Theta,x) where (S,Theta) is represented by the node
+    prior is y ~ N(output,sigma) and output is the matrix of outputs corresponding to different roots
+
+    Returns:
+        log_sum: the data log likelihood
+    """
+    outputs = copy.deepcopy(outputs)
+    scale = np.max(np.abs(outputs))
+    outputs = outputs / scale
+    epsilon = np.eye(outputs.shape[1]) * 1e-6
+    beta = np.linalg.inv(np.matmul(outputs.transpose(), outputs) + epsilon)
+    beta = np.matmul(beta, np.matmul(outputs.transpose(), y))
+    # perform the linear combination
+    output = np.matmul(outputs, beta)
+    # calculate the squared error
+    error = np.sum(np.square(y - output[:, 0]))
+
+    log_sum = error
+    var = 2 * sigma_y * sigma_y
+    log_sum = -log_sum / var
+    log_sum -= 0.5 * len(y) * np.log(np.pi * var)
+    return log_sum
 
 
 def stay(ln_nodes: List[Node], **hyper_params: Dict):
@@ -455,6 +486,11 @@ def prop(
     Propose a new tree from an existing tree with root `node`
 
     Return:
+        new_node: the new node after some action is applied
+        expand_node: whether the node has been expanded
+        shrink_node: whether the node has been shrunk
+        q: quantities for calculating acceptance prob
+        q_inv: quantities for calculating acceptance prob
     """
     # PART 1: collect necessary information
     new_node = copy.deepcopy(node)
@@ -628,4 +664,100 @@ def prop(
         reassign_feat(reassign_node, n_feature)
         q = q_inv = 1
 
-    return node, new_node, expand_node, shrink_node, q, q_inv
+    return new_node, expand_node, shrink_node, q, q_inv
+
+
+def calc_aux_ll(node: Node, **hyper_params):
+    sigma_a, sigma_b = hyper_params["sigma_a"], hyper_params["sigma_b"]
+    log_aux = np.log(invgamma.pdf(sigma_a, 1)) + np.log(invgamma.pdf(sigma_b, 1))
+
+    all_nodes = get_all_nodes(node)
+    lt_count = 0
+    for i in range(all_nodes):
+        if all_nodes[i].op_name == "ln":
+            lt_count += 1
+            a, b = all_nodes[i].params["a"], all_nodes[i].params["b"]
+            log_aux += np.log(norm.pdf(a, 1, np.sqrt(sigma_a)))
+            log_aux += np.log(norm.pdf(b, 0, np.sqrt(sigma_b)))
+
+    return log_aux, lt_count
+
+
+def prop_new(
+        roots: List[Node],
+        index: int,
+        sigma_y: float,
+        beta: float,
+        sigma_a: float,
+        sigma_b: float,
+        X: Union[np.ndarray, pd.DataFrame],
+        y: Union[np.ndarray, pd.DataFrame],
+        ops_name_lst: List[str],
+        ops_weight_lst: List[float],
+        ops_priors: Dict[str, Dict],
+):
+    # the hyper-param for linear combination, i.e. for `sigma_y`
+    sig = 4
+    K = len(roots)
+    root = roots[index]
+    use_aux_ll = True
+
+    # sample new sigma_a and sigma_b
+    new_sigma_a = invgamma.rvs(1)
+    new_sigma_b = invgamma.rvs(1)
+
+    hyper_params = {"sigma_a": sigma_a, "sigma_b": sigma_b, "beta": beta}
+    new_hyper_params = {"sigma_a": new_sigma_a, "sigma_b": new_sigma_b, "beta": beta}
+    # propose a new tree `node`
+    new_root, expand_node, shrink_node, q, q_inv = \
+        prop(root, ops_name_lst, ops_weight_lst, ops_priors, X.shape[1], **new_hyper_params)
+
+    n_feature = X.shape[0]
+    new_outputs = np.zeros((len(y), K))
+    old_outputs = np.zeros((len(y), K))
+
+    for i in np.arange(K):
+        tmp_old = root.evaluate(X)
+        old_outputs[:, i] = tmp_old
+        if i == index:
+            new_outputs[:, i] = new_root.evaluate(X)
+        else:
+            new_outputs[:, i] = tmp_old
+
+    if np.linalg.matrix_rank(new_outputs) < K:  # rejection due to insufficient rank
+        return False, root, sigma_y, sigma_a, sigma_b
+
+    y_ll_old = calc_y_ll(y, old_outputs, sigma_y)
+    # a magic number here as the parameter for generating new sigma_y
+    new_sigma_y = invgamma.rvs(sig)
+    y_ll_new = calc_y_ll(y, new_outputs, new_sigma_y)
+
+    log_y_ratio = y_ll_new - y_ll_old
+    # contribution of f(Theta, S)
+    if shrink_node or expand_node:
+        struct_ll_old = sum(calc_tree_ll(root, ops_priors, n_feature, **hyper_params))
+        struct_ll_new = sum(calc_tree_ll(new_root, ops_priors, n_feature, **hyper_params))
+        log_struct_ratio = struct_ll_new - struct_ll_old
+    else:
+        log_struct_ratio = calc_tree_ll(new_root, ops_priors, n_feature, **hyper_params)[0] - \
+            calc_tree_ll(root, ops_priors, n_feature, **hyper_params)
+
+    # contribution of proposal Q and Qinv
+    log_q_ratio = np.log(max(1e-5, q_inv / q))
+
+    log_r = log_y_ratio + log_struct_ratio + log_q_ratio + \
+        np.log(invgamma.pdf(new_sigma_y, sig)) - np.log(invgamma.pdf(sigma_y, sig))
+
+    if use_aux_ll and (expand_node or shrink_node):
+        old_aux_ll, old_lt_count = calc_aux_ll(root, **hyper_params)
+        new_aux_ll, _ = calc_aux_ll(new_root, **new_hyper_params)
+        log_r += old_aux_ll - new_aux_ll
+        # log for the Jacobian
+        log_r += np.log(max(1e-5, 1 / np.power(2, 2 * old_lt_count)))
+
+    alpha = min(log_r, 0)
+    test = np.random.uniform(0, 1, 0)[0]
+    if np.log(test) >= alpha:  # no accept
+        return False, root, sigma_y, sigma_a, sigma_b
+    else:  # accept
+        return True, new_root, new_sigma_y, new_sigma_a, new_sigma_b
