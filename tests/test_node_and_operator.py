@@ -12,7 +12,7 @@ def __build_tree_from_literals(literals: List[Union[str, int]], **hyper_params):
 
     The construction is done level-by-level. For example, the list `["sin", "inv", 1, 0] will render
     the following computation tree
-
+    
                 sin (root)
                 /       \
              inv      feature 1
@@ -41,8 +41,8 @@ def __build_tree_from_literals(literals: List[Union[str, int]], **hyper_params):
                 params.update(ops_init(**hyper_params))
             else:  # init is deterministic dict
                 params.update(ops_init)
-            node.setup(s, prior_dict[s]["fn"], prior_dict[s]["arity"])
-        else:
+            node.setup(s, prior_dict[s])
+        elif isinstance(s, int):
             params["feature"] = s
             node.setup(**params)
         if node.left:
@@ -53,7 +53,7 @@ def __build_tree_from_literals(literals: List[Union[str, int]], **hyper_params):
 
 
 def test_basic_linear_operation():
-    root = __build_tree_from_literals(["linear", 0])
+    root = __build_tree_from_literals(["ln", 0])
     test_x = np.array([[1, 2, 3], [4, 5, 6]])
     test_y = test_x[:, 0]
     assert (test_y - root.evaluate(test_x) < 1e-5).all()

@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 from typing import Union, Dict, Callable, Optional
 from enum import Enum
+from funcs import get_expression
 
 
 class NodeType(Enum):
@@ -27,7 +28,8 @@ class Node:
             parent: "Node" = None,
             operator: Callable = None,
             op_name: str = "",
-            op_arity: int = 0
+            op_arity: int = 0,
+            op_init: Callable = None,
     ):
         # tree structure attributes
         self.depth = depth
@@ -40,25 +42,35 @@ class Node:
         self.operator = operator
         self.op_name = op_name
         self.op_arity = op_arity
+        self.op_init = op_init
 
         # holding temporary calculation result, see `evaluate()`
         self.result = None
         # params for additional inputs into `operator`
         self.params = {}
 
+    def init_param(self, **hyper_params):
+        # init is a function randomized by some hyper-params
+        if callable(self.op_init):
+            self.params = self.op_init(**hyper_params)
+        else:  # init is deterministic dict
+            self.params = self.op_init
+
     def setup(
             self,
             op_name: str = "",
-            operator: Optional[Callable] = None,
-            op_arity: int = 0,
-            **params: Dict
+            ops_prior: Dict = {},
+            feature: int = 0,
+            **hyper_params
     ):
         self.op_name = op_name
-        self.operator = operator
-        self.op_arity = op_arity
-        self.params = params
+        self.operator = ops_prior.get("fn")
+        self.op_arity = ops_prior.get("arity", 0)
+        self.op_init = ops_prior.get("init", {})
+        self.init_param(**hyper_params)
 
         if self.op_arity == 0:
+            self.params["feature"] = feature
             self.node_type = NodeType.LEAF
         elif self.op_arity == 1:
             self.left = Node(depth=self.depth + 1, parent=self)
@@ -69,7 +81,7 @@ class Node:
             self.node_type = NodeType.BINARY
         else:
             raise ValueError(
-                "operation arity should be either 0, 1, 2; get {} instead".format(self._op_arity))
+                "operation arity should be either 0, 1, 2; get {} instead".format(self.op_arity))
 
     def evaluate(self, X: Union[np.ndarray, pd.DataFrame], store_result: bool = False) -> np.array:
         if X is None:
@@ -89,4 +101,4 @@ class Node:
         return result
 
     def __str__(self) -> str:
-        raise NotImplementedError("TODO")
+        return get_expression(self)
