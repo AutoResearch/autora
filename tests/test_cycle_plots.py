@@ -371,6 +371,28 @@ def test_2d_plot_indexing(cycle_lr):
     assert sum([s.axison for s in fig.axes]) == 3
 
 
+def test_2d_plot_negative_indexing(cycle_lr):
+    """
+    Test indexing of 2d plotter.
+    """
+    steps = 51
+    fig = plot_results_panel_2d(
+        cycle_lr,
+        steps=steps,
+        wrap=2,
+        query=[-2, -1],
+        subplot_kw={"sharex": True, "sharey": True},
+    )
+
+    # Should have 2 axes
+    assert len(fig.axes) == 2
+    assert sum([s.axison for s in fig.axes]) == 2
+
+    # Should be plotting cycles 8 and 9
+    assert fig.axes[0].get_children()[3].get_text() == "Cycle 8"
+    assert fig.axes[1].get_children()[3].get_text() == "Cycle 9"
+
+
 def test_2d_plot_slicing(cycle_lr):
     """
     Test slicing of 2d plotter using built-in slice() function.
