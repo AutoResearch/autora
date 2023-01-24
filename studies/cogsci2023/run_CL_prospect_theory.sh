@@ -1,7 +1,7 @@
 #!/bin/sh
 
 #SBATCH -J ProspectExperimentalists
-#SBATCH --time=23:00:00
+#SBATCH --time=41:00:00
 #SBATCH --array=1-120
 #SBATCH --mem=6GB
 #SBATCH -n 1
