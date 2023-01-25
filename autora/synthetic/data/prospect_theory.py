@@ -1,3 +1,5 @@
+from functools import partial
+
 import numpy as np
 
 from .._inventory import register
@@ -98,21 +100,28 @@ def prospect_theory_experiment(
     return Y
 
 
-def prospect_theory_data(metadata):
+ground_truth = partial(prospect_theory_experiment, std=0.0)
 
-    v_a = metadata.independent_variables[0].allowed_values
-    p_a = metadata.independent_variables[1].allowed_values
-    v_b = metadata.independent_variables[2].allowed_values
-    p_b = metadata.independent_variables[3].allowed_values
 
-    X = np.array(np.meshgrid(v_a, p_a, v_b, p_b)).T.reshape(-1, 4)
+def prospect_theory_data(metadata=prospect_theory_metadata):
 
-    y = prospect_theory_experiment(X, std=0)
+    X = get_domain(metadata)
+
+    y = ground_truth(X)
 
     return X, y
 
 
-def plot_prospect_theory(model=None):
+def get_domain(metadata=prospect_theory_metadata):
+    v_a = metadata.independent_variables[0].allowed_values
+    p_a = metadata.independent_variables[1].allowed_values
+    v_b = metadata.independent_variables[2].allowed_values
+    p_b = metadata.independent_variables[3].allowed_values
+    X = np.array(np.meshgrid(v_a, p_a, v_b, p_b)).T.reshape(-1, 4)
+    return X
+
+
+def plot_prospect_theory(model=None, ground_truth=ground_truth):
     import matplotlib.colors as mcolors
     import matplotlib.pyplot as plt
 
@@ -131,7 +140,7 @@ def plot_prospect_theory(model=None):
         X[:, 2] = v_b
         X[:, 3] = p_b
 
-        y = prospect_theory_experiment(X, std=0)
+        y = ground_truth(X)
         colors = mcolors.TABLEAU_COLORS
         col_keys = list(colors.keys())
         plt.plot(p_a, y, label=f"$V(A) = {v_a}$ (Original)", c=colors[col_keys[idx]])
@@ -159,43 +168,12 @@ def plot_prospect_theory(model=None):
     plt.show()
 
 
-# plot_prospect_theory()
-
-# value_alpha = 0.88
-# value_beta = 0.88
-# value_lambda = 2.25
-# probability_alpha = 1.0 #0.61
-# probability_beta = 0.69
-#
-# x_range = np.linspace(0, 1, 1000)
-# y = np.zeros((x_range.shape[0],1))
-#
-# for idx, x in enumerate(x_range):
-#
-#     # if x >= 0:
-#     #     value_A = x ** value_alpha
-#     # else:
-#     #     value_A = - value_lambda * (-x) ** (value_beta)
-#
-#     if x >= 0:
-#         coefficient = probability_alpha
-#     else:
-#         coefficient = probability_beta
-#
-#     probability_a = x ** coefficient / \
-#                     (x ** coefficient + (1 - x) ** coefficient) ** (1 / coefficient)
-#
-#     y[idx] = probability_a
-#
-# import matplotlib.pyplot as plt
-# plt.plot(x_range, y)
-# plt.show()
-
 register(
-    "prospect_theory",
-    metadata_callable=prospect_theory_metadata,
-    data_callable=prospect_theory_data,
-    synthetic_experiment_runner=prospect_theory_experiment,
+    id_="prospect_theory",
+    metadata=prospect_theory_metadata(),
+    domain=get_domain,
+    experiment=prospect_theory_experiment,
+    ground_truth=ground_truth,
     name="Prospect Theory",
     plotter=plot_prospect_theory,
 )

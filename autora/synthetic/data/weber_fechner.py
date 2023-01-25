@@ -1,3 +1,5 @@
+from functools import partial
+
 import numpy as np
 
 from autora.variable import DV, IV, ValueType, VariableCollection
@@ -45,40 +47,43 @@ def weber_fechner_metadata(weber_resolution=100, maximum_stimulus_intensity=5.0)
     return metadata
 
 
-def weber_fechner_experiment(X: np.ndarray, weber_constant: float = 1.0, std=0.01):
+def weber_fechner_experiment(
+    X: np.ndarray,
+    weber_constant: float = 1.0,
+    std: float = 0.01,
+    rng_generator=np.random.default_rng(),
+):
     Y = np.zeros((X.shape[0], 1))
     for idx, x in enumerate(X):
         # jnd =  np.min(x) * weber_constant
         # response = (x[1]-x[0]) - jnd
         # y = 1/(1+np.exp(-response)) + np.random.normal(0, std)
-        y = weber_constant * np.log(x[1] / x[0]) + np.random.normal(0, std)
+        y = weber_constant * np.log(x[1] / x[0]) + rng_generator.normal(0, std)
         Y[idx] = y
 
     return Y
 
 
-def weber_fechner_data(metadata):
+ground_truth_ = partial(weber_fechner_experiment, std=0.0)
 
+
+def get_domain(metadata=weber_fechner_metadata()):
     s1_values = metadata.independent_variables[0].allowed_values
     s2_values = metadata.independent_variables[1].allowed_values
-
     X = np.array(np.meshgrid(s1_values, s2_values)).T.reshape(-1, 2)
     # remove all combinations where s1 > s2
     X = X[X[:, 0] <= X[:, 1]]
-
-    y = weber_fechner_experiment(X, std=0)
-
-    return X, y
+    return X
 
 
-def plot_weber_fechner(model=None):
+def plot_weber_fechner(
+    model=None, metadata=weber_fechner_metadata(), ground_truth=ground_truth_
+):
     import matplotlib.colors as mcolors
     import matplotlib.pyplot as plt
 
     colors = mcolors.TABLEAU_COLORS
     col_keys = list(colors.keys())
-
-    metadata = weber_fechner_metadata()
 
     S0_list = [1, 2, 4]
     delta_S = np.linspace(0, 5, 100)
@@ -87,7 +92,7 @@ def plot_weber_fechner(model=None):
         S0 = S0_value + np.zeros(delta_S.shape)
         S1 = S0 + delta_S
         X = np.array([S0, S1]).T
-        y = weber_fechner_experiment(X, std=0)
+        y = ground_truth(X)
         plt.plot(
             delta_S, y, label=f"$S_0 = {S0_value}$ (Original)", c=colors[col_keys[idx]]
         )
@@ -116,10 +121,11 @@ def plot_weber_fechner(model=None):
 
 
 register(
-    "weber_fechner",
+    id_="weber_fechner",
     name="Weber-Fechner Law",
-    metadata_callable=weber_fechner_metadata,
-    data_callable=weber_fechner_data,
-    synthetic_experiment_runner=weber_fechner_experiment,
+    metadata=weber_fechner_metadata(),
+    domain=get_domain,
+    experiment=weber_fechner_experiment,
+    ground_truth=ground_truth_,
     plotter=plot_weber_fechner,
 )
