@@ -33,6 +33,7 @@ def prospect_theory_experiment(
     probability_alpha=prospect_theory_probability_alpha,
     probability_beta=prospect_theory_probability_beta,
     std=added_noise,
+    rng_generator=np.random.default_rng(),
 ):
 
     Y = np.zeros((X.shape[0], 1))
@@ -86,8 +87,8 @@ def prospect_theory_experiment(
             x[3] ** coefficient + (1 - x[3]) ** coefficient
         ) ** (1 / coefficient)
 
-        expected_value_A = value_A * probability_a + np.random.normal(0, std)
-        expected_value_B = value_B * probability_b + np.random.normal(0, std)
+        expected_value_A = value_A * probability_a + rng_generator.normal(0, std)
+        expected_value_B = value_B * probability_b + rng_generator.normal(0, std)
 
         # compute probability of choosing option A
         p_choose_A = np.exp(expected_value_A / choice_temperature) / (
