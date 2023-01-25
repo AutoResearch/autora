@@ -6,20 +6,12 @@ from autora.variable import DV, IV, ValueType, VariableCollection
 
 from .._inventory import register
 
-# general meta parameters
-added_noise = 0.01
 
-# expected value theory with linear value function
-expected_value_choice_temperature = 0.1
-expected_value_lambda = 0.5
-expected_value_resolution = 10
-expected_value_minimum_value = -1
-expected_value_maximum_value = 1
-
-# basic expected value theory
-
-
-def expected_value_theory_metadata():
+def expected_value_theory_metadata(
+    expected_value_minimum_value=-1,
+    expected_value_maximum_value=1,
+    expected_value_resolution=10,
+):
 
     v_a = IV(
         name="V_A",
@@ -83,9 +75,9 @@ def expected_value_theory_metadata():
 
 def expected_value_theory_experiment(
     X: np.ndarray,
-    choice_temperature: float = expected_value_choice_temperature,
-    value_lambda=expected_value_lambda,
-    std=added_noise,
+    choice_temperature: float = 0.1,
+    value_lambda: float = 0.5,
+    std: float = 0.01,
 ):
 
     Y = np.zeros((X.shape[0], 1))
