@@ -3,7 +3,6 @@ from copy import deepcopy
 from random import randint, random
 from typing import Optional, Tuple
 
-import numpy as np
 from numpy import exp
 
 from .mcmc import Tree
@@ -33,6 +32,7 @@ class Parallel:
         x=None,
         y=None,
         root=None,
+        seed=None,
     ) -> None:
         """
         Initialises Parallel Machine Scientist
@@ -65,6 +65,7 @@ class Parallel:
                 root_value=root.__name__ if root is not None else None,
                 fixed_root=True if root is not None else False,
                 custom_ops=custom_ops,
+                seed_value=seed,
             )
         }
         self.t1 = self.trees["1.0"]
@@ -81,6 +82,7 @@ class Parallel:
                 custom_ops=custom_ops,
                 max_size=max_size,
                 BT=float(BT),
+                seed_value=seed,
             )
             self.trees[BT] = treetmp
             # Share fitted parameters and representative with other trees
@@ -117,7 +119,7 @@ class Parallel:
         BT1, BT2 = t1.BT, t2.BT
         EB1, EB2 = t1.EB, t2.EB
         # The energy change
-        DeltaE = np.float(EB1) * (1.0 / BT2 - 1.0 / BT1) + np.float(EB2) * (
+        DeltaE = float(EB1) * (1.0 / BT2 - 1.0 / BT1) + float(EB2) * (
             1.0 / BT1 - 1.0 / BT2
         )
         if DeltaE > 0:
