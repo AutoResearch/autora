@@ -171,10 +171,10 @@ def plot_prospect_theory(model=None, ground_truth=ground_truth):
 
 register(
     id_="prospect_theory",
+    name="Prospect Theory",
     metadata=prospect_theory_metadata(),
     domain=get_domain,
-    experiment=prospect_theory_experiment,
     ground_truth=ground_truth,
-    name="Prospect Theory",
+    experiment=prospect_theory_experiment,
     plotter=plot_prospect_theory,
 )
