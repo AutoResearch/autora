@@ -78,6 +78,7 @@ def expected_value_theory_experiment(
     choice_temperature: float = 0.1,
     value_lambda: float = 0.5,
     std: float = 0.01,
+    rng_generator=np.random.default_rng(),
 ):
 
     Y = np.zeros((X.shape[0], 1))
@@ -89,8 +90,8 @@ def expected_value_theory_experiment(
         probability_a = x[1]
         probability_b = x[3]
 
-        expected_value_A = value_A * probability_a + np.random.normal(0, std)
-        expected_value_B = value_B * probability_b + np.random.normal(0, std)
+        expected_value_A = value_A * probability_a + rng_generator.normal(0, std)
+        expected_value_B = value_B * probability_b + rng_generator.normal(0, std)
 
         # compute probability of choosing option A
         p_choose_A = np.exp(expected_value_A / choice_temperature) / (
