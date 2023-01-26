@@ -31,13 +31,13 @@ def fit_theorist(X, y, theorist_name, metadata, theorist_epochs=None):
         if theorist_epochs is not None:
             epochs = theorist_epochs
         else:
-            epochs = 15
+            epochs = 1500 # 1500
         theorist = BMSRegressor(epochs=epochs)
     elif theorist_name == "DARTS 2 Nodes":
         if theorist_epochs is not None:
             epochs = theorist_epochs
         else:
-            epochs = 5
+            epochs = 500 # # 500
         theorist = DARTSRegressor(
             max_epochs=epochs, output_type=output_type, num_graph_nodes=2
         )
@@ -45,7 +45,7 @@ def fit_theorist(X, y, theorist_name, metadata, theorist_epochs=None):
         if theorist_epochs is not None:
             epochs = theorist_epochs
         else:
-            epochs = 5
+            epochs = 500 # 500
         theorist = DARTSRegressor(
             max_epochs=epochs, output_type=output_type, num_graph_nodes=3
         )
@@ -61,25 +61,28 @@ def fit_theorist(X, y, theorist_name, metadata, theorist_epochs=None):
         if theorist_epochs is not None:
             epochs = theorist_epochs
         else:
-            epochs = 5000
+            epochs = 5000 # 5000
         theorist = MLP_theorist(epochs=epochs, output_type=output_type, verbose=True)
-    elif theorist_name == "Logit Regression":
+    elif 'Regression' in theorist_name:
         theorist = LogitRegression()
     else:
         raise ValueError(f"Theorist {theorist_name} not implemented.")
 
     found_theory = False
-    while not found_theory:
-        try:
-            DV_type = metadata.dependent_variables[0].type
-            if DV_type == ValueType.PROBABILITY and theorist_name == "BMS Fixed Root":
-                theorist.fit(X, y, root=sigmoid)
-            else:
-                theorist.fit(X, y)
-            found_theory = True
-        except Exception as err:
-            print(f"Unexpected {err=}, {type(err)=}")
-            print("Trying again....")
+    # while not found_theory:
+    try:
+        if output_type == ValueType.PROBABILITY and theorist_name == "BMS Fixed Root":
+            theorist.fit(X, y, root=sigmoid)
+        elif output_type == ValueType.REAL and "Regression" in theorist_name:
+            theorist.fit(X, y, interaction_terms=True, logit_transform=False)
+        else:
+            theorist.fit(X, y)
+        found_theory = True
+    except Exception as err:
+        print(X)
+        print(y)
+        print(f"Unexpected {err=}, {type(err)=}")
+        print("Trying again....")
 
     return theorist
 
@@ -305,7 +308,7 @@ def get_DL(theorist, theorist_name, x, y_target):
         if theorist.pms.root is not None:
             prior -= theorist.model_.prior_par["Nopi_sigmoid"]
     elif theorist_name == "Logit Regression":
-        k = (1 + theorist.models_[1].coef_.shape[0])*2
+        k = (1 + theorist.model_.coef_.shape[0])*2
         prior += prior_par["Nopi_log"]
         prior += prior_par["Nopi_/"]
         prior += prior_par["Nopi_-"]

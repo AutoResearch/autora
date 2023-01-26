@@ -104,6 +104,11 @@ def shepard_luce_experiment(X: np.ndarray,
              similarity_A2 * actual_focus_A +
              similarity_B1 * (1 - actual_focus_A) +
              similarity_B2 * (1 - actual_focus_A))
+        # probability can't be negative or larger than 1 (the noise can make it so)
+        if y < 0:
+            y = 0
+        elif y > 1:
+            y = 1
         Y[idx] = y
 
     return Y

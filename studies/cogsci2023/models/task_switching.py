@@ -2,7 +2,7 @@ import numpy as np
 from autora.variable import DV, IV, ValueType, VariableCollection
 
 # task switching parameters
-task_switching_resolution = 100
+task_switching_resolution = 50
 priming_default = 0.3  # default for task priming
 choice_temperature = 0.2 # temperature for softmax when computing performance of current task
 minimum_task_control = 0.15 # minimum task control

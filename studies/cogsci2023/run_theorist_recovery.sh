@@ -1,9 +1,9 @@
 #!/bin/sh
 
-#SBATCH -J ProspectExperimentalists
-#SBATCH --time=41:00:00
-#SBATCH --array=0-119
-#SBATCH --mem=6GB
+#SBATCH -J TheoristRecovery
+#SBATCH --time=23:00:00
+#SBATCH --array=0-139
+#SBATCH --mem=4GB
 #SBATCH -n 1
 
 # Print key runtime properties for records
@@ -19,4 +19,4 @@ source ~/autora_dev/bin/activate
 cd /users/smusslic/research/AER_repo/studies/cogsci2023
 
 # Run job
-python run_CL_prospect_theory_slurm.py --slurm_id $SLURM_ARRAY_TASK_ID
+python run_theorist_recovery_slurm.py --slurm_id $SLURM_ARRAY_TASK_ID
