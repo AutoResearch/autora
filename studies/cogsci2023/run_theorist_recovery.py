@@ -48,7 +48,8 @@ for rep in range(repetitions):
         elapsed_time = et - st
         elapsed_time_log.append(elapsed_time)
 
-        if theorist_name == "BMS" or theorist_name == "BMS Fixed Root":
+        if theorist_name == "BMS" or theorist_name == "BMS Fixed Root" or theorist_name == 'Logit Regression'\
+            or 'DARTS' in theorist_name:
             DL = get_DL(theorist, theorist_name, X_test, y_test)
         else:
             DL = 0

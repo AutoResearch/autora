@@ -1,22 +1,22 @@
 from studies.cogsci2023.models.models import model_inventory
 from sklearn.model_selection import train_test_split
 from studies.cogsci2023.utils import fit_theorist, get_MSE, get_DL
+from random import seed
+import numpy as np
+import argparse
 import pickle
 import time
 
 # META PARAMETERS
-repetitions = 1                 # specifies how many times to repeat the study (20)
+num_repetitions = 20                 # specifies how many times to repeat the study (20)
 test_size = 0.2                # proportion of test set size to training set size
-
-# SELECT GROUND TRUTH MODEL
-ground_truth_name = "prospect_theory" # OPTIONS: see models.py
 
 theorists = [
              'MLP',
-             'DARTS 2 Nodes'
-             'Logit Regression',
+             'DARTS 2 Nodes',
              'DARTS 3 Nodes',
-             'BMS',
+             'Regression',
+             # 'BMS',
              'BMS Fixed Root'
              ]
 
@@ -29,6 +29,19 @@ gts = ['weber_fechner',
        'evc_demand_selection'
        ]
 
+parser = argparse.ArgumentParser("parser")
+parser.add_argument('--slurm_id', type=int, default=0, help='number of slurm array')
+args = parser.parse_args()
+
+repetitions = np.arange(num_repetitions)
+gt_ids = np.arange(len(gts))
+conditions = np.array(np.meshgrid(repetitions, gt_ids)).T.reshape(-1,2)
+
+rep = conditions[args.slurm_id,0] # args.slurm_id
+gt_id = conditions[args.slurm_id,1]
+ground_truth_name = gts[gt_id]
+seed(rep)
+
 # get information from the ground truth model
 if ground_truth_name not in model_inventory.keys():
     raise ValueError(f"Study {ground_truth_name} not found in model inventory.")
@@ -39,7 +52,6 @@ X_full, y_full = data_fnc(metadata)
 X_train, X_test, y_train, y_test = train_test_split(X_full, y_full,
                                                     test_size=test_size,
                                                     random_state=rep)
-
 MSE_log = list()
 DL_log = list()
 theory_log = list()
@@ -55,7 +67,9 @@ for theorist_name in theorists:
     elapsed_time = et - st
     elapsed_time_log.append(elapsed_time)
 
-    if theorist_name == "BMS" or theorist_name == "BMS Fixed Root":
+    if theorist_name == "BMS" \
+        or theorist_name == "BMS Fixed Root" \
+        or 'DARTS' in theorist_name:
         DL = get_DL(theorist, theorist_name, X_test, y_test)
     else:
         DL = 0
