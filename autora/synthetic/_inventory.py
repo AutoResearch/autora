@@ -37,6 +37,7 @@ def register(
         domain=domain,
         experiment=experiment,
         ground_truth=ground_truth,
+        plotter=plotter,
     )
     _INVENTORY[id_] = new_model
 
