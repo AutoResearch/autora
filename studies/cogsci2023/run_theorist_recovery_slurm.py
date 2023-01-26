@@ -1,6 +1,12 @@
-from studies.cogsci2023.models.models import model_inventory
+from models.models import model_inventory
 from sklearn.model_selection import train_test_split
-from studies.cogsci2023.utils import fit_theorist, get_MSE, get_DL
+
+from utils import (
+    fit_theorist,
+    get_DL,
+    get_MSE,
+)
+
 from random import seed
 import numpy as np
 import argparse

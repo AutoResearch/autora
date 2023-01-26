@@ -1,6 +1,6 @@
 #!/bin/sh
 
-#SBATCH -J ChoiceExperimentalist
+#SBATCH -J TheoristRecovery
 #SBATCH --time=23:00:00
 #SBATCH --array=0-139
 #SBATCH --mem=4GB
