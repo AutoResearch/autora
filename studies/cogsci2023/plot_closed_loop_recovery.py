@@ -24,7 +24,7 @@ legend_type = False # False, "auto"
 figure_dim = (5.5, 5.5)
 
 experimentalist_labels = dict()
-experimentalist_labels['dissimilarity'] = 'Dissimilarity'
+experimentalist_labels['dissimilarity'] = 'Novelty'
 experimentalist_labels['falsification'] = 'Falsification'
 experimentalist_labels['least confident'] = 'Least Confident'
 experimentalist_labels['model disagreement'] = 'Model Disagreement'

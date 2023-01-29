@@ -2,7 +2,7 @@
 
 #SBATCH -J ProspectExperimentalists
 #SBATCH --time=41:00:00
-#SBATCH --array=0-119
+#SBATCH --array=0-99
 #SBATCH --mem=6GB
 #SBATCH -n 1
 

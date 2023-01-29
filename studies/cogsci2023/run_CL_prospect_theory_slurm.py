@@ -31,7 +31,7 @@ experimentalists = [
     'popper',
     'falsification',
     'random',
-    "dissimilarity",
+    # "dissimilarity",
     'model disagreement',
     'least confident',
 ]
