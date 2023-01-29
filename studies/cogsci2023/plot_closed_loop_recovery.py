@@ -12,15 +12,27 @@ from studies.cogsci2023.models.models import model_inventory, plot_inventory
 # set the path to the data_closed_loop directory
 path = 'data_closed_loop/'
 ground_truth_name = 'stroop_model' # OPTIONS: see models.py
-experimentalist_name = 'dissimilarity' # for plotting
-max_cycle = 50 # None
+experimentalist_name = 'Random' # for plotting
+max_cycle_mse = 50 # None
+max_cycle_tnse = 20 # None
 
 plot_performance = True
 plot_model = True
 plot_tsne = True
 print_model = False
-legend_type = "auto" # False, "auto"
+legend_type = False # False, "auto"
 figure_dim = (5.5, 5.5)
+
+experimentalist_labels = dict()
+experimentalist_labels['dissimilarity'] = 'Dissimilarity'
+experimentalist_labels['falsification'] = 'Falsification'
+experimentalist_labels['least confident'] = 'Least Confident'
+experimentalist_labels['model disagreement'] = 'Model Disagreement'
+experimentalist_labels['random'] = 'Random'
+
+if legend_type == "auto":
+    figure_dim = (8.5, 5.5)
+
 
 # create an empty list to store the loaded pickle files
 loaded_pickles = []
@@ -60,14 +72,14 @@ for pickle in loaded_pickles:
         if np.isnan(MSE_log[idx]) or np.isinf(MSE_log[idx]):
             continue
 
-        if max_cycle is not None:
-            if cycle_log[idx] > max_cycle:
+        if max_cycle_mse is not None:
+            if cycle_log[idx] > max_cycle_mse:
                 continue
 
         row = dict()
         row["Entry"] = entry
         row["Theorist"] = configuration["theorist_name"]
-        row["Experimentalist"] = experimentalist_log[idx]
+        row["Experimentalist"] = experimentalist_labels[experimentalist_log[idx]]
         row["Repetition"] = repetition_log[idx]
         row["Data Collection Cycle"] = cycle_log[idx]
         row["Mean Squared Error"] = MSE_log[idx]
@@ -101,12 +113,12 @@ for experimenalist in experimentalists:
 # print the data_closed_loop frame
 print(df_validation)
 df_final_mse = df_validation.copy()
-df_final_mse = df_final_mse.drop(df_final_mse[df_final_mse["Data Collection Cycle"] != configuration["num_cycles"]].index)
+df_final_mse = df_final_mse.drop(df_final_mse[df_final_mse["Data Collection Cycle"] != max_cycle_mse].index)
 df_final_mse.to_csv(path + "/" + ground_truth_name + "_MSE.csv")
 
 # copy data set
 df_entropy = df_validation.copy()
-df_entropy = df_entropy.drop(df_entropy[df_entropy["Data Collection Cycle"] != configuration["num_cycles"]].index)
+df_entropy = df_entropy.drop(df_entropy[df_entropy["Data Collection Cycle"] != max_cycle_mse].index)
 entropy_log = []
 for index, row in df_entropy.iterrows():
     # compute entropy of the corresponding observations
@@ -159,45 +171,65 @@ if plot_model:
 # PLOT THE DATA COLLECTED BY THE BEST-PERFORMING EXPERIMENTALIST
 
 if plot_tsne:
+    df_tsne_cycle = df_validation[
+        df_validation["Data Collection Cycle"] == max_cycle_tnse]
+    df_best_theories = df_tsne_cycle.loc[
+        df_tsne_cycle.groupby(['Experimentalist'])['Mean Squared Error'].idxmin()]
+
     # collect ground truth data_closed_loop
     full_data_label = "full data set"
     X, y = data_fnc(metadata)
+    # T-SNE Transformation
+    tsne = TSNE(n_components=2, verbose=1, random_state=111)
+    z = tsne.fit_transform(X)
+
+    full_data_only = pd.DataFrame()
+    full_data_only["Component 1"] = z[:, 0]
+    full_data_only["Component 2"] = z[:, 1]
+    full_data_only["y"] = y
+
     labels = list()
     cycle_count = list()
+    comp1 = list()
+    comp2 = list()
     # populate the labels list with "full data_closed_loop set" for each data_closed_loop point in X
-    for i in range(len(X)):
-        labels.append(full_data_label)
-        cycle_count.append(configuration["num_cycles"])
+    # for i in range(len(X)):
+    #     labels.append(full_data_label)
+    #     cycle_count.append(configuration["num_cycles"])
 
     # collect data_closed_loop collected by the best-performing experimentalist
     for experimenalist in experimentalists:
-        entry = df_best_theories[df_best_theories["Experimentalist"] == experimenalist]['Entry'].values
+        entry = df_best_theories[(df_best_theories["Experimentalist"] == experimenalist)]['Entry'].values
         conditions = full_conditions_log[entry[0]]
-        X = np.vstack((X, conditions))
+        # X = np.vstack((X, conditions))
         for i in range(len(conditions)):
+            condition = conditions[i]
+            # find index of row in X that matches condition
+            index = np.where((X == condition).all(axis=1))[0][0]
+            comp1.append(z[index, 0])
+            comp2.append(z[index, 1])
             cycle_count.append(np.floor_divide(i, configuration["samples_per_cycle"]))
             labels.append(experimenalist)
 
-    # T-SNE Transformation
-    tsne = TSNE(n_components=2, verbose=1, random_state=1)
-    z = tsne.fit_transform(X)
+
 
     # create final data_closed_loop frame
     df = pd.DataFrame()
     df["Labels"] = labels
-    df["Component 1"] = z[:,0]
-    df["Component 2"] = z[:,1]
-    for col in range(X.shape[1]):
-        df[f"Condition {col}"] = X[:,col]
+    df["Component 1"] = comp1
+    df["Component 2"] = comp2
     df["Cycle"] = cycle_count
+    # for col in range(X.shape[1]):
+    #     df[f"Condition {col}"] = X[:,col]
 
-    # create separate df for full data set
-    full_data_only = df[df["Labels"] == 'full data set']
-    full_data_only["y"] = y
-
-    # drop conditions with the seed cycle and full data set
-    df.drop(df[df['Cycle'] == 0].index, inplace=True)
-    df.drop(df[df['Labels'] == full_data_label].index, inplace=True)
+    #
+    # # create separate df for full data set
+    # full_data_only = df[df["Labels"] == 'full data set']
+    # full_data_only["y"] = y
+    #
+    # # drop conditions with the seed cycle and full data set
+    # df.drop(df[df['Cycle'] == 0].index, inplace=True)
+    # df.drop(df[df['Labels'] == full_data_label].index, inplace=True)
 
     # T-SNE plot for full data
     custom_palette = sns.color_palette("Greys", len(y.tolist()))
@@ -229,7 +261,8 @@ if plot_tsne:
     # custom_palette[0] = (0.5, 0.5, 0.5)
     sns.scatterplot(x="Component 1", y="Component 2", hue=df.Labels.tolist(),
                     palette=custom_palette,
-                    s = 5,
+                    # s = 10,
+                    alpha=0.5,
                     legend=legend_type,
                     data=df).set(title="T-SNE Projection of Probed Experimental Conditions\n(" + plot_title + ")")
     plt.show()
