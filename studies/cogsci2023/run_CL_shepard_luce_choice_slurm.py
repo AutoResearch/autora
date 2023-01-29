@@ -114,8 +114,13 @@ for cycle in range(num_cycles):
     )
 
     # get new experiment conditions
+    st = time.time()
     print("Running experimentalist..." + experimentalist_name)
     X_new = experimentalist.run()
+
+    et = time.time()
+    elapsed_time = et - st
+    print("Elapsed time: " + str(elapsed_time))
 
     # run experiment
     print("Running experiment...")

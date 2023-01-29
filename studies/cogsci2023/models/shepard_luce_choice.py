@@ -5,7 +5,7 @@ from autora.variable import DV, IV, ValueType, VariableCollection
 added_noise = 0.01
 
 # shepard-luce choice parameters
-shepard_luce_resolution = 10
+shepard_luce_resolution = 5
 maximum_similarity = 10
 minimum_similarity = 1/shepard_luce_resolution
 focus = 0.8
