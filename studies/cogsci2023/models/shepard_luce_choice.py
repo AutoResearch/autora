@@ -5,7 +5,7 @@ from autora.variable import DV, IV, ValueType, VariableCollection
 added_noise = 0.01
 
 # shepard-luce choice parameters
-shepard_luce_resolution = 5
+shepard_luce_resolution = 8
 maximum_similarity = 10
 minimum_similarity = 1/shepard_luce_resolution
 focus = 0.8
@@ -52,14 +52,14 @@ def shepard_luce_metadata():
         type=ValueType.REAL
     )
 
-    focus_category_A = IV(
-        name="focus_category_A",
-        allowed_values=[0, 1],
-        value_range=(0, 1),
-        units="focus",
-        variable_label="Focus on Category A",
-        type=ValueType.REAL
-    )
+    # focus_category_A = IV(
+    #     name="focus_category_A",
+    #     allowed_values=[0, 1],
+    #     value_range=(0, 1),
+    #     units="focus",
+    #     variable_label="Focus on Category A",
+    #     type=ValueType.REAL
+    # )
 
 
     choose_A1 = DV(
@@ -75,7 +75,7 @@ def shepard_luce_metadata():
                                similarity_category_A2,
                                similarity_category_B1,
                                similarity_category_B2,
-                               focus_category_A],
+                               ],
         dependent_variables=[choose_A1],
     )
 
@@ -92,7 +92,7 @@ def shepard_luce_experiment(X: np.ndarray,
         similarity_A2 = x[1]
         similarity_B1 = x[2]
         similarity_B2 = x[3]
-        focus_A = x[4]
+        focus_A = 1
 
         if focus_A == 1:
             actual_focus_A = focus
@@ -119,13 +119,13 @@ def shepard_luce_data(metadata):
     similarity_A2 = metadata.independent_variables[1].allowed_values
     similarity_B1 = metadata.independent_variables[2].allowed_values
     similarity_B2 = metadata.independent_variables[3].allowed_values
-    focus_A = metadata.independent_variables[4].allowed_values
+    # focus_A = metadata.independent_variables[4].allowed_values
 
     X = np.array(np.meshgrid(similarity_A1,
                              similarity_A2,
                              similarity_B1,
                              similarity_B2,
-                             focus_A)).T.reshape(-1,5)
+                             )).T.reshape(-1,4)
 
     # remove all conditions from X where the focus is 0 and the similarity of A1 is 0 or the similarity of A2 is 0
     # X = X[~((X[:,4] == 0) & ((X[:,0] == 0) | (X[:,1] == 0)))]
@@ -150,7 +150,7 @@ def plot_shepard_luce(model = None):
 
     similarity_B1_list = [0.5, 0.75, 1]
     similarity_B2 = 0
-    focus = 1.0
+    # focus = 1.0
 
     colors = mcolors.TABLEAU_COLORS
     col_keys = list(colors.keys())
@@ -162,7 +162,7 @@ def plot_shepard_luce(model = None):
         X[:,1] = similarity_A2
         X[:,2] = similarity_B1
         X[:,3] = similarity_B2
-        X[:,4] = focus
+        # X[:,4] = focus
 
         y = shepard_luce_experiment(X, std=0)
         plt.plot(similarity_A1.reshape((len(similarity_A1), 1)), y,
