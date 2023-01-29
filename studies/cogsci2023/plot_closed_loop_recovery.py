@@ -13,11 +13,13 @@ from studies.cogsci2023.models.models import model_inventory, plot_inventory
 path = 'data_closed_loop/'
 ground_truth_name = 'stroop_model' # OPTIONS: see models.py
 experimentalist_name = 'dissimilarity' # for plotting
+max_cycle = 50 # None
 
 plot_performance = True
 plot_model = True
 plot_tsne = True
 print_model = False
+legend_type = "auto" # False, "auto"
 figure_dim = (5.5, 5.5)
 
 # create an empty list to store the loaded pickle files
@@ -58,6 +60,10 @@ for pickle in loaded_pickles:
         if np.isnan(MSE_log[idx]) or np.isinf(MSE_log[idx]):
             continue
 
+        if max_cycle is not None:
+            if cycle_log[idx] > max_cycle:
+                continue
+
         row = dict()
         row["Entry"] = entry
         row["Theorist"] = configuration["theorist_name"]
@@ -69,6 +75,7 @@ for pickle in loaded_pickles:
         full_conditions_log.append(conditions_log[idx])
         full_observations_log.append(observations_log[idx])
         df_validation = df_validation.append(row, ignore_index=True)
+        # df_validation = pd.concat([df_validation, pd.DataFrame.from_records([row])])
 
         entry = entry + 1
 
@@ -112,16 +119,16 @@ df_entropy["Entropy"] = entropy_log
 df_entropy.to_csv(path + "/" + ground_truth_name + "_entropy.csv")
 
 sns.set(rc={'figure.figsize':figure_dim})
+plot_fnc, plot_title = plot_inventory[ground_truth_name]
 
 # CYCLE PLOT
 if plot_performance:
-    plot_fnc, plot_title = plot_inventory[ground_truth_name]
     # plot the performance of different experimentalists as a function of cycle
     # sns.set_theme()
     rel = sns.relplot(
         data=df_validation, kind="line",
         x="Data Collection Cycle", y="Mean Squared Error",
-        hue="Experimentalist", style="Experimentalist", legend=False, # False
+        hue="Experimentalist", style="Experimentalist", legend=legend_type, # False
     )
     rel.fig.subplots_adjust(top=.90)
     rel.fig.subplots_adjust(bottom=0.2)
@@ -172,7 +179,7 @@ if plot_tsne:
             labels.append(experimenalist)
 
     # T-SNE Transformation
-    tsne = TSNE(n_components=2, verbose=1, random_state=123)
+    tsne = TSNE(n_components=2, verbose=1, random_state=1)
     z = tsne.fit_transform(X)
 
     # create final data_closed_loop frame
@@ -223,6 +230,7 @@ if plot_tsne:
     sns.scatterplot(x="Component 1", y="Component 2", hue=df.Labels.tolist(),
                     palette=custom_palette,
                     s = 5,
+                    legend=legend_type,
                     data=df).set(title="T-SNE Projection of Probed Experimental Conditions\n(" + plot_title + ")")
     plt.show()
 
