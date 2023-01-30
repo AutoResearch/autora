@@ -294,7 +294,7 @@ class BSRRegressor(BaseEstimator, RegressorMixin):
                         _beta /= scale
 
                         error = 0
-                        for i in np.arange(0, n_train):
+                        for i in np.arange(n_train):
                             error += (output[i, 0] - y[i]) * (
                                     output[i, 0] - y[i]
                             )
@@ -312,26 +312,26 @@ class BSRRegressor(BaseEstimator, RegressorMixin):
                             # converged
                             switch_label = True
                             break
-                if switch_label:
-                    break
+                    if switch_label:
+                        break
 
-            if self.show_log:
-                for i in np.arange(0, len(y)):
-                    _logger.info(output[i, 0], y[i])
-            toc = time.time()
-            tictoc = toc - tic
-            if self.show_log:
-                _logger.info("Run time: {:.2f}s".format(tictoc))
+                    if self.show_log:
+                        for i in np.arange(0, len(y)):
+                            _logger.info(output[i, 0], y[i])
+                    toc = time.time()
+                    tictoc = toc - tic
+                    if self.show_log:
+                        _logger.info("Run time: {:.2f}s".format(tictoc))
 
-                _logger.info("------")
-                _logger.info("Mean rmse of last 5 accepts: {}".format(np.mean(errs[-6:-1])))
+                        _logger.info("------")
+                        _logger.info("Mean rmse of last 5 accepts: {}".format(np.mean(errs[-6:-1])))
 
-            train_errs.append(errs)
-            roots.append(curr_roots)
-            betas.append(_beta)
+                    train_errs.append(errs)
+                    roots.append(curr_roots)
+                    betas.append(_beta)
 
-        self.roots_ = roots
-        self.train_errs_ = train_errs
-        self.betas_ = betas
-        self.X_, self.y_ = X, y
-        return self
+                self.roots_ = roots
+                self.train_errs_ = train_errs
+                self.betas_ = betas
+                self.X_, self.y_ = X, y
+                return self
