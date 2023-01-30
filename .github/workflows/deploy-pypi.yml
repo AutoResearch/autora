@@ -21,8 +21,10 @@ jobs:
       - name: Install dependencies
         run: poetry install
   
+      - run: poetry build
+
       - run: poetry config repositories.testpypi https://test.pypi.org/legacy/
       
       - run: poetry config pypi-token.testpypi ${{ secrets.PYPI_TOKEN }}      
       
-      - run: poetry publish --repository=testpypi --build 
+      - run: poetry publish --repository=testpypi
