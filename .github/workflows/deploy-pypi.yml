@@ -12,9 +12,7 @@ jobs:
       - uses: actions/checkout@v3
       
       - run: pipx install poetry
-      
-      - run: poetry self add "poetry-dynamic-versioning[plugin]"
-    
+
       - uses: actions/setup-python@v4
         with:
           python-version: 3.8
@@ -22,11 +20,17 @@ jobs:
 
       - name: Install dependencies
         run: poetry install
-  
-      - run: poetry build
 
-      - run: poetry config repositories.testpypi https://test.pypi.org/legacy/
+      - name: Bump version number
+        run: poetry version ${{ github.event.release.tag_name }}
+  
+      - name: Build package
+        run: poetry build
+
+      - name: Setup PyPI Repository
+        run: |
+          poetry config repositories.testpypi https://test.pypi.org/legacy/
+          poetry config pypi-token.testpypi ${{ secrets.PYPI_TOKEN }}
       
-      - run: poetry config pypi-token.testpypi ${{ secrets.PYPI_TOKEN }}      
-      
-      - run: poetry publish --repository=testpypi
+      - name: Publish
+        run: poetry publish --repository=testpypi
