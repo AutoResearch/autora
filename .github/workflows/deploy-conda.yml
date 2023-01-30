@@ -32,5 +32,5 @@ jobs:
     - name: Build
       run: |
         conda config --set anaconda_upload yes
-        conda build ./conda/recipe -c pytorch --token ${{ secrets.ANACONDA_TOKEN }}
+        conda build ./conda/recipe -c pytorch --token "${{ secrets.ANACONDA_TOKEN }}"
         
