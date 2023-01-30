@@ -23,6 +23,7 @@ jobs:
   
   deploy:
     runs-on: ubuntu-latest
+    needs: setup-environment
     steps:
 
       - run: poetry config repositories.testpypi https://test.pypi.org/legacy/
