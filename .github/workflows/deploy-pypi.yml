@@ -4,9 +4,6 @@ on:
   release:
     types: [ published ]
 
-permissions:
-  contents: write
-
 jobs:
   
   build-bump-publish:
@@ -24,13 +21,6 @@ jobs:
       - name: Install dependencies
         run: poetry install
   
-      - run: poetry version ${{ github.event.release.tag_name }}
-      
-      - uses: stefanzweifel/git-auto-commit-action@v4
-        with:
-          commit_message: "chore: bump version to ${{ github.event.release.tag_name }}"
-          branch: main
-
       - run: poetry config repositories.testpypi https://test.pypi.org/legacy/
       
       - run: poetry config pypi-token.testpypi ${{ secrets.PYPI_TOKEN }}      
