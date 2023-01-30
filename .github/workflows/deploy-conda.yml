@@ -7,6 +7,13 @@ on:
 jobs:
   build-conda:
     runs-on: ubuntu-20.04
+    # ubuntu-20.04 selected over ubuntu-latest because
+    # upload part of conda build command is broken in ubuntu-latest
+    # JGH: I think that the function conda_build.external.find_executable
+    # ...  might be returning a list of executables for the "anaconda"
+    # ...  rather than the expected single value.
+    # When updating to ubuntu 22.04: check that upload functions correctly.
+    # If it does, you're fine to update and get rid of this comment.
 
     steps:
     - uses: actions/checkout@v3
@@ -28,9 +35,7 @@ jobs:
         
     - name: Install dependencies
       run: | 
-        conda install conda-build
-        conda install conda-verify
-        conda install anaconda-client
+        conda install conda-build conda-verify anaconda-client
     
     - name: Build
       run: |
