@@ -20,7 +20,7 @@ jobs:
       - name: Install dependencies
         run: poetry install
 
-      - run: poetry source add test-pypi https://test.pypi.org/simple/
+      - run: poetry source add test-pypi https://test.pypi.org/legacy/
       
       - name: Build & Publish
         run: poetry publish --repository=test-pypi --build 
