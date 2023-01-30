@@ -31,6 +31,7 @@ jobs:
     
     - name: Build
       run: |
+        cd ./conda
         conda config --set anaconda_upload yes
-        conda build ./conda/recipe -c pytorch --output-folder conda/dist/ --token ${{ secrets.ANACONDA_TOKEN }}
+        conda build autora -c pytorch --token "${{ secrets.ANACONDA_TOKEN }}"
         
