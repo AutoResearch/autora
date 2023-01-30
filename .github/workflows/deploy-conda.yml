@@ -17,7 +17,11 @@ jobs:
         # $CONDA is an environment variable pointing to the root of the miniconda directory
         echo $CONDA/bin >> $GITHUB_PATH
         
-    - run: conda install conda-build
+    - name: Install dependencies
+      run: conda install conda-build
+    
+    - name: Bump version number
+      run: sed -i 's/{% set version = "0.0.0" %}/{% set version = "${{ github.event.release.tag_name }}" %}/g' ./conda/recipe/meta.yaml
   
     - name: Build
       run: conda build ./conda/recipe -c pytorch --output-folder conda/dist/
