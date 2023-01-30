@@ -22,4 +22,6 @@ jobs:
       run: conda install conda-build
     
     - name: Build conda package
-      run: conda build ./conda/recipe -c pytorch --output-folder conda/dist/
+      run: |
+        cd conda
+        conda build autora -c pytorch
