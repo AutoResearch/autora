@@ -1,9 +1,9 @@
-{% set pyproject = load_file_data("../../pyproject.toml", from_recipe_dir=True) %}
-{% set poetry = pyproject.get('tool', {}).get('poetry') %}
+{% set name = "autora" %}
+{% set version = "0.0.0" %}
 
 package:
-  name: {{ poetry.get('name') }}
-  version: {{ poetry.get('version') }}
+  name: "{{ name|lower }}"
+  version: "{{ version }}"
 
 source:
   path: ../../
