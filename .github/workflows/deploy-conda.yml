@@ -1,8 +1,6 @@
 name: Deploy to Anaconda.org
 
-on:
-  release:
-    types: [ published ]
+on: [ push ]
 
 jobs:
   build-linux:
@@ -18,6 +16,9 @@ jobs:
       run: |
         # $CONDA is an environment variable pointing to the root of the miniconda directory
         echo $CONDA/bin >> $GITHUB_PATH
+        
+    - run: conda install conda-build
+  
     - name: Build
       run: conda build ./conda/recipe -c pytorch --output-folder conda/dist/
         
