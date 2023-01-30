@@ -1,0 +1,28 @@
+name: Deploy to PyPi
+
+on:
+  release:
+    types: [ published ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - run: pipx install poetry
+    
+      - uses: actions/setup-python@v4
+        with:
+          python-version: 3.8
+          cache: 'poetry'
+
+      - name: Install dependencies
+        run: poetry install
+
+      - run: poetry source add test-pypi https://test.pypi.org/simple/
+      
+      - name: Build & Publish
+        run: poetry publish --repository=test-pypi --build 
+        env:
+          POETRY_PYPI_TOKEN_PYPI: ${{ secrets.PYPI_TOKEN }}
