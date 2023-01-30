@@ -5,7 +5,8 @@ on:
     types: [ published ]
 
 jobs:
-  deploy:
+  
+  setup-environment:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -19,9 +20,13 @@ jobs:
 
       - name: Install dependencies
         run: poetry install
+  
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
 
       - run: poetry config repositories.testpypi https://test.pypi.org/legacy/
       
-      - run: poetry config pypi-token.testpypi ${{ secrets.PYPI_TOKEN }}
+      - run: poetry config pypi-token.testpypi ${{ secrets.PYPI_TOKEN }}      
       
       - run: poetry publish --repository=testpypi --build 
