@@ -9,7 +9,7 @@ jobs:
   setup-environment:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v2
         with:
           ref: ${{ github.head_ref }}
       
