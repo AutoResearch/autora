@@ -9,7 +9,7 @@ permissions:
 
 jobs:
   
-  setup-environment:
+  build-bump-publish:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
