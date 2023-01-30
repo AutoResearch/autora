@@ -30,5 +30,7 @@ jobs:
       run: conda install conda-build
     
     - name: Build
-      run: conda build ./conda/recipe -c pytorch --output-folder conda/dist/
+      run: |
+        conda config --set anaconda_upload yes
+        conda build ./conda/recipe -c pytorch --output-folder conda/dist/ --token ${{ secrets.ANACONDA_TOKEN }}
         
