@@ -8,6 +8,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+
+    - name: Bump version number
+      run: sed -i 's/{% set version = "0.0.0" %}/{% set version = "${{ github.event.release.tag_name }}" %}/g' ./conda/recipe/meta.yaml
+
     - name: Set up Python 3.10
       uses: actions/setup-python@v3
       with:
@@ -20,9 +24,6 @@ jobs:
     - name: Install dependencies
       run: conda install conda-build
     
-    - name: Bump version number
-      run: sed -i 's/{% set version = "0.0.0" %}/{% set version = "${{ github.event.release.tag_name }}" %}/g' ./conda/recipe/meta.yaml
-  
     - name: Build
       run: conda build ./conda/recipe -c pytorch --output-folder conda/dist/
         
