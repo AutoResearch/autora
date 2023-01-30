@@ -102,6 +102,17 @@ def __get_prior(prior_name: str, prob: bool = True) -> Dict[str, float]:
 
 
 def get_prior_dict(prior_name="Uniform"):
+    """
+    Get the dictionary of prior information as well as several list of key operator properties
+
+    Argument:
+        prior_name: the name of the prior dictionary to use
+
+    Returns:
+        ops_name_lst: the list of operator names
+        ops_weight_lst: the list of operator weights
+        prior_dict: the dictionary of operator prior information
+    """
     ops_prior = __get_prior(prior_name)
     ops_init = __get_ops_init()
     ops_fn_and_arity = __get_ops_with_arity()
@@ -119,6 +130,16 @@ def get_prior_dict(prior_name="Uniform"):
 
 
 def get_prior_list(prior_name="Uniform"):
+    """
+    Get a dictionary of key prior properties
+
+    Argument:
+        prior_name: the name of the prior dictionary to use
+
+    Returns:
+        a dictionary that maps a prior property (e.g. `name`) to the list of such properties
+            for each operator.
+    """
     ops_prior = __get_prior(prior_name)
     ops_init = __get_ops_init()
     ops_fn_and_arity = __get_ops_with_arity()

@@ -16,7 +16,6 @@ def check_empty(func: Callable):
     A decorator that, if applied to `func`, checks whether an argument in `func` is an
     un-initialized node (i.e. node.node_type == NodeType.Empty). If so, an error is raised.
     """
-
     @wraps(func)
     def func_wrapper(*args, **kwargs):
         for arg in args:
@@ -49,6 +48,10 @@ def get_height(node: Node) -> int:
 
 @check_empty
 def update_depth(node: Node, depth: int):
+    """
+    Update the depth information of all nodes starting from root `node`, whose depth
+    is set equal to the given `depth`.
+    """
     node.depth = depth
     if node.node_type == NodeType.UNARY:
         update_depth(node.left, depth + 1)
@@ -62,6 +65,17 @@ def get_expression(
         ops_expr: Dict[str, str] = None,
         feature_names: Optional[List[str]] = None,
 ) -> str:
+    """
+    Get a literal (string) expression of an expression tree, which has root `node`.
+
+    Arguments:
+        node: the root of the tree where the expression is generated from
+        ops_expr: the dictionary that maps an operation name to its literal format; if not
+            offered, use the default one in `get_ops_expr()`
+        feature_names: the list of names for the data features
+    Return:
+        a literal expression of the tree
+    """
     if not ops_expr:
         ops_expr = get_ops_expr()
     if node.node_type == NodeType.LEAF:
@@ -104,7 +118,10 @@ def get_all_nodes(node: Node) -> List[Node]:
 
 
 @check_empty
-def get_num_lt_nodes(node: Node):
+def get_num_lt_nodes(node: Node) -> int:
+    """
+    Get the number of nodes with `lt` operation in a tree starting from `node`
+    """
     if node.node_type == NodeType.LEAF:
         return 0
     else:
@@ -121,6 +138,19 @@ def calc_tree_ll(
         n_feature: int = 1,
         **hyper_params: Dict
 ):
+    """
+    Calculate the likelihood-related quantities of the given tree `node`.
+
+    Arguments:
+        node: the tree node for which the calculations are done
+        ops_priors: the dictionary that maps operation names to their prior info
+        n_feature: number of features in the input data
+        hyperparams: hyperparameters for initialization
+
+    Returns:
+        struct_ll: tree structure-related likelihood
+        params_ll: tree parameters-related likelihood
+    """
     struct_ll = 0  # log likelihood of tree structure S = (T,M)
     params_ll = 0  # log likelihood of linear params
     depth = node.depth
@@ -205,7 +235,7 @@ def stay(ln_nodes: List[Node], **hyper_params: Dict):
         hyper_params: hyperparameters for re-initialization
     """
     for ln_node in ln_nodes:
-        ln_node.init_param(**hyper_params)
+        ln_node._init_param(**hyper_params)
 
 
 def grow(
@@ -309,6 +339,7 @@ def transform(
         ops_priors: the dictionary of operation prior properties
         n_feature: the number of features in input data
         hyper_params: hyperparameters for re-initialization
+
     Return:
         the middle node that gets inserted
     """
@@ -394,6 +425,9 @@ def reassign_feat(node: Node, n_feature: int = 1):
 
 
 class Action(Enum):
+    """
+    Enum class that represents a MCMC step with a certain action
+    """
     STAY = 0
     GROW = 1
     PRUNE = 2
@@ -416,6 +450,7 @@ class Action(Enum):
             lt_num: the number of linear (`lt`) nodes in the tree
             term_num: the number of terminal nodes in the tree
             de_trans_num: the number of de-trans qualified nodes in the tree (see `propose` for details)
+
         Returns:
             action: the MCMC action to perform
             weights: the probabilities for each action
@@ -483,7 +518,15 @@ def prop(
         **hyper_params
 ):
     """
-    Propose a new tree from an existing tree with root `node`
+    Propose a new tree from an existing tree with root `node`.
+
+    Arguments:
+        node: the existing tree node
+        ops_name_lst: the list of operator names
+        ops_weight_lst: the list of operator weights
+        ops_priors: the dictionary of operator prior information
+        n_feature: the number of features in input data
+        hyper_params: hyperparameters for initialization
 
     Return:
         new_node: the new node after some action is applied
@@ -532,7 +575,7 @@ def prop(
             q_inv = new_prob / max(1, new_nterm_count - 1)  # except the root
             if new_lt_count > len(lt_nodes):
                 expand_node = True
-
+    # ACTION 3: PRUNE
     elif action == Action.PRUNE:
         i = np.random.randint(0, len(nterm_nodes), 1)[0]
         pruned_node: Node = nterm_nodes[i]
@@ -551,7 +594,7 @@ def prop(
         )
         # calculate q_inv
         q_inv = pg * np.exp(tree_ll) / new_term_count
-
+    # ACTION 4: DE_TRANSFORM
     elif action == Action.DE_TRANSFORM:
         num_de_trans = len(de_trans_nodes)
         i = np.random.randint(0, num_de_trans, 1)[0]
@@ -594,7 +637,7 @@ def prop(
         if discarded_node:
             tree_ll, _ = calc_tree_ll(discarded_node, ops_priors, n_feature, **hyper_params)
             q_inv = q_inv * np.exp(tree_ll)
-
+    # ACTION 5: TRANSFORM
     elif action == Action.TRANSFORM:
         all_nodes = get_all_nodes(new_node)
         i = np.random.randint(0, len(all_nodes), 1)[0]
@@ -621,7 +664,7 @@ def prop(
         if inserted_node.node_type == NodeType.BINARY and \
                 inserted_node.left.node_type != NodeType.LEAF and inserted_node.right.node_type != NodeType.LEAF:
             q_inv = q_inv / 2
-
+    # ACTION 6: REASSIGN OPERATION
     elif action == Action.REASSIGN_OP:
         i = np.random.randint(0, len(nterm_nodes), 1)[0]
         reassign_node: Node = nterm_nodes[i]
@@ -657,8 +700,8 @@ def prop(
             expand_node = True
         elif new_lt_count < len(lt_nodes):
             shrink_node = True
-
-    else:  # reassign feature
+    # ACTION 7: REASSIGN FEATURE
+    else:
         i = np.random.randint(0, len(term_nodes), 1)[0]
         reassign_node = term_nodes[i]
         reassign_feat(reassign_node, n_feature)
@@ -667,7 +710,19 @@ def prop(
     return new_node, expand_node, shrink_node, q, q_inv
 
 
-def calc_aux_ll(node: Node, **hyper_params):
+def calc_aux_ll(node: Node, **hyper_params) -> Tuple[float, int]:
+    """
+    Calculate the likelihood of generating auxiliary parameters
+
+    Arguments:
+        node: the node from which the auxiliary params are generated
+        hyper_params: hyperparameters for generating auxiliary params
+
+    Returns:
+        log_aux: log likelihood of auxiliary params
+        lt_count: number of nodes with `lt` operator in the tree with
+            `node` as its root
+    """
     sigma_a, sigma_b = hyper_params["sigma_a"], hyper_params["sigma_b"]
     log_aux = np.log(invgamma.pdf(sigma_a, 1)) + np.log(invgamma.pdf(sigma_b, 1))
 
@@ -695,7 +750,28 @@ def prop_new(
         ops_name_lst: List[str],
         ops_weight_lst: List[float],
         ops_priors: Dict[str, Dict],
-):
+) -> Tuple[bool, Node, float, float, float]:
+    """
+    Propose new structure, sample new parameters and decide whether to accept the new tree.
+
+    Arguments:
+        roots: the list of root nodes
+        index: the index of the root node to update
+        sigma_y: scale hyperparameter for linear mixture of expression trees
+        beta: hyperparameter for growing an uninitialized expression tree
+        sigma_a, sigma_b: hyperparameters for `lt` operator initialization
+        X, y: input data (independent variable) matrix and dependent variable vector
+        ops_name_lst: the list of operator names
+        ops_weight_lst: the list of operator weights
+        ops_priors: the dictionary of operator prior information
+
+    Returns:
+        accept: whether to accept or reject the new expression tree
+        root: the old or new expression tree, determined by whether to accept the new tree
+        sigma_y: the old or new sigma_y
+        sigma_a: the old or new sigma_a
+        sigma_b: the old or new sigma_b
+    """
     # the hyper-param for linear combination, i.e. for `sigma_y`
     sig = 4
     K = len(roots)
@@ -752,7 +828,7 @@ def prop_new(
         old_aux_ll, old_lt_count = calc_aux_ll(root, **hyper_params)
         new_aux_ll, _ = calc_aux_ll(new_root, **new_hyper_params)
         log_r += old_aux_ll - new_aux_ll
-        # log for the Jacobian
+        # log for the Jacobian matrix
         log_r += np.log(max(1e-5, 1 / np.power(2, 2 * old_lt_count)))
 
     alpha = min(log_r, 0)

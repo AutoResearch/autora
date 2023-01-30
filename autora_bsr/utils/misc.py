@@ -1,5 +1,9 @@
 from typing import Dict
 
+"""
+a file for all miscellaneous functions that are used in BSR.
+"""
+
 
 def normalize_prior_dict(prior_dict: Dict[str, float]):
     """

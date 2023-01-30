@@ -49,7 +49,7 @@ class Node:
         # params for additional inputs into `operator`
         self.params = {}
 
-    def init_param(self, **hyper_params):
+    def _init_param(self, **hyper_params):
         # init is a function randomized by some hyper-params
         if callable(self.op_init):
             self.params = self.op_init(**hyper_params)
@@ -63,11 +63,22 @@ class Node:
             feature: int = 0,
             **hyper_params
     ):
+        """
+        Initialize an uninitialized node with given feature, in the case of a leaf node, or some
+        given operator information, in the case of unary or binary node. The type of the node is
+        determined by the feature/operator assigned to it.
+
+        Arguments:
+            op_name: the operator name, if given
+            ops_prior: the prior dictionary of the given operator
+            feature: the index of the assigned feature, if given
+            hyper_params: hyperparameters for initializing the node
+        """
         self.op_name = op_name
         self.operator = ops_prior.get("fn")
         self.op_arity = ops_prior.get("arity", 0)
         self.op_init = ops_prior.get("init", {})
-        self.init_param(**hyper_params)
+        self._init_param(**hyper_params)
 
         if self.op_arity == 0:
             self.params["feature"] = feature
@@ -84,6 +95,17 @@ class Node:
                 "operation arity should be either 0, 1, 2; get {} instead".format(self.op_arity))
 
     def evaluate(self, X: Union[np.ndarray, pd.DataFrame], store_result: bool = False) -> np.array:
+        """
+        Evaluate the expression, as represented by an expression tree with `self` as the root,
+        using the given data matrix `X`.
+
+        Arguments:
+            X: the data matrix with each row being a data point and each column a feature
+            store_result: whether to store the result of this calculation
+
+        Return:
+            result: the result of this calculation
+        """
         if X is None:
             raise TypeError("input data X is non-existing")
         if isinstance(X, np.ndarray):
@@ -101,4 +123,8 @@ class Node:
         return result
 
     def __str__(self) -> str:
+        """
+        Get a literal (string) representation of a tree `node` data structure.
+        See `get_expression` for more information.
+        """
         return get_expression(self)
