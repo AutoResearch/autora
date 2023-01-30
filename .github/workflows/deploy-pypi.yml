@@ -1,4 +1,4 @@
-name: Deploy to PyPi
+name: Deploy to PyPI
 
 on:
   release:
