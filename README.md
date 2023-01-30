@@ -395,25 +395,26 @@ autora/          # The directory containing the source code.
 ```
 # Release Process
 
-- Create a branch for the release
-- Bump the version number using `poetry version`
-- Check that the packaging and publishing works
-  - poetry build && poetry publish
-  - conda/publish-on-anaconda-org.sh
-- Merge the branch
-- Create the release and the tag in GitHub 
+The release process is automated using GitHub Actions. 
 
-## PyPI
-
-We use the standard poetry publishing workflow as outlined here: https://python-poetry.org/docs/libraries/#publishing-to-pypi
-
-## Conda
-
-The `conda` directory includes files for packaging the code for the Anaconda package manager `conda`.
-- [`meta.yaml`](conda/recipe/meta.yaml) is the `conda` recipe (configuration file)
-- [`publish-on-anaconda-org.sh`](conda/publish-on-anaconda-org.sh) is a script which runs the packaging and outputs the package into the `./dist` directory, then uploads the files to [anaconda.org](https://anaconda.org).
-
-To create and publish the `conda` package:
-- Update `./meta.yaml` with any changed dependencies, to match `pyproject.toml` and taking into account the dependencies which are actually available on the anaconda channels we use: defaults and pytorch. Commit these changes.
-- 🐛 Bugfix: Until poetry >=1.2 is available on anaconda.org (you should check each time we publish until it is), delete the [tool.poetry.group...] parts of pyproject.toml. These are recognized as incorrect Poetry configuration in poetry 1.1 and below, and will cause the build to fail. Don't commit these changes.  
-- run `publish-on-anaconda-org.sh`
+- Update [conda recipe](./conda/autora/meta.yaml): 
+    - dependencies, so that it matches [pyproject.toml](pyproject.toml).
+    - imports for testing – all modules should be listed.
+- Trigger a new release from GitHub. 
+  - Navigate to the repository's code tab at https://github.com/autoresearch/autora,
+  - Click "Releases",
+  - Click "Draft a new release",
+  - In the "Choose a tag" field, type the new semantic release number using the [PEP440 syntax](https://peps.python.
+    org/pep-0440/), 
+    e.g. "v1.2.3" for a standard release, "v1.2.3a4" for an alpha release, "v1.2.3b5" for a beta release, 
+    "v1.2.3rc6" for a release candidate, and then click "Create new tag on publish". The version number should be 
+    prefixed with a "v"
+  - Click on "Generate Release notes". Check that the release notes match with the version number you have chosen – 
+    breaking changes require a new major version number, e.g. v2.0.0, new features a minor version number, e.g. 
+    v1.3.0 and fixes a bugfix number v1.2.4. If necessary, modify the version number you've chosen to be consistent 
+    with the content of the release.
+  - Select whether this is a pre-release or a new "latest" release. It's a "pre-release" if there's an alpha, 
+    beta, or release candidate number in the tag name, otherwise it's a new "latest" release.
+  - Click on "Publish release"
+- GitHub actions will run to create and publish the PyPI and Anaconda packages, and publish the documentation. Check in 
+  GitHub actions whether they run without errors and fix any errors which occur.
