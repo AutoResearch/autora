@@ -9,9 +9,7 @@ jobs:
   setup-environment:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-        with:
-          ref: ${{ github.head_ref }}
+      - uses: actions/checkout@v3
       
       - run: pipx install poetry
     
@@ -28,6 +26,7 @@ jobs:
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: "chore: bump version to ${{ github.event.release.tag_name }}"
+          branch: main
 
       - run: poetry config repositories.testpypi https://test.pypi.org/legacy/
       
