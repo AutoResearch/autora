@@ -14,6 +14,7 @@ jobs:
     - name: Bump version number
       run: |
         REF_NAME_WITHOUT_V=${GITHUB_REF_NAME#v}
+        echo $REF_NAME_WITHOUT_V
         sed -i.bak "s/{% set version = \"0.0.0\" %}/{% set version = \"${REF_NAME_WITHOUT_V}\" %}/" conda/recipe/meta.yaml
         cat conda/recipe/meta.yaml
 
