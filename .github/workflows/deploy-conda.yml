@@ -14,7 +14,8 @@ jobs:
     - name: Bump version number
       run: |
         REF_NAME_WITHOUT_V=${GITHUB_REF_NAME#v}
-        sed -i.bak "s/{% set version = \"0.0.0\" %}/{% set version = \"${REF_NAME_WITHOUT_V}\" %}/" conda/recipe/meta.yaml
+        sed -i.bak "s/{% set version = \"0.0.0\" %}/{% set version = \"${REF_NAME_WITHOUT_V}\" %}/" conda/autora/meta
+        .yaml
 
     - name: Set up Python 3.10
       uses: actions/setup-python@v4
