@@ -11,7 +11,7 @@ from studies.cogsci2023.models.models import model_inventory, plot_inventory
 
 # set the path to the data_closed_loop directory
 path = 'data_closed_loop/'
-ground_truth_name = 'stroop_model' # OPTIONS: see models.py
+ground_truth_name = 'shepard_luce_choice' # OPTIONS: see models.py
 experimentalist_name = 'Random' # for plotting
 max_cycle_mse = 50 # None
 max_cycle_tnse = 20 # None
@@ -20,7 +20,7 @@ plot_performance = True
 plot_model = True
 plot_tsne = True
 print_model = False
-legend_type = False # False, "auto"
+legend_type = "auto" # False, "auto"
 figure_dim = (5.5, 5.5)
 
 experimentalist_labels = dict()
@@ -29,6 +29,7 @@ experimentalist_labels['falsification'] = 'Falsification'
 experimentalist_labels['least confident'] = 'Least Confident'
 experimentalist_labels['model disagreement'] = 'Model Disagreement'
 experimentalist_labels['random'] = 'Random'
+experimentalist_labels['popper'] = 'Popper'
 
 if legend_type == "auto":
     figure_dim = (8.5, 5.5)
@@ -129,6 +130,20 @@ for index, row in df_entropy.iterrows():
     entropy_log.append(entropy)
 df_entropy["Entropy"] = entropy_log
 df_entropy.to_csv(path + "/" + ground_truth_name + "_entropy.csv")
+
+# variance of the observations
+df_variance = df_validation.copy()
+df_variance = df_variance.drop(df_variance[df_variance["Data Collection Cycle"] != max_cycle_mse].index)
+variance_log = []
+for index, row in df_variance.iterrows():
+    # compute variance of the corresponding observations
+    entry = row["Entry"]
+    y = np.array(full_observations_log[entry])
+    # compute variance of y
+    variance = np.var(y)
+    variance_log.append(variance)
+df_variance["Variance"] = variance_log
+df_variance.to_csv(path + "/" + ground_truth_name + "_variance.csv")
 
 sns.set(rc={'figure.figsize':figure_dim})
 plot_fnc, plot_title = plot_inventory[ground_truth_name]

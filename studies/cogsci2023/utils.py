@@ -200,7 +200,7 @@ def get_experimentalist(
                 "dissimilarity__n": num_samples,
                 "dissimilarity__inverse": False,
                 "dissimilarity__metric": "euclidean",
-                "dissimilarity__integration": "product",
+                "dissimilarity__integration": "min", # product
             },
         )
 

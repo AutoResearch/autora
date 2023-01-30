@@ -2,7 +2,7 @@
 
 #SBATCH -J ChoiceExperimentalist
 #SBATCH --time=46:00:00
-#SBATCH --array=0-119
+#SBATCH --array=0-19
 #SBATCH --mem=9GB
 #SBATCH -n 1
 

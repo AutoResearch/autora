@@ -156,7 +156,7 @@ def plot_shepard_luce(model = None):
     col_keys = list(colors.keys())
     for idx, similarity_B1 in enumerate(similarity_B1_list):
         # similarity_B2 = 1 - similarity_B1
-        X = np.zeros((len(similarity_A1), 5))
+        X = np.zeros((len(similarity_A1), 4))
 
         X[:,0] = similarity_A1
         X[:,1] = similarity_A2
