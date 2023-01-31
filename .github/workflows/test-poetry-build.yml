@@ -1,4 +1,4 @@
-name: Check Poetry Build
+name: Test Poetry Build
 
 on:
   pull_request:

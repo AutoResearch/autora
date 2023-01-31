@@ -1,4 +1,4 @@
-name: Check Conda Build
+name: Test Conda Build
 
 on:
   pull_request:
