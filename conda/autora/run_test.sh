@@ -1,3 +1,3 @@
 #!/bin/zsh
 
-pytest ../../tests/
+pytest tests/

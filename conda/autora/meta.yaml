@@ -35,6 +35,8 @@ requirements:
 test:
   requires:
     - pytest
+  source_files:
+    - tests
   imports:
     - autora
     - autora.cycle
