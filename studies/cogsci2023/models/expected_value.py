@@ -8,7 +8,7 @@ added_noise = 0.01
 # expected value theory with linear value function
 expected_value_choice_temperature = 0.1
 expected_value_lambda = 0.5
-expected_value_resolution = 8
+expected_value_resolution = 9
 expected_value_minimum_value = -1
 expected_value_maximum_value = 1
 

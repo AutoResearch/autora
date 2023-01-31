@@ -7,7 +7,7 @@ added_noise = 0.01
 # shepard-luce choice parameters
 shepard_luce_resolution = 8
 maximum_similarity = 10
-minimum_similarity = maximum_similarity/shepard_luce_resolution
+minimum_similarity = 1/shepard_luce_resolution # maximum_similarity/shepard_luce_resolution
 focus = 0.8
 
 # Shepard-Luce Choice Rule according to Equation (4) in

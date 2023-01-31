@@ -28,12 +28,12 @@ theorist_name = "Logit Regression"
 ground_truth_name = "prospect_theory"  # OPTIONS: see models.py
 
 experimentalists = [
-    # 'popper',
-    # 'falsification',
-    # 'random',
+    'popper',
+    'falsification',
+    'random',
     "dissimilarity",
-    # 'model disagreement',
-    # 'least confident',
+    'model disagreement',
+    'least confident',
 ]
 
 st = time.time()
