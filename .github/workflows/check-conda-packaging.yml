@@ -1,4 +1,4 @@
-name: Check Conda Packaging
+name: Check Conda Build
 
 on:
   push:
