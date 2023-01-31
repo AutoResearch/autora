@@ -3,7 +3,6 @@ import copy
 import numpy as np
 import pandas as pd
 
-from autora_bsr.utils.misc import get_ops_expr
 from autora_bsr.utils.node import Node, NodeType
 from typing import Dict, List, Optional, Callable, Tuple, Union
 from scipy.stats import invgamma, norm
@@ -58,46 +57,6 @@ def update_depth(node: Node, depth: int):
     elif node.node_type == NodeType.BINARY:
         update_depth(node.left, depth + 1)
         update_depth(node.right, depth + 1)
-
-
-def get_expression(
-        node: Node,
-        ops_expr: Dict[str, str] = None,
-        feature_names: Optional[List[str]] = None,
-) -> str:
-    """
-    Get a literal (string) expression of an expression tree, which has root `node`.
-
-    Arguments:
-        node: the root of the tree where the expression is generated from
-        ops_expr: the dictionary that maps an operation name to its literal format; if not
-            offered, use the default one in `get_ops_expr()`
-        feature_names: the list of names for the data features
-    Return:
-        a literal expression of the tree
-    """
-    if not ops_expr:
-        ops_expr = get_ops_expr()
-    if node.node_type == NodeType.LEAF:
-        if feature_names:
-            return feature_names[node.params["feature"]]
-        else:
-            return f"x{node.params['feature']}"
-    elif node.node_type == NodeType.UNARY:
-        # if the expr for an operator is not defined, use placeholder
-        # e.g. operator `cosh` -> `cosh(xxx)`
-        place_holder = node.op_name + "({})"
-        left_expr = get_expression(node.left, ops_expr, feature_names)
-        expr_fmt = ops_expr.get(node.op_name, place_holder)
-        return expr_fmt.format(left_expr, **node.params)
-    elif node.node_type == NodeType.BINARY:
-        place_holder = node.op_name + "({})"
-        left_expr = get_expression(node.left, ops_expr, feature_names)
-        right_expr = get_expression(node.right, ops_expr, feature_names)
-        expr_fmt = ops_expr.get(node.op_name, place_holder)
-        return expr_fmt.format(left_expr, right_expr, **node.params)
-    else:  # empty node
-        return "(empty node)"
 
 
 @check_empty
@@ -456,7 +415,7 @@ class Action(Enum):
             weights: the probabilities for each action
         """
         # from the BSR paper
-        weights = []
+        weights = [0] * 7
         weights[0] = 0.25 * lt_num / (lt_num + 3)  # p_stay
         weights[1] = (1 - weights[0]) * min(1, 4 / (term_num + 2)) / 3  # p_grow
         weights[2] = (1 - weights[0]) / 3 - weights[1]  # p_prune

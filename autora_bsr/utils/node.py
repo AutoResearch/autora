@@ -1,8 +1,9 @@
 import numpy as np
 import pandas as pd
-from typing import Union, Dict, Callable, Optional
+from typing import Union, Dict, Callable, Optional, List
 from enum import Enum
-from funcs import get_expression
+
+from autora_bsr.utils.misc import get_ops_expr
 
 
 class NodeType(Enum):
@@ -122,9 +123,47 @@ class Node:
             self.result = result
         return result
 
+    def get_expression(
+        self,
+        ops_expr: Dict[str, str] = None,
+        feature_names: Optional[List[str]] = None,
+    ) -> str:
+        """
+        Get a literal (string) expression of the expression tree
+
+        Arguments:
+            ops_expr: the dictionary that maps an operation name to its literal format; if not
+                offered, use the default one in `get_ops_expr()`
+            feature_names: the list of names for the data features
+        Return:
+            a literal expression of the tree
+        """
+        if not ops_expr:
+            ops_expr = get_ops_expr()
+        if self.node_type == NodeType.LEAF:
+            if feature_names:
+                return feature_names[self.params["feature"]]
+            else:
+                return f"x{self.params['feature']}"
+        elif self.node_type == NodeType.UNARY:
+            # if the expr for an operator is not defined, use placeholder
+            # e.g. operator `cosh` -> `cosh(xxx)`
+            place_holder = self.op_name + "({})"
+            left_expr = self.left.get_expression(ops_expr, feature_names)
+            expr_fmt = ops_expr.get(self.op_name, place_holder)
+            return expr_fmt.format(left_expr, **self.params)
+        elif self.node_type == NodeType.BINARY:
+            place_holder = self.op_name + "({})"
+            left_expr = self.left.get_expression(ops_expr, feature_names)
+            right_expr = self.right.get_expression(ops_expr, feature_names)
+            expr_fmt = ops_expr.get(self.op_name, place_holder)
+            return expr_fmt.format(left_expr, right_expr, **self.params)
+        else:  # empty node
+            return "(empty node)"
+
     def __str__(self) -> str:
         """
         Get a literal (string) representation of a tree `node` data structure.
         See `get_expression` for more information.
         """
-        return get_expression(self)
+        return self.get_expression()

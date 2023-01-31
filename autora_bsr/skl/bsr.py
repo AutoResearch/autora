@@ -8,12 +8,7 @@ from scipy.stats import invgamma
 from sklearn.base import BaseEstimator, RegressorMixin
 from sklearn.utils.validation import check_is_fitted
 
-from autora_bsr.utils.funcs import (
-    prop_new,
-    grow,
-    get_expression,
-    get_all_nodes,
-)
+from autora_bsr.utils.funcs import prop_new, grow, get_all_nodes
 
 from typing import Union, Optional, List
 
@@ -47,7 +42,7 @@ class BSRRegressor(BaseEstimator, RegressorMixin):
     Attributes:
         roots_: the root(s) of the best-fit symbolic regression (SR) tree(s)
         betas_: the beta parameters of the best-fit model
-        train_errs: the training losses associated with the best-fit model
+        train_errs_: the training losses associated with the best-fit model
     """
 
     def __init__(
@@ -80,26 +75,13 @@ class BSRRegressor(BaseEstimator, RegressorMixin):
         self.val = val
         self.last_idx = last_idx
 
-        self.roots_ = []
-        self.betas_ = []
-        self.train_errs_ = []
+        # attributes that are not set until `fit`
+        self.roots_: List[List[Node]] = []
+        self.betas_: List[List[float]] = []
+        self.train_errs_: List[List[float]] = []
 
         self.X_: Optional[Union[np.ndarray, pd.DataFrame]] = None
         self.y_: Optional[Union[np.ndarray, pd.DataFrame]] = None
-
-    def model(self, last_ind: int = 1) -> List[str]:
-        models = []
-        for i in range(self.tree_num):
-            models.append(get_expression(self.roots_[-last_ind][i]))
-        return models
-
-    def complexity(self) -> int:
-        cp = 0
-        for i in range(self.tree_num):
-            root_node = self.roots_[-1][i]
-            num = len(get_all_nodes(root_node))
-            cp = cp + num
-        return cp
 
     def predict(self, X: Union[np.ndarray, pd.DataFrame]) -> np.ndarray:
         """
@@ -335,3 +317,25 @@ class BSRRegressor(BaseEstimator, RegressorMixin):
                 self.betas_ = betas
                 self.X_, self.y_ = X, y
                 return self
+
+    def _model(self, last_ind: int = 1) -> List[str]:
+        """
+        Return the models in the last-i-th iteration, default `last_ind = 1` refers to the
+        last (final) iteration.
+        """
+        models = []
+        for i in range(self.tree_num):
+            models.append(self.roots_[-last_ind][i].get_expression())
+        return models
+
+    def _complexity(self) -> int:
+        """
+        Return the complexity of the final models, which equals to the sum of nodes in all
+        expression trees.
+        """
+        cp = 0
+        for i in range(self.tree_num):
+            root_node = self.roots_[-1][i]
+            num = len(get_all_nodes(root_node))
+            cp = cp + num
+        return cp
