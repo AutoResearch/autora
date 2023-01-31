@@ -11,14 +11,14 @@ from studies.cogsci2023.models.models import model_inventory, plot_inventory
 
 # set the path to the data_closed_loop directory
 path = 'data_closed_loop/'
-ground_truth_name = 'shepard_luce_choice' # OPTIONS: see models.py
+ground_truth_name = 'prospect_theory' # OPTIONS: see models.py
 experimentalist_name = 'Random' # for plotting
 max_cycle_mse = 50 # None
 max_cycle_tnse = 20 # None
 
 plot_performance = True
-plot_model = True
-plot_tsne = True
+plot_model = False
+plot_tsne = False
 print_model = False
 legend_type = "auto" # False, "auto"
 figure_dim = (5.5, 5.5)
@@ -30,6 +30,15 @@ experimentalist_labels['least confident'] = 'Least Confident'
 experimentalist_labels['model disagreement'] = 'Model Disagreement'
 experimentalist_labels['random'] = 'Random'
 experimentalist_labels['popper'] = 'Popper'
+
+experimentalist_order = list()
+experimentalist_order.append(experimentalist_labels['random'])
+experimentalist_order.append(experimentalist_labels['dissimilarity'])
+experimentalist_order.append(experimentalist_labels['least confident'])
+experimentalist_order.append(experimentalist_labels['model disagreement'])
+experimentalist_order.append(experimentalist_labels['falsification'])
+experimentalist_order.append(experimentalist_labels['popper'])
+
 
 if legend_type == "auto":
     figure_dim = (8.5, 5.5)
@@ -146,6 +155,7 @@ df_variance["Variance"] = variance_log
 df_variance.to_csv(path + "/" + ground_truth_name + "_variance.csv")
 
 sns.set(rc={'figure.figsize':figure_dim})
+sns.set(font_scale=1.3)
 plot_fnc, plot_title = plot_inventory[ground_truth_name]
 
 # CYCLE PLOT
@@ -156,6 +166,7 @@ if plot_performance:
         data=df_validation, kind="line",
         x="Data Collection Cycle", y="Mean Squared Error",
         hue="Experimentalist", style="Experimentalist", legend=legend_type, # False
+        hue_order=experimentalist_order,
     )
     rel.fig.subplots_adjust(top=.90)
     rel.fig.subplots_adjust(bottom=0.2)
@@ -274,12 +285,15 @@ if plot_tsne:
     # T-SNE Plot for experimentalists
     custom_palette = sns.color_palette("deep", len(set(labels)))
     # custom_palette[0] = (0.5, 0.5, 0.5)
-    sns.scatterplot(x="Component 1", y="Component 2", hue=df.Labels.tolist(),
+    sns.set(font_scale=1.3)
+    pl = sns.scatterplot(x="Component 1", y="Component 2", hue=df.Labels.tolist(),
                     palette=custom_palette,
+                    hue_order=experimentalist_order,
                     # s = 10,
                     alpha=0.5,
                     legend=legend_type,
                     data=df).set(title="T-SNE Projection of Probed Experimental Conditions\n(" + plot_title + ")")
+    # pl.set_xlabel("X Label",fontsize=30)
     plt.show()
 
     sns.histplot(data=full_data_only, x="y", bins=100)
