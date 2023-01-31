@@ -127,7 +127,7 @@ def run_test_primitive_fitting(
             :,
         ]:
             plot_results(x_i, y, y_predict)
-        print(regressor.model())
+        print(regressor._model())
 
 
 def plot_results(X, y, y_predict):

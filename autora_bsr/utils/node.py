@@ -112,7 +112,7 @@ class Node:
         if isinstance(X, np.ndarray):
             X = pd.DataFrame(X)
         if self.node_type == NodeType.LEAF:
-            result = np.array(X.iloc[:, self.params["feature"]])
+            result = np.array(X.iloc[:, self.params["feature"]]).flatten()
         elif self.node_type == NodeType.UNARY:
             result = self.operator(self.left.evaluate(X), **self.params)
         elif self.node_type == NodeType.BINARY:

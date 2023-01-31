@@ -53,7 +53,7 @@ def run_test_primitive_fitting_2d(
     if verbose:
         y_predict = regressor.predict(X)
         plot_results_2d(X, y, y_predict)
-        print(regressor.model())
+        print(regressor._model())
 
 
 def plot_results_2d(X, y, y_predict):
