@@ -718,8 +718,10 @@ def prop_new(
         index: the index of the root node to update
         sigma_y: scale hyperparameter for linear mixture of expression trees
         beta: hyperparameter for growing an uninitialized expression tree
-        sigma_a, sigma_b: hyperparameters for `lt` operator initialization
-        X, y: input data (independent variable) matrix and dependent variable vector
+        sigma_a: hyperparameters for `lt` operator initialization
+        sigma_b: hyperparameters for `lt` operator initialization
+        X: input data (independent variable) matrix
+        y: dependent variable vector
         ops_name_lst: the list of operator names
         ops_weight_lst: the list of operator weights
         ops_priors: the dictionary of operator prior information

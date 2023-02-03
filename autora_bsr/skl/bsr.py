@@ -55,6 +55,7 @@ class BSRRegressor(BaseEstimator, RegressorMixin):
         show_log: bool = False,
         val: int = 100,
         last_idx: int = -1,
+        prior_name: str = "Uniform"
     ):
         """
         Arguments:
@@ -74,6 +75,7 @@ class BSRRegressor(BaseEstimator, RegressorMixin):
         self.show_log = show_log
         self.val = val
         self.last_idx = last_idx
+        self.prior_name = prior_name
 
         # attributes that are not set until `fit`
         self.roots_: List[List[Node]] = []
@@ -140,7 +142,7 @@ class BSRRegressor(BaseEstimator, RegressorMixin):
             n_feature = X.shape[1]
             n_train = X.shape[0]
 
-            ops_name_lst, ops_weight_lst, ops_priors = get_prior_dict(prior_name="Uniform")
+            ops_name_lst, ops_weight_lst, ops_priors = get_prior_dict(prior_name=self.prior_name)
 
             # List of tree samples
             root_lists = [[] for _ in range(k)]
