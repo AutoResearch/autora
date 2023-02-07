@@ -13,7 +13,7 @@ from utils import (
 )
 
 # META PARAMETERS
-num_cycles = 100  # number of cycles (20)
+num_cycles = 50  # number of cycles (20)
 samples_for_seed = 10  # number of seed data_closed_loop points (20)
 samples_per_cycle = 10  # number of data_closed_loop points chosen per cycle (20)
 theorist_epochs = 500  # number of epochs for theorist (not used for logistic regression)
@@ -114,8 +114,13 @@ for cycle in range(num_cycles):
     )
 
     # get new experiment conditions
+    st = time.time()
     print("Running experimentalist..." + experimentalist_name)
     X_new = experimentalist.run()
+
+    et = time.time()
+    elapsed_time = et - st
+    print("Elapsed time: " + str(elapsed_time))
 
     # run experiment
     print("Running experiment...")

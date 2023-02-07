@@ -166,14 +166,14 @@ def plot_task_switching(model = None):
 
     if model is not None:
         y_pred = model.predict(X)
-        word_switch_performance_pred = y_pred[0]
-        word_repetition_performance_pred = y_pred[1]
-        color_switch_performance_pred = y_pred[2]
-        color_repetition_performance_pred = y_pred[3]
-        word_performance_recovered = (1 - [word_repetition_performance_pred,
-                                      word_switch_performance_pred]) * 100
-        color_performance_recovered = (1 - [color_repetition_performance_pred,
-                                       color_switch_performance_pred]) * 100
+        word_switch_performance_pred = y_pred[0][0]
+        word_repetition_performance_pred = y_pred[1][0]
+        color_switch_performance_pred = y_pred[2][0]
+        color_repetition_performance_pred = y_pred[3][0]
+        word_performance_recovered = (1 - np.array([word_repetition_performance_pred,
+                                      word_switch_performance_pred])) * 100
+        color_performance_recovered = (1 - np.array([color_repetition_performance_pred,
+                                       color_switch_performance_pred])) * 100
 
     legend = ('Word Task (Original)', 'Color Task (Original)',
               'Word Task (Recovered)', 'Color Task (Recovered)',)

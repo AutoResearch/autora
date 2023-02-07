@@ -1,9 +1,9 @@
 #!/bin/sh
 
 #SBATCH -J StroopExperimentalists
-#SBATCH --time=23:00:00
-#SBATCH --array=1-120
-#SBATCH --mem=6GB
+#SBATCH --time=46:00:00
+#SBATCH --array=0-19
+#SBATCH --mem=9GB
 #SBATCH -n 1
 
 # Print key runtime properties for records

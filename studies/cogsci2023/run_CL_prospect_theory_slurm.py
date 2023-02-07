@@ -12,8 +12,10 @@ from utils import (
     get_seed_experimentalist,
 )
 
+# ID = 3
+
 # META PARAMETERS
-num_cycles = 100  # number of cycles (20)
+num_cycles = 50  # number of cycles (20)
 samples_for_seed = 10  # number of seed data_closed_loop points (20)
 samples_per_cycle = 10  # number of data_closed_loop points chosen per cycle (20)
 theorist_epochs = 500  # number of epochs for theorist (not used for logistic regression)
@@ -45,7 +47,7 @@ repetitions = np.arange(num_repetitions)
 experimentalist_ids = np.arange(len(experimentalists))
 conditions = np.array(np.meshgrid(repetitions, experimentalist_ids)).T.reshape(-1,2)
 
-rep = conditions[args.slurm_id,0]
+rep = conditions[args.slurm_id,0] # args.slurm_id
 experimentalist_id = conditions[args.slurm_id,1]
 experimentalist_name = experimentalists[experimentalist_id]
 seed(rep)
@@ -113,8 +115,13 @@ for cycle in range(num_cycles):
     )
 
     # get new experiment conditions
+    st = time.time()
     print("Running experimentalist..." + experimentalist_name)
     X_new = experimentalist.run()
+
+    et = time.time()
+    elapsed_time = et - st
+    print("Elapsed time: " + str(elapsed_time))
 
     # run experiment
     print("Running experiment...")

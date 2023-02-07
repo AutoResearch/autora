@@ -5,6 +5,7 @@ import numpy as np
 class LogitRegression(LinearRegression):
 
     __name__ = 'Logit Regression'
+    logit_transform = True
 
     def fit(self, x, p, interaction_terms=True, logit_transform=True):
         p = np.asarray(p)
