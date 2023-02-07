@@ -1,5 +1,5 @@
-from numpy import log
 import numpy as np
+from numpy import log
 
 x1_domain = range(1, 10)
 x2_domain = range(1, 10)

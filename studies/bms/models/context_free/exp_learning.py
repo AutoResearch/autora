@@ -23,5 +23,5 @@ def exp_learning_experiment():
 def exp_learning(x1: float, x2: float):
     p_initial = x1
     trial = x2
-    y = p_asymptotic - (p_asymptotic - p_initial) * np.exp(- lr * trial)
+    y = p_asymptotic - (p_asymptotic - p_initial) * np.exp(-lr * trial)
     return y
