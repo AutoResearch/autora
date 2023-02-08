@@ -78,9 +78,9 @@ class BSRRegressor(BaseEstimator, RegressorMixin):
         self.prior_name = prior_name
 
         # attributes that are not set until `fit`
-        self.roots_: List[List[Node]] = []
-        self.betas_: List[List[float]] = []
-        self.train_errs_: List[List[float]] = []
+        self.roots_: Optional[List[List[Node]]] = None
+        self.betas_: Optional[List[List[float]]] = None
+        self.train_errs_: Optional[List[List[float]]] = None
 
         self.X_: Optional[Union[np.ndarray, pd.DataFrame]] = None
         self.y_: Optional[Union[np.ndarray, pd.DataFrame]] = None
