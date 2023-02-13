@@ -1,7 +1,21 @@
-from autora_bsr.utils.operation import *
+from typing import Callable, Dict, Union
+
+import numpy as np
 from scipy.stats import norm
-from typing import Dict, Union, Callable
+
 from autora_bsr.utils.misc import normalize_prior_dict
+from autora_bsr.utils.operation import (
+    cos_op,
+    exp_op,
+    inv_op,
+    linear_op,
+    make_pow_op,
+    minus_op,
+    multiply_op,
+    neg_op,
+    plus_op,
+    sin_op,
+)
 
 
 def __get_ops_with_arity():
@@ -43,11 +57,11 @@ def linear_init(**hyper_params) -> Dict:
     sigma_a, sigma_b = hyper_params.get("sigma_a", 1), hyper_params.get("sigma_b", 1)
     return {
         "a": norm.rvs(loc=1, scale=np.sqrt(sigma_a)),
-        "b": norm.rvs(loc=0, scale=np.sqrt(sigma_b))
+        "b": norm.rvs(loc=0, scale=np.sqrt(sigma_b)),
     }
 
 
-def __get_ops_init() -> Dict[str, Union[Callable, Dict]]:
+def __get_ops_init() -> Dict[str, Union[Callable, object]]:
     """
     Get the initialization functions for operators that require additional
     parameters.
@@ -61,7 +75,7 @@ def __get_ops_init() -> Dict[str, Union[Callable, Dict]]:
     ops_init = {
         "linear": linear_init,
         "inv": {"cutoff": 1e-10},
-        "exp": {"cutoff": 1e-10}
+        "exp": {"cutoff": 1e-10},
     }
     return ops_init
 
@@ -119,12 +133,15 @@ def get_prior_dict(prior_name="Uniform"):
 
     ops_name_lst = list(ops_prior.keys())
     ops_weight_lst = list(ops_prior.values())
-    prior_dict = {k: {
-        "init": ops_init.get(k, {}),
-        "fn": ops_fn_and_arity[k][0],
-        "arity": ops_fn_and_arity[k][1],
-        "weight": ops_prior[k],
-    } for k in ops_prior}
+    prior_dict = {
+        k: {
+            "init": ops_init.get(k, {}),
+            "fn": ops_fn_and_arity[k][0],
+            "arity": ops_fn_and_arity[k][1],
+            "weight": ops_prior[k],
+        }
+        for k in ops_prior
+    }
 
     return ops_name_lst, ops_weight_lst, prior_dict
 

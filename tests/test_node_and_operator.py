@@ -1,7 +1,9 @@
+from typing import List, Union
+
+import numpy as np
+
 from autora_bsr.utils.node import Node
 from autora_bsr.utils.prior import get_prior_dict
-from typing import List, Union
-import numpy as np
 
 
 def __build_tree_from_literals(literals: List[Union[str, int]], **hyper_params):
@@ -12,7 +14,7 @@ def __build_tree_from_literals(literals: List[Union[str, int]], **hyper_params):
 
     The construction is done level-by-level. For example, the list `["sin", "inv", 1, 0] will render
     the following computation tree
-    
+
                 sin (root)
                 /       \
              inv      feature 1

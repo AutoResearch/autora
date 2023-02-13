@@ -1,6 +1,7 @@
 import copy
 import logging
 import time
+from typing import List, Optional, Union
 
 import numpy as np
 import pandas as pd
@@ -8,10 +9,7 @@ from scipy.stats import invgamma
 from sklearn.base import BaseEstimator, RegressorMixin
 from sklearn.utils.validation import check_is_fitted
 
-from autora_bsr.utils.funcs import prop_new, grow, get_all_nodes
-
-from typing import Union, Optional, List
-
+from autora_bsr.utils.funcs import get_all_nodes, grow, prop_new
 from autora_bsr.utils.node import Node
 from autora_bsr.utils.prior import get_prior_dict
 
@@ -23,8 +21,8 @@ class BSRRegressor(BaseEstimator, RegressorMixin):
     Bayesian Symbolic Regression (BSR)
 
     A MCMC-sampling-based Bayesian approach to symbolic regression -- a machine learning method
-    that bridges `X` and `y` by automatically building up mathematical expressions of basic functions.
-    Performance and speed of `BSR` depends on pre-defined parameters.
+    that bridges `X` and `y` by automatically building up mathematical expressions of basic
+    functions. Performance and speed of `BSR` depends on pre-defined parameters.
 
     This class is intended to be compatible with the
     [Scikit-Learn Estimator API](https://scikit-learn.org/stable/developers/develop.html).
@@ -55,7 +53,7 @@ class BSRRegressor(BaseEstimator, RegressorMixin):
         show_log: bool = False,
         val: int = 100,
         last_idx: int = -1,
-        prior_name: str = "Uniform"
+        prior_name: str = "Uniform",
     ):
         """
         Arguments:
@@ -104,6 +102,7 @@ class BSRRegressor(BaseEstimator, RegressorMixin):
         n_test = X.shape[0]
         tree_outs = np.zeros((n_test, k))
 
+        assert self.roots_ and self.betas_
         for i in np.arange(k):
             tree_out = self.roots_[-self.last_idx][i].evaluate(X)
             tree_out.shape = tree_out.shape[0]
@@ -116,7 +115,9 @@ class BSRRegressor(BaseEstimator, RegressorMixin):
 
         return output
 
-    def fit(self, X: Union[np.ndarray, pd.DataFrame], y: Union[np.ndarray, pd.DataFrame]):
+    def fit(
+        self, X: Union[np.ndarray, pd.DataFrame], y: Union[np.ndarray, pd.DataFrame]
+    ):
         """
         Runs the optimization for a given set of `X`s and `y`s.
 
@@ -129,9 +130,9 @@ class BSRRegressor(BaseEstimator, RegressorMixin):
         # train_data must be a dataframe
         if isinstance(X, np.ndarray):
             X = pd.DataFrame(X)
-        train_errs = []
-        roots = []
-        betas = []
+        train_errs: List[List[float]] = []
+        roots: List[List[Node]] = []
+        betas: List[List[float]] = []
         itr_num = self.itr_num
         k = self.tree_num
         beta = self.beta
@@ -142,10 +143,12 @@ class BSRRegressor(BaseEstimator, RegressorMixin):
             n_feature = X.shape[1]
             n_train = X.shape[0]
 
-            ops_name_lst, ops_weight_lst, ops_priors = get_prior_dict(prior_name=self.prior_name)
+            ops_name_lst, ops_weight_lst, ops_priors = get_prior_dict(
+                prior_name=self.prior_name
+            )
 
             # List of tree samples
-            root_lists = [[] for _ in range(k)]
+            root_lists: List[List[Node]] = [[] for _ in range(k)]
 
             sigma_a_list = []  # List of sigma_a, for each component tree
             sigma_b_list = []  # List of sigma_b, for each component tree
@@ -163,7 +166,15 @@ class BSRRegressor(BaseEstimator, RegressorMixin):
                 if self.show_log:
                     _logger.info("Grow a tree from the root node")
 
-                grow(root, ops_name_lst, ops_weight_lst, ops_priors, n_feature, sigma_a=sigma_a, sigma_b=sigma_b)
+                grow(
+                    root,
+                    ops_name_lst,
+                    ops_weight_lst,
+                    ops_priors,
+                    n_feature,
+                    sigma_a=sigma_a,
+                    sigma_b=sigma_b,
+                )
 
                 # put the root into list
                 root_lists[count].append(root)
@@ -190,7 +201,9 @@ class BSRRegressor(BaseEstimator, RegressorMixin):
             )  # add to the matrix to prevent singular matrrix
             yy = np.array(y)
             yy.shape = (yy.shape[0], 1)
-            _beta = np.linalg.inv(np.matmul(tree_outputs.transpose(), tree_outputs) + epsilon)
+            _beta = np.linalg.inv(
+                np.matmul(tree_outputs.transpose(), tree_outputs) + epsilon
+            )
             _beta = np.matmul(_beta, np.matmul(tree_outputs.transpose(), yy))
             output = np.matmul(tree_outputs, _beta)
             # rescale the beta, above we scale tree_outputs for calculation by fwl
@@ -207,8 +220,6 @@ class BSRRegressor(BaseEstimator, RegressorMixin):
             if self.show_log:
                 _logger.info("While total < ", self.val)
             while total < self.val:
-                curr_roots = []  # list of current components
-
                 switch_label = False
                 for count in range(k):
                     curr_roots = []  # list of current components
@@ -232,7 +243,7 @@ class BSRRegressor(BaseEstimator, RegressorMixin):
                         y,
                         ops_name_lst,
                         ops_weight_lst,
-                        ops_priors
+                        ops_priors,
                     )
                     if self.show_log:
                         _logger.info("res:", res)
@@ -270,8 +281,12 @@ class BSRRegressor(BaseEstimator, RegressorMixin):
                         )  # add to prevent singular matrix
                         yy = np.array(y)
                         yy.shape = (yy.shape[0], 1)
-                        _beta = np.linalg.inv(np.matmul(tree_outputs.transpose(), tree_outputs) + epsilon)
-                        _beta = np.matmul(_beta, np.matmul(tree_outputs.transpose(), yy))
+                        _beta = np.linalg.inv(
+                            np.matmul(tree_outputs.transpose(), tree_outputs) + epsilon
+                        )
+                        _beta = np.matmul(
+                            _beta, np.matmul(tree_outputs.transpose(), yy)
+                        )
 
                         output = np.matmul(tree_outputs, _beta)
                         # rescale the beta, above we scale tree_outputs for calculation
@@ -279,9 +294,7 @@ class BSRRegressor(BaseEstimator, RegressorMixin):
 
                         error = 0
                         for i in np.arange(n_train):
-                            error += (output[i, 0] - y[i]) * (
-                                    output[i, 0] - y[i]
-                            )
+                            error += (output[i, 0] - y[i]) * (output[i, 0] - y[i])
 
                         rmse = np.sqrt(error / n_train)
                         errs.append(rmse)
@@ -291,7 +304,9 @@ class BSRRegressor(BaseEstimator, RegressorMixin):
 
                     if len(errs) > 100:
                         lapses = min(10, len(errs))
-                        converge_ratio = 1 - np.min(errs[-lapses:]) / np.mean(errs[-lapses:])
+                        converge_ratio = 1 - np.min(errs[-lapses:]) / np.mean(
+                            errs[-lapses:]
+                        )
                         if converge_ratio < 0.05:
                             # converged
                             switch_label = True
@@ -308,7 +323,11 @@ class BSRRegressor(BaseEstimator, RegressorMixin):
                         _logger.info("Run time: {:.2f}s".format(tictoc))
 
                         _logger.info("------")
-                        _logger.info("Mean rmse of last 5 accepts: {}".format(np.mean(errs[-6:-1])))
+                        _logger.info(
+                            "Mean rmse of last 5 accepts: {}".format(
+                                np.mean(errs[-6:-1])
+                            )
+                        )
 
                     train_errs.append(errs)
                     roots.append(curr_roots)
@@ -326,6 +345,7 @@ class BSRRegressor(BaseEstimator, RegressorMixin):
         last (final) iteration.
         """
         models = []
+        assert self.roots_
         for i in range(self.tree_num):
             models.append(self.roots_[-last_ind][i].get_expression())
         return models
@@ -336,6 +356,7 @@ class BSRRegressor(BaseEstimator, RegressorMixin):
         expression trees.
         """
         cp = 0
+        assert self.roots_
         for i in range(self.tree_num):
             root_node = self.roots_[-1][i]
             num = len(get_all_nodes(root_node))

@@ -10,7 +10,7 @@ def normalize_prior_dict(prior_dict: Dict[str, float]):
     Normalize the prior weights for the operators so that the weights sum to
     1 and thus can be directly interpreted/used as probabilities.
     """
-    prior_sum = 0
+    prior_sum = 0.0
     for k in prior_dict:
         prior_sum += prior_dict[k]
     if prior_sum > 0:

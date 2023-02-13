@@ -1,13 +1,13 @@
-import numpy as np
-from typing import Dict, Callable
+from typing import Callable, Dict
 
+import numpy as np
 
 """
-this file contains functions (operators) for actually carrying out the computations 
+this file contains functions (operators) for actually carrying out the computations
 in our expression tree model. An operator can take in either 1 (unary) or 2 (binary)
 operands - corresponding to being used in a unary or binary node (see `node.py`). The
 operand(s) are recursively evaluated `np.array` from an operation or literal (in the
-case of a leaf node) in downstream node(s). 
+case of a leaf node) in downstream node(s).
 
 For certain operator, e.g. a linear operator, auxiliary parameters (slope/intercept)
 are needed and can be passed in through `params` dictionary. These parameters are
@@ -49,6 +49,7 @@ def cos_op(operand: np.array) -> np.array:
 def make_pow_op(power: int) -> Callable[[np.array], np.array]:
     def pow_op(operand: np.array) -> np.array:
         return np.power(operand, power)
+
     return pow_op
 
 

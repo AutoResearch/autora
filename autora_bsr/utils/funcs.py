@@ -1,13 +1,13 @@
 import copy
+from enum import Enum
+from functools import wraps
+from typing import Callable, Dict, List, Optional, Tuple, Union, cast
 
 import numpy as np
 import pandas as pd
+from scipy.stats import invgamma, norm
 
 from autora_bsr.utils.node import Node, NodeType
-from typing import Dict, List, Optional, Callable, Tuple, Union
-from scipy.stats import invgamma, norm
-from functools import wraps
-from enum import Enum
 
 
 def check_empty(func: Callable):
@@ -15,12 +15,15 @@ def check_empty(func: Callable):
     A decorator that, if applied to `func`, checks whether an argument in `func` is an
     un-initialized node (i.e. node.node_type == NodeType.Empty). If so, an error is raised.
     """
+
     @wraps(func)
     def func_wrapper(*args, **kwargs):
         for arg in args:
             if isinstance(arg, Node):
                 if arg.node_type == NodeType.EMPTY:
-                    raise TypeError("uninitialized node found in {}".format(func.__name__))
+                    raise TypeError(
+                        "uninitialized node found in {}".format(func.__name__)
+                    )
                 break
         return func(*args, **kwargs)
 
@@ -91,11 +94,9 @@ def get_num_lt_nodes(node: Node) -> int:
             return base + get_num_lt_nodes(node.left) + get_num_lt_nodes(node.right)
 
 
+@check_empty
 def calc_tree_ll(
-        node: Node,
-        ops_priors: Dict[str, Dict],
-        n_feature: int = 1,
-        **hyper_params: Dict
+    node: Node, ops_priors: Dict[str, Dict], n_feature: int = 1, **hyper_params
 ):
     """
     Calculate the likelihood-related quantities of the given tree `node`.
@@ -125,16 +126,17 @@ def calc_tree_ll(
     # contribution of splitting the node or becoming leaf node
     if node.node_type == NodeType.LEAF:
         # contribution of choosing terminal
-        struct_ll += np.log(
-            1 - 1 / np.power((1 + depth), -beta)
-        )
+        struct_ll += np.log(1 - 1 / np.power((1 + depth), -beta))
         # contribution of feature selection
         struct_ll -= np.log(n_feature)
         return struct_ll, params_ll
     elif node.node_type == NodeType.UNARY:  # unitary operator
         # contribution of child nodes are added since the log likelihood is additive
         # if we assume the parameters are independent.
-        struct_ll_left, params_ll_left = calc_tree_ll(node.left, ops_priors, n_feature, **hyper_params)
+        left = cast(Node, node.left)
+        struct_ll_left, params_ll_left = calc_tree_ll(
+            left, ops_priors, n_feature, **hyper_params
+        )
         struct_ll += struct_ll_left
         params_ll += params_ll_left
         # contribution of parameters of linear nodes
@@ -142,10 +144,16 @@ def calc_tree_ll(
         if node.op_name == "ln":
             params_ll -= np.power((node.params["a"] - 1), 2) / (2 * sigma_a)
             params_ll -= np.power(node.params["b"], 2) / (2 * sigma_b)
-            params_ll -= 0.5 * np.log(4 * np.pi ** 2 * sigma_a * sigma_b)
+            params_ll -= 0.5 * np.log(4 * np.pi**2 * sigma_a * sigma_b)
     else:  # binary operator
-        struct_ll_left, params_ll_left = calc_tree_ll(node.right, ops_priors, n_feature, **hyper_params)
-        struct_ll_right, params_ll_right = calc_tree_ll(node.right, ops_priors, n_feature, **hyper_params)
+        left = cast(Node, node.left)
+        right = cast(Node, node.right)
+        struct_ll_left, params_ll_left = calc_tree_ll(
+            left, ops_priors, n_feature, **hyper_params
+        )
+        struct_ll_right, params_ll_right = calc_tree_ll(
+            right, ops_priors, n_feature, **hyper_params
+        )
         struct_ll += struct_ll_left + struct_ll_right
         params_ll += params_ll_left + params_ll_right
 
@@ -160,8 +168,9 @@ def calc_tree_ll(
 
 def calc_y_ll(y: np.ndarray, outputs: Union[np.ndarray, pd.DataFrame], sigma_y: float):
     """
-    Calculate the log likelihood f(y|S,Theta,x) where (S,Theta) is represented by the node
-    prior is y ~ N(output,sigma) and output is the matrix of outputs corresponding to different roots
+    Calculate the log likelihood f(y|S,Theta,x) where (S,Theta) is represented by the
+    node prior is y ~ N(output,sigma) and output is the matrix of outputs corresponding to
+    different roots.
 
     Returns:
         log_sum: the data log likelihood
@@ -184,26 +193,26 @@ def calc_y_ll(y: np.ndarray, outputs: Union[np.ndarray, pd.DataFrame], sigma_y: 
     return log_sum
 
 
-def stay(ln_nodes: List[Node], **hyper_params: Dict):
+def stay(lt_nodes: List[Node], **hyper_params: Dict):
     """
     ACTION 1: Stay represents the action of doing nothing but to update the parameters for `ln`
     operators.
 
     Arguments:
-        ln_nodes: the list of nodes with `ln` operator
+        lt_nodes: the list of nodes with `ln` operator
         hyper_params: hyperparameters for re-initialization
     """
-    for ln_node in ln_nodes:
-        ln_node._init_param(**hyper_params)
+    for lt_node in lt_nodes:
+        lt_node._init_param(**hyper_params)
 
 
 def grow(
-        node: Node,
-        ops_name_lst: List[str],
-        ops_weight_lst: List[float],
-        ops_priors: Dict[str, Dict],
-        n_feature: int = 1,
-        **hyper_params: Dict
+    node: Node,
+    ops_name_lst: List[str],
+    ops_weight_lst: List[float],
+    ops_priors: Dict[str, Dict],
+    n_feature: int = 1,
+    **hyper_params
 ):
     """
     ACTION 2: Grow represents the action of growing a subtree from a given `node`
@@ -224,12 +233,26 @@ def grow(
     else:
         ops_name = np.random.choice(ops_name_lst, p=ops_weight_lst)
         ops_prior = ops_priors[ops_name]
-        node.setup(ops_name, ops_prior, **hyper_params)
+        node.setup(ops_name, ops_prior, hyper_params=hyper_params)
 
         # recursively set up downstream nodes
-        grow(node.left, ops_name_lst, ops_weight_lst, ops_priors, n_feature, **hyper_params)
+        grow(
+            cast(Node, node.left),
+            ops_name_lst,
+            ops_weight_lst,
+            ops_priors,
+            n_feature,
+            **hyper_params
+        )
         if node.node_type == NodeType.BINARY:
-            grow(node.right, ops_name_lst, ops_weight_lst, ops_priors, n_feature, **hyper_params)
+            grow(
+                cast(Node, node.right),
+                ops_name_lst,
+                ops_weight_lst,
+                ops_priors,
+                n_feature,
+                **hyper_params
+            )
 
 
 @check_empty
@@ -259,31 +282,34 @@ def de_transform(node: Node) -> Tuple[Node, Optional[Node]]:
         first node is the replaced node when `node` has been de-transformed
         second node is the discarded node
     """
+    left = cast(Node, node.left)
     if node.node_type == NodeType.UNARY:
-        return node.left, None
+        return left, None
+
     r = np.random.random()
+    right = cast(Node, node.right)
     # picked node is root
     if not node.depth:
-        if node.left.node_type == NodeType.LEAF:
-            return node.right, node.left
-        elif node.right.node_type == NodeType.LEAF:
-            return node.left, node.right
+        if left.node_type == NodeType.LEAF:
+            return right, left
+        elif right.node_type == NodeType.LEAF:
+            return left, right
         else:
-            return node.left, node.right if r < 0.5 else node.right, node.left
+            return (left, right) if r < 0.5 else (right, left)
     elif r < 0.5:
-        return node.left, node.right
+        return left, right
     else:
-        return node.right, node.left
+        return right, left
 
 
 @check_empty
 def transform(
-        node: Node,
-        ops_name_lst: List[str],
-        ops_weight_lst: List[float],
-        ops_priors: Dict[str, Dict],
-        n_feature: int = 1,
-        **hyper_params: Dict
+    node: Node,
+    ops_name_lst: List[str],
+    ops_weight_lst: List[float],
+    ops_priors: Dict[str, Dict],
+    n_feature: int = 1,
+    **hyper_params: Dict
 ) -> Node:
     """
     ACTION 5: Transform inserts a middle node between the picked `node` and its
@@ -306,7 +332,7 @@ def transform(
 
     insert_node = Node(depth=node.depth, parent=parent)
     insert_op = np.random.choice(ops_name_lst, 1, ops_weight_lst)[0]
-    insert_node.setup(insert_op, ops_priors[insert_op], **hyper_params)
+    insert_node.setup(insert_op, ops_priors[insert_op], hyper_params=hyper_params)
 
     if parent:
         is_left = node is parent.left
@@ -319,7 +345,14 @@ def transform(
     insert_node.left = node
     node.parent = insert_node
     if insert_node.node_type == NodeType.BINARY:
-        grow(insert_node.right, ops_name_lst, ops_weight_lst, ops_priors, n_feature, **hyper_params)
+        grow(
+            cast(Node, insert_node.right),
+            ops_name_lst,
+            ops_weight_lst,
+            ops_priors,
+            n_feature,
+            **hyper_params
+        )
 
     # make sure the depth property is updated correctly
     update_depth(node, node.depth + 1)
@@ -328,12 +361,12 @@ def transform(
 
 @check_empty
 def reassign_op(
-        node: Node,
-        ops_name_lst: List[str],
-        ops_weight_lst: List[float],
-        ops_priors: Dict[str, Dict],
-        n_feature: int = 1,
-        **hyper_params: Dict
+    node: Node,
+    ops_name_lst: List[str],
+    ops_weight_lst: List[float],
+    ops_priors: Dict[str, Dict],
+    n_feature: int = 1,
+    **hyper_params: Dict
 ):
     """
     ACTION 6: Re-assign action uniformly picks a non-terminal node, and assign a new operator.
@@ -356,7 +389,7 @@ def reassign_op(
     # store the original children and re-setup the `node`
     old_left, old_right = node.left, node.right
     new_op = np.random.choice(ops_name_lst, 1, ops_weight_lst)[0]
-    node.setup(new_op, ops_priors[new_op], **hyper_params)
+    node.setup(new_op, ops_priors[new_op], hyper_params=hyper_params)
 
     new_type = node.node_type
 
@@ -364,7 +397,14 @@ def reassign_op(
     if old_type == new_type:  # binary -> binary & unary -> unary
         node.right = old_right
     elif new_type == NodeType.BINARY:  # unary -> binary
-        grow(node.right, ops_name_lst, ops_weight_lst, ops_priors, n_feature, **hyper_params)
+        grow(
+            cast(Node, node.right),
+            ops_name_lst,
+            ops_weight_lst,
+            ops_priors,
+            n_feature,
+            **hyper_params
+        )
     else:
         node.right = None
 
@@ -383,10 +423,11 @@ def reassign_feat(node: Node, n_feature: int = 1):
     node.setup(feature=np.random.randint(0, n_feature, 1))
 
 
-class Action(Enum):
+class Action(int, Enum):
     """
     Enum class that represents a MCMC step with a certain action
     """
+
     STAY = 0
     GROW = 1
     PRUNE = 2
@@ -397,48 +438,46 @@ class Action(Enum):
 
     @classmethod
     def rand_action(
-            cls,
-            lt_num: int,
-            term_num: int,
-            de_trans_num: int
-    ) -> Tuple[int, float]:
+        cls, lt_num: int, term_num: int, de_trans_num: int
+    ) -> Tuple[int, List[float]]:
         """
         Draw a random action for MCMC algorithm to take a step
 
         Arguments:
             lt_num: the number of linear (`lt`) nodes in the tree
             term_num: the number of terminal nodes in the tree
-            de_trans_num: the number of de-trans qualified nodes in the tree (see `propose` for details)
+            de_trans_num: the number of de-trans qualified nodes in the tree
+                          (see `propose` for details)
 
         Returns:
             action: the MCMC action to perform
             weights: the probabilities for each action
         """
         # from the BSR paper
-        weights = [0] * 7
-        weights[0] = 0.25 * lt_num / (lt_num + 3)  # p_stay
-        weights[1] = (1 - weights[0]) * min(1, 4 / (term_num + 2)) / 3  # p_grow
-        weights[2] = (1 - weights[0]) / 3 - weights[1]  # p_prune
-        weights[3] = (1 - weights[0]) * (1 / 3) * de_trans_num / (3 + de_trans_num)  # p_detrans
-        weights[4] = (1 - weights[0]) / 3 - weights[3]  # p_trans
-        weights[5] = (1 - weights[0]) / 6  # p_reassign_op
-        weights[6] = 1 - sum(weights)  # p_reassign_feat
-        assert weights[6] >= 0
+        weights = []
+        weights.append(0.25 * lt_num / (lt_num + 3))  # p_stay
+        weights.append((1 - weights[0]) * min(1, 4 / (term_num + 2)) / 3)  # p_grow
+        weights.append((1 - weights[0]) / 3 - weights[1])  # p_prune
+        weights.append(
+            ((1 - weights[0]) * (1 / 3) * de_trans_num / (3 + de_trans_num))
+        )  # p_detrans
+        weights.append((1 - weights[0]) / 3 - weights[3])  # p_trans
+        weights.append((1 - weights[0]) / 6)  # p_reassign_op
+        weights.append(1 - sum(weights))  # p_reassign_feat
+        assert weights[-1] >= 0
 
         action = np.random.choice(np.arange(7), p=weights)
         return action, weights
 
 
-def _get_tree_classified_nodes(root: Node, get_count=False) \
-        -> Union[Tuple[List[Node], List[Node], List[Node], List[Node]],
-                 Tuple[int, int, int, int]]:
+def _get_tree_classified_nodes(
+    root: Node,
+) -> Tuple[List[Node], List[Node], List[Node], List[Node]]:
     """
     calculate the classified lists of nodes from a tree
 
     Argument:
         root: the root node where the calculation starts from
-        get_count: if `True`, the method returns the `len` of each list instead of the
-            list itself.
     Returns:
         term_nodes: the list of terminal nodes (or the count of this list, same below)
         nterm_nodes: the list of non-terminal nodes
@@ -461,20 +500,26 @@ def _get_tree_classified_nodes(root: Node, get_count=False) \
         if node.op_name == "ln":
             lt_nodes.append(node)
 
-    if get_count:
-        return len(term_nodes), len(nterm_nodes), len(lt_nodes), len(de_trans_nodes)
-    else:
-        return term_nodes, nterm_nodes, lt_nodes, de_trans_nodes
+    return term_nodes, nterm_nodes, lt_nodes, de_trans_nodes
+
+
+def _get_tree_classified_counts(root: Node) -> Tuple[int, int, int, int]:
+    """
+    Helper function that returns the counts (lengths) of the classified node lists from
+    `_get_tree_classified_nodes`, instead of the lists themselves.
+    """
+    term_nodes, nterm_nodes, lt_nodes, de_trans_nodes = _get_tree_classified_nodes(root)
+    return len(term_nodes), len(nterm_nodes), len(lt_nodes), len(de_trans_nodes)
 
 
 @check_empty
 def prop(
-        node: Node,
-        ops_name_lst: List[str],
-        ops_weight_lst: List[float],
-        ops_priors: Dict[str, Dict],
-        n_feature: int = 1,
-        **hyper_params
+    node: Node,
+    ops_name_lst: List[str],
+    ops_weight_lst: List[float],
+    ops_priors: Dict[str, Dict],
+    n_feature: int = 1,
+    **hyper_params
 ):
     """
     Propose a new tree from an existing tree with root `node`.
@@ -496,12 +541,16 @@ def prop(
     """
     # PART 1: collect necessary information
     new_node = copy.deepcopy(node)
-    term_nodes, nterm_nodes, lt_nodes, de_trans_nodes = _get_tree_classified_nodes(new_node)
+    term_nodes, nterm_nodes, lt_nodes, de_trans_nodes = _get_tree_classified_nodes(
+        new_node
+    )
 
     # PART 2: sample random action and perform the action
     # this step also calculates q and q_inv, quantities necessary for calculating
     # the acceptance probability in MCMC algorithm
-    action, probs = Action.rand_action(len(lt_nodes), len(term_nodes), len(de_trans_nodes))
+    action, probs = Action.rand_action(
+        len(lt_nodes), len(term_nodes), len(de_trans_nodes)
+    )
     # flags indicating potential dimensionality change (expand or shrink) in node
     expand_node, shrink_node = False, False
 
@@ -510,26 +559,40 @@ def prop(
     if action == Action.STAY:
         q = probs[Action.STAY]
         q_inv = probs[Action.STAY]
-        stay(new_node, **hyper_params)
+        stay(lt_nodes, **hyper_params)
     # ACTION 2: GROW
     # q and q_inv simply equal the probability if the grown node is a leaf node
     # otherwise, we calculate new information of the `new_node` after the action is applied
     elif action == Action.GROW:
         i = np.random.randint(0, len(term_nodes), 1)[0]
         grown_node: Node = term_nodes[i]
-        grow(grown_node, ops_name_lst, ops_weight_lst, ops_priors, n_feature, **hyper_params)
+        grow(
+            grown_node,
+            ops_name_lst,
+            ops_weight_lst,
+            ops_priors,
+            n_feature,
+            **hyper_params
+        )
         if grown_node.node_type == NodeType.LEAF:
             q = q_inv = 1
         else:
-            tree_ll, param_ll = calc_tree_ll(grown_node, ops_priors, n_feature, **hyper_params)
+            tree_ll, param_ll = calc_tree_ll(
+                grown_node, ops_priors, n_feature, **hyper_params
+            )
             # calculate q
             q = probs[Action.GROW] * np.exp(tree_ll) / len(term_nodes)
             # calculate q_inv by using updated information of `new_node`
-            new_term_count, new_nterm_count, new_lt_count, _ = _get_tree_classified_nodes(new_node, get_count=True)
+            (
+                new_term_count,
+                new_nterm_count,
+                new_lt_count,
+                _,
+            ) = _get_tree_classified_counts(new_node)
             new_prob = (
-                    (1 - 0.25 * new_lt_count / (new_lt_count + 3))
-                    * (1 - min(1, 4 / (len(new_nterm_count) + 2)))
-                    / 3
+                (1 - 0.25 * new_lt_count / (new_lt_count + 3))
+                * (1 - min(1, 4 / (new_nterm_count + 2)))
+                / 3
             )
             q_inv = new_prob / max(1, new_nterm_count - 1)  # except the root
             if new_lt_count > len(lt_nodes):
@@ -539,9 +602,13 @@ def prop(
         i = np.random.randint(0, len(nterm_nodes), 1)[0]
         pruned_node: Node = nterm_nodes[i]
         prune(pruned_node, n_feature)
-        tree_ll, param_ll = calc_tree_ll(pruned_node, ops_priors, n_feature, **hyper_params)
+        tree_ll, param_ll = calc_tree_ll(
+            pruned_node, ops_priors, n_feature, **hyper_params
+        )
 
-        new_term_count, new_nterm_count, new_lt_count, _ = _get_tree_classified_nodes(new_node, get_count=True)
+        new_term_count, new_nterm_count, new_lt_count, _ = _get_tree_classified_counts(
+            new_node
+        )
         # pruning any tree with `ln` operator will result in shrinkage
         if new_lt_count < len(lt_nodes):
             shrink_node = True
@@ -562,9 +629,13 @@ def prop(
         par_node = de_trans_node.parent
 
         q = probs[Action.DE_TRANSFORM] / num_de_trans
-        if not par_node and de_trans_node.left and de_trans_node.right \
-                and de_trans_node.left.node_type != NodeType.LEAF \
-                and de_trans_node.right.node_type != NodeType.LEAF:
+        if (
+            not par_node
+            and de_trans_node.left
+            and de_trans_node.right
+            and de_trans_node.left.node_type != NodeType.LEAF
+            and de_trans_node.right.node_type != NodeType.LEAF
+        ):
             q = q / 2
         elif de_trans_node.node_type == NodeType.BINARY:
             q = q / 2
@@ -582,8 +653,12 @@ def prop(
             replaced_node.parent = par_node
             update_depth(replaced_node, par_node.depth + 1)
 
-        new_term_count, new_nterm_count, new_lt_count, new_det_count = \
-            _get_tree_classified_nodes(new_node, get_count=True)
+        (
+            new_term_count,
+            new_nterm_count,
+            new_lt_count,
+            new_det_count,
+        ) = _get_tree_classified_counts(new_node)
 
         if new_lt_count < len(lt_nodes):
             shrink_node = True
@@ -592,27 +667,50 @@ def prop(
         # calculate q_inv
         new_pdetr = (1 - new_prob) * (1 / 3) * new_det_count / (new_det_count + 3)
         new_ptr = (1 - new_prob) / 3 - new_pdetr
-        q_inv = new_ptr * ops_priors[de_trans_node.op_name]["weight"] / (new_term_count + new_nterm_count)
+        q_inv = (
+            new_ptr
+            * ops_priors[de_trans_node.op_name]["weight"]
+            / (new_term_count + new_nterm_count)
+        )
         if discarded_node:
-            tree_ll, _ = calc_tree_ll(discarded_node, ops_priors, n_feature, **hyper_params)
+            tree_ll, _ = calc_tree_ll(
+                discarded_node, ops_priors, n_feature, **hyper_params
+            )
             q_inv = q_inv * np.exp(tree_ll)
     # ACTION 5: TRANSFORM
     elif action == Action.TRANSFORM:
         all_nodes = get_all_nodes(new_node)
         i = np.random.randint(0, len(all_nodes), 1)[0]
         trans_node: Node = all_nodes[i]
-        inserted_node: Node = \
-            transform(trans_node, ops_name_lst, ops_weight_lst, ops_priors, n_feature, **hyper_params)
+        inserted_node: Node = transform(
+            trans_node,
+            ops_name_lst,
+            ops_weight_lst,
+            ops_priors,
+            n_feature,
+            **hyper_params
+        )
 
         if inserted_node.right:
-            ll_right, _ = calc_tree_ll(inserted_node.right, ops_priors, n_feature, **hyper_params)
+            ll_right, _ = calc_tree_ll(
+                inserted_node.right, ops_priors, n_feature, **hyper_params
+            )
         else:
             ll_right = 0
         # calculate q
-        q = probs[Action.TRANSFORM] * ops_priors[inserted_node.op_name]["weight"] * np.exp(ll_right) / len(all_nodes)
+        q = (
+            probs[Action.TRANSFORM]
+            * ops_priors[inserted_node.op_name]["weight"]
+            * np.exp(ll_right)
+            / len(all_nodes)
+        )
 
-        new_term_count, new_nterm_count, new_lt_count, new_det_count = \
-            _get_tree_classified_nodes(new_node, get_count=True)
+        (
+            new_term_count,
+            new_nterm_count,
+            new_lt_count,
+            new_det_count,
+        ) = _get_tree_classified_counts(new_node)
         if new_lt_count > len(lt_nodes):
             expand_node = True
 
@@ -620,8 +718,12 @@ def prop(
         # calculate q_inv
         new_pdetr = (1 - new_prob) * (1 / 3) * new_det_count / (new_det_count + 3)
         q_inv = new_pdetr / new_det_count
-        if inserted_node.node_type == NodeType.BINARY and \
-                inserted_node.left.node_type != NodeType.LEAF and inserted_node.right.node_type != NodeType.LEAF:
+        assert inserted_node.left and inserted_node.right
+        if (
+            inserted_node.node_type == NodeType.BINARY
+            and inserted_node.left.node_type != NodeType.LEAF
+            and inserted_node.right.node_type != NodeType.LEAF
+        ):
             q_inv = q_inv / 2
     # ACTION 6: REASSIGN OPERATION
     elif action == Action.REASSIGN_OP:
@@ -629,9 +731,16 @@ def prop(
         reassign_node: Node = nterm_nodes[i]
         old_right = reassign_node.right
         old_op_name, old_type = reassign_node.op_name, reassign_node.node_type
-        reassign_op(reassign_node, ops_name_lst, ops_weight_lst, ops_priors, n_feature, **hyper_params)
+        reassign_op(
+            reassign_node,
+            ops_name_lst,
+            ops_weight_lst,
+            ops_priors,
+            n_feature,
+            **hyper_params
+        )
         new_type = reassign_node.node_type
-        _, new_nterm_count, new_lt_count, _ = _get_tree_classified_nodes(new_node, get_count=True)
+        _, new_nterm_count, new_lt_count, _ = _get_tree_classified_counts(new_node)
 
         if old_type == new_type:  # binary -> binary & unary -> unary
             q = ops_priors[reassign_node.op_name]["weight"]
@@ -639,11 +748,20 @@ def prop(
         else:
             op_weight = ops_priors[reassign_node.op_name]["weight"]
             if old_type == NodeType.UNARY:  # unary -> binary
-                tree_ll, _ = calc_tree_ll(reassign_node.right, ops_priors, n_feature, **hyper_params)
-                q = probs[Action.REASSIGN_OP] * np.exp(tree_ll) * op_weight / len(nterm_nodes)
+                tree_ll, _ = calc_tree_ll(
+                    reassign_node.right, ops_priors, n_feature, **hyper_params
+                )
+                q = (
+                    probs[Action.REASSIGN_OP]
+                    * np.exp(tree_ll)
+                    * op_weight
+                    / len(nterm_nodes)
+                )
                 ll_factor = 1
             else:  # binary -> unary
-                tree_ll, _ = calc_tree_ll(old_right, ops_priors, n_feature, **hyper_params)
+                tree_ll, _ = calc_tree_ll(
+                    old_right, ops_priors, n_feature, **hyper_params
+                )
                 q = probs[Action.REASSIGN_OP] * op_weight / len(nterm_nodes)
                 ll_factor = tree_ll
             # calculate q_inv
@@ -698,17 +816,17 @@ def calc_aux_ll(node: Node, **hyper_params) -> Tuple[float, int]:
 
 
 def prop_new(
-        roots: List[Node],
-        index: int,
-        sigma_y: float,
-        beta: float,
-        sigma_a: float,
-        sigma_b: float,
-        X: Union[np.ndarray, pd.DataFrame],
-        y: Union[np.ndarray, pd.DataFrame],
-        ops_name_lst: List[str],
-        ops_weight_lst: List[float],
-        ops_priors: Dict[str, Dict],
+    roots: List[Node],
+    index: int,
+    sigma_y: float,
+    beta: float,
+    sigma_a: float,
+    sigma_b: float,
+    X: Union[np.ndarray, pd.DataFrame],
+    y: Union[np.ndarray, pd.DataFrame],
+    ops_name_lst: List[str],
+    ops_weight_lst: List[float],
+    ops_priors: Dict[str, Dict],
 ) -> Tuple[bool, Node, float, float, float]:
     """
     Propose new structure, sample new parameters and decide whether to accept the new tree.
@@ -746,8 +864,9 @@ def prop_new(
     hyper_params = {"sigma_a": sigma_a, "sigma_b": sigma_b, "beta": beta}
     new_hyper_params = {"sigma_a": new_sigma_a, "sigma_b": new_sigma_b, "beta": beta}
     # propose a new tree `node`
-    new_root, expand_node, shrink_node, q, q_inv = \
-        prop(root, ops_name_lst, ops_weight_lst, ops_priors, X.shape[1], **new_hyper_params)
+    new_root, expand_node, shrink_node, q, q_inv = prop(
+        root, ops_name_lst, ops_weight_lst, ops_priors, X.shape[1], **new_hyper_params
+    )
 
     n_feature = X.shape[0]
     new_outputs = np.zeros((len(y), K))
@@ -773,17 +892,25 @@ def prop_new(
     # contribution of f(Theta, S)
     if shrink_node or expand_node:
         struct_ll_old = sum(calc_tree_ll(root, ops_priors, n_feature, **hyper_params))
-        struct_ll_new = sum(calc_tree_ll(new_root, ops_priors, n_feature, **hyper_params))
+        struct_ll_new = sum(
+            calc_tree_ll(new_root, ops_priors, n_feature, **hyper_params)
+        )
         log_struct_ratio = struct_ll_new - struct_ll_old
     else:
-        log_struct_ratio = calc_tree_ll(new_root, ops_priors, n_feature, **hyper_params)[0] - \
-            calc_tree_ll(root, ops_priors, n_feature, **hyper_params)
+        log_struct_ratio = calc_tree_ll(
+            new_root, ops_priors, n_feature, **hyper_params
+        )[0] - calc_tree_ll(root, ops_priors, n_feature, **hyper_params)
 
     # contribution of proposal Q and Qinv
     log_q_ratio = np.log(max(1e-5, q_inv / q))
 
-    log_r = log_y_ratio + log_struct_ratio + log_q_ratio + \
-        np.log(invgamma.pdf(new_sigma_y, sig)) - np.log(invgamma.pdf(sigma_y, sig))
+    log_r = (
+        log_y_ratio
+        + log_struct_ratio
+        + log_q_ratio
+        + np.log(invgamma.pdf(new_sigma_y, sig))
+        - np.log(invgamma.pdf(sigma_y, sig))
+    )
 
     if use_aux_ll and (expand_node or shrink_node):
         old_aux_ll, old_lt_count = calc_aux_ll(root, **hyper_params)
