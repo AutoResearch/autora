@@ -1,7 +1,4 @@
-Files
-.ipynb_checkpoints
-
-# Autora-specific files
+# AutoRA-specific files
 example/studies/**/modeling
 
 # PyCharm ignores are handled by the .idea/.gitignore file
@@ -28,6 +25,8 @@ __pycache__/
 build/
 develop-eggs/
 dist/
+conda/dist
+conda/env.sh
 downloads/
 eggs/
 .eggs/
@@ -47,7 +46,7 @@ MANIFEST
 pip-log.txt
 pip-delete-this-directory.txt
 
-# Unit example / coverage reports
+# Unit test / coverage reports
 htmlcov/
 .tox/
 .nox/
@@ -72,6 +71,3 @@ site/
 
 # Jupyter Notebook load data
 .ipynb_checkpoints
-
-# Intellij IDEA
-autora_bsr/.idea/*
