@@ -47,6 +47,9 @@ def __get_prior(prior_name):
             "Nopi2_*": 1.0,
             "Nopi_sig": 1.0,  # arbitrarily set for now
             "Nopi_relu": 1.0,  # arbitrarily set for now
+            "Nopi_maximum": 1.0,  # arbitrarily set for now
+            "Nopi_threshold2": 1.0,  # arbitrarily set for now
+            "Nopi_threshold3": 1.0,  # arbitrarily set for now
         },
     }
     assert prior_dict[prior_name] is not None, "prior key not recognized"
@@ -75,6 +78,9 @@ def __get_ops():
         "**": 2,
         "sig": 1,
         "relu": 1,
+        "maximum": 2,
+        "threshold2": 2,
+        "threshold3": 3,
     }
     return ops
 
@@ -88,3 +94,88 @@ def get_priors(prior="Guimera2020"):
 
 def relu(x):
     return np.maximum(x, 0)
+
+
+def maximum(x, y):
+    if type(x) == float and type(y) == float:
+        return y
+    elif type(x) == float:
+        for i in range(len(y)):
+            if y[i] < x:
+                y[i] = x
+        return y
+    elif type(y) == float:
+        for i in range(len(x)):
+            if x[i] < y:
+                x[i] = y
+        return x
+    else:
+        for i in range(len(x)):
+            if x[i] < y[i]:
+                x[i] = y[i]
+        return x
+
+
+#  Issue is that it's hard to find something that work well with both constants and variables
+def threshold2(x, y):
+    if type(x) == float and type(y) == float:
+        return y
+    elif type(x) == float:
+        for i in range(len(y)):
+            if y[i] < x:
+                y[i] = x
+        return y
+    elif type(y) == float:
+        for i in range(len(x)):
+            if x[i] < y:
+                x[i] = y
+        return x
+    else:
+        for i in range(len(x)):
+            if x[i] < y[i]:
+                x[i] = y[i]
+        return x
+
+
+def threshold3(x, y, z):
+    if type(x) == float and type(y) == float:
+        return y
+    elif type(x) == float:
+        for i in range(len(y)):
+            if y[i] < x:
+                y[i] = x
+        return y
+    elif type(y) == float:
+        for i in range(len(x)):
+            if x[i] < y:
+                x[i] = y
+        return x
+    else:
+        for i in range(len(x)):
+            if x[i] < y[i]:
+                x[i] = y[i]
+        return x
+
+
+"""
+
+def threshold2(x, y):
+    return np.where(x > 0, x, y)
+
+def threshold2(x, y):
+    if x > 0:
+        return x
+    else:
+        return y
+
+def threshold3(x, y, z):
+    return np.where(x > 0, y, z
+
+def threshold3(x, y, z):
+if x > 0:
+    return y
+else:
+    return z
+
+
+"""

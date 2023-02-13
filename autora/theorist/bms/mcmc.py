@@ -31,7 +31,7 @@ import scipy
 from scipy.optimize import curve_fit
 from sympy import lambdify, latex, log, sympify
 
-from .prior import get_priors, relu
+from .prior import get_priors, maximum, relu, threshold2, threshold3
 
 _logger = logging.getLogger(__name__)
 
@@ -161,7 +161,7 @@ class Tree:
         Args:
             ops: allowed operations to compose equation
             variables: dependent variable names
-            parameters: parameters that can be used to better fit the equation to the data_closed_loop
+            parameters: parameters that can be used to better fit the equation
             prior_par: hyperparameter values over operations within ops
             x: dependent variables
             y: independent variables
@@ -618,6 +618,9 @@ class Tree:
                 "fac": scipy.special.factorial,
                 "sig": scipy.special.expit,
                 "relu": relu,
+                "maximum": maximum,
+                "threshold2": threshold2,
+                "threshold3": threshold3,
             },
             **self.custom_ops
         )
@@ -1382,6 +1385,9 @@ class Tree:
                         "fac": scipy.special.factorial,
                         "sig": scipy.special.expit,
                         "relu": relu,
+                        "maximum": maximum,
+                        "threshold2": threshold2,
+                        "threshold3": threshold3,
                     },
                     **self.custom_ops
                 ),

@@ -43,6 +43,18 @@ def transform_through_primitive_pow_2d(x: np.ndarray) -> np.ndarray:
     return np.power(x[:, 0], x[:, 1])
 
 
+def transform_through_primitive_maximum(x: np.ndarray) -> np.ndarray:
+    y = x[0].copy()
+    # y = np.where(y < x[1], x[1], y)
+    return y
+
+
+def transform_through_primitive_threshold2(x: np.ndarray) -> np.ndarray:
+    y = x
+    y = np.where(y < 0, x[1], y)
+    return y
+
+
 def run_test_primitive_fitting_2d(
     X: np.ndarray,
     transformer: Callable,
@@ -104,4 +116,18 @@ def test_primitive_fitting_pow_2d():
     run_test_primitive_fitting_2d(
         generate_pos_x_2d(),
         transform_through_primitive_pow_2d,
+    )
+
+
+def test_primitive_fitting_maximum():
+    run_test_primitive_fitting_2d(
+        generate_x_2d(),
+        transform_through_primitive_maximum,
+    )
+
+
+def test_primitive_fitting_threshold2():
+    run_test_primitive_fitting_2d(
+        generate_x_2d(),
+        transform_through_primitive_threshold2,
     )
