@@ -1,7 +1,7 @@
-from autora_bsr.utils.funcs import grow
-from autora_bsr.utils.misc import get_ops_expr
-from autora_bsr.utils.node import Node
-from autora_bsr.utils.prior import get_prior_dict
+from autora.theorist.bsr.funcs import grow
+from autora.theorist.bsr.misc import get_ops_expr
+from autora.theorist.bsr.node import Node
+from autora.theorist.bsr.prior import get_prior_dict
 
 
 def test_grow_and_print_node():

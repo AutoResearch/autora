@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 from scipy.stats import invgamma, norm
 
-from autora_bsr.utils.node import Node, NodeType
+from .node import Node, NodeType
 
 
 def check_empty(func: Callable):

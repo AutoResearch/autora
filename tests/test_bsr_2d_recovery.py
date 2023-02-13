@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pytest  # noqa: 401
 
-from autora_bsr.skl.bsr import BSRRegressor
+from autora.skl.bsr import BSRRegressor
 
 warnings.filterwarnings("ignore")
 

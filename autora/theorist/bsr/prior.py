@@ -3,8 +3,8 @@ from typing import Callable, Dict, Union
 import numpy as np
 from scipy.stats import norm
 
-from autora_bsr.utils.misc import normalize_prior_dict
-from autora_bsr.utils.operation import (
+from .misc import normalize_prior_dict
+from .operation import (
     cos_op,
     exp_op,
     inv_op,

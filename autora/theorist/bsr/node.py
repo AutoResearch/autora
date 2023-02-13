@@ -4,7 +4,7 @@ from typing import Callable, Dict, List, Optional, Union
 import numpy as np
 import pandas as pd
 
-from autora_bsr.utils.misc import get_ops_expr
+from .misc import get_ops_expr
 
 
 class NodeType(Enum):

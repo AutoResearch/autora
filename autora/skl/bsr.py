@@ -9,9 +9,9 @@ from scipy.stats import invgamma
 from sklearn.base import BaseEstimator, RegressorMixin
 from sklearn.utils.validation import check_is_fitted
 
-from autora_bsr.utils.funcs import get_all_nodes, grow, prop_new
-from autora_bsr.utils.node import Node
-from autora_bsr.utils.prior import get_prior_dict
+from autora.theorist.bsr.funcs import get_all_nodes, grow, prop_new
+from autora.theorist.bsr.node import Node
+from autora.theorist.bsr.prior import get_prior_dict
 
 _logger = logging.getLogger(__name__)
 

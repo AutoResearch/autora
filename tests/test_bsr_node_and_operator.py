@@ -2,8 +2,8 @@ from typing import List, Union
 
 import numpy as np
 
-from autora_bsr.utils.node import Node
-from autora_bsr.utils.prior import get_prior_dict
+from autora.theorist.bsr.node import Node
+from autora.theorist.bsr.prior import get_prior_dict
 
 
 def __build_tree_from_literals(literals: List[Union[str, int]], **hyper_params):

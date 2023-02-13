@@ -1,6 +1,6 @@
-from test_node_and_operator import __build_tree_from_literals
+from test_bsr_node_and_operator import __build_tree_from_literals
 
-from autora_bsr.utils.funcs import (
+from autora.theorist.bsr.funcs import (
     de_transform,
     get_all_nodes,
     grow,
@@ -9,8 +9,8 @@ from autora_bsr.utils.funcs import (
     reassign_op,
     transform,
 )
-from autora_bsr.utils.node import Node, NodeType, Optional
-from autora_bsr.utils.prior import get_prior_dict
+from autora.theorist.bsr.node import Node, NodeType, Optional
+from autora.theorist.bsr.prior import get_prior_dict
 
 
 def _assert_tree_completeness(
