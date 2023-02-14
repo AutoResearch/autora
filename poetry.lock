@@ -729,14 +729,14 @@ files = [
 
 [[package]]
 name = "imageio"
-version = "2.25.0"
+version = "2.25.1"
 description = "Library for reading and writing a wide range of image, video, scientific, and volumetric data formats."
 category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "imageio-2.25.0-py3-none-any.whl", hash = "sha256:9ef2fdef1235eef849b1aea399f08508493624a2a2c8cc3bba957dabb7d0b79f"},
-    {file = "imageio-2.25.0.tar.gz", hash = "sha256:b80796a1f8c38c697a940a2ad7397ee28900d5c4e51061b9a67d16aca867f33e"},
+    {file = "imageio-2.25.1-py3-none-any.whl", hash = "sha256:5bce7f88eef7ee4e9aac798d3b218fea2e98cbbaa59a3e37b730a7aa5784eeac"},
+    {file = "imageio-2.25.1.tar.gz", hash = "sha256:6021d42debd2187e9c781e494a49a30eba002fbac1eef43f491bbc731e7a6d2b"},
 ]
 
 [package.dependencies]
@@ -897,14 +897,14 @@ files = [
 
 [[package]]
 name = "ipywidgets"
-version = "7.7.2"
+version = "7.7.3"
 description = "IPython HTML widgets for Jupyter"
 category = "dev"
 optional = false
 python-versions = "*"
 files = [
-    {file = "ipywidgets-7.7.2-py2.py3-none-any.whl", hash = "sha256:3d47a7826cc6e2644d7cb90db26699451f8b42379cf63b761431b63d19984ca2"},
-    {file = "ipywidgets-7.7.2.tar.gz", hash = "sha256:449ab8e7872d0f388ee5c5b3666b9d6af5e5618a5749fd62652680be37dff2af"},
+    {file = "ipywidgets-7.7.3-py2.py3-none-any.whl", hash = "sha256:c537a31feb4717d42b2331c9201a5c08e214693ca7439563fd4f1b64705312b9"},
+    {file = "ipywidgets-7.7.3.tar.gz", hash = "sha256:b41ca84d2742e39f2a730a13ea0dd619fca62e56cfac88c8f08989fb00a54fa8"},
 ]
 
 [package.dependencies]
@@ -1587,18 +1587,18 @@ files = [
 
 [[package]]
 name = "mkdocs-section-index"
-version = "0.3.4"
+version = "0.3.5"
 description = "MkDocs plugin to allow clickable sections that lead to an index page"
 category = "dev"
 optional = false
-python-versions = ">=3.6,<4.0"
+python-versions = ">=3.7"
 files = [
-    {file = "mkdocs-section-index-0.3.4.tar.gz", hash = "sha256:050151bfe7c0e374f197335e0ecb19c45b53dbafc0f817aa203f0cc24bcf7d10"},
-    {file = "mkdocs_section_index-0.3.4-py3-none-any.whl", hash = "sha256:214f7a6df9d35a5772e9577f3899ff3edd90044064589e6dd4d84615b72a8024"},
+    {file = "mkdocs_section_index-0.3.5-py3-none-any.whl", hash = "sha256:1f6359287b0a823d6297cf1cb6c0a49ed75851d0d1cea8b425b207a45ce10141"},
+    {file = "mkdocs_section_index-0.3.5.tar.gz", hash = "sha256:fa8b1ce0649326b1873c6460c1df2bb0c4825fd21e3dd416f13ec212d31edf12"},
 ]
 
 [package.dependencies]
-mkdocs = ">=1.1,<2.0"
+mkdocs = ">=1.0.3"
 
 [[package]]
 name = "mkdocstrings"
