@@ -73,7 +73,7 @@ def __get_ops_init() -> Dict[str, Union[Callable, object]]:
             value will be used in growing the `node` (see `funcs_legacy.py`).
     """
     ops_init = {
-        "linear": linear_init,
+        "ln": linear_init,
         "inv": {"cutoff": 1e-10},
         "exp": {"cutoff": 1e-10},
     }
