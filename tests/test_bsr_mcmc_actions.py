@@ -1,4 +1,4 @@
-from test_bsr_node_and_operator import __build_tree_from_literals
+from typing import List, Union
 
 from autora.theorist.bsr.funcs import (
     de_transform,
@@ -11,6 +11,54 @@ from autora.theorist.bsr.funcs import (
 )
 from autora.theorist.bsr.node import Node, NodeType, Optional
 from autora.theorist.bsr.prior import get_prior_dict
+
+
+def __build_tree_from_literals(literals: List[Union[str, int]], **hyper_params):
+    """
+    Helper testing function that builds up a valid computation tree with a list of str/int inputs
+    where a string input represents an operation (e.g. `inv`, `+`) and an integer indicates which
+    feature to use in a leaf node. For the list of valid operations, see `priors.py`.
+
+    The construction is done level-by-level. For example, the list `["sin", "inv", 1, 0] will render
+    the following computation tree
+
+                sin (root)
+                /       \
+             inv      feature 1
+             /
+        feature 0
+
+    Note that for simplicity this function doesn't check the validity of input list; e.g. using
+    a binary operation without specifying the features used by its two leaf nodes might cause error.
+
+    Arguments:
+        literals: a list of strings and integers that specifies how the tree should be built
+        hyper_params: parameters to initialize certain operations
+    Returns:
+        root: the root node of the tree
+    """
+    _, _, prior_dict = get_prior_dict()
+    root = Node(0)
+    node_queue = [root]
+    for s in literals:
+        node = node_queue.pop(0)
+        params = {}
+        if isinstance(s, str):
+            ops_init = prior_dict[s]["init"]
+            # init is a function randomized by some hyper-params
+            if callable(ops_init):
+                params.update(ops_init(**hyper_params))
+            else:  # init is deterministic dict
+                params.update(ops_init)
+            node.setup(s, prior_dict[s])
+        elif isinstance(s, int):
+            params["feature"] = s
+            node.setup(**params)
+        if node.left:
+            node_queue.append(node.left)
+        if node.right:
+            node_queue.append(node.right)
+    return root
 
 
 def _assert_tree_completeness(
