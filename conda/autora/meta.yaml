@@ -58,8 +58,7 @@ about:
   license: UNKNOWN
   license_family: OTHER
   license_file: LICENSE.md
-  summary: "Autonomous Research Assistant (AutoRA) is a framework for automating steps of the empirical research process. This framework implements tools for autonomously and iteratively generating 1) new theories to describe real-world data, and 2) experiments to invalidate those theories and seed a new cycle of theory-making. The experiments will be run online via crowd-sourcing platforms (MTurk, Prolific).
-"
+  summary: "Autonomous Research Assistant (AutoRA) is a framework for automating steps of the empirical research process. This framework implements tools for autonomously and iteratively generating 1) new theories to describe real-world data, and 2) experiments to invalidate those theories and seed a new cycle of theory-making. The experiments will be run online via crowd-sourcing platforms (MTurk, Prolific)."
   doc_url: https://autoresearch.github.io/autora/
   dev_url: https://github.com/AutoResearch/autora
 
