@@ -56,8 +56,9 @@ def __build_tree_from_literals(literals: List[Union[str, int]], **hyper_params):
 
 def test_basic_linear_operation():
     root = __build_tree_from_literals(["ln", 0])
+    root.params.update({"a": 2, "b": 3})
     test_x = np.array([[1, 2, 3], [4, 5, 6]])
-    test_y = test_x[:, 0]
+    test_y = 2 * test_x[:, 0] + 3
     assert (test_y - root.evaluate(test_x) < 1e-5).all()
 
 
