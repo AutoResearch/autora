@@ -116,7 +116,6 @@ def calc_tree_ll(
     depth = node.depth
     beta = hyper_params.get("beta", -1)
     sigma_a, sigma_b = hyper_params.get("sigma_a", 1), hyper_params.get("sigma_b", 1)
-    op_weight = ops_priors[node.op_name]["weight"]
 
     # contribution of hyperparameter sigma_theta
     if not depth:  # root node
@@ -157,6 +156,7 @@ def calc_tree_ll(
         struct_ll += struct_ll_left + struct_ll_right
         params_ll += params_ll_left + params_ll_right
 
+    op_weight = ops_priors[node.op_name]["weight"]
     # for unary & binary nodes, additionally consider the contribution of splitting
     if not depth:  # root node
         struct_ll += np.log(op_weight)
@@ -718,9 +718,9 @@ def prop(
         # calculate q_inv
         new_pdetr = (1 - new_prob) * (1 / 3) * new_det_count / (new_det_count + 3)
         q_inv = new_pdetr / new_det_count
-        assert inserted_node.left and inserted_node.right
         if (
-            inserted_node.node_type == NodeType.BINARY
+            inserted_node.left
+            and inserted_node.right
             and inserted_node.left.node_type != NodeType.LEAF
             and inserted_node.right.node_type != NodeType.LEAF
         ):
