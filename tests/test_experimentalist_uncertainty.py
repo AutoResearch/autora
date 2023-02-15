@@ -1,4 +1,3 @@
-import pathlib
 from functools import partial
 
 import numpy as np
@@ -20,12 +19,15 @@ def test_experimentalist_uncertainty():
 
     """
     # Load the data
-    datafile_path = pathlib.Path(__file__).parent.parent.joinpath(
-        "example/sklearn/darts/weber_data.csv"
-    )
-    data = pd.read_csv(datafile_path)
-    X = data[["S1", "S2"]]
-    y = data["difference_detected"]
+    resolution = 25
+    s1_values = s2_values = np.linspace(0.2, 5.0, resolution)
+    X = np.array(np.meshgrid(s1_values, s2_values)).T.reshape(-1, 2)
+    # remove all combinations where s1 > s2
+    X = X[X[:, 0] <= X[:, 1]]
+
+    weber_constant = 1.0
+    y = weber_constant * np.log(X[:, 1] / X[:, 0])
+
     y_classified = np.where(y >= 0.5, 1, 0)
 
     # Train logistic regression model
