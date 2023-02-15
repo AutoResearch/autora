@@ -116,7 +116,7 @@ def transform_through_primitive_ln(x: np.ndarray):
 def run_test_primitive_fitting(
     X: np.ndarray,
     transformer: Callable,
-    verbose: bool = True,
+    verbose: bool = False,
 ):
     y = transformer(X)
     regressor = BSRRegressor(tree_num=3, itr_num=10)
