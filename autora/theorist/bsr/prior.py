@@ -127,9 +127,9 @@ def get_prior_dict(prior_name="Uniform"):
         ops_weight_lst: the list of operator weights
         prior_dict: the dictionary of operator prior information
     """
-    ops_prior = __get_prior(prior_name)
-    ops_init = __get_ops_init()
-    ops_fn_and_arity = __get_ops_with_arity()
+    ops_prior = _get_prior(prior_name)
+    ops_init = _get_ops_init()
+    ops_fn_and_arity = _get_ops_with_arity()
 
     ops_name_lst = list(ops_prior.keys())
     ops_weight_lst = list(ops_prior.values())
@@ -157,9 +157,9 @@ def get_prior_list(prior_name="Uniform"):
         a dictionary that maps a prior property (e.g. `name`) to the list of such properties
             for each operator.
     """
-    ops_prior = __get_prior(prior_name)
-    ops_init = __get_ops_init()
-    ops_fn_and_arity = __get_ops_with_arity()
+    ops_prior = _get_prior(prior_name)
+    ops_init = _get_ops_init()
+    ops_fn_and_arity = _get_ops_with_arity()
 
     ops_name_lst = list(ops_prior.keys())
     ops_weight_lst = list(ops_prior.values())

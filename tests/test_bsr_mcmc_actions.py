@@ -13,7 +13,7 @@ from autora.theorist.bsr.node import Node, NodeType, Optional
 from autora.theorist.bsr.prior import get_prior_dict
 
 
-def __build_tree_from_literals(literals: List[Union[str, int]], **hyper_params):
+def _build_tree_from_literals(literals: List[Union[str, int]], **hyper_params):
     """
     Helper testing function that builds up a valid computation tree with a list of str/int inputs
     where a string input represents an operation (e.g. `inv`, `+`) and an integer indicates which
@@ -86,11 +86,11 @@ def _assert_tree_completeness(
 def test_mcmc_grow():
     ops_name_list, ops_weight_list, ops_priors = get_prior_dict()
     hyper_params = {"sigma_a": 1, "sigma_b": 1}
-    node = __build_tree_from_literals(["*", "+", "-", 0, 1, 0, 1], **hyper_params)
+    node = _build_tree_from_literals(["*", "+", "-", 0, 1, 0, 1], **hyper_params)
     grow(node.left.left, ops_name_list, ops_weight_list, ops_priors, **hyper_params)
     _assert_tree_completeness(node)
 
-    node = __build_tree_from_literals([0], **hyper_params)
+    node = _build_tree_from_literals([0], **hyper_params)
     grow(node, ops_name_list, ops_weight_list, ops_priors, **hyper_params)
     _assert_tree_completeness(node)
     assert len(get_all_nodes(node)) > 1
@@ -98,7 +98,7 @@ def test_mcmc_grow():
 
 def test_mcmc_prune():
     hyper_params = {"sigma_a": 1, "sigma_b": 1}
-    node = __build_tree_from_literals(["*", "+", "-", 0, 1, 0, 1], **hyper_params)
+    node = _build_tree_from_literals(["*", "+", "-", 0, 1, 0, 1], **hyper_params)
     prune(node.right)
     _assert_tree_completeness(node)
     assert node.left.op_name == "+"
@@ -107,19 +107,17 @@ def test_mcmc_prune():
 
 def test_mcmc_de_transform(**hyper_params):
     hyper_params = {"sigma_a": 1, "sigma_b": 1}
-    node = __build_tree_from_literals(["*", "exp", "-", 0, 0, 1], **hyper_params)
+    node = _build_tree_from_literals(["*", "exp", "-", 0, 0, 1], **hyper_params)
     repl, disc = de_transform(node.left)  # the unary case, replaced with child
     assert disc is None
     assert repl.node_type == NodeType.LEAF and repl.params["feature"] == 0
     # binary & root case
-    node = __build_tree_from_literals(["*", 2, "-", 0, 1], **hyper_params)
+    node = _build_tree_from_literals(["*", 2, "-", 0, 1], **hyper_params)
     repl, disc = de_transform(node)
     assert disc.node_type == NodeType.LEAF and disc.params["feature"] == 2
     _assert_tree_completeness(repl, 1, node)
     # binary & non-root case
-    node = __build_tree_from_literals(
-        ["+", "*", "-", "exp", 0, 1, 2, 3], **hyper_params
-    )
+    node = _build_tree_from_literals(["+", "*", "-", "exp", 0, 1, 2, 3], **hyper_params)
     _assert_tree_completeness(node)
     repl, disc = de_transform(node.left)
     if repl is node.left.left:
@@ -133,7 +131,7 @@ def test_mcmc_transform():
     ops_name_list, ops_weight_list, ops_priors = get_prior_dict()
     hyper_params = {"sigma_a": 1, "sigma_b": 1}
 
-    node = __build_tree_from_literals(["*", "+", "-", 0, 1, 0, 1], **hyper_params)
+    node = _build_tree_from_literals(["*", "+", "-", 0, 1, 0, 1], **hyper_params)
     old_left = node.left
     transform(old_left, ops_name_list, ops_weight_list, ops_priors, **hyper_params)
     _assert_tree_completeness(node)
@@ -147,7 +145,7 @@ def test_mcmc_reassign_op():
     hyper_params = {"sigma_a": 1, "sigma_b": 1}
     # repeat multiple times to cover all cases
     for _ in range(5):
-        node = __build_tree_from_literals(["*", "exp", "-", 0, 0, 1], **hyper_params)
+        node = _build_tree_from_literals(["*", "exp", "-", 0, 0, 1], **hyper_params)
         reassign_op(node, ops_name_list, ops_weight_list, ops_priors, **hyper_params)
         _assert_tree_completeness(node)
         if node.node_type == NodeType.BINARY:
@@ -166,7 +164,7 @@ def test_mcmc_reassign_op():
 
 
 def test_mcmc_reassign_feat(**hyper_params):
-    node = __build_tree_from_literals(["*", "exp", "-", 2, 2, 3], **hyper_params)
+    node = _build_tree_from_literals(["*", "exp", "-", 2, 2, 3], **hyper_params)
     reassign_feat(node.left.left)
     reassign_feat(node.right.right)
     _assert_tree_completeness(node)

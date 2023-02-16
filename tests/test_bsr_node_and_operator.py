@@ -6,7 +6,7 @@ from autora.theorist.bsr.node import Node
 from autora.theorist.bsr.prior import get_prior_dict
 
 
-def __build_tree_from_literals(literals: List[Union[str, int]], **hyper_params):
+def _build_tree_from_literals(literals: List[Union[str, int]], **hyper_params):
     """
     Helper testing function that builds up a valid computation tree with a list of str/int inputs
     where a string input represents an operation (e.g. `inv`, `+`) and an integer indicates which
@@ -55,7 +55,7 @@ def __build_tree_from_literals(literals: List[Union[str, int]], **hyper_params):
 
 
 def test_basic_linear_operation():
-    root = __build_tree_from_literals(["ln", 0])
+    root = _build_tree_from_literals(["ln", 0])
     root.params.update({"a": 2, "b": 3})
     test_x = np.array([[1, 2, 3], [4, 5, 6]])
     test_y = 2 * test_x[:, 0] + 3
@@ -63,56 +63,56 @@ def test_basic_linear_operation():
 
 
 def test_basic_exp_operation():
-    root = __build_tree_from_literals(["exp", 0])
+    root = _build_tree_from_literals(["exp", 0])
     test_x = np.array([[1, 2, 3], [4, 5, 6]])
     test_y = np.exp(test_x[:, 0])
     assert (test_y - root.evaluate(test_x) < 1e-5).all()
 
 
 def test_basic_inv_operation():
-    root = __build_tree_from_literals(["inv", 0])
+    root = _build_tree_from_literals(["inv", 0])
     test_x = np.array([[1, 2, 3], [4, 5, 6]])
     test_y = 1 / test_x[:, 0]
     assert (test_y - root.evaluate(test_x) < 1e-5).all()
 
 
 def test_basic_neg_operation():
-    root = __build_tree_from_literals(["neg", 0])
+    root = _build_tree_from_literals(["neg", 0])
     test_x = np.array([[1, 2, 3], [4, 5, 6]])
     test_y = -test_x[:, 0]
     assert (test_y - root.evaluate(test_x) < 1e-5).all()
 
 
 def test_basic_sin_operation():
-    root = __build_tree_from_literals(["sin", 0])
+    root = _build_tree_from_literals(["sin", 0])
     test_x = np.array([[1, 2, 3], [4, 5, 6]])
     test_y = np.sin(test_x[:, 0])
     assert (test_y - root.evaluate(test_x) < 1e-5).all()
 
 
 def test_basic_cos_operation():
-    root = __build_tree_from_literals(["cos", 0])
+    root = _build_tree_from_literals(["cos", 0])
     test_x = np.array([[1, 2, 3], [4, 5, 6]])
     test_y = np.cos(test_x[:, 0])
     assert (test_y - root.evaluate(test_x) < 1e-5).all()
 
 
 def test_basic_plus_operation():
-    root = __build_tree_from_literals(["+", 0, 1])
+    root = _build_tree_from_literals(["+", 0, 1])
     test_x = np.array([[1, 2, 3], [4, 5, 6]])
     test_y = np.add(test_x[:, 0], test_x[:, 1])
     assert (test_y - root.evaluate(test_x) < 1e-5).all()
 
 
 def test_basic_minus_operation():
-    root = __build_tree_from_literals(["-", 0, 1])
+    root = _build_tree_from_literals(["-", 0, 1])
     test_x = np.array([[1, 2, 3], [4, 5, 6]])
     test_y = np.subtract(test_x[:, 0], test_x[:, 1])
     assert (test_y - root.evaluate(test_x) < 1e-5).all()
 
 
 def test_basic_multiply_operation():
-    root = __build_tree_from_literals(["*", 0, 1])
+    root = _build_tree_from_literals(["*", 0, 1])
     test_x = np.array([[1, 2, 3], [4, 5, 6]])
     test_y = np.multiply(test_x[:, 0], test_x[:, 1])
     assert (test_y - root.evaluate(test_x) < 1e-5).all()
