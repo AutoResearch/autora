@@ -18,7 +18,7 @@ from .operation import (
 )
 
 
-def __get_ops_with_arity():
+def _get_ops_with_arity():
     """
     Get the operator function and arity (number of operands) of each operator.
 
@@ -61,7 +61,7 @@ def linear_init(**hyper_params) -> Dict:
     }
 
 
-def __get_ops_init() -> Dict[str, Union[Callable, object]]:
+def _get_ops_init() -> Dict[str, Union[Callable, object]]:
     """
     Get the initialization functions for operators that require additional
     parameters.
@@ -80,7 +80,7 @@ def __get_ops_init() -> Dict[str, Union[Callable, object]]:
     return ops_init
 
 
-def __get_prior(prior_name: str, prob: bool = True) -> Dict[str, float]:
+def _get_prior(prior_name: str, prob: bool = True) -> Dict[str, float]:
     prior_dict = {
         "Uniform": {
             "neg": 1.0,
