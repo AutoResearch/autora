@@ -119,7 +119,7 @@ def run_test_primitive_fitting(
     verbose: bool = False,
 ):
     y = transformer(X)
-    regressor = BSRRegressor(tree_num=3, itr_num=10)
+    regressor = BSRRegressor(tree_num=3, itr_num=10, val=10)
     regressor.fit(X, y.ravel())
     if verbose:
         y_predict = regressor.predict(X)
