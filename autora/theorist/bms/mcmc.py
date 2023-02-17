@@ -153,6 +153,8 @@ class Tree:
         max_size=50,
         root_value=None,
         fixed_root=False,
+        ignore_prior=False,
+        ignore_penalty=False,
         custom_ops={},
     ):
         """
@@ -161,7 +163,7 @@ class Tree:
         Args:
             ops: allowed operations to compose equation
             variables: dependent variable names
-            parameters: parameters that can be used to better fit the equation to the data_closed_loop
+            parameters: parameters that can be used to better fit the equation
             prior_par: hyperparameter values over operations within ops
             x: dependent variables
             y: independent variables
@@ -170,6 +172,7 @@ class Tree:
             max_size: maximum size of tree (maximum number of nodes)
             root_value: algebraic term held at root of equation
         """
+        self.penalty = ignore_penalty
         # The variables and parameters
         if custom_ops is None:
             custom_ops = dict()
@@ -232,7 +235,10 @@ class Tree:
         if prior_par == {}:
             self.prior_par = dict([("Nopi_%s" % t, 10.0) for t in self.ops])
         else:
-            self.prior_par = prior_par
+            if ignore_prior:
+                self.prior_par = get_priors("GuimeraTest2020")
+            else:
+                self.prior_par = prior_par
         # The datasets
         if x is None:
             self.x = {"d0": pd.DataFrame()}
@@ -719,12 +725,15 @@ class Tree:
         sse = self.get_sse(fit=fit, verbose=verbose)
         # Calculate the BIC
         parameters = set([p.value for p in self.ets[0] if p.value in self.parameters])
-        k = 1 + len(parameters)
+        if self.penalty:
+            k = 1 + len(parameters)
+        else:
+            k = 1
         BIC = 0.0
         for ds in self.y:
             n = len(self.y[ds])
             BIC += (k - n) * np.log(n) + n * (np.log(2.0 * np.pi) + log(sse[ds]) + 1)
-        for ds in self.y:
+        for ds in self.y:  # TODO: test removing this
             if sse[ds] == 0.0:
                 BIC = -np.inf
         if reset:

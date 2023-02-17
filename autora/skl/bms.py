@@ -84,6 +84,8 @@ class BMSRegressor(BaseEstimator, RegressorMixin):
         num_param: int = 1,
         root=None,
         custom_ops=None,
+        ignore_prior=False,
+        ignore_penalty=False,
     ) -> BMSRegressor:
         """
         Runs the optimization for a given set of `X`s and `y`s.
@@ -94,6 +96,8 @@ class BMSRegressor(BaseEstimator, RegressorMixin):
             num_param: number of parameters
             root: fixed root of the tree
             custom_ops: user-defined functions to additionally treated as primitives
+            ignore_prior: bool to ignore prior
+            ignore_penalty: bool to ignore penalty term in BIC calculation
 
         Returns:
             self (BMS): the fitted estimator
@@ -127,6 +131,8 @@ class BMSRegressor(BaseEstimator, RegressorMixin):
             ops=self.ops,
             custom_ops=self.custom_ops,
             root=root,
+            ignore_prior=ignore_prior,
+            ignore_penalty=ignore_penalty,
         )
         self.model_, self.loss_, self.cache_ = utils.run(self.pms, self.epochs)
         self.models_ = list(self.pms.trees.values())
