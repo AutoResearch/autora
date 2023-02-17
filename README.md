@@ -406,6 +406,7 @@ The release process is automated using GitHub Actions.
     api:read api:write`. Current token expires on 2023-03-01.
 - Update [conda recipe](./conda/autora/meta.yaml): 
     - dependencies, so that it matches [pyproject.toml](pyproject.toml).
+        - Be aware that the versions supported in Conda are not necessarily the same in name and version number as those in pypi. (e.g. pytorch vs torch).  
     - imports for testing – all modules should be listed.
 - Trigger a new release from GitHub. 
   - Navigate to the repository's code tab at https://github.com/autoresearch/autora,
