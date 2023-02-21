@@ -4,6 +4,7 @@ from autora.skl.bms import BMSRegressor
 from autora.skl.darts import DARTSRegressor
 from studies.bms.models_cache.recoverable.exp_learning import exp_learning_experiment
 from studies.bms.models_cache.recoverable.weber import weber_experiment
+from studies.bms.utils import mountain, threshold2, threshold3
 
 # recoverable models
 # make & collect data
@@ -25,7 +26,10 @@ recoverable = dict()
 for key in data_recoverable.keys():
     for theorist in theorists:
         X, y = data_recoverable[key]
-        theorist = theorist.fit(X, y).model_
+        if theorist.__name__ == "BMSRegressor":
+            theorist = theorist.fit(X, y, custom_ops=[mountain, threshold2, threshold3])
+        else:
+            theorist = theorist.fit(X, y)
         recoverable[key + "_" + theorist.__name__] = {
             "data": data_recoverable[key],
             "theorist_name": theorist.__name__,
@@ -55,7 +59,10 @@ nonrecoverable = dict()
 for key in data_nonrecoverable.keys():
     for theorist in theorists:
         X, y = data_nonrecoverable[key]
-        theorist = theorist.fit(X, y)
+        if theorist.__name__ == "BMSRegressor":
+            theorist = theorist.fit(X, y, custom_ops=[mountain, threshold2, threshold3])
+        else:
+            theorist = theorist.fit(X, y)
         nonrecoverable[key + "_" + theorist.__name__] = {
             "data": data_nonrecoverable[key],
             "theorist_name": theorist.__name__,

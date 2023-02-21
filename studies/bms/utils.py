@@ -111,3 +111,15 @@ def get_prior(model_, theorist_name):
     else:
         print(theorist_name)
         raise
+
+
+def mountain(x, y):
+    return np.maximum(x, y)
+
+
+def threshold2(x, y):
+    return np.where(x > 0, x, y)
+
+
+def threshold3(x, y, z):
+    return np.where(x > 0, y, z)
