@@ -200,7 +200,7 @@ def get_experimentalist(
                 "dissimilarity__n": num_samples,
                 "dissimilarity__inverse": False,
                 "dissimilarity__metric": "euclidean",
-                "dissimilarity__integration": "min", # product
+                "dissimilarity__integration": "min",  # product
             },
         )
 
@@ -274,86 +274,51 @@ def get_MSE(theorist, x, y_target):
     return MSE
 
 
-def get_DL(theorist, theorist_name, x, y_target):
-    # DL = BIC/2 + PRIORS
-    # BIC = n * log(MSE) + k * log(n)
-    k = 0  # number of parameters
-    prior = 0.0
-    prior_par, _ = get_priors()
-    if "BMS" in theorist_name:
-        parameters = set(
-            [
-                p.value
-                for p in theorist.model_.ets[0]
-                if p.value in theorist.model_.parameters
-            ]
-        )
-        k = 1 + len(parameters)
-        for op, nop in list(theorist.model_.nops.items()):
-            try:
-                if theorist.pms.root is not None and op in ["+", "/", "exp", "-"]:
-                    prior += prior_par["Nopi_%s" % op] * (nop + 1)
-                else:
-                    prior += prior_par["Nopi_%s" % op] * nop
-            except KeyError:
-                pass
-            try:
-                if theorist.pms.root is not None and op in ["+", "/", "exp", "-"]:
-                    prior += prior_par["Nopi2_%s" % op] * (nop + 1) ** 2
-                else:
-                    prior += prior_par["Nopi2_%s" % op] * nop**2
+def get_LL(mse):
+    # LL = log(MSE)
+    # BMS seems to make this assumption `\_0_/`
+    return np.log(mse)
 
-            except KeyError:
-                pass
-        if theorist.pms.root is not None:
-            prior -= theorist.model_.prior_par["Nopi_sigmoid"]
-    elif theorist_name == "Logit Regression":
-        k = (1 + theorist.model_.coef_.shape[0]) * 2
-        prior += prior_par["Nopi_log"]
-        prior += prior_par["Nopi_/"]
-        prior += prior_par["Nopi_-"]
-        # the part raised to the exponential
-        prior += prior_par["Nopi_+"] * (k - 1)
-        prior += prior_par["Nopi_*"] * (k - 1)
-        prior += prior_par["Nopi_**"] * (k - 1)
-        try:
-            prior += prior_par["Nopi2_+"] * (k - 1) ** 2
-            prior += prior_par["Nopi2_*"] * (k - 1) ** 2
-            prior += prior_par["Nopi2_**"] * (k - 1) ** 2
-        except KeyError:
-            pass
-    elif "DARTS" in theorist_name:
-        model_str = theorist.model_repr()
-        k = 1 + model_str.count(".")
-        for op in theorist.primitives:
-            try:
-                prior += prior_par["Nopi_%s" % op] * model_str.count(op)
-            except KeyError:
-                pass
-            try:
-                prior += prior_par["Nopi2_%s" % op] * model_str.count(op) ** 2
-            except KeyError:
-                pass
-    else:
-        print(theorist_name)
-        raise
-    n = len(x)  # number of observations
-    mse = get_MSE(theorist, x, y_target)
-    bic = n * np.log(mse) + k * np.log(n)
+
+def get_BIC(model_, theorist_name, mse, num_obs):
+    # BIC = n * LL + k * log(n)
+    num_params = get_num_params(model_, theorist_name)
+    return num_obs * get_LL(mse) + num_params * np.log(num_obs)
+
+
+def get_DL(model_, theorist_name, mse, num_obs):
+    # DL = BIC/2 + PRIORS
+    bic = get_BIC(model_, theorist_name, mse, num_obs)
+    prior = get_prior(model_, theorist_name)
     return bic / 2.0 + prior
 
 
-def get_DL_from_mse(model_, theorist_name, mse, num_obs):
-    # DL = BIC/2 + PRIORS
-    # BIC = n * log(MSE) + k * log(n)
-    k = 0  # number of parameters
+def get_num_params(theory, theorist_name):
+    k = 0
+    if "BMS" in theorist_name:
+        parameters = set(
+            [p.value for p in theory.ets[0] if p.value in theory.parameters]
+        )
+        k = 1 + len(parameters)
+    elif theorist_name == "LogitRegression":
+        k = (1 + theory.coef_.shape[0]) * 2
+    elif "DARTS" in theorist_name and type(theory) != LogitRegression:
+        temp_model = DARTSRegressor()
+        temp_model.model_ = theory
+        model_str = temp_model.model_repr()
+        k = 1 + model_str.count(".")
+    elif theorist_name == "MLP":
+        return 1201  # I checked (assuming we use default parameters for MLP Theorist)
+    else:
+        print(theorist_name)
+        raise
+    return k
+
+
+def get_prior(model_, theorist_name):
     prior = 0.0
     prior_par, _ = get_priors()
     if "BMS" in theorist_name:
-        parameters = set(
-            [p.value for p in model_.ets[0] if p.value in model_.parameters]
-        )
-        k = 1 + len(parameters)
         for op, nop in list(model_.nops.items()):
             try:
                 if op in ["+", "/", "exp", "-"]:
@@ -391,7 +356,6 @@ def get_DL_from_mse(model_, theorist_name, mse, num_obs):
         temp_model = DARTSRegressor()
         temp_model.model_ = model_
         model_str = temp_model.model_repr()
-        k = 1 + model_str.count(".")
         for op in temp_model.primitives:
             try:
                 prior += prior_par["Nopi_%s" % op] * model_str.count(op)
@@ -402,11 +366,9 @@ def get_DL_from_mse(model_, theorist_name, mse, num_obs):
             except KeyError:
                 pass
     elif theorist_name == "MLP":
-        pass
+        # print("Can't use for MLP")
+        # raise
+        return 0
     else:
         print(theorist_name)
         raise
-    n = num_obs  # number of observations
-    mse = mse
-    bic = n * np.log(mse) + k * np.log(n)
-    return bic / 2.0 + prior

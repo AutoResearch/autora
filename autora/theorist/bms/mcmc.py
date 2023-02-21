@@ -1406,7 +1406,7 @@ class Tree:
             # Predict
             try:
                 prediction = flam(*args)
-            except SyntaxError:
+            except (SyntaxError, KeyError):
                 # Do it point by point
                 prediction = [np.nan for i in range(len(this_x[ds]))]
             predictions[ds] = pd.Series(prediction, index=list(this_x[ds].index))

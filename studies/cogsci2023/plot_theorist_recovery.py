@@ -9,7 +9,7 @@ import seaborn as sns
 from sklearn.manifold import TSNE
 
 from studies.cogsci2023.models.models import model_inventory, plot_inventory
-from studies.cogsci2023.utils import get_DL_from_mse
+from studies.cogsci2023.utils import get_BIC, get_DL, get_LL
 
 # set the path to the data_closed_loop directory
 path = "data_theorist/"
@@ -53,13 +53,19 @@ for pickle in loaded_pickles:
         row["Theorist"] = theorist_name_log[idx]
         row["Ground Truth"] = configuration["ground_truth_name"]
         row["Mean Squared Error"] = MSE_log[idx]
-        row["Description Length"] = DL_log[idx]
-        if theorist_name_log[idx] == "Regression":
-            test_size = configuration["test_size"]
-            num_obs = test_size * full_n
-            row["Description Length"] = get_DL_from_mse(
-                theory_log[idx], theorist_name_log[idx], MSE_log[idx], num_obs
-            )
+        # row["Description Length"] = DL_log[idx]
+        # if theorist_name_log[idx] == "Regression":
+        test_size = configuration["test_size"]
+        num_obs = test_size * full_n
+        row["Description Length"] = get_DL(
+            theory_log[idx], theorist_name_log[idx], MSE_log[idx], num_obs
+        )
+        row["BIC"] = get_BIC(
+            theory_log[idx], theorist_name_log[idx], MSE_log[idx], num_obs
+        )
+        row["LL"] = get_BIC(
+            theory_log[idx], theorist_name_log[idx], MSE_log[idx], num_obs
+        )
         full_theory_log.append(theory_log[idx])
         df_validation = df_validation.append(row, ignore_index=True)
         entry = entry + 1
@@ -104,6 +110,19 @@ plt.show()
 sns.barplot(
     data=df_validation, x="Ground Truth", y="Description Length", hue="Theorist"
 )
+plt.show()
+
+# BIC PLOT
+sns.barplot(
+    data=df_validation,
+    x="Ground Truth",
+    y="Bayesian Information Criterion",
+    hue="Theorist",
+)
+plt.show()
+
+# LL PLOT
+sns.barplot(data=df_validation, x="Ground Truth", y="Log Likelihood", hue="Theorist")
 plt.show()
 
 # MODEL PLOT

@@ -1,24 +1,26 @@
-from studies.cogsci2023.models.models import model_inventory
-from sklearn.model_selection import train_test_split
-from studies.cogsci2023.utils import fit_theorist, get_MSE, get_DL
 import pickle
 import time
 
+from sklearn.model_selection import train_test_split
+
+from studies.cogsci2023.models.models import model_inventory
+from studies.cogsci2023.utils import fit_theorist, get_DL, get_MSE
+
 # META PARAMETERS
-repetitions = 1                 # specifies how many times to repeat the study (20)
-test_size = 0.2                # proportion of test set size to training set size
+repetitions = 1  # specifies how many times to repeat the study (20)
+test_size = 0.2  # proportion of test set size to training set size
 
 # SELECT GROUND TRUTH MODEL
-ground_truth_name = "prospect_theory" # OPTIONS: see models.py
+ground_truth_name = "weber_fechner"  # OPTIONS: see models.py
 
 theorists = [
-             #'MLP',
-             # 'DARTS 2 Nodes'
-             'Logit Regression',
-             #'DARTS 3 Nodes',
-             #'BMS',
-             #'BMS Fixed Root'
-             ]
+    "MLP",
+    "DARTS 2 Nodes",
+    "Logit Regression",
+    "DARTS 3 Nodes",
+    "BMS",
+    "BMS Fixed Root",
+]
 
 for rep in range(repetitions):
 
@@ -29,9 +31,9 @@ for rep in range(repetitions):
 
     # split data_closed_loop into training and test sets
     X_full, y_full = data_fnc(metadata)
-    X_train, X_test, y_train, y_test = train_test_split(X_full, y_full,
-                                                        test_size=test_size,
-                                                        random_state=rep)
+    X_train, X_test, y_train, y_test = train_test_split(
+        X_full, y_full, test_size=test_size, random_state=rep
+    )
 
     MSE_log = list()
     DL_log = list()
@@ -48,15 +50,15 @@ for rep in range(repetitions):
         elapsed_time = et - st
         elapsed_time_log.append(elapsed_time)
 
-        if theorist_name == "BMS" or theorist_name == "BMS Fixed Root" or theorist_name == 'Logit Regression'\
-            or 'DARTS' in theorist_name:
-            DL = get_DL(theorist, theorist_name, X_test, y_test)
-        else:
-            DL = 0
-        DL_log.append(DL)
+        # if theorist_name == "BMS" or theorist_name == "BMS Fixed Root" or theorist_name == 'Logit Regression'\
+        #    or 'DARTS' in theorist_name:
+        #    DL = get_DL(theorist, theorist_name, get_MSE(theorist, X_test, y_test), len(y_test))
+        # else:
+        #    DL = 0
+        # DL_log.append(DL)
 
         MSE_log.append(get_MSE(theorist, X_test, y_test))
-        if hasattr(theorist, 'model_'):
+        if hasattr(theorist, "model_"):
             theory_log.append(theorist.model_)
         else:
             theory_log.append(theorist)
@@ -65,25 +67,27 @@ for rep in range(repetitions):
     # save and load pickle file
     file_name = "data_theorist/" + ground_truth_name + "_" + str(rep) + ".pickle"
 
-    with open(file_name, 'wb') as f:
+    with open(file_name, "wb") as f:
         # simulation configuration
         configuration = dict()
         configuration["ground_truth_name"] = ground_truth_name
         configuration["repetitions"] = repetitions
         configuration["test_size"] = test_size
 
-        object_list = [configuration,
-                       MSE_log,
-                       theory_log,
-                       theorist_name_log,
-                       elapsed_time_log,
-                       DL_log,
-                       ]
+        object_list = [
+            configuration,
+            MSE_log,
+            theory_log,
+            theorist_name_log,
+            elapsed_time_log,
+            DL_log,
+        ]
 
         pickle.dump(object_list, f)
 
 # using datetime module
 import datetime
+
 # ct stores current time
 ct = datetime.datetime.now()
 print("current time:-", ct)
