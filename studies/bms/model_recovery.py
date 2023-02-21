@@ -9,7 +9,10 @@ from studies.bms.models_cache.recoverable.weber import weber_experiment
 # make & collect data
 data_recoverable = dict()
 data_recoverable["weber"] = weber_experiment()
-data_recoverable["exp_learning"] = exp_learning_experiment()
+# data_recoverable["exp_learning"] = exp_learning_experiment()
+# data_recoverable["expected_value"]
+# data_recoverable["stevens_power_law"]
+# data_recoverable["tva"]
 
 # initialize theorists
 bms = BMSRegressor(epochs=5)
@@ -32,7 +35,14 @@ for key in data_recoverable.keys():
 # non-recoverable models
 # make & collect data
 data_nonrecoverable = dict()
-data_nonrecoverable["prospect_theory"] = weber_experiment()
+# data_nonrecoverable["evc_coged"]
+# data_nonrecoverable["evc_congruency"]
+# data_nonrecoverable["evc_demand_selection"]
+# data_nonrecoverable["prospect_theory"]
+# data_nonrecoverable["shepard_luce_choice"]
+# data_nonrecoverable["stroop_model"]
+# data_recoverable["task_switching"]
+
 
 # initialize theorists
 bms = BMSRegressor(epochs=5)
