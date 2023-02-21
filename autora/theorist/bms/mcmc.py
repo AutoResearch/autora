@@ -31,7 +31,7 @@ import scipy
 from scipy.optimize import curve_fit
 from sympy import lambdify, latex, log, sympify
 
-from .prior import get_priors, maximum, relu, threshold2, threshold3
+from .prior import get_priors, relu
 
 _logger = logging.getLogger(__name__)
 
@@ -618,9 +618,6 @@ class Tree:
                 "fac": scipy.special.factorial,
                 "sig": scipy.special.expit,
                 "relu": relu,
-                "maximum": maximum,
-                "threshold2": threshold2,
-                "threshold3": threshold3,
             },
             **self.custom_ops
         )
@@ -1385,9 +1382,6 @@ class Tree:
                         "fac": scipy.special.factorial,
                         "sig": scipy.special.expit,
                         "relu": relu,
-                        "maximum": maximum,
-                        "threshold2": threshold2,
-                        "threshold3": threshold3,
                     },
                     **self.custom_ops
                 ),
