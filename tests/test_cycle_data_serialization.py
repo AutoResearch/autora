@@ -1,10 +1,11 @@
+import pickle
 import tempfile
 
+import joblib
 import numpy as np
 import pytest
 from sklearn.linear_model import LinearRegression
 
-from autora.cycle.filesystem import PickleDeSerializer
 from autora.cycle.simple import SimpleCycle, SimpleCycleData
 from autora.experimentalist.pipeline import make_pipeline
 from autora.variable import Variable, VariableCollection
@@ -51,17 +52,30 @@ def darts_dataset():
     return
 
 
-def test_serialize_deserialize_logistic_regression(
+def test_pickle_save_load_logistic_regression(
     logistic_regression_dataset: SimpleCycleData,
 ):
-    original_data = logistic_regression_dataset
+    run_save_load_test(
+        pickle, logistic_regression_dataset, assert_equality_logistic_regression_dataset
+    )
+
+
+def test_joblib_save_load_logistic_regression(
+    logistic_regression_dataset: SimpleCycleData,
+):
+    run_save_load_test(
+        joblib, logistic_regression_dataset, assert_equality_logistic_regression_dataset
+    )
+
+
+def run_save_load_test(serializer, data, comparator):
     with tempfile.NamedTemporaryFile() as file:
-        PickleDeSerializer.save(original_data, file=file)
+        serializer.dump(data, file)
 
         file.seek(0)
-        reloaded_data = PickleDeSerializer.load(file)
+        reloaded_data = serializer.load(file)
 
-        assert_equality_logistic_regression_dataset(original_data, reloaded_data)
+        comparator(data, reloaded_data)
 
 
 def assert_equality_logistic_regression_dataset(a, b):

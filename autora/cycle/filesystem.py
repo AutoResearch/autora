@@ -1,15 +1,16 @@
+import json
 import pickle
 
 
 class PickleDeSerializer:
     @staticmethod
-    def save(data: object, file):
+    def dump(data: object, file):
         """
         Serialize an arbitrary data object.
 
         Args:
             data: an arbitrary python object
-            file: location to save to
+            file: location to dump to
 
         Returns: None
 
@@ -20,4 +21,26 @@ class PickleDeSerializer:
     @staticmethod
     def load(file):
         data = pickle.load(file)
+        return data
+
+
+class JSONDeSerializer:
+    @staticmethod
+    def dump(data: object, file):
+        """
+        Serialize an arbitrary data object.
+
+        Args:
+            data: an arbitrary python object
+            file: location to dump to
+
+        Returns: None
+
+        """
+        json.dump(data, file)
+        return
+
+    @staticmethod
+    def load(file):
+        data = json.load(file)
         return data
