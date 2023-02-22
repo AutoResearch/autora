@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 from sklearn.linear_model import LinearRegression
 
-from autora.cycle.filesystem import load, save
+from autora.cycle.filesystem import PickleDeSerializer
 from autora.cycle.simple import SimpleCycle, SimpleCycleData
 from autora.experimentalist.pipeline import make_pipeline
 from autora.variable import Variable, VariableCollection
@@ -56,10 +56,10 @@ def test_serialize_deserialize_logistic_regression(
 ):
     original_data = logistic_regression_dataset
     with tempfile.NamedTemporaryFile() as file:
-        save(original_data, file=file)
+        PickleDeSerializer.save(original_data, file=file)
 
         file.seek(0)
-        reloaded_data = load(file)
+        reloaded_data = PickleDeSerializer.load(file)
 
         assert_equality_logistic_regression_dataset(original_data, reloaded_data)
 
