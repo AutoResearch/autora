@@ -55,11 +55,11 @@ def test_serialize_deserialize_logistic_regression(
     logistic_regression_dataset: SimpleCycleData,
 ):
     original_data = logistic_regression_dataset
-    with tempfile.NamedTemporaryFile() as tmpfile:
-        save(original_data, file=tmpfile)
+    with tempfile.NamedTemporaryFile() as file:
+        save(original_data, file=file)
 
-        tmpfile.seek(0)
-        reloaded_data = load(tmpfile)
+        file.seek(0)
+        reloaded_data = load(file)
 
         assert_equality_logistic_regression_dataset(original_data, reloaded_data)
 
