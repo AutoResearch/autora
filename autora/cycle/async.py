@@ -1,9 +1,11 @@
 """ ASync Cycle """
 
 import copy
+import pickle
 from dataclasses import dataclass
 from enum import Enum, auto
 from functools import partial
+from pathlib import Path
 from typing import (
     Any,
     Callable,
@@ -17,7 +19,9 @@ from typing import (
 )
 
 import numpy as np
+import yaml
 
+import autora.utils.YAMLSerializer as YAMLSerializer
 from autora.cycle.simple import _get_cycle_properties, _resolve_cycle_properties
 from autora.experimentalist.pipeline import Pipeline
 from autora.variable import VariableCollection
@@ -66,7 +70,92 @@ class ASyncCycleDataCollection:
         return self.data[index]
 
     def append(self, item: ResultContainer):
-        return self.data.append(item)
+        self.data.append(item)
+        return
+
+
+def _dumper(data_collection: ASyncCycleDataCollection, path: Path):
+    """
+
+
+    Args:
+        data_collection:
+        path:
+
+    Returns:
+
+    Examples:
+        First, we need to initialize an ASyncCycleDataCollection. This is usually handled
+        by the cycle itself. We start with a data collection as it would be at the very start of
+        an experiment, with just a VariableCollection.
+        >>> metadata = VariableCollection()
+        >>> c = ASyncCycleDataCollection(metadata=metadata, data=[])
+        >>> c # doctest: +NORMALIZE_WHITESPACE
+        ASyncCycleDataCollection(metadata=VariableCollection(independent_variables=[], \
+        dependent_variables=[], covariates=[]), data=[])
+
+        Now we can serialize the data collection using _dumper. We define a helper function for
+        demonstration purposes.
+        >>> import tempfile
+        >>> import os
+        >>> def dump_and_list(data, cat=False):
+        ...     with tempfile.TemporaryDirectory() as d:
+        ...         _dumper(c, d)
+        ...         print(sorted(os.listdir(d)))
+        ...         if cat:
+        ...             for fn in os.listdir(d):
+        ...                 with open(Path(d, fn), "r") as f:
+        ...                     print(f"{fn}:")
+        ...                     print(f.read())
+
+        Each immutable part gets its own file.
+        >>> dump_and_list(c)
+        ['metadata.yaml']
+
+        The next step is to plan the first observations by defining experimental conditions.
+        Thes are appended as a ResultContainer with the correct metadata.
+        >>> x = np.linspace(-2, 2, 10).reshape(-1, 1) * np.pi
+        >>> c.append(ResultContainer(x, ResultType.CONDITION))
+
+        If we dump and list again, we see that the new data are included as a new file in the same
+        directory.
+        >>> dump_and_list(c)
+        ['00000000.yaml', 'metadata.yaml']
+
+        Then, once we've gathered real data, we dump these too:
+        >>> y = 3. * x + 0.1 * np.sin(x - 0.1) - 2.
+        >>> c.append(ResultContainer(np.column_stack([x, y]), ResultType.OBSERVATION))
+        >>> dump_and_list(c)
+        ['00000000.yaml', '00000001.yaml', 'metadata.yaml']
+
+        We can inspect the contents of the files
+        >>> dump_and_list(c, cat=True)
+
+        We can also include a theory in the dump. The theory is saved as a pickle file by default
+        >>> from sklearn.linear_model import LinearRegression
+        >>> estimator = LinearRegression().fit(x, y)
+        >>> c.append(ResultContainer(estimator, ResultType.THEORY))
+        >>> dump_and_list(c)
+        ['00000000.yaml', '00000001.yaml', '00000002.pickle', 'metadata.yaml']
+
+
+
+
+    """
+    metadata_extension = "yaml"
+    metadata_str = yaml.dump(data_collection.metadata)
+    with open(Path(path, f"metadata.{metadata_extension}"), "w+") as f:
+        f.write(metadata_str)
+
+    for i, container in enumerate(data_collection.data):
+        extension, serializer, mode = {
+            ResultType.CONDITION: ("yaml", YAMLSerializer, "w+"),
+            ResultType.OBSERVATION: ("yaml", YAMLSerializer, "w+"),
+            ResultType.THEORY: ("pickle", pickle, "w+b"),
+        }[container.kind]
+        filename = f"{str(i).rjust(8, '0')}.{extension}"
+        with open(Path(path, filename), mode) as f:
+            serializer.dump(container, f)
 
 
 class ASyncCycle:
