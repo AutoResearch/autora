@@ -4,6 +4,7 @@ import tempfile
 import joblib
 import numpy as np
 import pytest
+import yaml
 from sklearn.linear_model import LinearRegression
 
 from autora.cycle.simple import SimpleCycle, SimpleCycleData
@@ -68,8 +69,29 @@ def test_joblib_save_load_logistic_regression(
     )
 
 
-def run_save_load_test(serializer, data, comparator):
-    with tempfile.NamedTemporaryFile() as file:
+def test_yaml_save_load_logistic_regression(
+    logistic_regression_dataset: SimpleCycleData,
+):
+    class YAMLSerializer:
+        def dump(self, data, file):
+            as_string = yaml.dump(data, Dumper=yaml.Dumper)
+            file.write(as_string)
+            return
+
+        def load(self, file):
+            result = yaml.load(file, Loader=yaml.Loader)
+            return result
+
+    run_save_load_test(
+        YAMLSerializer(),
+        logistic_regression_dataset,
+        assert_equality_logistic_regression_dataset,
+        filetype="w+",
+    )
+
+
+def run_save_load_test(serializer, data, comparator, filetype="w+b"):
+    with tempfile.NamedTemporaryFile(filetype) as file:
         serializer.dump(data, file)
 
         file.seek(0)
