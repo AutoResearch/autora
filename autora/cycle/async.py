@@ -80,7 +80,7 @@ def _dumper(data_collection: ASyncCycleDataCollection, path: Path):
 
     Args:
         data_collection:
-        path:
+        path: a directory
 
     Returns:
 
@@ -102,11 +102,6 @@ def _dumper(data_collection: ASyncCycleDataCollection, path: Path):
         ...     with tempfile.TemporaryDirectory() as d:
         ...         _dumper(c, d)
         ...         print(sorted(os.listdir(d)))
-        ...         if cat:
-        ...             for fn in os.listdir(d):
-        ...                 with open(Path(d, fn), "r") as f:
-        ...                     print(f"{fn}:")
-        ...                     print(f.read())
 
         Each immutable part gets its own file.
         >>> dump_and_list(c)
@@ -138,10 +133,9 @@ def _dumper(data_collection: ASyncCycleDataCollection, path: Path):
         >>> dump_and_list(c)
         ['00000000.yaml', '00000001.yaml', '00000002.pickle', 'metadata.yaml']
 
-
-
-
     """
+    assert Path(path).is_dir(), "Can't support individual files now."
+
     metadata_extension = "yaml"
     metadata_str = yaml.dump(data_collection.metadata)
     with open(Path(path, f"metadata.{metadata_extension}"), "w+") as f:
@@ -156,6 +150,60 @@ def _dumper(data_collection: ASyncCycleDataCollection, path: Path):
         filename = f"{str(i).rjust(8, '0')}.{extension}"
         with open(Path(path, filename), mode) as f:
             serializer.dump(container, f)
+
+
+def _loader(path: Path):
+    """
+
+    Examples:
+        First, we need to initialize an ASyncCycleDataCollection. This is usually handled
+        by the cycle itself. We construct a full set of results:
+        >>> from sklearn.linear_model import LinearRegression
+        >>> import tempfile
+        >>> metadata = VariableCollection()
+        >>> c = ASyncCycleDataCollection(metadata=metadata, data=[])
+        >>> x = np.linspace(-2, 2, 10).reshape(-1, 1) * np.pi
+        >>> c.append(ResultContainer(x, ResultType.CONDITION))
+        >>> y = 3. * x + 0.1 * np.sin(x - 0.1) - 2.
+        >>> c.append(ResultContainer(np.column_stack([x, y]), ResultType.OBSERVATION))
+        >>> estimator = LinearRegression().fit(x, y)
+        >>> c.append(ResultContainer(estimator, ResultType.THEORY))
+
+        Now we can serialize the data using _dumper, and reload the data using _loader:
+        >>> with tempfile.TemporaryDirectory() as d:
+        ...     _dumper(c, d)
+        ...     e = _loader(d)
+
+        We can now compare the dumped object "c" with the reloaded object "e". The data arrays
+        should be equal, and the theories should
+        >>> assert e.metadata == c.metadata
+        >>> for e_i, c_i in zip(e, c):
+        ...     assert isinstance(e_i.data, type(c_i.data)) # Types match
+        ...     if e_i.kind in (ResultType.CONDITION, ResultType.OBSERVATION):
+        ...         np.testing.assert_array_equal(e_i.data, c_i.data) # two numpy arrays
+        ...     if e_i.kind == ResultType.THEORY:
+        ...         np.testing.assert_array_equal(e_i.data.coef_, c_i.data.coef_) # two estimators
+
+    """
+    assert Path(path).is_dir(), f"{path=} must be a directory."
+    metadata = None
+    data = []
+
+    for file in sorted(Path(path).glob("*")):
+        serializer, mode = {".yaml": (YAMLSerializer, "r"), ".pickle": (pickle, "rb")}[
+            file.suffix
+        ]
+        with open(file, mode) as f:
+            loaded_object = serializer.load(f)
+        if isinstance(loaded_object, VariableCollection):
+            metadata = loaded_object
+        else:
+            data.append(loaded_object)
+
+    assert isinstance(metadata, VariableCollection)
+    data_collection = ASyncCycleDataCollection(metadata=metadata, data=data)
+
+    return data_collection
 
 
 class ASyncCycle:
