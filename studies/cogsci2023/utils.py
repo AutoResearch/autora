@@ -17,6 +17,7 @@ from autora.skl.bms import BMSRegressor
 from autora.skl.darts import DARTSRegressor
 from autora.theorist.bms.prior import get_priors
 from autora.variable import ValueType
+from studies.bms.utils import mountain, threshold2, threshold3
 
 
 def sigmoid(x):
@@ -27,7 +28,7 @@ def fit_theorist(X, y, theorist_name, metadata, theorist_epochs=None):
 
     output_type = metadata.dependent_variables[0].type
 
-    if theorist_name == "BMS" or theorist_name == "BMS Fixed Root":
+    if theorist_name in ["BMS", "BMS Fixed Root", "BMS Code Ops"]:
         if theorist_epochs is not None:
             epochs = theorist_epochs
         else:
@@ -75,6 +76,8 @@ def fit_theorist(X, y, theorist_name, metadata, theorist_epochs=None):
             theorist.fit(X, y, root=sigmoid)
         elif output_type == ValueType.REAL and "Regression" in theorist_name:
             theorist.fit(X, y, interaction_terms=True, logit_transform=False)
+        elif theorist_name == "BMS Code Ops":
+            theorist.fit(X, y, custom_ops=[mountain, threshold2, threshold3])
         else:
             theorist.fit(X, y)
         found_theory = True
@@ -268,6 +271,8 @@ def get_MSE(theorist, x, y_target):
 
     if y_target.shape[1] == 1:
         y_target = y_target.flatten()
+    if y_prediction.shape[1] == 1:
+        y_prediction = y_prediction.flatten()
 
     MSE = np.mean(np.square(y_target - y_prediction))
 
