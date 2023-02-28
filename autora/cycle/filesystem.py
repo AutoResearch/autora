@@ -1,215 +1,20 @@
-""" ASync Cycle """
+""" Filesystem Cycle"""
 
 import copy
 import logging
-import pickle
-from dataclasses import dataclass
-from enum import Enum, auto
 from functools import partial
 from pathlib import Path
-from typing import (
-    Any,
-    Callable,
-    Dict,
-    Iterable,
-    List,
-    NamedTuple,
-    Optional,
-    Sequence,
-    Union,
-)
+from typing import Callable, Dict, Iterable, List, Optional, Sequence, Union
 
 import numpy as np
-import yaml
 
-import autora.utils.YAMLSerializer as YAMLSerializer
+from autora.cycle.result import Result, ResultCollection, ResultKind
+from autora.cycle.result.serializer import yaml_
 from autora.cycle.simple import _get_cycle_properties, _resolve_cycle_properties
 from autora.experimentalist.pipeline import Pipeline
 from autora.variable import VariableCollection
 
 _logger = logging.getLogger(__name__)
-
-
-class ResultKind(Enum):
-    CONDITION = auto()
-    OBSERVATION = auto()
-    THEORY = auto()
-
-    def __str__(self):
-        return f"{self.name}"
-
-
-class Result(NamedTuple):
-    data: Optional[Any]
-    kind: Optional[ResultKind]
-
-
-def _get_all_of_kind(data: Sequence[Result], kind: ResultKind):
-    filtered_data = [
-        c.data for c in data if ((c.kind is not None) and (c.kind == kind))
-    ]
-    return filtered_data
-
-
-@dataclass
-class ResultCollection:
-    metadata: VariableCollection
-    data: List[Result]
-
-    @property
-    def conditions(self):
-        return _get_all_of_kind(self.data, ResultKind.CONDITION)
-
-    @property
-    def observations(self):
-        return _get_all_of_kind(self.data, ResultKind.OBSERVATION)
-
-    @property
-    def theories(self):
-        return _get_all_of_kind(self.data, ResultKind.THEORY)
-
-    def __len__(self):
-        return len(self.data)
-
-    def __getitem__(self, index: int) -> Result:
-        return self.data[index]
-
-    def append(self, item: Result):
-        self.data.append(item)
-        return
-
-
-def _dumper(data_collection: ResultCollection, path: Path):
-    """
-
-
-    Args:
-        data_collection:
-        path: a directory
-
-    Returns:
-
-    Examples:
-        First, we need to initialize a FilesystemCycleDataCollection. This is usually handled
-        by the cycle itself. We start with a data collection as it would be at the very start of
-        an experiment, with just a VariableCollection.
-        >>> metadata = VariableCollection()
-        >>> c = ResultCollection(metadata=metadata, data=[])
-        >>> c # doctest: +NORMALIZE_WHITESPACE
-        FilesystemCycleDataCollection(metadata=VariableCollection(independent_variables=[], \
-        dependent_variables=[], covariates=[]), data=[])
-
-        Now we can serialize the data collection using _dumper. We define a helper function for
-        demonstration purposes.
-        >>> import tempfile
-        >>> import os
-        >>> def dump_and_list(data, cat=False):
-        ...     with tempfile.TemporaryDirectory() as d:
-        ...         _dumper(c, d)
-        ...         print(sorted(os.listdir(d)))
-
-        Each immutable part gets its own file.
-        >>> dump_and_list(c)
-        ['metadata.yaml']
-
-        The next step is to plan the first observations by defining experimental conditions.
-        Thes are appended as a Result with the correct metadata.
-        >>> x = np.linspace(-2, 2, 10).reshape(-1, 1) * np.pi
-        >>> c.append(Result(x, ResultKind.CONDITION))
-
-        If we dump and list again, we see that the new data are included as a new file in the same
-        directory.
-        >>> dump_and_list(c)
-        ['00000000.yaml', 'metadata.yaml']
-
-        Then, once we've gathered real data, we dump these too:
-        >>> y = 3. * x + 0.1 * np.sin(x - 0.1) - 2.
-        >>> c.append(Result(np.column_stack([x, y]), ResultKind.OBSERVATION))
-        >>> dump_and_list(c)
-        ['00000000.yaml', '00000001.yaml', 'metadata.yaml']
-
-        We can also include a theory in the dump. The theory is saved as a pickle file by default
-        >>> from sklearn.linear_model import LinearRegression
-        >>> estimator = LinearRegression().fit(x, y)
-        >>> c.append(Result(estimator, ResultKind.THEORY))
-        >>> dump_and_list(c)
-        ['00000000.yaml', '00000001.yaml', '00000002.pickle', 'metadata.yaml']
-
-    """
-    if Path(path).exists():
-        assert Path(path).is_dir(), "Can't support individual files now."
-    else:
-        Path(path).mkdir()
-
-    metadata_extension = "yaml"
-    metadata_str = yaml.dump(data_collection.metadata)
-    with open(Path(path, f"metadata.{metadata_extension}"), "w+") as f:
-        f.write(metadata_str)
-
-    for i, container in enumerate(data_collection.data):
-        extension, serializer, mode = {
-            None: ("yaml", YAMLSerializer, "w+"),
-            ResultKind.CONDITION: ("yaml", YAMLSerializer, "w+"),
-            ResultKind.OBSERVATION: ("yaml", YAMLSerializer, "w+"),
-            ResultKind.THEORY: ("pickle", pickle, "w+b"),
-        }[container.kind]
-        filename = f"{str(i).rjust(8, '0')}.{extension}"
-        with open(Path(path, filename), mode) as f:
-            serializer.dump(container, f)
-
-
-def _loader(path: Path):
-    """
-
-    Examples:
-        First, we need to initialize a FilesystemCycleDataCollection. This is usually handled
-        by the cycle itself. We construct a full set of results:
-        >>> from sklearn.linear_model import LinearRegression
-        >>> import tempfile
-        >>> metadata = VariableCollection()
-        >>> c = ResultCollection(metadata=metadata, data=[])
-        >>> x = np.linspace(-2, 2, 10).reshape(-1, 1) * np.pi
-        >>> c.append(Result(x, ResultKind.CONDITION))
-        >>> y = 3. * x + 0.1 * np.sin(x - 0.1) - 2.
-        >>> c.append(Result(np.column_stack([x, y]), ResultKind.OBSERVATION))
-        >>> estimator = LinearRegression().fit(x, y)
-        >>> c.append(Result(estimator, ResultKind.THEORY))
-
-        Now we can serialize the data using _dumper, and reload the data using _loader:
-        >>> with tempfile.TemporaryDirectory() as d:
-        ...     _dumper(c, d)
-        ...     e = _loader(d)
-
-        We can now compare the dumped object "c" with the reloaded object "e". The data arrays
-        should be equal, and the theories should
-        >>> assert e.metadata == c.metadata
-        >>> for e_i, c_i in zip(e, c):
-        ...     assert isinstance(e_i.data, type(c_i.data)) # Types match
-        ...     if e_i.kind in (ResultKind.CONDITION, ResultKind.OBSERVATION):
-        ...         np.testing.assert_array_equal(e_i.data, c_i.data) # two numpy arrays
-        ...     if e_i.kind == ResultKind.THEORY:
-        ...         np.testing.assert_array_equal(e_i.data.coef_, c_i.data.coef_) # two estimators
-
-    """
-    assert Path(path).is_dir(), f"{path=} must be a directory."
-    metadata = None
-    data = []
-
-    for file in sorted(Path(path).glob("*")):
-        serializer, mode = {".yaml": (YAMLSerializer, "r"), ".pickle": (pickle, "rb")}[
-            file.suffix
-        ]
-        with open(file, mode) as f:
-            loaded_object = serializer.load(f)
-        if isinstance(loaded_object, VariableCollection):
-            metadata = loaded_object
-        else:
-            data.append(loaded_object)
-
-    assert isinstance(metadata, VariableCollection)
-    data_collection = ResultCollection(metadata=metadata, data=data)
-
-    return data_collection
 
 
 class FilesystemCycle:
@@ -223,6 +28,7 @@ class FilesystemCycle:
         params: Optional[Dict] = None,
         data: Optional[Union[Path, str, Sequence[Result], Result]] = None,
         path: Optional[Path] = None,
+        serializer=yaml_,
     ):
         """
         Args:
@@ -524,9 +330,10 @@ class FilesystemCycle:
             params = dict()
         self.params = params
         self.path = path
+        self.serializer = serializer
 
         # Load the data
-        self.state = self._load_state(data, metadata)
+        self.state = self._load_state(data, metadata, self.serializer)
 
     @staticmethod
     def _load_state(
@@ -540,11 +347,12 @@ class FilesystemCycle:
             ]
         ],
         metadata: Optional[VariableCollection],
+        serializer,
     ) -> ResultCollection:
         if isinstance(data, Path):
-            _data = _loader(data)
+            _data = serializer.load(data)
         elif isinstance(data, str):
-            _data = _loader(Path(data))
+            _data = serializer.load(Path(data))
         elif isinstance(data, ResultCollection):
             _data = data
         elif isinstance(data, Sequence):
@@ -589,7 +397,7 @@ class FilesystemCycle:
     def dump(self, path=None):
         if path is None:
             path = self.path
-        _dumper(data_collection=self.state, path=path)
+        self.serializer.dump(self.state, path=path)
 
     def _plan_next_step(self):  # TODO: move the business logic to a separate function
         all_params = _resolve_cycle_properties(
