@@ -601,17 +601,20 @@ class FilesystemCycle:
         curried_experimentalist = partial(
             self._experimentalist_callback,
             experimentalist=self.experimentalist,
+            data_in=self.data,
             params=all_params.get("experimentalist", dict()),
         )
         curried_theorist = partial(
             self._theorist_callback,
-            self.theorist,
-            all_params.get("theorist", dict()),
+            theorist=self.theorist,
+            data_in=self.data,
+            params=all_params.get("theorist", dict()),
         )
         curried_experiment_runner = partial(
             self._experiment_runner_callback,
-            self.experiment_runner,
-            all_params.get("experiment_runner", dict()),
+            experiment_runner=self.experiment_runner,
+            data_in=self.data,
+            params=all_params.get("experiment_runner", dict()),
         )
 
         curried_callback = last_result_kind_planner(
