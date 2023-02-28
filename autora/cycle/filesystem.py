@@ -3,7 +3,7 @@
 import copy
 import logging
 from functools import partial
-from typing import Callable, Dict, Iterable, List, Optional, Sequence, Union
+from typing import Callable, Dict, Iterable, Optional, Sequence, Union
 
 import numpy as np
 
@@ -24,11 +24,11 @@ class FilesystemCycle:
         experiment_runner,
         monitor: Optional[Callable[[ResultCollection], None]] = None,
         params: Optional[Dict] = None,
+        # Load Parameters
         metadata: Optional[VariableCollection] = None,
-        result_collection: Optional[
-            Union[ResultCollection, Sequence[Result], Result]
-        ] = None,
+        results: Optional[Union[Sequence[Result], Result]] = None,
         state: Optional[Union[ResultCollectionSerializer, ResultCollection]] = None,
+        # Dump Parameters
         serializer: Optional[ResultCollectionSerializer] = None,
     ):
         """
@@ -44,10 +44,9 @@ class FilesystemCycle:
                 which you wanted to set to the value 30, then params would be set to this:
                 `{"experimentalist": {"pool": {"n": 30}}}`
             metadata: a VariableCollection describing the domain of the problem.
-                Overrides any VariableCollection specified in the `state`.
+                Incompatible with setting `state`
             result_collection: a ResultCollection, sequence of Results or single Result which
-                will be used to seed the controller. Overrides any Results specified in the
-                `state`.
+                will be used to seed the controller. Incompatible with setting `state`.
             state: a ResultCollection (or a ...Serializer which can load one) which includes
                 both the Metadata and the Results.
 
@@ -336,40 +335,44 @@ class FilesystemCycle:
         if params is None:
             params = dict()
         self.params = params
-        self.serializer = serializer
 
         # Load the data
-        self.state: ResultCollection = self._load_state(state, metadata)
+        self.state: ResultCollection = self._load_state(state, metadata, results)
+
+        self.serializer = serializer
 
     @staticmethod
     def _load_state(
-        data: Optional[
+        state: Optional[Union[ResultCollectionSerializer, ResultCollection]],
+        metadata: Optional[VariableCollection],
+        results: Optional[
             Union[
-                ResultCollectionSerializer,
-                ResultCollection,
                 Sequence[Result],
                 Result,
             ]
         ],
-        metadata: Optional[VariableCollection],
     ) -> ResultCollection:
-        if isinstance(data, ResultCollectionSerializer):
-            _data = data.load()
-        if isinstance(data, ResultCollection):
-            _data = data
-        elif isinstance(data, Sequence):
-            assert metadata is not None
-            assert isinstance(data, List)
-            _data = ResultCollection(metadata=metadata, data=data)
-        elif isinstance(data, Result):
-            assert metadata is not None
-            _data = ResultCollection(metadata=metadata, data=[data])
-        elif data is None:
-            assert metadata is not None
-            _data = ResultCollection(metadata=metadata, data=[])
+        _state: ResultCollection
+
+        if state is not None:
+            assert metadata is None and results is None
+            if isinstance(state, ResultCollectionSerializer):
+                _state = state.load()
+            elif isinstance(state, ResultCollection):
+                _state = state
+
         else:
-            raise ValueError(f"{data=}, {metadata=} missing something")
-        return _data
+            assert state is None
+            assert metadata is not None
+            if results is None:
+                _results = []
+            elif isinstance(results, Result):
+                _results = [results]
+            elif isinstance(results, Sequence):
+                _results = list(results)
+            _state = ResultCollection(metadata=metadata, data=_results)
+
+        return _state
 
     def run(self, num_steps: int = 1):
         for i in range(num_steps):
