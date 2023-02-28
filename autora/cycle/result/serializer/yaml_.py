@@ -2,11 +2,12 @@ import pickle
 from pathlib import Path
 
 from autora.cycle.result import ResultCollection, ResultKind
+from autora.cycle.result.serializer import ResultCollectionSerializer
 from autora.utils import YAMLSerializer as YAMLSerializer
 from autora.variable import VariableCollection
 
 
-class YAMLResultCollectionSerializer:
+class YAMLResultCollectionSerializer(ResultCollectionSerializer):
     def __init__(self, path: Path):
         self.path = path
         self._check_path()
