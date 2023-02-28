@@ -370,6 +370,8 @@ class FilesystemCycle:
                 _results = [results]
             elif isinstance(results, Sequence):
                 _results = list(results)
+            else:
+                raise NotImplementedError(f"{results=} not supported")
             _state = ResultCollection(metadata=metadata, data=_results)
 
         return _state
