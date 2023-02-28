@@ -4,7 +4,7 @@ import time
 from sklearn.model_selection import train_test_split
 
 from studies.cogsci2023.models.models import model_inventory
-from studies.cogsci2023.utils import fit_theorist, get_DL, get_MSE
+from studies.cogsci2023.utils import fit_theorist, get_MSE, get_LL, get_BIC, get_DL
 
 # META PARAMETERS
 repetitions = 1  # specifies how many times to repeat the study (20)
@@ -14,12 +14,13 @@ test_size = 0.2  # proportion of test set size to training set size
 ground_truth_name = "weber_fechner"  # OPTIONS: see models.py
 
 theorists = [
-    "MLP",
+    "BMS",
+    "BMS Fixed Root",
+    "BMS Code Ops",
     "DARTS 2 Nodes",
     "Logit Regression",
     "DARTS 3 Nodes",
-    "BMS",
-    "BMS Fixed Root",
+    "MLP",
 ]
 
 for rep in range(repetitions):
@@ -36,6 +37,8 @@ for rep in range(repetitions):
     )
 
     MSE_log = list()
+    LL_log = list()
+    BIC_log = list()
     DL_log = list()
     theory_log = list()
     theorist_name_log = list()
@@ -56,9 +59,17 @@ for rep in range(repetitions):
         # else:
         #    DL = 0
         # DL_log.append(DL)
+        mse = get_MSE(theorist, X_test, y_test)
+        ll = get_LL(mse)
+        num_obs = X_test.shape[0]
+        bic = get_BIC(theorist, theorist_name, mse, num_obs)
+        dl = get_DL(theorist, theorist_name, mse, num_obs)
 
-        MSE_log.append(get_MSE(theorist, X_test, y_test))
-        if hasattr(theorist, "model_"):
+        MSE_log.append(mse)
+        LL_log.append(ll)
+        BIC_log.append(bic)
+        DL_log.append(dl)
+        if hasattr(theorist, "model_") and 'BMS' not in theorist_name:
             theory_log.append(theorist.model_)
         else:
             theory_log.append(theorist)
@@ -81,6 +92,8 @@ for rep in range(repetitions):
             theorist_name_log,
             elapsed_time_log,
             DL_log,
+            BIC_log,
+            LL_log,
         ]
 
         pickle.dump(object_list, f)
