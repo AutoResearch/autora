@@ -3,13 +3,12 @@
 import copy
 import logging
 from functools import partial
-from pathlib import Path
 from typing import Callable, Dict, Iterable, List, Optional, Sequence, Union
 
 import numpy as np
 
 from autora.cycle.result import Result, ResultCollection, ResultKind
-from autora.cycle.result.serializer import yaml_
+from autora.cycle.result.serializer import ResultCollectionSerializer
 from autora.cycle.simple import _get_cycle_properties, _resolve_cycle_properties
 from autora.experimentalist.pipeline import Pipeline
 from autora.variable import VariableCollection
@@ -24,15 +23,16 @@ class FilesystemCycle:
         experimentalist,
         experiment_runner,
         monitor: Optional[Callable[[ResultCollection], None]] = None,
-        metadata: Optional[VariableCollection] = None,
         params: Optional[Dict] = None,
-        data: Optional[Union[Path, str, Sequence[Result], Result]] = None,
-        path: Optional[Path] = None,
-        serializer=yaml_,
+        metadata: Optional[VariableCollection] = None,
+        result_collection: Optional[
+            Union[ResultCollection, Sequence[Result], Result]
+        ] = None,
+        state: Optional[Union[ResultCollectionSerializer, ResultCollection]] = None,
+        serializer: Optional[ResultCollectionSerializer] = None,
     ):
         """
         Args:
-            metadata: a description of the dependent and independent variables
             theorist: a scikit-learn-compatible estimator
             experimentalist: an autora.experimentalist.Pipeline
             experiment_runner: a function to map independent variables onto observed dependent
@@ -43,6 +43,13 @@ class FilesystemCycle:
                 E.g. if the experimentalist had a step named "pool" which took an argument "n",
                 which you wanted to set to the value 30, then params would be set to this:
                 `{"experimentalist": {"pool": {"n": 30}}}`
+            metadata: a VariableCollection describing the domain of the problem.
+                Overrides any VariableCollection specified in the `state`.
+            result_collection: a ResultCollection, sequence of Results or single Result which
+                will be used to seed the controller. Overrides any Results specified in the
+                `state`.
+            state: a ResultCollection (or a ...Serializer which can load one) which includes
+                both the Metadata and the Results.
 
 
         Examples:
@@ -87,14 +94,14 @@ class FilesystemCycle:
             We initialize the FilesystemCycle with the metadata describing the domain of the theory,
             the theorist, experimentalist and experiment runner,
             as well as a monitor which will let us know which cycle we're currently on.
+            >>> def last_datum_monitor(state):
+            ...     print(f"Generated {len(state)}-th datum, a new {state[-1].kind}")
             >>> cycle = FilesystemCycle(
-            ...     metadata=metadata_0,
             ...     theorist=example_theorist,
             ...     experimentalist=example_experimentalist,
             ...     experiment_runner=example_synthetic_experiment_runner,
-            ...     monitor=
-            ...         lambda data: print(f"Generated {len(data)}-th datum, a new {data[-1].kind}")
-            ... )
+            ...     monitor=last_datum_monitor,
+            ...     metadata=metadata_0)
             >>> cycle # doctest: +ELLIPSIS
             <filesystem.FilesystemCycle object at 0x...>
 
@@ -293,9 +300,9 @@ class FilesystemCycle:
 
             By using the monitor callback, we can investigate what's going on with the cycle
             properties:
-            >>> def observations_monitor(data):
-            ...     if data[-1].kind == ResultKind.OBSERVATION:
-            ...          print( _get_cycle_properties(data)["%observations.ivs%"].flatten())
+            >>> def observations_monitor(state):
+            ...     if state[-1].kind == ResultKind.OBSERVATION:
+            ...          print( _get_cycle_properties(state)["%observations.ivs%"].flatten())
             >>> cycle_with_cycle_properties.monitor = observations_monitor
 
             The monitor evaluates at the end of each cycle
@@ -329,31 +336,26 @@ class FilesystemCycle:
         if params is None:
             params = dict()
         self.params = params
-        self.path = path
         self.serializer = serializer
 
         # Load the data
-        self.state = self._load_state(data, metadata, self.serializer)
+        self.state: ResultCollection = self._load_state(state, metadata)
 
     @staticmethod
     def _load_state(
         data: Optional[
             Union[
-                Path,
-                str,
+                ResultCollectionSerializer,
                 ResultCollection,
                 Sequence[Result],
                 Result,
             ]
         ],
         metadata: Optional[VariableCollection],
-        serializer,
     ) -> ResultCollection:
-        if isinstance(data, Path):
-            _data = serializer.load(data)
-        elif isinstance(data, str):
-            _data = serializer.load(Path(data))
-        elif isinstance(data, ResultCollection):
+        if isinstance(data, ResultCollectionSerializer):
+            _data = data.load()
+        if isinstance(data, ResultCollection):
             _data = data
         elif isinstance(data, Sequence):
             assert metadata is not None
@@ -379,6 +381,7 @@ class FilesystemCycle:
 
     def __next__(self):
 
+        # Plan
         next_function = self._plan_next_step()
 
         # Execute
@@ -386,18 +389,18 @@ class FilesystemCycle:
 
         # Store
         self.state.append(result)
-        if self.path is not None:
-            self.dump()
+        self.dump()
 
         # Monitor
         self._monitor_callback(self.state)
 
         return self
 
-    def dump(self, path=None):
-        if path is None:
-            path = self.path
-        self.serializer.dump(self.state, path=path)
+    def dump(self):
+        if self.serializer is not None:
+            self.serializer.dump(self.state)
+        else:
+            _logger.debug(f"{self.serializer=} must be set in order to dump")
 
     def _plan_next_step(self):  # TODO: move the business logic to a separate function
         all_params = _resolve_cycle_properties(
