@@ -2,43 +2,18 @@
 
 import copy
 import logging
-from abc import abstractmethod
-from typing import (
-    Callable,
-    Dict,
-    Iterable,
-    Optional,
-    Protocol,
-    Sequence,
-    Union,
-    runtime_checkable,
-)
+from typing import Callable, Dict, Iterable, Optional, Sequence, Union
 
 import numpy as np
 
+from autora.cycle.planner import last_result_kind_planner
+from autora.cycle.protocol import Planner
 from autora.cycle.result import Result, ResultCollection, ResultKind
 from autora.cycle.result.serializer import ResultCollectionSerializer
 from autora.cycle.simple import _get_cycle_properties, _resolve_cycle_properties
 from autora.variable import VariableCollection
 
 _logger = logging.getLogger(__name__)
-
-
-@runtime_checkable
-class Planner(Protocol):
-    def __call__(self, state: ResultCollection, **kwargs) -> Callable:
-        ...
-
-
-def last_result_kind_planner(
-    state: ResultCollection, mapping: Dict[Optional[ResultKind], Callable]
-):
-    try:
-        last_result = state[-1]
-    except IndexError:
-        last_result = Result(None, None)
-    next = mapping[last_result.kind]
-    return next
 
 
 class FilesystemCycle:
@@ -49,6 +24,7 @@ class FilesystemCycle:
         experiment_runner,
         monitor: Optional[Callable[[ResultCollection], None]] = None,
         params: Optional[Dict] = None,
+        planner: Planner = last_result_kind_planner,
         # Load Parameters
         metadata: Optional[VariableCollection] = None,
         results: Optional[Union[Sequence[Result], Result]] = None,
@@ -360,6 +336,7 @@ class FilesystemCycle:
         if params is None:
             params = dict()
         self.params = params
+        self.planner = planner
 
         self.state: ResultCollection = self._load_state(state, metadata, results)
 
@@ -411,7 +388,7 @@ class FilesystemCycle:
     def __next__(self):
 
         # Plan
-        next_function = self.plan()
+        next_function = self.planner(self)
 
         # Execute
         result = next_function()
@@ -421,7 +398,7 @@ class FilesystemCycle:
         self.dump()
 
         # Monitor
-        self.monitor_callback(self.state)
+        self._monitor_callback(self.state)
 
         return self
 
@@ -438,11 +415,7 @@ class FilesystemCycle:
         )
         return all_params
 
-    @abstractmethod
-    def plan(self) -> Callable:
-        ...
-
-    def experimentalist_callback(
+    def run_experimentalist(
         self,
     ):
         experimentalist = self.experimentalist
@@ -466,7 +439,7 @@ class FilesystemCycle:
 
         return result
 
-    def experiment_runner_callback(
+    def run_experiment_runner(
         self,
     ):
         experiment_runner = self.experiment_runner
@@ -480,7 +453,7 @@ class FilesystemCycle:
 
         return result
 
-    def theorist_callback(self):
+    def run_theorist(self):
         theorist = self.theorist
         data_in = self.state
         params = self._params_and_cycle_properties.get("theorist", dict())
@@ -498,22 +471,6 @@ class FilesystemCycle:
 
         return result
 
-    def monitor_callback(self, data: ResultCollection):
+    def _monitor_callback(self, data: ResultCollection):
         if self.monitor is not None:
             self.monitor(data)
-
-
-class LastResultKindCycle(FilesystemCycle):
-    def plan(self):
-        try:
-            last_result = self.state[-1]
-        except IndexError:
-            last_result = Result(None, None)
-        callback = {
-            None: self.experimentalist_callback,
-            ResultKind.THEORY: self.experimentalist_callback,
-            ResultKind.CONDITION: self.experiment_runner_callback,
-            ResultKind.OBSERVATION: self.theorist_callback,
-        }[last_result.kind]
-
-        return callback
