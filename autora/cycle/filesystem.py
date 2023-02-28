@@ -30,7 +30,7 @@ from autora.variable import VariableCollection
 _logger = logging.getLogger(__name__)
 
 
-class ResultType(Enum):
+class ResultKind(Enum):
     CONDITION = auto()
     OBSERVATION = auto()
     THEORY = auto()
@@ -39,12 +39,12 @@ class ResultType(Enum):
         return f"{self.name}"
 
 
-class ResultContainer(NamedTuple):
+class Result(NamedTuple):
     data: Optional[Any]
-    kind: Optional[ResultType]
+    kind: Optional[ResultKind]
 
 
-def _get_all_of_kind(data: Sequence[ResultContainer], kind: ResultType):
+def _get_all_of_kind(data: Sequence[Result], kind: ResultKind):
     filtered_data = [
         c.data for c in data if ((c.kind is not None) and (c.kind == kind))
     ]
@@ -52,34 +52,34 @@ def _get_all_of_kind(data: Sequence[ResultContainer], kind: ResultType):
 
 
 @dataclass
-class FilesystemCycleDataCollection:
+class ResultCollection:
     metadata: VariableCollection
-    data: List[ResultContainer]
+    data: List[Result]
 
     @property
     def conditions(self):
-        return _get_all_of_kind(self.data, ResultType.CONDITION)
+        return _get_all_of_kind(self.data, ResultKind.CONDITION)
 
     @property
     def observations(self):
-        return _get_all_of_kind(self.data, ResultType.OBSERVATION)
+        return _get_all_of_kind(self.data, ResultKind.OBSERVATION)
 
     @property
     def theories(self):
-        return _get_all_of_kind(self.data, ResultType.THEORY)
+        return _get_all_of_kind(self.data, ResultKind.THEORY)
 
     def __len__(self):
         return len(self.data)
 
-    def __getitem__(self, index: int) -> ResultContainer:
+    def __getitem__(self, index: int) -> Result:
         return self.data[index]
 
-    def append(self, item: ResultContainer):
+    def append(self, item: Result):
         self.data.append(item)
         return
 
 
-def _dumper(data_collection: FilesystemCycleDataCollection, path: Path):
+def _dumper(data_collection: ResultCollection, path: Path):
     """
 
 
@@ -94,7 +94,7 @@ def _dumper(data_collection: FilesystemCycleDataCollection, path: Path):
         by the cycle itself. We start with a data collection as it would be at the very start of
         an experiment, with just a VariableCollection.
         >>> metadata = VariableCollection()
-        >>> c = FilesystemCycleDataCollection(metadata=metadata, data=[])
+        >>> c = ResultCollection(metadata=metadata, data=[])
         >>> c # doctest: +NORMALIZE_WHITESPACE
         FilesystemCycleDataCollection(metadata=VariableCollection(independent_variables=[], \
         dependent_variables=[], covariates=[]), data=[])
@@ -113,9 +113,9 @@ def _dumper(data_collection: FilesystemCycleDataCollection, path: Path):
         ['metadata.yaml']
 
         The next step is to plan the first observations by defining experimental conditions.
-        Thes are appended as a ResultContainer with the correct metadata.
+        Thes are appended as a Result with the correct metadata.
         >>> x = np.linspace(-2, 2, 10).reshape(-1, 1) * np.pi
-        >>> c.append(ResultContainer(x, ResultType.CONDITION))
+        >>> c.append(Result(x, ResultKind.CONDITION))
 
         If we dump and list again, we see that the new data are included as a new file in the same
         directory.
@@ -124,14 +124,14 @@ def _dumper(data_collection: FilesystemCycleDataCollection, path: Path):
 
         Then, once we've gathered real data, we dump these too:
         >>> y = 3. * x + 0.1 * np.sin(x - 0.1) - 2.
-        >>> c.append(ResultContainer(np.column_stack([x, y]), ResultType.OBSERVATION))
+        >>> c.append(Result(np.column_stack([x, y]), ResultKind.OBSERVATION))
         >>> dump_and_list(c)
         ['00000000.yaml', '00000001.yaml', 'metadata.yaml']
 
         We can also include a theory in the dump. The theory is saved as a pickle file by default
         >>> from sklearn.linear_model import LinearRegression
         >>> estimator = LinearRegression().fit(x, y)
-        >>> c.append(ResultContainer(estimator, ResultType.THEORY))
+        >>> c.append(Result(estimator, ResultKind.THEORY))
         >>> dump_and_list(c)
         ['00000000.yaml', '00000001.yaml', '00000002.pickle', 'metadata.yaml']
 
@@ -149,9 +149,9 @@ def _dumper(data_collection: FilesystemCycleDataCollection, path: Path):
     for i, container in enumerate(data_collection.data):
         extension, serializer, mode = {
             None: ("yaml", YAMLSerializer, "w+"),
-            ResultType.CONDITION: ("yaml", YAMLSerializer, "w+"),
-            ResultType.OBSERVATION: ("yaml", YAMLSerializer, "w+"),
-            ResultType.THEORY: ("pickle", pickle, "w+b"),
+            ResultKind.CONDITION: ("yaml", YAMLSerializer, "w+"),
+            ResultKind.OBSERVATION: ("yaml", YAMLSerializer, "w+"),
+            ResultKind.THEORY: ("pickle", pickle, "w+b"),
         }[container.kind]
         filename = f"{str(i).rjust(8, '0')}.{extension}"
         with open(Path(path, filename), mode) as f:
@@ -167,13 +167,13 @@ def _loader(path: Path):
         >>> from sklearn.linear_model import LinearRegression
         >>> import tempfile
         >>> metadata = VariableCollection()
-        >>> c = FilesystemCycleDataCollection(metadata=metadata, data=[])
+        >>> c = ResultCollection(metadata=metadata, data=[])
         >>> x = np.linspace(-2, 2, 10).reshape(-1, 1) * np.pi
-        >>> c.append(ResultContainer(x, ResultType.CONDITION))
+        >>> c.append(Result(x, ResultKind.CONDITION))
         >>> y = 3. * x + 0.1 * np.sin(x - 0.1) - 2.
-        >>> c.append(ResultContainer(np.column_stack([x, y]), ResultType.OBSERVATION))
+        >>> c.append(Result(np.column_stack([x, y]), ResultKind.OBSERVATION))
         >>> estimator = LinearRegression().fit(x, y)
-        >>> c.append(ResultContainer(estimator, ResultType.THEORY))
+        >>> c.append(Result(estimator, ResultKind.THEORY))
 
         Now we can serialize the data using _dumper, and reload the data using _loader:
         >>> with tempfile.TemporaryDirectory() as d:
@@ -185,9 +185,9 @@ def _loader(path: Path):
         >>> assert e.metadata == c.metadata
         >>> for e_i, c_i in zip(e, c):
         ...     assert isinstance(e_i.data, type(c_i.data)) # Types match
-        ...     if e_i.kind in (ResultType.CONDITION, ResultType.OBSERVATION):
+        ...     if e_i.kind in (ResultKind.CONDITION, ResultKind.OBSERVATION):
         ...         np.testing.assert_array_equal(e_i.data, c_i.data) # two numpy arrays
-        ...     if e_i.kind == ResultType.THEORY:
+        ...     if e_i.kind == ResultKind.THEORY:
         ...         np.testing.assert_array_equal(e_i.data.coef_, c_i.data.coef_) # two estimators
 
     """
@@ -207,7 +207,7 @@ def _loader(path: Path):
             data.append(loaded_object)
 
     assert isinstance(metadata, VariableCollection)
-    data_collection = FilesystemCycleDataCollection(metadata=metadata, data=data)
+    data_collection = ResultCollection(metadata=metadata, data=data)
 
     return data_collection
 
@@ -218,12 +218,10 @@ class FilesystemCycle:
         theorist,
         experimentalist,
         experiment_runner,
-        monitor: Optional[Callable[[FilesystemCycleDataCollection], None]] = None,
+        monitor: Optional[Callable[[ResultCollection], None]] = None,
         metadata: Optional[VariableCollection] = None,
         params: Optional[Dict] = None,
-        data: Optional[
-            Union[Path, str, Sequence[ResultContainer], ResultContainer]
-        ] = None,
+        data: Optional[Union[Path, str, Sequence[Result], Result]] = None,
         path: Optional[Path] = None,
     ):
         """
@@ -490,7 +488,7 @@ class FilesystemCycle:
             By using the monitor callback, we can investigate what's going on with the cycle
             properties:
             >>> def observations_monitor(data):
-            ...     if data[-1].kind == ResultType.OBSERVATION:
+            ...     if data[-1].kind == ResultKind.OBSERVATION:
             ...          print( _get_cycle_properties(data)["%observations.ivs%"].flatten())
             >>> cycle_with_cycle_properties.monitor = observations_monitor
 
@@ -536,29 +534,29 @@ class FilesystemCycle:
             Union[
                 Path,
                 str,
-                FilesystemCycleDataCollection,
-                Sequence[ResultContainer],
-                ResultContainer,
+                ResultCollection,
+                Sequence[Result],
+                Result,
             ]
         ],
         metadata: Optional[VariableCollection],
-    ) -> FilesystemCycleDataCollection:
+    ) -> ResultCollection:
         if isinstance(data, Path):
             _data = _loader(data)
         elif isinstance(data, str):
             _data = _loader(Path(data))
-        elif isinstance(data, FilesystemCycleDataCollection):
+        elif isinstance(data, ResultCollection):
             _data = data
         elif isinstance(data, Sequence):
             assert metadata is not None
             assert isinstance(data, List)
-            _data = FilesystemCycleDataCollection(metadata=metadata, data=data)
-        elif isinstance(data, ResultContainer):
+            _data = ResultCollection(metadata=metadata, data=data)
+        elif isinstance(data, Result):
             assert metadata is not None
-            _data = FilesystemCycleDataCollection(metadata=metadata, data=[data])
+            _data = ResultCollection(metadata=metadata, data=[data])
         elif data is None:
             assert metadata is not None
-            _data = FilesystemCycleDataCollection(metadata=metadata, data=[])
+            _data = ResultCollection(metadata=metadata, data=[])
         else:
             raise ValueError(f"{data=}, {metadata=} missing something")
         return _data
@@ -621,9 +619,9 @@ class FilesystemCycle:
             state=self.state,
             mapping={
                 None: curried_experimentalist,
-                ResultType.THEORY: curried_experimentalist,
-                ResultType.CONDITION: curried_experiment_runner,
-                ResultType.OBSERVATION: curried_theorist,
+                ResultKind.THEORY: curried_experimentalist,
+                ResultKind.CONDITION: curried_experiment_runner,
+                ResultKind.OBSERVATION: curried_theorist,
             },
         )
 
@@ -631,7 +629,7 @@ class FilesystemCycle:
 
     @staticmethod
     def _experimentalist_callback(
-        experimentalist: Pipeline, data_in: FilesystemCycleDataCollection, params: dict
+        experimentalist: Pipeline, data_in: ResultCollection, params: dict
     ):
         new_conditions = experimentalist(**params)
         if isinstance(new_conditions, Iterable):
@@ -648,28 +646,26 @@ class FilesystemCycle:
             new_conditions_array, np.ndarray
         )  # Check the object is bounded
 
-        result = ResultContainer(data=new_conditions_array, kind=ResultType.CONDITION)
+        result = Result(data=new_conditions_array, kind=ResultKind.CONDITION)
 
         return result
 
     @staticmethod
     def _experiment_runner_callback(
         experiment_runner: Callable,
-        data_in: FilesystemCycleDataCollection,
+        data_in: ResultCollection,
         params: dict,
     ):
         x = data_in.conditions[-1]
         y = experiment_runner(x, **params)
         new_observations = np.column_stack([x, y])
 
-        result = ResultContainer(data=new_observations, kind=ResultType.OBSERVATION)
+        result = Result(data=new_observations, kind=ResultKind.OBSERVATION)
 
         return result
 
     @staticmethod
-    def _theorist_callback(
-        theorist, data_in: FilesystemCycleDataCollection, params: dict
-    ):
+    def _theorist_callback(theorist, data_in: ResultCollection, params: dict):
         all_observations = np.row_stack(data_in.observations)
         n_xs = len(
             data_in.metadata.independent_variables
@@ -680,21 +676,21 @@ class FilesystemCycle:
         new_theorist = copy.deepcopy(theorist)
         new_theorist.fit(x, y, **params)
 
-        result = ResultContainer(data=new_theorist, kind=ResultType.THEORY)
+        result = Result(data=new_theorist, kind=ResultKind.THEORY)
 
         return result
 
-    def _monitor_callback(self, data: FilesystemCycleDataCollection):
+    def _monitor_callback(self, data: ResultCollection):
         if self.monitor is not None:
             self.monitor(data)
 
 
 def last_result_kind_planner(
-    state: FilesystemCycleDataCollection, mapping: Dict[Optional[ResultType], Callable]
+    state: ResultCollection, mapping: Dict[Optional[ResultKind], Callable]
 ):
     try:
         last_result = state[-1]
     except IndexError:
-        last_result = ResultContainer(None, None)
+        last_result = Result(None, None)
     next = mapping[last_result.kind]
     return next
