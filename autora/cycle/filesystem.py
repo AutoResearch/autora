@@ -2,18 +2,43 @@
 
 import copy
 import logging
-from functools import partial
-from typing import Callable, Dict, Iterable, Optional, Sequence, Union
+from abc import abstractmethod
+from typing import (
+    Callable,
+    Dict,
+    Iterable,
+    Optional,
+    Protocol,
+    Sequence,
+    Union,
+    runtime_checkable,
+)
 
 import numpy as np
 
 from autora.cycle.result import Result, ResultCollection, ResultKind
 from autora.cycle.result.serializer import ResultCollectionSerializer
 from autora.cycle.simple import _get_cycle_properties, _resolve_cycle_properties
-from autora.experimentalist.pipeline import Pipeline
 from autora.variable import VariableCollection
 
 _logger = logging.getLogger(__name__)
+
+
+@runtime_checkable
+class Planner(Protocol):
+    def __call__(self, state: ResultCollection, **kwargs) -> Callable:
+        ...
+
+
+def last_result_kind_planner(
+    state: ResultCollection, mapping: Dict[Optional[ResultKind], Callable]
+):
+    try:
+        last_result = state[-1]
+    except IndexError:
+        last_result = Result(None, None)
+    next = mapping[last_result.kind]
+    return next
 
 
 class FilesystemCycle:
@@ -336,7 +361,6 @@ class FilesystemCycle:
             params = dict()
         self.params = params
 
-        # Load the data
         self.state: ResultCollection = self._load_state(state, metadata, results)
 
         self.serializer = serializer
@@ -387,7 +411,7 @@ class FilesystemCycle:
     def __next__(self):
 
         # Plan
-        next_function = self._plan_next_step()
+        next_function = self.plan()
 
         # Execute
         result = next_function()
@@ -397,7 +421,7 @@ class FilesystemCycle:
         self.dump()
 
         # Monitor
-        self._monitor_callback(self.state)
+        self.monitor_callback(self.state)
 
         return self
 
@@ -407,46 +431,22 @@ class FilesystemCycle:
         else:
             _logger.debug(f"{self.serializer=} must be set in order to dump")
 
-    def _plan_next_step(self):  # TODO: move the business logic to a separate function
+    @property
+    def _params_and_cycle_properties(self):
         all_params = _resolve_cycle_properties(
             self.params, _get_cycle_properties(self.state)
         )
+        return all_params
 
-        curried_experimentalist = partial(
-            self._experimentalist_callback,
-            experimentalist=self.experimentalist,
-            data_in=self.state,
-            params=all_params.get("experimentalist", dict()),
-        )
-        curried_theorist = partial(
-            self._theorist_callback,
-            theorist=self.theorist,
-            data_in=self.state,
-            params=all_params.get("theorist", dict()),
-        )
-        curried_experiment_runner = partial(
-            self._experiment_runner_callback,
-            experiment_runner=self.experiment_runner,
-            data_in=self.state,
-            params=all_params.get("experiment_runner", dict()),
-        )
+    @abstractmethod
+    def plan(self) -> Callable:
+        ...
 
-        curried_callback = last_result_kind_planner(
-            state=self.state,
-            mapping={
-                None: curried_experimentalist,
-                ResultKind.THEORY: curried_experimentalist,
-                ResultKind.CONDITION: curried_experiment_runner,
-                ResultKind.OBSERVATION: curried_theorist,
-            },
-        )
-
-        return curried_callback
-
-    @staticmethod
-    def _experimentalist_callback(
-        experimentalist: Pipeline, data_in: ResultCollection, params: dict
+    def experimentalist_callback(
+        self,
     ):
+        experimentalist = self.experimentalist
+        params = self._params_and_cycle_properties.get("experimentalist", dict())
         new_conditions = experimentalist(**params)
         if isinstance(new_conditions, Iterable):
             # If the pipeline gives us an iterable, we need to make it into a concrete array.
@@ -466,12 +466,12 @@ class FilesystemCycle:
 
         return result
 
-    @staticmethod
-    def _experiment_runner_callback(
-        experiment_runner: Callable,
-        data_in: ResultCollection,
-        params: dict,
+    def experiment_runner_callback(
+        self,
     ):
+        experiment_runner = self.experiment_runner
+        data_in = self.state
+        params = self._params_and_cycle_properties.get("experiment_runner", dict())
         x = data_in.conditions[-1]
         y = experiment_runner(x, **params)
         new_observations = np.column_stack([x, y])
@@ -480,8 +480,10 @@ class FilesystemCycle:
 
         return result
 
-    @staticmethod
-    def _theorist_callback(theorist, data_in: ResultCollection, params: dict):
+    def theorist_callback(self):
+        theorist = self.theorist
+        data_in = self.state
+        params = self._params_and_cycle_properties.get("theorist", dict())
         all_observations = np.row_stack(data_in.observations)
         n_xs = len(
             data_in.metadata.independent_variables
@@ -496,17 +498,22 @@ class FilesystemCycle:
 
         return result
 
-    def _monitor_callback(self, data: ResultCollection):
+    def monitor_callback(self, data: ResultCollection):
         if self.monitor is not None:
             self.monitor(data)
 
 
-def last_result_kind_planner(
-    state: ResultCollection, mapping: Dict[Optional[ResultKind], Callable]
-):
-    try:
-        last_result = state[-1]
-    except IndexError:
-        last_result = Result(None, None)
-    next = mapping[last_result.kind]
-    return next
+class LastResultKindCycle(FilesystemCycle):
+    def plan(self):
+        try:
+            last_result = self.state[-1]
+        except IndexError:
+            last_result = Result(None, None)
+        callback = {
+            None: self.experimentalist_callback,
+            ResultKind.THEORY: self.experimentalist_callback,
+            ResultKind.CONDITION: self.experiment_runner_callback,
+            ResultKind.OBSERVATION: self.theorist_callback,
+        }[last_result.kind]
+
+        return callback
