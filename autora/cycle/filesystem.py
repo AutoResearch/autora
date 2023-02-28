@@ -583,33 +583,32 @@ class FilesystemCycle:
             self.params, _get_cycle_properties(self.data)
         )
 
-        callback, func, params = last_result_kind_planner(
+        curried_experimentalist = partial(
+            self._experimentalist_callback,
+            experimentalist=self.experimentalist,
+            params=all_params.get("experimentalist", dict()),
+        )
+        curried_theorist = partial(
+            self._theorist_callback,
+            self.theorist,
+            all_params.get("theorist", dict()),
+        )
+        curried_experiment_runner = partial(
+            self._experiment_runner_callback,
+            self.experiment_runner,
+            all_params.get("experiment_runner", dict()),
+        )
+
+        curried_callback = last_result_kind_planner(
             state=self.data,
             mapping={
-                None: (
-                    self._experimentalist_callback,
-                    self.experimentalist,
-                    all_params.get("experimentalist", dict()),
-                ),
-                ResultType.THEORY: (
-                    self._experimentalist_callback,
-                    self.experimentalist,
-                    all_params.get("experimentalist", dict()),
-                ),
-                ResultType.CONDITION: (
-                    self._experiment_runner_callback,
-                    self.experiment_runner,
-                    all_params.get("experiment_runner", dict()),
-                ),
-                ResultType.OBSERVATION: (
-                    self._theorist_callback,
-                    self.theorist,
-                    all_params.get("theorist", dict()),
-                ),
+                None: curried_experimentalist,
+                ResultType.THEORY: curried_experimentalist,
+                ResultType.CONDITION: curried_experiment_runner,
+                ResultType.OBSERVATION: curried_theorist,
             },
         )
 
-        curried_callback = partial(callback, func, self.data, params)
         return curried_callback
 
     @staticmethod
