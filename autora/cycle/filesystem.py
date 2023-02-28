@@ -40,12 +40,14 @@ class ResultType(Enum):
 
 
 class ResultContainer(NamedTuple):
-    data: Any
-    kind: ResultType
+    data: Optional[Any]
+    kind: Optional[ResultType]
 
 
 def _get_all_of_kind(data: Sequence[ResultContainer], kind: ResultType):
-    filtered_data = [c.data for c in data if c.kind == kind]
+    filtered_data = [
+        c.data for c in data if ((c.kind is not None) and (c.kind == kind))
+    ]
     return filtered_data
 
 
@@ -146,6 +148,7 @@ def _dumper(data_collection: FilesystemCycleDataCollection, path: Path):
 
     for i, container in enumerate(data_collection.data):
         extension, serializer, mode = {
+            None: ("yaml", YAMLSerializer, "w+"),
             ResultType.CONDITION: ("yaml", YAMLSerializer, "w+"),
             ResultType.OBSERVATION: ("yaml", YAMLSerializer, "w+"),
             ResultType.THEORY: ("pickle", pickle, "w+b"),
@@ -576,42 +579,38 @@ class FilesystemCycle:
         _dumper(data_collection=self.data, path=path)
 
     def _plan_next_step(self):  # TODO: move the business logic to a separate function
-        params_with_cycle_properties = _resolve_cycle_properties(
+        all_params = _resolve_cycle_properties(
             self.params, _get_cycle_properties(self.data)
         )
-        # Plan
-        try:
-            last_result = self.data[-1]
-        except IndexError:
-            last_result = None
-        if (last_result is None) or (last_result.kind == ResultType.THEORY):
-            params = params_with_cycle_properties.get("experimentalist", dict())
-            next_function = partial(
-                self._experimentalist_callback,
-                experimentalist=self.experimentalist,
-                data_in=self.data,
-                params=params,
-            )
-        elif last_result.kind == ResultType.CONDITION:
-            params = params_with_cycle_properties.get("experiment_runner", dict())
-            next_function = partial(
-                self._experiment_runner_callback,
-                experiment_runner=self.experiment_runner,
-                data_in=self.data,
-                params=params,
-            )
-        elif last_result.kind == ResultType.OBSERVATION:
-            params = params_with_cycle_properties.get("theorist", dict())
-            next_function = partial(
-                self._theorist_callback,
-                theorist=self.theorist,
-                data_in=self.data,
-                params=params,
-            )
 
-        else:
-            raise TypeError(f"Can't handle {last_result=}")
-        return next_function
+        callback, func, params = last_result_kind_planner(
+            state=self.data,
+            mapping={
+                None: (
+                    self._experimentalist_callback,
+                    self.experimentalist,
+                    all_params.get("experimentalist", dict()),
+                ),
+                ResultType.THEORY: (
+                    self._experimentalist_callback,
+                    self.experimentalist,
+                    all_params.get("experimentalist", dict()),
+                ),
+                ResultType.CONDITION: (
+                    self._experiment_runner_callback,
+                    self.experiment_runner,
+                    all_params.get("experiment_runner", dict()),
+                ),
+                ResultType.OBSERVATION: (
+                    self._theorist_callback,
+                    self.theorist,
+                    all_params.get("theorist", dict()),
+                ),
+            },
+        )
+
+        curried_callback = partial(callback, func, self.data, params)
+        return curried_callback
 
     @staticmethod
     def _experimentalist_callback(
@@ -671,3 +670,14 @@ class FilesystemCycle:
     def _monitor_callback(self, data: FilesystemCycleDataCollection):
         if self.monitor is not None:
             self.monitor(data)
+
+
+def last_result_kind_planner(
+    state: FilesystemCycleDataCollection, mapping: Dict[Optional[ResultType], Callable]
+):
+    try:
+        last_result = state[-1]
+    except IndexError:
+        last_result = ResultContainer(None, None)
+    next = mapping[last_result.kind]
+    return next
