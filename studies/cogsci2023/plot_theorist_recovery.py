@@ -9,7 +9,7 @@ import seaborn as sns
 from sklearn.manifold import TSNE
 
 from studies.cogsci2023.models.models import model_inventory, plot_inventory
-from studies.cogsci2023.utils import get_BIC, get_DL, get_LL
+
 
 # set the path to the data_closed_loop directory
 path = "data_theorist/"
@@ -45,6 +45,8 @@ for pickle in loaded_pickles:
     theory_log = pickle[2]
     theorist_name_log = pickle[3]
     DL_log = pickle[5]
+    BIC_log = pickle[6]
+    LL_log = pickle[7]
 
     for idx in range(len(MSE_log)):
 
@@ -53,19 +55,11 @@ for pickle in loaded_pickles:
         row["Theorist"] = theorist_name_log[idx]
         row["Ground Truth"] = configuration["ground_truth_name"]
         row["Mean Squared Error"] = MSE_log[idx]
-        # row["Description Length"] = DL_log[idx]
-        # if theorist_name_log[idx] == "Regression":
         test_size = configuration["test_size"]
         num_obs = test_size * full_n
-        row["Description Length"] = get_DL(
-            theory_log[idx], theorist_name_log[idx], MSE_log[idx], num_obs
-        )
-        row["BIC"] = get_BIC(
-            theory_log[idx], theorist_name_log[idx], MSE_log[idx], num_obs
-        )
-        row["LL"] = get_BIC(
-            theory_log[idx], theorist_name_log[idx], MSE_log[idx], num_obs
-        )
+        row['Description Length'] = DL_log[idx]
+        row['Bayesian Information Criterion'] = BIC_log[idx]
+        row['Log Likelihood'] = LL_log[idx]
         full_theory_log.append(theory_log[idx])
         df_validation = df_validation.append(row, ignore_index=True)
         entry = entry + 1
