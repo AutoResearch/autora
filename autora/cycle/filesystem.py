@@ -528,25 +528,40 @@ class FilesystemCycle:
         self.path = path
 
         # Load the data
-        self.data: FilesystemCycleDataCollection
+        self.data = self._load_data(data, metadata)
+
+    @staticmethod
+    def _load_data(
+        data: Optional[
+            Union[
+                Path,
+                str,
+                FilesystemCycleDataCollection,
+                Sequence[ResultContainer],
+                ResultContainer,
+            ]
+        ],
+        metadata: Optional[VariableCollection],
+    ) -> FilesystemCycleDataCollection:
         if isinstance(data, Path):
-            self.data = _loader(data)
+            _data = _loader(data)
         elif isinstance(data, str):
-            self.data = _loader(Path(data))
+            _data = _loader(Path(data))
         elif isinstance(data, FilesystemCycleDataCollection):
-            self.data = data
+            _data = data
         elif isinstance(data, Sequence):
             assert metadata is not None
             assert isinstance(data, List)
-            self.data = FilesystemCycleDataCollection(metadata=metadata, data=data)
+            _data = FilesystemCycleDataCollection(metadata=metadata, data=data)
         elif isinstance(data, ResultContainer):
             assert metadata is not None
-            self.data = FilesystemCycleDataCollection(metadata=metadata, data=[data])
+            _data = FilesystemCycleDataCollection(metadata=metadata, data=[data])
         elif data is None:
             assert metadata is not None
-            self.data = FilesystemCycleDataCollection(metadata=metadata, data=[])
+            _data = FilesystemCycleDataCollection(metadata=metadata, data=[])
         else:
             raise ValueError(f"{data=}, {metadata=} missing something")
+        return _data
 
     def run(self, num_steps: int = 1):
         for i in range(num_steps):
