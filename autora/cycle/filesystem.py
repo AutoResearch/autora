@@ -310,11 +310,11 @@ class FilesystemCycle:
 
             We can now interrogate the results. The first set of conditions which went into the
             experiment runner were:
-            >>> cycle.data.conditions[0]
+            >>> cycle.state.conditions[0]
             array([ 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10])
 
             The observations include the conditions and the results:
-            >>> cycle.data.observations[0]
+            >>> cycle.state.observations[0]
             array([[ 0.        ,  0.92675345],
                    [ 1.        ,  1.89519928],
                    [ 2.        ,  3.08746571],
@@ -328,23 +328,23 @@ class FilesystemCycle:
                    [10.        , 10.88517906]])
 
             In the third cycle (index = 2) the first and last values are different again:
-            >>> cycle.data.observations[2][[0,-1]]
+            >>> cycle.state.observations[2][[0,-1]]
             array([[ 0.        ,  1.08559827],
                    [10.        , 11.08179553]])
 
             The best fit theory after the first cycle is:
-            >>> cycle.data.theories[0]
+            >>> cycle.state.theories[0]
             LinearRegression()
 
             >>> def report_linear_fit(m: LinearRegression,  precision=4):
             ...     s = f"y = {np.round(m.coef_[0].item(), precision)} x " \\
             ...     f"+ {np.round(m.intercept_.item(), 4)}"
             ...     return s
-            >>> report_linear_fit(cycle.data.theories[0])
+            >>> report_linear_fit(cycle.state.theories[0])
             'y = 1.0089 x + 0.9589'
 
             The best fit theory after all the cycles, including all the data, is:
-            >>> report_linear_fit(cycle.data.theories[-1])
+            >>> report_linear_fit(cycle.state.theories[-1])
             'y = 0.9989 x + 1.0292'
 
             This is close to the ground truth theory of x -> (x + 1)
@@ -365,7 +365,7 @@ class FilesystemCycle:
             We can continue to run the cycle as long as we like,
             with a simple arbitrary stopping condition like the number of theories generated:
             >>> from itertools import takewhile
-            >>> _ = list(takewhile(lambda c: len(c.data.theories) < 9, cycle)) # doctest: +ELLIPSIS
+            >>> _ = list(takewhile(lambda c: len(c.state.theories) < 9, cycle)) # doctest: +ELLIPSIS
             Generated 13-th datum, a new CONDITION
             ...
             Generated 27-th datum, a new THEORY
@@ -374,8 +374,8 @@ class FilesystemCycle:
             of the second-last and last cycle is larger than 1x10^-3).
             >>> _ = list(
             ...         takewhile(
-            ...             lambda c: np.abs(c.data.theories[-1].coef_.item() -
-            ...                            c.data.theories[-2].coef_.item()) > 1e-3,
+            ...             lambda c: np.abs(c.state.theories[-1].coef_.item() -
+            ...                            c.state.theories[-2].coef_.item()) > 1e-3,
             ...             cycle
             ...         )
             ...     ) # doctest: +ELLIPSIS
@@ -406,16 +406,16 @@ class FilesystemCycle:
             ...     experiment_runner=example_synthetic_experiment_runner,
             ...     params={"experimentalist": {"uniform_random_sampler": {"n": 7}}}
             ... )
-            >>> _ = list(takewhile(lambda c: len(c.data.conditions) < 1, cycle_with_parameters))
-            >>> cycle_with_parameters.data.conditions[0].flatten()
+            >>> _ = list(takewhile(lambda c: len(c.state.conditions) < 1, cycle_with_parameters))
+            >>> cycle_with_parameters.state.conditions[0].flatten()
             array([6.33661987, 7.34916618, 6.08596494, 2.28566582, 1.9553974 ,
                    5.80023149, 3.27007909])
 
             For the next cycle, if we wish, we can change the parameter value:
             >>> cycle_with_parameters.params["experimentalist"]["uniform_random_sampler"]\\
             ...     ["n"] = 2
-            >>> _ = list(takewhile(lambda c: len(c.data.conditions) < 2, cycle_with_parameters))
-            >>> cycle_with_parameters.data.conditions[1].flatten()
+            >>> _ = list(takewhile(lambda c: len(c.state.conditions) < 2, cycle_with_parameters))
+            >>> cycle_with_parameters.state.conditions[1].flatten()
             array([10.5838232 ,  9.45666031])
 
             ### Accessing "Cycle Properties"
@@ -478,13 +478,13 @@ class FilesystemCycle:
             The first time round, we have the full set of 10 possible conditions to select from,
             and we select "2" at random:
             >>> _ = cycle_with_cycle_properties.run(num_steps=3)
-            >>> cycle_with_cycle_properties.data.conditions[-1]
+            >>> cycle_with_cycle_properties.state.conditions[-1]
             array([2])
 
             We can continue to run the cycler, each time we add more to the list of "excluded"
             options:
             >>> _ = cycle_with_cycle_properties.run(num_steps=15)
-            >>> cycle_with_cycle_properties.data.conditions
+            >>> cycle_with_cycle_properties.state.conditions
             [array([2]), array([6]), array([5]), array([7]), array([3]), array([4])]
 
             By using the monitor callback, we can investigate what's going on with the cycle
@@ -506,7 +506,7 @@ class FilesystemCycle:
 
             We can continue until we've sampled all of the options:
             >>> _ = cycle_with_cycle_properties.run(num_steps=6)
-            >>> cycle_with_cycle_properties.data.conditions # doctest: +NORMALIZE_WHITESPACE
+            >>> cycle_with_cycle_properties.state.conditions # doctest: +NORMALIZE_WHITESPACE
             [array([2]), array([6]), array([5]), array([7]), array([3]), \
             array([4]), array([9]), array([0]), array([8]), array([1])]
 
@@ -528,10 +528,10 @@ class FilesystemCycle:
         self.path = path
 
         # Load the data
-        self.data = self._load_data(data, metadata)
+        self.state = self._load_state(data, metadata)
 
     @staticmethod
-    def _load_data(
+    def _load_state(
         data: Optional[
             Union[
                 Path,
@@ -579,46 +579,46 @@ class FilesystemCycle:
         result = next_function()
 
         # Store
-        self.data.append(result)
+        self.state.append(result)
         if self.path is not None:
             self.dump()
 
         # Monitor
-        self._monitor_callback(self.data)
+        self._monitor_callback(self.state)
 
         return self
 
     def dump(self, path=None):
         if path is None:
             path = self.path
-        _dumper(data_collection=self.data, path=path)
+        _dumper(data_collection=self.state, path=path)
 
     def _plan_next_step(self):  # TODO: move the business logic to a separate function
         all_params = _resolve_cycle_properties(
-            self.params, _get_cycle_properties(self.data)
+            self.params, _get_cycle_properties(self.state)
         )
 
         curried_experimentalist = partial(
             self._experimentalist_callback,
             experimentalist=self.experimentalist,
-            data_in=self.data,
+            data_in=self.state,
             params=all_params.get("experimentalist", dict()),
         )
         curried_theorist = partial(
             self._theorist_callback,
             theorist=self.theorist,
-            data_in=self.data,
+            data_in=self.state,
             params=all_params.get("theorist", dict()),
         )
         curried_experiment_runner = partial(
             self._experiment_runner_callback,
             experiment_runner=self.experiment_runner,
-            data_in=self.data,
+            data_in=self.state,
             params=all_params.get("experiment_runner", dict()),
         )
 
         curried_callback = last_result_kind_planner(
-            state=self.data,
+            state=self.state,
             mapping={
                 None: curried_experimentalist,
                 ResultType.THEORY: curried_experimentalist,
