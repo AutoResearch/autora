@@ -5,6 +5,8 @@ from utils import (
     fit_theorist,
     get_DL,
     get_MSE,
+    get_BIC,
+    get_LL
 )
 
 from random import seed
@@ -60,6 +62,8 @@ X_train, X_test, y_train, y_test = train_test_split(X_full, y_full,
                                                     random_state=rep)
 MSE_log = list()
 DL_log = list()
+BIC_log = list()
+LL_log = list()
 theory_log = list()
 theorist_name_log = list()
 elapsed_time_log = list()
@@ -80,7 +84,8 @@ for theorist_name in theorists:
     else:
         DL = 0
     DL_log.append(DL)
-
+    LL_log.append(get_LL(get_MSE(theorist, X_test, y_test)))
+    BIC_log.append(get_BIC(theorist, theorist_name, X_test, y_test))
     MSE_log.append(get_MSE(theorist, X_test, y_test))
     if hasattr(theorist, 'model_'):
         theory_log.append(theorist.model_)
@@ -104,6 +109,8 @@ with open(file_name, 'wb') as f:
                    theorist_name_log,
                    elapsed_time_log,
                    DL_log,
+                   BIC_log,
+                   LL_log
                    ]
 
     pickle.dump(object_list, f)
