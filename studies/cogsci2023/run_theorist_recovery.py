@@ -21,6 +21,7 @@ theorists = [
     "Logit Regression",
     "DARTS 3 Nodes",
     "MLP",
+    "BSR"
 ]
 
 for rep in range(repetitions):
