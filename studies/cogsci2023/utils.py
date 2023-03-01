@@ -15,6 +15,7 @@ from autora.experimentalist.sampler import (
 )
 from autora.skl.bms import BMSRegressor
 from autora.skl.darts import DARTSRegressor
+from autora.skl.bsr import BSRRegressor
 from autora.theorist.bms.prior import get_priors
 from autora.variable import ValueType
 from studies.bms.utils import mountain, threshold2, threshold3
@@ -66,6 +67,12 @@ def fit_theorist(X, y, theorist_name, metadata, theorist_epochs=None):
         theorist = MLP_theorist(epochs=epochs, output_type=output_type, verbose=True)
     elif "Regression" in theorist_name:
         theorist = LogitRegression()
+    elif theorist_name == "BSR":
+        if theorist_epochs is not None:
+            epochs = theorist_epochs
+        else:
+            epochs = 5
+        theorist = BSRRegressor(itr_num=epochs)
     else:
         raise ValueError(f"Theorist {theorist_name} not implemented.")
 
@@ -285,46 +292,47 @@ def get_LL(mse):
     return np.log(mse)
 
 
-def get_BIC(model_, theorist_name, mse, num_obs):
+def get_BIC(theorist, theorist_name, mse, num_obs):
     # BIC = n * LL + k * log(n)
-    num_params = get_num_params(model_, theorist_name)
+    num_params = get_num_params(theorist, theorist_name)
     return num_obs * get_LL(mse) + num_params * np.log(num_obs)
 
 
-def get_DL(model_, theorist_name, mse, num_obs):
+def get_DL(theorist, theorist_name, mse, num_obs):
     # DL = BIC/2 + PRIORS
-    bic = get_BIC(model_, theorist_name, mse, num_obs)
-    prior = get_prior(model_, theorist_name)
+    bic = get_BIC(theorist, theorist_name, mse, num_obs)
+    prior = get_prior(theorist, theorist_name)
     return bic / 2.0 + prior
 
 
-def get_num_params(theory, theorist_name):
-    k = 0
+def get_num_params(theorist, theorist_name):
     if "BMS" in theorist_name:
         parameters = set(
-            [p.value for p in theory.ets[0] if p.value in theory.parameters]
+            [
+                p.value
+                for p in theorist.model_.ets[0]
+                if p.value in theorist.model_.parameters
+            ]
         )
         k = 1 + len(parameters)
-    elif theorist_name == "LogitRegression":
-        k = (1 + theory.coef_.shape[0]) * 2
-    elif "DARTS" in theorist_name and type(theory) != LogitRegression:
-        temp_model = DARTSRegressor()
-        temp_model.model_ = theory
-        model_str = temp_model.model_repr()
+    elif theorist_name == "Logit Regression":
+        k = (1 + theorist.model_.coef_.shape[0]) * 2
+    elif "DARTS" in theorist_name:
+        model_str = theorist.model_repr()
         k = 1 + model_str.count(".")
     elif theorist_name == "MLP":
-        return 1201  # I checked (assuming we use default parameters for MLP Theorist)
+        return 1201
     else:
         print(theorist_name)
         raise
     return k
 
 
-def get_prior(model_, theorist_name):
+def get_prior(theorist, theorist_name):
     prior = 0.0
     prior_par, _ = get_priors()
     if "BMS" in theorist_name:
-        for op, nop in list(model_.nops.items()):
+        for op, nop in list(theorist.model_.nops.items()):
             try:
                 if op in ["+", "/", "exp", "-"]:
                     prior += prior_par["Nopi_%s" % op] * (nop + 1)
@@ -342,8 +350,8 @@ def get_prior(model_, theorist_name):
                 pass
         if theorist_name == "BMS Fixed Root":
             prior += prior_par["Nopi_/"] + prior_par["Nopi_+"] + prior_par["Nopi_exp"]
-    elif theorist_name == "Regression":
-        k = (1 + model_.coef_.shape[0]) * 2
+    elif theorist_name == "Logit Regression":
+        k = (1 + theorist.model_.coef_.shape[0]) * 2
         prior += prior_par["Nopi_log"]
         prior += prior_par["Nopi_/"]
         prior += prior_par["Nopi_-"]
@@ -358,10 +366,8 @@ def get_prior(model_, theorist_name):
         except KeyError:
             pass
     elif "DARTS" in theorist_name:
-        temp_model = DARTSRegressor()
-        temp_model.model_ = model_
-        model_str = temp_model.model_repr()
-        for op in temp_model.primitives:
+        model_str = theorist.model_repr()
+        for op in theorist.primitives:
             try:
                 prior += prior_par["Nopi_%s" % op] * model_str.count(op)
             except KeyError:
@@ -371,9 +377,8 @@ def get_prior(model_, theorist_name):
             except KeyError:
                 pass
     elif theorist_name == "MLP":
-        # print("Can't use for MLP")
-        # raise
-        return 0
+        print("Description Length not applicable to MLP")
     else:
         print(theorist_name)
         raise
+    return prior
