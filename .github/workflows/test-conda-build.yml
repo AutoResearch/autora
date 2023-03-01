@@ -1,0 +1,25 @@
+name: Test Conda Build
+
+on:
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-conda:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+            
+    - name: Add conda to system path
+      run: |
+        # $CONDA is an environment variable pointing to the root of the miniconda directory
+        echo $CONDA/bin >> $GITHUB_PATH
+        
+    - name: Install dependencies
+      run: conda install conda-build
+    
+    - name: Build conda package
+      run: |
+        cd conda
+        conda build autora -c pytorch

@@ -1,0 +1,34 @@
+name: Publish to PyPI
+
+on:
+  release:
+    types: [ published ]
+
+jobs:
+  
+  build-publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - run: pipx install poetry
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: 3.8
+          cache: 'poetry'
+
+      - name: Install dependencies
+        run: poetry install
+
+      - name: Bump version number
+        run: poetry version ${{ github.event.release.tag_name }}
+  
+      - name: Build package
+        run: poetry build
+
+      - name: Setup PyPI Repository
+        run: poetry config pypi-token.pypi ${{ secrets.PYPI_TOKEN }}
+      
+      - name: Publish
+        run: poetry publish

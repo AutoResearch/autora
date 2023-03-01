@@ -1,12 +1,20 @@
+import inspect
 from itertools import product
-from typing import List, Optional, Sequence, Tuple
+from typing import Callable, List, Optional, Sequence, Tuple, Union
 
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from matplotlib import rcParams
 from matplotlib.patches import Patch
+from matplotlib.ticker import MaxNLocator
 
-from autora.cycle import Cycle
+from .simple import SimpleCycle as Cycle
+
+# Change default plot styles
+rcParams["axes.spines.top"] = False
+rcParams["axes.spines.right"] = False
+rcParams["legend.frameon"] = False
 
 
 def _get_variable_index(
@@ -121,21 +129,27 @@ def _generate_mesh_grid(cycle: Cycle, steps: int = 50) -> np.ndarray:
     return np.meshgrid(*l_space)
 
 
-def _theory_predict(cycle: Cycle, conditions: Sequence) -> dict:
+def _theory_predict(
+    cycle: Cycle, conditions: Sequence, predict_proba: bool = False
+) -> list:
     """
-    Gets theory predictions over conditions space and saves results of each cycle to a dictionary.
+    Gets theory predictions over conditions space and saves results of each cycle to a list.
     Args:
         cycle: AER Cycle object that has been run
         conditions: Condition space. Should be an array of grouped conditions.
+        predict_proba: Use estimator.predict_proba method instead of estimator.predict.
 
-    Returns: dict
+    Returns: list
 
     """
-    d_predictions = {}
+    l_predictions = []
     for i, theory in enumerate(cycle.data.theories):
-        d_predictions[i] = theory.predict(conditions)
+        if not predict_proba:
+            l_predictions.append(theory.predict(conditions))
+        else:
+            l_predictions.append(theory.predict_proba(conditions))
 
-    return d_predictions
+    return l_predictions
 
 
 def _check_replace_default_kw(default: dict, user: dict) -> dict:
@@ -172,7 +186,7 @@ def plot_results_panel_2d(
     dv_name: Optional[str] = None,
     steps: int = 50,
     wrap: int = 4,
-    spines: bool = False,
+    query: Optional[Union[List, slice]] = None,
     subplot_kw: dict = {},
     scatter_previous_kw: dict = {},
     scatter_current_kw: dict = {},
@@ -194,7 +208,8 @@ def plot_results_panel_2d(
         steps: Number of steps to define the condition space to plot the theory.
         wrap: Number of panels to appear in a row. Example: 9 panels with wrap=3 results in a
                 3x3 grid.
-        spines: Show axis spines for 2D plots, default False.
+        query: Query which cycles to plot with either a List of indexes or a slice. The slice must
+                be constructed with the `slice()` function or `np.s_[]` index expression.
         subplot_kw: Dictionary of keywords to pass to matplotlib 'subplot' function
         scatter_previous_kw: Dictionary of keywords to pass to matplotlib 'scatter' function that
                     plots the data_closed_loop points from previous cycles.
@@ -206,7 +221,6 @@ def plot_results_panel_2d(
     Returns: matplotlib figure
 
     """
-    n_cycles = len(cycle.data.theories)
 
     # ---Figure and plot params---
     # Set defaults, check and add user supplied keywords
@@ -263,29 +277,44 @@ def plot_results_panel_2d(
 
     # Generate IV space
     condition_space = _generate_condition_space(cycle, steps=steps)
+
     # Get theory predictions over space
-    d_predictions = _theory_predict(cycle, condition_space)
+    l_predictions = _theory_predict(cycle, condition_space)
+
+    # Cycle Indexing
+    cycle_idx = list(range(len(cycle.data.theories)))
+    if query:
+        if isinstance(query, list):
+            cycle_idx = [cycle_idx[s] for s in query]
+        elif isinstance(query, slice):
+            cycle_idx = cycle_idx[query]
 
     # Subplot configurations
-    if n_cycles < wrap:
-        shape = (1, n_cycles)
+    n_cycles_to_plot = len(cycle_idx)
+    if n_cycles_to_plot < wrap:
+        shape = (1, n_cycles_to_plot)
     else:
-        shape = (int(np.ceil(n_cycles / wrap)), wrap)
+        shape = (int(np.ceil(n_cycles_to_plot / wrap)), wrap)
     fig, axs = plt.subplots(*shape, **d_kw["subplot_kw"])
+    # Place axis object in an array if plotting single panel
+    if shape == (1, 1):
+        axs = np.array([axs])
 
     # Loop by panel
     for i, ax in enumerate(axs.flat):
-        if i + 1 <= n_cycles:
+        if i + 1 <= n_cycles_to_plot:
+            # Get index of cycle to plot
+            i_cycle = cycle_idx[i]
 
             # ---Plot observed data_closed_loop---
             # Independent variable values
             x_vals = df_observed.loc[:, iv[0]]
             # Dependent values masked by current cycle vs previous data_closed_loop
             dv_previous = np.ma.masked_where(
-                df_observed["cycle"] >= i, df_observed[dv[0]]
+                df_observed["cycle"] >= i_cycle, df_observed[dv[0]]
             )
             dv_current = np.ma.masked_where(
-                df_observed["cycle"] != i, df_observed[dv[0]]
+                df_observed["cycle"] != i_cycle, df_observed[dv[0]]
             )
             # Plotting scatter
             ax.scatter(x_vals, dv_previous, **d_kw["scatter_previous_kw"])
@@ -293,14 +322,12 @@ def plot_results_panel_2d(
 
             # ---Plot Theory---
             conditions = condition_space[:, iv[0]]
-            ax.plot(conditions, d_predictions[i], **d_kw["plot_theory_kw"])
+            ax.plot(conditions, l_predictions[i_cycle], **d_kw["plot_theory_kw"])
 
             # Label Panels
-            ax.text(0.05, 1, f"Cycle {i}", ha="left", va="top", transform=ax.transAxes)
-
-            if not spines:
-                ax.spines.right.set_visible(False)
-                ax.spines.top.set_visible(False)
+            ax.text(
+                0.05, 1, f"Cycle {i_cycle}", ha="left", va="top", transform=ax.transAxes
+            )
 
         else:
             ax.axis("off")
@@ -408,7 +435,7 @@ def plot_results_panel_3d(
     x1, x2 = _generate_mesh_grid(cycle, steps=steps)
 
     # Get theory predictions over space
-    d_predictions = _theory_predict(cycle, np.column_stack((x1.ravel(), x2.ravel())))
+    l_predictions = _theory_predict(cycle, np.column_stack((x1.ravel(), x2.ravel())))
 
     # Subplot configurations
     if n_cycles < wrap:
@@ -438,7 +465,7 @@ def plot_results_panel_3d(
 
             # ---Plot Theory---
             ax.plot_surface(
-                x1, x2, d_predictions[i].reshape(x1.shape), **d_kw["surface_kw"]
+                x1, x2, l_predictions[i].reshape(x1.shape), **d_kw["surface_kw"]
             )
             # ---Labels---
             # Title
@@ -470,5 +497,110 @@ def plot_results_panel_3d(
         bbox_to_anchor=(0.5, 0),
         loc="lower center",
     )
+
+    return fig
+
+
+def cycle_default_score(cycle: Cycle, x_vals: np.ndarray, y_true: np.ndarray):
+    """
+    Calculates score for each cycle using the estimator's default scorer.
+    Args:
+        cycle: AER Cycle object that has been run
+        x_vals: Test dataset independent values
+        y_true: Test dataset dependent values
+
+    Returns:
+        List of scores by cycle
+    """
+    l_scores = [s.score(x_vals, y_true) for s in cycle.data.theories]
+    return l_scores
+
+
+def cycle_specified_score(
+    scorer: Callable, cycle: Cycle, x_vals: np.ndarray, y_true: np.ndarray, **kwargs
+):
+    """
+    Calculates score for each cycle using specified sklearn scoring function.
+    Args:
+        scorer: sklearn scoring function
+        cycle: AER Cycle object that has been run
+        x_vals: Test dataset independent values
+        y_true: Test dataset dependent values
+        **kwargs: Keyword arguments to send to scoring function
+
+    Returns:
+
+    """
+    # Get predictions
+    if "y_pred" in inspect.signature(scorer).parameters.keys():
+        l_y_pred = _theory_predict(cycle, x_vals, predict_proba=False)
+    elif "y_score" in inspect.signature(scorer).parameters.keys():
+        l_y_pred = _theory_predict(cycle, x_vals, predict_proba=True)
+
+    # Score each cycle
+    l_scores = []
+    for y_pred in l_y_pred:
+        l_scores.append(scorer(y_true, y_pred, **kwargs))
+
+    return l_scores
+
+
+def plot_cycle_score(
+    cycle: Cycle,
+    X: np.ndarray,
+    y_true: np.ndarray,
+    scorer: Optional[Callable] = None,
+    x_label: str = "Cycle",
+    y_label: Optional[str] = None,
+    figsize: Tuple[float, float] = rcParams["figure.figsize"],
+    ylim: Optional[Tuple[float, float]] = None,
+    xlim: Optional[Tuple[float, float]] = None,
+    scorer_kw: dict = {},
+    plot_kw: dict = {},
+) -> plt.Figure:
+    """
+    Plots scoring metrics of cycle's theories given test data.
+    Args:
+        cycle: AER Cycle object that has been run
+        X: Test dataset independent values
+        y_true: Test dataset dependent values
+        scorer: sklearn scoring function (optional)
+        x_label: Label for x-axis
+        y_label: Label for y-axis
+        figsize: Optional figure size tuple in inches
+        ylim: Optional limits for the y-axis as a tuple (lower, upper)
+        xlim: Optional limits for the x-axis as a tuple (lower, upper)
+        scorer_kw: Dictionary of keywords for scoring function if scorer is supplied.
+        plot_kw: Dictionary of keywords to pass to matplotlib 'plot' function.
+
+    Returns:
+        matplotlib.figure.Figure
+    """
+
+    # Use estimator's default scoring method if specific scorer is not supplied
+    if scorer is None:
+        l_scores = cycle_default_score(cycle, X, y_true)
+    else:
+        l_scores = cycle_specified_score(scorer, cycle, X, y_true, **scorer_kw)
+
+    # Plotting
+    fig, ax = plt.subplots(figsize=figsize)
+    ax.plot(np.arange(len(cycle.data.theories)), l_scores, **plot_kw)
+
+    # Adjusting axis limits
+    if ylim:
+        ax.set_ylim(*ylim)
+    if xlim:
+        ax.set_xlim(*xlim)
+
+    # Labeling
+    ax.set_xlabel(x_label)
+    if y_label is None:
+        if scorer is not None:
+            y_label = scorer.__name__
+        else:
+            y_label = "Score"
+    ax.set_ylabel(y_label)
+    ax.xaxis.set_major_locator(MaxNLocator(integer=True))
 
     return fig

@@ -3,7 +3,6 @@ from copy import deepcopy
 from random import randint, random
 from typing import Optional, Tuple
 
-import numpy as np
 from numpy import exp
 
 from .mcmc import Tree
@@ -17,7 +16,7 @@ class Parallel:
     Attributes:
         Ts: list of parallel temperatures
         trees: list of parallel trees, corresponding to each parallel temperature
-        t1: equation tree which best describes the data_closed_loop
+        t1: equation tree which best describes the data
     """
 
     # -------------------------------------------------------------------------
@@ -35,6 +34,7 @@ class Parallel:
         root=None,
         ignore_prior=False,
         ignore_penalty=False,
+        seed=None,
     ) -> None:
         """
         Initialises Parallel Machine Scientist
@@ -42,7 +42,7 @@ class Parallel:
         Args:
             Ts: list of temperature values
             ops: allowed operations for the search task
-            variables: independent variables from data_closed_loop
+            variables: independent variables from data
             parameters: settable values to improve model fit
             max_size: maximum size (number of nodes) in a tree
             prior_par: prior values over ops
@@ -69,6 +69,7 @@ class Parallel:
                 custom_ops=custom_ops,
                 ignore_prior=ignore_prior,
                 ignore_penalty=ignore_penalty,
+                seed_value=seed,
             )
         }
         self.t1 = self.trees["1.0"]
@@ -87,6 +88,7 @@ class Parallel:
                 BT=float(BT),
                 ignore_prior=ignore_prior,
                 ignore_penalty=ignore_penalty,
+                seed_value=seed,
             )
             self.trees[BT] = treetmp
             # Share fitted parameters and representative with other trees
@@ -123,7 +125,7 @@ class Parallel:
         BT1, BT2 = t1.BT, t2.BT
         EB1, EB2 = t1.EB, t2.EB
         # The energy change
-        DeltaE = np.float(EB1) * (1.0 / BT2 - 1.0 / BT1) + np.float(EB2) * (
+        DeltaE = float(EB1) * (1.0 / BT2 - 1.0 / BT1) + float(EB2) * (
             1.0 / BT1 - 1.0 / BT2
         )
         if DeltaE > 0:

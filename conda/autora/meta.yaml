@@ -1,9 +1,9 @@
-{% set pyproject = load_file_data("../../pyproject.toml", from_recipe_dir=True) %}
-{% set poetry = pyproject.get('tool', {}).get('poetry') %}
+{% set name = "autora" %}
+{% set version = "0.0.0" %}
 
 package:
-  name: {{ poetry.get('name') }}
-  version: {{ poetry.get('version') }}
+  name: "{{ name|lower }}"
+  version: "{{ version }}"
 
 source:
   path: ../../
@@ -18,20 +18,7 @@ requirements:
     - python
     - pip
     - poetry
-    - graphviz
-    - imageio >=2.9.0,<3.0.0
-    - matplotlib >=3.2.1,<4.0.0
-    - numpy >=1.23.1,<2.0.0
-    - pandas >=1.4.2,<2.0.0
-    - pytorch >=1.12.1,<2.0.0
-    - python-graphviz >=0.14.1,<0.21.0
-    - scikit-learn >=1.1.1,<2.0.0
-    - scipy >=1.9.3,<2.0.0
-    - seaborn >=0.11.1,<0.13.0
-    - sympy >=1.10.1,<2.0.0
-    - tqdm >=4.64.0,<5.0.0
   run:
-    - python
     - graphviz
     - imageio >=2.9.0,<3.0.0
     - matplotlib >=3.2.1,<4.0.0
@@ -46,6 +33,10 @@ requirements:
     - tqdm >=4.64.0,<5.0.0
 
 test:
+  requires:
+    - pytest
+  source_files:
+    - tests
   imports:
     - autora
     - autora.cycle
@@ -57,9 +48,11 @@ test:
     - autora.skl
     - autora.skl.darts
     - autora.skl.bms
+    - autora.skl.bsr
     - autora.theorist
-    - autora.theorist.bms
     - autora.theorist.darts
+    - autora.theorist.bms
+    - autora.theorist.bsr
     - autora.variable
 
 about:
@@ -67,7 +60,7 @@ about:
   license: UNKNOWN
   license_family: OTHER
   license_file: LICENSE.md
-  summary: "Autonomous Research Assistant (AutoRA) is a framework for implementing machine learning tools which autonomously and iteratively generate 1) new theories to describe real-world data_closed_loop, and 2) experiments to invalidate those theories and seed a new cycle of theory-making. The experiments will be run online via crowd-sourcing platforms (MTurk, Prolific)."
+  summary: "Autonomous Research Assistant (AutoRA) is a framework for automating steps of the empirical research process. This framework implements tools for autonomously and iteratively generating 1) new theories to describe real-world data, and 2) experiments to invalidate those theories and seed a new cycle of theory-making. The experiments will be run online via crowd-sourcing platforms (MTurk, Prolific)."
   doc_url: https://autoresearch.github.io/autora/
   dev_url: https://github.com/AutoResearch/autora
 

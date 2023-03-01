@@ -60,7 +60,7 @@ class BMSRegressor(BaseEstimator, RegressorMixin):
         """
         Arguments:
             prior_par: a dictionary of the prior probabilities of different functions based on
-                wikipedia data_closed_loop scraping
+                wikipedia data scraping
             ts: contains a list of the temperatures that the parallel ms works at
         """
         self.ts = ts
@@ -86,6 +86,7 @@ class BMSRegressor(BaseEstimator, RegressorMixin):
         custom_ops=None,
         ignore_prior=False,
         ignore_penalty=False,
+        seed=None,
     ) -> BMSRegressor:
         """
         Runs the optimization for a given set of `X`s and `y`s.
@@ -133,6 +134,7 @@ class BMSRegressor(BaseEstimator, RegressorMixin):
             root=root,
             ignore_prior=ignore_prior,
             ignore_penalty=ignore_penalty,
+            seed=seed,
         )
         self.model_, self.loss_, self.cache_ = utils.run(self.pms, self.epochs)
         self.models_ = list(self.pms.trees.values())
