@@ -315,7 +315,7 @@ def get_num_params(theorist, theorist_name):
             ]
         )
         k = 1 + len(parameters)
-    elif theorist_name == "Logit Regression":
+    elif "Regression" in theorist_name:
         k = (1 + theorist.model_.coef_.shape[0]) * 2
     elif "DARTS" in theorist_name:
         model_str = theorist.model_repr()
@@ -350,7 +350,7 @@ def get_prior(theorist, theorist_name):
                 pass
         if theorist_name == "BMS Fixed Root":
             prior += prior_par["Nopi_/"] + prior_par["Nopi_+"] + prior_par["Nopi_exp"]
-    elif theorist_name == "Logit Regression":
+    elif "Regression" in theorist_name:
         k = (1 + theorist.model_.coef_.shape[0]) * 2
         prior += prior_par["Nopi_log"]
         prior += prior_par["Nopi_/"]
