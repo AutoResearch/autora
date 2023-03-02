@@ -72,6 +72,9 @@ for rep in range(repetitions):
         DL_log.append(dl)
         if hasattr(theorist, "model_") and 'BMS' not in theorist_name:
             theory_log.append(theorist.model_)
+        elif 'BSR' in theorist_name:
+            print('BSR not compatible with pickle')
+            pass
         else:
             theory_log.append(theorist)
         theorist_name_log.append(theorist_name)

@@ -24,8 +24,10 @@ theorists = [
              'DARTS 2 Nodes',
              'DARTS 3 Nodes',
              'Regression',
-             # 'BMS',
-             'BMS Fixed Root'
+             'BMS',
+             'BMS Fixed Root',
+             'BMS Code Ops',
+             'BSR'
              ]
 
 gts = ['weber_fechner',
@@ -77,18 +79,15 @@ for theorist_name in theorists:
     elapsed_time = et - st
     elapsed_time_log.append(elapsed_time)
 
-    if theorist_name == "BMS" \
-        or theorist_name == "BMS Fixed Root" \
-        or 'DARTS' in theorist_name:
-        DL = get_DL(theorist, theorist_name, X_test, y_test)
-    else:
-        DL = 0
-    DL_log.append(DL)
+    DL_log.append(get_DL(theorist, theorist_name, X_test, y_test))
     LL_log.append(get_LL(get_MSE(theorist, X_test, y_test)))
     BIC_log.append(get_BIC(theorist, theorist_name, X_test, y_test))
     MSE_log.append(get_MSE(theorist, X_test, y_test))
-    if hasattr(theorist, 'model_'):
+    if hasattr(theorist, 'model_') and 'BMS' not in theorist_name:
         theory_log.append(theorist.model_)
+    elif 'BSR' in theorist_name:
+        print('BSR not compatible with pickle')
+        pass
     else:
         theory_log.append(theorist)
     theorist_name_log.append(theorist_name)

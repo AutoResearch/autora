@@ -17,6 +17,8 @@ from autora.skl.bms import BMSRegressor
 from autora.skl.darts import DARTSRegressor
 from autora.skl.bsr import BSRRegressor
 from autora.theorist.bms.prior import get_priors
+from autora.theorist.bsr.funcs import get_all_nodes
+from autora.theorist.bsr.prior import get_prior_dict
 from autora.variable import ValueType
 from studies.bms.utils import mountain, threshold2, threshold3
 
@@ -71,7 +73,7 @@ def fit_theorist(X, y, theorist_name, metadata, theorist_epochs=None):
         if theorist_epochs is not None:
             epochs = theorist_epochs
         else:
-            epochs = 5
+            epochs = 500
         theorist = BSRRegressor(itr_num=epochs)
     else:
         raise ValueError(f"Theorist {theorist_name} not implemented.")
@@ -314,18 +316,24 @@ def get_num_params(theorist, theorist_name):
                 if p.value in theorist.model_.parameters
             ]
         )
-        k = 1 + len(parameters)
+        return 1 + len(parameters)
     elif "Regression" in theorist_name:
-        k = (1 + theorist.model_.coef_.shape[0]) * 2
+        return (1 + theorist.model_.coef_.shape[0]) * 2
     elif "DARTS" in theorist_name:
         model_str = theorist.model_repr()
-        k = 1 + model_str.count(".")
+        return 1 + model_str.count(".")
     elif theorist_name == "MLP":
         return 1201
+    elif 'BSR' in theorist_name:
+        nodes = bsr_get_nodes(theorist)
+        k = 0
+        for node in nodes:
+            if node.op_name == 'linear':
+                k += 2
+        return k
     else:
         print(theorist_name)
         raise
-    return k
 
 
 def get_prior(theorist, theorist_name):
@@ -378,7 +386,22 @@ def get_prior(theorist, theorist_name):
                 pass
     elif theorist_name == "MLP":
         print("Description Length not applicable to MLP")
+    elif theorist_name == 'BSR':
+        nodes = bsr_get_nodes(theorist)
+        ops_priors = get_prior_dict(prior_name=theorist.prior_name)[2]
+        for node in nodes:
+            if node.op_name in ops_priors.keys():
+                prior += ops_priors[node.op_name]['weight']
     else:
         print(theorist_name)
         raise
     return prior
+
+
+def bsr_get_nodes(bsr):
+    nodes = []
+    assert bsr.roots_
+    for i in np.arange(bsr.tree_num):
+        roots = bsr.roots_[-bsr.last_idx][i]
+        nodes += get_all_nodes(roots)
+    return nodes
