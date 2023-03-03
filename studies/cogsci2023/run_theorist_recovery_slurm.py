@@ -79,10 +79,16 @@ for theorist_name in theorists:
     elapsed_time = et - st
     elapsed_time_log.append(elapsed_time)
 
-    DL_log.append(get_DL(theorist, theorist_name, X_test, y_test))
-    LL_log.append(get_LL(get_MSE(theorist, X_test, y_test)))
-    BIC_log.append(get_BIC(theorist, theorist_name, X_test, y_test))
-    MSE_log.append(get_MSE(theorist, X_test, y_test))
+    mse = get_MSE(theorist, X_test, y_test)
+    ll = get_LL(mse)
+    num_obs = X_test.shape[0]
+    bic = get_BIC(theorist, theorist_name, mse, num_obs)
+    dl = get_DL(theorist, theorist_name, mse, num_obs)
+
+    MSE_log.append(mse)
+    LL_log.append(ll)
+    BIC_log.append(bic)
+    DL_log.append(dl)
     if hasattr(theorist, 'model_') and 'BMS' not in theorist_name:
         theory_log.append(theorist.model_)
     elif 'BSR' in theorist_name:
