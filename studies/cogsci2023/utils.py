@@ -326,7 +326,8 @@ def get_num_params(theorist, theorist_name):
         return 1201
     elif 'BSR' in theorist_name:
         nodes = bsr_get_nodes(theorist)
-        k = 0
+        # k = len(theorist.betas_)
+        k=0
         for node in nodes:
             if node.op_name == 'linear':
                 k += 2
