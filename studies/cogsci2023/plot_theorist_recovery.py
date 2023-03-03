@@ -100,11 +100,11 @@ sns.barplot(
 )
 plt.show()
 
-# DL PLOT
-sns.barplot(
-    data=df_validation, x="Ground Truth", y="Description Length", hue="Theorist"
-)
+
+# LL PLOT
+sns.barplot(data=df_validation, x="Ground Truth", y="Log Likelihood", hue="Theorist")
 plt.show()
+
 
 # BIC PLOT
 sns.barplot(
@@ -115,8 +115,11 @@ sns.barplot(
 )
 plt.show()
 
-# LL PLOT
-sns.barplot(data=df_validation, x="Ground Truth", y="Log Likelihood", hue="Theorist")
+
+# DL PLOT
+sns.barplot(
+    data=df_validation, x="Ground Truth", y="Description Length", hue="Theorist"
+)
 plt.show()
 
 # MODEL PLOT
