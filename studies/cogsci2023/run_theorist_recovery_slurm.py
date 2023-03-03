@@ -16,7 +16,7 @@ import pickle
 import time
 
 # META PARAMETERS
-num_repetitions = 10                 # specifies how many times to repeat the study (20)
+num_repetitions = 20                 # specifies how many times to repeat the study (20)
 test_size = 0.2                # proportion of test set size to training set size
 
 theorists = [
