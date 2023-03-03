@@ -31,7 +31,7 @@ def fit_theorist(X, y, theorist_name, metadata, theorist_epochs=None):
 
     output_type = metadata.dependent_variables[0].type
 
-    if theorist_name in ["BMS", "BMS Fixed Root", "BMS Code Ops"]:
+    if "BMS" in theorist_name:
         if theorist_epochs is not None:
             epochs = theorist_epochs
         else:
@@ -87,6 +87,12 @@ def fit_theorist(X, y, theorist_name, metadata, theorist_epochs=None):
             theorist.fit(X, y, interaction_terms=True, logit_transform=False)
         elif theorist_name == "BMS Code Ops":
             theorist.fit(X, y, custom_ops=[mountain, threshold2, threshold3])
+        elif theorist_name == "BMS No Prior":
+            theorist.fit(X, y, ignore_prior=True)
+        elif theorist_name == "BMS No Penalty":
+            theorist.fit(X, y, ignore_penalty=True)
+        elif theorist_name == "BMS Lite":
+            theorist.fit(X, y, ignore_prior=True, ignore_penalty=True)
         else:
             theorist.fit(X, y)
         found_theory = True
