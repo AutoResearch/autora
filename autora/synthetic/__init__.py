@@ -5,7 +5,7 @@ Examples:
     The registry is accessed using the `retrieve` function, optionally setting parameters:
     >>> from autora.synthetic import retrieve
     >>> import numpy as np
-    >>> s = retrieve("weber_fechner", rng=np.random.default_rng(seed=180))  # the Weber-Fechner Law
+    >>> s = retrieve("weber_fechner",rng=np.random.default_rng(seed=180))  # the Weber-Fechner Law
 
     The synthetic experiement `s` has properties like the name of the experiment:
     >>> s.name
@@ -64,4 +64,4 @@ Examples:
 """
 
 from autora.synthetic import data
-from autora.synthetic.inventory import Inventory, register, retrieve
+from autora.synthetic.inventory import _Inventory, register, retrieve

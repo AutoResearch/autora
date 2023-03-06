@@ -181,4 +181,4 @@ def expected_value_theory(
     return collection
 
 
-register(id="expected_value", closure=expected_value_theory)
+register("expected_value", expected_value_theory)

@@ -53,7 +53,7 @@ Examples:
     ...     return collection
 
     Then we can register the experiment. We register the function, rather than evaluating it.
-    >>> register("sinusoid_experiment", sinusoid_experiment)
+    >>> register("sinusoid_experiment",sinusoid_experiment)
 
     When we want to retrieve the experiment, we can just use the default values if we like:
     >>> s = retrieve("sinusoid_experiment")
@@ -64,7 +64,7 @@ Examples:
 
     If we need to modify the parameter values, we can pass them as arguments to the retrieve
     function:
-    >>> t = retrieve("sinusoid_experiment", delta=0.2)
+    >>> t = retrieve("sinusoid_experiment",delta=0.2)
     >>> t.params  # doctest: +ELLIPSIS
     {..., 'delta': 0.2, ...}
 """
@@ -78,14 +78,14 @@ from typing import Any, Callable, Dict, Optional, Protocol
 from autora.variable import VariableCollection
 
 
-class SyntheticExperimentClosure(Protocol):
+class _SyntheticExperimentClosure(Protocol):
     """A function which returns a SyntheticExperimentCollection."""
 
     def __call__(self, *args, **kwargs) -> SyntheticExperimentCollection:
         ...
 
 
-class SupportsPredict(Protocol):
+class _SupportsPredict(Protocol):
     def predict(self, X) -> Any:
         ...
 
@@ -114,32 +114,34 @@ class SyntheticExperimentCollection:
     domain: Optional[Callable] = None
     experiment_runner: Optional[Callable] = None
     ground_truth: Optional[Callable] = None
-    plotter: Optional[Callable[[Optional[SupportsPredict]], None]] = None
+    plotter: Optional[Callable[[Optional[_SupportsPredict]], None]] = None
 
 
-Inventory: Dict[str, SyntheticExperimentClosure] = dict()
+_Inventory: Dict[str, _SyntheticExperimentClosure] = dict()
 """ The dictionary of `SyntheticExperimentCollection`. """
 
 
-def register(id: str, closure: SyntheticExperimentClosure) -> None:
+def register(id_: str, closure: _SyntheticExperimentClosure) -> None:
     """
-    Add a new synthetic experiment to the Inventory.
+    Add a new synthetic experiment to the _Inventory.
 
     Parameters:
-         id: the unique id for the model.
+         id_: the unique id for the model.
          closure: a function which returns a SyntheticExperimentCollection
 
     """
-    Inventory[id] = closure
+    _Inventory[id_] = closure
 
 
-def retrieve(id: str, **kwargs) -> SyntheticExperimentCollection:
-    """Retrieve a synthetic experiment from the Inventory.
+def retrieve(id_: str, **kwargs) -> SyntheticExperimentCollection:
+    """Retrieve a synthetic experiment from the _Inventory.
 
     Parameters:
-        id: the unique id for the model
+        id_: the unique id for the model
         **kwargs: keyword arguments for the synthetic experiment (metadata, coefficients etc.)
+    Returns:
+        the synthetic experiment
     """
-    closure: SyntheticExperimentClosure = Inventory[id]
+    closure: _SyntheticExperimentClosure = _Inventory[id_]
     evaluated_closure = closure(**kwargs)
     return evaluated_closure
