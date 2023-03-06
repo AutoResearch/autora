@@ -1,5 +1,5 @@
 import autora.synthetic
-from autora.synthetic._inventory import SyntheticExperimentCollection
+from autora.synthetic.inventory import SyntheticExperimentCollection
 from autora.variable import VariableCollection
 
 
