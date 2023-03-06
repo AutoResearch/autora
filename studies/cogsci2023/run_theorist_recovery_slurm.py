@@ -95,6 +95,7 @@ for theorist_name in theorists:
     if hasattr(theorist, 'model_') and 'BMS' not in theorist_name:
         theory_log.append(theorist.model_)
     elif 'BSR' in theorist_name:
+        theory_log.append('No BSR Theorist to Append')
         print('BSR not compatible with pickle')
         pass
     else:
