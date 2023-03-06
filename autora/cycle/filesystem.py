@@ -1,16 +1,21 @@
 """ Filesystem Cycle"""
 
-import copy
 import logging
-from typing import Callable, Dict, Iterable, Optional, Sequence, Union
+from typing import Callable, Dict, Optional, Sequence, Union
 
-import numpy as np
+from sklearn.base import BaseEstimator
 
+from autora.cycle.executor import (
+    wrap_experiment_runner_synthetic_experiment,
+    wrap_experimentalist_autora_experimentalist_pipeline,
+    wrap_theorist_scikit_learn,
+)
 from autora.cycle.planner import last_result_kind_planner
-from autora.cycle.protocol import Planner
-from autora.cycle.result import Result, ResultCollection, ResultKind
+from autora.cycle.protocol.v1 import Planner
+from autora.cycle.result import Result, ResultCollection
 from autora.cycle.result.serializer import ResultCollectionSerializer
 from autora.cycle.simple import _get_cycle_properties, _resolve_cycle_properties
+from autora.experimentalist.pipeline import Pipeline
 from autora.variable import VariableCollection
 
 _logger = logging.getLogger(__name__)
@@ -19,11 +24,11 @@ _logger = logging.getLogger(__name__)
 class FilesystemCycle:
     def __init__(
         self,
-        theorist,
-        experimentalist,
-        experiment_runner,
+        theorist: BaseEstimator,
+        experimentalist: Pipeline,
+        experiment_runner: Callable,
         monitor: Optional[Callable[[ResultCollection], None]] = None,
-        params: Optional[Dict] = None,
+        raw_params: Optional[Dict] = None,
         planner: Planner = last_result_kind_planner,
         # Load Parameters
         metadata: Optional[VariableCollection] = None,
@@ -215,7 +220,7 @@ class FilesystemCycle:
             ...     theorist=example_theorist,
             ...     experimentalist=example_experimentalist_with_parameters,
             ...     experiment_runner=example_synthetic_experiment_runner,
-            ...     params={"experimentalist": {"uniform_random_sampler": {"n": 7}}}
+            ...     raw_params={"experimentalist": {"uniform_random_sampler": {"n": 7}}}
             ... )
             >>> _ = list(takewhile(lambda c: len(c.state.conditions) < 1, cycle_with_parameters))
             >>> cycle_with_parameters.state.conditions[0].flatten()
@@ -277,7 +282,7 @@ class FilesystemCycle:
             ...     theorist=example_theorist,
             ...     experimentalist=unobserved_data_experimentalist,
             ...     experiment_runner=example_synthetic_experiment_runner,
-            ...     params={
+            ...     raw_params={
             ...         "experimentalist": {
             ...             "exclude_conditions": {"excluded_conditions": "%observations.ivs%"},
             ...             "custom_random_sampler": {"n": 1}
@@ -329,13 +334,17 @@ class FilesystemCycle:
             ValueError: a cannot be empty unless no samples are taken
         """
 
-        self.experimentalist = experimentalist
-        self.experiment_runner = experiment_runner
-        self.theorist = theorist
+        self.experimentalist = wrap_experimentalist_autora_experimentalist_pipeline(
+            experimentalist
+        )
+        self.experiment_runner = wrap_experiment_runner_synthetic_experiment(
+            experiment_runner
+        )
+        self.theorist = wrap_theorist_scikit_learn(theorist)
         self.monitor = monitor
-        if params is None:
-            params = dict()
-        self.params = params
+        if raw_params is None:
+            raw_params = dict()
+        self.raw_params = raw_params
         self.planner = planner
 
         self.state: ResultCollection = self._load_state(state, metadata, results)
@@ -391,7 +400,7 @@ class FilesystemCycle:
         next_function = self.planner(self)
 
         # Execute
-        result = next_function()
+        result = next_function(self)
 
         # Store
         self.state.append(result)
@@ -409,67 +418,12 @@ class FilesystemCycle:
             _logger.debug(f"{self.serializer=} must be set in order to dump")
 
     @property
-    def _params_and_cycle_properties(self):
+    def params(self):
+        """Returns the params dictionary, with "special" values like `theorist[-1]` resolved."""
         all_params = _resolve_cycle_properties(
-            self.params, _get_cycle_properties(self.state)
+            self.raw_params, _get_cycle_properties(self.state)
         )
         return all_params
-
-    def run_experimentalist(
-        self,
-    ):
-        experimentalist = self.experimentalist
-        params = self._params_and_cycle_properties.get("experimentalist", dict())
-        new_conditions = experimentalist(**params)
-        if isinstance(new_conditions, Iterable):
-            # If the pipeline gives us an iterable, we need to make it into a concrete array.
-            # We can't move this logic to the Pipeline, because the pipeline doesn't know whether
-            # it's within another pipeline and whether it should convert the iterable to a
-            # concrete array.
-            new_conditions_values = list(new_conditions)
-            new_conditions_array = np.array(new_conditions_values)
-        else:
-            raise NotImplementedError(f"Object {new_conditions} can't be handled yet.")
-
-        assert isinstance(
-            new_conditions_array, np.ndarray
-        )  # Check the object is bounded
-
-        result = Result(data=new_conditions_array, kind=ResultKind.CONDITION)
-
-        return result
-
-    def run_experiment_runner(
-        self,
-    ):
-        experiment_runner = self.experiment_runner
-        data_in = self.state
-        params = self._params_and_cycle_properties.get("experiment_runner", dict())
-        x = data_in.conditions[-1]
-        y = experiment_runner(x, **params)
-        new_observations = np.column_stack([x, y])
-
-        result = Result(data=new_observations, kind=ResultKind.OBSERVATION)
-
-        return result
-
-    def run_theorist(self):
-        theorist = self.theorist
-        data_in = self.state
-        params = self._params_and_cycle_properties.get("theorist", dict())
-        all_observations = np.row_stack(data_in.observations)
-        n_xs = len(
-            data_in.metadata.independent_variables
-        )  # The number of independent variables
-        x, y = all_observations[:, :n_xs], all_observations[:, n_xs:]
-        if y.shape[1] == 1:
-            y = y.ravel()
-        new_theorist = copy.deepcopy(theorist)
-        new_theorist.fit(x, y, **params)
-
-        result = Result(data=new_theorist, kind=ResultKind.THEORY)
-
-        return result
 
     def _monitor_callback(self, data: ResultCollection):
         if self.monitor is not None:

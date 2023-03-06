@@ -3,7 +3,7 @@ step.  """
 
 import random
 
-from autora.cycle.protocol import Cycle
+from autora.cycle.protocol.v1 import Cycle
 from autora.cycle.result import Result, ResultKind
 
 
@@ -20,10 +20,10 @@ def last_result_kind_planner(cycle: Cycle):
         last_result = Result(None, None)
 
     callback = {
-        None: cycle.run_experimentalist,
-        ResultKind.THEORY: cycle.run_experimentalist,
-        ResultKind.CONDITION: cycle.run_experiment_runner,
-        ResultKind.OBSERVATION: cycle.run_theorist,
+        None: cycle.experimentalist,
+        ResultKind.THEORY: cycle.experimentalist,
+        ResultKind.CONDITION: cycle.experiment_runner,
+        ResultKind.OBSERVATION: cycle.theorist,
     }[last_result.kind]
 
     return callback
@@ -36,9 +36,9 @@ def random_operation_planner(cycle: Cycle):
     Interpretation: A mercurial research assistant who doesn't remember what they did last.
     """
     options = [
-        cycle.run_experimentalist,
-        cycle.run_experiment_runner,
-        cycle.run_theorist,
+        cycle.experimentalist,
+        cycle.experiment_runner,
+        cycle.theorist,
     ]
     choice = random.choice(options)
     return choice
