@@ -3,7 +3,7 @@ from autora.synthetic._inventory import SyntheticExperimentCollection
 from autora.variable import VariableCollection
 
 
-def test_model_registration():
+def test_model_registration_retrieval():
     # We can register a model and retrieve it
     autora.synthetic.register("empty", lambda: SyntheticExperimentCollection())
     empty = autora.synthetic.retrieve("empty")
