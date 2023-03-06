@@ -30,7 +30,7 @@ def register(id_: str, closure: SyntheticExperimentClosure):
     _INVENTORY[id_] = closure
 
 
-def retrieve(id_: str, **params: Optional[Dict]):
+def retrieve(id_: str, **params):
     closure: SyntheticExperimentClosure = _INVENTORY[id_]
     evaluated_closure = closure(**params)
     return evaluated_closure
