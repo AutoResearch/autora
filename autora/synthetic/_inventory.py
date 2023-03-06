@@ -12,7 +12,7 @@ class SyntheticExperimentCollection:
     params: Optional[Dict] = field(default=None)
     metadata: Optional[VariableCollection] = field(default=None)
     domain: Optional[Callable] = field(default=None)
-    experiment: Optional[Callable] = field(default=None)
+    experiment_runner: Optional[Callable] = field(default=None)
     ground_truth: Optional[Callable] = field(default=None)
     plotter: Optional[Callable] = field(default=None)
 
@@ -22,15 +22,15 @@ class SyntheticExperimentClosure(Protocol):
         ...
 
 
-_INVENTORY: Dict[str, SyntheticExperimentClosure] = dict()
+Inventory: Dict[str, SyntheticExperimentClosure] = dict()
 """ An dictionary of example datasets which can be used to test different functionality."""
 
 
 def register(id: str, closure: SyntheticExperimentClosure):
-    _INVENTORY[id] = closure
+    Inventory[id] = closure
 
 
 def retrieve(id: str, **params):
-    closure: SyntheticExperimentClosure = _INVENTORY[id]
+    closure: SyntheticExperimentClosure = Inventory[id]
     evaluated_closure = closure(**params)
     return evaluated_closure

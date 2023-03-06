@@ -93,32 +93,36 @@ def expected_value_theory(
         minimum_value=minimum_value, maximum_value=maximum_value, resolution=resolution
     )
 
-    def experiment(X: np.ndarray, std=added_noise):
+    def experiment_runner(X: np.ndarray, added_noise_=added_noise):
 
-        n_obs = X.shape[0]
+        Y = np.zeros((X.shape[0], 1))
+        for idx, x in enumerate(X):
+            value_A = value_lambda * x[0]
+            value_B = value_lambda * x[2]
 
-        value_a = value_lambda * X[:, 0]
-        value_b = value_lambda * X[:, 2]
+            probability_a = x[1]
+            probability_b = x[3]
 
-        probability_a = X[:, 1]
-        probability_b = X[:, 3]
+            expected_value_A = value_A * probability_a + rng.normal(0, added_noise_)
+            expected_value_B = value_B * probability_b + rng.normal(0, added_noise_)
 
-        expected_value_a = value_a * probability_a + rng.normal(0, std, size=n_obs)
-        expected_value_b = value_b * probability_b + rng.normal(0, std, size=n_obs)
+            # compute probability of choosing option A
+            p_choose_A = np.exp(expected_value_A / choice_temperature) / (
+                np.exp(expected_value_A / choice_temperature)
+                + np.exp(expected_value_B / choice_temperature)
+            )
 
-        # compute probability of choosing option A
-        p_choose_a = np.exp(expected_value_a / choice_temperature) / (
-            np.exp(expected_value_a / choice_temperature)
-            + np.exp(expected_value_b / choice_temperature)
-        )
+            Y[idx] = p_choose_A
 
-        return p_choose_a
+        return Y
 
-    ground_truth = partial(experiment, added_noise_=0.0)
+    ground_truth = partial(experiment_runner, added_noise_=0.0)
 
-    domain = np.array(
-        np.meshgrid([x.allowed_values for x in metadata.independent_variables])
-    ).T.reshape(-1, 4)
+    def domain():
+        X = np.array(
+            np.meshgrid([x.allowed_values for x in metadata.independent_variables])
+        ).T.reshape(-1, 4)
+        return X
 
     def plotter(model=None):
         import matplotlib.colors as mcolors
@@ -168,7 +172,7 @@ def expected_value_theory(
     collection = SyntheticExperimentCollection(
         name=name,
         metadata=metadata,
-        experiment=experiment,
+        experiment_runner=experiment_runner,
         ground_truth=ground_truth,
         domain=domain,
         plotter=plotter,

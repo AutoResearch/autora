@@ -7,18 +7,18 @@ from .expected_value import get_metadata
 
 
 def prospect_theory(
-    added_noise=0.00,
+    name="Prospect Theory",
+    added_noise=0.01,
     choice_temperature=0.1,
     value_alpha=0.88,
     value_beta=0.88,
     value_lambda=2.25,
-    probability_alpha=1.0,
+    probability_alpha=0.61,
     probability_beta=0.69,
     resolution=10,
     minimum_value=-1,
     maximum_value=1,
     rng=np.random.default_rng(),
-    name="Prospect Theory",
 ):
     """
     Parameters from
@@ -26,15 +26,18 @@ def prospect_theory(
     Econometrica 47, 263–292 (1979). doi:10.2307/1914185
 
     Power value function according to:
+        - A. Tversky, D. Kahneman, Advances in prospect theory: Cumulative representation of
+          uncertainty. J. Risk Uncertain. 5, 297–323 (1992). doi:10.1007/BF00122574
 
-    A. Tversky, D. Kahneman, Advances in prospect theory: Cumulative representation of
-    uncertainty. J. Risk Uncertain. 5, 297–323 (1992). doi:10.1007/BF00122574
+        - I. Gilboa, Expected utility with purely subjective non-additive probabilities.
+          J. Math. Econ. 16, 65–88 (1987). doi:10.1016/0304-4068(87)90022-X
 
-    I. Gilboa, Expected utility with purely subjective non-additive probabilities.
-    J. Math. Econ. 16, 65–88 (1987). doi:10.1016/0304-4068(87)90022-X
+        - D. Schmeidler, Subjective probability and expected utility without additivity.
+          Econometrica 57, 571 (1989). doi:10.2307/1911053
 
-    D. Schmeidler, Subjective probability and expected utility without additivity.
-    Econometrica 57, 571 (1989). doi:10.2307/1911053
+    Probability function according to:
+        A. Tversky, D. Kahneman, Advances in prospect theory: Cumulative representation of
+        uncertainty. J. Risk Uncertain. 5, 297–323 (1992). doi:10.1007/BF00122574
 
     """
 
@@ -57,14 +60,21 @@ def prospect_theory(
         minimum_value=minimum_value, maximum_value=maximum_value, resolution=resolution
     )
 
-    def experiment(
-        X: np.ndarray,
-        std=added_noise,
-        rng_generator=np.random.default_rng(),
-    ):
+    def experiment_runner(X: np.ndarray, added_noise_=added_noise):
 
         Y = np.zeros((X.shape[0], 1))
         for idx, x in enumerate(X):
+
+            # power value function according to:
+
+            # A. Tversky, D. Kahneman, Advances in prospect theory: Cumulative representation of
+            # uncertainty. J. Risk Uncertain. 5, 297–323 (1992). doi:10.1007/BF00122574
+
+            # I. Gilboa, Expected utility with purely subjective non-additive probabilities.
+            # J. Math. Econ. 16, 65–88 (1987). doi:10.1016/0304-4068(87)90022-X
+
+            # D. Schmeidler, Subjective probability and expected utility without additivity.
+            # Econometrica 57, 571 (1989). doi:10.2307/1911053
 
             # compute value of option A
             if x[0] > 0:
@@ -84,7 +94,7 @@ def prospect_theory(
             # uncertainty. J. Risk Uncertain. 5, 297–323 (1992). doi:10.1007/BF00122574
 
             # compute probability of option A
-            if x[1] >= 0:
+            if x[0] >= 0:
                 coefficient = probability_alpha
             else:
                 coefficient = probability_beta
@@ -94,7 +104,7 @@ def prospect_theory(
             ) ** (1 / coefficient)
 
             # compute probability of option B
-            if x[3] >= 0:
+            if x[2] >= 0:
                 coefficient = probability_alpha
             else:
                 coefficient = probability_beta
@@ -103,8 +113,8 @@ def prospect_theory(
                 x[3] ** coefficient + (1 - x[3]) ** coefficient
             ) ** (1 / coefficient)
 
-            expected_value_A = value_A * probability_a + rng_generator.normal(0, std)
-            expected_value_B = value_B * probability_b + rng_generator.normal(0, std)
+            expected_value_A = value_A * probability_a + rng.normal(0, added_noise_)
+            expected_value_B = value_B * probability_b + rng.normal(0, added_noise_)
 
             # compute probability of choosing option A
             p_choose_A = np.exp(expected_value_A / choice_temperature) / (
@@ -116,11 +126,16 @@ def prospect_theory(
 
         return Y
 
-    ground_truth = partial(experiment, std=0.0)
+    ground_truth = partial(experiment_runner, added_noise_=0.0)
 
-    domain = np.array(
-        np.meshgrid([x.allowed_values for x in metadata.independent_variables])
-    ).T.reshape(-1, 4)
+    def domain():
+        v_a = metadata.independent_variables[0].allowed_values
+        p_a = metadata.independent_variables[1].allowed_values
+        v_b = metadata.independent_variables[2].allowed_values
+        p_b = metadata.independent_variables[3].allowed_values
+
+        X = np.array(np.meshgrid(v_a, p_a, v_b, p_b)).T.reshape(-1, 4)
+        return X
 
     def plotter(model=None):
         import matplotlib.colors as mcolors
@@ -173,7 +188,7 @@ def prospect_theory(
         params=params,
         metadata=metadata,
         domain=domain,
-        experiment=experiment,
+        experiment_runner=experiment_runner,
         ground_truth=ground_truth,
         plotter=plotter,
     )
