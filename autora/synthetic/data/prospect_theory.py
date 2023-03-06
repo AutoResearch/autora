@@ -2,7 +2,7 @@ from functools import partial
 
 import numpy as np
 
-from .._inventory import SyntheticExperimentCollection, register
+from ..inventory import SyntheticExperimentCollection, register
 from .expected_value import get_metadata
 
 

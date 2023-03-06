@@ -64,4 +64,4 @@ Examples:
 """
 
 from autora.synthetic import data
-from autora.synthetic._inventory import Inventory, register, retrieve
+from autora.synthetic.inventory import Inventory, register, retrieve

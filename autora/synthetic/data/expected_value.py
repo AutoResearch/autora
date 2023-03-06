@@ -4,7 +4,7 @@ import numpy as np
 
 from autora.variable import DV, IV, ValueType, VariableCollection
 
-from .._inventory import SyntheticExperimentCollection, register
+from ..inventory import SyntheticExperimentCollection, register
 
 
 def get_metadata(minimum_value, maximum_value, resolution):

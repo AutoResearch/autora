@@ -4,7 +4,7 @@ import numpy as np
 
 from autora.variable import DV, IV, ValueType, VariableCollection
 
-from .._inventory import SyntheticExperimentCollection, register
+from ..inventory import SyntheticExperimentCollection, register
 
 
 def weber_fechner_law(
