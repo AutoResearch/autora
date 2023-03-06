@@ -1,0 +1,45 @@
+name: Publish package to Anaconda.org
+
+on:
+  release:
+    types: [ published ]
+
+jobs:
+  build-conda:
+    runs-on: ubuntu-20.04
+    # ubuntu-20.04 selected over ubuntu-latest because
+    # upload part of conda build command is broken in ubuntu-latest
+    # JGH: I think that the function conda_build.external.find_executable
+    # ...  might be returning a list of executables for the "anaconda"
+    # ...  rather than the expected single value.
+    # When updating to ubuntu 22.04: check that upload functions correctly.
+    # If it does, you're fine to update and get rid of this comment.
+
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Replace version number in meta.yaml with release number
+      run: |
+        REF_NAME_WITHOUT_V=${GITHUB_REF_NAME#v}
+        sed -i.bak "s/^{% set version =.*$/{% set version = \"${REF_NAME_WITHOUT_V}\" %}/" conda/autora/meta.yaml
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+        
+    - name: Add conda to system path
+      run: |
+        # $CONDA is an environment variable pointing to the root of the miniconda directory
+        echo $CONDA/bin >> $GITHUB_PATH
+        
+    - name: Install dependencies
+      run: | 
+        conda install conda-build conda-verify anaconda-client
+    
+    - name: Build
+      run: |
+        cd ./conda
+        conda config --set anaconda_upload yes
+        conda build autora -c pytorch --token "${{ secrets.ANACONDA_TOKEN }}"
+        
