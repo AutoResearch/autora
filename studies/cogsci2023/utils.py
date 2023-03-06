@@ -268,6 +268,8 @@ def get_MSE(theorist, x, y_target):
 
     if y_target.shape[1] == 1:
         y_target = y_target.flatten()
+    if y_prediction.shape[1] == 1:
+        y_prediction = y_prediction.flatten()
 
     MSE = np.mean(np.square(y_target - y_prediction))
 

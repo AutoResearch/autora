@@ -9,7 +9,7 @@ from studies.cogsci2023.models.models import model_inventory
 
 # set the path to the data directory
 path = './data/'
-ground_truth_name = 'prospect_theory'
+ground_truth_name = 'shepard_luce_chocie'
 # OPTIONS: see models.py
 
 # TODO: - implement a better way to exclude outliers (e.g., MSE above mean + 3std for each experimentalist)

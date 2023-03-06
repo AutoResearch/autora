@@ -19,10 +19,10 @@ test_size = 0.2                # proportion of test set size to training set siz
 
 theorists = [
              'MLP',
-             'DARTS 2 Nodes',
+             # 'DARTS 2 Nodes',
              'DARTS 3 Nodes',
              'Regression',
-             # 'BMS',
+             'BMS',
              'BMS Fixed Root'
              ]
 

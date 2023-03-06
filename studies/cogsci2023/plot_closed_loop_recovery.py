@@ -11,32 +11,33 @@ from studies.cogsci2023.models.models import model_inventory, plot_inventory
 
 # set the path to the data_closed_loop directory
 path = 'data_closed_loop/'
-ground_truth_name = 'prospect_theory' # OPTIONS: see models.py
+ground_truth_name = 'stroop_model' # OPTIONS: see models.py
 experimentalist_name = 'Random' # for plotting
 max_cycle_mse = 50 # None
-max_cycle_tnse = 20 # None
+max_cycle_tnse = 10 # None
 
 plot_performance = True
-plot_model = False
-plot_tsne = False
+plot_model = True
+plot_tsne = True
 print_model = False
 legend_type = "auto" # False, "auto"
 figure_dim = (5.5, 5.5)
+figure_dim_tnse = (5.5, 5.5)
 
 experimentalist_labels = dict()
 experimentalist_labels['dissimilarity'] = 'Novelty'
-experimentalist_labels['falsification'] = 'Falsification'
+# experimentalist_labels['falsification'] = 'Falsification'
 experimentalist_labels['least confident'] = 'Least Confident'
-experimentalist_labels['model disagreement'] = 'Model Disagreement'
+experimentalist_labels['model disagreement'] = 'Model Comparison'
 experimentalist_labels['random'] = 'Random'
-experimentalist_labels['popper'] = 'Popper'
+experimentalist_labels['popper'] = 'Falsification'
 
 experimentalist_order = list()
 experimentalist_order.append(experimentalist_labels['random'])
 experimentalist_order.append(experimentalist_labels['dissimilarity'])
 experimentalist_order.append(experimentalist_labels['least confident'])
 experimentalist_order.append(experimentalist_labels['model disagreement'])
-experimentalist_order.append(experimentalist_labels['falsification'])
+# experimentalist_order.append(experimentalist_labels['falsification'])
 experimentalist_order.append(experimentalist_labels['popper'])
 
 
@@ -170,7 +171,7 @@ if plot_performance:
     )
     rel.fig.subplots_adjust(top=.90)
     rel.fig.subplots_adjust(bottom=0.2)
-    rel.fig.suptitle(plot_title)
+    rel.fig.suptitle("Model Performance") # n" + "(" + plot_title + ")"
     rel.fig.set_size_inches(figure_dim[0],figure_dim[1]-2)
     # leg = rel._legend
     # leg.set_bbox_to_anchor([0.5, 0.5])  # coordinates of lower left of bounding box
@@ -197,6 +198,9 @@ if plot_model:
 # PLOT THE DATA COLLECTED BY THE BEST-PERFORMING EXPERIMENTALIST
 
 if plot_tsne:
+    sns.set(rc={'figure.figsize': figure_dim}) # figure_dim
+    sns.set(font_scale=1.3)
+
     df_tsne_cycle = df_validation[
         df_validation["Data Collection Cycle"] == max_cycle_tnse]
     df_best_theories = df_tsne_cycle.loc[
@@ -285,15 +289,21 @@ if plot_tsne:
     # T-SNE Plot for experimentalists
     custom_palette = sns.color_palette("deep", len(set(labels)))
     # custom_palette[0] = (0.5, 0.5, 0.5)
-    sns.set(font_scale=1.3)
     pl = sns.scatterplot(x="Component 1", y="Component 2", hue=df.Labels.tolist(),
                     palette=custom_palette,
                     hue_order=experimentalist_order,
                     # s = 10,
                     alpha=0.5,
                     legend=legend_type,
-                    data=df).set(title="T-SNE Projection of Probed Experimental Conditions\n(" + plot_title + ")")
+                    data=df).set(title="Probed Experimental Conditions\n After " + str(max_cycle_tnse) + " Data Collection Cycles") # \n(" + plot_title + ")
     # pl.set_xlabel("X Label",fontsize=30)
+    # pl[0].axes.legend(loc='center left', bbox_to_anchor=(1.25, 0.5), ncol=1)
+    plt.subplots_adjust(left=0.15)
+    if legend_type == "auto":
+        plt.subplots_adjust(right=0.3)
+        leg = plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0, frameon=True)
+        frame = leg.get_frame()
+        frame.set_facecolor('white')
     plt.show()
 
     sns.histplot(data=full_data_only, x="y", bins=100)
