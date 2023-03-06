@@ -4,7 +4,7 @@ import numpy as np
 
 from autora.variable import DV, IV, ValueType, VariableCollection
 
-from .._inventory import register
+from .._inventory import SyntheticExperimentCollection, register
 
 
 def weber_fechner_metadata(weber_resolution=100, maximum_stimulus_intensity=5.0):
@@ -122,10 +122,5 @@ def plot_weber_fechner(
 
 register(
     id_="weber_fechner",
-    name="Weber-Fechner Law",
-    metadata=weber_fechner_metadata(),
-    domain=get_domain,
-    experiment=weber_fechner_experiment,
-    ground_truth=ground_truth_,
-    plotter=plot_weber_fechner,
+    closure=lambda: SyntheticExperimentCollection(),  # TODO replace this
 )

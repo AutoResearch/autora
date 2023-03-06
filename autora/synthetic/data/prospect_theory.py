@@ -2,8 +2,8 @@ from functools import partial
 
 import numpy as np
 
-from .._inventory import register
-from .expected_value import expected_value_theory_metadata
+from .._inventory import SyntheticExperimentCollection, register
+from .expected_value import make_metadata as expected_value_theory_metadata
 
 # general meta parameters
 added_noise = 0.00
@@ -171,10 +171,5 @@ def plot_prospect_theory(model=None, ground_truth=ground_truth):
 
 register(
     id_="prospect_theory",
-    name="Prospect Theory",
-    metadata=prospect_theory_metadata(),
-    domain=get_domain,
-    ground_truth=ground_truth,
-    experiment=prospect_theory_experiment,
-    plotter=plot_prospect_theory,
+    closure=lambda: SyntheticExperimentCollection(),  # TODO replace this
 )
