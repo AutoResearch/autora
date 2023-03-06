@@ -120,7 +120,4 @@ def plot_weber_fechner(
     plt.show()
 
 
-register(
-    id_="weber_fechner",
-    closure=lambda: SyntheticExperimentCollection(),  # TODO replace this
-)
+register(id="weber_fechner", closure=lambda: SyntheticExperimentCollection())

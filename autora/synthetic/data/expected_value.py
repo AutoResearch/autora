@@ -7,15 +7,15 @@ from autora.variable import DV, IV, ValueType, VariableCollection
 from .._inventory import SyntheticExperimentCollection, register
 
 
-def make_metadata(minimum_value_, maximum_value_, resolution_):
+def get_metadata(minimum_value, maximum_value, resolution):
     v_a = IV(
         name="V_A",
         allowed_values=np.linspace(
-            minimum_value_,
-            maximum_value_,
-            resolution_,
+            minimum_value,
+            maximum_value,
+            resolution,
         ),
-        value_range=(minimum_value_, maximum_value_),
+        value_range=(minimum_value, maximum_value),
         units="dollar",
         variable_label="Value of Option A",
         type=ValueType.REAL,
@@ -24,11 +24,11 @@ def make_metadata(minimum_value_, maximum_value_, resolution_):
     v_b = IV(
         name="V_B",
         allowed_values=np.linspace(
-            minimum_value_,
-            maximum_value_,
-            resolution_,
+            minimum_value,
+            maximum_value,
+            resolution,
         ),
-        value_range=(minimum_value_, maximum_value_),
+        value_range=(minimum_value, maximum_value),
         units="dollar",
         variable_label="Value of Option B",
         type=ValueType.REAL,
@@ -36,7 +36,7 @@ def make_metadata(minimum_value_, maximum_value_, resolution_):
 
     p_a = IV(
         name="P_A",
-        allowed_values=np.linspace(0, 1, resolution_),
+        allowed_values=np.linspace(0, 1, resolution),
         value_range=(0, 1),
         units="probability",
         variable_label="Probability of Option A",
@@ -45,7 +45,7 @@ def make_metadata(minimum_value_, maximum_value_, resolution_):
 
     p_b = IV(
         name="P_B",
-        allowed_values=np.linspace(0, 1, resolution_),
+        allowed_values=np.linspace(0, 1, resolution),
         value_range=(0, 1),
         units="probability",
         variable_label="Probability of Option B",
@@ -70,7 +70,7 @@ def make_metadata(minimum_value_, maximum_value_, resolution_):
 def expected_value_theory(
     name="Expected Value Theory",
     choice_temperature: float = 0.1,
-    lambda_: float = 0.5,
+    value_lambda: float = 0.5,
     resolution=10,
     minimum_value=-1,
     maximum_value=1,
@@ -79,37 +79,32 @@ def expected_value_theory(
 ):
 
     params = dict(
+        name=name,
         minimum_value=minimum_value,
         maximum_value=maximum_value,
         resolution=resolution,
         choice_temperature=choice_temperature,
-        lambda_=lambda_,
+        value_lambda=value_lambda,
         added_noise=added_noise,
         random_number_generator=rng,
     )
 
-    metadata_ = make_metadata(
-        minimum_value_=minimum_value,
-        maximum_value_=maximum_value,
-        resolution_=resolution,
+    metadata = get_metadata(
+        minimum_value=minimum_value, maximum_value=maximum_value, resolution=resolution
     )
 
-    def expected_value_theory_experiment(X: np.ndarray, added_noise_=added_noise):
+    def experiment(X: np.ndarray, std=added_noise):
 
         n_obs = X.shape[0]
 
-        value_a = lambda_ * X[:, 0]
-        value_b = lambda_ * X[:, 2]
+        value_a = value_lambda * X[:, 0]
+        value_b = value_lambda * X[:, 2]
 
         probability_a = X[:, 1]
         probability_b = X[:, 3]
 
-        expected_value_a = value_a * probability_a + rng.normal(
-            0, added_noise_, size=n_obs
-        )
-        expected_value_b = value_b * probability_b + rng.normal(
-            0, added_noise_, size=n_obs
-        )
+        expected_value_a = value_a * probability_a + rng.normal(0, std, size=n_obs)
+        expected_value_b = value_b * probability_b + rng.normal(0, std, size=n_obs)
 
         # compute probability of choosing option A
         p_choose_a = np.exp(expected_value_a / choice_temperature) / (
@@ -119,13 +114,13 @@ def expected_value_theory(
 
         return p_choose_a
 
-    ground_truth_ = partial(expected_value_theory_experiment, added_noise_=0.0)
+    ground_truth = partial(experiment, added_noise_=0.0)
 
     domain = np.array(
-        np.meshgrid(x.allowed_values for x in metadata_.independent_variables)
+        np.meshgrid([x.allowed_values for x in metadata.independent_variables])
     ).T.reshape(-1, 4)
 
-    def plotter(model=None, ground_truth=ground_truth_):
+    def plotter(model=None):
         import matplotlib.colors as mcolors
         import matplotlib.pyplot as plt
 
@@ -157,7 +152,7 @@ def expected_value_theory(
                     linestyle="--",
                 )
 
-        x_limit = [0, metadata_.independent_variables[1].value_range[1]]
+        x_limit = [0, metadata.independent_variables[1].value_range[1]]
         y_limit = [0, 1]
         x_label = "Probability of Choosing Option A"
         y_label = "Probability of Obtaining V(A)"
@@ -172,9 +167,9 @@ def expected_value_theory(
 
     collection = SyntheticExperimentCollection(
         name=name,
-        metadata=metadata_,
-        experiment=expected_value_theory_experiment,
-        ground_truth=ground_truth_,
+        metadata=metadata,
+        experiment=experiment,
+        ground_truth=ground_truth,
         domain=domain,
         plotter=plotter,
         params=params,
@@ -182,4 +177,4 @@ def expected_value_theory(
     return collection
 
 
-register(id_="expected_value", closure=expected_value_theory)
+register(id="expected_value", closure=expected_value_theory)

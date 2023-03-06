@@ -26,11 +26,11 @@ _INVENTORY: Dict[str, SyntheticExperimentClosure] = dict()
 """ An dictionary of example datasets which can be used to test different functionality."""
 
 
-def register(id_: str, closure: SyntheticExperimentClosure):
-    _INVENTORY[id_] = closure
+def register(id: str, closure: SyntheticExperimentClosure):
+    _INVENTORY[id] = closure
 
 
-def retrieve(id_: str, **params):
-    closure: SyntheticExperimentClosure = _INVENTORY[id_]
+def retrieve(id: str, **params):
+    closure: SyntheticExperimentClosure = _INVENTORY[id]
     evaluated_closure = closure(**params)
     return evaluated_closure
