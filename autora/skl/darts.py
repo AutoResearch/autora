@@ -772,7 +772,7 @@ class DARTSRegressor(BaseEstimator, RegressorMixin):
             output_format=output_format,
         )
 
-        model_repr_ = "\n".join(["SyntheticDataCollection:"] + edge_list)
+        model_repr_ = "\n".join(["Model:"] + edge_list)
         return model_repr_
 
 

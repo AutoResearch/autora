@@ -184,7 +184,7 @@ def plot_darts_summary(
         x2_label = x2_name
 
     if y_reference_label == "":
-        y_reference_label = "Data Generating SyntheticDataCollection"
+        y_reference_label = "Data Generating Model"
 
     # determine directory for study results and figures
     results_path = (
@@ -526,7 +526,7 @@ def plot_darts_summary(
 
         colors = sns.color_palette(palette, 10)
         color = colors[-1]
-        full_label = "Reconstructed SyntheticDataCollection" + legend_label_spec
+        full_label = "Reconstructed Model" + legend_label_spec
         sns.lineplot(
             x=x1_plot,
             y=y_plot,
@@ -543,7 +543,7 @@ def plot_darts_summary(
 
         # draw second y value
         if metric == "mean_min" or metric == "mean_max":
-            full_label = "Reconstructed SyntheticDataCollection" + legend_label2_spec
+            full_label = "Reconstructed Model" + legend_label2_spec
             ax.plot(x1_plot, y2_plot, "*", linewidth=2, label=full_label, color=color)
 
             if show_legend:
@@ -648,7 +648,7 @@ def plot_darts_summary(
                 best_model_y,
                 "*",
                 linewidth=2,
-                label="Best SyntheticDataCollection",
+                label="Best Model",
                 color=color,
             )
 
@@ -911,9 +911,7 @@ class DebugWindow:
         # set labels
         self.modelFitPlot.set_xlabel("Epoch", fontsize=self.fontSize)
         self.modelFitPlot.set_ylabel("Information Criterion", fontsize=self.fontSize)
-        self.modelFitPlot.set_title(
-            "SyntheticDataCollection Fit", fontsize=self.fontSize
-        )
+        self.modelFitPlot.set_title("Model Fit", fontsize=self.fontSize)
         self.modelFitPlot.legend((self.BIC, self.AIC), ("BIC", "AIC"))
 
         # adjust axes
