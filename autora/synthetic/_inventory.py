@@ -1,4 +1,4 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Callable, Dict, Optional, Protocol
 
 from autora.variable import VariableCollection
@@ -8,13 +8,13 @@ from autora.variable import VariableCollection
 class SyntheticExperimentCollection:
     """Represents a synthetic experiment setup, including domain."""
 
-    name: Optional[str] = field(default=None)
-    params: Optional[Dict] = field(default=None)
-    metadata: Optional[VariableCollection] = field(default=None)
-    domain: Optional[Callable] = field(default=None)
-    experiment_runner: Optional[Callable] = field(default=None)
-    ground_truth: Optional[Callable] = field(default=None)
-    plotter: Optional[Callable] = field(default=None)
+    name: Optional[str] = None
+    params: Optional[Dict] = None
+    metadata: Optional[VariableCollection] = None
+    domain: Optional[Callable] = None
+    experiment_runner: Optional[Callable] = None
+    ground_truth: Optional[Callable] = None
+    plotter: Optional[Callable] = None
 
 
 class SyntheticExperimentClosure(Protocol):
