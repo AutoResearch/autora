@@ -1,0 +1,24 @@
+name: Test Poetry Build
+
+on:
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-poetry:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - run: pipx install poetry
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: 3.8
+          cache: 'poetry'
+
+      - name: Install dependencies
+        run: poetry install
+
+      - name: Build package
+        run: poetry build

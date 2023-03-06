@@ -14,6 +14,7 @@ from .simple import SimpleCycle as Cycle
 # Change default plot styles
 rcParams["axes.spines.top"] = False
 rcParams["axes.spines.right"] = False
+rcParams["legend.frameon"] = False
 
 
 def _get_variable_index(
@@ -130,25 +131,25 @@ def _generate_mesh_grid(cycle: Cycle, steps: int = 50) -> np.ndarray:
 
 def _theory_predict(
     cycle: Cycle, conditions: Sequence, predict_proba: bool = False
-) -> dict:
+) -> list:
     """
-    Gets theory predictions over conditions space and saves results of each cycle to a dictionary.
+    Gets theory predictions over conditions space and saves results of each cycle to a list.
     Args:
         cycle: AER Cycle object that has been run
         conditions: Condition space. Should be an array of grouped conditions.
         predict_proba: Use estimator.predict_proba method instead of estimator.predict.
 
-    Returns: dict
+    Returns: list
 
     """
-    d_predictions = {}
+    l_predictions = []
     for i, theory in enumerate(cycle.data.theories):
         if not predict_proba:
-            d_predictions[i] = theory.predict(conditions)
+            l_predictions.append(theory.predict(conditions))
         else:
-            d_predictions[i] = theory.predict_proba(conditions)
+            l_predictions.append(theory.predict_proba(conditions))
 
-    return d_predictions
+    return l_predictions
 
 
 def _check_replace_default_kw(default: dict, user: dict) -> dict:
@@ -278,13 +279,13 @@ def plot_results_panel_2d(
     condition_space = _generate_condition_space(cycle, steps=steps)
 
     # Get theory predictions over space
-    d_predictions = _theory_predict(cycle, condition_space)
+    l_predictions = _theory_predict(cycle, condition_space)
 
     # Cycle Indexing
     cycle_idx = list(range(len(cycle.data.theories)))
     if query:
         if isinstance(query, list):
-            cycle_idx = query
+            cycle_idx = [cycle_idx[s] for s in query]
         elif isinstance(query, slice):
             cycle_idx = cycle_idx[query]
 
@@ -321,7 +322,7 @@ def plot_results_panel_2d(
 
             # ---Plot Theory---
             conditions = condition_space[:, iv[0]]
-            ax.plot(conditions, d_predictions[i_cycle], **d_kw["plot_theory_kw"])
+            ax.plot(conditions, l_predictions[i_cycle], **d_kw["plot_theory_kw"])
 
             # Label Panels
             ax.text(
@@ -434,7 +435,7 @@ def plot_results_panel_3d(
     x1, x2 = _generate_mesh_grid(cycle, steps=steps)
 
     # Get theory predictions over space
-    d_predictions = _theory_predict(cycle, np.column_stack((x1.ravel(), x2.ravel())))
+    l_predictions = _theory_predict(cycle, np.column_stack((x1.ravel(), x2.ravel())))
 
     # Subplot configurations
     if n_cycles < wrap:
@@ -464,7 +465,7 @@ def plot_results_panel_3d(
 
             # ---Plot Theory---
             ax.plot_surface(
-                x1, x2, d_predictions[i].reshape(x1.shape), **d_kw["surface_kw"]
+                x1, x2, l_predictions[i].reshape(x1.shape), **d_kw["surface_kw"]
             )
             # ---Labels---
             # Title
@@ -532,13 +533,13 @@ def cycle_specified_score(
     """
     # Get predictions
     if "y_pred" in inspect.signature(scorer).parameters.keys():
-        d_y_pred = _theory_predict(cycle, x_vals, predict_proba=False)
+        l_y_pred = _theory_predict(cycle, x_vals, predict_proba=False)
     elif "y_score" in inspect.signature(scorer).parameters.keys():
-        d_y_pred = _theory_predict(cycle, x_vals, predict_proba=True)
+        l_y_pred = _theory_predict(cycle, x_vals, predict_proba=True)
 
     # Score each cycle
     l_scores = []
-    for i, y_pred in d_y_pred.items():
+    for y_pred in l_y_pred:
         l_scores.append(scorer(y_true, y_pred, **kwargs))
 
     return l_scores

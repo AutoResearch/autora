@@ -1,4 +1,4 @@
-name: documentation
+name: Publish documentation to GitHub Pages
 on:
   release:
     types: [released]
