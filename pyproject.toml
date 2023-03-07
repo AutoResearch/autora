@@ -46,7 +46,7 @@ mkdocs-material = "^8.5.10"
 mkdocs-gen-files = "^0.3.4"
 mkdocs-literate-nav = "^0.4.1"
 mkdocs-section-index = "^0.3.4"
-mkdocstrings-python = "^0.7.1"
+mkdocstrings-python = ">=0.7.1,<0.9.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
