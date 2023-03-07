@@ -32,7 +32,7 @@ tinkerforge = ["tinkerforge"]
 [tool.poetry.group.dev.dependencies]
 jupyter = "^1.0.0"
 ipython = "^8.4.0"
-ipywidgets = "^7.7.1"
+ipywidgets = ">=7.7.1,<9.0.0"
 flake8 = "^6.0.0"
 
 [tool.poetry.group.test.dependencies]
