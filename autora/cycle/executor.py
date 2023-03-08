@@ -11,7 +11,7 @@ from autora.experimentalist.pipeline import Pipeline
 
 def wrap_theorist_scikit_learn(theorist: BaseEstimator):
     def wrapped_theorist(cycle: Cycle):
-        params = cycle.params.get("theorist", dict())
+        params = cycle.params_resolved.get("theorist", dict())
         all_observations = np.row_stack(cycle.state.observations)
         n_xs = len(cycle.state.metadata.independent_variables)
         x, y = all_observations[:, :n_xs], all_observations[:, n_xs:]
@@ -28,7 +28,7 @@ def wrap_theorist_scikit_learn(theorist: BaseEstimator):
 def wrap_experimentalist_autora_experimentalist_pipeline(experimentalist: Pipeline):
     def wrapped_experimentalist(cycle: Cycle):
 
-        params = cycle.params.get("experimentalist", dict())
+        params = cycle.params_resolved.get("experimentalist", dict())
         new_conditions = experimentalist(**params)
         if isinstance(new_conditions, Iterable):
             # If the pipeline gives us an iterable, we need to make it into a concrete array.
@@ -50,7 +50,7 @@ def wrap_experimentalist_autora_experimentalist_pipeline(experimentalist: Pipeli
 
 def wrap_experiment_runner_synthetic_experiment(experiment_runner: Callable):
     def wrapped_experiment_runner(cycle):
-        params = cycle.params.get("experiment_runner", dict())
+        params = cycle.params_resolved.get("experiment_runner", dict())
         x = cycle.state.conditions[-1]
         y = experiment_runner(x, **params)
         new_observations = np.column_stack([x, y])

@@ -8,7 +8,7 @@ from autora.cycle.result import Result, ResultCollection
 @runtime_checkable
 class Cycle(Protocol):
     state: ResultCollection
-    params: Dict
+    params_resolved: Dict
     experimentalist: Executor
     experiment_runner: Executor
     theorist: Executor

@@ -28,13 +28,11 @@ class FilesystemCycle:
         experimentalist: Pipeline,
         experiment_runner: Callable,
         monitor: Optional[Callable[[ResultCollection], None]] = None,
-        raw_params: Optional[Dict] = None,
+        params: Optional[Dict] = None,
         planner: Planner = last_result_kind_planner,
-        # Load Parameters
         metadata: Optional[VariableCollection] = None,
         results: Optional[Union[Sequence[Result], Result]] = None,
         state: Optional[Union[ResultCollectionSerializer, ResultCollection]] = None,
-        # Dump Parameters
         serializer: Optional[ResultCollectionSerializer] = None,
     ):
         """
@@ -64,7 +62,7 @@ class FilesystemCycle:
             Aim: Use the FilesystemCycle to recover a simple ground truth theory from noisy data.
 
             >>> def ground_truth(x):
-            ...     return x + 1
+            ...     return (x + 1)
 
             The space of allowed x values is the integers between 0 and 10 inclusive,
             and we record the allowed output values as well.
@@ -85,10 +83,11 @@ class FilesystemCycle:
             >>> def get_example_synthetic_experiment_runner():
             ...     rng = np.random.default_rng(seed=180)
             ...     def runner(x):
-            ...         return ground_truth(x) + rng.normal(0, 0.1, x.shape)
+            ...         result = ground_truth(x) + rng.normal(0, 0.1, x.shape)
+            ...         return result
             ...     return runner
             >>> example_synthetic_experiment_runner = get_example_synthetic_experiment_runner()
-            >>> example_synthetic_experiment_runner(np.ndarray([1]))
+            >>> example_synthetic_experiment_runner(np.array([1.]))
             array([2.04339546])
 
             The theorist "tries" to work out the best theory.
@@ -101,12 +100,11 @@ class FilesystemCycle:
             as well as a monitor which will let us know which cycle we're currently on.
             >>> def last_datum_monitor(state):
             ...     print(f"Generated {len(state)}-th datum, a new {state[-1].kind}")
-            >>> cycle = FilesystemCycle(
-            ...     theorist=example_theorist,
-            ...     experimentalist=example_experimentalist,
-            ...     experiment_runner=example_synthetic_experiment_runner,
-            ...     monitor=last_datum_monitor,
-            ...     metadata=metadata_0)
+            >>> cycle = FilesystemCycle(theorist=example_theorist,
+            ...                         experimentalist=example_experimentalist,
+            ...                         experiment_runner=example_synthetic_experiment_runner,
+            ...                         monitor=last_datum_monitor,
+            ...                         metadata=metadata_0)
             >>> cycle # doctest: +ELLIPSIS
             <filesystem.FilesystemCycle object at 0x...>
 
@@ -216,20 +214,18 @@ class FilesystemCycle:
 
             The cycle can handle that using the `params` keyword:
             >>> cycle_with_parameters = FilesystemCycle(
-            ...     metadata=metadata_0,
             ...     theorist=example_theorist,
             ...     experimentalist=example_experimentalist_with_parameters,
             ...     experiment_runner=example_synthetic_experiment_runner,
-            ...     raw_params={"experimentalist": {"uniform_random_sampler": {"n": 7}}}
-            ... )
+            ...     params={"experimentalist": {"uniform_random_sampler": {"n": 7}}},
+            ...     metadata=metadata_0)
             >>> _ = list(takewhile(lambda c: len(c.state.conditions) < 1, cycle_with_parameters))
             >>> cycle_with_parameters.state.conditions[0].flatten()
             array([6.33661987, 7.34916618, 6.08596494, 2.28566582, 1.9553974 ,
                    5.80023149, 3.27007909])
 
             For the next cycle, if we wish, we can change the parameter value:
-            >>> cycle_with_parameters.params["experimentalist"]["uniform_random_sampler"]\\
-            ...     ["n"] = 2
+            >>> cycle_with_parameters.params["experimentalist"]["uniform_random_sampler"]["n"] = 2
             >>> _ = list(takewhile(lambda c: len(c.state.conditions) < 2, cycle_with_parameters))
             >>> cycle_with_parameters.state.conditions[1].flatten()
             array([10.5838232 ,  9.45666031])
@@ -282,7 +278,7 @@ class FilesystemCycle:
             ...     theorist=example_theorist,
             ...     experimentalist=unobserved_data_experimentalist,
             ...     experiment_runner=example_synthetic_experiment_runner,
-            ...     raw_params={
+            ...     params={
             ...         "experimentalist": {
             ...             "exclude_conditions": {"excluded_conditions": "%observations.ivs%"},
             ...             "custom_random_sampler": {"n": 1}
@@ -305,6 +301,7 @@ class FilesystemCycle:
 
             By using the monitor callback, we can investigate what's going on with the cycle
             properties:
+            >>> from autora.cycle.result import ResultKind
             >>> def observations_monitor(state):
             ...     if state[-1].kind == ResultKind.OBSERVATION:
             ...          print( _get_cycle_properties(state)["%observations.ivs%"].flatten())
@@ -342,9 +339,9 @@ class FilesystemCycle:
         )
         self.theorist = wrap_theorist_scikit_learn(theorist)
         self.monitor = monitor
-        if raw_params is None:
-            raw_params = dict()
-        self.raw_params = raw_params
+        if params is None:
+            params = dict()
+        self.params = params
         self.planner = planner
 
         self.state: ResultCollection = self._load_state(state, metadata, results)
@@ -418,10 +415,10 @@ class FilesystemCycle:
             _logger.debug(f"{self.serializer=} must be set in order to dump")
 
     @property
-    def params(self):
+    def params_resolved(self):
         """Returns the params dictionary, with "special" values like `theorist[-1]` resolved."""
         all_params = _resolve_cycle_properties(
-            self.raw_params, _get_cycle_properties(self.state)
+            self.params, _get_cycle_properties(self.state)
         )
         return all_params
 
