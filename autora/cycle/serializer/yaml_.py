@@ -1,8 +1,8 @@
 import pickle
 from pathlib import Path
 
+from autora.cycle.protocol.v1 import ResultCollectionSerializer
 from autora.cycle.result import ResultCollection, ResultKind
-from autora.cycle.result.serializer import ResultCollectionSerializer
 from autora.utils import YAMLSerializer as YAMLSerializer
 from autora.variable import VariableCollection
 
@@ -39,7 +39,8 @@ class YAMLResultCollectionSerializer(ResultCollectionSerializer):
             >>> import os
             >>> def dump_and_list(data, cat=False):
             ...     with tempfile.TemporaryDirectory() as d:
-            ...         dump(c, d)
+            ...         s = YAMLResultCollectionSerializer(d)
+            ...         s.dump(c)
             ...         print(sorted(os.listdir(d)))
 
             Each immutable part gets its own file.
@@ -111,8 +112,9 @@ class YAMLResultCollectionSerializer(ResultCollectionSerializer):
 
             Now we can serialize the data using _dumper, and reload the data using _loader:
             >>> with tempfile.TemporaryDirectory() as d:
-            ...     dump(c, d)
-            ...     e = load(d)
+            ...     s = YAMLResultCollectionSerializer(d)
+            ...     s.dump(c)
+            ...     e = s.load()
 
             We can now compare the dumped object "c" with the reloaded object "e". The data arrays
             should be equal, and the theories should

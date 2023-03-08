@@ -11,9 +11,8 @@ from autora.cycle.executor import (
     wrap_theorist_scikit_learn,
 )
 from autora.cycle.planner import last_result_kind_planner
-from autora.cycle.protocol.v1 import Planner
+from autora.cycle.protocol.v1 import Planner, ResultCollectionSerializer
 from autora.cycle.result import Result, ResultCollection
-from autora.cycle.result.serializer import ResultCollectionSerializer
 from autora.cycle.simple import _get_cycle_properties, _resolve_cycle_properties
 from autora.experimentalist.pipeline import Pipeline
 from autora.variable import VariableCollection

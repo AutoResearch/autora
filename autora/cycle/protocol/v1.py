@@ -24,3 +24,12 @@ class Planner(Protocol):
 class Executor(Protocol):
     def __call__(self, cycle: Cycle) -> Result:
         ...
+
+
+@runtime_checkable
+class ResultCollectionSerializer(Protocol):
+    def load(self) -> ResultCollection:
+        ...
+
+    def dump(self, data: ResultCollection) -> None:
+        ...
