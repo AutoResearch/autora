@@ -11,7 +11,7 @@ def last_result_kind_planner(cycle: Cycle):
     """
     Chooses the operation based on the last result, e.g. new theory -> run experimentalist.
 
-    Interpretation: The "traditional" AutoRA Cycle.
+    Interpretation: The "traditional" AutoRA Cycle – a systematic, effective research assistant.
     """
 
     try:
@@ -33,7 +33,8 @@ def random_operation_planner(cycle: Cycle):
     """
     Chooses a random operation, ignoring any data which already exist.
 
-    Interpretation: A mercurial research assistant who doesn't remember what they did last.
+    Interpretation: A mercurial PI with good technique but poor planning, who doesn't remember what
+    they did last.
     """
     options = [
         cycle.experimentalist,
