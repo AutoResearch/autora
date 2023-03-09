@@ -8,15 +8,23 @@ Examples:
     >>> from functools import partial
     >>> import matplotlib.pyplot as plt
     >>> import numpy as np
-    >>> from autora.synthetic.inventory import SyntheticExperimentCollection
-    >>> from autora.synthetic import register, retrieve
+    >>> from autora.synthetic import register, retrieve, describe, SyntheticExperimentCollection
     >>> from autora.variable import IV, DV, VariableCollection
 
-    Then we can define the function. We define all the arguments we need for the
-    SyntheticExperimentCollection, and then instantiate that collection. The closure – in this
-    case `sinusoid_experiment` – is the scope for all the parameters we need.
+    Then we can define the function. We define all the arguments we want and add them to a
+    dictionary. The closure – in this case `sinusoid_experiment` – is the scope for all
+    the parameters we need.
     >>> def sinusoid_experiment(omega=np.pi/3, delta=np.pi/2., m=0.3, resolution=1000,
     ...                         rng=np.random.default_rng()):
+    ...     \"\"\"Shifted sinusoid experiment, combining a sinusoid and a gradient drift.
+    ...     Ground truth: y = sin((x - delta) * omega) + (x * m)
+    ...     Parameters:
+    ...         omega: angular speed in radians
+    ...         delta: offset in radians
+    ...         m: drift gradient in [radians ^ -1]
+    ...         resolution: number of x values
+    ...     \"\"\"
+    ...
     ...     name = "Shifted Sinusoid"
     ...
     ...     params = dict(omega=omega, delta=delta, resolution=resolution, m=m, rng=rng)
@@ -53,10 +61,22 @@ Examples:
     ...     return collection
 
     Then we can register the experiment. We register the function, rather than evaluating it.
-    >>> register("sinusoid_experiment",sinusoid_experiment)
+    >>> register("sinusoid_experiment", sinusoid_experiment)
 
     When we want to retrieve the experiment, we can just use the default values if we like:
     >>> s = retrieve("sinusoid_experiment")
+
+    We can retrieve the docstring of the model using the `describe` function
+    >>> describe(s)  # doctest: +ELLIPSIS
+    'Shifted sinusoid experiment, combining...
+
+    ... or using its id:
+    >>> describe("sinusoid_experiment")  # doctest: +ELLIPSIS
+    'Shifted sinusoid experiment, combining...
+
+    ... or we can look at the closure function directly:
+    >>> describe(sinusoid_experiment) # doctest: +ELLIPSIS
+    'Shifted sinusoid experiment, combining...
 
     The object returned includes all the used parameters as a dictionary
     >>> s.params  # doctest: +ELLIPSIS
@@ -73,11 +93,13 @@ Examples:
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, Callable, Dict, Optional, Protocol
+from functools import singledispatch
+from typing import Any, Callable, Dict, Optional, Protocol, runtime_checkable
 
 from autora.variable import VariableCollection
 
 
+@runtime_checkable
 class _SyntheticExperimentClosure(Protocol):
     """A function which returns a SyntheticExperimentCollection."""
 
@@ -115,6 +137,7 @@ class SyntheticExperimentCollection:
     experiment_runner: Optional[Callable] = None
     ground_truth: Optional[Callable] = None
     plotter: Optional[Callable[[Optional[_SupportsPredict]], None]] = None
+    closure: Optional[Callable] = None
 
 
 _Inventory: Dict[str, _SyntheticExperimentClosure] = dict()
@@ -134,7 +157,8 @@ def register(id_: str, closure: _SyntheticExperimentClosure) -> None:
 
 
 def retrieve(id_: str, **kwargs) -> SyntheticExperimentCollection:
-    """Retrieve a synthetic experiment from the _Inventory.
+    """
+    Retrieve a synthetic experiment from the _Inventory.
 
     Parameters:
         id_: the unique id for the model
@@ -144,4 +168,36 @@ def retrieve(id_: str, **kwargs) -> SyntheticExperimentCollection:
     """
     closure: _SyntheticExperimentClosure = _Inventory[id_]
     evaluated_closure = closure(**kwargs)
+    evaluated_closure.closure = closure
     return evaluated_closure
+
+
+@singledispatch
+def describe(arg) -> str:
+    """
+    Show the docstring for a synthetic experiment.
+
+    Args:
+        arg: the experiment's ID, an object returned from the `retrieve` function, or a closure
+            which creates a new experiment.
+
+    Returns: the docstring associated with the synthetic experiment
+
+    """
+    raise NotImplementedError(f"{arg=} not yet supported")
+
+
+@describe.register
+def _(closure: _SyntheticExperimentClosure):
+    return closure.__doc__
+
+
+@describe.register
+def _(collection: SyntheticExperimentCollection):
+    return describe(collection.closure)
+
+
+@describe.register
+def _(id_: str):
+    collection = retrieve(id_)
+    return describe(collection)
