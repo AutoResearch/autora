@@ -32,21 +32,21 @@ tinkerforge = ["tinkerforge"]
 [tool.poetry.group.dev.dependencies]
 jupyter = "^1.0.0"
 ipython = "^8.4.0"
-ipywidgets = "^7.7.1"
+ipywidgets = ">=7.7.1,<9.0.0"
 flake8 = "^6.0.0"
 
 [tool.poetry.group.test.dependencies]
 pytest = "^7.2.0"
 
 [tool.poetry.group.pre-commit.dependencies]
-pre-commit = "^2.20.0"
+pre-commit = ">=2.20,<4.0"
 
 [tool.poetry.group.docs.dependencies]
 mkdocs-material = "^8.5.10"
 mkdocs-gen-files = "^0.3.4"
 mkdocs-literate-nav = "^0.4.1"
 mkdocs-section-index = "^0.3.4"
-mkdocstrings-python = "^0.7.1"
+mkdocstrings-python = ">=0.7.1,<0.9.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
