@@ -8,13 +8,26 @@ from ..inventory import SyntheticExperimentCollection, register
 
 
 def weber_fechner_law(
-    added_noise=0.01,
     name="Weber-Fechner Law",
     resolution=100,
     constant=1.0,
     maximum_stimulus_intensity=5.0,
+    added_noise=0.01,
     rng=np.random.default_rng(),
 ):
+    """Weber-Fechner Law.
+
+    Args:
+        name: name of the experiment
+        resolution: number of allowed values for stimulus 1 and 2
+        constant: constant multiplier
+        maximum_stimulus_intensity: maximum value for stimulus 1 and 2
+        added_noise: standard deviation of normally distributed noise added to y-values
+        rng: `np.random` random number generator to use for generating noise
+
+    Returns:
+
+    """
 
     params = dict(
         added_noise=added_noise,

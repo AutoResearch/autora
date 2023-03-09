@@ -3,9 +3,13 @@ Provides an interface for loading and saving synthetic experiments.
 
 Examples:
     The registry is accessed using the `retrieve` function, optionally setting parameters:
-    >>> from autora.synthetic import retrieve
+    >>> from autora.synthetic import retrieve, describe
     >>> import numpy as np
     >>> s = retrieve("weber_fechner",rng=np.random.default_rng(seed=180))  # the Weber-Fechner Law
+
+    Use the describe function to give information about the synthetic experiment:
+    >>> describe(s) # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
+    Weber-Fechner Law...
 
     The synthetic experiement `s` has properties like the name of the experiment:
     >>> s.name
