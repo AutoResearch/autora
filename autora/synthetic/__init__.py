@@ -69,6 +69,7 @@ Examples:
 
 from autora.synthetic import data
 from autora.synthetic.inventory import (
+    Inventory,
     SyntheticExperimentCollection,
     describe,
     register,

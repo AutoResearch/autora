@@ -146,25 +146,25 @@ class SyntheticExperimentCollection:
     closure: Optional[Callable] = None
 
 
-_Inventory: Dict[str, _SyntheticExperimentClosure] = dict()
+Inventory: Dict[str, _SyntheticExperimentClosure] = dict()
 """ The dictionary of `SyntheticExperimentCollection`. """
 
 
 def register(id_: str, closure: _SyntheticExperimentClosure) -> None:
     """
-    Add a new synthetic experiment to the _Inventory.
+    Add a new synthetic experiment to the Inventory.
 
     Parameters:
          id_: the unique id for the model.
          closure: a function which returns a SyntheticExperimentCollection
 
     """
-    _Inventory[id_] = closure
+    Inventory[id_] = closure
 
 
 def retrieve(id_: str, **kwargs) -> SyntheticExperimentCollection:
     """
-    Retrieve a synthetic experiment from the _Inventory.
+    Retrieve a synthetic experiment from the Inventory.
 
     Parameters:
         id_: the unique id for the model
@@ -172,7 +172,7 @@ def retrieve(id_: str, **kwargs) -> SyntheticExperimentCollection:
     Returns:
         the synthetic experiment
     """
-    closure: _SyntheticExperimentClosure = _Inventory[id_]
+    closure: _SyntheticExperimentClosure = Inventory[id_]
     evaluated_closure = closure(**kwargs)
     evaluated_closure.closure = closure
     return evaluated_closure
