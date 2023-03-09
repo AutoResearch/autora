@@ -179,16 +179,13 @@ def retrieve(id_: str, **kwargs) -> SyntheticExperimentCollection:
 
 
 @singledispatch
-def describe(arg) -> str:
+def describe(arg):
     """
-    Show the docstring for a synthetic experiment.
+    Print the docstring for a synthetic experiment.
 
     Args:
         arg: the experiment's ID, an object returned from the `retrieve` function, or a closure
             which creates a new experiment.
-
-    Returns: the docstring associated with the synthetic experiment
-
     """
     raise NotImplementedError(f"{arg=} not yet supported")
 
