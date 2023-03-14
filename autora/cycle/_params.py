@@ -5,9 +5,8 @@ from typing import Dict, Mapping
 
 import numpy as np
 
+from autora.cycle._state import CycleState
 from autora.utils.dictionary import LazyDict
-
-from ._state import CycleState
 
 
 def _resolve_state_params(state: CycleState) -> Dict:

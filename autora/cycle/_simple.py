@@ -6,10 +6,9 @@ from __future__ import annotations
 from dataclasses import replace
 from typing import Callable, Dict, Optional
 
+from autora.cycle._executor import FullCycleExecutorCollection
+from autora.cycle._state import CycleState
 from autora.variable import VariableCollection
-
-from ._executor import FullCycleExecutorCollection
-from ._state import CycleState
 
 
 class SimpleCycle:

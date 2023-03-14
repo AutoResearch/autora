@@ -9,10 +9,9 @@ from typing import Callable, Iterable
 import numpy as np
 from sklearn.base import BaseEstimator
 
+from autora.cycle._params import _resolve_state_params
 from autora.cycle._state import CycleState
 from autora.experimentalist.pipeline import Pipeline
-
-from ._params import _resolve_state_params
 
 
 class OnlineExecutorCollection:
