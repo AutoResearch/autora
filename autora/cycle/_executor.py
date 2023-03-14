@@ -4,21 +4,15 @@ from __future__ import annotations
 
 import copy
 from dataclasses import replace
-from typing import Callable, Iterable, Protocol
+from typing import Callable, Iterable
 
 import numpy as np
+from sklearn.base import BaseEstimator
 
 from autora.cycle._state import CycleState
 from autora.experimentalist.pipeline import Pipeline
 
 from ._params import _resolve_state_params
-
-
-class SupportsFit(Protocol):
-    """An object with a fit method, like scikit-learn regressors."""
-
-    def fit(self, x, y, **params):
-        ...
 
 
 class OnlineExecutorCollection:
@@ -37,7 +31,7 @@ class OnlineExecutorCollection:
         self,
         experimentalist_pipeline: Pipeline,
         experiment_runner_callable: Callable,
-        theorist_estimator: SupportsFit,
+        theorist_estimator: BaseEstimator,
     ):
         self.experimentalist_pipeline = experimentalist_pipeline
         self.experiment_runner_callable = experiment_runner_callable
