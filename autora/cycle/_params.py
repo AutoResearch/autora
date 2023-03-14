@@ -27,7 +27,7 @@ def _resolve_state_params(state: CycleState) -> Dict:
     return resolved_params
 
 
-def _get_cycle_properties(data: CycleState):
+def _get_cycle_properties(state: CycleState):
     """
     Examples:
         Even with an empty data object, we can initialize the dictionary,
@@ -47,18 +47,18 @@ def _get_cycle_properties(data: CycleState):
 
     """
 
-    n_ivs = len(data.metadata.independent_variables)
-    n_dvs = len(data.metadata.dependent_variables)
+    n_ivs = len(state.metadata.independent_variables)
+    n_dvs = len(state.metadata.dependent_variables)
     cycle_property_dict = LazyDict(
         {
-            "%observations.ivs[-1]%": lambda: data.observations[-1][:, 0:n_ivs],
-            "%observations.dvs[-1]%": lambda: data.observations[-1][:, n_ivs:],
+            "%observations.ivs[-1]%": lambda: state.observations[-1][:, 0:n_ivs],
+            "%observations.dvs[-1]%": lambda: state.observations[-1][:, n_ivs:],
             "%observations.ivs%": lambda: np.row_stack(
-                [np.empty([0, n_ivs + n_dvs])] + data.observations
+                [np.empty([0, n_ivs + n_dvs])] + state.observations
             )[:, 0:n_ivs],
-            "%observations.dvs%": lambda: np.row_stack(data.observations)[:, n_ivs:],
-            "%theories[-1]%": lambda: data.theories[-1],
-            "%theories%": lambda: data.theories,
+            "%observations.dvs%": lambda: np.row_stack(state.observations)[:, n_ivs:],
+            "%theories[-1]%": lambda: state.theories[-1],
+            "%theories%": lambda: state.theories,
         }
     )
     return cycle_property_dict
