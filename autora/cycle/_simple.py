@@ -8,7 +8,7 @@ from typing import Callable, Dict, Optional
 
 from autora.variable import VariableCollection
 
-from ._executor import FullCycleExecutor
+from ._executor import FullCycleExecutorCollection
 from ._state import CycleState
 
 
@@ -312,7 +312,7 @@ class SimpleCycle:
         experiment_runner,
         monitor: Optional[Callable[[CycleState], None]] = None,
         params: Optional[Dict] = None,
-        executor_collection=FullCycleExecutor,
+        executor_collection=FullCycleExecutorCollection,
     ):
         """
         Args:
@@ -386,3 +386,27 @@ class SimpleCycle:
     def params(self, value):
         new_data = replace(self.data, params=value)
         self.data = new_data
+
+    @property
+    def theorist(self):
+        return self.executor_collection.theorist_estimator
+
+    @theorist.setter
+    def theorist(self, value):
+        self.executor_collection.theorist_estimator = value
+
+    @property
+    def experimentalist(self):
+        return self.executor_collection.experimentalist_pipeline
+
+    @experimentalist.setter
+    def experimentalist(self, value):
+        self.executor_collection.experimentalist_pipeline = value
+
+    @property
+    def experiment_runner(self):
+        return self.executor_collection.experiment_runner_callable
+
+    @experiment_runner.setter
+    def experiment_runner(self, value):
+        self.executor_collection.experiment_runner_callable = value

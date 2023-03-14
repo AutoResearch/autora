@@ -13,23 +13,32 @@ from ._params import _resolve_state_params
 
 
 class SupportsFit(Protocol):
+    """An object with a fit method, like scikit-learn regressors."""
+
     def fit(self, x, y, **params):
         ...
 
 
-class OnlineExecutor:
+class OnlineExecutorCollection:
+    """
+    An ExecutorCollection for running experiments in a single session.
+
+    This object allows a user to specify
+
+    """
+
     def __init__(
         self,
         experimentalist_pipeline: Pipeline,
         experiment_runner_callable: Callable,
         theorist_estimator: SupportsFit,
     ):
-        self._experimentalist = experimentalist_pipeline
-        self._experiment_runner = experiment_runner_callable
-        self._theorist = theorist_estimator
+        self.experimentalist_pipeline = experimentalist_pipeline
+        self.experiment_runner_callable = experiment_runner_callable
+        self.theorist_estimator = theorist_estimator
 
     def experimentalist(self, state: CycleState, params: dict):
-        new_conditions = self._experimentalist(**params)
+        new_conditions = self.experimentalist_pipeline(**params)
         if isinstance(new_conditions, Iterable):
             # If the pipeline gives us an iterable, we need to make it into a concrete array.
             # We can't move this logic to the Pipeline, because the pipeline doesn't know whether
@@ -52,7 +61,7 @@ class OnlineExecutor:
 
     def experiment_runner(self, state: CycleState, params: dict):
         x = state.conditions[-1]
-        y = self._experiment_runner(x, **params)
+        y = self.experiment_runner_callable(x, **params)
         new_observations = np.column_stack([x, y])
         new_state = replace(state, observations=state.observations + [new_observations])
         return new_state
@@ -63,7 +72,7 @@ class OnlineExecutor:
         x, y = all_observations[:, :n_xs], all_observations[:, n_xs:]
         if y.shape[1] == 1:
             y = y.ravel()
-        new_theorist = copy.deepcopy(self._theorist)
+        new_theorist = copy.deepcopy(self.theorist_estimator)
         new_theorist.fit(x, y, **params)
 
         new_state = replace(
@@ -74,7 +83,7 @@ class OnlineExecutor:
         return new_state
 
 
-class FullCycleExecutor(OnlineExecutor):
+class FullCycleExecutorCollection(OnlineExecutorCollection):
     def full_cycle(self, state: CycleState):
         experimentalist_params = _resolve_state_params(state).get(
             "experimentalist", dict()
