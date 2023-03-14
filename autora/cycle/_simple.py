@@ -4,7 +4,6 @@ The basic cycle controller for AER.
 from __future__ import annotations
 
 import logging
-from dataclasses import replace
 from typing import Callable, Dict, Optional
 
 from autora.cycle._executor import FullCycleExecutorCollection
@@ -212,16 +211,16 @@ class SimpleCycle:
         >>> cycle_with_parameters.data.conditions[-1].flatten()
         array([10.5838232 ,  9.45666031])
 
-        ### Accessing "Cycle Properties"
+        ### Accessing "State-dependent Properties"
 
          Some experimentalists, experiment runners and theorists require access to the values
             created during the cycle execution, e.g. experimentalists which require access
             to the current best theory or the observed data. These data update each cycle, and
             so cannot easily be set using simple `params`.
 
-        For this case, it is possible to use "cycle properties" in the `params` dictionary. These
-            are the following strings, which will be replaced during execution by their respective
-            current values:
+        For this case, it is possible to use "state-dependent properties" in the `params`
+            dictionary. These are the following strings, which will be replaced during execution by
+            their respective current values:
 
         - `"%observations.ivs[-1]%"`: the last observed independent variables
         - `"%observations.dvs[-1]%"`: the last observed dependent variables
@@ -253,7 +252,7 @@ class SimpleCycle:
         ...     custom_random_sampler
         ...     ]
         ... )
-        >>> cycle_with_cycle_properties = SimpleCycle(
+        >>> cycle_with_state_dep_properties = SimpleCycle(
         ...     metadata=metadata_1,
         ...     theorist=example_theorist,
         ...     experimentalist=unobserved_data_experimentalist,
@@ -268,39 +267,40 @@ class SimpleCycle:
 
         Now we can run the cycler to generate conditions and run experiments. The first time round,
         we have the full set of 10 possible conditions to select from, and we select "2" at random:
-        >>> _ = cycle_with_cycle_properties.run()
-        >>> cycle_with_cycle_properties.data.conditions[-1]
+        >>> _ = cycle_with_state_dep_properties.run()
+        >>> cycle_with_state_dep_properties.data.conditions[-1]
         array([2])
 
         We can continue to run the cycler, each time we add more to the list of "excluded" options:
-        >>> _ = cycle_with_cycle_properties.run(num_cycles=5)
-        >>> cycle_with_cycle_properties.data.conditions
+        >>> _ = cycle_with_state_dep_properties.run(num_cycles=5)
+        >>> cycle_with_state_dep_properties.data.conditions
         [array([2]), array([6]), array([5]), array([7]), array([3]), array([4])]
 
-        By using the monitor callback, we can investigate what's going on with the cycle properties:
-        >>> cycle_with_cycle_properties.monitor = lambda data: print(
+        By using the monitor callback, we can investigate what's going on with the
+        state-dependent properties:
+        >>> cycle_with_state_dep_properties.monitor = lambda data: print(
         ...     np.row_stack(data.observations)[:,0]  # just the independent variable values
         ... )
 
         The monitor evaluates at the end of each cycle
         and shows that we've added a new observed IV each step
-        >>> _ = cycle_with_cycle_properties.run()
+        >>> _ = cycle_with_state_dep_properties.run()
         [2. 6. 5. 7. 3. 4. 9.]
-        >>> _ = cycle_with_cycle_properties.run()
+        >>> _ = cycle_with_state_dep_properties.run()
         [2. 6. 5. 7. 3. 4. 9. 0.]
 
         We deactivate the monitor by making it "None" again.
-        >>> cycle_with_cycle_properties.monitor = None
+        >>> cycle_with_state_dep_properties.monitor = None
 
         We can continue until we've sampled all of the options:
-        >>> _ = cycle_with_cycle_properties.run(num_cycles=2)
-        >>> cycle_with_cycle_properties.data.conditions # doctest: +NORMALIZE_WHITESPACE
+        >>> _ = cycle_with_state_dep_properties.run(num_cycles=2)
+        >>> cycle_with_state_dep_properties.data.conditions # doctest: +NORMALIZE_WHITESPACE
         [array([2]), array([6]), array([5]), array([7]), array([3]), \
         array([4]), array([9]), array([0]), array([8]), array([1])]
 
         If we try to evaluate it again, the experimentalist fails, as there aren't any more
         conditions which are available:
-        >>> cycle_with_cycle_properties.run()  # doctest: +ELLIPSIS
+        >>> cycle_with_state_dep_properties.run()  # doctest: +ELLIPSIS
         Traceback (most recent call last):
         ...
         ValueError: a cannot be empty unless no samples are taken
@@ -393,17 +393,13 @@ class SimpleCycle:
         ...     except ValueError as e:
         ...         print(f"FAILED: on iteration {i=} time with {e=}") # doctest: +ELLIPSIS
         ==== Starting iteration i=0 ====
-        INFO: running next_function=<bound method OnlineExecutorCollection.theorist ...
         FAILED: on iteration i=0 time with e=ValueError('need at least one array to concatenate')
         ==== Starting iteration i=1 ====
-        INFO: running next_function=<bound method OnlineExecutorCollection.experimentalist ...
         MONITOR: Generated new ResultKind.CONDITION
         ==== Starting iteration i=2 ====
-        INFO: running next_function=<bound method OnlineExecutorCollection.experimentalist ...
         MONITOR: Generated new ResultKind.CONDITION
         ...
         ==== Starting iteration i=8 ====
-        INFO: running next_function=<bound method OnlineExecutorCollection.theorist...
         MONITOR: Generated new ResultKind.THEORY
 
         The first cycle, the theorist is selected as the random Executor, and it fails because it
@@ -471,7 +467,6 @@ class SimpleCycle:
 
         # Plan
         next_function = self.planner(self.data, self.executor_collection)
-        _logger.info(f"running {next_function=}")
 
         # Execute
         data = next_function(self.data)
@@ -497,8 +492,7 @@ class SimpleCycle:
 
     @params.setter
     def params(self, value):
-        new_data = replace(self.data, params=value)
-        self.data = new_data
+        self.data.params = value
 
     @property
     def theorist(self):
