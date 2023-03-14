@@ -135,9 +135,7 @@ class CycleState:
     def _filter_result_by_kind(
         result_sequence: Sequence[Result], kind: set[ResultKind]
     ):
-        for r in result_sequence:
-            if r.kind in kind:
-                yield r
+        return filter(lambda r: r.kind in kind, result_sequence)
 
 
 class SupportsResultSequence(Protocol):
