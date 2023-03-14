@@ -3,15 +3,19 @@
 from __future__ import annotations
 
 import copy
-from dataclasses import replace
-from typing import Callable, Iterable
+from typing import Callable, Iterable, Protocol
 
 import numpy as np
 from sklearn.base import BaseEstimator
 
 from autora.cycle._params import _resolve_state_params
-from autora.cycle._state import CycleState
+from autora.cycle._state import CycleState, Result, ResultKind, SupportsResultSequence
 from autora.experimentalist.pipeline import Pipeline
+
+
+class Executor(Protocol):
+    def __call__(self, state: SupportsResultSequence) -> Result:
+        ...
 
 
 class OnlineExecutorCollection:
@@ -52,20 +56,17 @@ class OnlineExecutorCollection:
             new_conditions_array, np.ndarray
         )  # Check the object is bounded
 
-        new_state = replace(
-            state,
-            conditions=state.conditions + [new_conditions_array],
-        )
+        state.update(new_conditions_array, kind=ResultKind.CONDITION)
 
-        return new_state
+        return state
 
     def experiment_runner(self, state: CycleState, params: dict):
         """Interface for running the experiment runner callable"""
         x = state.conditions[-1]
         y = self.experiment_runner_callable(x, **params)
         new_observations = np.column_stack([x, y])
-        new_state = replace(state, observations=state.observations + [new_observations])
-        return new_state
+        state.update(new_observations, kind=ResultKind.OBSERVATION)
+        return state
 
     def theorist(self, state: CycleState, params: dict):
         """Interface for running the theorist estimator."""
@@ -77,12 +78,9 @@ class OnlineExecutorCollection:
         new_theorist = copy.deepcopy(self.theorist_estimator)
         new_theorist.fit(x, y, **params)
 
-        new_state = replace(
-            state,
-            theories=state.theories + [new_theorist],
-        )
+        state.update(new_theorist, kind=ResultKind.THEORY)
 
-        return new_state
+        return state
 
 
 class FullCycleExecutorCollection(OnlineExecutorCollection):
@@ -105,3 +103,13 @@ class FullCycleExecutorCollection(OnlineExecutorCollection):
         state = self.theorist(state, theorist_params)
 
         return state
+
+
+class SupportsFullCycle(Protocol):
+    full_cycle: Executor
+
+
+class SupportsExperimentalistExperimentRunnerTheorist(Protocol):
+    experimentalist: Executor
+    experiment_runner: Executor
+    theorist: Executor
