@@ -371,9 +371,9 @@ class SimpleCycle:
     def __iter__(self):
         return self
 
-    def _monitor_callback(self, data: SimpleCycleData):
+    def _monitor_callback(self):
         if self.monitor is not None:
-            self.monitor(data)
+            self.monitor(self.data)
 
     @property
     def params(self):
