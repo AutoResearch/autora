@@ -40,8 +40,9 @@ class OnlineExecutorCollection:
         self.experiment_runner_callable = experiment_runner_callable
         self.theorist_estimator = theorist_estimator
 
-    def experimentalist(self, state: CycleState, params: dict):
+    def experimentalist(self, state: CycleState):
         """Interface for running the experimentalist pipeline."""
+        params = _resolve_state_params(state).get("experimentalist", dict())
         new_conditions = self.experimentalist_pipeline(**params)
         if isinstance(new_conditions, Iterable):
             # If the pipeline gives us an iterable, we need to make it into a concrete array.
@@ -60,16 +61,18 @@ class OnlineExecutorCollection:
 
         return state
 
-    def experiment_runner(self, state: CycleState, params: dict):
+    def experiment_runner(self, state: CycleState):
         """Interface for running the experiment runner callable"""
+        params = _resolve_state_params(state).get("experiment_runner", dict())
         x = state.conditions[-1]
         y = self.experiment_runner_callable(x, **params)
         new_observations = np.column_stack([x, y])
         state.update(new_observations, kind=ResultKind.OBSERVATION)
         return state
 
-    def theorist(self, state: CycleState, params: dict):
+    def theorist(self, state: CycleState):
         """Interface for running the theorist estimator."""
+        params = _resolve_state_params(state).get("theorist", dict())
         all_observations = np.row_stack(state.observations)
         n_xs = len(state.metadata.independent_variables)
         x, y = all_observations[:, :n_xs], all_observations[:, n_xs:]
@@ -89,18 +92,11 @@ class FullCycleExecutorCollection(OnlineExecutorCollection):
     """
 
     def full_cycle(self, state: CycleState):
-        experimentalist_params = _resolve_state_params(state).get(
-            "experimentalist", dict()
-        )
-        state = self.experimentalist(state, experimentalist_params)
+        state = self.experimentalist(state)
 
-        experiment_runner_params = _resolve_state_params(state).get(
-            "experiment_runner", dict()
-        )
-        state = self.experiment_runner(state, experiment_runner_params)
+        state = self.experiment_runner(state)
 
-        theorist_params = _resolve_state_params(state).get("theorist", dict())
-        state = self.theorist(state, theorist_params)
+        state = self.theorist(state)
 
         return state
 

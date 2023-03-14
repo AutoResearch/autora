@@ -3,12 +3,16 @@ The basic cycle controller for AER.
 """
 from __future__ import annotations
 
+import logging
 from dataclasses import replace
 from typing import Callable, Dict, Optional
 
 from autora.cycle._executor import FullCycleExecutorCollection
+from autora.cycle._planner import full_cycle_planner
 from autora.cycle._state import CycleState
 from autora.variable import VariableCollection
+
+_logger = logging.getLogger(__name__)
 
 
 class SimpleCycle:
@@ -301,6 +305,64 @@ class SimpleCycle:
         ...
         ValueError: a cannot be empty unless no samples are taken
 
+        ### Using Alternative Executors and Planners
+
+        By switching out the `executor_collection` and/or the `planner`, we can specify a
+        different way of running the cycle.
+
+        In this example, we use a planner which suggests a different random operation at each
+        step, demonstrating arbitrary execution order.
+        >>> from autora.cycle._executor import OnlineExecutorCollection
+        >>> from autora.cycle._planner import random_operation_planner
+        >>> def monitor(data):
+        ...     print(f"MONITOR: Generated new {data.conditions_observations_theories[-1].kind}")
+        >>> cycle_with_random_planner = SimpleCycle(
+        ...     planner=random_operation_planner,
+        ...     executor_collection=OnlineExecutorCollection,
+        ...     monitor=monitor,
+        ...     metadata=metadata_0,
+        ...     theorist=example_theorist,
+        ...     experimentalist=example_experimentalist,
+        ...     experiment_runner=example_synthetic_experiment_runner,
+        ... )
+
+        The `random_operation_planner` depends on the python random number generator, so we seed
+        it first:
+        >>> from random import seed
+        >>> seed(42)
+
+        We also want to watch the logging messages from the cycle:
+        >>> import logging
+        >>> import sys
+        >>> logging.basicConfig(format='%(levelname)s: %(message)s', stream=sys.stdout,
+        ...     level=logging.INFO)
+
+        Now we can evaluate the cycle and watch its behaviour:
+        >>> for i in range(9):
+        ...     print(f"==== Starting iteration {i=} ====")
+        ...     try:
+        ...         _ = next(cycle_with_random_planner)
+        ...     except ValueError as e:
+        ...         print(f"FAILED: on iteration {i=} time with {e=}") # doctest: +ELLIPSIS
+        ==== Starting iteration i=0 ====
+        INFO: running next_function=<bound method OnlineExecutorCollection.theorist ...
+        FAILED: on iteration i=0 time with e=ValueError('need at least one array to concatenate')
+        ==== Starting iteration i=1 ====
+        INFO: running next_function=<bound method OnlineExecutorCollection.experimentalist ...
+        MONITOR: Generated new ResultKind.CONDITION
+        ==== Starting iteration i=2 ====
+        INFO: running next_function=<bound method OnlineExecutorCollection.experimentalist ...
+        MONITOR: Generated new ResultKind.CONDITION
+        ...
+        ==== Starting iteration i=8 ====
+        INFO: running next_function=<bound method OnlineExecutorCollection.theorist...
+        MONITOR: Generated new ResultKind.THEORY
+
+        The first cycle, the theorist is selected as the random Executor, and it fails because it
+        depends on there being observations to theorize against.
+
+        By the last iteration, there are observations which the theorist can use, and it succeeds.
+
     """
 
     def __init__(
@@ -312,6 +374,7 @@ class SimpleCycle:
         monitor: Optional[Callable[[CycleState], None]] = None,
         params: Optional[Dict] = None,
         executor_collection=FullCycleExecutorCollection,
+        planner=full_cycle_planner,
     ):
         """
         Args:
@@ -348,6 +411,8 @@ class SimpleCycle:
             params=params,
         )
 
+        self.planner = planner
+
     def run(self, num_cycles: int = 1):
         """Execute the next step in the cycle."""
         for i in range(num_cycles):
@@ -357,7 +422,8 @@ class SimpleCycle:
     def __next__(self):
 
         # Plan
-        next_function = self.executor_collection.full_cycle
+        next_function = self.planner(self.data, self.executor_collection)
+        _logger.info(f"running {next_function=}")
 
         # Execute
         data = next_function(self.data)
