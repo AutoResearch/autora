@@ -20,10 +20,8 @@ def _resolve_state_params(state: CycleState) -> Dict:
         {'experimentalist': {'source': 'the second theory'}}
 
     """
-
-    resolved_params = _resolve_cycle_properties(
-        state.params, _get_cycle_properties(state)
-    )
+    cycle_properties = _get_cycle_properties(state)
+    resolved_params = _resolve_cycle_properties(state.params, cycle_properties)
     return resolved_params
 
 
