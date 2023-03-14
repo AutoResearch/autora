@@ -1538,18 +1538,18 @@ mkdocs = ">=1.0.3,<2.0.0"
 
 [[package]]
 name = "mkdocs-literate-nav"
-version = "0.4.1"
+version = "0.6.0"
 description = "MkDocs plugin to specify the navigation in Markdown instead of YAML"
 category = "dev"
 optional = false
-python-versions = ">=3.6,<4.0"
+python-versions = ">=3.7"
 files = [
-    {file = "mkdocs-literate-nav-0.4.1.tar.gz", hash = "sha256:9efe26b662f2f901cae5807bfd51446d30ea7e033c2bc43a15d6282c7dfac1ab"},
-    {file = "mkdocs_literate_nav-0.4.1-py3-none-any.whl", hash = "sha256:a4b761792ba21defbe2dfd5e0de6ba451639e1ca0f0661c37eda83cc6261e4f9"},
+    {file = "mkdocs_literate_nav-0.6.0-py3-none-any.whl", hash = "sha256:8c1b84714e5974da5e44e011ec0069275ae7647270c13a679662cf6ffce675a4"},
+    {file = "mkdocs_literate_nav-0.6.0.tar.gz", hash = "sha256:81ccbea18163ae8e10bd0bd39237fe70c32a1f2dff6c170779f5d52dd98a0470"},
 ]
 
 [package.dependencies]
-mkdocs = ">=1.0.3,<2.0.0"
+mkdocs = ">=1.0.3"
 
 [[package]]
 name = "mkdocs-material"
@@ -3362,4 +3362,4 @@ tinkerforge = ["tinkerforge"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8.10,<3.11"
-content-hash = "bc3d15279413368ebfcdb701fa3bad6ef519f3806648dc7162bcbbcc0cef4b9c"
+content-hash = "66a9a2b8df64dd50fde5c16b00dcab53a31e6ccab5943aa9ea476e376f05c55a"
