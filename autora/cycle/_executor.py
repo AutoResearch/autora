@@ -6,9 +6,10 @@ from typing import Callable, Iterable, Protocol
 
 import numpy as np
 
-from autora.cycle.params import _resolve_state_params
-from autora.cycle.state import CycleState
+from autora.cycle._state import CycleState
 from autora.experimentalist.pipeline import Pipeline
+
+from ._params import _resolve_state_params
 
 
 class SupportsFit(Protocol):

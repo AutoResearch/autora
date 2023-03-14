@@ -9,7 +9,7 @@ from matplotlib import rcParams
 from matplotlib.patches import Patch
 from matplotlib.ticker import MaxNLocator
 
-from .simple import SimpleCycle as Cycle
+from ._simple import SimpleCycle as Cycle
 
 # Change default plot styles
 rcParams["axes.spines.top"] = False
