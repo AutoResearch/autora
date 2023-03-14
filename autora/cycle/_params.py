@@ -20,26 +20,26 @@ def _resolve_state_params(state: CycleState) -> Dict:
         {'experimentalist': {'source': 'the second theory'}}
 
     """
-    cycle_properties = _get_cycle_properties(state)
-    resolved_params = _resolve_cycle_properties(state.params, cycle_properties)
+    state_dependent_properties = _get_state_dependent_properties(state)
+    resolved_params = _resolve_properties(state.params, state_dependent_properties)
     return resolved_params
 
 
-def _get_cycle_properties(state: CycleState):
+def _get_state_dependent_properties(state: CycleState):
     """
     Examples:
         Even with an empty data object, we can initialize the dictionary,
         >>> from autora.variable import VariableCollection
-        >>> cycle_properties = _get_cycle_properties(CycleState())
+        >>> state_dependent_properties = _get_state_dependent_properties(CycleState())
 
         ... but it will raise an exception if a value isn't yet available when we try to use it
-        >>> cycle_properties["%theories[-1]%"] # doctest: +ELLIPSIS
+        >>> state_dependent_properties["%theories[-1]%"] # doctest: +ELLIPSIS
         Traceback (most recent call last):
         ...
         IndexError: list index out of range
 
         Nevertheless, we can iterate through its keys no problem:
-        >>> [key for key in cycle_properties.keys()] # doctest: +NORMALIZE_WHITESPACE
+        >>> [key for key in state_dependent_properties.keys()] # doctest: +NORMALIZE_WHITESPACE
         ['%observations.ivs[-1]%', '%observations.dvs[-1]%', '%observations.ivs%',
         '%observations.dvs%', '%theories[-1]%', '%theories%']
 
@@ -47,7 +47,7 @@ def _get_cycle_properties(state: CycleState):
 
     n_ivs = len(state.metadata.independent_variables)
     n_dvs = len(state.metadata.dependent_variables)
-    cycle_property_dict = LazyDict(
+    state_dependent_property_dict = LazyDict(
         {
             "%observations.ivs[-1]%": lambda: state.observations[-1][:, 0:n_ivs],
             "%observations.dvs[-1]%": lambda: state.observations[-1][:, n_ivs:],
@@ -59,44 +59,45 @@ def _get_cycle_properties(state: CycleState):
             "%theories%": lambda: state.theories,
         }
     )
-    return cycle_property_dict
+    return state_dependent_property_dict
 
 
-def _resolve_cycle_properties(params: Dict, cycle_properties: Mapping):
+def _resolve_properties(params: Dict, state_dependent_properties: Mapping):
     """
-    Resolve "cycle properties" inside a nested dictionary.
+    Resolve state-dependent properties inside a nested dictionary.
 
-    In this context, a "cycle property" is a string which is meant to be replaced by a
-    different value before the dictionary is used.
+    In this context, a state-dependent-property is a string which is meant to be replaced by its
+    updated, current value before the dictionary is used. A state-dependent property might be
+    something like "the last theorist available" or "all the experimental results until now".
 
     Args:
         params: a (nested) dictionary of keys and values, where some values might be
             "cycle property names"
-        cycle_properties: a dictionary of "cycle property names" and their "real values"
+        state_dependent_properties: a dictionary of "property names" and their "real values"
 
-    Returns: a (nested) dictionary where "cycle property names" are replaced by the "real values"
+    Returns: a (nested) dictionary where "property names" are replaced by the "real values"
 
     Examples:
 
         >>> params_0 = {"key": "%foo%"}
         >>> cycle_properties_0 = {"%foo%": 180}
-        >>> _resolve_cycle_properties(params_0, cycle_properties_0)
+        >>> _resolve_properties(params_0,cycle_properties_0)
         {'key': 180}
 
         >>> params_1 = {"key": "%bar%", "nested_dict": {"inner_key": "%foobar%"}}
         >>> cycle_properties_1 = {"%bar%": 1, "%foobar%": 2}
-        >>> _resolve_cycle_properties(params_1, cycle_properties_1)
+        >>> _resolve_properties(params_1,cycle_properties_1)
         {'key': 1, 'nested_dict': {'inner_key': 2}}
 
     """
     params_ = copy.copy(params)
     for key, value in params_.items():
         if isinstance(value, dict):
-            params_[key] = _resolve_cycle_properties(value, cycle_properties)
+            params_[key] = _resolve_properties(value, state_dependent_properties)
         elif (
-            isinstance(value, str) and value in cycle_properties
+            isinstance(value, str) and value in state_dependent_properties
         ):  # value is a key in the cycle_properties dictionary
-            params_[key] = cycle_properties[value]
+            params_[key] = state_dependent_properties[value]
         else:
             pass  # no change needed
 
