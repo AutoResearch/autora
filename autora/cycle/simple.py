@@ -7,7 +7,7 @@ from dataclasses import replace
 from typing import Callable, Dict, Optional
 
 from autora.cycle._executor import FullCycleExecutor
-from autora.cycle.state import SimpleCycleData
+from autora.cycle.state import CycleState
 from autora.variable import VariableCollection
 
 
@@ -309,7 +309,7 @@ class SimpleCycle:
         theorist,
         experimentalist,
         experiment_runner,
-        monitor: Optional[Callable[[SimpleCycleData], None]] = None,
+        monitor: Optional[Callable[[CycleState], None]] = None,
         params: Optional[Dict] = None,
         executor_collection=FullCycleExecutor,
     ):
@@ -340,7 +340,7 @@ class SimpleCycle:
         if params is None:
             params = dict()
 
-        self.data = SimpleCycleData(
+        self.data = CycleState(
             metadata=metadata,
             conditions=[],
             observations=[],

@@ -5,16 +5,16 @@ from typing import Dict, Mapping
 
 import numpy as np
 
-from autora.cycle.state import SimpleCycleData
+from autora.cycle.state import CycleState
 from autora.utils.dictionary import LazyDict
 
 
-def _resolve_state_params(state: SimpleCycleData) -> Dict:
+def _resolve_state_params(state: CycleState) -> Dict:
     """
     Returns the `params` attribute of the input, with `cycle properties` resolved.
 
     Examples:
-        >>> state = SimpleCycleData(theories=["the first theory", "the second theory"],
+        >>> state = CycleState(theories=["the first theory", "the second theory"],
         ...     params={"experimentalist": {"source": "%theories[-1]%"}})
         >>> _resolve_state_params(state)
         {'experimentalist': {'source': 'the second theory'}}
@@ -27,12 +27,12 @@ def _resolve_state_params(state: SimpleCycleData) -> Dict:
     return resolved_params
 
 
-def _get_cycle_properties(data: SimpleCycleData):
+def _get_cycle_properties(data: CycleState):
     """
     Examples:
         Even with an empty data object, we can initialize the dictionary,
         >>> from autora.variable import VariableCollection
-        >>> cycle_properties = _get_cycle_properties(SimpleCycleData())
+        >>> cycle_properties = _get_cycle_properties(CycleState())
 
         ... but it will raise an exception if a value isn't yet available when we try to use it
         >>> cycle_properties["%theories[-1]%"] # doctest: +ELLIPSIS

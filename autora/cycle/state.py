@@ -10,7 +10,7 @@ from autora.variable import VariableCollection
 
 
 @dataclass(frozen=True)
-class SimpleCycleData:
+class CycleState:
     """An object passed between and updated by processing steps in the SimpleCycle."""
 
     # Static

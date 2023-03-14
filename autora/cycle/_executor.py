@@ -7,7 +7,7 @@ from typing import Callable, Iterable, Protocol
 import numpy as np
 
 from autora.cycle.params import _resolve_state_params
-from autora.cycle.state import SimpleCycleData
+from autora.cycle.state import CycleState
 from autora.experimentalist.pipeline import Pipeline
 
 
@@ -27,7 +27,7 @@ class OnlineExecutor:
         self._experiment_runner = experiment_runner_callable
         self._theorist = theorist_estimator
 
-    def experimentalist(self, state: SimpleCycleData, params: dict):
+    def experimentalist(self, state: CycleState, params: dict):
         new_conditions = self._experimentalist(**params)
         if isinstance(new_conditions, Iterable):
             # If the pipeline gives us an iterable, we need to make it into a concrete array.
@@ -49,14 +49,14 @@ class OnlineExecutor:
 
         return new_state
 
-    def experiment_runner(self, state: SimpleCycleData, params: dict):
+    def experiment_runner(self, state: CycleState, params: dict):
         x = state.conditions[-1]
         y = self._experiment_runner(x, **params)
         new_observations = np.column_stack([x, y])
         new_state = replace(state, observations=state.observations + [new_observations])
         return new_state
 
-    def theorist(self, state: SimpleCycleData, params: dict):
+    def theorist(self, state: CycleState, params: dict):
         all_observations = np.row_stack(state.observations)
         n_xs = len(state.metadata.independent_variables)
         x, y = all_observations[:, :n_xs], all_observations[:, n_xs:]
@@ -74,7 +74,7 @@ class OnlineExecutor:
 
 
 class FullCycleExecutor(OnlineExecutor):
-    def full_cycle(self, state: SimpleCycleData):
+    def full_cycle(self, state: CycleState):
         experimentalist_params = _resolve_state_params(state).get(
             "experimentalist", dict()
         )
