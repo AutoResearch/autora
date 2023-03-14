@@ -273,9 +273,8 @@ class SimpleCycle:
         [array([2]), array([6]), array([5]), array([7]), array([3]), array([4])]
 
         By using the monitor callback, we can investigate what's going on with the cycle properties:
-        >>> from autora.cycle.params import _get_cycle_properties
         >>> cycle_with_cycle_properties.monitor = lambda data: print(
-        ...     _get_cycle_properties(data)["%observations.ivs%"].flatten()
+        ...     np.row_stack(data.observations)[:,0]  # just the independent variable values
         ... )
 
         The monitor evaluates at the end of each cycle
