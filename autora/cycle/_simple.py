@@ -389,6 +389,7 @@ class SimpleCycle:
 
     @property
     def theorist(self):
+        """The theorist – scikit-learn-compatible estimator – used when running the cycle."""
         return self.executor_collection.theorist_estimator
 
     @theorist.setter
@@ -397,6 +398,7 @@ class SimpleCycle:
 
     @property
     def experimentalist(self):
+        """The experimentalist Pipeline used when running the cycle."""
         return self.executor_collection.experimentalist_pipeline
 
     @experimentalist.setter
@@ -405,6 +407,7 @@ class SimpleCycle:
 
     @property
     def experiment_runner(self):
+        """The callable used to generate new experimental results"""
         return self.executor_collection.experiment_runner_callable
 
     @experiment_runner.setter

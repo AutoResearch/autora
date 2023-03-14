@@ -21,10 +21,14 @@ class SupportsFit(Protocol):
 
 class OnlineExecutorCollection:
     """
-    An ExecutorCollection for running experiments in a single session.
+    Runs experiment design, observation and theory generation in a single session.
 
     This object allows a user to specify
+    - an experimentalist: a Pipeline
+    - an experiment runner: some Callable and
+    - a theorist: a scikit-learn-compatible estimator with a fit method
 
+    ... and exposes methods to call these and update a CycleState object with new data.
     """
 
     def __init__(
@@ -84,6 +88,10 @@ class OnlineExecutorCollection:
 
 
 class FullCycleExecutorCollection(OnlineExecutorCollection):
+    """
+    Runs a full AER cycle each `full_cycle` call in a single session.
+    """
+
     def full_cycle(self, state: CycleState):
         experimentalist_params = _resolve_state_params(state).get(
             "experimentalist", dict()
