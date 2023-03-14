@@ -69,7 +69,7 @@ class CycleState:
     @property
     def metadata(self) -> VariableCollection:
         try:
-            m = self._get_last_data_by_kind(kind={ResultKind.METADATA})
+            m = self._get_last(kind={ResultKind.METADATA}).data
         except StopIteration:
             m = VariableCollection()
         return m
@@ -81,7 +81,7 @@ class CycleState:
     @property
     def params(self) -> Dict:
         try:
-            p = self._get_last_data_by_kind(kind={ResultKind.PARAMS})
+            p = self._get_last(kind={ResultKind.PARAMS}).data
         except StopIteration:
             p = dict()
         return p
@@ -92,50 +92,43 @@ class CycleState:
 
     @property
     def conditions(self) -> List[ArrayLike]:
-        return list(
-            self._filter_data_by_kind(self.result_sequence, kind={ResultKind.CONDITION})
+        return self._list_data(
+            self._filter_result(self.result_sequence, kind={ResultKind.CONDITION})
         )
 
     @property
     def observations(self) -> List[ArrayLike]:
-        return list(
-            self._filter_data_by_kind(
-                self.result_sequence, kind={ResultKind.OBSERVATION}
-            )
+        return self._list_data(
+            self._filter_result(self.result_sequence, kind={ResultKind.OBSERVATION})
         )
 
     @property
     def theories(self) -> List[BaseEstimator]:
-        return list(
-            self._filter_data_by_kind(self.result_sequence, kind={ResultKind.THEORY})
+        return self._list_data(
+            self._filter_result(self.result_sequence, kind={ResultKind.THEORY})
         )
 
     @property
     def conditions_observations_theories(self) -> List[Result]:
         return list(
-            self._filter_result_by_kind(
+            self._filter_result(
                 self.result_sequence,
                 kind={ResultKind.CONDITION, ResultKind.OBSERVATION, ResultKind.THEORY},
             )
         )
 
-    def _get_last_data_by_kind(self, kind):
+    def _get_last(self, kind):
         results_new_to_old = reversed(self.result_sequence)
-        last_of_kind = next(self._filter_data_by_kind(results_new_to_old, kind=kind))
+        last_of_kind = next(self._filter_result(results_new_to_old, kind=kind))
         return last_of_kind
 
     @staticmethod
-    def _filter_data_by_kind(result_sequence: Sequence[Result], kind: set[ResultKind]):
-        return (
-            r.data
-            for r in CycleState._filter_result_by_kind(result_sequence, kind=kind)
-        )
+    def _filter_result(result_sequence: Sequence[Result], kind: set[ResultKind]):
+        return filter(lambda r: r.kind in kind, result_sequence)
 
     @staticmethod
-    def _filter_result_by_kind(
-        result_sequence: Sequence[Result], kind: set[ResultKind]
-    ):
-        return filter(lambda r: r.kind in kind, result_sequence)
+    def _list_data(result_sequence: Sequence[Result]):
+        return list(r.data for r in result_sequence)
 
 
 class SupportsResultSequence(Protocol):
