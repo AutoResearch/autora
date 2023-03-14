@@ -3,6 +3,7 @@ The basic cycle controller for AER.
 """
 from __future__ import annotations
 
+from dataclasses import replace
 from typing import Callable, Dict, Optional
 
 from autora.cycle._executor import FullCycleExecutor
@@ -336,13 +337,13 @@ class SimpleCycle:
         self.monitor = monitor
         if params is None:
             params = dict()
-        self.params = params
 
         self.data = SimpleCycleData(
             metadata=metadata,
             conditions=[],
             observations=[],
             theories=[],
+            params=params,
         )
 
     def run(self, num_cycles: int = 1):
@@ -352,7 +353,7 @@ class SimpleCycle:
         return self
 
     def __next__(self):
-        data = self.executor_collection.full_cycle(self.data, self.params)
+        data = self.executor_collection.full_cycle(self.data)
         self._monitor_callback(data)
         self.data = data
         return self
@@ -363,3 +364,12 @@ class SimpleCycle:
     def _monitor_callback(self, data: SimpleCycleData):
         if self.monitor is not None:
             self.monitor(data)
+
+    @property
+    def params(self):
+        return self.data.params
+
+    @params.setter
+    def params(self, value):
+        new_data = replace(self.data, params=value)
+        self.data = new_data

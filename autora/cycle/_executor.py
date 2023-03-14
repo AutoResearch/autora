@@ -6,7 +6,7 @@ from typing import Callable, Iterable, Protocol
 
 import numpy as np
 
-from autora.cycle.params import _get_cycle_properties, _resolve_cycle_properties
+from autora.cycle.params import _resolve_state_params
 from autora.cycle.state import SimpleCycleData
 from autora.experimentalist.pipeline import Pipeline
 
@@ -74,18 +74,18 @@ class OnlineExecutor:
 
 
 class FullCycleExecutor(OnlineExecutor):
-    def full_cycle(self, state: SimpleCycleData, params: dict):
-        experimentalist_params = _resolve_cycle_properties(
-            params, _get_cycle_properties(state)
-        ).get("experimentalist", dict())
+    def full_cycle(self, state: SimpleCycleData):
+        experimentalist_params = _resolve_state_params(state).get(
+            "experimentalist", dict()
+        )
         state = self.experimentalist(state, experimentalist_params)
 
-        experiment_runner_params = _resolve_cycle_properties(
-            params, _get_cycle_properties(state)
-        ).get("experiment_runner", dict())
+        experiment_runner_params = _resolve_state_params(state).get(
+            "experiment_runner", dict()
+        )
         state = self.experiment_runner(state, experiment_runner_params)
-        theorist_params = _resolve_cycle_properties(
-            params, _get_cycle_properties(state)
-        ).get("theorist", dict())
+
+        theorist_params = _resolve_state_params(state).get("theorist", dict())
         state = self.theorist(state, theorist_params)
+
         return state
