@@ -353,9 +353,19 @@ class SimpleCycle:
         return self
 
     def __next__(self):
-        data = self.executor_collection.full_cycle(self.data)
-        self._monitor_callback(data)
+
+        # Plan
+        next_function = self.executor_collection.full_cycle
+
+        # Execute
+        data = next_function(self.data)
+
+        # Update
         self.data = data
+
+        # Monitor
+        self._monitor_callback(data)
+
         return self
 
     def __iter__(self):
