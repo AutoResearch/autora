@@ -30,16 +30,18 @@ class Result:
 
 @dataclass
 class CycleState:
+    """An object passed between and updated by Executors."""
+
     result_sequence: List[Result] = field(default_factory=list)
 
     def __init__(
         self,
-        result_sequence: Optional[Sequence[Result]] = None,
+        metadata: Optional[VariableCollection] = None,
+        params: Optional[Dict] = None,
         conditions: Optional[Sequence[ArrayLike]] = None,
         observations: Optional[Sequence[ArrayLike]] = None,
         theories: Optional[Sequence[BaseEstimator]] = None,
-        metadata: Optional[VariableCollection] = None,
-        params: Optional[Dict] = None,
+        result_sequence: Optional[Sequence[Result]] = None,
     ):
         if result_sequence is not None:
             self.result_sequence = list(result_sequence)
