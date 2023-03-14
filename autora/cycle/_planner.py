@@ -47,24 +47,24 @@ def last_result_kind_planner(
         'experimentalist'
 
         ... or if we had produced conditions, then we could run an experiment
-        >>> state.update("some theory", kind="CONDITION")
+        >>> state.update("some theory",kind="CONDITION")
         >>> last_result_kind_planner(state, executor_collection)
         'experiment_runner'
 
         ... or if we last produced observations, then we could now run the theorist:
-        >>> state.update("some theory", kind="OBSERVATION")
+        >>> state.update("some theory",kind="OBSERVATION")
         >>> last_result_kind_planner(state, executor_collection)
         'theorist'
 
         ... or if we last produced a theory, then we could now run the experimentalist:
-        >>> state.update("some theory", kind="THEORY")
+        >>> state.update("some theory",kind="THEORY")
         >>> last_result_kind_planner(state, executor_collection)
         'experimentalist'
 
     """
 
     try:
-        last_result_kind = state.conditions_observations_theories[-1].kind
+        last_result_kind = state.results[-1].kind
     except IndexError:
         last_result_kind = None
 

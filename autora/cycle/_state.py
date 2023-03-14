@@ -22,7 +22,7 @@ class ResultKind(Enum):
         return f"{cls_name}.{self.name}"
 
 
-@dataclass
+@dataclass(frozen=True)
 class Result:
     data: Any
     kind: ResultKind
@@ -32,7 +32,7 @@ class Result:
 class CycleState:
     """An object passed between and updated by Executors."""
 
-    result_sequence: List[Result] = field(default_factory=list)
+    data: List[Result] = field(default_factory=list)
 
     def __init__(
         self,
@@ -41,12 +41,12 @@ class CycleState:
         conditions: Optional[Sequence[ArrayLike]] = None,
         observations: Optional[Sequence[ArrayLike]] = None,
         theories: Optional[Sequence[BaseEstimator]] = None,
-        result_sequence: Optional[Sequence[Result]] = None,
+        data: Optional[Sequence[Result]] = None,
     ):
-        if result_sequence is not None:
-            self.result_sequence = list(result_sequence)
+        if data is not None:
+            self.data = list(data)
         else:
-            self.result_sequence = []
+            self.data = []
 
         for seq, kind in [
             (conditions, ResultKind.CONDITION),
@@ -63,8 +63,8 @@ class CycleState:
         if params is not None:
             self.params = params
 
-    def update(self, data, kind):
-        self.result_sequence.append(Result(data, ResultKind(kind)))
+    def update(self, value, kind):
+        self.data.append(Result(value, ResultKind(kind)))
 
     @property
     def metadata(self) -> VariableCollection:
@@ -93,32 +93,30 @@ class CycleState:
     @property
     def conditions(self) -> List[ArrayLike]:
         return self._list_data(
-            self._filter_result(self.result_sequence, kind={ResultKind.CONDITION})
+            self._filter_result(self.data, kind={ResultKind.CONDITION})
         )
 
     @property
     def observations(self) -> List[ArrayLike]:
         return self._list_data(
-            self._filter_result(self.result_sequence, kind={ResultKind.OBSERVATION})
+            self._filter_result(self.data, kind={ResultKind.OBSERVATION})
         )
 
     @property
     def theories(self) -> List[BaseEstimator]:
-        return self._list_data(
-            self._filter_result(self.result_sequence, kind={ResultKind.THEORY})
-        )
+        return self._list_data(self._filter_result(self.data, kind={ResultKind.THEORY}))
 
     @property
-    def conditions_observations_theories(self) -> List[Result]:
+    def results(self) -> List[Result]:
         return list(
             self._filter_result(
-                self.result_sequence,
+                self.data,
                 kind={ResultKind.CONDITION, ResultKind.OBSERVATION, ResultKind.THEORY},
             )
         )
 
     def _get_last(self, kind):
-        results_new_to_old = reversed(self.result_sequence)
+        results_new_to_old = reversed(self.data)
         last_of_kind = next(self._filter_result(results_new_to_old, kind=kind))
         return last_of_kind
 
@@ -132,8 +130,8 @@ class CycleState:
 
 
 class SupportsResultSequence(Protocol):
-    result_sequence: Sequence[Result]
+    data: Sequence[Result]
 
 
 class SupportsConditionsObservationsTheories(Protocol):
-    conditions_observations_theories: Sequence[Result]
+    results: Sequence[Result]

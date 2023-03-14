@@ -317,7 +317,7 @@ class SimpleCycle:
         >>> from autora.cycle._executor import OnlineExecutorCollection
         >>> from autora.cycle._planner import last_result_kind_planner
         >>> def monitor(data):
-        ...     print(f"MONITOR: Generated new {data.conditions_observations_theories[-1].kind}")
+        ...     print(f"MONITOR: Generated new {data.results[-1].kind}")
         >>> cycle_with_last_result_planner = SimpleCycle(
         ...     planner=last_result_kind_planner,
         ...     executor_collection=OnlineExecutorCollection,
@@ -349,7 +349,7 @@ class SimpleCycle:
         ...     experiment_runner=example_synthetic_experiment_runner,
         ... )
         >>> seed_observation = example_synthetic_experiment_runner(np.linspace(0,5,10))
-        >>> cycle_with_seed_observation.data.update(seed_observation, kind="OBSERVATION")
+        >>> cycle_with_seed_observation.data.update(seed_observation,kind="OBSERVATION")
 
         >>> _ = next(cycle_with_seed_observation)
         MONITOR: Generated new ResultKind.THEORY
@@ -363,7 +363,7 @@ class SimpleCycle:
         different times in the cycle, e.g. for initial seeding.
         >>> from autora.cycle._planner import random_operation_planner
         >>> def monitor(data):
-        ...     print(f"MONITOR: Generated new {data.conditions_observations_theories[-1].kind}")
+        ...     print(f"MONITOR: Generated new {data.results[-1].kind}")
         >>> cycle_with_random_planner = SimpleCycle(
         ...     planner=random_operation_planner,
         ...     executor_collection=OnlineExecutorCollection,
