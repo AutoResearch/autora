@@ -26,20 +26,20 @@ class SimpleCycle:
             properties:
 
             - `metadata`
+            -  `params` (dict): a nested dictionary with parameters for the cycle parts.
+                    `{
+                        "experimentalist": {<experimentalist params...>},
+                        "theorist": {<theorist params...>},
+                        "experiment_runner": {<experiment_runner params...>}
+                    }`
             - `conditions`: a list of np.ndarrays representing all of the IVs proposed by the
                 experimentalist
             - `observations`: a list of np.ndarrays representing all of the IVs and DVs returned by
                 the experiment runner
             - `theories`: a list of all the fitted theories (scikit-learn compatible estimators)
 
-        params (dict): a nested dictionary with parameters for the cycle parts.
-
-                `{
-                    "experimentalist": {<experimentalist params...>},
-                    "theorist": {<theorist params...>},
-                    "experiment_runner": {<experiment_runner params...>}
-                }`
-
+        executor_collection: an object with interfaces for running the theorist, experimentalist
+            and experiment_runner.
 
     Examples:
 
