@@ -1,3 +1,5 @@
+""" Executors for the AutoRA Cycle."""
+
 from __future__ import annotations
 
 import copy
@@ -42,6 +44,7 @@ class OnlineExecutorCollection:
         self.theorist_estimator = theorist_estimator
 
     def experimentalist(self, state: CycleState, params: dict):
+        """Interface for running the experimentalist pipeline."""
         new_conditions = self.experimentalist_pipeline(**params)
         if isinstance(new_conditions, Iterable):
             # If the pipeline gives us an iterable, we need to make it into a concrete array.
@@ -64,6 +67,7 @@ class OnlineExecutorCollection:
         return new_state
 
     def experiment_runner(self, state: CycleState, params: dict):
+        """Interface for running the experiment runner callable"""
         x = state.conditions[-1]
         y = self.experiment_runner_callable(x, **params)
         new_observations = np.column_stack([x, y])
@@ -71,6 +75,7 @@ class OnlineExecutorCollection:
         return new_state
 
     def theorist(self, state: CycleState, params: dict):
+        """Interface for running the theorist estimator."""
         all_observations = np.row_stack(state.observations)
         n_xs = len(state.metadata.independent_variables)
         x, y = all_observations[:, :n_xs], all_observations[:, n_xs:]
