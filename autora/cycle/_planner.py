@@ -93,6 +93,7 @@ def random_operation_planner(
         >>> state = {}
 
         We simulate a productive executor_collection using a SimpleNamespace
+        >>> from types import SimpleNamespace
         >>> executor_collection = SimpleNamespace(
         ...     experimentalist = "experimentalist",
         ...     experiment_runner = "experiment_runner",
