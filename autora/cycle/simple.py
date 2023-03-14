@@ -364,7 +364,7 @@ class SimpleCycle:
         self.data = data
 
         # Monitor
-        self._monitor_callback(data)
+        self._monitor_callback()
 
         return self
 
