@@ -25,6 +25,5 @@ jobs:
         python-version: ${{ matrix.python-version }}
         cache: "poetry"
     - run: poetry install
-    - run: |
-        poetry run pytest
-        poetry run pytest --doctest-modules autora/cycle
+    - run: poetry run pytest
+    - run: poetry run pytest --doctest-modules autora/cycle
