@@ -310,9 +310,57 @@ class SimpleCycle:
         By switching out the `executor_collection` and/or the `planner`, we can specify a
         different way of running the cycle.
 
-        In this example, we use a planner which suggests a different random operation at each
-        step, demonstrating arbitrary execution order.
+        #### Easier Seeding with a Smarter Planner
+
+        In this example, we use a planner which considers the last available result and picks the
+        matching next step. This means that seeding is relatively simple.
         >>> from autora.cycle._executor import OnlineExecutorCollection
+        >>> from autora.cycle._planner import last_result_kind_planner
+        >>> def monitor(data):
+        ...     print(f"MONITOR: Generated new {data.conditions_observations_theories[-1].kind}")
+        >>> cycle_with_last_result_planner = SimpleCycle(
+        ...     planner=last_result_kind_planner,
+        ...     executor_collection=OnlineExecutorCollection,
+        ...     monitor=monitor,
+        ...     metadata=metadata_0,
+        ...     theorist=example_theorist,
+        ...     experimentalist=example_experimentalist,
+        ...     experiment_runner=example_synthetic_experiment_runner,
+        ... )
+
+        When we run this cycle starting with no data, we generate an experimental condition first:
+        >>> _ = list(takewhile(lambda c: len(c.data.theories) < 2, cycle_with_last_result_planner))
+        MONITOR: Generated new ResultKind.CONDITION
+        MONITOR: Generated new ResultKind.OBSERVATION
+        MONITOR: Generated new ResultKind.THEORY
+        MONITOR: Generated new ResultKind.CONDITION
+        MONITOR: Generated new ResultKind.OBSERVATION
+        MONITOR: Generated new ResultKind.THEORY
+
+        However, if we seed the same cycle with observations, then its first Executor will be the
+        theorist:
+        >>> cycle_with_seed_observation = SimpleCycle(
+        ...     planner=last_result_kind_planner,
+        ...     executor_collection=OnlineExecutorCollection,
+        ...     monitor=monitor,
+        ...     metadata=metadata_0,
+        ...     theorist=example_theorist,
+        ...     experimentalist=example_experimentalist,
+        ...     experiment_runner=example_synthetic_experiment_runner,
+        ... )
+        >>> seed_observation = example_synthetic_experiment_runner(np.linspace(0,5,10))
+        >>> cycle_with_seed_observation.data.update(seed_observation, kind="OBSERVATION")
+
+        >>> _ = next(cycle_with_seed_observation)
+        MONITOR: Generated new ResultKind.THEORY
+
+        #### Arbitrary Execution Order (Toy Example)
+
+        In the next example, we use a planner which suggests a different random operation at each
+        step, demonstrating arbitrary execution order.
+
+        This might be useful in cases when different experimentalists or theorists are needed at
+        different times in the cycle, e.g. for initial seeding.
         >>> from autora.cycle._planner import random_operation_planner
         >>> def monitor(data):
         ...     print(f"MONITOR: Generated new {data.conditions_observations_theories[-1].kind}")
