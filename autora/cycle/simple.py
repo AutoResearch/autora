@@ -1,3 +1,6 @@
+"""
+The basic cycle controller for AER.
+"""
 from __future__ import annotations
 
 from typing import Callable, Dict, Optional
@@ -344,6 +347,7 @@ class SimpleCycle:
         )
 
     def run(self, num_cycles: int = 1):
+        """Execute the next step in the cycle."""
         for i in range(num_cycles):
             next(self)
         return self
