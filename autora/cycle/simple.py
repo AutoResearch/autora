@@ -90,14 +90,14 @@ class SimpleCycle:
         ...     monitor=lambda data: print(f"Generated {len(data.theories)} theories"),
         ... )
         >>> cycle # doctest: +ELLIPSIS
-        <simple.SimpleCycle object at 0x...>
+        <...SimpleCycle object at 0x...>
 
         We can run the cycle by calling the run method:
         >>> cycle.run(num_cycles=3)  # doctest: +ELLIPSIS
         Generated 1 theories
         Generated 2 theories
         Generated 3 theories
-        <simple.SimpleCycle object at 0x...>
+        <...SimpleCycle object at 0x...>
 
         We can now interrogate the results. The first set of conditions which went into the
         experiment runner were:
@@ -143,15 +143,15 @@ class SimpleCycle:
         We can also run the cycle with more control over the execution flow:
         >>> next(cycle) # doctest: +ELLIPSIS
         Generated 4 theories
-        <simple.SimpleCycle object at 0x...>
+        <...SimpleCycle object at 0x...>
 
         >>> next(cycle) # doctest: +ELLIPSIS
         Generated 5 theories
-        <simple.SimpleCycle object at 0x...>
+        <...SimpleCycle object at 0x...>
 
         >>> next(cycle) # doctest: +ELLIPSIS
         Generated 6 theories
-        <simple.SimpleCycle object at 0x...>
+        <...SimpleCycle object at 0x...>
 
         We can continue to run the cycle as long as we like,
         with a simple arbitrary stopping condition like the number of theories generated:
