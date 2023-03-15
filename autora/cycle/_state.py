@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Any, Dict, List, Optional, Protocol, Sequence, Union
 
-from numpy._typing import ArrayLike
+from numpy.typing import ArrayLike
 from sklearn.base import BaseEstimator
 
 from autora.variable import VariableCollection
