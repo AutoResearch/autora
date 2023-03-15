@@ -11,6 +11,25 @@ from sklearn.base import BaseEstimator
 from autora.variable import VariableCollection
 
 
+class SupportsDataKind(Protocol):
+    """Object with attributes for `data` and `kind`"""
+
+    data: Optional[Any]
+    kind: Optional[Any]
+
+
+class SupportsData(Protocol):
+    """Object with an attribute which has a sequence of arbitrary data."""
+
+    data: Sequence[SupportsDataKind]
+
+
+class SupportsResults(Protocol):
+    """Object with an attribute which has a sequence of conditions, observations and theories."""
+
+    results: Sequence[SupportsDataKind]
+
+
 @dataclass
 class CycleState:
     """Container class for the state of an AER cycle."""
@@ -396,15 +415,3 @@ class ResultKind(Enum):
     def __repr__(self):
         cls_name = self.__class__.__name__
         return f"{cls_name}.{self.name}"
-
-
-class SupportsResultSequence(Protocol):
-    """Object with an attribute which has a sequence of arbitrary data."""
-
-    data: Sequence[Result]
-
-
-class SupportsConditionsObservationsTheories(Protocol):
-    """Object with an attribute which has a sequence of conditions, observations and theories."""
-
-    results: Sequence[Result]

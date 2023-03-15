@@ -6,7 +6,7 @@ from autora.cycle._executor import (
     SupportsExperimentalistExperimentRunnerTheorist,
     SupportsFullCycle,
 )
-from autora.cycle._state import ResultKind, SupportsConditionsObservationsTheories
+from autora.cycle._state import ResultKind, SupportsResults
 
 
 class Planner(Protocol):
@@ -20,7 +20,7 @@ def full_cycle_planner(state: Any, executor_collection: SupportsFullCycle):
 
 
 def last_result_kind_planner(
-    state: SupportsConditionsObservationsTheories,
+    state: SupportsResults,
     executor_collection: SupportsExperimentalistExperimentRunnerTheorist,
 ):
     """

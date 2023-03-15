@@ -9,12 +9,12 @@ import numpy as np
 from sklearn.base import BaseEstimator
 
 from autora.cycle._params import _resolve_state_params
-from autora.cycle._state import CycleState, Result, ResultKind, SupportsResultSequence
+from autora.cycle._state import CycleState, Result, ResultKind, SupportsData
 from autora.experimentalist.pipeline import Pipeline
 
 
 class Executor(Protocol):
-    def __call__(self, state: SupportsResultSequence) -> Result:
+    def __call__(self, state: SupportsData) -> Result:
         ...
 
 
