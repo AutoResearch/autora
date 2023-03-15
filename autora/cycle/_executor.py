@@ -18,6 +18,16 @@ class Executor(Protocol):
         ...
 
 
+class SupportsFullCycle(Protocol):
+    full_cycle: Executor
+
+
+class SupportsExperimentalistExperimentRunnerTheorist(Protocol):
+    experimentalist: Executor
+    experiment_runner: Executor
+    theorist: Executor
+
+
 class OnlineExecutorCollection:
     """
     Runs experiment design, observation and theory generation in a single session.
@@ -96,13 +106,3 @@ class FullCycleExecutorCollection(OnlineExecutorCollection):
         state = self.experiment_runner(state)
         state = self.theorist(state)
         return state
-
-
-class SupportsFullCycle(Protocol):
-    full_cycle: Executor
-
-
-class SupportsExperimentalistExperimentRunnerTheorist(Protocol):
-    experimentalist: Executor
-    experiment_runner: Executor
-    theorist: Executor
