@@ -24,10 +24,14 @@ class Executor(Protocol):
 
 
 class SupportsFullCycle(Protocol):
+    """An object which has a single executor that runs the full AER cycle."""
+
     full_cycle: Executor
 
 
 class SupportsExperimentalistExperimentRunnerTheorist(Protocol):
+    """Supports methods for the experimentalist, experiment runner and theorist of AER."""
+
     experimentalist: Executor
     experiment_runner: Executor
     theorist: Executor
@@ -55,9 +59,9 @@ class OnlineExecutorCollection:
         self.experiment_runner_callable = experiment_runner_callable
         self.theorist_estimator = theorist_estimator
 
-    def experimentalist(self, state: List[Result]) -> List[Result]:
+    def experimentalist(self, history: List[Result]) -> List[Result]:
         """Interface for running the experimentalist pipeline."""
-        params = _resolve_state_params(state).get("experimentalist", dict())
+        params = _resolve_state_params(history).get("experimentalist", dict())
         new_conditions = self.experimentalist_pipeline(**params)
         if isinstance(new_conditions, Iterable):
             # If the pipeline gives us an iterable, we need to make it into a concrete array.
@@ -74,20 +78,20 @@ class OnlineExecutorCollection:
         result = [Result(new_conditions_array, kind=ResultKind.CONDITION)]
         return result
 
-    def experiment_runner(self, state: List[Result]) -> List[Result]:
+    def experiment_runner(self, history: List[Result]) -> List[Result]:
         """Interface for running the experiment runner callable"""
-        params = _resolve_state_params(state).get("experiment_runner", dict())
-        x = history_to_kind(state).conditions[-1]
+        params = _resolve_state_params(history).get("experiment_runner", dict())
+        x = history_to_kind(history).conditions[-1]
         y = self.experiment_runner_callable(x, **params)
         new_observations = np.column_stack([x, y])
         result = [Result(new_observations, kind=ResultKind.OBSERVATION)]
         return result
 
-    def theorist(self, state: List[Result]) -> List[Result]:
+    def theorist(self, history: List[Result]) -> List[Result]:
         """Interface for running the theorist estimator."""
-        params = _resolve_state_params(state).get("theorist", dict())
-        metadata = history_to_kind(state).metadata
-        observations = history_to_kind(state).observations
+        params = _resolve_state_params(history).get("theorist", dict())
+        metadata = history_to_kind(history).metadata
+        observations = history_to_kind(history).observations
         all_observations = np.row_stack(observations)
         n_xs = len(metadata.independent_variables)
         x, y = all_observations[:, :n_xs], all_observations[:, n_xs:]
@@ -104,8 +108,13 @@ class FullCycleExecutorCollection(OnlineExecutorCollection):
     Runs a full AER cycle each `full_cycle` call in a single session.
     """
 
-    def full_cycle(self, state: List[Result]) -> List[Result]:
-        state_ = list(state)
+    def full_cycle(self, history: List[Result]) -> List[Result]:
+        """
+        Executes the experimentalist, experiment runner and theorist on the given state.
+
+        Returns: A list of new results
+        """
+        state_ = list(history)
         experimentalist_result = self.experimentalist(state_)
         experiment_runner_result = self.experiment_runner(
             state_ + experimentalist_result
