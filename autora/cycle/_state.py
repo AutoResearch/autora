@@ -423,3 +423,81 @@ def get_last(data: Sequence[Result], kind):
     results_new_to_old = reversed(data)
     last_of_kind = next(filter_result(results_new_to_old, kind=kind))
     return last_of_kind
+
+
+def init_result_list(
+    metadata: Optional[VariableCollection] = None,
+    params: Optional[Dict] = None,
+    conditions: Optional[Iterable[ArrayLike]] = None,
+    observations: Optional[Iterable[ArrayLike]] = None,
+    theories: Optional[Iterable[BaseEstimator]] = None,
+) -> List[Result]:
+    """
+    Initialize a list of Result objects
+
+    Returns:
+
+    Args:
+        metadata: a single datum to be marked as "metadata"
+        params: a single datum to be marked as "params"
+        conditions: an iterable of data, each to be marked as "conditions"
+        observations: an iterable of data, each to be marked as "observations"
+        theories: an iterable of data, each to be marked as "theories"
+
+    Examples:
+        CycleState can be initialized in an empty state:
+        >>> init_result_list()
+        []
+
+        ... or with values for any or all of the parameters:
+        >>> from autora.variable import VariableCollection
+        >>> init_result_list(metadata=VariableCollection()) # doctest: +ELLIPSIS
+        [Result(data=VariableCollection(...), kind=ResultKind.METADATA)]
+
+        >>> init_result_list(params={"some": "params"})
+        [Result(data={'some': 'params'}, kind=ResultKind.PARAMS)]
+
+        >>> init_result_list(conditions=["a condition"])
+        [Result(data='a condition', kind=ResultKind.CONDITION)]
+
+        >>> init_result_list(observations=["an observation"])
+        [Result(data='an observation', kind=ResultKind.OBSERVATION)]
+
+        >>> from sklearn.linear_model import LinearRegression
+        >>> init_result_list(theories=[LinearRegression()])
+        [Result(data=LinearRegression(), kind=ResultKind.THEORY)]
+
+        The input arguments are added to the data in the order `metadata`,
+        `params`, `conditions`, `observations`, `theories`:
+        >>> init_result_list(metadata=VariableCollection(),
+        ...                  params={"some": "params"},
+        ...                  conditions=["a condition"],
+        ...                  observations=["an observation", "another observation"],
+        ...                  theories=[LinearRegression()],
+        ... ) # doctest: +NORMALIZE_WHITESPACE +ELLIPSIS
+        [Result(data=VariableCollection(...), kind=ResultKind.METADATA),
+         Result(data={'some': 'params'}, kind=ResultKind.PARAMS),
+         Result(data='a condition', kind=ResultKind.CONDITION),
+         Result(data='an observation', kind=ResultKind.OBSERVATION),
+         Result(data='another observation', kind=ResultKind.OBSERVATION),
+         Result(data=LinearRegression(), kind=ResultKind.THEORY)]
+
+    """
+    data = []
+
+    if metadata is not None:
+        data.append(Result(metadata, ResultKind.METADATA))
+
+    if params is not None:
+        data.append(Result(params, ResultKind.PARAMS))
+
+    for seq, kind in [
+        (conditions, ResultKind.CONDITION),
+        (observations, ResultKind.OBSERVATION),
+        (theories, ResultKind.THEORY),
+    ]:
+        if seq is not None:
+            for i in seq:
+                data.append(Result(i, kind=kind))
+
+    return data
