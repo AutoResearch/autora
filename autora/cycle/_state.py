@@ -404,6 +404,9 @@ class Result(SupportsDataKind):
     data: Optional[Any]
     kind: Optional[ResultKind]
 
+    def __post_init__(self):
+        object.__setattr__(self, "kind", ResultKind(self.kind))
+
 
 class ResultKind(Enum):
     """Kinds of results which can be held in the Result object"""
