@@ -391,8 +391,61 @@ def _filter_result(data: Iterable[Result], kind: set[ResultKind]):
     return filter(lambda r: r.kind in kind, data)
 
 
-def _list_data(data: Iterable[Result]):
+def _list_data(data: Sequence[Result]):
     return list(r.data for r in data)
+
+
+def _list_conditions(data: Sequence[Result]):
+    """
+    Get all the results of kind "CONDITION"
+
+    Examples:
+        Initially, we get an empty list back:
+        >>> state = []
+        >>> _list_conditions(state)
+        []
+
+        We can add new conditions by using the `.update` method and specifying the kind as
+        `"CONDITION"`:
+        >>> state = [Result([11,12,13], kind="CONDITION")]
+        >>> _list_conditions(state)
+        [[11, 12, 13]]
+
+        When we add multiple conditions, we get them all back:
+        >>> state.append(Result([21,22,23], kind="CONDITION"))
+        >>> state.append(Result([31,32,33], kind="CONDITION"))
+        >>> _list_conditions(state)
+        [[11, 12, 13], [21, 22, 23], [31, 32, 33]]
+
+    """
+    return _list_data(_filter_result(data, kind={ResultKind.CONDITION}))
+
+
+def _list_observations(data: Sequence[Result]):
+    """
+    Get all the results of kind "OBSERVATION"
+
+    Examples:
+        Initially, we get an empty list back:
+        >>> state = []
+        >>> _list_observations(state)
+        []
+
+        If our state has observations, then they are returned:
+        >>> state = [Result([11,12,13], kind="OBSERVATION")]
+        >>> _list_observations(state)
+        [[11, 12, 13]]
+
+        When we add multiple conditions, we get them all back:
+        >>> state.append(Result([21,22,23], kind="OBSERVATION"))
+        >>> state.append(Result([31,32,33], kind="OBSERVATION"))
+        >>> _list_observations(state)
+        [[11, 12, 13], [21, 22, 23], [31, 32, 33]]
+    """
+    return _list_data(_filter_result(data, {ResultKind.OBSERVATION}))
+
+
+# ToDO: try just using a list again – this state is messy and not thread-safe...
 
 
 @dataclass(frozen=True)
