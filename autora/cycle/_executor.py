@@ -93,11 +93,8 @@ class FullCycleExecutorCollection(OnlineExecutorCollection):
 
     def full_cycle(self, state: CycleState):
         state = self.experimentalist(state)
-
         state = self.experiment_runner(state)
-
         state = self.theorist(state)
-
         return state
 
 
