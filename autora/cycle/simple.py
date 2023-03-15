@@ -9,7 +9,7 @@ from typing import Callable, Dict, Optional
 
 from autora.cycle._executor import FullCycleExecutorCollection
 from autora.cycle._planner import full_cycle_planner
-from autora.cycle._state import CycleState, init_result_list, sequence_to_namespace
+from autora.cycle._state import init_result_list, sequence_to_namespace
 from autora.variable import VariableCollection
 
 _logger = logging.getLogger(__name__)
@@ -417,7 +417,7 @@ class SimpleCycle:
         theorist,
         experimentalist,
         experiment_runner,
-        monitor: Optional[Callable[[CycleState], None]] = None,
+        monitor: Optional[Callable[[SimpleCycle], None]] = None,
         params: Optional[Dict] = None,
         executor_collection=FullCycleExecutorCollection,
         planner=full_cycle_planner,
