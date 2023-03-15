@@ -1,16 +1,16 @@
 import random
 from typing import Iterable, Protocol
 
-from autora.cycle._executor import (
+from autora.cycle.executor import (
     Executor,
     SupportsExperimentalistExperimentRunnerTheorist,
     SupportsFullCycle,
 )
-from autora.cycle._state import ResultKind, SupportsDataKind, filter_result
+from autora.cycle.state import ResultKind, SupportsDataKind, filter_result
 
 
 class Planner(Protocol):
-    def __call__(self, state, executor_collection) -> Executor:
+    def __call__(self, state_or_history, executor_collection) -> Executor:
         ...
 
 
@@ -46,7 +46,7 @@ def last_result_kind_planner(
         'experimentalist'
 
         ... or if we had produced conditions, then we could run an experiment
-        >>> from autora.cycle._state import Result
+        >>> from autora.cycle.state import Result
         >>> history.append(Result("some theory",kind="CONDITION"))
         >>> last_result_kind_planner(history, executor_collection)
         'experiment_runner'

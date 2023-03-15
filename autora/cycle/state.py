@@ -11,7 +11,7 @@ history and the Result object holds both the data and metadata like the "kind".
 
 Examples:
     We start with an emtpy history
-    >>> from autora.cycle._state import history_to_kind, ResultKind, Result
+    >>> from autora.cycle.state import history_to_kind, ResultKind, Result
     >>> history_ = []
 
     The view of this empty history on the "kind" dimension is also empty:
@@ -129,13 +129,29 @@ def history_to_kind(history: Sequence[Result]):
 class Result(SupportsDataKind):
     """
     Container class for data and metadata.
+
+    >>> Result()
+    Result(data=None, kind=None)
+
+    >>> Result("a")
+    Result(data='a', kind=None)
+
+    >>> Result(None, "THEORY")
+    Result(data=None, kind=ResultKind.THEORY)
+
+    >>> Result(data="b")
+    Result(data='b', kind=None)
+
+    >>> Result("c", "OBSERVATION")
+    Result(data='c', kind=ResultKind.OBSERVATION)
     """
 
-    data: Optional[Any]
-    kind: Optional[ResultKind]
+    data: Optional[Any] = None
+    kind: Optional[ResultKind] = None
 
     def __post_init__(self):
-        object.__setattr__(self, "kind", ResultKind(self.kind))
+        if isinstance(self.kind, str):
+            object.__setattr__(self, "kind", ResultKind(self.kind))
 
 
 class ResultKind(str, Enum):
@@ -174,6 +190,16 @@ class ResultKind(str, Enum):
 
 
 def list_data(data: Sequence[SupportsDataKind]):
+    """
+    Extract the `.data` attribute of each item in a sequence, and return as a list.
+
+    Examples:
+        >>> list_data([])
+        []
+
+        >>> list_data([Result("a"), Result("b")])
+        ['a', 'b']
+    """
     return list(r.data for r in data)
 
 
@@ -278,7 +304,7 @@ def _resolve_state_params(state: Sequence[Result]) -> Dict:
     Returns the `params` attribute of the input, with `cycle properties` resolved.
 
     Examples:
-        >>> from autora.cycle._state import init_result_list, _resolve_state_params
+
         >>> s = init_result_list(theories=["the first theory", "the second theory"],
         ...     params={"experimentalist": {"source": "%theories[-1]%"}})
         >>> _resolve_state_params(s)

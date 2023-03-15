@@ -8,7 +8,7 @@ from typing import Callable, Iterable, List, Protocol
 import numpy as np
 from sklearn.base import BaseEstimator
 
-from autora.cycle._state import (
+from autora.cycle.state import (
     Result,
     ResultKind,
     SupportsData,

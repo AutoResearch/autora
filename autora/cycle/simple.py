@@ -7,9 +7,9 @@ import logging
 from types import SimpleNamespace
 from typing import Callable, Dict, Optional
 
-from autora.cycle._executor import FullCycleExecutorCollection
-from autora.cycle._planner import full_cycle_planner
-from autora.cycle._state import history_to_kind, init_result_list
+from autora.cycle.executor import FullCycleExecutorCollection
+from autora.cycle.planner import full_cycle_planner
+from autora.cycle.state import history_to_kind, init_result_list
 from autora.variable import VariableCollection
 
 _logger = logging.getLogger(__name__)
@@ -315,8 +315,8 @@ class SimpleCycle:
 
         In this example, we use a planner which considers the last available result and picks the
         matching next step. This means that seeding is relatively simple.
-        >>> from autora.cycle._executor import OnlineExecutorCollection
-        >>> from autora.cycle._planner import last_result_kind_planner
+        >>> from autora.cycle.executor import OnlineExecutorCollection
+        >>> from autora.cycle.planner import last_result_kind_planner
         >>> def monitor(cycle):
         ...     print(f"MONITOR: Generated new {cycle.history[-1].kind}")
         >>> cycle_with_last_result_planner = SimpleCycle(
@@ -340,7 +340,7 @@ class SimpleCycle:
 
         However, if we seed the same cycle with observations, then its first Executor will be the
         theorist:
-        >>> from autora.cycle._state import Result
+        >>> from autora.cycle.state import Result
         >>> cycle_with_seed_observation = SimpleCycle(
         ...     planner=last_result_kind_planner,
         ...     executor_collection=OnlineExecutorCollection,
@@ -363,7 +363,7 @@ class SimpleCycle:
 
         This might be useful in cases when different experimentalists or theorists are needed at
         different times in the cycle, e.g. for initial seeding.
-        >>> from autora.cycle._planner import random_operation_planner
+        >>> from autora.cycle.planner import random_operation_planner
         >>> def monitor(cycle):
         ...     print(f"MONITOR: Generated new {cycle.history[-1].kind}")
         >>> cycle_with_random_planner = SimpleCycle(
