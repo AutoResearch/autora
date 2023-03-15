@@ -388,13 +388,17 @@ def _resolve_properties(params: Dict, state_dependent_properties: Mapping):
         >>> _resolve_properties(params_1,cycle_properties_1)
         {'key': 1, 'nested_dict': {'inner_key': 2}}
 
+        >>> params_2 = {"key": "baz"}
+        >>> _resolve_properties(params_2,cycle_properties_1)
+        {'key': 'baz'}
+
     """
     params_ = copy.copy(params)
     for key, value in params_.items():
         if isinstance(value, dict):
             params_[key] = _resolve_properties(value, state_dependent_properties)
-        elif (
-            isinstance(value, str) and value in state_dependent_properties
+        elif isinstance(value, str) and (
+            value in state_dependent_properties
         ):  # value is a key in the cycle_properties dictionary
             params_[key] = state_dependent_properties[value]
         else:
