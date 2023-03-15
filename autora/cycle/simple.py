@@ -4,11 +4,12 @@ The basic cycle controller for AER.
 from __future__ import annotations
 
 import logging
+from types import SimpleNamespace
 from typing import Callable, Dict, Optional
 
 from autora.cycle._executor import FullCycleExecutorCollection
 from autora.cycle._planner import full_cycle_planner
-from autora.cycle._state import CycleState
+from autora.cycle._state import CycleState, init_result_list, sequence_to_namespace
 from autora.variable import VariableCollection
 
 _logger = logging.getLogger(__name__)
@@ -90,7 +91,7 @@ class SimpleCycle:
         ...     theorist=example_theorist,
         ...     experimentalist=example_experimentalist,
         ...     experiment_runner=example_synthetic_experiment_runner,
-        ...     monitor=lambda data: print(f"Generated {len(data.theories)} theories"),
+        ...     monitor=lambda cycle: print(f"Generated {len(cycle.data.theories)} theories"),
         ... )
         >>> cycle # doctest: +ELLIPSIS
         <...SimpleCycle object at 0x...>
@@ -278,8 +279,8 @@ class SimpleCycle:
 
         By using the monitor callback, we can investigate what's going on with the
         state-dependent properties:
-        >>> cycle_with_state_dep_properties.monitor = lambda data: print(
-        ...     np.row_stack(data.observations)[:,0]  # just the independent variable values
+        >>> cycle_with_state_dep_properties.monitor = lambda cycle: print(
+        ...     np.row_stack(cycle.data.observations)[:,0]  # just the independent variable values
         ... )
 
         The monitor evaluates at the end of each cycle
@@ -316,8 +317,8 @@ class SimpleCycle:
         matching next step. This means that seeding is relatively simple.
         >>> from autora.cycle._executor import OnlineExecutorCollection
         >>> from autora.cycle._planner import last_result_kind_planner
-        >>> def monitor(data):
-        ...     print(f"MONITOR: Generated new {data.results[-1].kind}")
+        >>> def monitor(cycle):
+        ...     print(f"MONITOR: Generated new {cycle.history[-1].kind}")
         >>> cycle_with_last_result_planner = SimpleCycle(
         ...     planner=last_result_kind_planner,
         ...     executor_collection=OnlineExecutorCollection,
@@ -339,6 +340,7 @@ class SimpleCycle:
 
         However, if we seed the same cycle with observations, then its first Executor will be the
         theorist:
+        >>> from autora.cycle._state import Result
         >>> cycle_with_seed_observation = SimpleCycle(
         ...     planner=last_result_kind_planner,
         ...     executor_collection=OnlineExecutorCollection,
@@ -349,7 +351,7 @@ class SimpleCycle:
         ...     experiment_runner=example_synthetic_experiment_runner,
         ... )
         >>> seed_observation = example_synthetic_experiment_runner(np.linspace(0,5,10))
-        >>> cycle_with_seed_observation.data.update(seed_observation,kind="OBSERVATION")
+        >>> cycle_with_seed_observation.history.append(Result(seed_observation,kind="OBSERVATION"))
 
         >>> _ = next(cycle_with_seed_observation)
         MONITOR: Generated new ResultKind.THEORY
@@ -362,8 +364,8 @@ class SimpleCycle:
         This might be useful in cases when different experimentalists or theorists are needed at
         different times in the cycle, e.g. for initial seeding.
         >>> from autora.cycle._planner import random_operation_planner
-        >>> def monitor(data):
-        ...     print(f"MONITOR: Generated new {data.results[-1].kind}")
+        >>> def monitor(cycle):
+        ...     print(f"MONITOR: Generated new {cycle.history[-1].kind}")
         >>> cycle_with_random_planner = SimpleCycle(
         ...     planner=random_operation_planner,
         ...     executor_collection=OnlineExecutorCollection,
@@ -447,7 +449,7 @@ class SimpleCycle:
         if params is None:
             params = dict()
 
-        self.data = CycleState(
+        self.history = init_result_list(
             metadata=metadata,
             conditions=[],
             observations=[],
@@ -466,13 +468,13 @@ class SimpleCycle:
     def __next__(self):
 
         # Plan
-        next_function = self.planner(self.data, self.executor_collection)
+        next_function = self.planner(self.history, self.executor_collection)
 
         # Execute
-        data = next_function(self.data)
+        result = next_function(self.history)
 
         # Update
-        self.data = data
+        self.history = self.history + result
 
         # Monitor
         self._monitor_callback()
@@ -484,7 +486,20 @@ class SimpleCycle:
 
     def _monitor_callback(self):
         if self.monitor is not None:
-            self.monitor(self.data)
+            self.monitor(self)
+
+    @property
+    def data(self) -> SimpleNamespace:
+        """
+        View the cycle's data as a namespace with attributes:
+        - `.metadata`
+        - `.params`
+        - `.conditions`
+        - `.observations`
+        - `.theories`
+
+        """
+        return sequence_to_namespace(self.history)
 
     @property
     def params(self):

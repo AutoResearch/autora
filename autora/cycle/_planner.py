@@ -1,12 +1,12 @@
 import random
-from typing import Any, Protocol
+from typing import Any, Iterable, Protocol
 
 from autora.cycle._executor import (
     Executor,
     SupportsExperimentalistExperimentRunnerTheorist,
     SupportsFullCycle,
 )
-from autora.cycle._state import ResultKind, SupportsResults
+from autora.cycle._state import ResultKind, SupportsDataKind, filter_result
 
 
 class Planner(Protocol):
@@ -20,7 +20,7 @@ def full_cycle_planner(state: Any, executor_collection: SupportsFullCycle):
 
 
 def last_result_kind_planner(
-    state: SupportsResults,
+    state: Iterable[SupportsDataKind],
     executor_collection: SupportsExperimentalistExperimentRunnerTheorist,
 ):
     """
@@ -30,8 +30,8 @@ def last_result_kind_planner(
 
     Examples:
         We initialize a new CycleState to run our planner on:
-        >>> from autora.cycle._state import CycleState
-        >>> state = CycleState()
+        >>> from autora.cycle._state import Result
+        >>> state = []
 
         We simulate a productive executor_collection using a SimpleNamespace
         >>> from types import SimpleNamespace
@@ -47,24 +47,31 @@ def last_result_kind_planner(
         'experimentalist'
 
         ... or if we had produced conditions, then we could run an experiment
-        >>> state.update("some theory",kind="CONDITION")
+        >>> state.append(Result("some theory",kind="CONDITION"))
         >>> last_result_kind_planner(state, executor_collection)
         'experiment_runner'
 
         ... or if we last produced observations, then we could now run the theorist:
-        >>> state.update("some theory",kind="OBSERVATION")
+        >>> state.append(Result("some theory",kind="OBSERVATION"))
         >>> last_result_kind_planner(state, executor_collection)
         'theorist'
 
         ... or if we last produced a theory, then we could now run the experimentalist:
-        >>> state.update("some theory",kind="THEORY")
+        >>> state.append(Result("some theory",kind="THEORY"))
         >>> last_result_kind_planner(state, executor_collection)
         'experimentalist'
 
     """
 
+    filtered_state = list(
+        filter_result(
+            state,
+            kind={ResultKind.CONDITION, ResultKind.OBSERVATION, ResultKind.THEORY},
+        )
+    )
+
     try:
-        last_result_kind = state.results[-1].kind
+        last_result_kind = filtered_state[-1].kind
     except IndexError:
         last_result_kind = None
 

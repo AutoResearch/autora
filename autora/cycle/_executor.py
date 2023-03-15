@@ -3,13 +3,18 @@
 from __future__ import annotations
 
 import copy
-from typing import Callable, Iterable, Protocol
+from typing import Callable, Iterable, List, Protocol
 
 import numpy as np
 from sklearn.base import BaseEstimator
 
-from autora.cycle._params import _resolve_state_params
-from autora.cycle._state import CycleState, Result, ResultKind, SupportsData
+from autora.cycle._state import (
+    Result,
+    ResultKind,
+    SupportsData,
+    _resolve_state_params,
+    sequence_to_namespace,
+)
 from autora.experimentalist.pipeline import Pipeline
 
 
@@ -50,7 +55,7 @@ class OnlineExecutorCollection:
         self.experiment_runner_callable = experiment_runner_callable
         self.theorist_estimator = theorist_estimator
 
-    def experimentalist(self, state: CycleState):
+    def experimentalist(self, state: List[Result]) -> List[Result]:
         """Interface for running the experimentalist pipeline."""
         params = _resolve_state_params(state).get("experimentalist", dict())
         new_conditions = self.experimentalist_pipeline(**params)
@@ -66,34 +71,32 @@ class OnlineExecutorCollection:
         assert isinstance(
             new_conditions_array, np.ndarray
         )  # Check the object is bounded
+        result = [Result(new_conditions_array, kind=ResultKind.CONDITION)]
+        return result
 
-        state.update(new_conditions_array, kind=ResultKind.CONDITION)
-
-        return state
-
-    def experiment_runner(self, state: CycleState):
+    def experiment_runner(self, state: List[Result]) -> List[Result]:
         """Interface for running the experiment runner callable"""
         params = _resolve_state_params(state).get("experiment_runner", dict())
-        x = state.conditions[-1]
+        x = sequence_to_namespace(state).conditions[-1]
         y = self.experiment_runner_callable(x, **params)
         new_observations = np.column_stack([x, y])
-        state.update(new_observations, kind=ResultKind.OBSERVATION)
-        return state
+        result = [Result(new_observations, kind=ResultKind.OBSERVATION)]
+        return result
 
-    def theorist(self, state: CycleState):
+    def theorist(self, state: List[Result]) -> List[Result]:
         """Interface for running the theorist estimator."""
         params = _resolve_state_params(state).get("theorist", dict())
-        all_observations = np.row_stack(state.observations)
-        n_xs = len(state.metadata.independent_variables)
+        metadata = sequence_to_namespace(state).metadata
+        observations = sequence_to_namespace(state).observations
+        all_observations = np.row_stack(observations)
+        n_xs = len(metadata.independent_variables)
         x, y = all_observations[:, :n_xs], all_observations[:, n_xs:]
         if y.shape[1] == 1:
             y = y.ravel()
         new_theorist = copy.deepcopy(self.theorist_estimator)
         new_theorist.fit(x, y, **params)
-
-        state.update(new_theorist, kind=ResultKind.THEORY)
-
-        return state
+        result = [Result(new_theorist, kind=ResultKind.THEORY)]
+        return result
 
 
 class FullCycleExecutorCollection(OnlineExecutorCollection):
@@ -101,8 +104,13 @@ class FullCycleExecutorCollection(OnlineExecutorCollection):
     Runs a full AER cycle each `full_cycle` call in a single session.
     """
 
-    def full_cycle(self, state: CycleState):
-        state = self.experimentalist(state)
-        state = self.experiment_runner(state)
-        state = self.theorist(state)
-        return state
+    def full_cycle(self, state: List[Result]) -> List[Result]:
+        state_ = list(state)
+        experimentalist_result = self.experimentalist(state_)
+        experiment_runner_result = self.experiment_runner(
+            state_ + experimentalist_result
+        )
+        theorist_result = self.theorist(
+            state_ + experimentalist_result + experiment_runner_result
+        )
+        return experimentalist_result + experiment_runner_result + theorist_result
