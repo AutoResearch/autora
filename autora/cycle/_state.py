@@ -1,4 +1,32 @@
-""" Classes for storing and sharing a cycle's state between Executors. """
+"""
+Classes for storing and passing a cycle's state between Executors.
+
+We provide two views of a cycle's state:
+- by "history" – first datum, second datum ... last datum – where the results are strictly
+  sequential.
+- by "kind" – metadata, parameter, condition, observation, theory
+
+Our fundamental representation is as a list of Results objects: the order in the list represents
+history and the Result object holds both the data and metadata like the "kind".
+
+Examples:
+    We start with an emtpy history
+    >>> from autora.cycle._state import sequence_to_namespace, ResultKind, Result
+    >>> history_ = []
+
+    The view of this empty history on the "kind" dimension is also empty:
+    >>> sequence_to_namespace(history_) # doctest: +NORMALIZE_WHITESPACE +ELLIPSIS
+    namespace(conditions=[], metadata=VariableCollection(...), observations=[], params={},
+              theories=[])
+
+    We can add new results to the history:
+    >>> history_.append(Result([1,2,3], ResultKind.CONDITION))
+
+    ... and view the results:
+    >>> sequence_to_namespace(history_) # doctest: +ELLIPSIS
+    namespace(conditions=[[1, 2, 3]], ...)
+
+"""
 from __future__ import annotations
 
 import copy
@@ -34,6 +62,69 @@ class SupportsResults(Protocol):
     results: Sequence[SupportsDataKind]
 
 
+def sequence_to_namespace(history: Sequence[Result]):
+    """
+    Convert a sequence of results into a SimpleNamespace with attributes:
+    - `.metadata`
+    - `.params`
+    - `.conditions`
+    - `.observations`
+    - `.theories`
+
+    Examples:
+        History might be empty
+        >>> history_ = []
+        >>> sequence_to_namespace(history_) # doctest: +NORMALIZE_WHITESPACE
+        namespace(conditions=[], metadata=VariableCollection(independent_variables=[],
+            dependent_variables=[], covariates=[]), observations=[], params={}, theories=[])
+
+        ... or with values for any or all of the parameters:
+        >>> history_ = init_result_list(params={"some": "params"})
+        >>> sequence_to_namespace(history_) # doctest: +NORMALIZE_WHITESPACE +ELLIPSIS
+        namespace(... params={'some': 'params'}, ...)
+
+        >>> history_ += init_result_list(conditions=["a condition"])
+        >>> sequence_to_namespace(history_) # doctest: +NORMALIZE_WHITESPACE +ELLIPSIS
+        namespace(conditions=['a condition'], ..., params={'some': 'params'}, ...)
+
+        >>> sequence_to_namespace(history_).params
+        {'some': 'params'}
+
+        >>> history_ += init_result_list(observations=["an observation"])
+        >>> sequence_to_namespace(history_) # doctest: +NORMALIZE_WHITESPACE +ELLIPSIS
+        namespace(conditions=['a condition'], ..., observations=['an observation'],
+            params={'some': 'params'}, ...)
+
+        >>> from sklearn.linear_model import LinearRegression
+        >>> history_ = [Result(LinearRegression(), kind=ResultKind.THEORY)]
+        >>> sequence_to_namespace(history_) # doctest: +ELLIPSIS
+        namespace(..., theories=[LinearRegression()])
+
+        >>> from autora.variable import VariableCollection, IV
+        >>> metadata = VariableCollection(independent_variables=[IV(name="example")])
+        >>> history_ = [Result(metadata, kind=ResultKind.METADATA)]
+        >>> sequence_to_namespace(history_) # doctest: +ELLIPSIS
+        namespace(... metadata=VariableCollection(independent_variables=[IV(name='example', ...
+
+        >>> history_ = [Result({'some': 'params'}, kind=ResultKind.PARAMS)]
+        >>> sequence_to_namespace(history_) # doctest: +ELLIPSIS
+        namespace(..., params={'some': 'params'}, ...)
+
+    """
+    namespace = SimpleNamespace(
+        metadata=get_last_data_with_default(
+            history, kind={ResultKind.METADATA}, default=VariableCollection()
+        ),
+        params=get_last_data_with_default(
+            history, kind={ResultKind.PARAMS}, default={}
+        ),
+        observations=list_data(filter_result(history, kind={ResultKind.OBSERVATION})),
+        theories=list_data(filter_result(history, kind={ResultKind.THEORY})),
+        conditions=list_data(filter_result(history, kind={ResultKind.CONDITION})),
+    )
+    return namespace
+
+
 @dataclass(frozen=True)
 class Result(SupportsDataKind):
     """
@@ -47,8 +138,29 @@ class Result(SupportsDataKind):
         object.__setattr__(self, "kind", ResultKind(self.kind))
 
 
-class ResultKind(Enum):
-    """Kinds of results which can be held in the Result object"""
+class ResultKind(str, Enum):
+    """
+    Kinds of results which can be held in the Result object.
+
+    Examples:
+        >>> ResultKind.CONDITION is ResultKind.CONDITION
+        True
+
+        >>> ResultKind.CONDITION is ResultKind.METADATA
+        False
+
+        >>> ResultKind.CONDITION == "CONDITION"
+        True
+
+        >>> ResultKind.CONDITION == "METADATA"
+        False
+
+        >>> ResultKind.CONDITION in {ResultKind.CONDITION, ResultKind.PARAMS}
+        True
+
+        >>> ResultKind.METADATA in {ResultKind.CONDITION, ResultKind.PARAMS}
+        False
+    """
 
     CONDITION = "CONDITION"
     OBSERVATION = "OBSERVATION"
@@ -166,7 +278,7 @@ def _resolve_state_params(state: Sequence[Result]) -> Dict:
     Returns the `params` attribute of the input, with `cycle properties` resolved.
 
     Examples:
-        >>> from autora.cycle._state import init_result_list
+        >>> from autora.cycle._state import init_result_list, _resolve_state_params
         >>> s = init_result_list(theories=["the first theory", "the second theory"],
         ...     params={"experimentalist": {"source": "%theories[-1]%"}})
         >>> _resolve_state_params(s)
@@ -174,8 +286,8 @@ def _resolve_state_params(state: Sequence[Result]) -> Dict:
 
     """
     state_dependent_properties = _get_state_dependent_properties(state)
-    params = get_last(state, kind={ResultKind.PARAMS}).data
-    resolved_params = _resolve_properties(params, state_dependent_properties)
+    namespace_params = sequence_to_namespace(state).params
+    resolved_params = _resolve_properties(namespace_params, state_dependent_properties)
     return resolved_params
 
 
@@ -198,24 +310,26 @@ def _get_state_dependent_properties(state: Sequence[Result]):
         '%observations.dvs%', '%theories[-1]%', '%theories%']
 
     """
-    metadata = get_last_data_with_default(
-        state, kind={ResultKind.METADATA}, default=VariableCollection()
-    )
-    observations = list_data(filter_result(state, kind={ResultKind.OBSERVATION}))
-    theories = list_data(filter_result(state, kind={ResultKind.THEORY}))
+    namespace_view = sequence_to_namespace(state)
 
-    n_ivs = len(metadata.independent_variables)
-    n_dvs = len(metadata.dependent_variables)
+    n_ivs = len(namespace_view.metadata.independent_variables)
+    n_dvs = len(namespace_view.metadata.dependent_variables)
     state_dependent_property_dict = LazyDict(
         {
-            "%observations.ivs[-1]%": lambda: observations[-1][:, 0:n_ivs],
-            "%observations.dvs[-1]%": lambda: observations[-1][:, n_ivs:],
+            "%observations.ivs[-1]%": lambda: namespace_view.observations[-1][
+                :, 0:n_ivs
+            ],
+            "%observations.dvs[-1]%": lambda: namespace_view.observations[-1][
+                :, n_ivs:
+            ],
             "%observations.ivs%": lambda: np.row_stack(
-                [np.empty([0, n_ivs + n_dvs])] + observations
+                [np.empty([0, n_ivs + n_dvs])] + namespace_view.observations
             )[:, 0:n_ivs],
-            "%observations.dvs%": lambda: np.row_stack(observations)[:, n_ivs:],
-            "%theories[-1]%": lambda: theories[-1],
-            "%theories%": lambda: theories,
+            "%observations.dvs%": lambda: np.row_stack(namespace_view.observations)[
+                :, n_ivs:
+            ],
+            "%theories[-1]%": lambda: namespace_view.theories[-1],
+            "%theories%": lambda: namespace_view.theories,
         }
     )
     return state_dependent_property_dict
@@ -261,59 +375,3 @@ def _resolve_properties(params: Dict, state_dependent_properties: Mapping):
             pass  # no change needed
 
     return params_
-
-
-def sequence_to_namespace(history: Sequence[Result]):
-    """
-    Convert a sequence of results into a SimpleNamespace with attributes:
-    - `.metadata`
-    - `.params`
-    - `.conditions`
-    - `.observations`
-    - `.theories`
-
-    Examples:
-        History might be empty
-        >>> history_ = []
-        >>> sequence_to_namespace(history_) # doctest: +NORMALIZE_WHITESPACE
-        namespace(conditions=[], metadata=VariableCollection(independent_variables=[],
-            dependent_variables=[], covariates=[]), observations=[], params={}, theories=[])
-
-        ... or with values for any or all of the parameters:
-        >>> history_ = init_result_list(params={"some": "params"})
-        >>> sequence_to_namespace(history_) # doctest: +NORMALIZE_WHITESPACE +ELLIPSIS
-        namespace(... params={'some': 'params'}, ...)
-
-        >>> history_ += init_result_list(conditions=["a condition"])
-        >>> sequence_to_namespace(history_) # doctest: +NORMALIZE_WHITESPACE +ELLIPSIS
-        namespace(conditions=['a condition'], ..., params={'some': 'params'}, ...)
-
-        >>> history_ += init_result_list(observations=["an observation"])
-        >>> sequence_to_namespace(history_) # doctest: +NORMALIZE_WHITESPACE +ELLIPSIS
-        namespace(conditions=['a condition'], ..., observations=['an observation'],
-            params={'some': 'params'}, ...)
-
-        >>> from sklearn.linear_model import LinearRegression
-        >>> history_ = [Result(LinearRegression(), kind=ResultKind.THEORY)]
-        >>> sequence_to_namespace(history_)
-        namespace(..., theories=[LinearRegression()])
-
-        >>> from autora.variable import VariableCollection, IV
-        >>> metadata = VariableCollection(independent_variables=[IV(name="example")])
-        >>> history_ = [Result(metadata, kind=ResultKind.METADATA)]
-        >>> sequence_to_namespace(history_)
-        namespace(... metadata=VariableCollection(independent_variables=[IV(name='example', ...
-
-    """
-    namespace = SimpleNamespace(
-        metadata=get_last_data_with_default(
-            history, kind={ResultKind.METADATA}, default=VariableCollection()
-        ),
-        params=get_last_data_with_default(
-            history, kind={ResultKind.PARAMS}, default={}
-        ),
-        observations=list_data(filter_result(history, kind={ResultKind.OBSERVATION})),
-        theories=list_data(filter_result(history, kind={ResultKind.THEORY})),
-        conditions=list_data(filter_result(history, kind={ResultKind.CONDITION})),
-    )
-    return namespace
