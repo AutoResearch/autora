@@ -95,10 +95,6 @@ def random_operation_planner(
     they did last.
 
     Examples:
-        This planner completely ignores the state, so we can simulate it by using anything we
-        like, here we choose the empty set:
-        >>> state = {}
-
         We simulate a productive executor_collection using a SimpleNamespace
         >>> from types import SimpleNamespace
         >>> executor_collection = SimpleNamespace(
@@ -112,12 +108,13 @@ def random_operation_planner(
         >>> seed(42)
 
         Now we can begin to see which operations are returned by the planner. The first (for this
-        seed) is the theorist.
-        >>> random_operation_planner(state, executor_collection)
+        seed) is the theorist. (The first argument is provided for compatibility with the
+        protocol, but is ignored.)
+        >>> random_operation_planner({}, executor_collection)
         'theorist'
 
         If we evaluate again, a random executor will be suggested each time
-        >>> [random_operation_planner(state, executor_collection) for i in range(5)]
+        >>> [random_operation_planner({}, executor_collection) for i in range(5)]
         ['experimentalist', 'experimentalist', 'theorist', 'experiment_runner', 'experimentalist']
 
     """
