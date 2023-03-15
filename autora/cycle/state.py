@@ -223,7 +223,7 @@ def init_result_list(
         theories: an iterable of data, each to be marked as "theories"
 
     Examples:
-        CycleState can be initialized in an empty state:
+        Empty input leads to an empty state:
         >>> init_result_list()
         []
 

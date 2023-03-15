@@ -507,7 +507,7 @@ class SimpleCycle:
 
     @params.setter
     def params(self, value):
-        self.data.params = value
+        self.history = self.history + init_result_list(params=value)
 
     @property
     def theorist(self):
