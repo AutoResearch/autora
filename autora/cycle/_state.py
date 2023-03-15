@@ -201,7 +201,7 @@ class CycleState:
 
         """
         try:
-            m = _get_last(self.data, kind={ResultKind.METADATA}).data
+            m = get_last(self.data, kind={ResultKind.METADATA}).data
         except StopIteration:
             m = VariableCollection()
         return m
@@ -241,7 +241,7 @@ class CycleState:
 
         """
         try:
-            p = _get_last(self.data, kind={ResultKind.PARAMS}).data
+            p = get_last(self.data, kind={ResultKind.PARAMS}).data
         except StopIteration:
             p = dict()
         return p
@@ -275,7 +275,7 @@ class CycleState:
             [array([11, 12, 13]), array([21, 22, 23]), array([31, 32, 33])]
 
         """
-        return _list_data(_filter_result(self.data, kind={ResultKind.CONDITION}))
+        return list_data(filter_result(self.data, kind={ResultKind.CONDITION}))
 
     @property
     def observations(self) -> List[ArrayLike]:
@@ -302,7 +302,7 @@ class CycleState:
             [array([11, 12, 13]), array([21, 22, 23]), array([31, 32, 33])]
 
         """
-        return _list_data(_filter_result(self.data, kind={ResultKind.OBSERVATION}))
+        return list_data(filter_result(self.data, kind={ResultKind.OBSERVATION}))
 
     @property
     def theories(self) -> List[BaseEstimator]:
@@ -330,7 +330,7 @@ class CycleState:
             >>> state.theories
             [LinearRegression(), LinearRegression()]
         """
-        return _list_data(_filter_result(self.data, kind={ResultKind.THEORY}))
+        return list_data(filter_result(self.data, kind={ResultKind.THEORY}))
 
     @property
     def results(self) -> List[Result]:
@@ -374,75 +374,11 @@ class CycleState:
 
         """
         return list(
-            _filter_result(
+            filter_result(
                 self.data,
                 kind={ResultKind.CONDITION, ResultKind.OBSERVATION, ResultKind.THEORY},
             )
         )
-
-
-def _get_last(data: Sequence[Result], kind):
-    results_new_to_old = reversed(data)
-    last_of_kind = next(_filter_result(results_new_to_old, kind=kind))
-    return last_of_kind
-
-
-def _filter_result(data: Iterable[Result], kind: set[ResultKind]):
-    return filter(lambda r: r.kind in kind, data)
-
-
-def _list_data(data: Sequence[Result]):
-    return list(r.data for r in data)
-
-
-def _list_conditions(data: Sequence[Result]):
-    """
-    Get all the results of kind "CONDITION"
-
-    Examples:
-        Initially, we get an empty list back:
-        >>> state = []
-        >>> _list_conditions(state)
-        []
-
-        We can add new conditions by using the `.update` method and specifying the kind as
-        `"CONDITION"`:
-        >>> state = [Result([11,12,13], kind="CONDITION")]
-        >>> _list_conditions(state)
-        [[11, 12, 13]]
-
-        When we add multiple conditions, we get them all back:
-        >>> state.append(Result([21,22,23], kind="CONDITION"))
-        >>> state.append(Result([31,32,33], kind="CONDITION"))
-        >>> _list_conditions(state)
-        [[11, 12, 13], [21, 22, 23], [31, 32, 33]]
-
-    """
-    return _list_data(_filter_result(data, kind={ResultKind.CONDITION}))
-
-
-def _list_observations(data: Sequence[Result]):
-    """
-    Get all the results of kind "OBSERVATION"
-
-    Examples:
-        Initially, we get an empty list back:
-        >>> state = []
-        >>> _list_observations(state)
-        []
-
-        If our state has observations, then they are returned:
-        >>> state = [Result([11,12,13], kind="OBSERVATION")]
-        >>> _list_observations(state)
-        [[11, 12, 13]]
-
-        When we add multiple conditions, we get them all back:
-        >>> state.append(Result([21,22,23], kind="OBSERVATION"))
-        >>> state.append(Result([31,32,33], kind="OBSERVATION"))
-        >>> _list_observations(state)
-        [[11, 12, 13], [21, 22, 23], [31, 32, 33]]
-    """
-    return _list_data(_filter_result(data, {ResultKind.OBSERVATION}))
 
 
 # ToDO: try just using a list again – this state is messy and not thread-safe...
@@ -473,3 +409,17 @@ class ResultKind(Enum):
     def __repr__(self):
         cls_name = self.__class__.__name__
         return f"{cls_name}.{self.name}"
+
+
+def list_data(data: Sequence[Result]):
+    return list(r.data for r in data)
+
+
+def filter_result(data: Iterable[Result], kind: set[ResultKind]):
+    return filter(lambda r: r.kind in kind, data)
+
+
+def get_last(data: Sequence[Result], kind):
+    results_new_to_old = reversed(data)
+    last_of_kind = next(filter_result(results_new_to_old, kind=kind))
+    return last_of_kind
