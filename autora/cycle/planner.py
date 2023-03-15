@@ -1,17 +1,12 @@
 import random
-from typing import Iterable, Protocol
+from typing import Iterable
 
-from autora.cycle.executor import (
-    Executor,
+from autora.cycle.protocol.v1 import (
+    SupportsDataKind,
     SupportsExperimentalistExperimentRunnerTheorist,
     SupportsFullCycle,
 )
-from autora.cycle.state import ResultKind, SupportsDataKind, filter_result
-
-
-class Planner(Protocol):
-    def __call__(self, state_or_history, executor_collection) -> Executor:
-        ...
+from autora.cycle.state import ResultKind, filter_result
 
 
 def full_cycle_planner(_, executor_collection: SupportsFullCycle):

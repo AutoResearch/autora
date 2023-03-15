@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import copy
-from typing import Callable, Iterable, List, Protocol
+from typing import Callable, Iterable, List
 
 import numpy as np
 from sklearn.base import BaseEstimator
@@ -11,30 +11,10 @@ from sklearn.base import BaseEstimator
 from autora.cycle.state import (
     Result,
     ResultKind,
-    SupportsData,
     _resolve_state_params,
     history_to_kind,
 )
 from autora.experimentalist.pipeline import Pipeline
-
-
-class Executor(Protocol):
-    def __call__(self, state: SupportsData) -> Result:
-        ...
-
-
-class SupportsFullCycle(Protocol):
-    """An object which has a single executor that runs the full AER cycle."""
-
-    full_cycle: Executor
-
-
-class SupportsExperimentalistExperimentRunnerTheorist(Protocol):
-    """Supports methods for the experimentalist, experiment runner and theorist of AER."""
-
-    experimentalist: Executor
-    experiment_runner: Executor
-    theorist: Executor
 
 
 class OnlineExecutorCollection:

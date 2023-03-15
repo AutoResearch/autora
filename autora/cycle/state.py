@@ -33,33 +33,15 @@ import copy
 from dataclasses import dataclass
 from enum import Enum
 from types import SimpleNamespace
-from typing import Any, Dict, Iterable, List, Mapping, Optional, Protocol, Sequence, Set
+from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence, Set
 
 import numpy as np
 from numpy.typing import ArrayLike
 from sklearn.base import BaseEstimator
 
+from autora.cycle.protocol.v1 import SupportsDataKind
 from autora.utils.dictionary import LazyDict
 from autora.variable import VariableCollection
-
-
-class SupportsDataKind(Protocol):
-    """Object with attributes for `data` and `kind`"""
-
-    data: Optional[Any]
-    kind: Optional[Any]
-
-
-class SupportsData(Protocol):
-    """Object with an attribute which has a sequence of arbitrary data."""
-
-    data: Sequence[SupportsDataKind]
-
-
-class SupportsResults(Protocol):
-    """Object with an attribute which has a sequence of conditions, observations and theories."""
-
-    results: Sequence[SupportsDataKind]
 
 
 def history_to_kind(history: Sequence[Result]):
