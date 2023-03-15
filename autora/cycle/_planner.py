@@ -1,5 +1,5 @@
 import random
-from typing import Any, Iterable, Protocol
+from typing import Iterable, Protocol
 
 from autora.cycle._executor import (
     Executor,
@@ -14,13 +14,13 @@ class Planner(Protocol):
         ...
 
 
-def full_cycle_planner(state: Any, executor_collection: SupportsFullCycle):
+def full_cycle_planner(_, executor_collection: SupportsFullCycle):
     """Always returns the `full_cycle` method."""
     return executor_collection.full_cycle
 
 
 def last_result_kind_planner(
-    state: Iterable[SupportsDataKind],
+    history: Iterable[SupportsDataKind],
     executor_collection: SupportsExperimentalistExperimentRunnerTheorist,
 ):
     """
@@ -29,9 +29,8 @@ def last_result_kind_planner(
     Interpretation: The "traditional" AutoRA Controller – a systematic research assistant.
 
     Examples:
-        We initialize a new CycleState to run our planner on:
-        >>> from autora.cycle._state import Result
-        >>> state = []
+        We initialize a new list to run our planner on:
+        >>> history = []
 
         We simulate a productive executor_collection using a SimpleNamespace
         >>> from types import SimpleNamespace
@@ -43,29 +42,30 @@ def last_result_kind_planner(
 
         Based on the results available in the state, we can get the next kind of executor we need.
         When we have no results of any kind, we get an experimentalist:
-        >>> last_result_kind_planner(state, executor_collection)
+        >>> last_result_kind_planner(history, executor_collection)
         'experimentalist'
 
         ... or if we had produced conditions, then we could run an experiment
-        >>> state.append(Result("some theory",kind="CONDITION"))
-        >>> last_result_kind_planner(state, executor_collection)
+        >>> from autora.cycle._state import Result
+        >>> history.append(Result("some theory",kind="CONDITION"))
+        >>> last_result_kind_planner(history, executor_collection)
         'experiment_runner'
 
         ... or if we last produced observations, then we could now run the theorist:
-        >>> state.append(Result("some theory",kind="OBSERVATION"))
-        >>> last_result_kind_planner(state, executor_collection)
+        >>> history.append(Result("some theory",kind="OBSERVATION"))
+        >>> last_result_kind_planner(history, executor_collection)
         'theorist'
 
         ... or if we last produced a theory, then we could now run the experimentalist:
-        >>> state.append(Result("some theory",kind="THEORY"))
-        >>> last_result_kind_planner(state, executor_collection)
+        >>> history.append(Result("some theory",kind="THEORY"))
+        >>> last_result_kind_planner(history, executor_collection)
         'experimentalist'
 
     """
 
     filtered_state = list(
         filter_result(
-            state,
+            history,
             kind={ResultKind.CONDITION, ResultKind.OBSERVATION, ResultKind.THEORY},
         )
     )
@@ -110,11 +110,11 @@ def random_operation_planner(
         Now we can begin to see which operations are returned by the planner. The first (for this
         seed) is the theorist. (The first argument is provided for compatibility with the
         protocol, but is ignored.)
-        >>> random_operation_planner({}, executor_collection)
+        >>> random_operation_planner([], executor_collection)
         'theorist'
 
         If we evaluate again, a random executor will be suggested each time
-        >>> [random_operation_planner({}, executor_collection) for i in range(5)]
+        >>> [random_operation_planner([], executor_collection) for i in range(5)]
         ['experimentalist', 'experimentalist', 'theorist', 'experiment_runner', 'experimentalist']
 
     """

@@ -33,7 +33,7 @@ import copy
 from dataclasses import dataclass
 from enum import Enum
 from types import SimpleNamespace
-from typing import Any, Dict, Iterable, List, Mapping, Optional, Protocol, Sequence
+from typing import Any, Dict, Iterable, List, Mapping, Optional, Protocol, Sequence, Set
 
 import numpy as np
 from numpy.typing import ArrayLike
@@ -177,11 +177,11 @@ def list_data(data: Sequence[SupportsDataKind]):
     return list(r.data for r in data)
 
 
-def filter_result(data: Iterable[SupportsDataKind], kind: set[ResultKind]):
+def filter_result(data: Iterable[SupportsDataKind], kind: Set[ResultKind]):
     return filter(lambda r: r.kind in kind, data)
 
 
-def get_last(data: Sequence[SupportsDataKind], kind: set[ResultKind]):
+def get_last(data: Sequence[SupportsDataKind], kind: Set[ResultKind]):
     results_new_to_old = reversed(data)
     last_of_kind = next(filter_result(results_new_to_old, kind=kind))
     return last_of_kind
