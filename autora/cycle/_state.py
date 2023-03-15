@@ -200,7 +200,7 @@ class CycleState:
 
         """
         try:
-            m = self._get_last(kind={ResultKind.METADATA}).data
+            m = self._get_last(self.data, kind={ResultKind.METADATA}).data
         except StopIteration:
             m = VariableCollection()
         return m
@@ -240,7 +240,7 @@ class CycleState:
 
         """
         try:
-            p = self._get_last(kind={ResultKind.PARAMS}).data
+            p = self._get_last(self.data, kind={ResultKind.PARAMS}).data
         except StopIteration:
             p = dict()
         return p
@@ -383,18 +383,19 @@ class CycleState:
             )
         )
 
-    def _get_last(self, kind):
-        results_new_to_old = reversed(self.data)
-        last_of_kind = next(self._filter_result(results_new_to_old, kind=kind))
+    @staticmethod
+    def _get_last(data: Sequence[Result], kind):
+        results_new_to_old = reversed(data)
+        last_of_kind = next(CycleState._filter_result(results_new_to_old, kind=kind))
         return last_of_kind
 
     @staticmethod
-    def _filter_result(result_sequence: Iterable[Result], kind: set[ResultKind]):
-        return filter(lambda r: r.kind in kind, result_sequence)
+    def _filter_result(data: Iterable[Result], kind: set[ResultKind]):
+        return filter(lambda r: r.kind in kind, data)
 
     @staticmethod
-    def _list_data(result_sequence: Iterable[Result]):
-        return list(r.data for r in result_sequence)
+    def _list_data(data: Iterable[Result]):
+        return list(r.data for r in data)
 
 
 @dataclass(frozen=True)
