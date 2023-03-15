@@ -10,27 +10,9 @@ from sklearn.base import BaseEstimator
 from autora.variable import VariableCollection
 
 
-class ResultKind(Enum):
-    CONDITION = "CONDITION"
-    OBSERVATION = "OBSERVATION"
-    THEORY = "THEORY"
-    PARAMS = "PARAMS"
-    METADATA = "METADATA"
-
-    def __repr__(self):
-        cls_name = self.__class__.__name__
-        return f"{cls_name}.{self.name}"
-
-
-@dataclass(frozen=True)
-class Result:
-    data: Any
-    kind: ResultKind
-
-
 @dataclass
 class CycleState:
-    """An object passed between and updated by Executors."""
+    """Container class for the state of an AER cycle."""
 
     data: List[Result]
 
@@ -43,6 +25,66 @@ class CycleState:
         theories: Optional[Sequence[BaseEstimator]] = None,
         data: Optional[Sequence[Result]] = None,
     ):
+        """
+
+        Args:
+            metadata: a single datum to be marked as "metadata"
+            params: a single datum to be marked as "params"
+            conditions: a sequence of data, each to be marked as "conditions"
+            observations: a sequence of data, each to be marked as "observations"
+            theories: a sequence of data, each to be marked as "theories"
+            data: a sequence of `Result` objects
+
+        Examples:
+            CycleState can be initialized in an empty state:
+            >>> CycleState()
+            CycleState(data=[])
+
+            ... or with values for any or all of the parameters:
+            >>> from autora.variable import VariableCollection
+            >>> CycleState(metadata=VariableCollection())
+            CycleState(data=[Result(data=VariableCollection(...), kind=ResultKind.METADATA)])
+
+            >>> CycleState(params={"some": "params"})
+            CycleState(data=[Result(data={'some': 'params'}, kind=ResultKind.PARAMS)])
+
+            >>> CycleState(conditions=["a condition"])
+            CycleState(data=[Result(data='a condition', kind=ResultKind.CONDITION)])
+
+            >>> CycleState(observations=["an observation"])
+            CycleState(data=[Result(data='an observation', kind=ResultKind.OBSERVATION)])
+
+            >>> CycleState(theories=["a theory"])
+            CycleState(data=[Result(data='a theory', kind=ResultKind.THEORY)])
+
+            The CycleState can also be initialized with a sequence of `Result` objects:
+            >>> data_generator = (Result(i, ResultKind.CONDITION) for i in range(5))
+            >>> CycleState(data=data_generator) # doctest: +NORMALIZE_WHITESPACE
+            CycleState(data=[Result(data=0, kind=ResultKind.CONDITION),
+                             Result(data=1, kind=ResultKind.CONDITION),
+                             Result(data=2, kind=ResultKind.CONDITION),
+                             Result(data=3, kind=ResultKind.CONDITION),
+                             Result(data=4, kind=ResultKind.CONDITION)])
+
+            The input arguments are added to the data in the order `data`, `metadata`,
+            `params`, `conditions`, `observations`, `theories`:
+            >>> CycleState(metadata=VariableCollection(),
+            ...            params={"some": "params"},
+            ...            conditions=["a condition"],
+            ...            observations=["an observation", "another observation"],
+            ...            theories=["a theory"],
+            ...            data=(Result(i, ResultKind.CONDITION) for i in range(2))
+            ... ) # doctest: +NORMALIZE_WHITESPACE +ELLIPSIS
+            CycleState(data=[Result(data=0, kind=ResultKind.CONDITION),
+                             Result(data=1, kind=ResultKind.CONDITION),
+                             Result(data=VariableCollection(...), kind=ResultKind.METADATA),
+                             Result(data={'some': 'params'}, kind=ResultKind.PARAMS),
+                             Result(data='a condition', kind=ResultKind.CONDITION),
+                             Result(data='an observation', kind=ResultKind.OBSERVATION),
+                             Result(data='another observation', kind=ResultKind.OBSERVATION),
+                             Result(data='a theory', kind=ResultKind.THEORY)])
+
+        """
         if data is not None:
             self.data = list(data)
         else:
@@ -330,6 +372,28 @@ class CycleState:
     @staticmethod
     def _list_data(result_sequence: Sequence[Result]):
         return list(r.data for r in result_sequence)
+
+
+@dataclass(frozen=True)
+class Result:
+    """Container class for data and metadata."""
+
+    data: Optional[Any]
+    kind: Optional[ResultKind]
+
+
+class ResultKind(Enum):
+    """Kinds of results which can be held in the Result object"""
+
+    CONDITION = "CONDITION"
+    OBSERVATION = "OBSERVATION"
+    THEORY = "THEORY"
+    PARAMS = "PARAMS"
+    METADATA = "METADATA"
+
+    def __repr__(self):
+        cls_name = self.__class__.__name__
+        return f"{cls_name}.{self.name}"
 
 
 class SupportsResultSequence(Protocol):
