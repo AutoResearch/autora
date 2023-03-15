@@ -32,7 +32,9 @@ class SupportsResults(Protocol):
 
 @dataclass
 class CycleState:
-    """Container class for the state of an AER cycle."""
+    """
+    Container class for the state of an AER cycle.
+    """
 
     data: List[Result]
 
@@ -396,8 +398,10 @@ class CycleState:
 
 
 @dataclass(frozen=True)
-class Result:
-    """Container class for data and metadata."""
+class Result(SupportsDataKind):
+    """
+    Container class for data and metadata.
+    """
 
     data: Optional[Any]
     kind: Optional[ResultKind]
