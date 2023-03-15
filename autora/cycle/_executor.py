@@ -13,7 +13,7 @@ from autora.cycle._state import (
     ResultKind,
     SupportsData,
     _resolve_state_params,
-    sequence_to_namespace,
+    history_to_kind,
 )
 from autora.experimentalist.pipeline import Pipeline
 
@@ -77,7 +77,7 @@ class OnlineExecutorCollection:
     def experiment_runner(self, state: List[Result]) -> List[Result]:
         """Interface for running the experiment runner callable"""
         params = _resolve_state_params(state).get("experiment_runner", dict())
-        x = sequence_to_namespace(state).conditions[-1]
+        x = history_to_kind(state).conditions[-1]
         y = self.experiment_runner_callable(x, **params)
         new_observations = np.column_stack([x, y])
         result = [Result(new_observations, kind=ResultKind.OBSERVATION)]
@@ -86,8 +86,8 @@ class OnlineExecutorCollection:
     def theorist(self, state: List[Result]) -> List[Result]:
         """Interface for running the theorist estimator."""
         params = _resolve_state_params(state).get("theorist", dict())
-        metadata = sequence_to_namespace(state).metadata
-        observations = sequence_to_namespace(state).observations
+        metadata = history_to_kind(state).metadata
+        observations = history_to_kind(state).observations
         all_observations = np.row_stack(observations)
         n_xs = len(metadata.independent_variables)
         x, y = all_observations[:, :n_xs], all_observations[:, n_xs:]

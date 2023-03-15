@@ -9,7 +9,7 @@ from typing import Callable, Dict, Optional
 
 from autora.cycle._executor import FullCycleExecutorCollection
 from autora.cycle._planner import full_cycle_planner
-from autora.cycle._state import init_result_list, sequence_to_namespace
+from autora.cycle._state import history_to_kind, init_result_list
 from autora.variable import VariableCollection
 
 _logger = logging.getLogger(__name__)
@@ -331,12 +331,12 @@ class SimpleCycle:
 
         When we run this cycle starting with no data, we generate an experimental condition first:
         >>> _ = list(takewhile(lambda c: len(c.data.theories) < 2, cycle_with_last_result_planner))
-        MONITOR: Generated new ResultKind.CONDITION
-        MONITOR: Generated new ResultKind.OBSERVATION
-        MONITOR: Generated new ResultKind.THEORY
-        MONITOR: Generated new ResultKind.CONDITION
-        MONITOR: Generated new ResultKind.OBSERVATION
-        MONITOR: Generated new ResultKind.THEORY
+        MONITOR: Generated new CONDITION
+        MONITOR: Generated new OBSERVATION
+        MONITOR: Generated new THEORY
+        MONITOR: Generated new CONDITION
+        MONITOR: Generated new OBSERVATION
+        MONITOR: Generated new THEORY
 
         However, if we seed the same cycle with observations, then its first Executor will be the
         theorist:
@@ -354,7 +354,7 @@ class SimpleCycle:
         >>> cycle_with_seed_observation.history.append(Result(seed_observation,kind="OBSERVATION"))
 
         >>> _ = next(cycle_with_seed_observation)
-        MONITOR: Generated new ResultKind.THEORY
+        MONITOR: Generated new THEORY
 
         #### Arbitrary Execution Order (Toy Example)
 
@@ -397,12 +397,12 @@ class SimpleCycle:
         ==== Starting iteration i=0 ====
         FAILED: on iteration i=0 time with e=ValueError('need at least one array to concatenate')
         ==== Starting iteration i=1 ====
-        MONITOR: Generated new ResultKind.CONDITION
+        MONITOR: Generated new CONDITION
         ==== Starting iteration i=2 ====
-        MONITOR: Generated new ResultKind.CONDITION
+        MONITOR: Generated new CONDITION
         ...
         ==== Starting iteration i=8 ====
-        MONITOR: Generated new ResultKind.THEORY
+        MONITOR: Generated new THEORY
 
         The first cycle, the theorist is selected as the random Executor, and it fails because it
         depends on there being observations to theorize against.
@@ -499,7 +499,7 @@ class SimpleCycle:
         - `.theories`
 
         """
-        return sequence_to_namespace(self.history)
+        return history_to_kind(self.history)
 
     @property
     def params(self):
