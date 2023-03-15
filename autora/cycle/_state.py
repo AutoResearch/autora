@@ -1,8 +1,9 @@
+""" Classes for storing and sharing a cycle's state between Executors. """
 from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import Enum
-from typing import Any, Dict, List, Optional, Protocol, Sequence, Union
+from typing import Any, Dict, Iterable, List, Optional, Protocol, Sequence, Union
 
 from numpy.typing import ArrayLike
 from sklearn.base import BaseEstimator
@@ -20,19 +21,19 @@ class CycleState:
         self,
         metadata: Optional[VariableCollection] = None,
         params: Optional[Dict] = None,
-        conditions: Optional[Sequence[ArrayLike]] = None,
-        observations: Optional[Sequence[ArrayLike]] = None,
-        theories: Optional[Sequence[BaseEstimator]] = None,
-        data: Optional[Sequence[Result]] = None,
+        conditions: Optional[Iterable[ArrayLike]] = None,
+        observations: Optional[Iterable[ArrayLike]] = None,
+        theories: Optional[Iterable[BaseEstimator]] = None,
+        data: Optional[Iterable[Result]] = None,
     ):
         """
 
         Args:
             metadata: a single datum to be marked as "metadata"
             params: a single datum to be marked as "params"
-            conditions: a sequence of data, each to be marked as "conditions"
-            observations: a sequence of data, each to be marked as "observations"
-            theories: a sequence of data, each to be marked as "theories"
+            conditions: an iterable of data, each to be marked as "conditions"
+            observations: an iterable of data, each to be marked as "observations"
+            theories: an iterable of data, each to be marked as "theories"
             data: a sequence of `Result` objects
 
         Examples:
@@ -54,11 +55,12 @@ class CycleState:
             >>> CycleState(observations=["an observation"])
             CycleState(data=[Result(data='an observation', kind=ResultKind.OBSERVATION)])
 
-            >>> CycleState(theories=["a theory"])
-            CycleState(data=[Result(data='a theory', kind=ResultKind.THEORY)])
+            >>> from sklearn.linear_model import LinearRegression
+            >>> CycleState(theories=[LinearRegression()])
+            CycleState(data=[Result(data=LinearRegression(), kind=ResultKind.THEORY)])
 
             The CycleState can also be initialized with a sequence of `Result` objects:
-            >>> data_generator = (Result(i, ResultKind.CONDITION) for i in range(5))
+            >>> data_generator = (Result(j, ResultKind.CONDITION) for j in range(5))
             >>> CycleState(data=data_generator) # doctest: +NORMALIZE_WHITESPACE
             CycleState(data=[Result(data=0, kind=ResultKind.CONDITION),
                              Result(data=1, kind=ResultKind.CONDITION),
@@ -72,8 +74,8 @@ class CycleState:
             ...            params={"some": "params"},
             ...            conditions=["a condition"],
             ...            observations=["an observation", "another observation"],
-            ...            theories=["a theory"],
-            ...            data=(Result(i, ResultKind.CONDITION) for i in range(2))
+            ...            theories=[LinearRegression()],
+            ...            data=(Result(k, ResultKind.CONDITION) for k in range(2))
             ... ) # doctest: +NORMALIZE_WHITESPACE +ELLIPSIS
             CycleState(data=[Result(data=0, kind=ResultKind.CONDITION),
                              Result(data=1, kind=ResultKind.CONDITION),
@@ -82,7 +84,7 @@ class CycleState:
                              Result(data='a condition', kind=ResultKind.CONDITION),
                              Result(data='an observation', kind=ResultKind.OBSERVATION),
                              Result(data='another observation', kind=ResultKind.OBSERVATION),
-                             Result(data='a theory', kind=ResultKind.THEORY)])
+                             Result(data=LinearRegression(), kind=ResultKind.THEORY)])
 
         """
         if data is not None:
@@ -366,11 +368,11 @@ class CycleState:
         return last_of_kind
 
     @staticmethod
-    def _filter_result(result_sequence: Sequence[Result], kind: set[ResultKind]):
+    def _filter_result(result_sequence: Iterable[Result], kind: set[ResultKind]):
         return filter(lambda r: r.kind in kind, result_sequence)
 
     @staticmethod
-    def _list_data(result_sequence: Sequence[Result]):
+    def _list_data(result_sequence: Iterable[Result]):
         return list(r.data for r in result_sequence)
 
 
@@ -397,8 +399,12 @@ class ResultKind(Enum):
 
 
 class SupportsResultSequence(Protocol):
+    """Object with an attribute which has a sequence of arbitrary data."""
+
     data: Sequence[Result]
 
 
 class SupportsConditionsObservationsTheories(Protocol):
+    """Object with an attribute which has a sequence of conditions, observations and theories."""
+
     results: Sequence[Result]
