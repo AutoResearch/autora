@@ -109,15 +109,15 @@ class CycleState:
 
         """
         if data is not None:
-            self.data = list(data)
+            _data = list(data)
         else:
-            self.data = []
+            _data = []
 
         if metadata is not None:
-            self.metadata = metadata
+            _data.append(Result(metadata, ResultKind.METADATA))
 
         if params is not None:
-            self.params = params
+            _data.append(Result(params, ResultKind.PARAMS))
 
         for seq, kind in [
             (conditions, ResultKind.CONDITION),
@@ -126,7 +126,8 @@ class CycleState:
         ]:
             if seq is not None:
                 for i in seq:
-                    self.update(i, kind=kind)
+                    _data.append(Result(i, kind=kind))
+        self.data = _data
 
     def update(self, value, kind: Union[ResultKind, str]):
         """
@@ -200,7 +201,7 @@ class CycleState:
 
         """
         try:
-            m = self._get_last(self.data, kind={ResultKind.METADATA}).data
+            m = _get_last(self.data, kind={ResultKind.METADATA}).data
         except StopIteration:
             m = VariableCollection()
         return m
@@ -240,7 +241,7 @@ class CycleState:
 
         """
         try:
-            p = self._get_last(self.data, kind={ResultKind.PARAMS}).data
+            p = _get_last(self.data, kind={ResultKind.PARAMS}).data
         except StopIteration:
             p = dict()
         return p
@@ -274,9 +275,7 @@ class CycleState:
             [array([11, 12, 13]), array([21, 22, 23]), array([31, 32, 33])]
 
         """
-        return self._list_data(
-            self._filter_result(self.data, kind={ResultKind.CONDITION})
-        )
+        return _list_data(_filter_result(self.data, kind={ResultKind.CONDITION}))
 
     @property
     def observations(self) -> List[ArrayLike]:
@@ -303,9 +302,7 @@ class CycleState:
             [array([11, 12, 13]), array([21, 22, 23]), array([31, 32, 33])]
 
         """
-        return self._list_data(
-            self._filter_result(self.data, kind={ResultKind.OBSERVATION})
-        )
+        return _list_data(_filter_result(self.data, kind={ResultKind.OBSERVATION}))
 
     @property
     def theories(self) -> List[BaseEstimator]:
@@ -333,7 +330,7 @@ class CycleState:
             >>> state.theories
             [LinearRegression(), LinearRegression()]
         """
-        return self._list_data(self._filter_result(self.data, kind={ResultKind.THEORY}))
+        return _list_data(_filter_result(self.data, kind={ResultKind.THEORY}))
 
     @property
     def results(self) -> List[Result]:
@@ -377,25 +374,25 @@ class CycleState:
 
         """
         return list(
-            self._filter_result(
+            _filter_result(
                 self.data,
                 kind={ResultKind.CONDITION, ResultKind.OBSERVATION, ResultKind.THEORY},
             )
         )
 
-    @staticmethod
-    def _get_last(data: Sequence[Result], kind):
-        results_new_to_old = reversed(data)
-        last_of_kind = next(CycleState._filter_result(results_new_to_old, kind=kind))
-        return last_of_kind
 
-    @staticmethod
-    def _filter_result(data: Iterable[Result], kind: set[ResultKind]):
-        return filter(lambda r: r.kind in kind, data)
+def _get_last(data: Sequence[Result], kind):
+    results_new_to_old = reversed(data)
+    last_of_kind = next(_filter_result(results_new_to_old, kind=kind))
+    return last_of_kind
 
-    @staticmethod
-    def _list_data(data: Iterable[Result]):
-        return list(r.data for r in data)
+
+def _filter_result(data: Iterable[Result], kind: set[ResultKind]):
+    return filter(lambda r: r.kind in kind, data)
+
+
+def _list_data(data: Iterable[Result]):
+    return list(r.data for r in data)
 
 
 @dataclass(frozen=True)
