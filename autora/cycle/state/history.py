@@ -280,7 +280,7 @@ class SimpleCycleDataHistory:
         return self._by_kind.params
 
     @property
-    def conditions(self) -> Sequence[ArrayLike]:
+    def conditions(self) -> List[ArrayLike]:
         """
         Returns:
 
@@ -299,7 +299,7 @@ class SimpleCycleDataHistory:
         return self._by_kind.conditions
 
     @property
-    def observations(self) -> Sequence[ArrayLike]:
+    def observations(self) -> List[ArrayLike]:
         """
 
         Returns:
@@ -318,7 +318,7 @@ class SimpleCycleDataHistory:
         return self._by_kind.observations
 
     @property
-    def theories(self) -> Sequence[BaseEstimator]:
+    def theories(self) -> List[BaseEstimator]:
         """
 
         Returns:
@@ -338,7 +338,7 @@ class SimpleCycleDataHistory:
         return self._by_kind.theories
 
     @property
-    def history(self) -> Sequence[Result]:
+    def history(self) -> List[Result]:
         """
 
         Examples:
@@ -368,7 +368,7 @@ class SimpleCycleDataHistory:
             [..., Result(data={'new': 'param'}, kind=ResultKind.PARAMS)]
 
             The history can be filtered using the `filter_result` function:
-            >>> list(_filter_result(s.history, {ResultKind.PARAMS})
+            >>> list(filter_history(s.history, {ResultKind.PARAMS})
             ... )  # doctest: +NORMALIZE_WHITESPACE
             [Result(data={'a': 'param'}, kind=ResultKind.PARAMS),
              Result(data={'new': 'param'}, kind=ResultKind.PARAMS)]
@@ -377,7 +377,7 @@ class SimpleCycleDataHistory:
         return self._history
 
 
-def _history_to_kind(history: Sequence[Result]):
+def _history_to_kind(history: Sequence[Result]) -> SimpleCycleData:
     """
     Convert a sequence of results into a SimpleCycleData instance:
 
@@ -428,9 +428,9 @@ def _history_to_kind(history: Sequence[Result]):
         params=_get_last_data_with_default(
             history, kind={ResultKind.PARAMS}, default={}
         ),
-        observations=_list_data(_filter_result(history, kind={ResultKind.OBSERVATION})),
-        theories=_list_data(_filter_result(history, kind={ResultKind.THEORY})),
-        conditions=_list_data(_filter_result(history, kind={ResultKind.CONDITION})),
+        observations=_list_data(filter_history(history, kind={ResultKind.OBSERVATION})),
+        theories=_list_data(filter_history(history, kind={ResultKind.THEORY})),
+        conditions=_list_data(filter_history(history, kind={ResultKind.CONDITION})),
     )
     return namespace
 
@@ -513,13 +513,13 @@ def _list_data(data: Sequence[SupportsDataKind]):
     return list(r.data for r in data)
 
 
-def _filter_result(data: Iterable[SupportsDataKind], kind: Set[ResultKind]):
+def filter_history(data: Iterable[SupportsDataKind], kind: Set[ResultKind]):
     return filter(lambda r: r.kind in kind, data)
 
 
 def _get_last(data: Sequence[SupportsDataKind], kind: Set[ResultKind]):
     results_new_to_old = reversed(data)
-    last_of_kind = next(_filter_result(results_new_to_old, kind=kind))
+    last_of_kind = next(filter_history(results_new_to_old, kind=kind))
     return last_of_kind
 
 
@@ -609,30 +609,28 @@ def _init_result_list(
     return data
 
 
-def _resolve_state_params(state: Sequence[Result]) -> Dict:
+def resolve_state_params(state: SimpleCycleDataHistory) -> Dict:
     """
     Returns the `params` attribute of the input, with `cycle properties` resolved.
 
     Examples:
 
-        >>> s = _init_result_list(theories=["the first theory", "the second theory"],
+        >>> s = SimpleCycleDataHistory(theories=["the first theory", "the second theory"],
         ...     params={"experimentalist": {"source": "%theories[-1]%"}})
-        >>> _resolve_state_params(s)
+        >>> resolve_state_params(s)
         {'experimentalist': {'source': 'the second theory'}}
 
     """
     state_dependent_properties = _get_state_dependent_properties(state)
-    namespace_params = _history_to_kind(state).params
-    resolved_params = _resolve_properties(namespace_params, state_dependent_properties)
+    resolved_params = _resolve_properties(state.params, state_dependent_properties)
     return resolved_params
 
 
-def _get_state_dependent_properties(state: Sequence[Result]):
+def _get_state_dependent_properties(state: SimpleCycleDataHistory):
     """
     Examples:
         Even with an empty data object, we can initialize the dictionary,
-        >>> from autora.variable import VariableCollection
-        >>> state_dependent_properties = _get_state_dependent_properties([])
+        >>> state_dependent_properties = _get_state_dependent_properties(SimpleCycleDataHistory())
 
         ... but it will raise an exception if a value isn't yet available when we try to use it
         >>> state_dependent_properties["%theories[-1]%"] # doctest: +ELLIPSIS
@@ -646,26 +644,19 @@ def _get_state_dependent_properties(state: Sequence[Result]):
         '%observations.dvs%', '%theories[-1]%', '%theories%']
 
     """
-    namespace_view = _history_to_kind(state)
 
-    n_ivs = len(namespace_view.metadata.independent_variables)
-    n_dvs = len(namespace_view.metadata.dependent_variables)
+    n_ivs = len(state.metadata.independent_variables)
+    n_dvs = len(state.metadata.dependent_variables)
     state_dependent_property_dict = LazyDict(
         {
-            "%observations.ivs[-1]%": lambda: namespace_view.observations[-1][
-                :, 0:n_ivs
-            ],
-            "%observations.dvs[-1]%": lambda: namespace_view.observations[-1][
-                :, n_ivs:
-            ],
+            "%observations.ivs[-1]%": lambda: state.observations[-1][:, 0:n_ivs],
+            "%observations.dvs[-1]%": lambda: state.observations[-1][:, n_ivs:],
             "%observations.ivs%": lambda: np.row_stack(
-                [np.empty([0, n_ivs + n_dvs])] + namespace_view.observations
+                [np.empty([0, n_ivs + n_dvs])] + state.observations
             )[:, 0:n_ivs],
-            "%observations.dvs%": lambda: np.row_stack(namespace_view.observations)[
-                :, n_ivs:
-            ],
-            "%theories[-1]%": lambda: namespace_view.theories[-1],
-            "%theories%": lambda: namespace_view.theories,
+            "%observations.dvs%": lambda: np.row_stack(state.observations)[:, n_ivs:],
+            "%theories[-1]%": lambda: state.theories[-1],
+            "%theories%": lambda: state.theories,
         }
     )
     return state_dependent_property_dict

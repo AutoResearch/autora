@@ -1,12 +1,10 @@
 import random
-from typing import Iterable
 
 from autora.cycle.protocol.v1 import (
-    SupportsDataKind,
     SupportsExperimentalistExperimentRunnerTheorist,
     SupportsFullCycle,
 )
-from autora.cycle.state import ResultKind, _filter_result
+from autora.cycle.state import ResultKind, SimpleCycleDataHistory, filter_history
 
 
 def full_cycle_planner(_, executor_collection: SupportsFullCycle):
@@ -15,7 +13,7 @@ def full_cycle_planner(_, executor_collection: SupportsFullCycle):
 
 
 def last_result_kind_planner(
-    history: Iterable[SupportsDataKind],
+    state: SimpleCycleDataHistory,
     executor_collection: SupportsExperimentalistExperimentRunnerTheorist,
 ):
     """
@@ -25,7 +23,7 @@ def last_result_kind_planner(
 
     Examples:
         We initialize a new list to run our planner on:
-        >>> history = []
+        >>> state = SimpleCycleDataHistory()
 
         We simulate a productive executor_collection using a SimpleNamespace
         >>> from types import SimpleNamespace
@@ -37,30 +35,30 @@ def last_result_kind_planner(
 
         Based on the results available in the state, we can get the next kind of executor we need.
         When we have no results of any kind, we get an experimentalist:
-        >>> last_result_kind_planner(history, executor_collection)
+        >>> last_result_kind_planner(state, executor_collection)
         'experimentalist'
 
         ... or if we had produced conditions, then we could run an experiment
         >>> from autora.cycle.state import Result
-        >>> history.append(Result("some theory",kind="CONDITION"))
-        >>> last_result_kind_planner(history, executor_collection)
+        >>> state = state.update(conditions=["some condition"])
+        >>> last_result_kind_planner(state, executor_collection)
         'experiment_runner'
 
         ... or if we last produced observations, then we could now run the theorist:
-        >>> history.append(Result("some theory",kind="OBSERVATION"))
-        >>> last_result_kind_planner(history, executor_collection)
+        >>> state = state.update(observations=["some observation"])
+        >>> last_result_kind_planner(state, executor_collection)
         'theorist'
 
         ... or if we last produced a theory, then we could now run the experimentalist:
-        >>> history.append(Result("some theory",kind="THEORY"))
-        >>> last_result_kind_planner(history, executor_collection)
+        >>> state = state.update(theories=["some theory"])
+        >>> last_result_kind_planner(state, executor_collection)
         'experimentalist'
 
     """
 
     filtered_state = list(
-        _filter_result(
-            history,
+        filter_history(
+            state.history,
             kind={ResultKind.CONDITION, ResultKind.OBSERVATION, ResultKind.THEORY},
         )
     )

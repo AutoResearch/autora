@@ -9,7 +9,7 @@ from typing import Callable, Dict, Optional
 
 from autora.cycle.executor import FullCycleExecutorCollection
 from autora.cycle.planner import full_cycle_planner
-from autora.cycle.state import _history_to_kind, _init_result_list
+from autora.cycle.state import SimpleCycleDataHistory
 from autora.variable import VariableCollection
 
 _logger = logging.getLogger(__name__)
@@ -318,7 +318,7 @@ class SimpleCycle:
         >>> from autora.cycle.executor import OnlineExecutorCollection
         >>> from autora.cycle.planner import last_result_kind_planner
         >>> def monitor(cycle):
-        ...     print(f"MONITOR: Generated new {cycle.history[-1].kind}")
+        ...     print(f"MONITOR: Generated new {cycle.state.history[-1].kind}")
         >>> cycle_with_last_result_planner = SimpleCycle(
         ...     planner=last_result_kind_planner,
         ...     executor_collection=OnlineExecutorCollection,
@@ -351,7 +351,8 @@ class SimpleCycle:
         ...     experiment_runner=example_synthetic_experiment_runner,
         ... )
         >>> seed_observation = example_synthetic_experiment_runner(np.linspace(0,5,10))
-        >>> cycle_with_seed_observation.history.append(Result(seed_observation,kind="OBSERVATION"))
+        >>> cycle_with_seed_observation.state = cycle_with_seed_observation.state.update(
+        ...     observations=[seed_observation])
 
         >>> _ = next(cycle_with_seed_observation)
         MONITOR: Generated new THEORY
@@ -365,7 +366,7 @@ class SimpleCycle:
         different times in the cycle, e.g. for initial seeding.
         >>> from autora.cycle.planner import random_operation_planner
         >>> def monitor(cycle):
-        ...     print(f"MONITOR: Generated new {cycle.history[-1].kind}")
+        ...     print(f"MONITOR: Generated new {cycle.state.history[-1].kind}")
         >>> cycle_with_random_planner = SimpleCycle(
         ...     planner=random_operation_planner,
         ...     executor_collection=OnlineExecutorCollection,
@@ -420,7 +421,7 @@ class SimpleCycle:
         monitor: Optional[Callable[[SimpleCycle], None]] = None,
         params: Optional[Dict] = None,
         executor_collection=FullCycleExecutorCollection,
-        state_collection=_init_result_list,
+        state_collection=SimpleCycleDataHistory,
         planner=full_cycle_planner,
     ):
         """
@@ -452,7 +453,7 @@ class SimpleCycle:
         if params is None:
             params = dict()
 
-        self.history = state_collection(
+        self.state = state_collection(
             metadata=metadata,
             conditions=[],
             observations=[],
@@ -471,13 +472,13 @@ class SimpleCycle:
     def __next__(self):
 
         # Plan
-        next_function = self.planner(self.history, self.executor_collection)
+        next_function = self.planner(self.state, self.executor_collection)
 
         # Execute
-        result = next_function(self.history)
+        result = next_function(self.state)
 
         # Update
-        self.history = self.history + result
+        self.state = result
 
         # Monitor
         self._monitor_callback()
@@ -502,7 +503,7 @@ class SimpleCycle:
         - `.theories`
 
         """
-        return _history_to_kind(self.history)
+        return self.state
 
     @property
     def params(self):
@@ -519,11 +520,11 @@ class SimpleCycle:
             >>> c.params
             {'new': 'value'}
         """
-        return self.data.params
+        return self.state.params
 
     @params.setter
     def params(self, value):
-        self.history = self.history + _init_result_list(params=value)
+        self.state = self.state.update(params=value)
 
     @property
     def theorist(self):
