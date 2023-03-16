@@ -16,15 +16,15 @@ Examples:
 
     The view of this empty history on the "kind" dimension is also empty:
     >>> history_to_kind(history_) # doctest: +NORMALIZE_WHITESPACE +ELLIPSIS
-    namespace(conditions=[], metadata=VariableCollection(...), observations=[], params={},
-              theories=[])
+    SimpleCycleData(metadata=VariableCollection(independent_variables=[], dependent_variables=[],
+                    covariates=[]), params={}, conditions=[], observations=[], theories=[])
 
     We can add new results to the history:
     >>> history_.append(Result([1,2,3], ResultKind.CONDITION))
 
     ... and view the results:
     >>> history_to_kind(history_) # doctest: +ELLIPSIS
-    namespace(conditions=[[1, 2, 3]], ...)
+    SimpleCycleData(..., conditions=[[1, 2, 3]], ...)
 
 """
 from __future__ import annotations
@@ -32,7 +32,6 @@ from __future__ import annotations
 import copy
 from dataclasses import dataclass
 from enum import Enum
-from types import SimpleNamespace
 from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence, Set
 
 import numpy as np
@@ -40,6 +39,7 @@ from numpy.typing import ArrayLike
 from sklearn.base import BaseEstimator
 
 from autora.cycle.protocol.v1 import SupportsDataKind
+from autora.cycle.state.simple import SimpleCycleData
 from autora.utils.dictionary import LazyDict
 from autora.variable import VariableCollection
 
@@ -47,13 +47,33 @@ from autora.variable import VariableCollection
 class SimpleCycleDataHistory:
     def __init__(
         self,
-        metadata: Optional[VariableCollection],
-        params: Optional[Dict],
-        conditions: Optional[List[ArrayLike]],
-        observations: Optional[List[ArrayLike]],
-        theories: Optional[List[BaseEstimator]],
-        history: Optional[Sequence[Result]],
+        metadata: Optional[VariableCollection] = None,
+        params: Optional[Dict] = None,
+        conditions: Optional[List[ArrayLike]] = None,
+        observations: Optional[List[ArrayLike]] = None,
+        theories: Optional[List[BaseEstimator]] = None,
+        history: Optional[Sequence[Result]] = None,
     ):
+        """
+
+        Args:
+            metadata:
+            params:
+            conditions:
+            observations:
+            theories:
+            history:
+
+        Examples:
+             >>> SimpleCycleDataHistory()
+             SimpleCycleDataHistory([])
+
+             >>> SimpleCycleDataHistory()._by_kind  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
+             SimpleCycleData(metadata=VariableCollection(...), params={}, conditions=[],
+                             observations=[], theories=[])
+
+
+        """
         self._history: List
 
         if history is not None:
@@ -70,7 +90,7 @@ class SimpleCycleDataHistory:
         )
 
     def __repr__(self):
-        return f"{self.name}({self.history})"
+        return f"{type(self).__name__}({self.history})"
 
     @property
     def _by_kind(self):
@@ -113,44 +133,44 @@ def history_to_kind(history: Sequence[Result]):
     Examples:
         History might be empty
         >>> history_ = []
-        >>> history_to_kind(history_) # doctest: +NORMALIZE_WHITESPACE
-        namespace(conditions=[], metadata=VariableCollection(independent_variables=[],
-            dependent_variables=[], covariates=[]), observations=[], params={}, theories=[])
+        >>> history_to_kind(history_) # doctest: +NORMALIZE_WHITESPACE +ELLIPSIS
+        SimpleCycleData(metadata=VariableCollection(...), params={},
+                        conditions=[], observations=[], theories=[])
 
         ... or with values for any or all of the parameters:
         >>> history_ = init_result_list(params={"some": "params"})
         >>> history_to_kind(history_) # doctest: +NORMALIZE_WHITESPACE +ELLIPSIS
-        namespace(... params={'some': 'params'}, ...)
+        SimpleCycleData(..., params={'some': 'params'}, ...)
 
         >>> history_ += init_result_list(conditions=["a condition"])
         >>> history_to_kind(history_) # doctest: +NORMALIZE_WHITESPACE +ELLIPSIS
-        namespace(conditions=['a condition'], ..., params={'some': 'params'}, ...)
+        SimpleCycleData(..., params={'some': 'params'}, conditions=['a condition'], ...)
 
         >>> history_to_kind(history_).params
         {'some': 'params'}
 
         >>> history_ += init_result_list(observations=["an observation"])
         >>> history_to_kind(history_) # doctest: +NORMALIZE_WHITESPACE +ELLIPSIS
-        namespace(conditions=['a condition'], ..., observations=['an observation'],
-            params={'some': 'params'}, ...)
+        SimpleCycleData(..., params={'some': 'params'}, conditions=['a condition'],
+                        observations=['an observation'], ...)
 
         >>> from sklearn.linear_model import LinearRegression
         >>> history_ = [Result(LinearRegression(), kind=ResultKind.THEORY)]
         >>> history_to_kind(history_) # doctest: +ELLIPSIS
-        namespace(..., theories=[LinearRegression()])
+        SimpleCycleData(..., theories=[LinearRegression()])
 
         >>> from autora.variable import VariableCollection, IV
         >>> metadata = VariableCollection(independent_variables=[IV(name="example")])
         >>> history_ = [Result(metadata, kind=ResultKind.METADATA)]
         >>> history_to_kind(history_) # doctest: +ELLIPSIS
-        namespace(... metadata=VariableCollection(independent_variables=[IV(name='example', ...
+        SimpleCycleData(metadata=VariableCollection(independent_variables=[IV(name='example', ...
 
         >>> history_ = [Result({'some': 'params'}, kind=ResultKind.PARAMS)]
         >>> history_to_kind(history_) # doctest: +ELLIPSIS
-        namespace(..., params={'some': 'params'}, ...)
+        SimpleCycleData(..., params={'some': 'params'}, ...)
 
     """
-    namespace = SimpleNamespace(
+    namespace = SimpleCycleData(
         metadata=get_last_data_with_default(
             history, kind={ResultKind.METADATA}, default=VariableCollection()
         ),
