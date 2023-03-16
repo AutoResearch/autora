@@ -10,14 +10,13 @@ from __future__ import annotations
 
 import copy
 from dataclasses import dataclass
-from enum import Enum
-from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence, Set
+from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence, Set, Union
 
 import numpy as np
 from numpy.typing import ArrayLike
 from sklearn.base import BaseEstimator
 
-from autora.cycle.protocol.v1 import SupportsDataKind
+from autora.cycle.protocol.v1 import ResultKind, SupportsDataKind
 from autora.cycle.state.simple import SimpleCycleData
 from autora.utils.dictionary import LazyDict
 from autora.variable import VariableCollection
@@ -367,14 +366,31 @@ class SimpleCycleDataHistory:
             >>> s.history  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
             [..., Result(data={'new': 'param'}, kind=ResultKind.PARAMS)]
 
-            The history can be filtered using the `filter_result` function:
-            >>> list(filter_history(s.history, {ResultKind.PARAMS})
-            ... )  # doctest: +NORMALIZE_WHITESPACE
-            [Result(data={'a': 'param'}, kind=ResultKind.PARAMS),
-             Result(data={'new': 'param'}, kind=ResultKind.PARAMS)]
-
         """
         return self._history
+
+    def filter_by(self, kind=Set[Union[str, ResultKind]]) -> SimpleCycleDataHistory:
+        """
+        Return a copy of the object with only data belonging to the specified kinds.
+
+        Examples:
+            >>> s = SimpleCycleDataHistory(theories=['t1', 't2'], conditions=['c1', 'c2'],
+            ...     observations=['o1', 'o2'], params={'a': 'param'}, metadata=VariableCollection(),
+            ...     history=[Result("from history", ResultKind.METADATA)])
+
+            >>> s.filter_by(kind={"THEORY"})   # doctest: +NORMALIZE_WHITESPACE
+            SimpleCycleDataHistory([Result(data='t1', kind=ResultKind.THEORY),
+                                    Result(data='t2', kind=ResultKind.THEORY)])
+
+            >>> s.filter_by(kind={ResultKind.OBSERVATION})  # doctest: +NORMALIZE_WHITESPACE
+            SimpleCycleDataHistory([Result(data='o1', kind=ResultKind.OBSERVATION),
+                                    Result(data='o2', kind=ResultKind.OBSERVATION)])
+
+        """
+        kind_ = {ResultKind(s) for s in kind}
+        filtered_history = _filter_history(self._history, kind_)
+        new_object = SimpleCycleDataHistory(history=filtered_history)
+        return new_object
 
 
 def _history_to_kind(history: Sequence[Result]) -> SimpleCycleData:
@@ -428,9 +444,11 @@ def _history_to_kind(history: Sequence[Result]) -> SimpleCycleData:
         params=_get_last_data_with_default(
             history, kind={ResultKind.PARAMS}, default={}
         ),
-        observations=_list_data(filter_history(history, kind={ResultKind.OBSERVATION})),
-        theories=_list_data(filter_history(history, kind={ResultKind.THEORY})),
-        conditions=_list_data(filter_history(history, kind={ResultKind.CONDITION})),
+        observations=_list_data(
+            _filter_history(history, kind={ResultKind.OBSERVATION})
+        ),
+        theories=_list_data(_filter_history(history, kind={ResultKind.THEORY})),
+        conditions=_list_data(_filter_history(history, kind={ResultKind.CONDITION})),
     )
     return namespace
 
@@ -464,41 +482,6 @@ class Result(SupportsDataKind):
             object.__setattr__(self, "kind", ResultKind(self.kind))
 
 
-class ResultKind(str, Enum):
-    """
-    Kinds of results which can be held in the Result object.
-
-    Examples:
-        >>> ResultKind.CONDITION is ResultKind.CONDITION
-        True
-
-        >>> ResultKind.CONDITION is ResultKind.METADATA
-        False
-
-        >>> ResultKind.CONDITION == "CONDITION"
-        True
-
-        >>> ResultKind.CONDITION == "METADATA"
-        False
-
-        >>> ResultKind.CONDITION in {ResultKind.CONDITION, ResultKind.PARAMS}
-        True
-
-        >>> ResultKind.METADATA in {ResultKind.CONDITION, ResultKind.PARAMS}
-        False
-    """
-
-    CONDITION = "CONDITION"
-    OBSERVATION = "OBSERVATION"
-    THEORY = "THEORY"
-    PARAMS = "PARAMS"
-    METADATA = "METADATA"
-
-    def __repr__(self):
-        cls_name = self.__class__.__name__
-        return f"{cls_name}.{self.name}"
-
-
 def _list_data(data: Sequence[SupportsDataKind]):
     """
     Extract the `.data` attribute of each item in a sequence, and return as a list.
@@ -513,13 +496,13 @@ def _list_data(data: Sequence[SupportsDataKind]):
     return list(r.data for r in data)
 
 
-def filter_history(data: Iterable[SupportsDataKind], kind: Set[ResultKind]):
+def _filter_history(data: Iterable[SupportsDataKind], kind: Set[ResultKind]):
     return filter(lambda r: r.kind in kind, data)
 
 
 def _get_last(data: Sequence[SupportsDataKind], kind: Set[ResultKind]):
     results_new_to_old = reversed(data)
-    last_of_kind = next(filter_history(results_new_to_old, kind=kind))
+    last_of_kind = next(_filter_history(results_new_to_old, kind=kind))
     return last_of_kind
 
 

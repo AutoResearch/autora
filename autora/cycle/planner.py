@@ -1,10 +1,11 @@
 import random
 
 from autora.cycle.protocol.v1 import (
+    ResultKind,
+    SupportsCycleStateHistory,
     SupportsExperimentalistExperimentRunnerTheorist,
     SupportsFullCycle,
 )
-from autora.cycle.state import ResultKind, SimpleCycleDataHistory, filter_history
 
 
 def full_cycle_planner(_, executor_collection: SupportsFullCycle):
@@ -13,7 +14,7 @@ def full_cycle_planner(_, executor_collection: SupportsFullCycle):
 
 
 def last_result_kind_planner(
-    state: SimpleCycleDataHistory,
+    state: SupportsCycleStateHistory,
     executor_collection: SupportsExperimentalistExperimentRunnerTheorist,
 ):
     """
@@ -23,6 +24,7 @@ def last_result_kind_planner(
 
     Examples:
         We initialize a new list to run our planner on:
+        >>> from autora.cycle.state import SimpleCycleDataHistory
         >>> state = SimpleCycleDataHistory()
 
         We simulate a productive executor_collection using a SimpleNamespace
@@ -56,15 +58,12 @@ def last_result_kind_planner(
 
     """
 
-    filtered_state = list(
-        filter_history(
-            state.history,
-            kind={ResultKind.CONDITION, ResultKind.OBSERVATION, ResultKind.THEORY},
-        )
-    )
+    filtered_history = state.filter_by(
+        kind={"CONDITION", "OBSERVATION", "THEORY"}
+    ).history
 
     try:
-        last_result_kind = filtered_state[-1].kind
+        last_result_kind = filtered_history[-1].kind
     except IndexError:
         last_result_kind = None
 
