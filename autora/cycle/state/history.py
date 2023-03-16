@@ -44,6 +44,58 @@ from autora.utils.dictionary import LazyDict
 from autora.variable import VariableCollection
 
 
+class SimpleCycleDataHistory:
+    def __init__(
+        self,
+        metadata: Optional[VariableCollection],
+        params: Optional[Dict],
+        conditions: Optional[List[ArrayLike]],
+        observations: Optional[List[ArrayLike]],
+        theories: Optional[List[BaseEstimator]],
+        history: Optional[Sequence[Result]],
+    ):
+        if history is not None:
+            self._history = list(history)
+        else:
+            self._history = []
+
+        self._history += init_result_list(
+            metadata=metadata,
+            params=params,
+            conditions=conditions,
+            observations=observations,
+            theories=theories,
+        )
+
+    @property
+    def _by_kind(self):
+        return history_to_kind(self._history)
+
+    @property
+    def history(self) -> Sequence[Result]:
+        return self._history
+
+    @property
+    def metadata(self) -> VariableCollection:
+        return self._by_kind.metadata
+
+    @property
+    def params(self) -> Dict:
+        return self._by_kind.params
+
+    @property
+    def conditions(self) -> Sequence[ArrayLike]:
+        return self._by_kind.conditions
+
+    @property
+    def observations(self) -> Sequence[ArrayLike]:
+        return self._by_kind.observations
+
+    @property
+    def theories(self) -> Sequence[BaseEstimator]:
+        return self._by_kind.theories
+
+
 def history_to_kind(history: Sequence[Result]):
     """
     Convert a sequence of results into a SimpleNamespace with attributes:
