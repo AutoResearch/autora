@@ -6,7 +6,7 @@ from autora.cycle.protocol.v1 import (
     SupportsExperimentalistExperimentRunnerTheorist,
     SupportsFullCycle,
 )
-from autora.cycle.state import ResultKind, filter_result
+from autora.cycle.state import ResultKind, _filter_result
 
 
 def full_cycle_planner(_, executor_collection: SupportsFullCycle):
@@ -59,7 +59,7 @@ def last_result_kind_planner(
     """
 
     filtered_state = list(
-        filter_result(
+        _filter_result(
             history,
             kind={ResultKind.CONDITION, ResultKind.OBSERVATION, ResultKind.THEORY},
         )

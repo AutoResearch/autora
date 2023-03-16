@@ -9,7 +9,7 @@ from typing import Callable, Dict, Optional
 
 from autora.cycle.executor import FullCycleExecutorCollection
 from autora.cycle.planner import full_cycle_planner
-from autora.cycle.state import history_to_kind, init_result_list
+from autora.cycle.state import _history_to_kind, _init_result_list
 from autora.variable import VariableCollection
 
 _logger = logging.getLogger(__name__)
@@ -420,7 +420,7 @@ class SimpleCycle:
         monitor: Optional[Callable[[SimpleCycle], None]] = None,
         params: Optional[Dict] = None,
         executor_collection=FullCycleExecutorCollection,
-        state_collection=init_result_list,
+        state_collection=_init_result_list,
         planner=full_cycle_planner,
     ):
         """
@@ -502,7 +502,7 @@ class SimpleCycle:
         - `.theories`
 
         """
-        return history_to_kind(self.history)
+        return _history_to_kind(self.history)
 
     @property
     def params(self):
@@ -523,7 +523,7 @@ class SimpleCycle:
 
     @params.setter
     def params(self, value):
-        self.history = self.history + init_result_list(params=value)
+        self.history = self.history + _init_result_list(params=value)
 
     @property
     def theorist(self):

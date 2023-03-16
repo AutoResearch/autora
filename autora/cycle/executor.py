@@ -11,8 +11,8 @@ from sklearn.base import BaseEstimator
 from autora.cycle.state import (
     Result,
     ResultKind,
+    _history_to_kind,
     _resolve_state_params,
-    history_to_kind,
 )
 from autora.experimentalist.pipeline import Pipeline
 
@@ -61,7 +61,7 @@ class OnlineExecutorCollection:
     def experiment_runner(self, history: List[Result]) -> List[Result]:
         """Interface for running the experiment runner callable"""
         params = _resolve_state_params(history).get("experiment_runner", dict())
-        x = history_to_kind(history).conditions[-1]
+        x = _history_to_kind(history).conditions[-1]
         y = self.experiment_runner_callable(x, **params)
         new_observations = np.column_stack([x, y])
         result = [Result(new_observations, kind=ResultKind.OBSERVATION)]
@@ -70,8 +70,8 @@ class OnlineExecutorCollection:
     def theorist(self, history: List[Result]) -> List[Result]:
         """Interface for running the theorist estimator."""
         params = _resolve_state_params(history).get("theorist", dict())
-        metadata = history_to_kind(history).metadata
-        observations = history_to_kind(history).observations
+        metadata = _history_to_kind(history).metadata
+        observations = _history_to_kind(history).observations
         all_observations = np.row_stack(observations)
         n_xs = len(metadata.independent_variables)
         x, y = all_observations[:, :n_xs], all_observations[:, n_xs:]
