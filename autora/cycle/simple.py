@@ -524,6 +524,20 @@ class SimpleCycle:
 
     @property
     def theorist(self):
+        """
+        Examples:
+            >>> from autora.cycle.simple import SimpleCycle
+            >>> from sklearn.linear_model import LinearRegression, PoissonRegressor
+            >>> c = SimpleCycle(metadata=None, theorist=LinearRegression(), experimentalist=None,
+            ...                 experiment_runner=None)
+            >>> c.theorist
+            LinearRegression()
+
+            >>> c.theorist = PoissonRegressor()
+            >>> c.theorist
+            PoissonRegressor()
+
+        """
         """The theorist – scikit-learn-compatible estimator – used when running the cycle."""
         return self.executor_collection.theorist_estimator
 
