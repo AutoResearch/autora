@@ -54,6 +54,8 @@ class SimpleCycleDataHistory:
         theories: Optional[List[BaseEstimator]],
         history: Optional[Sequence[Result]],
     ):
+        self._history: List
+
         if history is not None:
             self._history = list(history)
         else:
