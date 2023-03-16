@@ -69,13 +69,12 @@ class SimpleCycleDataHistory:
             theories=theories,
         )
 
+    def __repr__(self):
+        return f"{self.name}({self.history})"
+
     @property
     def _by_kind(self):
         return history_to_kind(self._history)
-
-    @property
-    def history(self) -> Sequence[Result]:
-        return self._history
 
     @property
     def metadata(self) -> VariableCollection:
@@ -96,6 +95,10 @@ class SimpleCycleDataHistory:
     @property
     def theories(self) -> Sequence[BaseEstimator]:
         return self._by_kind.theories
+
+    @property
+    def history(self) -> Sequence[Result]:
+        return self._history
 
 
 def history_to_kind(history: Sequence[Result]):
