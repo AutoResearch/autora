@@ -547,7 +547,24 @@ class SimpleCycle:
 
     @property
     def experimentalist(self):
-        """The experimentalist Pipeline used when running the cycle."""
+        """
+        The experimentalist Pipeline used when running the cycle.
+
+        Examples:
+            >>> from autora.cycle.simple import SimpleCycle
+            >>> from autora.experimentalist.pipeline import Pipeline
+
+            z
+            >>> c = SimpleCycle(metadata=None, theorist=None, experiment_runner=None,
+            ...                 experimentalist=Pipeline([("pool", [11,12,13])]))
+            >>> c.experimentalist
+            Pipeline(steps=[('pool', [11, 12, 13])], params={})
+
+            >>> c.experimentalist = Pipeline([('pool', [21,22,23])])
+            >>> c.experimentalist
+            Pipeline(steps=[('pool', [21, 22, 23])], params={})
+
+        """
         return self.executor_collection.experimentalist_pipeline
 
     @experimentalist.setter
