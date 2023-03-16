@@ -436,8 +436,10 @@ class SimpleCycle:
                 E.g. if the experimentalist had a step named "pool" which took an argument "n",
                 which you wanted to set to the value 30, then params would be set to this:
                 `{"experimentalist": {"pool": {"n": 30}}}`
-            executor_collection: an object with functions for running the theorist,
-                experimentalist and experiment_runner.
+            executor_collection: the constructor for an object with functions for running the
+                theorist, experimentalist and experiment_runner.
+            state_collection: the constructor for an object which holds the state of the cycle
+                and is passed between executors
         """
 
         self.executor_collection = executor_collection(
