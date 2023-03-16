@@ -43,15 +43,15 @@ class OnlineExecutorCollection:
         """Interface for running the experimentalist pipeline."""
         params = _resolve_state_params(history).get("experimentalist", dict())
         new_conditions = self.experimentalist_pipeline(**params)
-        if isinstance(new_conditions, Iterable):
-            # If the pipeline gives us an iterable, we need to make it into a concrete array.
-            # We can't move this logic to the Pipeline, because the pipeline doesn't know whether
-            # it's within another pipeline and whether it should convert the iterable to a
-            # concrete array.
-            new_conditions_values = list(new_conditions)
-            new_conditions_array = np.array(new_conditions_values)
-        else:
-            raise NotImplementedError(f"Object {new_conditions} can't be handled yet.")
+
+        assert isinstance(new_conditions, Iterable)
+        # If the pipeline gives us an iterable, we need to make it into a concrete array.
+        # We can't move this logic to the Pipeline, because the pipeline doesn't know whether
+        # it's within another pipeline and whether it should convert the iterable to a
+        # concrete array.
+        new_conditions_values = list(new_conditions)
+        new_conditions_array = np.array(new_conditions_values)
+
         assert isinstance(
             new_conditions_array, np.ndarray
         )  # Check the object is bounded
