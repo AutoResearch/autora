@@ -503,6 +503,19 @@ class SimpleCycle:
 
     @property
     def params(self):
+        """
+        Examples:
+            >>> from autora.cycle.simple import SimpleCycle
+            >>> p = {"some": "params"}
+            >>> c = SimpleCycle(metadata=None, theorist=None, experimentalist=None,
+            ...                 experiment_runner=None, params=p)
+            >>> c.params
+            {'some': 'params'}
+
+            >>> c.params = {"new": "value"}
+            >>> c.params
+            {'new': 'value'}
+        """
         return self.data.params
 
     @params.setter
