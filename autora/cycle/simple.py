@@ -420,6 +420,7 @@ class SimpleCycle:
         monitor: Optional[Callable[[SimpleCycle], None]] = None,
         params: Optional[Dict] = None,
         executor_collection=FullCycleExecutorCollection,
+        state_collection=init_result_list,
         planner=full_cycle_planner,
     ):
         """
@@ -449,7 +450,7 @@ class SimpleCycle:
         if params is None:
             params = dict()
 
-        self.history = init_result_list(
+        self.history = state_collection(
             metadata=metadata,
             conditions=[],
             observations=[],
