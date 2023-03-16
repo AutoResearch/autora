@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Dict, List
 
-import numpy as np
+from numpy.typing import ArrayLike
 from sklearn.base import BaseEstimator
 
 from autora.variable import VariableCollection
@@ -16,8 +16,8 @@ class SimpleCycleData:
     params: Dict
 
     # Sequences
-    conditions: List[np.ndarray]
-    observations: List[np.ndarray]
+    conditions: List[ArrayLike]
+    observations: List[ArrayLike]
     theories: List[BaseEstimator]
 
     def update(
