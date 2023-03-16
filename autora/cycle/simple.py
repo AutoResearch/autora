@@ -574,6 +574,25 @@ class SimpleCycle:
 
     @property
     def experiment_runner(self):
+        """
+        Examples:
+            >>> from autora.cycle.simple import SimpleCycle
+            >>> def plus_one(x): return x + 1
+            >>> c = SimpleCycle(metadata=None, theorist=None, experimentalist=None,
+            ...                 experiment_runner=plus_one)
+            >>> c.experiment_runner  # doctest: +ELLIPSIS
+            <function plus_one at 0x...>
+            >>> c.experiment_runner(1)
+            2
+
+            >>> def plus_two(x): return x + 2
+            >>> c.experiment_runner = plus_two
+            >>> c.experiment_runner  # doctest: +ELLIPSIS
+            <function plus_two at 0x...>
+            >>> c.experiment_runner(1)
+            3
+
+        """
         """The callable used to generate new experimental results"""
         return self.executor_collection.experiment_runner_callable
 
