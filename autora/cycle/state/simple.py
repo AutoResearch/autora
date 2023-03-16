@@ -1,3 +1,4 @@
+""" Classes for storing and passing a cycle's state. """
 from dataclasses import dataclass
 from typing import Dict, List
 
