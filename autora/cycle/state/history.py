@@ -1,31 +1,10 @@
 """
-Classes for storing and passing a cycle's state between Executors.
+Classes for storing and passing a cycle's state, including its history.
 
 We provide two views of a cycle's state:
 - by "history" – first datum, second datum ... last datum – where the results are strictly
   sequential.
 - by "kind" – metadata, parameter, condition, observation, theory
-
-Our fundamental representation is as a list of Results objects: the order in the list represents
-history and the Result object holds both the data and metadata like the "kind".
-
-Examples:
-    We start with an emtpy history
-    >>> from autora.cycle.state import history_to_kind, ResultKind, Result
-    >>> history_ = []
-
-    The view of this empty history on the "kind" dimension is also empty:
-    >>> history_to_kind(history_) # doctest: +NORMALIZE_WHITESPACE +ELLIPSIS
-    SimpleCycleData(metadata=VariableCollection(independent_variables=[], dependent_variables=[],
-                    covariates=[]), params={}, conditions=[], observations=[], theories=[])
-
-    We can add new results to the history:
-    >>> history_.append(Result([1,2,3], ResultKind.CONDITION))
-
-    ... and view the results:
-    >>> history_to_kind(history_) # doctest: +ELLIPSIS
-    SimpleCycleData(..., conditions=[[1, 2, 3]], ...)
-
 """
 from __future__ import annotations
 
@@ -68,7 +47,7 @@ class SimpleCycleDataHistory:
              >>> SimpleCycleDataHistory()
              SimpleCycleDataHistory([])
 
-             >>> SimpleCycleDataHistory().by_kind  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
+             >>> SimpleCycleDataHistory()._by_kind  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
              SimpleCycleData(metadata=VariableCollection(...), params={}, conditions=[],
                              observations=[], theories=[])
 
@@ -119,7 +98,7 @@ class SimpleCycleDataHistory:
 
             We can update the metadata again:
             >>> s2 = s1.update(metadata=VariableCollection(["some IV"]))
-            >>> s2.by_kind  # doctest: +ELLIPSIS
+            >>> s2._by_kind  # doctest: +ELLIPSIS
             SimpleCycleData(metadata=VariableCollection(independent_variables=['some IV'],...), ...)
 
             ... and we see that there is only ever one metadata object returned.
@@ -213,7 +192,7 @@ class SimpleCycleDataHistory:
         return f"{type(self).__name__}({self.history})"
 
     @property
-    def by_kind(self):
+    def _by_kind(self):
         return history_to_kind(self._history)
 
     @property
@@ -240,7 +219,7 @@ class SimpleCycleDataHistory:
             VariableCollection(independent_variables=['some other IV'], ...)
 
             ... and we see that there is only ever one metadata object returned."""
-        return self.by_kind.metadata
+        return self._by_kind.metadata
 
     @property
     def params(self) -> Dict:
@@ -265,7 +244,7 @@ class SimpleCycleDataHistory:
             SimpleCycleDataHistory([Result(data={'first': 'params'}, kind=ResultKind.PARAMS),
                                     Result(data={'second': 'params'}, kind=ResultKind.PARAMS)])
         """
-        return self.by_kind.params
+        return self._by_kind.params
 
     @property
     def conditions(self) -> Sequence[ArrayLike]:
@@ -284,7 +263,7 @@ class SimpleCycleDataHistory:
             [(1, 2, 3), (4, 5, 6), (7, 8, 9)]
 
         """
-        return self.by_kind.conditions
+        return self._by_kind.conditions
 
     @property
     def observations(self) -> Sequence[ArrayLike]:
@@ -303,7 +282,7 @@ class SimpleCycleDataHistory:
             ['1st observation', '2nd observation']
 
         """
-        return self.by_kind.observations
+        return self._by_kind.observations
 
     @property
     def theories(self) -> Sequence[BaseEstimator]:
@@ -323,7 +302,7 @@ class SimpleCycleDataHistory:
             ['1st theory', '2nd theory']
 
         """
-        return self.by_kind.theories
+        return self._by_kind.theories
 
     @property
     def history(self) -> Sequence[Result]:
