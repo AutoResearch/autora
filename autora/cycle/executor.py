@@ -8,7 +8,8 @@ from typing import Callable, Iterable
 import numpy as np
 from sklearn.base import BaseEstimator
 
-from autora.cycle.state import SimpleCycleDataHistory, resolve_state_params
+from autora.cycle.protocol.v1 import SupportsCycleState
+from autora.cycle.state import resolve_state_params
 from autora.experimentalist.pipeline import Pipeline
 
 
@@ -34,7 +35,7 @@ class OnlineExecutorCollection:
         self.experiment_runner_callable = experiment_runner_callable
         self.theorist_estimator = theorist_estimator
 
-    def experimentalist(self, state: SimpleCycleDataHistory) -> SimpleCycleDataHistory:
+    def experimentalist(self, state: SupportsCycleState) -> SupportsCycleState:
         """Interface for running the experimentalist pipeline."""
         params = resolve_state_params(state).get("experimentalist", dict())
         new_conditions = self.experimentalist_pipeline(**params)
@@ -53,9 +54,7 @@ class OnlineExecutorCollection:
         new_state = state.update(conditions=[new_conditions_array])
         return new_state
 
-    def experiment_runner(
-        self, state: SimpleCycleDataHistory
-    ) -> SimpleCycleDataHistory:
+    def experiment_runner(self, state: SupportsCycleState) -> SupportsCycleState:
         """Interface for running the experiment runner callable"""
         params = resolve_state_params(state).get("experiment_runner", dict())
         x = state.conditions[-1]
@@ -64,7 +63,7 @@ class OnlineExecutorCollection:
         new_state = state.update(observations=[new_observations])
         return new_state
 
-    def theorist(self, state: SimpleCycleDataHistory) -> SimpleCycleDataHistory:
+    def theorist(self, state: SupportsCycleState) -> SupportsCycleState:
         """Interface for running the theorist estimator."""
         params = resolve_state_params(state).get("theorist", dict())
         metadata = state.metadata
@@ -85,7 +84,7 @@ class FullCycleExecutorCollection(OnlineExecutorCollection):
     Runs a full AER cycle each `full_cycle` call in a single session.
     """
 
-    def full_cycle(self, state: SimpleCycleDataHistory) -> SimpleCycleDataHistory:
+    def full_cycle(self, state: SupportsCycleState) -> SupportsCycleState:
         """
         Executes the experimentalist, experiment runner and theorist on the given state.
 

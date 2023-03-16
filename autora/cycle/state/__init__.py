@@ -7,6 +7,6 @@ from .history import (
     _history_to_kind,
     _init_result_list,
     _list_data,
-    resolve_state_params,
 )
+from .param import resolve_state_params
 from .simple import SimpleCycleData
