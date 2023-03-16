@@ -554,8 +554,6 @@ class SimpleCycle:
         Examples:
             >>> from autora.cycle.simple import SimpleCycle
             >>> from autora.experimentalist.pipeline import Pipeline
-
-            z
             >>> c = SimpleCycle(metadata=None, theorist=None, experiment_runner=None,
             ...                 experimentalist=Pipeline([("pool", [11,12,13])]))
             >>> c.experimentalist
