@@ -1,4 +1,4 @@
-""" Classes for storing and passing a cycle's state. """
+""" Classes for storing and passing a cycle's state as an immutable snapshot. """
 from dataclasses import dataclass, field
 from typing import Dict, List
 

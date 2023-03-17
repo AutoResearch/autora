@@ -1,4 +1,4 @@
-""" Classes for storing and passing a cycle's state, including its history. """
+""" Classes for storing and passing a cycle's state as an immutable history. """
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -8,7 +8,7 @@ from numpy.typing import ArrayLike
 from sklearn.base import BaseEstimator
 
 from autora.cycle.protocol.v1 import ResultKind, SupportsDataKind
-from autora.cycle.state.simple import CycleState
+from autora.cycle.state.snapshot import CycleState
 from autora.variable import VariableCollection
 
 

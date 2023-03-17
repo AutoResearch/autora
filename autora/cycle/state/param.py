@@ -1,4 +1,4 @@
-""" Functions for handling a sequence of CycleState updates """
+""" Functions for handling cycle-state-dependent parameters. """
 from __future__ import annotations
 
 import copy
