@@ -2,11 +2,11 @@
 from __future__ import annotations
 
 import logging
-from typing import Callable, Dict, Optional, Type
+from typing import Callable, Dict, Optional
 
 from autora.cycle.executor import FullCycleExecutorCollection
 from autora.cycle.planner import full_cycle_planner
-from autora.cycle.protocol.v1 import Planner, SupportsCycleState
+from autora.cycle.protocol.v1 import Planner
 from autora.cycle.state import CycleState
 from autora.variable import VariableCollection
 
@@ -60,7 +60,7 @@ class Controller:
         monitor: Optional[Callable[[Controller], None]] = None,
         params: Optional[Dict] = None,
         executor_collection=FullCycleExecutorCollection,
-        state_collection: Type[SupportsCycleState] = CycleState,
+        state_collection=CycleState,
         planner: Planner = full_cycle_planner,
     ):
         """
