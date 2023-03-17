@@ -509,7 +509,7 @@ class Controller:
     def params(self):
         """
         Examples:
-            >>> from autora.cycle.simple import Controller
+            >>> from autora.cycle.controller import Controller
             >>> p = {"some": "params"}
             >>> c = Controller(metadata=None, theorist=None, experimentalist=None,
             ...                 experiment_runner=None, params=p)
@@ -532,7 +532,7 @@ class Controller:
         The theorist – scikit-learn-compatible estimator – used when running the cycle.
 
         Examples:
-            >>> from autora.cycle.simple import Controller
+            >>> from autora.cycle.controller import Controller
             >>> from sklearn.linear_model import LinearRegression, PoissonRegressor
             >>> c = Controller(metadata=None, theorist=LinearRegression(), experimentalist=None,
             ...                 experiment_runner=None)
@@ -556,7 +556,7 @@ class Controller:
         The experimentalist Pipeline used when running the cycle.
 
         Examples:
-            >>> from autora.cycle.simple import Controller
+            >>> from autora.cycle.controller import Controller
             >>> from autora.experimentalist.pipeline import Pipeline
             >>> c = Controller(metadata=None, theorist=None, experiment_runner=None,
             ...                 experimentalist=Pipeline([("pool", [11,12,13])]))
@@ -578,7 +578,7 @@ class Controller:
     def experiment_runner(self):
         """
         Examples:
-            >>> from autora.cycle.simple import Controller
+            >>> from autora.cycle.controller import Controller
             >>> def plus_one(x): return x + 1
             >>> c = Controller(metadata=None, theorist=None, experimentalist=None,
             ...                 experiment_runner=plus_one)
