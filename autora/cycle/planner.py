@@ -59,7 +59,7 @@ def last_result_kind_planner(
     """
 
     filtered_history = state.filter_by(
-        kind={"CONDITION", "OBSERVATION", "THEORY"}
+        kind={ResultKind.CONDITION, ResultKind.OBSERVATION, ResultKind.THEORY}
     ).history
 
     try:
