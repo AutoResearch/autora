@@ -132,21 +132,21 @@ class Controller:
 
     @property
     def data(self):
-        """
-        View the cycle's data as a snapshot with attributes:
-        - `.metadata`
-        - `.params`
-        - `.conditions`
-        - `.observations`
-        - `.theories`
-
-        """
+        """An alias for `.state`."""
         return self.state
 
     @property
     def params(self):
         """
-        The parameters used when running the cycle.
+        The parameters passed to the `theorist`, `experimentalist` and `experiment_runner`.
+
+        Should be a nested dictionary like
+        ```
+        {'experimentalist': {... params for experimentalist ...},
+         'experiment_runner': {... params for experiment_runner ...},
+         'theorist': {... params for theorist ...}}
+        ```
+
 
         Examples:
             >>> from autora.cycle.controller import Controller
@@ -169,7 +169,7 @@ class Controller:
     @property
     def theorist(self):
         """
-        The theorist – scikit-learn-compatible estimator – used when running the cycle.
+        Generates new theories.
 
         Examples:
             >>> from autora.cycle.controller import Controller
@@ -193,7 +193,7 @@ class Controller:
     @property
     def experimentalist(self):
         """
-        The experimentalist Pipeline used when running the cycle.
+        Generates new experimental conditions.
 
         Examples:
             >>> from autora.cycle.controller import Controller
@@ -217,6 +217,8 @@ class Controller:
     @property
     def experiment_runner(self):
         """
+        Generates new observations.
+
         Examples:
             >>> from autora.cycle.controller import Controller
             >>> def plus_one(x): return x + 1
