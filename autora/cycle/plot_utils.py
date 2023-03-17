@@ -9,7 +9,7 @@ from matplotlib import rcParams
 from matplotlib.patches import Patch
 from matplotlib.ticker import MaxNLocator
 
-from autora.cycle.controller import Controller as Cycle
+from .controller import Controller as Cycle
 
 # Change default plot styles
 rcParams["axes.spines.top"] = False
