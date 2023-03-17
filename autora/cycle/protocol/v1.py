@@ -9,6 +9,8 @@ from sklearn.base import BaseEstimator
 
 from autora.variable import VariableCollection
 
+T = TypeVar("T")
+
 
 class SupportsDataKind(Protocol):
     """Object with attributes for `data` and `kind`"""
@@ -25,9 +27,9 @@ class Planner(Protocol):
 
 
 class Executor(Protocol):
-    """A Callable which, given some state, returns 1 or more updates."""
+    """A Callable which, given some state, returns an updated state."""
 
-    def __call__(self, state: Sequence[SupportsDataKind]) -> Sequence[SupportsDataKind]:
+    def __call__(self, __state: T) -> T:
         ...
 
 
@@ -63,9 +65,6 @@ class SupportsMetadataParams(Protocol):
     params: Dict
 
 
-T = TypeVar("T")
-
-
 class SupportsUpdate(Protocol):
     """Supports updating an immutable object and returning a new copy with updated values."""
 
@@ -80,6 +79,9 @@ class SupportsCycleState(
     Protocol,
 ):
     ...
+
+    def __init__(self, **kwargs) -> None:
+        ...
 
 
 class SupportsCycleStateHistory(
