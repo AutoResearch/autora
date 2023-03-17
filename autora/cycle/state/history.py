@@ -390,66 +390,6 @@ class SimpleCycleDataHistory:
         return new_object
 
 
-def _history_to_kind(history: Sequence[Result]) -> SimpleCycleData:
-    """
-    Convert a sequence of results into a SimpleCycleData instance:
-
-    Examples:
-        History might be empty
-        >>> history_ = []
-        >>> _history_to_kind(history_) # doctest: +NORMALIZE_WHITESPACE +ELLIPSIS
-        SimpleCycleData(metadata=VariableCollection(...), params={},
-                        conditions=[], observations=[], theories=[])
-
-        ... or with values for any or all of the parameters:
-        >>> history_ = _init_result_list(params={"some": "params"})
-        >>> _history_to_kind(history_) # doctest: +NORMALIZE_WHITESPACE +ELLIPSIS
-        SimpleCycleData(..., params={'some': 'params'}, ...)
-
-        >>> history_ += _init_result_list(conditions=["a condition"])
-        >>> _history_to_kind(history_) # doctest: +NORMALIZE_WHITESPACE +ELLIPSIS
-        SimpleCycleData(..., params={'some': 'params'}, conditions=['a condition'], ...)
-
-        >>> _history_to_kind(history_).params
-        {'some': 'params'}
-
-        >>> history_ += _init_result_list(observations=["an observation"])
-        >>> _history_to_kind(history_) # doctest: +NORMALIZE_WHITESPACE +ELLIPSIS
-        SimpleCycleData(..., params={'some': 'params'}, conditions=['a condition'],
-                        observations=['an observation'], ...)
-
-        >>> from sklearn.linear_model import LinearRegression
-        >>> history_ = [Result(LinearRegression(), kind=ResultKind.THEORY)]
-        >>> _history_to_kind(history_) # doctest: +ELLIPSIS
-        SimpleCycleData(..., theories=[LinearRegression()])
-
-        >>> from autora.variable import VariableCollection, IV
-        >>> metadata = VariableCollection(independent_variables=[IV(name="example")])
-        >>> history_ = [Result(metadata, kind=ResultKind.METADATA)]
-        >>> _history_to_kind(history_) # doctest: +ELLIPSIS
-        SimpleCycleData(metadata=VariableCollection(independent_variables=[IV(name='example', ...
-
-        >>> history_ = [Result({'some': 'params'}, kind=ResultKind.PARAMS)]
-        >>> _history_to_kind(history_) # doctest: +ELLIPSIS
-        SimpleCycleData(..., params={'some': 'params'}, ...)
-
-    """
-    namespace = SimpleCycleData(
-        metadata=_get_last_data_with_default(
-            history, kind={ResultKind.METADATA}, default=VariableCollection()
-        ),
-        params=_get_last_data_with_default(
-            history, kind={ResultKind.PARAMS}, default={}
-        ),
-        observations=_list_data(
-            _filter_history(history, kind={ResultKind.OBSERVATION})
-        ),
-        theories=_list_data(_filter_history(history, kind={ResultKind.THEORY})),
-        conditions=_list_data(_filter_history(history, kind={ResultKind.CONDITION})),
-    )
-    return namespace
-
-
 @dataclass(frozen=True)
 class Result(SupportsDataKind):
     """
@@ -477,38 +417,6 @@ class Result(SupportsDataKind):
     def __post_init__(self):
         if isinstance(self.kind, str):
             object.__setattr__(self, "kind", ResultKind(self.kind))
-
-
-def _list_data(data: Sequence[SupportsDataKind]):
-    """
-    Extract the `.data` attribute of each item in a sequence, and return as a list.
-
-    Examples:
-        >>> _list_data([])
-        []
-
-        >>> _list_data([Result("a"), Result("b")])
-        ['a', 'b']
-    """
-    return list(r.data for r in data)
-
-
-def _filter_history(data: Iterable[SupportsDataKind], kind: Set[ResultKind]):
-    return filter(lambda r: r.kind in kind, data)
-
-
-def _get_last(data: Sequence[SupportsDataKind], kind: Set[ResultKind]):
-    results_new_to_old = reversed(data)
-    last_of_kind = next(_filter_history(results_new_to_old, kind=kind))
-    return last_of_kind
-
-
-def _get_last_data_with_default(data: Sequence[SupportsDataKind], kind, default):
-    try:
-        result = _get_last(data, kind).data
-    except StopIteration:
-        result = default
-    return result
 
 
 def _init_result_list(
@@ -587,3 +495,95 @@ def _init_result_list(
                 data.append(Result(i, kind=kind))
 
     return data
+
+
+def _history_to_kind(history: Sequence[Result]) -> SimpleCycleData:
+    """
+    Convert a sequence of results into a SimpleCycleData instance:
+
+    Examples:
+        History might be empty
+        >>> history_ = []
+        >>> _history_to_kind(history_) # doctest: +NORMALIZE_WHITESPACE +ELLIPSIS
+        SimpleCycleData(metadata=VariableCollection(...), params={},
+                        conditions=[], observations=[], theories=[])
+
+        ... or with values for any or all of the parameters:
+        >>> history_ = _init_result_list(params={"some": "params"})
+        >>> _history_to_kind(history_) # doctest: +NORMALIZE_WHITESPACE +ELLIPSIS
+        SimpleCycleData(..., params={'some': 'params'}, ...)
+
+        >>> history_ += _init_result_list(conditions=["a condition"])
+        >>> _history_to_kind(history_) # doctest: +NORMALIZE_WHITESPACE +ELLIPSIS
+        SimpleCycleData(..., params={'some': 'params'}, conditions=['a condition'], ...)
+
+        >>> _history_to_kind(history_).params
+        {'some': 'params'}
+
+        >>> history_ += _init_result_list(observations=["an observation"])
+        >>> _history_to_kind(history_) # doctest: +NORMALIZE_WHITESPACE +ELLIPSIS
+        SimpleCycleData(..., params={'some': 'params'}, conditions=['a condition'],
+                        observations=['an observation'], ...)
+
+        >>> from sklearn.linear_model import LinearRegression
+        >>> history_ = [Result(LinearRegression(), kind=ResultKind.THEORY)]
+        >>> _history_to_kind(history_) # doctest: +ELLIPSIS
+        SimpleCycleData(..., theories=[LinearRegression()])
+
+        >>> from autora.variable import VariableCollection, IV
+        >>> metadata = VariableCollection(independent_variables=[IV(name="example")])
+        >>> history_ = [Result(metadata, kind=ResultKind.METADATA)]
+        >>> _history_to_kind(history_) # doctest: +ELLIPSIS
+        SimpleCycleData(metadata=VariableCollection(independent_variables=[IV(name='example', ...
+
+        >>> history_ = [Result({'some': 'params'}, kind=ResultKind.PARAMS)]
+        >>> _history_to_kind(history_) # doctest: +ELLIPSIS
+        SimpleCycleData(..., params={'some': 'params'}, ...)
+
+    """
+    namespace = SimpleCycleData(
+        metadata=_get_last_data_with_default(
+            history, kind={ResultKind.METADATA}, default=VariableCollection()
+        ),
+        params=_get_last_data_with_default(
+            history, kind={ResultKind.PARAMS}, default={}
+        ),
+        observations=_list_data(
+            _filter_history(history, kind={ResultKind.OBSERVATION})
+        ),
+        theories=_list_data(_filter_history(history, kind={ResultKind.THEORY})),
+        conditions=_list_data(_filter_history(history, kind={ResultKind.CONDITION})),
+    )
+    return namespace
+
+
+def _list_data(data: Sequence[SupportsDataKind]):
+    """
+    Extract the `.data` attribute of each item in a sequence, and return as a list.
+
+    Examples:
+        >>> _list_data([])
+        []
+
+        >>> _list_data([Result("a"), Result("b")])
+        ['a', 'b']
+    """
+    return list(r.data for r in data)
+
+
+def _filter_history(data: Iterable[SupportsDataKind], kind: Set[ResultKind]):
+    return filter(lambda r: r.kind in kind, data)
+
+
+def _get_last(data: Sequence[SupportsDataKind], kind: Set[ResultKind]):
+    results_new_to_old = reversed(data)
+    last_of_kind = next(_filter_history(results_new_to_old, kind=kind))
+    return last_of_kind
+
+
+def _get_last_data_with_default(data: Sequence[SupportsDataKind], kind, default):
+    try:
+        result = _get_last(data, kind).data
+    except StopIteration:
+        result = default
+    return result
