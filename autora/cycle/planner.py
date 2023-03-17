@@ -1,3 +1,6 @@
+"""
+Functions which look at state and output the next function to execute.
+"""
 import random
 
 from autora.cycle.protocol.v1 import (

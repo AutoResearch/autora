@@ -388,20 +388,21 @@ class Result(SupportsDataKind):
     """
     Container class for data and metadata.
 
-    >>> Result()
-    Result(data=None, kind=None)
+    Examples:
+        >>> Result()
+        Result(data=None, kind=None)
 
-    >>> Result("a")
-    Result(data='a', kind=None)
+        >>> Result("a")
+        Result(data='a', kind=None)
 
-    >>> Result(None, "THEORY")
-    Result(data=None, kind=ResultKind.THEORY)
+        >>> Result(None, "THEORY")
+        Result(data=None, kind=ResultKind.THEORY)
 
-    >>> Result(data="b")
-    Result(data='b', kind=None)
+        >>> Result(data="b")
+        Result(data='b', kind=None)
 
-    >>> Result("c", "OBSERVATION")
-    Result(data='c', kind=ResultKind.OBSERVATION)
+        >>> Result("c", "OBSERVATION")
+        Result(data='c', kind=ResultKind.OBSERVATION)
     """
 
     data: Optional[Any] = None

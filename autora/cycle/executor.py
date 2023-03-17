@@ -1,4 +1,6 @@
-""" Executors for the AutoRA Cycle."""
+"""
+Objects for handling input and outputs from experimentalists, experiment runners and theorists.
+"""
 
 from __future__ import annotations
 

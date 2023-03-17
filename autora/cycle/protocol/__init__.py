@@ -1,0 +1,1 @@
+""" Specifications of object types. """
