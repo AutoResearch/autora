@@ -28,11 +28,11 @@ def last_result_kind_planner(
     Examples:
         We initialize a new list to run our planner on:
         >>> from autora.cycle.state import CycleStateHistory
-        >>> state = CycleStateHistory()
+        >>> state_ = CycleStateHistory()
 
         We simulate a productive executor_collection using a SimpleNamespace
         >>> from types import SimpleNamespace
-        >>> executor_collection = SimpleNamespace(
+        >>> executor_collection_ = SimpleNamespace(
         ...     experimentalist = "experimentalist",
         ...     experiment_runner = "experiment_runner",
         ...     theorist = "theorist",
@@ -40,23 +40,23 @@ def last_result_kind_planner(
 
         Based on the results available in the state, we can get the next kind of executor we need.
         When we have no results of any kind, we get an experimentalist:
-        >>> last_result_kind_planner(state, executor_collection)
+        >>> last_result_kind_planner(state_, executor_collection_)
         'experimentalist'
 
         ... or if we had produced conditions, then we could run an experiment
         >>> from autora.cycle.state import Result
-        >>> state = state.update(conditions=["some condition"])
-        >>> last_result_kind_planner(state, executor_collection)
+        >>> state_ = state_.update(conditions=["some condition"])
+        >>> last_result_kind_planner(state_, executor_collection_)
         'experiment_runner'
 
         ... or if we last produced observations, then we could now run the theorist:
-        >>> state = state.update(observations=["some observation"])
-        >>> last_result_kind_planner(state, executor_collection)
+        >>> state_ = state_.update(observations=["some observation"])
+        >>> last_result_kind_planner(state_, executor_collection_)
         'theorist'
 
         ... or if we last produced a theory, then we could now run the experimentalist:
-        >>> state = state.update(theories=["some theory"])
-        >>> last_result_kind_planner(state, executor_collection)
+        >>> state_ = state_.update(theories=["some theory"])
+        >>> last_result_kind_planner(state_, executor_collection_)
         'experimentalist'
 
     """
