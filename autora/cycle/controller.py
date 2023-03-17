@@ -101,9 +101,9 @@ class Controller:
 
         self.planner = planner
 
-    def run(self, num_cycles: int = 1):
+    def run(self, num_steps: int = 1):
         """Execute the next step in the cycle."""
-        for i in range(num_cycles):
+        for i in range(num_steps):
             next(self)
         return self
 

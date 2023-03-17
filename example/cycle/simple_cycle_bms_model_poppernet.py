@@ -74,7 +74,7 @@ seed_cycle = Cycle(
 )
 
 # run seed cycle
-seed_cycle.run(num_cycles=1)
+seed_cycle.run(num_steps=1)
 
 seed_model = seed_cycle.data.theories[0].model_
 seed_x = seed_cycle.data.conditions[0]
@@ -112,7 +112,7 @@ cycle = Cycle(
     experimentalist=popper_experimentalist,
     experiment_runner=synthetic_experiment_runner,
 )
-cycle.run(num_cycles=1)
+cycle.run(num_steps=1)
 
 # plot output of architecture search
 all_obs = np.row_stack(seed_cycle.data.observations)
