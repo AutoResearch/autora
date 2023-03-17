@@ -1,3 +1,4 @@
+""" Functions for handling a sequence of CycleState updates """
 from __future__ import annotations
 
 import copy
@@ -13,8 +14,8 @@ def _get_state_dependent_properties(state: SupportsCycleState):
     """
     Examples:
         Even with an empty data object, we can initialize the dictionary,
-        >>> from autora.cycle.state import SimpleCycleDataHistory
-        >>> state_dependent_properties = _get_state_dependent_properties(SimpleCycleDataHistory())
+        >>> from autora.cycle.state import CycleState
+        >>> state_dependent_properties = _get_state_dependent_properties(CycleState())
 
         ... but it will raise an exception if a value isn't yet available when we try to use it
         >>> state_dependent_properties["%theories[-1]%"] # doctest: +ELLIPSIS
@@ -97,8 +98,8 @@ def resolve_state_params(state: SupportsCycleState) -> Dict:
     Returns the `params` attribute of the input, with `cycle properties` resolved.
 
     Examples:
-        >>> from autora.cycle.state import SimpleCycleDataHistory
-        >>> s = SimpleCycleDataHistory(theories=["the first theory", "the second theory"],
+        >>> from autora.cycle.state import CycleStateHistory
+        >>> s = CycleStateHistory(theories=["the first theory", "the second theory"],
         ...     params={"experimentalist": {"source": "%theories[-1]%"}})
         >>> resolve_state_params(s)
         {'experimentalist': {'source': 'the second theory'}}

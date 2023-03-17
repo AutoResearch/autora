@@ -1,11 +1,4 @@
-"""
-Classes for storing and passing a cycle's state, including its history.
-
-We provide two views of a cycle's state:
-- by "history" – first datum, second datum ... last datum – where the results are strictly
-  sequential.
-- by "kind" – metadata, parameter, condition, observation, theory
-"""
+""" Classes for storing and passing a cycle's state, including its history. """
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -15,11 +8,11 @@ from numpy.typing import ArrayLike
 from sklearn.base import BaseEstimator
 
 from autora.cycle.protocol.v1 import ResultKind, SupportsDataKind
-from autora.cycle.state.simple import SimpleCycleData
+from autora.cycle.state.simple import CycleState
 from autora.variable import VariableCollection
 
 
-class SimpleCycleDataHistory:
+class CycleStateHistory:
     """
     An immutable object for tracking the state and history of an AER cycle.
     """
@@ -45,34 +38,34 @@ class SimpleCycleDataHistory:
 
         Examples:
             Empty input leads to an empty state:
-            >>> SimpleCycleDataHistory()
-            SimpleCycleDataHistory([])
+            >>> CycleStateHistory()
+            CycleStateHistory([])
 
             ... or with values for any or all of the parameters:
             >>> from autora.variable import VariableCollection
-            >>> SimpleCycleDataHistory(metadata=VariableCollection()) # doctest: +ELLIPSIS
-            SimpleCycleDataHistory([Result(data=VariableCollection(...), kind=ResultKind.METADATA)])
+            >>> CycleStateHistory(metadata=VariableCollection()) # doctest: +ELLIPSIS
+            CycleStateHistory([Result(data=VariableCollection(...), kind=ResultKind.METADATA)])
 
-            >>> SimpleCycleDataHistory(params={"some": "params"})
-            SimpleCycleDataHistory([Result(data={'some': 'params'}, kind=ResultKind.PARAMS)])
+            >>> CycleStateHistory(params={"some": "params"})
+            CycleStateHistory([Result(data={'some': 'params'}, kind=ResultKind.PARAMS)])
 
-            >>> SimpleCycleDataHistory(conditions=["a condition"])
-            SimpleCycleDataHistory([Result(data='a condition', kind=ResultKind.CONDITION)])
+            >>> CycleStateHistory(conditions=["a condition"])
+            CycleStateHistory([Result(data='a condition', kind=ResultKind.CONDITION)])
 
-            >>> SimpleCycleDataHistory(observations=["an observation"])
-            SimpleCycleDataHistory([Result(data='an observation', kind=ResultKind.OBSERVATION)])
+            >>> CycleStateHistory(observations=["an observation"])
+            CycleStateHistory([Result(data='an observation', kind=ResultKind.OBSERVATION)])
 
             >>> from sklearn.linear_model import LinearRegression
-            >>> SimpleCycleDataHistory(theories=[LinearRegression()])
-            SimpleCycleDataHistory([Result(data=LinearRegression(), kind=ResultKind.THEORY)])
+            >>> CycleStateHistory(theories=[LinearRegression()])
+            CycleStateHistory([Result(data=LinearRegression(), kind=ResultKind.THEORY)])
 
             Parameters passed to the constructor are included in the history in the following order:
             `history`, `metadata`, `params`, `conditions`, `observations`, `theories`
-            >>> SimpleCycleDataHistory(theories=['t1', 't2'], conditions=['c1', 'c2'],
+            >>> CycleStateHistory(theories=['t1', 't2'], conditions=['c1', 'c2'],
             ...     observations=['o1', 'o2'], params={'a': 'param'}, metadata=VariableCollection(),
             ...     history=[Result("from history", ResultKind.METADATA)]
             ... )  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
-            SimpleCycleDataHistory([Result(data='from history', kind=ResultKind.METADATA),
+            CycleStateHistory([Result(data='from history', kind=ResultKind.METADATA),
                                     Result(data=VariableCollection(...), kind=ResultKind.METADATA),
                                     Result(data={'a': 'param'}, kind=ResultKind.PARAMS),
                                     Result(data='c1', kind=ResultKind.CONDITION),
@@ -111,31 +104,31 @@ class SimpleCycleDataHistory:
 
         Examples:
             The initial object is empty:
-            >>> s0 = SimpleCycleDataHistory()
+            >>> s0 = CycleStateHistory()
             >>> s0
-            SimpleCycleDataHistory([])
+            CycleStateHistory([])
 
             We can update the metadata using the `.update` method:
             >>> from autora.variable import VariableCollection
             >>> s1 = s0.update(metadata=VariableCollection())
             >>> s1  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
-            SimpleCycleDataHistory([Result(data=VariableCollection(...), kind=ResultKind.METADATA)])
+            CycleStateHistory([Result(data=VariableCollection(...), kind=ResultKind.METADATA)])
 
             ... the original object is unchanged:
             >>> s0
-            SimpleCycleDataHistory([])
+            CycleStateHistory([])
 
             We can update the metadata again:
             >>> s2 = s1.update(metadata=VariableCollection(["some IV"]))
             >>> s2._by_kind  # doctest: +ELLIPSIS
-            SimpleCycleData(metadata=VariableCollection(independent_variables=['some IV'],...), ...)
+            CycleState(metadata=VariableCollection(independent_variables=['some IV'],...), ...)
 
             ... and we see that there is only ever one metadata object returned.
 
             Params is treated the same way as metadata:
             >>> sp = s0.update(params={'first': 'params'})
             >>> sp
-            SimpleCycleDataHistory([Result(data={'first': 'params'}, kind=ResultKind.PARAMS)])
+            CycleStateHistory([Result(data={'first': 'params'}, kind=ResultKind.PARAMS)])
 
             ... where only the most recent "params" object is returned from the `.params` property.
             >>> sp = sp.update(params={'second': 'params'})
@@ -144,19 +137,19 @@ class SimpleCycleDataHistory:
 
             ... however, the full history of the params objects remains available, if needed:
             >>> sp  # doctest: +NORMALIZE_WHITESPACE
-            SimpleCycleDataHistory([Result(data={'first': 'params'}, kind=ResultKind.PARAMS),
+            CycleStateHistory([Result(data={'first': 'params'}, kind=ResultKind.PARAMS),
                                     Result(data={'second': 'params'}, kind=ResultKind.PARAMS)])
 
             When we update the conditions, observations or theories, a new entry is added to the
             history:
             >>> s3 = s0.update(theories=["1st theory"])
             >>> s3  # doctest: +NORMALIZE_WHITESPACE
-            SimpleCycleDataHistory([Result(data='1st theory', kind=ResultKind.THEORY)])
+            CycleStateHistory([Result(data='1st theory', kind=ResultKind.THEORY)])
 
             ... so we can see the history of all the theories, for instance.
             >>> s3 = s3.update(theories=["2nd theory"])  # doctest: +NORMALIZE_WHITESPACE
             >>> s3  # doctest: +NORMALIZE_WHITESPACE
-            SimpleCycleDataHistory([Result(data='1st theory', kind=ResultKind.THEORY),
+            CycleStateHistory([Result(data='1st theory', kind=ResultKind.THEORY),
                                     Result(data='2nd theory', kind=ResultKind.THEORY)])
 
             ... and the full history of theories is available using the `.theories` parameter:
@@ -166,36 +159,36 @@ class SimpleCycleDataHistory:
             The same for the observations:
             >>> s4 = s0.update(observations=["1st observation"])
             >>> s4
-            SimpleCycleDataHistory([Result(data='1st observation', kind=ResultKind.OBSERVATION)])
+            CycleStateHistory([Result(data='1st observation', kind=ResultKind.OBSERVATION)])
 
             >>> s4.update(observations=["2nd observation"]
             ... )  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
-            SimpleCycleDataHistory([Result(data='1st observation', kind=ResultKind.OBSERVATION),
+            CycleStateHistory([Result(data='1st observation', kind=ResultKind.OBSERVATION),
                                     Result(data='2nd observation', kind=ResultKind.OBSERVATION)])
 
 
             The same for the conditions:
             >>> s5 = s0.update(conditions=["1st condition"])
             >>> s5
-            SimpleCycleDataHistory([Result(data='1st condition', kind=ResultKind.CONDITION)])
+            CycleStateHistory([Result(data='1st condition', kind=ResultKind.CONDITION)])
 
             >>> s5.update(conditions=["2nd condition"])  # doctest: +NORMALIZE_WHITESPACE
-            SimpleCycleDataHistory([Result(data='1st condition', kind=ResultKind.CONDITION),
+            CycleStateHistory([Result(data='1st condition', kind=ResultKind.CONDITION),
                                     Result(data='2nd condition', kind=ResultKind.CONDITION)])
 
             You can also update with multiple conditions, observations and theories:
             >>> s0.update(conditions=['c1', 'c2'])  # doctest: +NORMALIZE_WHITESPACE
-            SimpleCycleDataHistory([Result(data='c1', kind=ResultKind.CONDITION),
+            CycleStateHistory([Result(data='c1', kind=ResultKind.CONDITION),
                                     Result(data='c2', kind=ResultKind.CONDITION)])
 
             >>> s0.update(theories=['t1', 't2'], metadata={'m': 1}) # doctest: +NORMALIZE_WHITESPACE
-            SimpleCycleDataHistory([Result(data={'m': 1}, kind=ResultKind.METADATA),
+            CycleStateHistory([Result(data={'m': 1}, kind=ResultKind.METADATA),
                                     Result(data='t1', kind=ResultKind.THEORY),
                                     Result(data='t2', kind=ResultKind.THEORY)])
 
             >>> s0.update(theories=['t1'], observations=['o1'], metadata={'m': 1}
             ... )  # doctest: +NORMALIZE_WHITESPACE
-            SimpleCycleDataHistory([Result(data={'m': 1}, kind=ResultKind.METADATA),
+            CycleStateHistory([Result(data={'m': 1}, kind=ResultKind.METADATA),
                                     Result(data='o1', kind=ResultKind.OBSERVATION),
                                     Result(data='t1', kind=ResultKind.THEORY)])
 
@@ -215,7 +208,7 @@ class SimpleCycleDataHistory:
         )
         new_full_history = self._history + history_extension
 
-        return SimpleCycleDataHistory(history=new_full_history)
+        return CycleStateHistory(history=new_full_history)
 
     def __repr__(self):
         return f"{type(self).__name__}({self.history})"
@@ -230,7 +223,7 @@ class SimpleCycleDataHistory:
 
         Examples:
             The initial object is empty:
-            >>> s = SimpleCycleDataHistory()
+            >>> s = CycleStateHistory()
 
             ... and returns an emtpy metadata object
             >>> s.metadata
@@ -258,7 +251,7 @@ class SimpleCycleDataHistory:
 
         Examples:
             Params is treated the same way as metadata:
-            >>> s = SimpleCycleDataHistory()
+            >>> s = CycleStateHistory()
             >>> s = s.update(params={'first': 'params'})
             >>> s.params
             {'first': 'params'}
@@ -270,7 +263,7 @@ class SimpleCycleDataHistory:
 
             ... however, the full history of the params objects remains available, if needed:
             >>> s  # doctest: +NORMALIZE_WHITESPACE
-            SimpleCycleDataHistory([Result(data={'first': 'params'}, kind=ResultKind.PARAMS),
+            CycleStateHistory([Result(data={'first': 'params'}, kind=ResultKind.PARAMS),
                                     Result(data={'second': 'params'}, kind=ResultKind.PARAMS)])
         """
         return self._by_kind.params
@@ -282,7 +275,7 @@ class SimpleCycleDataHistory:
 
         Examples:
             View the sequence of theories with one conditions:
-            >>> s = SimpleCycleDataHistory(conditions=[(1,2,3,)])
+            >>> s = CycleStateHistory(conditions=[(1,2,3,)])
             >>> s.conditions
             [(1, 2, 3)]
 
@@ -302,7 +295,7 @@ class SimpleCycleDataHistory:
 
         Examples:
             The sequence of all observations is returned
-            >>> s = SimpleCycleDataHistory(observations=["1st observation"])
+            >>> s = CycleStateHistory(observations=["1st observation"])
             >>> s.observations
             ['1st observation']
 
@@ -321,7 +314,7 @@ class SimpleCycleDataHistory:
 
         Examples:
             View the sequence of theories with one theory:
-            >>> s = SimpleCycleDataHistory(theories=["1st theory"])
+            >>> s = CycleStateHistory(theories=["1st theory"])
             >>> s.theories  # doctest: +NORMALIZE_WHITESPACE
             ['1st theory']
 
@@ -339,7 +332,7 @@ class SimpleCycleDataHistory:
 
         Examples:
             We initialze some history:
-            >>> s = SimpleCycleDataHistory(theories=['t1', 't2'], conditions=['c1', 'c2'],
+            >>> s = CycleStateHistory(theories=['t1', 't2'], conditions=['c1', 'c2'],
             ...     observations=['o1', 'o2'], params={'a': 'param'}, metadata=VariableCollection(),
             ...     history=[Result("from history", ResultKind.METADATA)])
 
@@ -366,27 +359,27 @@ class SimpleCycleDataHistory:
         """
         return self._history
 
-    def filter_by(self, kind=Set[Union[str, ResultKind]]) -> SimpleCycleDataHistory:
+    def filter_by(self, kind=Set[Union[str, ResultKind]]) -> CycleStateHistory:
         """
         Return a copy of the object with only data belonging to the specified kinds.
 
         Examples:
-            >>> s = SimpleCycleDataHistory(theories=['t1', 't2'], conditions=['c1', 'c2'],
+            >>> s = CycleStateHistory(theories=['t1', 't2'], conditions=['c1', 'c2'],
             ...     observations=['o1', 'o2'], params={'a': 'param'}, metadata=VariableCollection(),
             ...     history=[Result("from history", ResultKind.METADATA)])
 
             >>> s.filter_by(kind={"THEORY"})   # doctest: +NORMALIZE_WHITESPACE
-            SimpleCycleDataHistory([Result(data='t1', kind=ResultKind.THEORY),
+            CycleStateHistory([Result(data='t1', kind=ResultKind.THEORY),
                                     Result(data='t2', kind=ResultKind.THEORY)])
 
             >>> s.filter_by(kind={ResultKind.OBSERVATION})  # doctest: +NORMALIZE_WHITESPACE
-            SimpleCycleDataHistory([Result(data='o1', kind=ResultKind.OBSERVATION),
+            CycleStateHistory([Result(data='o1', kind=ResultKind.OBSERVATION),
                                     Result(data='o2', kind=ResultKind.OBSERVATION)])
 
         """
         kind_ = {ResultKind(s) for s in kind}
         filtered_history = _filter_history(self._history, kind_)
-        new_object = SimpleCycleDataHistory(history=filtered_history)
+        new_object = CycleStateHistory(history=filtered_history)
         return new_object
 
 
@@ -497,51 +490,51 @@ def _init_result_list(
     return data
 
 
-def _history_to_kind(history: Sequence[Result]) -> SimpleCycleData:
+def _history_to_kind(history: Sequence[Result]) -> CycleState:
     """
-    Convert a sequence of results into a SimpleCycleData instance:
+    Convert a sequence of results into a CycleState instance:
 
     Examples:
         History might be empty
         >>> history_ = []
         >>> _history_to_kind(history_) # doctest: +NORMALIZE_WHITESPACE +ELLIPSIS
-        SimpleCycleData(metadata=VariableCollection(...), params={},
+        CycleState(metadata=VariableCollection(...), params={},
                         conditions=[], observations=[], theories=[])
 
         ... or with values for any or all of the parameters:
         >>> history_ = _init_result_list(params={"some": "params"})
         >>> _history_to_kind(history_) # doctest: +NORMALIZE_WHITESPACE +ELLIPSIS
-        SimpleCycleData(..., params={'some': 'params'}, ...)
+        CycleState(..., params={'some': 'params'}, ...)
 
         >>> history_ += _init_result_list(conditions=["a condition"])
         >>> _history_to_kind(history_) # doctest: +NORMALIZE_WHITESPACE +ELLIPSIS
-        SimpleCycleData(..., params={'some': 'params'}, conditions=['a condition'], ...)
+        CycleState(..., params={'some': 'params'}, conditions=['a condition'], ...)
 
         >>> _history_to_kind(history_).params
         {'some': 'params'}
 
         >>> history_ += _init_result_list(observations=["an observation"])
         >>> _history_to_kind(history_) # doctest: +NORMALIZE_WHITESPACE +ELLIPSIS
-        SimpleCycleData(..., params={'some': 'params'}, conditions=['a condition'],
+        CycleState(..., params={'some': 'params'}, conditions=['a condition'],
                         observations=['an observation'], ...)
 
         >>> from sklearn.linear_model import LinearRegression
         >>> history_ = [Result(LinearRegression(), kind=ResultKind.THEORY)]
         >>> _history_to_kind(history_) # doctest: +ELLIPSIS
-        SimpleCycleData(..., theories=[LinearRegression()])
+        CycleState(..., theories=[LinearRegression()])
 
         >>> from autora.variable import VariableCollection, IV
         >>> metadata = VariableCollection(independent_variables=[IV(name="example")])
         >>> history_ = [Result(metadata, kind=ResultKind.METADATA)]
         >>> _history_to_kind(history_) # doctest: +ELLIPSIS
-        SimpleCycleData(metadata=VariableCollection(independent_variables=[IV(name='example', ...
+        CycleState(metadata=VariableCollection(independent_variables=[IV(name='example', ...
 
         >>> history_ = [Result({'some': 'params'}, kind=ResultKind.PARAMS)]
         >>> _history_to_kind(history_) # doctest: +ELLIPSIS
-        SimpleCycleData(..., params={'some': 'params'}, ...)
+        CycleState(..., params={'some': 'params'}, ...)
 
     """
-    namespace = SimpleCycleData(
+    namespace = CycleState(
         metadata=_get_last_data_with_default(
             history, kind={ResultKind.METADATA}, default=VariableCollection()
         ),

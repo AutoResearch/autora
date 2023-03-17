@@ -24,8 +24,8 @@ def last_result_kind_planner(
 
     Examples:
         We initialize a new list to run our planner on:
-        >>> from autora.cycle.state import SimpleCycleDataHistory
-        >>> state = SimpleCycleDataHistory()
+        >>> from autora.cycle.state import CycleStateHistory
+        >>> state = CycleStateHistory()
 
         We simulate a productive executor_collection using a SimpleNamespace
         >>> from types import SimpleNamespace
