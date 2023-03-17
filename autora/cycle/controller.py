@@ -6,6 +6,7 @@ from typing import Callable, Dict, Optional
 
 from autora.cycle.executor import FullCycleExecutorCollection
 from autora.cycle.planner import full_cycle_planner
+from autora.cycle.protocol.v1 import Planner
 from autora.cycle.state import CycleStateHistory
 from autora.variable import VariableCollection
 
@@ -60,7 +61,7 @@ class Controller:
         params: Optional[Dict] = None,
         executor_collection=FullCycleExecutorCollection,
         state_collection=CycleStateHistory,
-        planner=full_cycle_planner,
+        planner: Planner = full_cycle_planner,
     ):
         """
         Args:
