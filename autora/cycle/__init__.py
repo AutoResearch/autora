@@ -282,11 +282,13 @@ Examples:
     matching next step. This means that seeding is relatively simple.
     >>> from autora.cycle.executor import OnlineExecutorCollection
     >>> from autora.cycle.planner import last_result_kind_planner
+    >>> from autora.cycle.state import CycleStateHistory
     >>> def monitor(cycle):
     ...     print(f"MONITOR: Generated new {cycle.state.history[-1].kind}")
     >>> cycle_with_last_result_planner = Controller(
     ...     planner=last_result_kind_planner,
     ...     executor_collection=OnlineExecutorCollection,
+    ...     state_collection=CycleStateHistory,
     ...     monitor=monitor,
     ...     metadata=metadata_0,
     ...     theorist=example_theorist,
@@ -309,6 +311,7 @@ Examples:
     >>> cycle_with_seed_observation = Controller(
     ...     planner=last_result_kind_planner,
     ...     executor_collection=OnlineExecutorCollection,
+    ...     state_collection=CycleStateHistory,
     ...     monitor=monitor,
     ...     metadata=metadata_0,
     ...     theorist=example_theorist,
@@ -342,6 +345,7 @@ Examples:
     >>> cycle_with_random_planner = Controller(
     ...     planner=random_operation_planner,
     ...     executor_collection=OnlineExecutorCollection,
+    ...     state_collection=CycleStateHistory,
     ...     monitor=monitor,
     ...     metadata=metadata_0,
     ...     theorist=example_theorist,

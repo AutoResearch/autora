@@ -80,7 +80,7 @@ class SupportsCycleState(
 ):
     ...
 
-    def __init__(self, **kwargs) -> None:
+    def __init__(self, *args, **kwargs) -> None:
         ...
 
 
@@ -92,6 +92,9 @@ class SupportsCycleStateHistory(
     Protocol,
 ):
     ...
+
+    def __init__(self, *args, **kwargs) -> None:
+        ...
 
 
 class ResultKind(str, Enum):

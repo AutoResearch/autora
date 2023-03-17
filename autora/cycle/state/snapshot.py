@@ -5,11 +5,12 @@ from typing import Dict, List
 from numpy.typing import ArrayLike
 from sklearn.base import BaseEstimator
 
+from autora.cycle.protocol.v1 import SupportsCycleState
 from autora.variable import VariableCollection
 
 
 @dataclass(frozen=True)
-class CycleState:
+class CycleState(SupportsCycleState):
     """An object passed between and updated by processing steps in the Controller."""
 
     # Single values
