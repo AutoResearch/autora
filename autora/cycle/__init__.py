@@ -55,7 +55,7 @@ Examples:
     <...Controller object at 0x...>
 
     We can run the cycle by calling the run method:
-    >>> cycle.run(num_steps=3)  # doctest: +ELLIPSIS
+    >>> cycle.run(num_cycles=3)  # doctest: +ELLIPSIS
     Generated 1 theories
     Generated 2 theories
     Generated 3 theories
@@ -136,7 +136,7 @@ Examples:
     Generated 11 theories
 
     ... or continue to run as long as we like:
-    >>> _ = cycle.run(num_steps=100) # doctest: +ELLIPSIS
+    >>> _ = cycle.run(num_cycles=100) # doctest: +ELLIPSIS
     Generated 12 theories
     ...
     Generated 111 theories
@@ -236,7 +236,7 @@ Examples:
     array([2])
 
     We can continue to run the cycler, each time we add more to the list of "excluded" options:
-    >>> _ = cycle_with_state_dep_properties.run(num_steps=5)
+    >>> _ = cycle_with_state_dep_properties.run(num_cycles=5)
     >>> cycle_with_state_dep_properties.data.conditions
     [array([2]), array([6]), array([5]), array([7]), array([3]), array([4])]
 
@@ -257,7 +257,7 @@ Examples:
     >>> cycle_with_state_dep_properties.monitor = None
 
     We can continue until we've sampled all of the options:
-    >>> _ = cycle_with_state_dep_properties.run(num_steps=2)
+    >>> _ = cycle_with_state_dep_properties.run(num_cycles=2)
     >>> cycle_with_state_dep_properties.data.conditions # doctest: +NORMALIZE_WHITESPACE
     [array([2]), array([6]), array([5]), array([7]), array([3]), \
     array([4]), array([9]), array([0]), array([8]), array([1])]
