@@ -1,6 +1,4 @@
-"""
-The basic cycle controller for AER.
-"""
+"""  The basic cycle controller for AER. """
 from __future__ import annotations
 
 import logging
@@ -48,7 +46,7 @@ class Controller:
 
         ### Basic Usage
 
-        Aim: Use the SimpleCycle to recover a simple ground truth theory from noisy data.
+        Aim: Use the Controller to recover a simple ground truth theory from noisy data.
 
         >>> def ground_truth(x):
         ...     return x + 1
@@ -83,7 +81,7 @@ class Controller:
         >>> from sklearn.linear_model import LinearRegression
         >>> example_theorist = LinearRegression()
 
-        We initialize the SimpleCycle with the metadata describing the domain of the theory,
+        We initialize the Controller with the metadata describing the domain of the theory,
         the theorist, experimentalist and experiment runner,
         as well as a monitor which will let us know which cycle we're currently on.
         >>> cycle = Controller(
