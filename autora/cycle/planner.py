@@ -92,7 +92,7 @@ def random_operation_planner(
     Examples:
         We simulate a productive executor_collection using a SimpleNamespace
         >>> from types import SimpleNamespace
-        >>> executor_collection = SimpleNamespace(
+        >>> executor_collection_ = SimpleNamespace(
         ...     experimentalist = "experimentalist",
         ...     experiment_runner = "experiment_runner",
         ...     theorist = "theorist",
@@ -105,11 +105,11 @@ def random_operation_planner(
         Now we can begin to see which operations are returned by the planner. The first (for this
         seed) is the theorist. (The first argument is provided for compatibility with the
         protocol, but is ignored.)
-        >>> random_operation_planner([], executor_collection)
+        >>> random_operation_planner([], executor_collection_)
         'theorist'
 
         If we evaluate again, a random executor will be suggested each time
-        >>> [random_operation_planner([], executor_collection) for i in range(5)]
+        >>> [random_operation_planner([], executor_collection_) for i in range(5)]
         ['experimentalist', 'experimentalist', 'theorist', 'experiment_runner', 'experimentalist']
 
     """
