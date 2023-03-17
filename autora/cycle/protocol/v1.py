@@ -20,7 +20,7 @@ class SupportsDataKind(Protocol):
 class Planner(Protocol):
     """A Callable which, based on some state, returns an Executor."""
 
-    def __call__(self, state_or_history, executor_collection) -> Executor:
+    def __call__(self, __state, __executor_collection) -> Executor:
         ...
 
 
