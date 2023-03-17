@@ -10,7 +10,7 @@ from autora.variable import VariableCollection
 
 @dataclass(frozen=True)
 class CycleState:
-    """An object passed between and updated by processing steps in the SimpleCycle."""
+    """An object passed between and updated by processing steps in the Controller."""
 
     # Single values
     metadata: VariableCollection = field(default_factory=VariableCollection)

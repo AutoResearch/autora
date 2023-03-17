@@ -15,7 +15,7 @@ from autora.variable import VariableCollection
 _logger = logging.getLogger(__name__)
 
 
-class SimpleCycle:
+class Controller:
     """
     Runs an experimentalist, theorist and experiment runner in a loop.
 
@@ -86,7 +86,7 @@ class SimpleCycle:
         We initialize the SimpleCycle with the metadata describing the domain of the theory,
         the theorist, experimentalist and experiment runner,
         as well as a monitor which will let us know which cycle we're currently on.
-        >>> cycle = SimpleCycle(
+        >>> cycle = Controller(
         ...     metadata=metadata_0,
         ...     theorist=example_theorist,
         ...     experimentalist=example_experimentalist,
@@ -94,14 +94,14 @@ class SimpleCycle:
         ...     monitor=lambda cycle: print(f"Generated {len(cycle.data.theories)} theories"),
         ... )
         >>> cycle # doctest: +ELLIPSIS
-        <...SimpleCycle object at 0x...>
+        <...Controller object at 0x...>
 
         We can run the cycle by calling the run method:
         >>> cycle.run(num_cycles=3)  # doctest: +ELLIPSIS
         Generated 1 theories
         Generated 2 theories
         Generated 3 theories
-        <...SimpleCycle object at 0x...>
+        <...Controller object at 0x...>
 
         We can now interrogate the results. The first set of conditions which went into the
         experiment runner were:
@@ -147,15 +147,15 @@ class SimpleCycle:
         We can also run the cycle with more control over the execution flow:
         >>> next(cycle) # doctest: +ELLIPSIS
         Generated 4 theories
-        <...SimpleCycle object at 0x...>
+        <...Controller object at 0x...>
 
         >>> next(cycle) # doctest: +ELLIPSIS
         Generated 5 theories
-        <...SimpleCycle object at 0x...>
+        <...Controller object at 0x...>
 
         >>> next(cycle) # doctest: +ELLIPSIS
         Generated 6 theories
-        <...SimpleCycle object at 0x...>
+        <...Controller object at 0x...>
 
         We can continue to run the cycle as long as we like,
         with a simple arbitrary stopping condition like the number of theories generated:
@@ -193,7 +193,7 @@ class SimpleCycle:
         >>> example_experimentalist_with_parameters = make_pipeline([uniform_random_sampler])
 
         The cycle can handle that using the `params` keyword:
-        >>> cycle_with_parameters = SimpleCycle(
+        >>> cycle_with_parameters = Controller(
         ...     metadata=metadata_0,
         ...     theorist=example_theorist,
         ...     experimentalist=example_experimentalist_with_parameters,
@@ -253,7 +253,7 @@ class SimpleCycle:
         ...     custom_random_sampler
         ...     ]
         ... )
-        >>> cycle_with_state_dep_properties = SimpleCycle(
+        >>> cycle_with_state_dep_properties = Controller(
         ...     metadata=metadata_1,
         ...     theorist=example_theorist,
         ...     experimentalist=unobserved_data_experimentalist,
@@ -319,7 +319,7 @@ class SimpleCycle:
         >>> from autora.cycle.planner import last_result_kind_planner
         >>> def monitor(cycle):
         ...     print(f"MONITOR: Generated new {cycle.state.history[-1].kind}")
-        >>> cycle_with_last_result_planner = SimpleCycle(
+        >>> cycle_with_last_result_planner = Controller(
         ...     planner=last_result_kind_planner,
         ...     executor_collection=OnlineExecutorCollection,
         ...     monitor=monitor,
@@ -341,7 +341,7 @@ class SimpleCycle:
         However, if we seed the same cycle with observations, then its first Executor will be the
         theorist:
         >>> from autora.cycle.state import Result
-        >>> cycle_with_seed_observation = SimpleCycle(
+        >>> cycle_with_seed_observation = Controller(
         ...     planner=last_result_kind_planner,
         ...     executor_collection=OnlineExecutorCollection,
         ...     monitor=monitor,
@@ -367,7 +367,7 @@ class SimpleCycle:
         >>> from autora.cycle.planner import random_operation_planner
         >>> def monitor(cycle):
         ...     print(f"MONITOR: Generated new {cycle.state.history[-1].kind}")
-        >>> cycle_with_random_planner = SimpleCycle(
+        >>> cycle_with_random_planner = Controller(
         ...     planner=random_operation_planner,
         ...     executor_collection=OnlineExecutorCollection,
         ...     monitor=monitor,
@@ -418,7 +418,7 @@ class SimpleCycle:
         theorist,
         experimentalist,
         experiment_runner,
-        monitor: Optional[Callable[[SimpleCycle], None]] = None,
+        monitor: Optional[Callable[[Controller], None]] = None,
         params: Optional[Dict] = None,
         executor_collection=FullCycleExecutorCollection,
         state_collection=CycleStateHistory,
@@ -509,9 +509,9 @@ class SimpleCycle:
     def params(self):
         """
         Examples:
-            >>> from autora.cycle.simple import SimpleCycle
+            >>> from autora.cycle.simple import Controller
             >>> p = {"some": "params"}
-            >>> c = SimpleCycle(metadata=None, theorist=None, experimentalist=None,
+            >>> c = Controller(metadata=None, theorist=None, experimentalist=None,
             ...                 experiment_runner=None, params=p)
             >>> c.params
             {'some': 'params'}
@@ -532,9 +532,9 @@ class SimpleCycle:
         The theorist – scikit-learn-compatible estimator – used when running the cycle.
 
         Examples:
-            >>> from autora.cycle.simple import SimpleCycle
+            >>> from autora.cycle.simple import Controller
             >>> from sklearn.linear_model import LinearRegression, PoissonRegressor
-            >>> c = SimpleCycle(metadata=None, theorist=LinearRegression(), experimentalist=None,
+            >>> c = Controller(metadata=None, theorist=LinearRegression(), experimentalist=None,
             ...                 experiment_runner=None)
             >>> c.theorist
             LinearRegression()
@@ -556,9 +556,9 @@ class SimpleCycle:
         The experimentalist Pipeline used when running the cycle.
 
         Examples:
-            >>> from autora.cycle.simple import SimpleCycle
+            >>> from autora.cycle.simple import Controller
             >>> from autora.experimentalist.pipeline import Pipeline
-            >>> c = SimpleCycle(metadata=None, theorist=None, experiment_runner=None,
+            >>> c = Controller(metadata=None, theorist=None, experiment_runner=None,
             ...                 experimentalist=Pipeline([("pool", [11,12,13])]))
             >>> c.experimentalist
             Pipeline(steps=[('pool', [11, 12, 13])], params={})
@@ -578,9 +578,9 @@ class SimpleCycle:
     def experiment_runner(self):
         """
         Examples:
-            >>> from autora.cycle.simple import SimpleCycle
+            >>> from autora.cycle.simple import Controller
             >>> def plus_one(x): return x + 1
-            >>> c = SimpleCycle(metadata=None, theorist=None, experimentalist=None,
+            >>> c = Controller(metadata=None, theorist=None, experimentalist=None,
             ...                 experiment_runner=plus_one)
             >>> c.experiment_runner  # doctest: +ELLIPSIS
             <function plus_one at 0x...>
