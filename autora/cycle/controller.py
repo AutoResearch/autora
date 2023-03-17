@@ -16,8 +16,8 @@ class Controller:
     """
     Runs an experimentalist, theorist and experiment runner in a loop.
 
-    Once initialized, the `cycle` can be started by calling `next(cycle)` or using the `cycle.run`
-        method.
+    Once initialized, the `controller` can be started by calling `next(controller)` or using the
+        `controller.run` method.
 
     Attributes:
         state (CycleState or CycleStateHistory): an object which is updated during the cycle and
@@ -44,6 +44,9 @@ class Controller:
         planner (Callable): a function which takes the `state` as input and returns one of the
             `executor_collection` methods. This must be compatible with both the `state` and
             the `executor_collection`.
+
+        monitor (Callable): a function which takes the controller as input and is called at
+            the end of each step.
 
     """
 
