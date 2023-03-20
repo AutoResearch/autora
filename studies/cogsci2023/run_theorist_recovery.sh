@@ -2,7 +2,7 @@
 
 #SBATCH -J TheoristRecovery
 #SBATCH --time=23:00:00
-#SBATCH --array=0-139
+#SBATCH --array=0-159
 #SBATCH --mem=4GB
 #SBATCH -n 1
 
