@@ -14,8 +14,8 @@ def _get_state_dependent_properties(state: SupportsControllerState):
     """
     Examples:
         Even with an empty data object, we can initialize the dictionary,
-        >>> from autora.controller.state import ControllerState
-        >>> state_dependent_properties = _get_state_dependent_properties(ControllerState())
+        >>> from autora.controller.state import Snapshot
+        >>> state_dependent_properties = _get_state_dependent_properties(Snapshot())
 
         ... but it will raise an exception if a value isn't yet available when we try to use it
         >>> state_dependent_properties["%theories[-1]%"] # doctest: +ELLIPSIS
@@ -98,8 +98,8 @@ def resolve_state_params(state: SupportsControllerState) -> Dict:
     Returns the `params` attribute of the input, with `cycle properties` resolved.
 
     Examples:
-        >>> from autora.controller.state import ControllerStateHistory
-        >>> s = ControllerStateHistory(theories=["the first theory", "the second theory"],
+        >>> from autora.controller.state import History
+        >>> s = History(theories=["the first theory", "the second theory"],
         ...     params={"experimentalist": {"source": "%theories[-1]%"}})
         >>> resolve_state_params(s)
         {'experimentalist': {'source': 'the second theory'}}

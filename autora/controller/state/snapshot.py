@@ -9,7 +9,7 @@ from autora.variable import VariableCollection
 
 
 @dataclass(frozen=True)
-class ControllerState:
+class Snapshot:
     """An object passed between and updated by processing steps in the Controller."""
 
     # Single values
@@ -33,18 +33,18 @@ class ControllerState:
         Create a new object with updated values.
 
         The initial object is empty:
-        >>> s0 = ControllerState()
+        >>> s0 = Snapshot()
         >>> s0  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
-        ControllerState(metadata=VariableCollection(...), params={}, conditions=[],
+        Snapshot(metadata=VariableCollection(...), params={}, conditions=[],
                         observations=[], theories=[])
 
         We can update the params using the `.update` method:
         >>> s0.update(params={'first': 'params'})  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
-        ControllerState(..., params={'first': 'params'}, ...)
+        Snapshot(..., params={'first': 'params'}, ...)
 
         ... but the original object is unchanged:
         >>> s0  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
-        ControllerState(..., params={}, ...)
+        Snapshot(..., params={}, ...)
 
         For params, only one object is returned from the respective property:
         >>> s0.update(params={'first': 'params'}).update(params={'second': 'params'}).params
@@ -59,38 +59,38 @@ class ControllerState:
         When we update the conditions, observations or theories, the respective list is extended:
         >>> s3 = s0.update(theories=["1st theory"])
         >>> s3
-        ControllerState(..., theories=['1st theory'])
+        Snapshot(..., theories=['1st theory'])
 
         ... so we can see the history of all the theories, for instance.
         >>> s3.update(theories=["2nd theory"])
-        ControllerState(..., theories=['1st theory', '2nd theory'])
+        Snapshot(..., theories=['1st theory', '2nd theory'])
 
         The same applies to observations:
         >>> s4 = s0.update(observations=["1st observation"])
         >>> s4
-        ControllerState(..., observations=['1st observation'], ...)
+        Snapshot(..., observations=['1st observation'], ...)
 
         >>> s4.update(observations=["2nd observation"])  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
-        ControllerState(..., observations=['1st observation', '2nd observation'], ...)
+        Snapshot(..., observations=['1st observation', '2nd observation'], ...)
 
 
         The same applies to conditions:
         >>> s5 = s0.update(conditions=["1st condition"])
         >>> s5
-        ControllerState(..., conditions=['1st condition'], ...)
+        Snapshot(..., conditions=['1st condition'], ...)
 
         >>> s5.update(conditions=["2nd condition"])  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
-        ControllerState(..., conditions=['1st condition', '2nd condition'], ...)
+        Snapshot(..., conditions=['1st condition', '2nd condition'], ...)
 
         You can also update with multiple conditions, observations and theories:
         >>> s0.update(conditions=['c1', 'c2'])
-        ControllerState(..., conditions=['c1', 'c2'], ...)
+        Snapshot(..., conditions=['c1', 'c2'], ...)
 
         >>> s0.update(theories=['t1', 't2'], metadata={'m': 1})
-        ControllerState(metadata={'m': 1}, ..., theories=['t1', 't2'])
+        Snapshot(metadata={'m': 1}, ..., theories=['t1', 't2'])
 
         >>> s0.update(theories=['t1'], observations=['o1'], metadata={'m': 1})
-        ControllerState(metadata={'m': 1}, ..., observations=['o1'], theories=['t1'])
+        Snapshot(metadata={'m': 1}, ..., observations=['o1'], theories=['t1'])
 
 
         Inputs to theories, observations and conditions must be Lists
@@ -119,6 +119,4 @@ class ControllerState:
         conditions_ = _coalesce_lists(self.conditions, conditions)
         observations_ = _coalesce_lists(self.observations, observations)
         theories_ = _coalesce_lists(self.theories, theories)
-        return ControllerState(
-            metadata_, params_, conditions_, observations_, theories_
-        )
+        return Snapshot(metadata_, params_, conditions_, observations_, theories_)

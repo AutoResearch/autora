@@ -1,3 +1,3 @@
-from .history import ControllerStateHistory
+from .history import History
 from .param import resolve_state_params
-from .snapshot import ControllerState
+from .snapshot import Snapshot
