@@ -52,7 +52,7 @@ class SupportsDataKind(Protocol):
 
 
 class SupportsControllerStateFields(Protocol):
-    """An object which can support representing snapshots of a controller state."""
+    """Support representing snapshots of a controller state as mutable fields."""
 
     def __init__(
         self,
@@ -75,6 +75,8 @@ class SupportsControllerStateFields(Protocol):
 
 
 class SupportsControllerStateProperties(Protocol):
+    """Support representing snapshots of a controller state as immutable properties."""
+
     def __init__(
         self,
         metadata: Optional[VariableCollection],
@@ -115,6 +117,8 @@ SupportsControllerState = Union[
 
 
 class SupportsControllerStateHistory(SupportsControllerStateProperties, Protocol):
+    """Represents controller state as a linear sequence of entries."""
+
     def __init__(
         self,
         metadata: Optional[VariableCollection],
