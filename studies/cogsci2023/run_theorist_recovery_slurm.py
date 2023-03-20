@@ -21,15 +21,10 @@ test_size = 0.2                # proportion of test set size to training set siz
 
 theorists = [
              'MLP',
-             'DARTS 2 Nodes',
              'DARTS 3 Nodes',
              'Regression',
              'BMS',
              'BMS Fixed Root',
-             'BMS Code Ops',
-             'BMS No Prior',
-             'BMS No Penalty',
-             'BMS Lite',
              'BSR'
              ]
 
@@ -39,7 +34,12 @@ gts = ['weber_fechner',
        'expected_value',
        'prospect_theory',
        'stroop_model',
-       'evc_demand_selection'
+       'evc_demand_selection',
+       'evc_coged',
+       'evc_congruency',
+       'shepard_luce_choice',
+       'task_switching',
+       'tva'
        ]
 
 parser = argparse.ArgumentParser("parser")
