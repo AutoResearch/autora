@@ -51,10 +51,10 @@ class Snapshot:
         {'second': 'params'}
 
         ... and the same applies to metadata:
-        >>> from autora.variable import VariableCollection
-        >>> (s0.update(metadata=VariableCollection(["1st IV"]))
-        ...    .update(metadata=VariableCollection(["2nd IV"]))).metadata
-        VariableCollection(independent_variables=['2nd IV'], dependent_variables=[], covariates=[])
+        >>> from autora.variable import VariableCollection, IV
+        >>> (s0.update(metadata=VariableCollection([IV("1st IV")]))
+        ...    .update(metadata=VariableCollection([IV("2nd IV")]))).metadata
+        VariableCollection(independent_variables=[IV(name='2nd IV',...)], ...)
 
         When we update the conditions, observations or theories, the respective list is extended:
         >>> s3 = s0.update(theories=["1st theory"])
