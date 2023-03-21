@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Any, Dict, Optional, Protocol, Sequence, TypeVar, Union
+from typing import Any, Dict, Mapping, Optional, Protocol, Sequence, TypeVar, Union
 
 from numpy.typing import ArrayLike
 from sklearn.base import BaseEstimator
@@ -145,4 +145,4 @@ class Executor(Protocol):
         ...
 
 
-ExecutorCollection = Dict[str, Executor]
+ExecutorCollection = Mapping[str, Executor]
