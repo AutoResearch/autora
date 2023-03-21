@@ -146,8 +146,3 @@ class Executor(Protocol):
 
 
 ExecutorCollection = Mapping[str, Executor]
-
-
-class ExperimentRunner(Protocol):
-    def __call__(self, __x: ArrayLike) -> ArrayLike:
-        ...
