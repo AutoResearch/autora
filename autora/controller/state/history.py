@@ -359,7 +359,7 @@ class History:
         """
         return self._history
 
-    def filter_by(self, kind=Set[Union[str, ResultKind]]) -> History:
+    def filter_by(self, kind: Set[Union[str, ResultKind]]) -> History:
         """
         Return a copy of the object with only data belonging to the specified kinds.
 
