@@ -24,5 +24,6 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
         cache: "poetry"
+    - run: poetry config installer.modern-installation false
     - run: poetry install
     - run: poetry run pytest
