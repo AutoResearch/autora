@@ -122,5 +122,6 @@ def random_operation_planner(_, executor_collection: ExecutorCollection):
         ['experimentalist', 'experimentalist', 'theorist', 'experiment_runner', 'experimentalist']
 
     """
-    choice = random.choice(list(executor_collection.values()))
+    all_executors = list(executor_collection.values())
+    choice = random.choice(all_executors)
     return choice
