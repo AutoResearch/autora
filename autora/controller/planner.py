@@ -1,39 +1,24 @@
 """
-Functions which look at state and output the next function to execute.
+Functions which look at state and output the next function name to execute.
 """
 import random
 
-from autora.controller.protocol.v1 import (
-    ExecutorCollection,
-    ResultKind,
-    SupportsControllerStateHistory,
-)
+from autora.controller.protocol.v1 import ResultKind, SupportsControllerStateHistory
 
 
-def full_cycle_planner(_, executor_collection: ExecutorCollection):
+def full_cycle_planner(_):
     """Always returns the `full_cycle` method.
 
     Examples:
-        We simulate a productive executor_collection using a simple dict
-        >>> executor_collection_ = dict(
-        ...     experimentalist = "experimentalist",
-        ...     experiment_runner = "experiment_runner",
-        ...     theorist = "theorist",
-        ...     full_cycle = "full_cycle",
-        ... )
-
         The full_cycle_planner always returns the full cycle Executor
-        >>> full_cycle_planner([], executor_collection_)
+        >>> full_cycle_planner([])
         'full_cycle'
 
     """
-    return executor_collection["full_cycle"]
+    return "full_cycle"
 
 
-def last_result_kind_planner(
-    state: SupportsControllerStateHistory,
-    executor_collection: ExecutorCollection,
-):
+def last_result_kind_planner(state: SupportsControllerStateHistory):
     """
     Chooses the operation based on the last result, e.g. new theory -> run experimentalist.
 
@@ -44,31 +29,24 @@ def last_result_kind_planner(
         >>> from autora.controller.state import History
         >>> state_ = History()
 
-        We simulate a productive executor_collection using a dict
-        >>> executor_collection_ = dict(
-        ...     experimentalist = "experimentalist",
-        ...     experiment_runner = "experiment_runner",
-        ...     theorist = "theorist",
-        ... )
-
         Based on the results available in the state, we can get the next kind of executor we need.
         When we have no results of any kind, we get an experimentalist:
-        >>> last_result_kind_planner(state_, executor_collection_)
+        >>> last_result_kind_planner(state_)
         'experimentalist'
 
         ... or if we had produced conditions, then we could run an experiment
         >>> state_ = state_.update(conditions=["some condition"])
-        >>> last_result_kind_planner(state_, executor_collection_)
+        >>> last_result_kind_planner(state_)
         'experiment_runner'
 
         ... or if we last produced observations, then we could now run the theorist:
         >>> state_ = state_.update(observations=["some observation"])
-        >>> last_result_kind_planner(state_, executor_collection_)
+        >>> last_result_kind_planner(state_)
         'theorist'
 
         ... or if we last produced a theory, then we could now run the experimentalist:
         >>> state_ = state_.update(theories=["some theory"])
-        >>> last_result_kind_planner(state_, executor_collection_)
+        >>> last_result_kind_planner(state_)
         'experimentalist'
 
     """
@@ -82,17 +60,17 @@ def last_result_kind_planner(
     except IndexError:
         last_result_kind = None
 
-    callback = {
-        None: executor_collection["experimentalist"],
-        ResultKind.THEORY: executor_collection["experimentalist"],
-        ResultKind.CONDITION: executor_collection["experiment_runner"],
-        ResultKind.OBSERVATION: executor_collection["theorist"],
+    executor_name = {
+        None: "experimentalist",
+        ResultKind.THEORY: "experimentalist",
+        ResultKind.CONDITION: "experiment_runner",
+        ResultKind.OBSERVATION: "theorist",
     }[last_result_kind]
 
-    return callback
+    return executor_name
 
 
-def random_operation_planner(_, executor_collection: ExecutorCollection):
+def random_operation_planner(_):
     """
     Chooses a random operation, ignoring any data which already exist.
 
@@ -114,14 +92,13 @@ def random_operation_planner(_, executor_collection: ExecutorCollection):
         Now we can begin to see which operations are returned by the planner. The first (for this
         seed) is the theorist. (The first argument is provided for compatibility with the
         protocol, but is ignored.)
-        >>> random_operation_planner([], executor_collection_)
+        >>> random_operation_planner([])
         'theorist'
 
         If we evaluate again, a random executor will be suggested each time
-        >>> [random_operation_planner([], executor_collection_) for i in range(5)]
+        >>> [random_operation_planner([]) for i in range(5)]
         ['experimentalist', 'experimentalist', 'theorist', 'experiment_runner', 'experimentalist']
 
     """
-    all_executors = list(executor_collection.values())
-    choice = random.choice(all_executors)
+    choice = random.choice(["experimentalist", "experiment_runner", "theorist"])
     return choice

@@ -12,107 +12,9 @@ from typing import Callable, Iterable, Literal, Tuple, Union
 import numpy as np
 from sklearn.base import BaseEstimator
 
-from autora.controller.protocol.v1 import (
-    Executor,
-    ExecutorCollection,
-    State,
-    SupportsControllerState,
-)
+from autora.controller.protocol.v1 import SupportsControllerState
 from autora.controller.state import resolve_state_params
 from autora.experimentalist.pipeline import Pipeline
-
-
-class OnlineExecutorCollection:
-    """
-    Runs experiment design, observation and theory generation in a single session.
-
-    This object allows a user to specify
-    - an experimentalist: a Pipeline
-    - an experiment runner: some Callable and
-    - a theorist: a scikit-learn-compatible estimator with a fit method
-
-    ... and exposes methods to call these and update a CycleState object with new data.
-
-    Examples:
-        >>> from autora.experimentalist.pipeline import Pipeline
-        >>> from sklearn.linear_model import LinearRegression
-        >>> experimentalist_pipeline_ = Pipeline([('p', (1, 2))])
-        >>> def experiment_runner_(x):
-        ...     return 2 * x + 1
-        >>> theorist_estimator_ = LinearRegression()
-        >>> c = OnlineExecutorCollection(
-        ...     experimentalist_pipeline=experimentalist_pipeline_,
-        ...     theorist_estimator=theorist_estimator_,
-        ...     experiment_runner_callable=experiment_runner_
-        ... )
-        >>> c  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
-        OnlineExecutorCollection(experimentalist_pipeline=Pipeline(steps=[('p', (1, 2))],
-        params={}), experiment_runner_callable=<function experiment_runner_ at 0x...>,
-        theorist_estimator=LinearRegression())
-
-        We can access the collection as a mapping:
-        >>> c["experimentalist_pipeline"]
-        Pipeline(steps=[('p', (1, 2))], params={})
-
-        ... or using the attributes directly:
-        >>> c.experimentalist_pipeline
-        Pipeline(steps=[('p', (1, 2))], params={})
-
-        Updating the pipeline functions
-    """
-
-    def __init__(
-        self,
-        experimentalist_pipeline: Pipeline,
-        experiment_runner_callable: Callable,
-        theorist_estimator: BaseEstimator,
-    ):
-        self.experimentalist_pipeline = experimentalist_pipeline
-        self.experiment_runner_callable = experiment_runner_callable
-        self.theorist_estimator = theorist_estimator
-
-    def __getitem__(self, item):
-        """Mapping interface."""
-        return getattr(self, item)
-
-    def __repr__(self):
-        return (
-            f"{type(self).__name__}("
-            f"experimentalist_pipeline={self.experimentalist_pipeline}, "
-            f"experiment_runner_callable={self.experiment_runner_callable}, "
-            f"theorist_estimator={self.theorist_estimator}"
-            f")"
-        )
-
-    def experimentalist(
-        self, state: SupportsControllerState
-    ) -> SupportsControllerState:
-        """Interface for running the experimentalist pipeline."""
-        new_state = experimentalist_wrapper(state, self.experiment_runner_callable)
-        return new_state
-
-    def experiment_runner(
-        self, state: SupportsControllerState
-    ) -> SupportsControllerState:
-        """Interface for running the experiment runner callable"""
-        new_state = experiment_runner_wrapper(state, self.experiment_runner_callable)
-        return new_state
-
-    def theorist(self, state: SupportsControllerState) -> SupportsControllerState:
-        """Interface for running the theorist estimator."""
-        new_state = theorist_wrapper(state, self.theorist_estimator)
-        return new_state
-
-    def full_cycle(self, state: SupportsControllerState) -> SupportsControllerState:
-        """
-        Executes the experimentalist, experiment runner and theorist on the given state.
-
-        Returns: A list of new results
-        """
-        experimentalist_result = self.experimentalist(state)
-        experiment_runner_result = self.experiment_runner(experimentalist_result)
-        theorist_result = self.theorist(experiment_runner_result)
-        return theorist_result
 
 
 def experimentalist_wrapper(
@@ -147,7 +49,9 @@ def experiment_runner_wrapper(
     return new_state
 
 
-def theorist_wrapper(state: State, estimator: BaseEstimator) -> State:
+def theorist_wrapper(
+    state: SupportsControllerState, estimator: BaseEstimator
+) -> SupportsControllerState:
     params = resolve_state_params(state).get("theorist", dict())
     metadata = state.metadata
     observations = state.observations
@@ -163,11 +67,11 @@ def theorist_wrapper(state: State, estimator: BaseEstimator) -> State:
 
 
 def full_cycle_wrapper(
-    state: State,
+    state: SupportsControllerState,
     experimentalist_pipeline: Pipeline,
     experiment_runner_callable: Callable,
     theorist_estimator: BaseEstimator,
-):
+) -> SupportsControllerState:
     experimentalist_result = experimentalist_wrapper(state, experimentalist_pipeline)
     experiment_runner_result = experiment_runner_wrapper(
         experimentalist_result, experiment_runner_callable
@@ -179,7 +83,7 @@ def full_cycle_wrapper(
 def make_online_executor(
     kind: Literal["experimentalist", "experiment_runner", "theorist"],
     core: Union[Pipeline, Callable, BaseEstimator],
-) -> Executor:
+):
     """
 
     Args:
@@ -194,7 +98,7 @@ def make_online_executor(
         assert isinstance(core, Pipeline)
         curried_function = partial(experimentalist_wrapper, pipeline=core)
     elif kind == "experiment_runner":
-        assert isinstance(core, Callable)
+        assert callable(core)
         curried_function = partial(experiment_runner_wrapper, callable=core)
     elif kind == "theorist":
         assert isinstance(core, BaseEstimator)
@@ -206,7 +110,7 @@ def make_online_executor(
     return curried_function
 
 
-def make_executor_collection(
+def make_online_executor_collection(
     x: Iterable[
         Tuple[
             str,
@@ -214,7 +118,7 @@ def make_executor_collection(
             Union[Pipeline, Callable, BaseEstimator],
         ]
     ]
-) -> ExecutorCollection:
+):
     """
 
     Make an executor collection using experimentalists, experiment_runners and theorists.
@@ -226,26 +130,27 @@ def make_executor_collection(
 
     Examples:
         >>> from sklearn.linear_model import LinearRegression
-        >>> make_executor_collection([("t", "theorist", LinearRegression())]) # doctest: +ELLIPSIS
+        >>> make_online_executor_collection([("t", "theorist", LinearRegression())]
+        ... ) # doctest: +ELLIPSIS
         {'t': functools.partial(<function theorist_wrapper at 0x...>, estimator=LinearRegression())}
 
-        >>> make_executor_collection([("er", "experiment_runner", lambda x_: x_ + 1)]
+        >>> make_online_executor_collection([("er", "experiment_runner", lambda x_: x_ + 1)]
         ... ) # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
         {'er': functools.partial(<function experiment_runner_wrapper at 0x...>, callable=<function
         <lambda> at 0x...>)}
     """
-    c: ExecutorCollection = {}
+    c = {}
     for name, kind, core in x:
         c[name] = make_online_executor(kind, core)
 
     return c
 
 
-def make_default_executor_collection(
+def make_default_online_executor_collection(
     experimentalist_pipeline: Pipeline,
     experiment_runner_callable: Callable,
     theorist_estimator: BaseEstimator,
-) -> ExecutorCollection:
+):
     """
     Make the default AER executor collection.
 
@@ -265,7 +170,7 @@ def make_default_executor_collection(
         >>> def experiment_runner_(x):
         ...     return 2 * x + 1
         >>> theorist_estimator_ = LinearRegression()
-        >>> c = make_default_executor_collection(
+        >>> c = make_default_online_executor_collection(
         ...     experimentalist_pipeline=experimentalist_pipeline_,
         ...     theorist_estimator=theorist_estimator_,
         ...     experiment_runner_callable=experiment_runner_
@@ -311,7 +216,7 @@ def make_default_executor_collection(
 
     """
 
-    c = make_executor_collection(
+    c = make_online_executor_collection(
         [
             ("experimentalist", "experimentalist", experimentalist_pipeline),
             ("experiment_runner", "experiment_runner", experiment_runner_callable),
