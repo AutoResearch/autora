@@ -68,3 +68,24 @@ def minus_op(operand_a: np.array, operand_b: np.array):
 
 def multiply_op(operand_a: np.array, operand_b: np.array):
     return operand_a * operand_b
+
+
+'''
+extra operations made for theorist study
+'''
+
+
+def log_op(operand_a: np.array):
+    return np.log(operand_a)
+
+
+def relu_op(operand_a: np.array):
+    return np.max(operand_a, 0)
+
+
+def sig_op(operand_a: np.array):
+    return np.sigmoid(operand_a)
+
+
+def pow_op(operand_a: np.array, operand_b: np.array):
+    return operand_a ** operand_b
