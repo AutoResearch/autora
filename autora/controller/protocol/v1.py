@@ -145,4 +145,6 @@ class Executor(Protocol):
         ...
 
 
-ExecutorCollection = Mapping[str, Executor]
+ExecutorName = TypeVar("ExecutorName", bound=str)
+
+ExecutorCollection = Mapping[ExecutorName, Executor]
