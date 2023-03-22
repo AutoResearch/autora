@@ -3,7 +3,7 @@ Functions which look at state and output the next function name to execute.
 """
 import random
 
-from autora.controller.protocol.v1 import ResultKind, SupportsControllerStateHistory
+from autora.controller.protocol import ResultKind, SupportsControllerStateHistory
 
 
 def full_cycle_planner(_):
