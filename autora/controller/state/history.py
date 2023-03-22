@@ -193,8 +193,19 @@ class History(SupportsControllerStateHistory):
             >>> s0.update(theories=['t1'], observations=['o1'], metadata={'m': 1}
             ... )  # doctest: +NORMALIZE_WHITESPACE
             History([Result(data={'m': 1}, kind=ResultKind.METADATA),
-                                    Result(data='o1', kind=ResultKind.OBSERVATION),
-                                    Result(data='t1', kind=ResultKind.THEORY)])
+                     Result(data='o1', kind=ResultKind.OBSERVATION),
+                     Result(data='t1', kind=ResultKind.THEORY)])
+
+            We can also update with a complete history:
+            >>> History().update(history=[Result(data={'m': 2}, kind=ResultKind.METADATA),
+            ...                           Result(data='o1', kind=ResultKind.OBSERVATION),
+            ...                           Result(data='t1', kind=ResultKind.THEORY)],
+            ...                  conditions=['c1']
+            ... )  # doctest: +NORMALIZE_WHITESPACE
+            History([Result(data={'m': 2}, kind=ResultKind.METADATA),
+                     Result(data='o1', kind=ResultKind.OBSERVATION),
+                     Result(data='t1', kind=ResultKind.THEORY),
+                     Result(data='c1', kind=ResultKind.CONDITION)])
 
         """
 
@@ -363,7 +374,7 @@ class History(SupportsControllerStateHistory):
         """
         return self._history
 
-    def filter_by(self, kind: Optional[Set[Union[str, ResultKind]]]) -> History:
+    def filter_by(self, kind: Optional[Set[Union[str, ResultKind]]] = None) -> History:
         """
         Return a copy of the object with only data belonging to the specified kinds.
 
@@ -379,6 +390,18 @@ class History(SupportsControllerStateHistory):
             >>> s.filter_by(kind={ResultKind.OBSERVATION})  # doctest: +NORMALIZE_WHITESPACE
             History([Result(data='o1', kind=ResultKind.OBSERVATION),
                                     Result(data='o2', kind=ResultKind.OBSERVATION)])
+
+            If we don't specify any filter criteria, we get the full history back:
+            >>> s.filter_by()   # doctest: +NORMALIZE_WHITESPACE +ELLIPSIS
+            History([Result(data='from history', kind=ResultKind.METADATA),
+                     Result(data=VariableCollection(...), kind=ResultKind.METADATA),
+                     Result(data={'a': 'param'}, kind=ResultKind.PARAMS),
+                     Result(data='c1', kind=ResultKind.CONDITION),
+                     Result(data='c2', kind=ResultKind.CONDITION),
+                     Result(data='o1', kind=ResultKind.OBSERVATION),
+                     Result(data='o2', kind=ResultKind.OBSERVATION),
+                     Result(data='t1', kind=ResultKind.THEORY),
+                     Result(data='t2', kind=ResultKind.THEORY)])
 
         """
         if kind is None:
