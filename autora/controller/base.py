@@ -2,19 +2,12 @@
 from __future__ import annotations
 
 import logging
-from typing import Callable, Mapping, Optional, TypeVar, Union
-
-from autora.controller.protocol import (
-    SupportsControllerState,
-    SupportsControllerStateHistory,
-)
+from typing import Callable, Mapping, Optional, TypeVar
 
 _logger = logging.getLogger(__name__)
 
 
-State = TypeVar(
-    "State", bound=Union[SupportsControllerState, SupportsControllerStateHistory]
-)
+State = TypeVar("State")
 ExecutorName = TypeVar("ExecutorName", bound=str)
 
 
@@ -27,31 +20,15 @@ class BaseController:
 
     Attributes:
         state (CycleState or CycleStateHistory): an object which is updated during the cycle and
-            has the following properties:
+            is compatible with the `executor_collection`, `planner` and `monitor`.
 
-            - `metadata` (VariableCollection)
-            -  `params` (dict): a nested dictionary with parameters for the cycle parts.
-                    `{
-                        "experimentalist": {<experimentalist params...>},
-                        "theorist": {<theorist params...>},
-                        "experiment_runner": {<experiment_runner params...>}
-                    }`
-            - `conditions`: a list of ArrayLike objects representing all the IVs proposed by the
-                experimentalist
-            - `observations`: a list of ArrayLike objects representing all the IVs and DVs
-                returned by the experiment runner
-            - `theories`: a list of all the fitted theories (scikit-learn compatible estimators)
-            - `history`: (only when using CycleStateHistory) a sequential list of all the above.
+        planner: a function which takes the `state` as input and returns the name one of the
+            `executor_collection` names.
 
-        executor_collection (FullCycleExecutorCollection, OnlineExecutorCollection): an
-            object with interfaces for running the theorist, experimentalist and
-            experiment_runner. This must be compatible with the `state`.
+        executor_collection: a mapping between names and functions which take the state as
+            input and return a state.
 
-        planner (Callable): a function which takes the `state` as input and returns one of the
-            `executor_collection` methods. This must be compatible with both the `state` and
-            the `executor_collection`.
-
-        monitor (Callable): a function which takes the controller as input and is called at
+        monitor (Callable): a function which takes the state as input and is called at
             the end of each step.
 
     """
@@ -87,7 +64,7 @@ class BaseController:
     def __next__(self):
 
         # Plan
-        next_function_name = self.planner(self.state, self.executor_collection)
+        next_function_name = self.planner(self.state)
 
         # Map
         next_function = self.executor_collection[next_function_name]
@@ -100,7 +77,7 @@ class BaseController:
 
         # Monitor
         if self.monitor is not None:
-            self.monitor(self)
+            self.monitor(self.state)
 
         return self
 

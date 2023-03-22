@@ -5,9 +5,10 @@ Objects for handling input and outputs from experimentalists, experiment runners
 from __future__ import annotations
 
 import copy
+import logging
 from functools import partial
 from types import MappingProxyType
-from typing import Callable, Iterable, Literal, Tuple, Union
+from typing import Callable, Iterable, Literal, Optional, Tuple, Union
 
 import numpy as np
 from sklearn.base import BaseEstimator
@@ -15,6 +16,8 @@ from sklearn.base import BaseEstimator
 from autora.controller.protocol import SupportsControllerState
 from autora.controller.state import resolve_state_params
 from autora.experimentalist.pipeline import Pipeline
+
+_logger = logging.getLogger(__name__)
 
 
 def experimentalist_wrapper(
@@ -80,9 +83,15 @@ def full_cycle_wrapper(
     return theorist_result
 
 
+def no_op(state):
+    """An Executor which has no effect on the state."""
+    _logger.warning("You called a `no_op` Executor. Returning the state unchanged.")
+    return state
+
+
 def make_online_executor(
     kind: Literal["experimentalist", "experiment_runner", "theorist"],
-    core: Union[Pipeline, Callable, BaseEstimator],
+    core: Optional[Union[Pipeline, Callable, BaseEstimator]] = None,
 ):
     """
 
@@ -94,7 +103,9 @@ def make_online_executor(
     Returns: a curried function which will run the kind of AER step requested
 
     """
-    if kind == "experimentalist":
+    if core is None:
+        curried_function = no_op
+    elif kind == "experimentalist":
         assert isinstance(core, Pipeline)
         curried_function = partial(experimentalist_wrapper, pipeline=core)
     elif kind == "experiment_runner":
@@ -166,9 +177,9 @@ def make_online_executor_collection(
 
 
 def make_default_online_executor_collection(
-    experimentalist_pipeline: Pipeline,
-    experiment_runner_callable: Callable,
-    theorist_estimator: BaseEstimator,
+    experimentalist_pipeline: Optional[Pipeline] = None,
+    experiment_runner_callable: Optional[Callable] = None,
+    theorist_estimator: Optional[BaseEstimator] = None,
 ):
     """
     Make the default AER executor collection.
@@ -183,6 +194,17 @@ def make_default_online_executor_collection(
 
 
     Examples:
+
+        If we make the empty executor collection, all the executors are no-ops:
+        >>> make_default_online_executor_collection()  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
+        mappingproxy({'experimentalist': <function no_op at 0x...>,
+                      'experiment_runner': <function no_op at 0x...>,
+                      'theorist': <function no_op at 0x...>,
+                      'full_cycle': functools.partial(<function full_cycle_wrapper at 0x...>,
+                                                      experimentalist_pipeline=None,
+                                                      experiment_runner_callable=None,
+                                                      theorist_estimator=None)})
+
         >>> from autora.experimentalist.pipeline import Pipeline
         >>> from sklearn.linear_model import LinearRegression
         >>> experimentalist_pipeline_ = Pipeline([('p', (1, 2))])
