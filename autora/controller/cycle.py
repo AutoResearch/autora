@@ -18,10 +18,11 @@ _logger = logging.getLogger(__name__)
 
 class Cycle(BaseController):
     """
-    Runs an experimentalist, theorist and experiment runner in a loop.
+    Runs an experimentalist, experiment runner, and theorist in a loop.
 
     Once initialized, the `cycle` can be started by calling `next(cycle)` or using the
-        `cycle.run` method. Each step runs the full AER cycle
+        `cycle.run` method. Each iteration runs the full AER cycle, starting with the
+        experimentalist and ending with the theorist.
 
     Attributes:
         state (CycleState or CycleStateHistory): an object which is updated during the cycle and
