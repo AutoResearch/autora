@@ -54,16 +54,6 @@ class SupportsDataKind(Protocol):
 class SupportsControllerStateFields(Protocol):
     """Support representing snapshots of a controller state as mutable fields."""
 
-    def __init__(
-        self,
-        metadata: Optional[VariableCollection],
-        params: Optional[Dict],
-        conditions: Optional[Sequence[ArrayLike]],
-        observations=Optional[Sequence[ArrayLike]],
-        theories=Optional[Sequence[ArrayLike]],
-    ) -> None:
-        ...
-
     metadata: VariableCollection
     params: Dict
     conditions: Sequence[ArrayLike]
@@ -76,16 +66,6 @@ class SupportsControllerStateFields(Protocol):
 
 class SupportsControllerStateProperties(Protocol):
     """Support representing snapshots of a controller state as immutable properties."""
-
-    def __init__(
-        self,
-        metadata: Optional[VariableCollection],
-        params: Optional[Dict],
-        conditions: Optional[Sequence[ArrayLike]],
-        observations=Optional[Sequence[ArrayLike]],
-        theories=Optional[Sequence[ArrayLike]],
-    ) -> None:
-        ...
 
     def update(self: State, **kwargs) -> State:
         ...
@@ -118,17 +98,6 @@ SupportsControllerState = Union[
 
 class SupportsControllerStateHistory(SupportsControllerStateProperties, Protocol):
     """Represents controller state as a linear sequence of entries."""
-
-    def __init__(
-        self,
-        metadata: Optional[VariableCollection],
-        params: Optional[Dict],
-        conditions: Optional[Sequence[ArrayLike]],
-        observations=Optional[Sequence[ArrayLike]],
-        theories=Optional[Sequence[ArrayLike]],
-        history=Optional[Sequence[SupportsDataKind]],
-    ) -> None:
-        ...
 
     def filter_by(self: State, **kwargs) -> State:
         ...
