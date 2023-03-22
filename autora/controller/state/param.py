@@ -6,7 +6,7 @@ from typing import Dict, Mapping
 
 import numpy as np
 
-from autora.controller.protocol.v1 import SupportsControllerState
+from autora.controller.protocol import SupportsControllerState
 from autora.utils.dictionary import LazyDict
 
 
