@@ -105,13 +105,3 @@ class SupportsControllerStateHistory(SupportsControllerStateProperties, Protocol
     @property
     def history(self) -> Sequence[SupportsDataKind]:
         ...
-
-
-class Executor(Protocol):
-    """A Callable which, given some state, returns an updated state."""
-
-    def __call__(self, __state: State) -> State:
-        ...
-
-
-ExecutorCollection = Dict[str, Executor]
