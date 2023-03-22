@@ -43,7 +43,7 @@ def experimentalist_wrapper(
 def experiment_runner_wrapper(
     state: SupportsControllerState, callable: Callable
 ) -> SupportsControllerState:
-    """Interface for running the experiment runner callable"""
+    """Interface for running the experiment runner callable."""
     params = resolve_state_params(state).get("experiment_runner", dict())
     x = state.conditions[-1]
     y = callable(x, **params)
@@ -55,6 +55,7 @@ def experiment_runner_wrapper(
 def theorist_wrapper(
     state: SupportsControllerState, estimator: BaseEstimator
 ) -> SupportsControllerState:
+    """Interface for running the theorist estimator given some State."""
     params = resolve_state_params(state).get("theorist", dict())
     metadata = state.metadata
     observations = state.observations
@@ -75,6 +76,7 @@ def full_cycle_wrapper(
     experiment_runner_callable: Callable,
     theorist_estimator: BaseEstimator,
 ) -> SupportsControllerState:
+    """Interface for running the full AER cycle."""
     experimentalist_result = experimentalist_wrapper(state, experimentalist_pipeline)
     experiment_runner_result = experiment_runner_wrapper(
         experimentalist_result, experiment_runner_callable
