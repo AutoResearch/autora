@@ -193,8 +193,19 @@ class History(SupportsControllerStateHistory):
             >>> s0.update(theories=['t1'], observations=['o1'], metadata={'m': 1}
             ... )  # doctest: +NORMALIZE_WHITESPACE
             History([Result(data={'m': 1}, kind=ResultKind.METADATA),
-                                    Result(data='o1', kind=ResultKind.OBSERVATION),
-                                    Result(data='t1', kind=ResultKind.THEORY)])
+                     Result(data='o1', kind=ResultKind.OBSERVATION),
+                     Result(data='t1', kind=ResultKind.THEORY)])
+
+            We can also update with a complete history:
+            >>> History().update(history=[Result(data={'m': 2}, kind=ResultKind.METADATA),
+            ...                           Result(data='o1', kind=ResultKind.OBSERVATION),
+            ...                           Result(data='t1', kind=ResultKind.THEORY)],
+            ...                  conditions=['c1']
+            ... )  # doctest: +NORMALIZE_WHITESPACE
+            History([Result(data={'m': 2}, kind=ResultKind.METADATA),
+                     Result(data='o1', kind=ResultKind.OBSERVATION),
+                     Result(data='t1', kind=ResultKind.THEORY),
+                     Result(data='c1', kind=ResultKind.CONDITION)])
 
         """
 
