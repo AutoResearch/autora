@@ -34,8 +34,12 @@ def _get_state_dependent_properties(state: SupportsControllerState):
     n_dvs = len(state.metadata.dependent_variables)
     state_dependent_property_dict = LazyDict(
         {
-            "%observations.ivs[-1]%": lambda: state.observations[-1][:, 0:n_ivs],
-            "%observations.dvs[-1]%": lambda: state.observations[-1][:, n_ivs:],
+            "%observations.ivs[-1]%": lambda: np.array(state.observations[-1])[
+                :, 0:n_ivs
+            ],
+            "%observations.dvs[-1]%": lambda: np.array(state.observations[-1])[
+                :, n_ivs:
+            ],
             "%observations.ivs%": lambda: np.row_stack(
                 [np.empty([0, n_ivs + n_dvs])] + list(state.observations)
             )[:, 0:n_ivs],
