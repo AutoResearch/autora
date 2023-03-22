@@ -269,5 +269,130 @@ Examples:
     ...
     ValueError: a cannot be empty unless no samples are taken
 
+
+# Using Alternative Executors and Planners
+
+By switching out the `executor_collection` and/or the `planner`, we can specify a
+different way of running the cycle.
+
+## Easier Seeding with a Smarter Planner
+
+Examples:
+
+    In this example, we use the `Controller` which allows much more control over execution
+    order. It considers the last available result and picks the matching next step. This means
+    that seeding is relatively simple.
+    >>> from autora.controller import Controller
+    >>> def monitor(state):
+    ...     print(f"MONITOR: Generated new {state.history[-1].kind}")
+    >>> cycle_with_last_result_planner = Controller(
+    ...     monitor=monitor,
+    ...     metadata=metadata_0,
+    ...     theorist=example_theorist,
+    ...     experimentalist=example_experimentalist,
+    ...     experiment_runner=example_synthetic_experiment_runner,
+    ... )
+
+    When we run this cycle starting with no data, we generate an experimental condition first:
+    >>> _ = list(takewhile(lambda c: len(c.state.theories) < 2, cycle_with_last_result_planner))
+    MONITOR: Generated new CONDITION
+    MONITOR: Generated new OBSERVATION
+    MONITOR: Generated new THEORY
+    MONITOR: Generated new CONDITION
+    MONITOR: Generated new OBSERVATION
+    MONITOR: Generated new THEORY
+
+    However, if we seed the same cycle with observations, then its first Executor will be the
+    theorist:
+    >>> controller_with_seed_observation = Controller(
+    ...     monitor=monitor,
+    ...     metadata=metadata_0,
+    ...     theorist=example_theorist,
+    ...     experimentalist=example_experimentalist,
+    ...     experiment_runner=example_synthetic_experiment_runner,
+    ... )
+    >>> seed_observation = example_synthetic_experiment_runner(np.linspace(0,5,10))
+    >>> controller_with_seed_observation.seed(observations=[seed_observation])
+
+    >>> _ = next(controller_with_seed_observation)
+    MONITOR: Generated new THEORY
+
+## Arbitrary Execution Order (Toy Example)
+
+In some cases, we need to change the order of execution of different steps completely. This might be
+ useful in cases when different experimentalists or theorists are needed at different times in
+ the cycle, e.g. for initial seeding, or if the _order_ of execution is the subject of the
+ experiment.
+
+Examples:
+
+    In this example, we use a planner which suggests a different random operation at each
+    step, demonstrating arbitrary execution order. We do this by modifying the planner attribute
+    of an existing controller
+
+    This might be useful in cases when different experimentalists or theorists are needed at
+    different times in the cycle, e.g. for initial seeding.
+    >>> from autora.controller.planner import random_operation_planner
+    >>> def monitor(state):
+    ...     print(f"MONITOR: Generated new {state.history[-1].kind}")
+    >>> controller_with_random_planner = Controller(
+    ...     planner=random_operation_planner,
+    ...     monitor=monitor,
+    ...     metadata=metadata_0,
+    ...     theorist=example_theorist,
+    ...     experimentalist=example_experimentalist,
+    ...     experiment_runner=example_synthetic_experiment_runner,
+    ... )
+
+    The `random_operation_planner` depends on the python random number generator, so we seed
+    it first:
+    >>> from random import seed
+    >>> seed(42)
+
+    We also want to watch the logging messages from the cycle:
+    >>> import logging
+    >>> import sys
+    >>> logging.basicConfig(format='%(levelname)s: %(message)s', stream=sys.stdout,
+    ...     level=logging.INFO)
+
+    Now we can evaluate the cycle and watch its behaviour:
+    >>> def step(controller_):
+    ...     try:
+    ...         _ = next(controller_)
+    ...     except ValueError as e:
+    ...         print(f"FAILED: with {e=}")
+
+    The first step, the theorist is selected as the random Executor, and it fails because it
+    depends on there being observations to theorize against:
+    >>> step(controller_with_random_planner) # i = 0
+    FAILED: with e=ValueError('need at least one array to concatenate')
+
+    The second step, a new condition is generated.
+    >>> step(controller_with_random_planner) # i = 1
+    MONITOR: Generated new CONDITION
+
+    ... which is repeated on the third step as well:
+    >>> step(controller_with_random_planner) # i = 2
+    MONITOR: Generated new CONDITION
+
+    On the fourth step, we generate another error when trying to run the theorist:
+    >>> step(controller_with_random_planner) # i = 3
+    FAILED: with e=ValueError('need at least one array to concatenate')
+
+    On the fifth step, we generate a first real observation, so that the next time we try to run
+    a theorist we are successful:
+    >>> step(controller_with_random_planner) # i = 4
+    MONITOR: Generated new OBSERVATION
+
+    By the ninth iteration, there are observations which the theorist can use, and it succeeds.
+    >>> _ = list(takewhile(lambda c: len(c.state.theories) < 1, controller_with_random_planner))
+    MONITOR: Generated new CONDITION
+    MONITOR: Generated new CONDITION
+    MONITOR: Generated new CONDITION
+    MONITOR: Generated new THEORY
+
+
+
 """
+from .controller import Controller
 from .cycle import Cycle

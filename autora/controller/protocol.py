@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Any, Dict, Mapping, Optional, Protocol, Sequence, TypeVar, Union
+from typing import Any, Dict, Mapping, Optional, Protocol, Sequence, Set, TypeVar, Union
 
 from numpy.typing import ArrayLike
 from sklearn.base import BaseEstimator
@@ -99,7 +99,7 @@ SupportsControllerState = Union[
 class SupportsControllerStateHistory(SupportsControllerStateProperties, Protocol):
     """Represents controller state as a linear sequence of entries."""
 
-    def filter_by(self: State, **kwargs) -> State:
+    def filter_by(self: State, kind: Optional[Set[Union[str, ResultKind]]]) -> State:
         ...
 
     @property

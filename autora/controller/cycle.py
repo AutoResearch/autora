@@ -24,35 +24,6 @@ class Cycle(BaseController):
         `cycle.run` method. Each iteration runs the full AER cycle, starting with the
         experimentalist and ending with the theorist.
 
-    Attributes:
-        state (CycleState or CycleStateHistory): an object which is updated during the cycle and
-            has the following properties:
-
-            - `metadata` (VariableCollection)
-            -  `params` (dict): a nested dictionary with parameters for the cycle parts.
-                    `{
-                        "experimentalist": {<experimentalist params...>},
-                        "theorist": {<theorist params...>},
-                        "experiment_runner": {<experiment_runner params...>}
-                    }`
-            - `conditions`: a list of ArrayLike objects representing all the IVs proposed by the
-                experimentalist
-            - `observations`: a list of ArrayLike objects representing all the IVs and DVs
-                returned by the experiment runner
-            - `theories`: a list of all the fitted theories (scikit-learn compatible estimators)
-            - `history`: (only when using CycleStateHistory) a sequential list of all the above.
-
-        executor_collection (FullCycleExecutorCollection, OnlineExecutorCollection): an
-            object with interfaces for running the theorist, experimentalist and
-            experiment_runner. This must be compatible with the `state`.
-
-        planner (Callable): a function which takes the `state` as input and returns one of the
-            `executor_collection` methods. This must be compatible with both the `state` and
-            the `executor_collection`.
-
-        monitor (Callable): a function which takes the controller as input and is called at
-            the end of each step.
-
     """
 
     def __init__(
