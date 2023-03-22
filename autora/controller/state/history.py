@@ -7,12 +7,16 @@ from typing import Any, Dict, Iterable, List, Optional, Sequence, Set, Union
 from numpy.typing import ArrayLike
 from sklearn.base import BaseEstimator
 
-from autora.controller.protocol import ResultKind, SupportsDataKind
+from autora.controller.protocol import (
+    ResultKind,
+    SupportsControllerStateHistory,
+    SupportsDataKind,
+)
 from autora.controller.state.snapshot import Snapshot
 from autora.variable import VariableCollection
 
 
-class History:
+class History(SupportsControllerStateHistory):
     """
     An immutable object for tracking the state and history of an AER cycle.
     """
@@ -359,7 +363,7 @@ class History:
         """
         return self._history
 
-    def filter_by(self, kind: Set[Union[str, ResultKind]]) -> History:
+    def filter_by(self, kind: Optional[Set[Union[str, ResultKind]]]) -> History:
         """
         Return a copy of the object with only data belonging to the specified kinds.
 
@@ -377,10 +381,13 @@ class History:
                                     Result(data='o2', kind=ResultKind.OBSERVATION)])
 
         """
-        kind_ = {ResultKind(s) for s in kind}
-        filtered_history = _filter_history(self._history, kind_)
-        new_object = History(history=filtered_history)
-        return new_object
+        if kind is None:
+            return self
+        else:
+            kind_ = {ResultKind(s) for s in kind}
+            filtered_history = _filter_history(self._history, kind_)
+            new_object = History(history=filtered_history)
+            return new_object
 
 
 @dataclass(frozen=True)
