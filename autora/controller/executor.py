@@ -86,7 +86,15 @@ def full_cycle_wrapper(
 
 
 def no_op(state):
-    """An Executor which has no effect on the state."""
+    """
+    An Executor which has no effect on the state.
+
+    Examples:
+         >>> from autora.controller.state import Snapshot
+         >>> s = Snapshot()
+         >>> s_returned = no_op(s)
+         >>> assert s_returned is s
+    """
     _logger.warning("You called a `no_op` Executor. Returning the state unchanged.")
     return state
 
@@ -103,6 +111,18 @@ def make_online_executor(
             Callable, "theorist": a BaseEstimator
 
     Returns: a curried function which will run the kind of AER step requested
+
+    Examples:
+        Initializing executors which are understood:
+        >>> make_online_executor("experiment_runner", lambda x: x + 1
+        ... )  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
+        functools.partial(<function experiment_runner_wrapper at 0x...>,
+                          callable=<function <lambda> at 0x...>)
+
+        >>> make_online_executor("not_allowed_kind", lambda x: x + 1)
+        Traceback (most recent call last):
+        ...
+        NotImplementedError: kind='not_allowed_kind' is not implemented for executor definitions.
 
     """
     if core is None:
