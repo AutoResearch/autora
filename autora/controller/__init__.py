@@ -391,7 +391,166 @@ Examples:
     MONITOR: Generated new CONDITION
     MONITOR: Generated new THEORY
 
+## Arbitrary Executors and Planners
 
+In some cases, we need to go beyond adding different orders of planning the three
+`experimentalist`, `experiment_runner` and `theorist` and build more complex cycles with
+different Executors for different states.
+
+For instance, there might be a situation where in the
+first iteration, the controller needs to gather observations over a uniform sample of the domain,
+but in subsequent samples we use a different active experimentalist.
+
+In these cases, we need full control over (and have full responsibility for) the planners and
+executors.
+
+Examples:
+    The theory we'll try to discover is:
+    >>> def ground_truth(x, m=3.5, c=1):
+    ...     return m * x + c
+    >>> rng = np.random.default_rng(seed=180)
+    >>> def experiment_runner(x):
+    ...     return ground_truth(x) + rng.normal(0, 0.1)
+    >>> metadata_2 = VariableCollection(
+    ...    independent_variables=[Variable(name="x1", value_range=(-10, 10))],
+    ...    dependent_variables=[Variable(name="y", value_range=(-100, 100))],
+    ...    )
+
+    We now define a planner which chooses a different experimentalist when supplied with no data
+    versus some data.
+    >>> from autora.controller.protocol import ResultKind
+    >>> def seeding_planner(state):
+    ...     # First, we have to filter the history by the kinds of objects we care about.
+    ...     # If other objects were added later – parameters, or metadata updates – we don't want
+    ...     #   them to affect the order.
+    ...     filtered_history = state.filter_by(
+    ...         kind={ResultKind.CONDITION, ResultKind.OBSERVATION, ResultKind.THEORY}
+    ...     ).history
+    ...
+    ...     # In case there aren't any results, we need to have a fallback type – None
+    ...     try:
+    ...         last_result_kind = filtered_history[-1].kind
+    ...     except IndexError:
+    ...         last_result_kind = None
+    ...
+    ...     # We map the result kind (or None) to the next step we care about
+    ...     executor_name = {
+    ...         None: "seed_experimentalist",        # specify a special seeding experimentalist
+    ...         ResultKind.THEORY: "main_experimentalist", # the usual experimentalist
+    ...         ResultKind.CONDITION: "experiment_runner",
+    ...         ResultKind.OBSERVATION: "theorist",
+    ...     }[last_result_kind]
+    ...
+    ...     return executor_name
+
+    Now we can see what would happen with a particular state. If there are no results, then we get
+    the seed experimentalist:
+    >>> from autora.controller.state import History
+    >>> seeding_planner(History())
+    'seed_experimentalist'
+
+    ... whereas if we have a theory to work on, we get the main experimentalist:
+    >>> seeding_planner(History(theories=['a theory']))
+    'main_experimentalist'
+
+    If we had a condition last, we choose the experiment runner next:
+    >>> seeding_planner(History(conditions=['a condition']))
+    'experiment_runner'
+
+    If we had an observation last, we choose the theorist next:
+    >>> seeding_planner(History(observations=['an observation']))
+    'theorist'
+
+    Now we need to define an executor collection to handle the actual execution steps.
+    >>> from autora.experimentalist.pipeline import make_pipeline
+    >>> from autora.experimentalist.sampler.random import random_sampler
+    >>> from functools import partial
+
+    Wen can run the seed pipeline with no data:
+    >>> experimentalist_which_needs_no_data = make_pipeline([
+    ...     np.linspace(*metadata_2.independent_variables[0].value_range, 1_000),
+    ...     partial(random_sampler, n=10)]
+    ... )
+    >>> np.array(experimentalist_which_needs_no_data())
+    array([ 6.71671672, -0.73073073, -5.05505506,  6.13613614,  0.03003003,
+            4.59459459,  2.79279279,  5.43543544, -1.65165165,  8.0980981 ])
+
+
+    ... whereas we need some model for this sampler:
+    >>> from autora.experimentalist.sampler.model_disagreement import model_disagreement_sampler
+    >>> experimentalist_which_needs_a_theory = make_pipeline([
+    ...     np.linspace(*metadata_2.independent_variables[0].value_range, 1_000),
+    ...     partial(model_disagreement_sampler, num_samples=10)])
+    >>> experimentalist_which_needs_a_theory()
+    Traceback (most recent call last):
+    ...
+    TypeError: model_disagreement_sampler() missing 1 required positional argument: 'models'
+
+    We'll have to provide the models during the cycle run.
+
+    We need a reasonable theorist for this situation. For this problem, a linear regressor will
+    suffice.
+    >>> t = LinearRegression()
+
+    Let's test the theorist for the ideal case – lots of data:
+    >>> X = np.linspace(*metadata_2.independent_variables[0].value_range, 1_000).reshape(-1, 1)
+    >>> tfitted = t.fit(X, experiment_runner(X))
+    >>> f"m = {tfitted.coef_[0][0]:.2f}, c = {tfitted.intercept_[0]:.2f}"
+    'm = 3.50, c = 1.04'
+
+    This seems to work fine.
+
+    Now we can define the executor component. We'll use a factory method to generate the
+    collection:
+    >>> from autora.controller.executor import make_online_executor_collection
+    >>> executor_collection = make_online_executor_collection([
+    ...     ("seed_experimentalist", "experimentalist", experimentalist_which_needs_no_data),
+    ...     ("main_experimentalist", "experimentalist", experimentalist_which_needs_a_theory),
+    ...     ("theorist", "theorist", LinearRegression()),
+    ...     ("experiment_runner", "experiment_runner", experiment_runner),
+    ... ])
+
+    We need some special parameters to handle the main experimentalist, so we specify those:
+    >>> params = {"main_experimentalist": {"models": "%theories%"}}
+
+    We now instantiate the controller:
+    >>> from autora.controller.base import BaseController
+    >>> from autora.controller.state import History
+    >>> c = BaseController(
+    ...         state=History(metadata=metadata_2, params=params),
+    ...         planner=seeding_planner,
+    ...         executor_collection=executor_collection
+    ... )
+    >>> c  # doctest: +ELLIPSIS
+    <...BaseController object at 0x...>
+
+    On the first step, we generate a condition (as we expected):
+    >>> next(c).state.history[-1]  # doctest: +NORMALIZE_WHITESPACE
+    Result(data=array([ 9.4994995 , -8.17817818, -1.19119119,  8.6986987 ,  7.45745746,
+                      -6.93693694,  8.05805806, -1.45145145, -5.97597598,  1.57157157]),
+           kind=ResultKind.CONDITION)
+
+    On the second step, we generate some new observations:
+    >>> next(c).state.history[-1]
+    Result(data=array([[  9.4994995 ,  34.1750017 ],
+           [ -8.17817818, -27.69687017],
+           [ -1.19119119,  -3.24241572],
+           [  8.6986987 ,  31.3721989 ],
+           [  7.45745746,  27.02785455],
+           [ -6.93693694, -23.35252583],
+           [  8.05805806,  29.12995666],
+           [ -1.45145145,  -4.15332663],
+           [ -5.97597598, -19.98916246],
+           [  1.57157157,   6.42725395]]), kind=ResultKind.OBSERVATION)
+
+
+    On the third step, we generate a new theory:
+    >>> next(c).state.history[-1]
+    Result(data=LinearRegression(), kind=ResultKind.THEORY)
+
+    On the fourth step, we switch to using the main experimentalist and generate some new
+    experimental data that way
+    >>> next(c).state.history[-1]
 
 """
 from .controller import Controller
