@@ -5,11 +5,12 @@ from typing import Dict, List
 from numpy.typing import ArrayLike
 from sklearn.base import BaseEstimator
 
+from autora.controller.protocol import SupportsControllerStateFields
 from autora.variable import VariableCollection
 
 
 @dataclass(frozen=True)
-class Snapshot:
+class Snapshot(SupportsControllerStateFields):
     """An object passed between and updated by processing steps in the Controller."""
 
     # Single values
