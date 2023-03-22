@@ -2,12 +2,15 @@
 from __future__ import annotations
 
 import copy
+import logging
 from typing import Dict, Mapping
 
 import numpy as np
 
 from autora.controller.protocol import SupportsControllerState
 from autora.utils.dictionary import LazyDict
+
+_logger = logging.getLogger(__name__)
 
 
 def _get_state_dependent_properties(state: SupportsControllerState):
@@ -92,7 +95,7 @@ def _resolve_properties(params: Dict, state_dependent_properties: Mapping):
         ):  # value is a key in the cycle_properties dictionary
             params_[key] = state_dependent_properties[value]
         else:
-            pass  # no change needed
+            _logger.debug(f"leaving {params=} unchanged")
 
     return params_
 
