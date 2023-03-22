@@ -12,7 +12,7 @@ from typing import Callable, Iterable, Literal, Tuple, Union
 import numpy as np
 from sklearn.base import BaseEstimator
 
-from autora.controller.protocol.v1 import SupportsControllerState
+from autora.controller.protocol import SupportsControllerState
 from autora.controller.state import resolve_state_params
 from autora.experimentalist.pipeline import Pipeline
 
@@ -120,7 +120,6 @@ def make_online_executor_collection(
     ]
 ):
     """
-
     Make an executor collection using experimentalists, experiment_runners and theorists.
 
     Args:
@@ -129,15 +128,35 @@ def make_online_executor_collection(
     Returns:
 
     Examples:
+        We can create an executor collection with one theorist:
         >>> from sklearn.linear_model import LinearRegression
         >>> make_online_executor_collection([("t", "theorist", LinearRegression())]
         ... ) # doctest: +ELLIPSIS
         {'t': functools.partial(<function theorist_wrapper at 0x...>, estimator=LinearRegression())}
 
+        ... or with two different theorists (e.g., if a Planner had several options)
+        >>> make_online_executor_collection([
+        ...     ("t0", "theorist", LinearRegression(fit_intercept=False)),
+        ...     ("t1", "theorist", LinearRegression(fit_intercept=True))
+        ... ]) # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
+        {'t0': functools.partial(<function theorist_wrapper at 0x...>,
+                                 estimator=LinearRegression(fit_intercept=False)),
+        't1': functools.partial(<function theorist_wrapper at 0x...>,
+                                estimator=LinearRegression())}
+
+        The same applies for experiment runners:
         >>> make_online_executor_collection([("er", "experiment_runner", lambda x_: x_ + 1)]
         ... ) # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
-        {'er': functools.partial(<function experiment_runner_wrapper at 0x...>, callable=<function
-        <lambda> at 0x...>)}
+        {'er': functools.partial(<function experiment_runner_wrapper at 0x...>,
+                                 callable=<function <lambda> at 0x...>)}
+
+        ... and experimentalists:
+        >>> from autora.experimentalist.pipeline import make_pipeline
+        >>> make_online_executor_collection([("ex", "experimentalist", make_pipeline([(1,2,3)]))]
+        ... ) # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
+        {'ex': functools.partial(<function experimentalist_wrapper at 0x...>,
+                                 pipeline=Pipeline(steps=[('step', (1, 2, 3))], params={}))}
+
     """
     c = {}
     for name, kind, core in x:
