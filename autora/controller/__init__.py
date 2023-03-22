@@ -397,9 +397,11 @@ In some cases, we need to go beyond adding different orders of planning the thre
 `experimentalist`, `experiment_runner` and `theorist` and build more complex cycles with
 different Executors for different states.
 
-For instance, there might be a situation where in the
-first iteration, the controller needs to gather observations over a uniform sample of the domain,
-but in subsequent samples we use a different active experimentalist.
+For instance, there might be a situation where at the start, the main "active" experimentalist
+can't be run as it needs one or more theories as input.
+Once there are at least two theories, then the active experimentalist _can_ be run.
+One method to handle this is to run a "seed" experimentalist until the main experimentalist can
+be used.
 
 In these cases, we need full control over (and have full responsibility for) the planners and
 executors.
@@ -419,38 +421,31 @@ Examples:
     We now define a planner which chooses a different experimentalist when supplied with no data
     versus some data.
     >>> from autora.controller.protocol import ResultKind
+    >>> from autora.controller.planner import last_result_kind_planner
     >>> def seeding_planner(state):
-    ...     # First, we have to filter the history by the kinds of objects we care about.
-    ...     # If other objects were added later – parameters, or metadata updates – we don't want
-    ...     #   them to affect the order.
-    ...     filtered_history = state.filter_by(
-    ...         kind={ResultKind.CONDITION, ResultKind.OBSERVATION, ResultKind.THEORY}
-    ...     ).history
-    ...
-    ...     # In case there aren't any results, we need to have a fallback type – None
-    ...     try:
-    ...         last_result_kind = filtered_history[-1].kind
-    ...     except IndexError:
-    ...         last_result_kind = None
-    ...
-    ...     # We map the result kind (or None) to the next step we care about
-    ...     executor_name = {
-    ...         None: "seed_experimentalist",        # specify a special seeding experimentalist
-    ...         ResultKind.THEORY: "main_experimentalist", # the usual experimentalist
-    ...         ResultKind.CONDITION: "experiment_runner",
-    ...         ResultKind.OBSERVATION: "theorist",
-    ...     }[last_result_kind]
-    ...
-    ...     return executor_name
+    ...     # We're going to reuse the "last_available_result" planner, and modify its output.
+    ...     next_function = last_result_kind_planner(state)
+    ...     if next_function == "experimentalist":
+    ...         if len(state.theories) >= 2:
+    ...             return "main_experimentalist"
+    ...         else:
+    ...             return "seed_experimentalist"
+    ...     else:
+    ...         return next_function
 
-    Now we can see what would happen with a particular state. If there are no results, then we get
-    the seed experimentalist:
+    Now we can see what would happen with a particular state. If there are no results,
+    then we get the seed experimentalist:
     >>> from autora.controller.state import History
     >>> seeding_planner(History())
     'seed_experimentalist'
 
-    ... whereas if we have a theory to work on, we get the main experimentalist:
-    >>> seeding_planner(History(theories=['a theory']))
+    ... and we also get the seed experimentalist if the last result was a theory and there are less
+    than two theories:
+    >>> seeding_planner(History(theories=['a single theory']))
+    'seed_experimentalist'
+
+    ... whereas if we have at least two theories to work on, we get the main experimentalist:
+    >>> seeding_planner(History(theories=['a theory', 'another theory']))
     'main_experimentalist'
 
     If we had a condition last, we choose the experiment runner next:
@@ -462,7 +457,7 @@ Examples:
     'theorist'
 
     Now we need to define an executor collection to handle the actual execution steps.
-    >>> from autora.experimentalist.pipeline import make_pipeline
+    >>> from autora.experimentalist.pipeline import make_pipeline, Pipeline
     >>> from autora.experimentalist.sampler.random import random_sampler
     >>> from functools import partial
 
@@ -478,9 +473,9 @@ Examples:
 
     ... whereas we need some model for this sampler:
     >>> from autora.experimentalist.sampler.model_disagreement import model_disagreement_sampler
-    >>> experimentalist_which_needs_a_theory = make_pipeline([
-    ...     np.linspace(*metadata_2.independent_variables[0].value_range, 1_000),
-    ...     partial(model_disagreement_sampler, num_samples=10)])
+    >>> experimentalist_which_needs_a_theory = Pipeline([
+    ...     ('pool', np.linspace(*metadata_2.independent_variables[0].value_range, 1_000)),
+    ...     ('sampler', partial(model_disagreement_sampler, num_samples=5)),])
     >>> experimentalist_which_needs_a_theory()
     Traceback (most recent call last):
     ...
@@ -511,7 +506,11 @@ Examples:
     ... ])
 
     We need some special parameters to handle the main experimentalist, so we specify those:
-    >>> params = {"main_experimentalist": {"models": "%theories%"}}
+    >>> params = {"experimentalist": {"sampler": {"models": "%theories%"}}}
+
+    Warning: the dictionary `{"sampler": {"models": "%theories%"}}` above is shared by
+    both the seed and main experimentalists. This behavior may change in future to allow separate
+    parameter dictionaries for each executor in the collection.
 
     We now instantiate the controller:
     >>> from autora.controller.base import BaseController
@@ -524,33 +523,36 @@ Examples:
     >>> c  # doctest: +ELLIPSIS
     <...BaseController object at 0x...>
 
-    On the first step, we generate a condition (as we expected):
+    >>> class PrintHandler(logging.Handler):
+    ...     def emit(self, record):
+    ...         print(self.format(record))
+
+    On the first step, we generate a condition sampled randomly across the whole domain (as we
+    expected):
     >>> next(c).state.history[-1]  # doctest: +NORMALIZE_WHITESPACE
     Result(data=array([ 9.4994995 , -8.17817818, -1.19119119,  8.6986987 ,  7.45745746,
                       -6.93693694,  8.05805806, -1.45145145, -5.97597598,  1.57157157]),
            kind=ResultKind.CONDITION)
 
-    On the second step, we generate some new observations:
-    >>> next(c).state.history[-1]
-    Result(data=array([[  9.4994995 ,  34.1750017 ],
-           [ -8.17817818, -27.69687017],
-           [ -1.19119119,  -3.24241572],
-           [  8.6986987 ,  31.3721989 ],
-           [  7.45745746,  27.02785455],
-           [ -6.93693694, -23.35252583],
-           [  8.05805806,  29.12995666],
-           [ -1.45145145,  -4.15332663],
-           [ -5.97597598, -19.98916246],
-           [  1.57157157,   6.42725395]]), kind=ResultKind.OBSERVATION)
+    After three more steps, we generate a new condition, which again is sampled across the whole
+    domain. Here we iterate the controller until we've got two sets of conditions:
+    >>> _ = list(takewhile(lambda c: len(c.state.conditions) < 2, c))
+    >>> c.state.history[-1]  # doctest: +NORMALIZE_WHITESPACE
+    Result(data=array([ 1.57157157, -3.93393393, -0.47047047, -4.47447447,  8.43843844,
+                        6.17617618, -3.49349349, -8.998999  ,  4.93493493,  2.25225225]),
+           kind=ResultKind.CONDITION)
 
+    Once we have two theories:
+    >>> _ = list(takewhile(lambda c: len(c.state.theories) < 2, c))
+    >>> c.state.theories
+    [LinearRegression(), LinearRegression()]
 
-    On the third step, we generate a new theory:
-    >>> next(c).state.history[-1]
-    Result(data=LinearRegression(), kind=ResultKind.THEORY)
-
-    On the fourth step, we switch to using the main experimentalist and generate some new
-    experimental data that way
-    >>> next(c).state.history[-1]
+    ... when we run the next step, we'll get the main experimentalist, which samples five points
+    from the extreme parts of the problem domain where the disagreement between the two theories
+    is the greatest:
+    >>> next(c).state.history[-1]  # doctest: +NORMALIZE_WHITESPACE
+    Result(data=array([-10.       ,  -9.97997998,  -9.95995996,  -9.93993994,  -9.91991992]),
+           kind=ResultKind.CONDITION)
 
 """
 from .controller import Controller
