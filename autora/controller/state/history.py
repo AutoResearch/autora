@@ -7,7 +7,7 @@ from typing import Any, Dict, Iterable, List, Optional, Sequence, Set, Union
 from numpy.typing import ArrayLike
 from sklearn.base import BaseEstimator
 
-from autora.controller.protocol.v1 import ResultKind, SupportsDataKind
+from autora.controller.protocol import ResultKind, SupportsDataKind
 from autora.controller.state.snapshot import Snapshot
 from autora.variable import VariableCollection
 
