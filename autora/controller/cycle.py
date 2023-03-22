@@ -99,7 +99,6 @@ class Cycle(BaseController):
          'theorist': {... params for theorist ...}}
         ```
 
-
         Examples:
             >>> from autora.controller.cycle import Cycle
             >>> p = {"some": "params"}
