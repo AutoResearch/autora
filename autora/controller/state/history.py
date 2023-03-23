@@ -108,89 +108,89 @@ class History(SupportsControllerStateHistory):
 
         Examples:
             The initial object is empty:
-            >>> s0 = History()
-            >>> s0
+            >>> h0 = History()
+            >>> h0
             History([])
 
             We can update the metadata using the `.update` method:
             >>> from autora.variable import VariableCollection
-            >>> s1 = s0.update(metadata=VariableCollection())
-            >>> s1  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
+            >>> h1 = h0.update(metadata=VariableCollection())
+            >>> h1  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
             History([Result(data=VariableCollection(...), kind=ResultKind.METADATA)])
 
             ... the original object is unchanged:
-            >>> s0
+            >>> h0
             History([])
 
             We can update the metadata again:
-            >>> s2 = s1.update(metadata=VariableCollection(["some IV"]))
-            >>> s2._by_kind  # doctest: +ELLIPSIS
+            >>> h2 = h1.update(metadata=VariableCollection(["some IV"]))
+            >>> h2._by_kind  # doctest: +ELLIPSIS
             Snapshot(metadata=VariableCollection(independent_variables=['some IV'],...), ...)
 
             ... and we see that there is only ever one metadata object returned.
 
             Params is treated the same way as metadata:
-            >>> sp = s0.update(params={'first': 'params'})
-            >>> sp
+            >>> hp = h0.update(params={'first': 'params'})
+            >>> hp
             History([Result(data={'first': 'params'}, kind=ResultKind.PARAMS)])
 
             ... where only the most recent "params" object is returned from the `.params` property.
-            >>> sp = sp.update(params={'second': 'params'})
-            >>> sp.params
+            >>> hp = hp.update(params={'second': 'params'})
+            >>> hp.params
             {'second': 'params'}
 
             ... however, the full history of the params objects remains available, if needed:
-            >>> sp  # doctest: +NORMALIZE_WHITESPACE
+            >>> hp  # doctest: +NORMALIZE_WHITESPACE
             History([Result(data={'first': 'params'}, kind=ResultKind.PARAMS),
                                     Result(data={'second': 'params'}, kind=ResultKind.PARAMS)])
 
             When we update the conditions, observations or theories, a new entry is added to the
             history:
-            >>> s3 = s0.update(theories=["1st theory"])
-            >>> s3  # doctest: +NORMALIZE_WHITESPACE
+            >>> h3 = h0.update(theories=["1st theory"])
+            >>> h3  # doctest: +NORMALIZE_WHITESPACE
             History([Result(data='1st theory', kind=ResultKind.THEORY)])
 
             ... so we can see the history of all the theories, for instance.
-            >>> s3 = s3.update(theories=["2nd theory"])  # doctest: +NORMALIZE_WHITESPACE
-            >>> s3  # doctest: +NORMALIZE_WHITESPACE
+            >>> h3 = h3.update(theories=["2nd theory"])  # doctest: +NORMALIZE_WHITESPACE
+            >>> h3  # doctest: +NORMALIZE_WHITESPACE
             History([Result(data='1st theory', kind=ResultKind.THEORY),
                                     Result(data='2nd theory', kind=ResultKind.THEORY)])
 
             ... and the full history of theories is available using the `.theories` parameter:
-            >>> s3.theories
+            >>> h3.theories
             ['1st theory', '2nd theory']
 
             The same for the observations:
-            >>> s4 = s0.update(observations=["1st observation"])
-            >>> s4
+            >>> h4 = h0.update(observations=["1st observation"])
+            >>> h4
             History([Result(data='1st observation', kind=ResultKind.OBSERVATION)])
 
-            >>> s4.update(observations=["2nd observation"]
+            >>> h4.update(observations=["2nd observation"]
             ... )  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
             History([Result(data='1st observation', kind=ResultKind.OBSERVATION),
                                     Result(data='2nd observation', kind=ResultKind.OBSERVATION)])
 
 
             The same for the conditions:
-            >>> s5 = s0.update(conditions=["1st condition"])
-            >>> s5
+            >>> h5 = h0.update(conditions=["1st condition"])
+            >>> h5
             History([Result(data='1st condition', kind=ResultKind.CONDITION)])
 
-            >>> s5.update(conditions=["2nd condition"])  # doctest: +NORMALIZE_WHITESPACE
+            >>> h5.update(conditions=["2nd condition"])  # doctest: +NORMALIZE_WHITESPACE
             History([Result(data='1st condition', kind=ResultKind.CONDITION),
                                     Result(data='2nd condition', kind=ResultKind.CONDITION)])
 
             You can also update with multiple conditions, observations and theories:
-            >>> s0.update(conditions=['c1', 'c2'])  # doctest: +NORMALIZE_WHITESPACE
+            >>> h0.update(conditions=['c1', 'c2'])  # doctest: +NORMALIZE_WHITESPACE
             History([Result(data='c1', kind=ResultKind.CONDITION),
                                     Result(data='c2', kind=ResultKind.CONDITION)])
 
-            >>> s0.update(theories=['t1', 't2'], metadata={'m': 1}) # doctest: +NORMALIZE_WHITESPACE
+            >>> h0.update(theories=['t1', 't2'], metadata={'m': 1}) # doctest: +NORMALIZE_WHITESPACE
             History([Result(data={'m': 1}, kind=ResultKind.METADATA),
                                     Result(data='t1', kind=ResultKind.THEORY),
                                     Result(data='t2', kind=ResultKind.THEORY)])
 
-            >>> s0.update(theories=['t1'], observations=['o1'], metadata={'m': 1}
+            >>> h0.update(theories=['t1'], observations=['o1'], metadata={'m': 1}
             ... )  # doctest: +NORMALIZE_WHITESPACE
             History([Result(data={'m': 1}, kind=ResultKind.METADATA),
                      Result(data='o1', kind=ResultKind.OBSERVATION),
