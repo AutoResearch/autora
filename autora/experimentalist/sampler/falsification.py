@@ -17,13 +17,12 @@ from autora.variable import ValueType, VariableCollection
 def falsification_sampler(
     X,
     model,
-    x_train: np.ndarray,
-    y_train: np.ndarray,
+    X_train: np.ndarray,
+    Y_train: np.ndarray,
     metadata: VariableCollection,
     n: Optional[int] = None,
     training_epochs: int = 1000,
     training_lr: float = 1e-3,
-    mse_scale: float = 1,
     plot: bool = False,
 ):
     """
@@ -36,8 +35,8 @@ def falsification_sampler(
     Args:
         X: The candidate samples of conditions to be evaluated.
         model: Scikit-learn model, could be either a classification or regression model
-        x_train: Conditions that the model was trained on
-        y_train: Observations that the model was trained to predict
+        X_train: Conditions that the model was trained on
+        Y_train: Observations that the model was trained to predict
         metadata: Meta-data about the dependent and independent variables
         n: Number of samples to return
         training_epochs: Number of epochs to train the popper network for approximating the
@@ -51,9 +50,9 @@ def falsification_sampler(
 
     # format input
 
-    x_train = np.array(x_train)
-    if len(x_train.shape) == 1:
-        x_train = x_train.reshape(-1, 1)
+    X_train = np.array(X_train)
+    if len(X_train.shape) == 1:
+        X_train = X_train.reshape(-1, 1)
 
     # get target pattern for popper net
     model_predict = getattr(model, "predict_proba", None)
@@ -63,7 +62,7 @@ def falsification_sampler(
     if callable(model_predict) is False or model_predict is None:
         raise Exception("Model must have `predict` or `predict_proba` method.")
 
-    model_prediction = model_predict(x_train)
+    model_prediction = model_predict(X_train)
     if isinstance(model_prediction, np.ndarray) is False:
         try:
             model_prediction = np.array(model_prediction)
@@ -72,30 +71,28 @@ def falsification_sampler(
     if model_prediction.ndim == 1:
         model_prediction = model_prediction.reshape(-1, 1)
 
-    return get_scored_samples_from_predicted_theory_error(
+    return get_samples_from_model_prediction(
         X,
         model_prediction,
-        x_train,
-        y_train,
+        X_train,
+        Y_train,
         metadata,
         n,
         training_epochs,
         training_lr,
-        mse_scale,
         plot,
     )
 
 
-def get_samples_from_predicted_theory_error(
+def get_samples_from_model_prediction(
     X,
-    y_predicted,
-    x_train: np.ndarray,
-    y_train: np.ndarray,
+    Y_predicted,
+    X_train: np.ndarray,
+    Y_train: np.ndarray,
     metadata: Optional[VariableCollection] = None,
     n: Optional[int] = None,
     training_epochs: int = 1000,
     training_lr: float = 1e-3,
-    mse_scale: float = 1,
     plot: bool = False,
 ):
     """
@@ -108,9 +105,9 @@ def get_samples_from_predicted_theory_error(
 
     Args:
         X: The candidate samples to be evaluated.
-        y_predicted: Prediction obtained from the model for the set of conditions x_train
-        x_train: Conditions that the model was trained on
-        y_train: Observations that the model was trained to predict
+        Y_predicted: Prediction obtained from the model for the set of conditions X_train
+        X_train: Conditions that the model was trained on
+        Y_train: Observations that the model was trained to predict
         metadata: Meta-data about the dependent and independent variables
         n: Number of samples to return
         training_epochs: Number of epochs to train the popper network for approximating the
@@ -121,32 +118,30 @@ def get_samples_from_predicted_theory_error(
     Returns: Samples with the highest loss
 
     """
-    X, scores = get_scored_samples_from_predicted_theory_error(
+    X, scores = get_scored_samples_from_model_prediction(
         X,
-        y_predicted,
-        x_train,
-        y_train,
+        Y_predicted,
+        X_train,
+        Y_train,
         metadata,
         n,
         training_epochs,
         training_lr,
-        mse_scale,
         plot,
     )
 
     return X
 
 
-def get_scored_samples_from_predicted_theory_error(
+def get_scored_samples_from_model_prediction(
     X,
-    y_predicted,
-    x_train: np.ndarray,
-    y_train: np.ndarray,
+    Y_predicted,
+    X_train: np.ndarray,
+    Y_train: np.ndarray,
     metadata: Optional[VariableCollection] = None,
     n: Optional[int] = None,
     training_epochs: int = 1000,
     training_lr: float = 1e-3,
-    mse_scale: float = 1,
     plot: bool = False,
 ):
     """
@@ -159,9 +154,9 @@ def get_scored_samples_from_predicted_theory_error(
 
     Args:
         X: The candidate samples to be evaluated.
-        y_predicted: Prediction obtained from the model for the set of conditions x_train
-        x_train: Conditions that the model was trained on
-        y_train: Observations that the model was trained to predict
+        Y_predicted: Prediction obtained from the model for the set of conditions X_train
+        X_train: Conditions that the model was trained on
+        Y_train: Observations that the model was trained to predict
         metadata: Meta-data about the dependent and independent variables
         n: Number of samples to return
         training_epochs: Number of epochs to train the popper network for approximating the
@@ -179,22 +174,22 @@ def get_scored_samples_from_predicted_theory_error(
     if len(X.shape) == 1:
         X = X.reshape(-1, 1)
 
-    x_train = np.array(x_train)
-    if len(x_train.shape) == 1:
-        x_train = x_train.reshape(-1, 1)
+    X_train = np.array(X_train)
+    if len(X_train.shape) == 1:
+        X_train = X_train.reshape(-1, 1)
 
-    y_train = np.array(y_train)
-    if len(y_train.shape) == 1:
-        y_train = y_train.reshape(-1, 1)
+    Y_train = np.array(Y_train)
+    if len(Y_train.shape) == 1:
+        Y_train = Y_train.reshape(-1, 1)
 
     if n is None:
         n = X.shape[0]
 
     if metadata is not None:
         if metadata.dependent_variables[0].type == ValueType.CLASS:
-            # find all unique values in y_train
-            num_classes = len(np.unique(y_train))
-            y_train = class_to_onehot(y_train, n_classes=num_classes)
+            # find all unique values in Y_train
+            num_classes = len(np.unique(Y_train))
+            Y_train = class_to_onehot(Y_train, n_classes=num_classes)
 
     # create list of IV limits
     iv_limit_list = list()
@@ -207,28 +202,28 @@ def get_scored_samples_from_predicted_theory_error(
                 upper_bound = value_range[1]
                 iv_limit_list.append(([lower_bound, upper_bound]))
     else:
-        for col in X.shape[1]:
+        for col in range(X.shape[1]):
             min = np.min(X[:, col])
             max = np.max(X[:, col])
             iv_limit_list.append(([min, max]))
 
     # get input pattern for popper net
-    popper_input = Variable(torch.from_numpy(x_train), requires_grad=False).float()
+    popper_input = Variable(torch.from_numpy(X_train), requires_grad=False).float()
 
     # get dimensions of input and output
-    n_input = x_train.shape[1]
+    n_input = X_train.shape[1]
     n_output = 1  # only predicting one MSE
 
-    if isinstance(y_predicted, np.ndarray) is False:
+    if isinstance(Y_predicted, np.ndarray) is False:
         try:
-            y_predicted = np.array(y_predicted)
+            Y_predicted = np.array(Y_predicted)
         except Exception:
             raise Exception("Model prediction must be convertable to numpy array.")
-    if y_predicted.ndim == 1:
-        y_predicted = y_predicted.reshape(-1, 1)
+    if Y_predicted.ndim == 1:
+        Y_predicted = Y_predicted.reshape(-1, 1)
 
     criterion = nn.MSELoss()
-    model_loss = (y_predicted - y_train) ** 2 * mse_scale
+    model_loss = (Y_predicted - Y_train) ** 2
     model_loss = np.mean(model_loss, axis=1)
 
     # standardize the loss
@@ -273,16 +268,18 @@ def get_scored_samples_from_predicted_theory_error(
             popper_input_full,
             popper_prediction,
             popper_target,
-            y_predicted,
-            y_train,
+            Y_predicted,
+            Y_train,
         )
 
     # now that the popper network is trained we can assign losses to all data points to be evaluated
-    popper_input = Variable(torch.from_numpy(X), requires_grad=True).float()
+    popper_input = Variable(torch.from_numpy(X)).float()
     Y = popper_net(popper_input).detach().numpy().flatten()
+    scaler = StandardScaler()
+    score = scaler.fit_transform(Y.reshape(-1, 1)).flatten()
 
     # order rows in Y from highest to lowest
-    sorted_X = X[np.argsort(Y)[::-1]]
-    sorted_score = Y[np.argsort(Y)[::-1]]
+    sorted_X = X[np.argsort(score)[::-1]]
+    sorted_score = score[np.argsort(score)[::-1]]
 
     return sorted_X[:n], sorted_score[:n]
