@@ -20,13 +20,13 @@ num_repetitions = 20                 # specifies how many times to repeat the st
 test_size = 0.2                # proportion of test set size to training set size
 
 theorists = [
-             'MLP',
-             'DARTS 3 Nodes',
-             'Regression',
-             'BMS',
-             'BMS Fixed Root',
-             'BSR'
-             ]
+    'BMS Prior',
+    'BMS Williams2023Psychophysics',
+    'BMS Williams2023PsychophysicsUpWeighted',
+    'BMS Williams2023CognitivePsychology',
+    'BMS Williams2023CognitivePsychologyUpWeighted',
+    'BMS Williams2023BehavioralEconomics',
+    'BMS Williams2023BehavioralEconomicsUpWeighted']
 
 gts = ['weber_fechner',
        'stevens_power_law',

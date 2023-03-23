@@ -36,7 +36,29 @@ def fit_theorist(X, y, theorist_name, metadata, theorist_epochs=None):
             epochs = theorist_epochs
         else:
             epochs = 1500  # 1500
-        theorist = BMSRegressor(epochs=epochs)
+        if 'PriorStudy' in theorist_name:
+            theorist = BMSRegressor(epochs=epochs,
+                                    prior_par=get_priors('PriorStudy'))
+        elif 'Williams2023Psychophysics' in theorist_name:
+            theorist = BMSRegressor(epochs=epochs,
+                                    prior_par=get_priors('Williams2023Psychophysics'))
+        elif 'Williams2023PsychophysicsUpWeighted' in theorist_name:
+            theorist = BMSRegressor(epochs=epochs,
+                                    prior_par=get_priors('Williams2023PsychophysicsUpWeighted'))
+        elif 'Williams2023CognitivePsychology' in theorist_name:
+            theorist = BMSRegressor(epochs=epochs,
+                                    prior_par=get_priors('Williams2023CognitivePsychology'))
+        elif 'Williams2023CognitivePsychologyUpWeighted' in theorist_name:
+            theorist = BMSRegressor(epochs=epochs,
+                                    prior_par=get_priors('Williams2023CognitivePsychologyUpWeighted'))
+        elif 'Williams2023BehavioralEconomics' in theorist_name:
+            theorist = BMSRegressor(epochs=epochs,
+                                    prior_par=get_priors('Williams2023BehavioralEconomics'))
+        elif 'Williams2023BehavioralEconomicsUpWeighted' in theorist_name:
+            theorist = BMSRegressor(epochs=epochs,
+                                    prior_par=get_priors('Williams2023BehavioralEconomicsUpWeighted'))
+        else:
+            theorist = BMSRegressor(epochs=epochs)
     elif theorist_name == "DARTS 2 Nodes":
         if theorist_epochs is not None:
             epochs = theorist_epochs
