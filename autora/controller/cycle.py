@@ -56,7 +56,7 @@ class Cycle(BaseController):
             conditions=[],
             observations=[],
             theories=[],
-            params=params,
+            params={"full_cycle": params},
         )
         planner = full_cycle_planner
 
@@ -111,11 +111,11 @@ class Cycle(BaseController):
             >>> c.params
             {'new': 'value'}
         """
-        return self.state.params
+        return self.state.params["full_cycle"]
 
     @params.setter
     def params(self, value):
-        self.state = self.state.update(params=value)
+        self.state = self.state.update(params={"full_cycle": value})
 
     @property
     def theorist(self):

@@ -68,9 +68,10 @@ class BaseController:
 
         # Map
         next_function = self.executor_collection[next_function_name]
+        next_params = self.state.params.get(next_function_name, {})
 
         # Execute
-        result = next_function(self.state)
+        result = next_function(self.state, params=next_params)
 
         # Update
         self.state = result

@@ -506,11 +506,7 @@ Examples:
     ... ])
 
     We need some special parameters to handle the main experimentalist, so we specify those:
-    >>> params = {"experimentalist": {"sampler": {"models": "%theories%"}}}
-
-    Warning: the dictionary `{"sampler": {"models": "%theories%"}}` above is shared by
-    both the seed and main experimentalists. This behavior may change in future to allow separate
-    parameter dictionaries for each executor in the collection.
+    >>> params = {"main_experimentalist": {"sampler": {"models": "%theories%"}}}
 
     We now instantiate the controller:
     >>> from autora.controller.base import BaseController
