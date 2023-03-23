@@ -8,7 +8,7 @@ import copy
 import logging
 from functools import partial
 from types import MappingProxyType
-from typing import Callable, Iterable, Literal, Optional, Tuple, Union
+from typing import Callable, Dict, Iterable, Literal, Optional, Tuple, Union
 
 import numpy as np
 from sklearn.base import BaseEstimator
@@ -21,11 +21,11 @@ _logger = logging.getLogger(__name__)
 
 
 def experimentalist_wrapper(
-    state: SupportsControllerState, pipeline: Pipeline
+    state: SupportsControllerState, pipeline: Pipeline, params: Dict
 ) -> SupportsControllerState:
     """Interface for running the experimentalist pipeline."""
-    params = resolve_state_params(state).get("experimentalist", dict())
-    new_conditions = pipeline(**params)
+    params_ = resolve_state_params(params, state)
+    new_conditions = pipeline(**params_)
 
     assert isinstance(new_conditions, Iterable)
     # If the pipeline gives us an iterable, we need to make it into a concrete array.
@@ -41,22 +41,22 @@ def experimentalist_wrapper(
 
 
 def experiment_runner_wrapper(
-    state: SupportsControllerState, callable: Callable
+    state: SupportsControllerState, callable: Callable, params: Dict
 ) -> SupportsControllerState:
     """Interface for running the experiment runner callable."""
-    params = resolve_state_params(state).get("experiment_runner", dict())
+    params_ = resolve_state_params(params, state)
     x = state.conditions[-1]
-    y = callable(x, **params)
+    y = callable(x, **params_)
     new_observations = np.column_stack([x, y])
     new_state = state.update(observations=[new_observations])
     return new_state
 
 
 def theorist_wrapper(
-    state: SupportsControllerState, estimator: BaseEstimator
+    state: SupportsControllerState, estimator: BaseEstimator, params: Dict
 ) -> SupportsControllerState:
     """Interface for running the theorist estimator given some State."""
-    params = resolve_state_params(state).get("theorist", dict())
+    params_ = resolve_state_params(params, state)
     metadata = state.metadata
     observations = state.observations
     all_observations = np.row_stack(observations)
@@ -65,7 +65,7 @@ def theorist_wrapper(
     if y.shape[1] == 1:
         y = y.ravel()
     new_theorist = copy.deepcopy(estimator)
-    new_theorist.fit(x, y, **params)
+    new_theorist.fit(x, y, **params_)
     new_state = state.update(theories=[new_theorist])
     return new_state
 
@@ -75,24 +75,32 @@ def full_cycle_wrapper(
     experimentalist_pipeline: Pipeline,
     experiment_runner_callable: Callable,
     theorist_estimator: BaseEstimator,
+    params: Dict,
 ) -> SupportsControllerState:
     """Interface for running the full AER cycle."""
-    experimentalist_result = experimentalist_wrapper(state, experimentalist_pipeline)
-    experiment_runner_result = experiment_runner_wrapper(
-        experimentalist_result, experiment_runner_callable
+    experimentalist_params = params.get("experimentalist", {})
+    experimentalist_result = experimentalist_wrapper(
+        state, experimentalist_pipeline, experimentalist_params
     )
-    theorist_result = theorist_wrapper(experiment_runner_result, theorist_estimator)
+    experiment_runner_params = params.get("experiment_runner", {})
+    experiment_runner_result = experiment_runner_wrapper(
+        experimentalist_result, experiment_runner_callable, experiment_runner_params
+    )
+    theorist_params = params.get("theorist", {})
+    theorist_result = theorist_wrapper(
+        experiment_runner_result, theorist_estimator, theorist_params
+    )
     return theorist_result
 
 
-def no_op(state):
+def no_op(state, params):
     """
     An Executor which has no effect on the state.
 
     Examples:
          >>> from autora.controller.state import Snapshot
          >>> s = Snapshot()
-         >>> s_returned = no_op(s)
+         >>> s_returned = no_op(s, {})
          >>> assert s_returned is s
     """
     _logger.warning("You called a `no_op` Executor. Returning the state unchanged.")

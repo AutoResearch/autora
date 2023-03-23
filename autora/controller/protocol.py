@@ -108,9 +108,9 @@ class SupportsControllerStateHistory(SupportsControllerStateProperties, Protocol
 
 
 class Executor(Protocol):
-    """A Callable which, given some state, returns an updated state."""
+    """A Callable which, given some state, and some parameters, returns an updated state."""
 
-    def __call__(self, __state: State) -> State:
+    def __call__(self, __state: State, __params: Dict) -> State:
         ...
 
 
