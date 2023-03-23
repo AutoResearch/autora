@@ -100,18 +100,18 @@ def _resolve_properties(params: Dict, state_dependent_properties: Mapping):
     return params_
 
 
-def resolve_state_params(state: SupportsControllerState) -> Dict:
+def resolve_state_params(params: Dict, state: SupportsControllerState) -> Dict:
     """
     Returns the `params` attribute of the input, with `cycle properties` resolved.
 
     Examples:
         >>> from autora.controller.state import History
-        >>> s = History(theories=["the first theory", "the second theory"],
-        ...     params={"experimentalist": {"source": "%theories[-1]%"}})
-        >>> resolve_state_params(s)
+        >>> params = {"experimentalist": {"source": "%theories[-1]%"}}
+        >>> s = History(theories=["the first theory", "the second theory"])
+        >>> resolve_state_params(params, s)
         {'experimentalist': {'source': 'the second theory'}}
 
     """
     state_dependent_properties = _get_state_dependent_properties(state)
-    resolved_params = _resolve_properties(state.params, state_dependent_properties)
+    resolved_params = _resolve_properties(params, state_dependent_properties)
     return resolved_params
