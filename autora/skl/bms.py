@@ -15,7 +15,7 @@ _logger = logging.getLogger(__name__)
 
 # hyperparameters for BMS
 # 1) Priors for MCMC
-PRIORS, _ = get_priors()
+PRIORS, OPS = get_priors()
 
 # 2) Temperatures for parallel tempering
 TEMPERATURES = [1.0] + [1.04**k for k in range(1, 20)]
@@ -67,7 +67,7 @@ class BMSRegressor(BaseEstimator, RegressorMixin):
         self.prior_par = prior_par
         self.epochs = epochs
         self.pms: Parallel = Parallel(Ts=ts)
-        self.ops = get_priors()[1]
+        self.ops = {k: v for k, v in get_priors()[1].items() if "Nopi_" + k in prior_par}
         self.custom_ops: Dict[str, Callable] = dict()
         self.X_: Optional[np.ndarray] = None
         self.y_: Optional[np.ndarray] = None
