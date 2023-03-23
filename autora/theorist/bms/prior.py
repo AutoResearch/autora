@@ -59,6 +59,17 @@ def __get_prior(prior_name):
             "Nopi_exp": 4.768665265735502,
             "Nopi_log": 4.745957377206544,
         },
+        'PriorStudy':{
+            "Nopi_+": 5.808163661224514,
+            "Nopi_-": 3.350846072163632,
+            "Nopi_*": 5.002213595420244,
+            "Nopi_/": 5.912205942815285,
+            "Nopi_**": 6.4734429542245495,
+            "Nopi_log": 4.745957377206544,
+            "Nopi_exp": 4.768665265735502,
+            "Nopi_sin": 5.965917796154835,
+            "Nopi_cos": 5.452564657261127,
+        },
         'Williams2023Psychophysics':{
             "Nopi_+": float(29/48),
             "Nopi_-": float(35/48),
@@ -69,6 +80,17 @@ def __get_prior(prior_name):
             "Nopi_exp": float(0/48),
             "Nopi_sin": float(0/48),
             "Nopi_cos": float(0/48),
+        },
+        'Williams2023PsychophysicsUpWeighted': {
+            "Nopi_+": float(29 / 48) * 10,
+            "Nopi_-": float(35 / 48) * 10,
+            "Nopi_*": float(66 / 48) * 10,
+            "Nopi_/": float(14 / 48) * 10,
+            "Nopi_**": float(10 / 48) * 10,
+            "Nopi_log": float(4 / 48) * 10,
+            "Nopi_exp": float(0 / 48) * 10,
+            "Nopi_sin": float(0 / 48) * 10,
+            "Nopi_cos": float(0 / 48) * 10,
         },
         'Williams2023CognitivePsychology': {
             "Nopi_+": float(65/92),
@@ -81,6 +103,17 @@ def __get_prior(prior_name):
             "Nopi_sin": float(0/92),
             "Nopi_cos": float(1/92),
         },
+        'Williams2023CognitivePsychologyUpWeighted': {
+            "Nopi_+": float(65 / 92)*10,
+            "Nopi_-": float(66 / 92)*10,
+            "Nopi_*": float(120 / 92)*10,
+            "Nopi_/": float(37 / 92)*10,
+            "Nopi_**": float(33 / 92)*10,
+            "Nopi_log": float(8 / 92)*10,
+            "Nopi_exp": float(3 / 92)*10,
+            "Nopi_sin": float(0 / 92)*10,
+            "Nopi_cos": float(1 / 92)*10,
+        },
         'Williams2023BehavioralEconomics': {
             "Nopi_+": float(46 /115),
             "Nopi_-": float(54 /115),
@@ -91,6 +124,17 @@ def __get_prior(prior_name):
             "Nopi_exp": float(3 /115),
             "Nopi_sin": float(0 /115),
             "Nopi_cos": float(0 /115),
+        },
+        'Williams2023BehavioralEconomicsUpWeighted': {
+            "Nopi_+": float(46 / 115)*10,
+            "Nopi_-": float(54 / 115)*10,
+            "Nopi_*": float(105 / 115)*10,
+            "Nopi_/": float(46 / 115)*10,
+            "Nopi_**": float(38 / 115)*10,
+            "Nopi_log": float(8 / 115)*10,
+            "Nopi_exp": float(3 / 115)*10,
+            "Nopi_sin": float(0 / 115)*10,
+            "Nopi_cos": float(0 / 115)*10,
         }
     }
     assert prior_dict[prior_name] is not None, "prior key not recognized"
