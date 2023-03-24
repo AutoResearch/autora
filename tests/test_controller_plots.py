@@ -5,15 +5,15 @@ import pytest
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import r2_score
 
-from autora.cycle import (
-    Cycle,
+from autora.controller import Cycle
+from autora.controller.plotting import (
+    _check_replace_default_kw,
     cycle_default_score,
     cycle_specified_score,
     plot_cycle_score,
     plot_results_panel_2d,
     plot_results_panel_3d,
 )
-from autora.cycle.plot_utils import _check_replace_default_kw
 from autora.experimentalist.pipeline import Pipeline
 from autora.experimentalist.pooler.general_pool import grid_pool
 from autora.experimentalist.sampler import random_sampler
@@ -29,7 +29,7 @@ def ground_truth_1x():
 
 
 @pytest.fixture
-def cycle_lr(ground_truth_1x):
+def state_lr(ground_truth_1x):
     random.seed(1)
 
     # Variable Metadata
@@ -78,7 +78,7 @@ def cycle_lr(ground_truth_1x):
     # Run 10 iterations
     cycle.run(10)
 
-    return cycle
+    return cycle.state
 
 
 @pytest.fixture
@@ -146,6 +146,11 @@ def cycle_multi_lr(ground_truth_2x):
     return cycle
 
 
+@pytest.fixture
+def state_multi_lr(cycle_multi_lr):
+    return cycle_multi_lr.state
+
+
 def test_check_replace_default_kw():
     default = {
         "subplot_kw": {"sharex": True, "sharey": True},
@@ -165,13 +170,13 @@ def test_check_replace_default_kw():
     }
 
 
-def test_2d_plot(cycle_lr):
+def test_2d_plot(state_lr):
     """
     Tests plotting functionality of plot_results_panel_2d.
     """
     steps = 51
     fig = plot_results_panel_2d(
-        cycle_lr, steps=steps, wrap=3, subplot_kw={"sharex": True, "sharey": True}
+        state_lr, steps=steps, wrap=3, subplot_kw={"sharex": True, "sharey": True}
     )
 
     # Should have 12 axes, 10 with data and the last 2 turned off
@@ -216,16 +221,16 @@ def test_2d_plot(cycle_lr):
         assert len(axes.lines[0].get_ydata()) == steps
 
 
-def test_3d_plot(cycle_multi_lr):
+def test_3d_plot(state_multi_lr):
     """
     Tests plotting functionality of plot_results_panel_3d.
     """
     steps = 20
     fig = plot_results_panel_3d(
-        cycle_multi_lr,
+        state_multi_lr,
         steps=steps,
-        view=(20, 60),
         wrap=3,
+        view=(20, 60),
         subplot_kw=dict(figsize=(11, 8)),
     )
 
@@ -253,17 +258,15 @@ def test_3d_plot(cycle_multi_lr):
     )
 
 
-def test_score_functions(cycle_lr, ground_truth_1x):
+def test_score_functions(state_lr, ground_truth_1x):
     """
     Tests the scoring functions cycle_default_score and cycle_specified_score.
     """
-    X_test = cycle_lr.data.metadata.independent_variables[0].allowed_values.reshape(
-        -1, 1
-    )
+    X_test = state_lr.metadata.independent_variables[0].allowed_values.reshape(-1, 1)
     y_test = ground_truth_1x(X_test)
 
-    scores_default = cycle_default_score(cycle_lr, X_test, y_test)
-    scores_specified = cycle_specified_score(r2_score, cycle_lr, X_test, y_test)
+    scores_default = cycle_default_score(state_lr, X_test, y_test)
+    scores_specified = cycle_specified_score(r2_score, state_lr, X_test, y_test)
 
     # Check scores are the expected values
     score_values = [
@@ -285,15 +288,13 @@ def test_score_functions(cycle_lr, ground_truth_1x):
     assert np.array_equal(scores_default, scores_specified)
 
 
-def test_cycle_score_plot(cycle_lr, ground_truth_1x):
+def test_cycle_score_plot(state_lr, ground_truth_1x):
     """
     Tests plotting functionality of test_cycle_score_plot with a 2D linear regression.
     """
-    X_test = cycle_lr.data.metadata.independent_variables[0].allowed_values.reshape(
-        -1, 1
-    )
+    X_test = state_lr.metadata.independent_variables[0].allowed_values.reshape(-1, 1)
     y_test = ground_truth_1x(X_test)
-    fig = plot_cycle_score(cycle_lr, X_test, y_test)
+    fig = plot_cycle_score(state_lr, X_test, y_test)
 
     # Should have 1 axis
     assert len(fig.axes) == 1
@@ -325,10 +326,10 @@ def test_cycle_score_plot_multi_lr(cycle_multi_lr, ground_truth_2x):
     """
     cycle_multi_lr.run(6)  # Run additional 6 times, total of 12 cycles
     X_test = np.array(
-        list(grid_pool(cycle_multi_lr.data.metadata.independent_variables))
+        list(grid_pool(cycle_multi_lr.state.metadata.independent_variables))
     )
     y_test = ground_truth_2x(X_test)
-    fig = plot_cycle_score(cycle_multi_lr, X_test, y_test)
+    fig = plot_cycle_score(cycle_multi_lr.state, X_test, y_test)
 
     # Test line is plotted correctly
     axis = fig.axes[0]
@@ -353,13 +354,13 @@ def test_cycle_score_plot_multi_lr(cycle_multi_lr, ground_truth_2x):
     assert np.array_equal(np.around(y_plotted, 8), np.around(y_values, 8))
 
 
-def test_2d_plot_indexing(cycle_lr):
+def test_2d_plot_indexing(state_lr):
     """
     Test indexing of 2d plotter.
     """
     steps = 51
     fig = plot_results_panel_2d(
-        cycle_lr,
+        state_lr,
         steps=steps,
         wrap=2,
         query=[0, 3, 7],
@@ -371,13 +372,13 @@ def test_2d_plot_indexing(cycle_lr):
     assert sum([s.axison for s in fig.axes]) == 3
 
 
-def test_2d_plot_negative_indexing(cycle_lr):
+def test_2d_plot_negative_indexing(state_lr):
     """
     Test indexing of 2d plotter.
     """
     steps = 51
     fig = plot_results_panel_2d(
-        cycle_lr,
+        state_lr,
         steps=steps,
         wrap=2,
         query=[-2, -1],
@@ -393,7 +394,7 @@ def test_2d_plot_negative_indexing(cycle_lr):
     assert fig.axes[1].get_children()[3].get_text() == "Cycle 9"
 
 
-def test_2d_plot_slicing(cycle_lr):
+def test_2d_plot_slicing(state_lr):
     """
     Test slicing of 2d plotter using built-in slice() function.
     """
@@ -402,7 +403,7 @@ def test_2d_plot_slicing(cycle_lr):
     # Using Slice function
     # Cycles 0, 2, 4, 6, 8
     fig = plot_results_panel_2d(
-        cycle_lr,
+        state_lr,
         steps=steps,
         wrap=3,
         query=slice(0, 9, 2),
@@ -414,7 +415,7 @@ def test_2d_plot_slicing(cycle_lr):
 
     # Last 4 plots
     fig2 = plot_results_panel_2d(
-        cycle_lr,
+        state_lr,
         steps=steps,
         wrap=3,
         query=slice(-4, None, None),
@@ -425,7 +426,7 @@ def test_2d_plot_slicing(cycle_lr):
     assert sum([s.axison for s in fig2.axes]) == 4
 
 
-def test_2d_plot_slicing_np(cycle_lr):
+def test_2d_plot_slicing_np(state_lr):
     """
     Test slicing of 2d plotter using np.s_ Index Expression
     """
@@ -433,7 +434,7 @@ def test_2d_plot_slicing_np(cycle_lr):
 
     # Cycles 0, 2, 4, 6, 8
     fig1 = plot_results_panel_2d(
-        cycle_lr,
+        state_lr,
         steps=steps,
         wrap=3,
         query=np.s_[0:9:2],
@@ -444,7 +445,7 @@ def test_2d_plot_slicing_np(cycle_lr):
     assert sum([s.axison for s in fig1.axes]) == 5
 
     fig2 = plot_results_panel_2d(
-        cycle_lr,
+        state_lr,
         steps=steps,
         wrap=3,
         query=np.s_[-4:],
@@ -455,7 +456,7 @@ def test_2d_plot_slicing_np(cycle_lr):
     assert sum([s.axison for s in fig2.axes]) == 4
 
 
-def test_2d_plot_plot_single(cycle_lr):
+def test_2d_plot_plot_single(state_lr):
     """
     Test query of 2d plotter for a single cycle.
     """
@@ -463,17 +464,14 @@ def test_2d_plot_plot_single(cycle_lr):
 
     # Using index
     fig1 = plot_results_panel_2d(
-        cycle_lr,
-        steps=steps,
-        query=[9],
-        subplot_kw={"sharex": True, "sharey": True},
+        state_lr, steps=steps, query=[9], subplot_kw={"sharex": True, "sharey": True}
     )
     assert len(fig1.axes) == 1
     assert sum([s.axison for s in fig1.axes]) == 1
 
     # Using slice()
     fig2 = plot_results_panel_2d(
-        cycle_lr,
+        state_lr,
         steps=steps,
         query=slice(-1, None, None),
         subplot_kw={"sharex": True, "sharey": True},
@@ -483,7 +481,7 @@ def test_2d_plot_plot_single(cycle_lr):
 
     # Using np.s_ Index expression
     fig3 = plot_results_panel_2d(
-        cycle_lr,
+        state_lr,
         steps=steps,
         query=np.s_[-1:],
         subplot_kw={"sharex": True, "sharey": True},
