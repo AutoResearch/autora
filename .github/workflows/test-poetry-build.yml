@@ -2,7 +2,6 @@ name: Test Poetry Build
 
 on:
   pull_request:
-    branches: [ "main" ]
 
 jobs:
   build-poetry:
