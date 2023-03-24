@@ -38,25 +38,25 @@ def fit_theorist(X, y, theorist_name, metadata, theorist_epochs=None):
             epochs = 1500  # 1500
         if 'PriorStudy' in theorist_name:
             theorist = BMSRegressor(epochs=epochs,
-                                    prior_par=get_priors('PriorStudy'))
+                                    prior_par=get_priors('PriorStudy')[0])
         elif 'Williams2023Psychophysics' in theorist_name:
             theorist = BMSRegressor(epochs=epochs,
-                                    prior_par=get_priors('Williams2023Psychophysics'))
+                                    prior_par=get_priors('Williams2023Psychophysics')[0])
         elif 'Williams2023PsychophysicsUpWeighted' in theorist_name:
             theorist = BMSRegressor(epochs=epochs,
-                                    prior_par=get_priors('Williams2023PsychophysicsUpWeighted'))
+                                    prior_par=get_priors('Williams2023PsychophysicsUpWeighted')[0])
         elif 'Williams2023CognitivePsychology' in theorist_name:
             theorist = BMSRegressor(epochs=epochs,
-                                    prior_par=get_priors('Williams2023CognitivePsychology'))
+                                    prior_par=get_priors('Williams2023CognitivePsychology')[0])
         elif 'Williams2023CognitivePsychologyUpWeighted' in theorist_name:
             theorist = BMSRegressor(epochs=epochs,
-                                    prior_par=get_priors('Williams2023CognitivePsychologyUpWeighted'))
+                                    prior_par=get_priors('Williams2023CognitivePsychologyUpWeighted')[0])
         elif 'Williams2023BehavioralEconomics' in theorist_name:
             theorist = BMSRegressor(epochs=epochs,
-                                    prior_par=get_priors('Williams2023BehavioralEconomics'))
+                                    prior_par=get_priors('Williams2023BehavioralEconomics')[0])
         elif 'Williams2023BehavioralEconomicsUpWeighted' in theorist_name:
             theorist = BMSRegressor(epochs=epochs,
-                                    prior_par=get_priors('Williams2023BehavioralEconomicsUpWeighted'))
+                                    prior_par=get_priors('Williams2023BehavioralEconomicsUpWeighted')[0])
         else:
             theorist = BMSRegressor(epochs=epochs)
     elif theorist_name == "DARTS 2 Nodes":
@@ -325,7 +325,7 @@ def get_LL(mse):
 def get_BIC(theorist, theorist_name, mse, num_obs):
     # BIC = n * LL + k * log(n)
     num_params = get_num_params(theorist, theorist_name)
-    return num_params * np.log(num_obs) - 2 * get_LL(mse)
+    return num_params * np.log(num_obs) + 2 * get_LL(mse)
 
 
 def get_DL(theorist, theorist_name, mse, num_obs):
