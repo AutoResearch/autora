@@ -9,7 +9,7 @@ from matplotlib import rcParams
 from matplotlib.patches import Patch
 from matplotlib.ticker import MaxNLocator
 
-from .simple import SimpleCycle as Cycle
+from .protocol import SupportsControllerState
 
 # Change default plot styles
 rcParams["axes.spines.top"] = False
@@ -18,41 +18,40 @@ rcParams["legend.frameon"] = False
 
 
 def _get_variable_index(
-    cycle: Cycle,
+    state: SupportsControllerState,
 ) -> Tuple[List[Tuple[int, str, str]], List[Tuple[int, str, str]]]:
     """
     Extracts information about independent and dependent variables from the cycle object.
     Returns a list of tuples of (index, name, units). The index is in reference to the column number
     in the observed value arrays.
     Args:
-        cycle: AER Cycle object that has been run
+        state: AER Cycle object that has been run
 
     Returns: Tuple of 2 lists of tuples
 
     """
     l_iv = [
-        (i, s.name, s.units)
-        for i, s in enumerate(cycle.data.metadata.independent_variables)
+        (i, s.name, s.units) for i, s in enumerate(state.metadata.independent_variables)
     ]
     n_iv = len(l_iv)
     l_dv = [
         (i + n_iv, s.name, s.units)
-        for i, s in enumerate(cycle.data.metadata.dependent_variables)
+        for i, s in enumerate(state.metadata.dependent_variables)
     ]
     return l_iv, l_dv
 
 
-def _observed_to_df(cycle: Cycle) -> pd.DataFrame:
+def _observed_to_df(state: SupportsControllerState) -> pd.DataFrame:
     """
     Concatenates observation data of cycles into a single dataframe with a field "cycle" with the
     cycle index.
     Args:
-        cycle: AER Cycle object that has been run
+        state: AER Cycle object that has been run
 
     Returns: Dataframe
 
     """
-    l_observations = cycle.data.observations
+    l_observations = state.observations
     l_agg = []
 
     for i, data in enumerate(l_observations):
@@ -63,18 +62,18 @@ def _observed_to_df(cycle: Cycle) -> pd.DataFrame:
     return df_return
 
 
-def _min_max_observations(cycle: Cycle) -> List[Tuple[float, float]]:
+def _min_max_observations(state: SupportsControllerState) -> List[Tuple[float, float]]:
     """
     Returns minimum and maximum of observed values for each independent variable.
     Args:
-        cycle: AER Cycle object that has been run
+        state: AER Cycle object that has been run
 
     Returns: List of tuples
 
     """
     l_return = []
-    iv_index = range(len(cycle.data.metadata.independent_variables))
-    l_observations = cycle.data.observations
+    iv_index = range(len(state.metadata.independent_variables))
+    l_observations = state.observations
     # Get min and max of observation data
     # Min and max by cycle - All IVs
     l_mins = [np.min(s, axis=0) for s in l_observations]  # Arrays by columns
@@ -88,17 +87,19 @@ def _min_max_observations(cycle: Cycle) -> List[Tuple[float, float]]:
     return l_return
 
 
-def _generate_condition_space(cycle: Cycle, steps: int = 50) -> np.array:
+def _generate_condition_space(
+    state: SupportsControllerState, steps: int = 50
+) -> np.array:
     """
     Generates condition space based on the minimum and maximum of all observed data in AER Cycle.
     Args:
-        cycle: AER Cycle object that has been run
+        state: AER Cycle object that has been run
         steps: Number of steps to define the condition space
 
     Returns: np.array
 
     """
-    l_min_max = _min_max_observations(cycle)
+    l_min_max = _min_max_observations(state)
     l_space = []
 
     for min_max in l_min_max:
@@ -110,17 +111,17 @@ def _generate_condition_space(cycle: Cycle, steps: int = 50) -> np.array:
         return l_space[0].reshape(-1, 1)
 
 
-def _generate_mesh_grid(cycle: Cycle, steps: int = 50) -> np.ndarray:
+def _generate_mesh_grid(state: SupportsControllerState, steps: int = 50) -> np.ndarray:
     """
     Generates a mesh grid based on the minimum and maximum of all observed data in AER Cycle.
     Args:
-        cycle: AER Cycle object that has been run
+        state: AER Cycle object that has been run
         steps: Number of steps to define the condition space
 
     Returns: np.ndarray
 
     """
-    l_min_max = _min_max_observations(cycle)
+    l_min_max = _min_max_observations(state)
     l_space = []
 
     for min_max in l_min_max:
@@ -130,12 +131,12 @@ def _generate_mesh_grid(cycle: Cycle, steps: int = 50) -> np.ndarray:
 
 
 def _theory_predict(
-    cycle: Cycle, conditions: Sequence, predict_proba: bool = False
+    state: SupportsControllerState, conditions: Sequence, predict_proba: bool = False
 ) -> list:
     """
     Gets theory predictions over conditions space and saves results of each cycle to a list.
     Args:
-        cycle: AER Cycle object that has been run
+        state: AER Cycle object that has been run
         conditions: Condition space. Should be an array of grouped conditions.
         predict_proba: Use estimator.predict_proba method instead of estimator.predict.
 
@@ -143,7 +144,7 @@ def _theory_predict(
 
     """
     l_predictions = []
-    for i, theory in enumerate(cycle.data.theories):
+    for i, theory in enumerate(state.theories):
         if not predict_proba:
             l_predictions.append(theory.predict(conditions))
         else:
@@ -181,7 +182,7 @@ def _check_replace_default_kw(default: dict, user: dict) -> dict:
 
 
 def plot_results_panel_2d(
-    cycle: Cycle,
+    state: SupportsControllerState,
     iv_name: Optional[str] = None,
     dv_name: Optional[str] = None,
     steps: int = 50,
@@ -200,7 +201,7 @@ def plot_results_panel_2d(
     range of the observed data.
 
     Args:
-        cycle: AER Cycle object that has been run
+        state: AER Cycle object that has been run
         iv_name: Independent variable name. Name should match the name instantiated in the cycle
                     object. Default will select the first.
         dv_name: Single dependent variable name. Name should match the names instantiated in the
@@ -260,7 +261,7 @@ def plot_results_panel_2d(
         d_kw[key] = _check_replace_default_kw(d1, d2)
 
     # ---Extract IVs and DV metadata and indexes---
-    ivs, dvs = _get_variable_index(cycle)
+    ivs, dvs = _get_variable_index(state)
     if iv_name:
         iv = [s for s in ivs if s[1] == iv_name][0]
     else:
@@ -273,16 +274,16 @@ def plot_results_panel_2d(
     dv_label = f"{dv[1]} {dv[2]}"
 
     # Create a dataframe of observed data from cycle
-    df_observed = _observed_to_df(cycle)
+    df_observed = _observed_to_df(state)
 
     # Generate IV space
-    condition_space = _generate_condition_space(cycle, steps=steps)
+    condition_space = _generate_condition_space(state, steps=steps)
 
     # Get theory predictions over space
-    l_predictions = _theory_predict(cycle, condition_space)
+    l_predictions = _theory_predict(state, condition_space)
 
     # Cycle Indexing
-    cycle_idx = list(range(len(cycle.data.theories)))
+    cycle_idx = list(range(len(state.theories)))
     if query:
         if isinstance(query, list):
             cycle_idx = [cycle_idx[s] for s in query]
@@ -348,7 +349,7 @@ def plot_results_panel_2d(
 
 
 def plot_results_panel_3d(
-    cycle: Cycle,
+    state: SupportsControllerState,
     iv_names: Optional[List[str]] = None,
     dv_name: Optional[str] = None,
     steps: int = 50,
@@ -368,7 +369,7 @@ def plot_results_panel_3d(
 
     Args:
 
-        cycle: AER Cycle object that has been run
+        state: AER Cycle object that has been run
         iv_names: List of up to 2 independent variable names. Names should match the names
                     instantiated in the cycle object. Default will select up to the first two.
         dv_name: Single DV name. Name should match the names instantiated in the cycle object.
@@ -388,7 +389,7 @@ def plot_results_panel_3d(
     Returns: matplotlib figure
 
     """
-    n_cycles = len(cycle.data.theories)
+    n_cycles = len(state.theories)
 
     # ---Figure and plot params---
     # Set defaults, check and add user supplied keywords
@@ -416,7 +417,7 @@ def plot_results_panel_3d(
         d_kw[key] = _check_replace_default_kw(d1, d2)
 
     # ---Extract IVs and DV metadata and indexes---
-    ivs, dvs = _get_variable_index(cycle)
+    ivs, dvs = _get_variable_index(state)
     if iv_names:
         iv = [s for s in ivs if s[1] == iv_names]
     else:
@@ -429,13 +430,13 @@ def plot_results_panel_3d(
     dv_label = f"{dv[1]} {dv[2]}"
 
     # Create a dataframe of observed data from cycle
-    df_observed = _observed_to_df(cycle)
+    df_observed = _observed_to_df(state)
 
     # Generate IV Mesh Grid
-    x1, x2 = _generate_mesh_grid(cycle, steps=steps)
+    x1, x2 = _generate_mesh_grid(state, steps=steps)
 
     # Get theory predictions over space
-    l_predictions = _theory_predict(cycle, np.column_stack((x1.ravel(), x2.ravel())))
+    l_predictions = _theory_predict(state, np.column_stack((x1.ravel(), x2.ravel())))
 
     # Subplot configurations
     if n_cycles < wrap:
@@ -501,29 +502,35 @@ def plot_results_panel_3d(
     return fig
 
 
-def cycle_default_score(cycle: Cycle, x_vals: np.ndarray, y_true: np.ndarray):
+def cycle_default_score(
+    state: SupportsControllerState, x_vals: np.ndarray, y_true: np.ndarray
+):
     """
     Calculates score for each cycle using the estimator's default scorer.
     Args:
-        cycle: AER Cycle object that has been run
+        state: AER Cycle object that has been run
         x_vals: Test dataset independent values
         y_true: Test dataset dependent values
 
     Returns:
         List of scores by cycle
     """
-    l_scores = [s.score(x_vals, y_true) for s in cycle.data.theories]
+    l_scores = [s.score(x_vals, y_true) for s in state.theories]
     return l_scores
 
 
 def cycle_specified_score(
-    scorer: Callable, cycle: Cycle, x_vals: np.ndarray, y_true: np.ndarray, **kwargs
+    scorer: Callable,
+    state: SupportsControllerState,
+    x_vals: np.ndarray,
+    y_true: np.ndarray,
+    **kwargs,
 ):
     """
     Calculates score for each cycle using specified sklearn scoring function.
     Args:
         scorer: sklearn scoring function
-        cycle: AER Cycle object that has been run
+        state: AER Cycle object that has been run
         x_vals: Test dataset independent values
         y_true: Test dataset dependent values
         **kwargs: Keyword arguments to send to scoring function
@@ -533,9 +540,9 @@ def cycle_specified_score(
     """
     # Get predictions
     if "y_pred" in inspect.signature(scorer).parameters.keys():
-        l_y_pred = _theory_predict(cycle, x_vals, predict_proba=False)
+        l_y_pred = _theory_predict(state, x_vals, predict_proba=False)
     elif "y_score" in inspect.signature(scorer).parameters.keys():
-        l_y_pred = _theory_predict(cycle, x_vals, predict_proba=True)
+        l_y_pred = _theory_predict(state, x_vals, predict_proba=True)
 
     # Score each cycle
     l_scores = []
@@ -546,7 +553,7 @@ def cycle_specified_score(
 
 
 def plot_cycle_score(
-    cycle: Cycle,
+    state: SupportsControllerState,
     X: np.ndarray,
     y_true: np.ndarray,
     scorer: Optional[Callable] = None,
@@ -561,7 +568,7 @@ def plot_cycle_score(
     """
     Plots scoring metrics of cycle's theories given test data.
     Args:
-        cycle: AER Cycle object that has been run
+        state: AER Cycle object that has been run
         X: Test dataset independent values
         y_true: Test dataset dependent values
         scorer: sklearn scoring function (optional)
@@ -579,13 +586,13 @@ def plot_cycle_score(
 
     # Use estimator's default scoring method if specific scorer is not supplied
     if scorer is None:
-        l_scores = cycle_default_score(cycle, X, y_true)
+        l_scores = cycle_default_score(state, X, y_true)
     else:
-        l_scores = cycle_specified_score(scorer, cycle, X, y_true, **scorer_kw)
+        l_scores = cycle_specified_score(scorer, state, X, y_true, **scorer_kw)
 
     # Plotting
     fig, ax = plt.subplots(figsize=figsize)
-    ax.plot(np.arange(len(cycle.data.theories)), l_scores, **plot_kw)
+    ax.plot(np.arange(len(state.theories)), l_scores, **plot_kw)
 
     # Adjusting axis limits
     if ylim:
