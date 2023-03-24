@@ -325,7 +325,7 @@ def get_LL(mse):
 def get_BIC(theorist, theorist_name, mse, num_obs):
     # BIC = n * LL + k * log(n)
     num_params = get_num_params(theorist, theorist_name)
-    return num_obs * get_LL(mse) + num_params * np.log(num_obs)
+    return num_params * np.log(num_obs) - 2 * get_LL(mse)
 
 
 def get_DL(theorist, theorist_name, mse, num_obs):
