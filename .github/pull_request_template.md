@@ -29,6 +29,7 @@ this section:
 > - "fix: add missing foo in module bar" 
 > - "feat: new theorist abc",
 > - "feat!: replace module x with module y"
+> - "docs: add notebooks on theorist z" 
 > 
 > ... then delete this block.
 
