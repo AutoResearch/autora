@@ -268,6 +268,6 @@ def test_falsification_reconstruction_without_model(
     # check if the scores are properly ordered
     assert scores[0] > scores[1]
 
-    # check if the right data points were selected
+    # check if the data points with the highest predicted error were selected
     assert np.round(X_selected[0, 0], 4) == 1.8 or np.round(X_selected[0, 0], 4) == 4.8
     assert np.round(X_selected[1, 0], 4) == 1.8 or np.round(X_selected[1, 0], 4) == 4.8
