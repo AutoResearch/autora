@@ -729,14 +729,14 @@ files = [
 
 [[package]]
 name = "imageio"
-version = "2.26.1"
+version = "2.27.0"
 description = "Library for reading and writing a wide range of image, video, scientific, and volumetric data formats."
 category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "imageio-2.26.1-py3-none-any.whl", hash = "sha256:df56ade8a9b43476ce020be0202b09a3a4cc0c7a079f8fe5ee4b87105eff4237"},
-    {file = "imageio-2.26.1.tar.gz", hash = "sha256:7f7bc13254a311f298bc64d60c2690dd3460fd412532717e2c51715daed17fc5"},
+    {file = "imageio-2.27.0-py3-none-any.whl", hash = "sha256:24c6ad7d000e64eacc2861c402b6fb128f370cb0a6623cf796d83bca0d0d14d3"},
+    {file = "imageio-2.27.0.tar.gz", hash = "sha256:ee269c957785ef0373cc7a7323185956d83ec05e6cdf20b42a03ba7b74ac58c6"},
 ]
 
 [package.dependencies]
