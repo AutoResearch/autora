@@ -39,19 +39,31 @@ extra_javascript:
 
 nav:
 - Introduction: 'index.md'
+- Experimentalists:
+    - Overview: 'example/pipeline/Experimentalist Pipeline Examples.ipynb'
+- Synthetic Experiments:
+    - Inventory: 'example/synthetic/inventory.ipynb'
 - Theorists:
-  - Overview: 'theorist/overview.md'
+  - Overview: 'example/theorist/overview.md'
   - DARTS:
-      - Introduction: 'theorist/darts/introduction.md'
-      - How it works: 'theorist/darts/how_it_works.md'
-      - Meta parameters: 'theorist/darts/meta_parameters.md'
-      - Search space: 'theorist/darts/search_space.md'
-      - Example: 'theorist/darts/example.md'
+      - Introduction: 'example/theorist/darts/introduction.md'
+      - How it works: 'example/theorist/darts/how_it_works.md'
+      - Meta parameters: 'example/theorist/darts/meta_parameters.md'
+      - Search space: 'example/theorist/darts/search_space.md'
+      - Example: 'example/theorist/darts/example.md'
   - BMS:
-      - Introduction: 'theorist/bms/introduction.md'
-      - How it works: 'theorist/bms/how_it_works.md'
-      - Meta parameters: 'theorist/bms/meta_parameters.md'
-      - Search space: 'theorist/bms/search_space.md'
-      - Example: 'theorist/bms/example.md'
-- Code Reference: reference/  #
+      - Introduction: 'example/theorist/bms/introduction.md'
+      - How it works: 'example/theorist/bms/how_it_works.md'
+      - Meta parameters: 'example/theorist/bms/meta_parameters.md'
+      - Search space: 'example/theorist/bms/search_space.md'
+      - Example: 'example/theorist/bms/example.md'
+- Cycle:
+    - Scoring: 'example/cycle/cycle_scoring.ipynb'
+    - Plotting: 'example/cycle/cycle_results_plots.ipynb'
+    - Examples:
+      - DARTS & BMS: 'example/cycle/simple_cycle_bms_darts.ipynb'
+      - BMS & Poppernet: 'example/cycle/simple_cycle_bms_model_poppernet.py'
+      - Uncertainty Experimentalist: 'example/cycle/simple_cycle_uncertainty_experimentalist.ipynb'
+
+- Code Reference: reference/autora/  #
 
