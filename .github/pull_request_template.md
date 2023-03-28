@@ -23,7 +23,6 @@ If this is a breaking change (which might apply to any of the other kinds of cha
 this section:
 - **BREAKING_CHANGE**: {description}
 
-
 > Update the title of the PR to follow the convention:
 > `{type}{! if BREAKING_CHANGE}: {short description}`, e.g. 
 > - "fix: add missing foo in module bar" 
