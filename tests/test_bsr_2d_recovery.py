@@ -48,6 +48,7 @@ def run_test_primitive_fitting_2d(
     verbose: bool = False,
 ):
     y = transformer(X)
+    np.random.seed(180)
     regressor = BSRRegressor(tree_num=3, itr_num=10)
     regressor.fit(X, y.ravel())
     if verbose:
