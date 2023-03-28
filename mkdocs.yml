@@ -21,6 +21,9 @@ plugins:
         python:
           import:
             - https://scikit-learn.org/stable/objects.inv
+  - mkdocs-jupyter:
+      include_source: true
+      execute: false
 
 
 markdown_extensions:
