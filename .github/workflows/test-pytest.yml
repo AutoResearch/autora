@@ -4,10 +4,8 @@
 name: Test with py.test
 
 on:
-  push:
-    branches: [ "main" ]
   pull_request:
-    branches: [ "main" ]
+  merge_group:
 
 jobs:
   test:
