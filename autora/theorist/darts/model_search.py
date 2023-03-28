@@ -416,7 +416,10 @@ class Network(nn.Module):
         return
 
     def sample_alphas_normal(
-        self, sample_amp: float = 1, fair_darts_weight_threshold: float = 0
+        self,
+        sample_amp: float = 1,
+        fair_darts_weight_threshold: float = 0,
+        rng=np.random.default_rng(),
     ) -> torch.Tensor:
         """
         Samples an architecture from the mixed operations from a probability distribution that is
@@ -428,6 +431,7 @@ class Network(nn.Module):
             sample_amp: temperature that is applied before passing the weights through a softmax
             fair_darts_weight_threshold: used in fair DARTS. If an architecture weight is below
                 this value then it is set to zero.
+            rng: initialization of random generator object
 
         Returns:
             alphas_normal_sample: sampled architecture weights.
@@ -466,7 +470,7 @@ class Network(nn.Module):
                 )
                 k_sample = random.randrange(len(W_soft))
             else:
-                k_sample = np.random.choice(range(len(W_soft)), p=W_soft.data.numpy())
+                k_sample = rng.choice(range(len(W_soft)), p=W_soft.data.numpy())
             alphas_normal_sample[edge, k_sample] = 1
 
         return alphas_normal_sample
@@ -490,7 +494,7 @@ class Network(nn.Module):
         return alphas_normal_sample
 
     # returns the genotype of the model
-    def genotype(self, sample: bool = False) -> Genotype:
+    def genotype(self, sample: bool = False, rng=np.random.default_rng()) -> Genotype:
         """
         Computes a genotype of the model which specifies the current computation graph based on
         the largest architecture weight for each edge, or based on a sample.
@@ -501,6 +505,7 @@ class Network(nn.Module):
                 from a probability distribution that is determined by the
                 softmaxed architecture weights. If set to false (default), the architecture will be
                 determined based on the largest architecture weight per edge.
+            rng: initialization of random generator object
 
         Returns:
             genotype: genotype describing the current (sampled) architecture
@@ -538,9 +543,7 @@ class Network(nn.Module):
                 ) in edges:  # looping through all the edges for the current node (i)
                     if sample:
                         W_soft = F.softmax(Variable(torch.from_numpy(W[j])))
-                        k_best = np.random.choice(
-                            range(len(W[j])), p=W_soft.data.numpy()
-                        )
+                        k_best = rng.choice(range(len(W[j])), p=W_soft.data.numpy())
                     else:
                         k_best = None
                         # looping through all the primitives

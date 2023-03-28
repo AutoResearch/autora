@@ -1491,12 +1491,12 @@ class Tree:
 # -----------------------------------------------------------------------------
 
 
-def test3(num_points=10, samples=100000):
+def test3(num_points=10, samples=100000, rng=np.random.default_rng()):
     # Create the data
     x = pd.DataFrame(
-        dict([("x%d" % i, np.random.uniform(0, 10, num_points)) for i in range(5)])
+        dict([("x%d" % i, rng.uniform(0, 10, num_points)) for i in range(5)])
     )
-    eps = np.random.normal(0.0, 5, num_points)
+    eps = rng.normal(0.0, 5, num_points)
     y = 50.0 * np.sin(x["x0"]) / x["x2"] - 4.0 * x["x1"] + 3 + eps
     x.to_csv("data_x.csv", index=False)
     y.to_csv("data_y.csv", index=False, header=["y"])
@@ -1525,12 +1525,12 @@ def test3(num_points=10, samples=100000):
     return t
 
 
-def test4(num_points=10, samples=1000):
+def test4(num_points=10, samples=1000, rng=np.random.default_rng()):
     # Create the data
     x = pd.DataFrame(
-        dict([("x%d" % i, np.random.uniform(0, 10, num_points)) for i in range(5)])
+        dict([("x%d" % i, rng.uniform(0, 10, num_points)) for i in range(5)])
     )
-    eps = np.random.normal(0.0, 5, num_points)
+    eps = rng.normal(0.0, 5, num_points)
     y = 50.0 * np.sin(x["x0"]) / x["x2"] - 4.0 * x["x1"] + 3 + eps
     x.to_csv("data_x.csv", index=False)
     y.to_csv("data_y.csv", index=False, header=["y"])

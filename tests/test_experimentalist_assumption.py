@@ -21,7 +21,7 @@ def test_experimentalist_assumption():
     def ground_truth(xs):
         return (xs**2.0) + xs + 1.0
 
-    # X = np.random.randint(low=0, high=10, size=100).reshape(-1, 1)
+    # X = np.random.default_rng().integers(low=0, high=10, size=100).reshape(-1, 1)
     X = np.array(range(11)).reshape(-1, 1)
     y = np.array([x for x in ground_truth(X)])
 

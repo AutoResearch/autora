@@ -212,6 +212,7 @@ def grow(
     ops_weight_lst: List[float],
     ops_priors: Dict[str, Dict],
     n_feature: int = 1,
+    rng=np.random.default_rng(),
     **hyper_params
 ):
     """
@@ -223,15 +224,16 @@ def grow(
         ops_weight_lst: list of operation prior weights
         ops_priors: the dictionary of operation prior properties
         n_feature: the number of features in input data
+        rng: initialization of random generator object
         hyper_params: hyperparameters for re-initialization
     """
     depth = node.depth
     p = 1 / np.power((1 + depth), -hyper_params.get("beta", -1))
 
-    if depth > 0 and p < np.random.uniform(0, 1, 1):  # create leaf node
-        node.setup(feature=np.random.randint(0, n_feature, 1))
+    if depth > 0 and p < rng.uniform(0, 1, 1):  # create leaf node
+        node.setup(feature=rng.integers(0, n_feature, 1))
     else:
-        ops_name = np.random.choice(ops_name_lst, p=ops_weight_lst)
+        ops_name = rng.choice(ops_name_lst, p=ops_weight_lst)
         ops_prior = ops_priors[ops_name]
         node.setup(ops_name, ops_prior, hyper_params=hyper_params)
 
@@ -256,19 +258,22 @@ def grow(
 
 
 @check_empty
-def prune(node: Node, n_feature: int = 1):
+def prune(node: Node, n_feature: int = 1, rng=np.random.default_rng()):
     """
     ACTION 3: Prune a non-terminal node into a terminal node and assign it a feature
 
     Arguments:
         node: the tree node to be pruned
         n_feature: the number of features in input data
+        rng: initialization of random generator object
     """
-    node.setup(feature=np.random.randint(0, n_feature, 1))
+    node.setup(feature=rng.integers(0, n_feature, 1))
 
 
 @check_empty
-def de_transform(node: Node) -> Tuple[Node, Optional[Node]]:
+def de_transform(
+    node: Node, rng=np.random.default_rng()
+) -> Tuple[Node, Optional[Node]]:
     """
     ACTION 4: De-transform deletes the current `node` and replaces it with children
     according to the following rule: if the `node` is unary, simply replace with its
@@ -277,6 +282,7 @@ def de_transform(node: Node) -> Tuple[Node, Optional[Node]]:
 
     Arguments:
         node: the tree node that gets de-transformed
+        rng: initialization of random generator object
 
     Returns:
         first node is the replaced node when `node` has been de-transformed
@@ -286,7 +292,7 @@ def de_transform(node: Node) -> Tuple[Node, Optional[Node]]:
     if node.node_type == NodeType.UNARY:
         return left, None
 
-    r = np.random.random()
+    r = rng.random()
     right = cast(Node, node.right)
     # picked node is root
     if not node.depth:
@@ -309,6 +315,7 @@ def transform(
     ops_weight_lst: List[float],
     ops_priors: Dict[str, Dict],
     n_feature: int = 1,
+    rng=np.random.default_rng(),
     **hyper_params: Dict
 ) -> Node:
     """
@@ -323,6 +330,7 @@ def transform(
         ops_weight_lst: list of operation prior weights
         ops_priors: the dictionary of operation prior properties
         n_feature: the number of features in input data
+        rng: initialization of random generator object
         hyper_params: hyperparameters for re-initialization
 
     Return:
@@ -331,7 +339,7 @@ def transform(
     parent = node.parent
 
     insert_node = Node(depth=node.depth, parent=parent)
-    insert_op = np.random.choice(ops_name_lst, 1, ops_weight_lst)[0]
+    insert_op = rng.choice(ops_name_lst, 1, ops_weight_lst)[0]
     insert_node.setup(insert_op, ops_priors[insert_op], hyper_params=hyper_params)
 
     if parent:
@@ -366,6 +374,7 @@ def reassign_op(
     ops_weight_lst: List[float],
     ops_priors: Dict[str, Dict],
     n_feature: int = 1,
+    rng=np.random.default_rng(),
     **hyper_params: Dict
 ):
     """
@@ -380,6 +389,7 @@ def reassign_op(
         ops_weight_lst: list of operation prior weights
         ops_priors: the dictionary of operation prior properties
         n_feature: the number of features in input data
+        rng: initialization of random generator object
         hyper_params: hyperparameters for re-initialization
     """
     # make sure `node` is non-terminal
@@ -388,7 +398,7 @@ def reassign_op(
 
     # store the original children and re-setup the `node`
     old_left, old_right = node.left, node.right
-    new_op = np.random.choice(ops_name_lst, 1, ops_weight_lst)[0]
+    new_op = rng.choice(ops_name_lst, 1, ops_weight_lst)[0]
     node.setup(new_op, ops_priors[new_op], hyper_params=hyper_params)
 
     new_type = node.node_type
@@ -410,17 +420,18 @@ def reassign_op(
 
 
 @check_empty
-def reassign_feat(node: Node, n_feature: int = 1):
+def reassign_feat(node: Node, n_feature: int = 1, rng=np.random.default_rng()):
     """
     ACTION 7: Re-assign feature randomly picks a feature and assign it to `node`.
 
     Arguments:
         node: the tree node that gets re-assigned a feature
         n_feature: the number of features in input data
+        rng: initialization of random generator object
     """
     # make sure we have a leaf node
     assert node.node_type == NodeType.LEAF
-    node.setup(feature=np.random.randint(0, n_feature, 1))
+    node.setup(feature=rng.integers(0, n_feature, 1))
 
 
 class Action(int, Enum):
@@ -438,7 +449,7 @@ class Action(int, Enum):
 
     @classmethod
     def rand_action(
-        cls, lt_num: int, term_num: int, de_trans_num: int
+        cls, lt_num: int, term_num: int, de_trans_num: int, rng=np.random.default_rng()
     ) -> Tuple[int, List[float]]:
         """
         Draw a random action for MCMC algorithm to take a step
@@ -448,6 +459,7 @@ class Action(int, Enum):
             term_num: the number of terminal nodes in the tree
             de_trans_num: the number of de-trans qualified nodes in the tree
                           (see `propose` for details)
+            rng: initialization of random generator object
 
         Returns:
             action: the MCMC action to perform
@@ -466,7 +478,7 @@ class Action(int, Enum):
         weights.append(1 - sum(weights))  # p_reassign_feat
         assert weights[-1] >= 0
 
-        action = np.random.choice(np.arange(7), p=weights)
+        action = rng.choice(np.arange(7), p=weights)
         return action, weights
 
 
@@ -519,6 +531,7 @@ def prop(
     ops_weight_lst: List[float],
     ops_priors: Dict[str, Dict],
     n_feature: int = 1,
+    rng=np.random.default_rng(),
     **hyper_params
 ):
     """
@@ -530,6 +543,7 @@ def prop(
         ops_weight_lst: the list of operator weights
         ops_priors: the dictionary of operator prior information
         n_feature: the number of features in input data
+        rng: initialization of random generator object
         hyper_params: hyperparameters for initialization
 
     Return:
@@ -564,7 +578,7 @@ def prop(
     # q and q_inv simply equal the probability if the grown node is a leaf node
     # otherwise, we calculate new information of the `new_node` after the action is applied
     elif action == Action.GROW:
-        i = np.random.randint(0, len(term_nodes), 1)[0]
+        i = rng.integers(0, len(term_nodes), 1)[0]
         grown_node: Node = term_nodes[i]
         grow(
             grown_node,
@@ -599,7 +613,7 @@ def prop(
                 expand_node = True
     # ACTION 3: PRUNE
     elif action == Action.PRUNE:
-        i = np.random.randint(0, len(nterm_nodes), 1)[0]
+        i = rng.integers(0, len(nterm_nodes), 1)[0]
         pruned_node: Node = nterm_nodes[i]
         prune(pruned_node, n_feature)
         tree_ll, param_ll = calc_tree_ll(
@@ -623,7 +637,7 @@ def prop(
     # ACTION 4: DE_TRANSFORM
     elif action == Action.DE_TRANSFORM:
         num_de_trans = len(de_trans_nodes)
-        i = np.random.randint(0, num_de_trans, 1)[0]
+        i = rng.integers(0, num_de_trans, 1)[0]
         de_trans_node: Node = de_trans_nodes[i]
         replaced_node, discarded_node = de_transform(de_trans_node)
         par_node = de_trans_node.parent
@@ -680,7 +694,7 @@ def prop(
     # ACTION 5: TRANSFORM
     elif action == Action.TRANSFORM:
         all_nodes = get_all_nodes(new_node)
-        i = np.random.randint(0, len(all_nodes), 1)[0]
+        i = rng.integers(0, len(all_nodes), 1)[0]
         trans_node: Node = all_nodes[i]
         inserted_node: Node = transform(
             trans_node,
@@ -727,7 +741,7 @@ def prop(
             q_inv = q_inv / 2
     # ACTION 6: REASSIGN OPERATION
     elif action == Action.REASSIGN_OP:
-        i = np.random.randint(0, len(nterm_nodes), 1)[0]
+        i = rng.integers(0, len(nterm_nodes), 1)[0]
         reassign_node: Node = nterm_nodes[i]
         old_right = reassign_node.right
         old_op_name, old_type = reassign_node.op_name, reassign_node.node_type
@@ -779,7 +793,7 @@ def prop(
             shrink_node = True
     # ACTION 7: REASSIGN FEATURE
     else:
-        i = np.random.randint(0, len(term_nodes), 1)[0]
+        i = rng.integers(0, len(term_nodes), 1)[0]
         reassign_node = term_nodes[i]
         reassign_feat(reassign_node, n_feature)
         q = q_inv = 1
@@ -827,6 +841,7 @@ def prop_new(
     ops_name_lst: List[str],
     ops_weight_lst: List[float],
     ops_priors: Dict[str, Dict],
+    rng=np.random.default_rng(),
 ) -> Tuple[bool, Node, float, float, float]:
     """
     Propose new structure, sample new parameters and decide whether to accept the new tree.
@@ -843,6 +858,7 @@ def prop_new(
         ops_name_lst: the list of operator names
         ops_weight_lst: the list of operator weights
         ops_priors: the dictionary of operator prior information
+        rng: initialization of random generator object
 
     Returns:
         accept: whether to accept or reject the new expression tree
@@ -920,7 +936,7 @@ def prop_new(
         log_r += np.log(max(1e-5, 1 / np.power(2, 2 * old_lt_count)))
 
     alpha = min(log_r, 0)
-    test = np.random.uniform(0, 1, 0)[0]
+    test = rng.uniform(0, 1, 0)[0]
     if np.log(test) >= alpha:  # no accept
         return False, root, sigma_y, sigma_a, sigma_b
     else:  # accept

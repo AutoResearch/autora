@@ -81,7 +81,7 @@ def weber_fechner_law(
         for idx, x in enumerate(X):
             # jnd =  np.min(x) * weber_constant
             # response = (x[1]-x[0]) - jnd
-            # y = 1/(1+np.exp(-response)) + np.random.normal(0, std)
+            # y = 1/(1+np.exp(-response)) + rng.normal(0, std)
             y = constant * np.log(x[1] / x[0]) + rng.normal(0, std)
             Y[idx] = y
 

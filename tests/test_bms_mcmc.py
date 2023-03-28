@@ -6,7 +6,10 @@ from autora.theorist.bms import Tree, get_priors
 
 
 def test_tree_mcmc_stepping(
-    num_points: int = 10, samples: int = 100, show_plot: bool = False
+    num_points: int = 10,
+    samples: int = 100,
+    show_plot: bool = False,
+    rng=np.random.default_rng(),
 ) -> Tree:
     """
     Testing the basic MCMC capacity. Note that even though an option (`show_plot`) is
@@ -22,6 +25,8 @@ def test_tree_mcmc_stepping(
             calculated as `burnin` + `samples`
         show_plot:
             whether to plot the predicted against actual response variable
+        rng:
+            initialization of random generator object
 
     Returns:
         the expression tree obtained from running the MCMC algorithm
@@ -29,9 +34,9 @@ def test_tree_mcmc_stepping(
 
     # Create the data
     x = pd.DataFrame(
-        dict([("x%d" % i, np.random.uniform(0, 10, num_points)) for i in range(5)])
+        dict([("x%d" % i, rng.uniform(0, 10, num_points)) for i in range(5)])
     )
-    eps = np.random.normal(0.0, 5, num_points)
+    eps = rng.normal(0.0, 5, num_points)
     y = 50.0 * np.sin(x["x0"]) / x["x2"] - 4.0 * x["x1"] + 3 + eps
 
     # Create the formula
