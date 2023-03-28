@@ -10,10 +10,10 @@ import torch
 import torch.nn
 import torch.nn.utils
 import torch.utils.data
-import tqdm
 from matplotlib import pyplot as plt
 from sklearn.base import BaseEstimator, RegressorMixin
 from sklearn.utils.validation import check_array, check_is_fitted, check_X_y
+from tqdm.auto import tqdm
 
 from autora.theorist.darts import (
     PRIMITIVES,
@@ -32,7 +32,7 @@ from autora.variable import ValueType
 
 _logger = logging.getLogger(__name__)
 
-_progress_indicator = tqdm.auto.tqdm
+_progress_indicator = tqdm
 
 SAMPLING_STRATEGIES = Literal["max", "sample"]
 IMPLEMENTED_DARTS_TYPES = Literal["original", "fair"]
