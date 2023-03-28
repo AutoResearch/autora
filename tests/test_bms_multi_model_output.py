@@ -1,3 +1,5 @@
+import random
+
 import numpy as np
 import pytest
 
@@ -14,6 +16,7 @@ def curve_to_fit():
 
 def test_bms_models(curve_to_fit):
     x, y = curve_to_fit
+    random.seed(180)
     regressor = BMSRegressor(epochs=100)
 
     regressor.fit(x, y)

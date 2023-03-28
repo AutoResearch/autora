@@ -1,3 +1,4 @@
+import random
 from typing import Callable, Optional
 
 import matplotlib.pyplot as plt
@@ -78,6 +79,7 @@ def run_test_primitive_fitting_2d(
     custom_primitive: Optional[Callable] = None,
 ):
     y = transformer(X)
+    random.seed(180)
     regressor = BMSRegressor(epochs=30)
     regressor.fit(X, y.ravel(), custom_ops=[custom_primitive])
     # custom primitive is none or it is in bms' custom ops

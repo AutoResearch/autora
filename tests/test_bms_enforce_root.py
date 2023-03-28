@@ -1,3 +1,4 @@
+import random
 from typing import Callable, Optional
 
 import numpy as np
@@ -24,6 +25,7 @@ def run_test_primitive_fitting_2d(
     root=None,
 ):
     y = transformer(X)
+    random.seed(180)
     regressor = BMSRegressor(epochs=60)
     regressor.fit(X, y.ravel(), custom_ops=[custom_primitive], root=root)
     # root is none or is in custom ops

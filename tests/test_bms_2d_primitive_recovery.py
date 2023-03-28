@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import random
 import warnings
 from typing import Callable
 
@@ -49,6 +50,7 @@ def run_test_primitive_fitting_2d(
     verbose: bool = False,
 ):
     y = transformer(X)
+    random.seed(180)
     regressor = BMSRegressor(epochs=30)
     regressor.fit(X, y.ravel())
     if verbose:

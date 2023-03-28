@@ -1,3 +1,5 @@
+import random
+
 import numpy as np
 import pandas as pd
 import pytest  # noqa: 401
@@ -35,6 +37,7 @@ def test_tree_mcmc_stepping(
     y = 50.0 * np.sin(x["x0"]) / x["x2"] - 4.0 * x["x1"] + 3 + eps
 
     # Create the formula
+    random.seed(180)
     t = Tree(
         variables=["x%d" % i for i in range(5)],
         parameters=["a%d" % i for i in range(10)],
