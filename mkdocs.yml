@@ -4,6 +4,7 @@ site_name: Autonomous Empirical Research
 
 theme:
   name: material
+  custom_dir: docs/overrides
 
 watch:
   - autora/
