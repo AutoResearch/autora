@@ -55,8 +55,8 @@ nav:
       - Introduction: 'example/theorist/bms/introduction.md'
       - How it works: 'example/theorist/bms/how_it_works.md'
       - Meta parameters: 'example/theorist/bms/meta_parameters.md'
-      - Search space: 'example/theorist/bms/search_space.md'
-      - Example: 'example/theorist/bms/example.md'
+      - Search space: 'example/theorist/bms/search_space.ipynb'
+      - Example: 'example/theorist/bms/example.ipynb'
 - Cycle:
     - Scoring: 'example/cycle/cycle_scoring.ipynb'
     - Plotting: 'example/cycle/cycle_results_plots.ipynb'
