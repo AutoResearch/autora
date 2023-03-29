@@ -852,7 +852,10 @@ class Tree:
             ]
         )
         # check/update canonical representative
-        rep_res = self.update_representative(verbose=verbose)
+        try:
+            rep_res = self.update_representative(verbose=verbose)
+        except TypeError:  # funnels any suggestions which have a complex parameter to forbidden
+            rep_res = -1
         if rep_res == -1:
             # this formula is forbidden
             self.et_replace(added, old, update_gof=False, verbose=verbose)
@@ -936,7 +939,10 @@ class Tree:
             except KeyError:
                 pass
             # check/update canonical representative
-            rep_res = self.update_representative(verbose=verbose)
+            try:
+                rep_res = self.update_representative(verbose=verbose)
+            except TypeError:  # funnels any suggestions which have a complex parameter to forbidden
+                rep_res = -1
             if rep_res == -1:
                 # this formula is forbidden
                 target.value = old
@@ -1030,7 +1036,10 @@ class Tree:
             oldrr = [self.root.value, [o.value for o in self.root.offspring[1:]]]
             self.prune_root(update_gof=False, verbose=verbose)
             # check/update canonical representative
-            rep_res = self.update_representative(verbose=verbose)
+            try:
+                rep_res = self.update_representative(verbose=verbose)
+            except TypeError:  # funnels any suggestions which have a complex parameter to forbidden
+                rep_res = -1
             if rep_res == -1:
                 # this formula is forbidden
                 self.replace_root(rr=oldrr, update_gof=False, verbose=verbose)
