@@ -70,7 +70,7 @@ nav:
     - Plotting: 'example/cycle/cycle_results_plots.ipynb'
     - Examples:
       - DARTS & BMS: 'example/cycle/simple_cycle_bms_darts.ipynb'
-      - BMS & Poppernet: 'example/cycle/simple_cycle_bms_model_poppernet.py'
+      - BMS & Poppernet: 'example/cycle/simple_cycle_bms_model_poppernet.ipynb'
       - Uncertainty Experimentalist: 'example/cycle/simple_cycle_uncertainty_experimentalist.ipynb'
 
 - Code Reference: reference/autora/  #
