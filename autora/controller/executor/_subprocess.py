@@ -34,7 +34,7 @@ async def dispatch_to_subprocess(controller: Controller_) -> Controller_:
         ...     return x + 1
         >>> c = Controller(experiment_runner=plus_1)
         >>> c.state = c.state.update(conditions=[np.array([1,2,3])])
-        >>> cn = asyncio.run(dispatch_to_subprocess(c))  # doctest: +ELLIPSIS
+        >>> cn = asyncio.run(dispatch_to_subprocess(c))
         >>> cn  # doctest: +ELLIPSIS
         <autora...Controller object at 0x...>
 
