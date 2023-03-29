@@ -25,6 +25,7 @@ plugins:
   - mkdocs-jupyter:
       include_source: true
       execute: false
+      ignore_h1_titles: True
 
 
 markdown_extensions:
