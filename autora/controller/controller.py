@@ -33,7 +33,7 @@ class Controller(BaseController):
 
     def __init__(
         self,
-        metadata: Optional[VariableCollection],
+        metadata: Optional[VariableCollection] = None,
         theorist: Optional[BaseEstimator] = None,
         experimentalist: Optional[Pipeline] = None,
         experiment_runner: Optional[Callable] = None,
@@ -58,8 +58,6 @@ class Controller(BaseController):
                 is to map from the last result in the state's history to the next logical step.
         """
 
-        if params is None:
-            params = {}
         state = History(
             metadata=metadata,
             conditions=[],
