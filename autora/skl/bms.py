@@ -71,8 +71,8 @@ class BMSRegressor(BaseEstimator, RegressorMixin):
         self.custom_ops: Dict[str, Callable] = dict()
         self.X_: Optional[np.ndarray] = None
         self.y_: Optional[np.ndarray] = None
-        self.model_: Tree = Tree()
-        self.models_: List[Tree] = [Tree()]
+        self.model_: Optional[Tree] = None
+        self.models_: Optional[List[Tree]] = None
         self.loss_: float = np.inf
         self.cache_: List = []
         self.variables: List = []
@@ -81,7 +81,7 @@ class BMSRegressor(BaseEstimator, RegressorMixin):
         self,
         X: np.ndarray,
         y: np.ndarray,
-        num_param: int = 1,
+        num_param: int = 3,
         root=None,
         custom_ops=None,
         ignore_prior=False,
