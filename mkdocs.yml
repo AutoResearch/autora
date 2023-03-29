@@ -51,15 +51,22 @@ nav:
       - How it works: 'example/theorist/darts/how_it_works.md'
       - Meta parameters: 'example/theorist/darts/meta_parameters.md'
       - Search space: 'example/theorist/darts/search_space.md'
-      - Example: 'example/theorist/darts/example.md'
+      - Examples:
+        - Basic Usage: 'example/theorist/darts/example.md'
+        - Weber-Fechner Law: 'example/theorist/darts/weber.ipynb'
   - BMS:
       - Introduction: 'example/theorist/bms/introduction.md'
       - How it works: 'example/theorist/bms/how_it_works.md'
       - Meta parameters: 'example/theorist/bms/meta_parameters.md'
       - Search space: 'example/theorist/bms/search_space.ipynb'
-      - Example: 'example/theorist/bms/example.ipynb'
+      - Examples:
+        - Basic Usage: 'example/theorist/bms/example.ipynb'
+        - Weber-Fechner Law: 'example/theorist/bms/weber.ipynb'
+  - BSR: 'example/theorist/bsr/bsr.ipynb'
 - Cycle:
-    - Scoring: 'example/cycle/cycle_scoring.ipynb'
+    - Scoring:
+      - Logistic Regression: 'example/cycle/cycle_scoring.ipynb'
+      - BMS: 'example/cycle/cycle_scoring_bms.ipynb'
     - Plotting: 'example/cycle/cycle_results_plots.ipynb'
     - Examples:
       - DARTS & BMS: 'example/cycle/simple_cycle_bms_darts.ipynb'
