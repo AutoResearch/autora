@@ -1,19 +1,29 @@
+""" A dispatcher which creates a new subprocess which calls next(Controller) """
+
 import asyncio
 import pathlib
 import sys
 import tempfile
-from typing import TypeVar
+from typing import Protocol, TypeVar
 
 import dill
 
-Controller_ = TypeVar("Controller_")
+
+class SupportsNext(Protocol):
+    """An object which supports the next(...) protocol"""
+
+    def __next__(self):
+        ...
+
+
+Controller_ = TypeVar("Controller_", bound=SupportsNext)
 
 
 async def dispatch_to_subprocess(controller: Controller_) -> Controller_:
     """
 
     Args:
-        curried_online_executor:
+        controller: An object which supports the next(...) protocol
 
     Returns:
 
