@@ -1,7 +1,6 @@
 # yaml-language-server: $schema=https://squidfunk.github.io/mkdocs-material/schema.json
 
 site_name: Autonomous Empirical Research
-repo_url: https://github.com/AutoResearch/autora/
 
 theme:
   name: material
