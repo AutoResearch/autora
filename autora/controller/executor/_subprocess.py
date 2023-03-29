@@ -39,11 +39,10 @@ async def dispatch_to_subprocess(controller: Controller_) -> Controller_:
         <autora...Controller object at 0x...>
 
         >>> cn.state  # doctest: +NORMALIZE_WHITESPACE
-        History([Result(data={}, kind=ResultKind.PARAMS),
-        Result(data=array([1, 2, 3]), kind=ResultKind.CONDITION),
-        Result(data=array([[1, 2],
-                           [2, 3],
-                           [3, 4]]), kind=ResultKind.OBSERVATION)])
+        History([Result(data=array([1, 2, 3]), kind=ResultKind.CONDITION),
+                 Result(data=array([[1, 2],
+                                    [2, 3],
+                                    [3, 4]]), kind=ResultKind.OBSERVATION)])
 
     """
     with tempfile.TemporaryDirectory() as tmpdir:
