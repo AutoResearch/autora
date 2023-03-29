@@ -25,15 +25,14 @@ async def dispatch_to_subprocess(controller: Controller_) -> Controller_:
     Args:
         controller: An object which supports the next(...) protocol
 
-    Returns:
-
+    Returns: a controller with an updated state
 
     Examples:
         >>> from autora.controller import Controller
         >>> import numpy as np
         >>> def plus_1(x):
         ...     return x + 1
-        >>> c = Controller(metadata=None, experiment_runner=plus_1)
+        >>> c = Controller(experiment_runner=plus_1)
         >>> c.state = c.state.update(conditions=[np.array([1,2,3])])
         >>> cn = asyncio.run(dispatch_to_subprocess(c))  # doctest: +ELLIPSIS
         >>> cn  # doctest: +ELLIPSIS
