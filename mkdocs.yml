@@ -1,6 +1,7 @@
 # yaml-language-server: $schema=https://squidfunk.github.io/mkdocs-material/schema.json
 
 site_name: Autonomous Empirical Research
+repo_url: https://github.com/AutoResearch/autora/
 
 theme:
   name: material
@@ -52,7 +53,7 @@ nav:
       - Meta parameters: 'example/theorist/darts/meta_parameters.md'
       - Search space: 'example/theorist/darts/search_space.md'
       - Examples:
-        - Basic Usage: 'example/theorist/darts/example.md'
+        - Basic Usage: 'example/theorist/darts/example.ipynb'
         - Weber-Fechner Law: 'example/theorist/darts/weber.ipynb'
   - BMS:
       - Introduction: 'example/theorist/bms/introduction.md'
