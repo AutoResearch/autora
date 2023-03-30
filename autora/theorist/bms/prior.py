@@ -44,9 +44,9 @@ def __get_prior(prior_name):
             "Nopi_+": 5.808163661224514,
             "Nopi_*": 5.002213595420244,
             "Nopi_fac": 10.0,
-            "Nopi2_*": 1.0,
-            "Nopi_sig": 1.0,  # arbitrarily set for now
-            "Nopi_relu": 1.0,  # arbitrarily set for now
+            "Nopi2_*": 10.0,
+            "Nopi_sig": 10.0,  # arbitrarily set for now
+            "Nopi_relu": 10.0,  # arbitrarily set for now
         },
         'TheoristStudy': {
             "Nopi_/": 5.912205942815285,
@@ -167,7 +167,7 @@ def __get_ops():
     return ops
 
 
-def get_priors(prior="TheoristStudy"):
+def get_priors(prior="Guimera2020"):
     priors = __get_prior(prior)
     all_ops = __get_ops()
     ops = {k: v for k, v in all_ops.items() if "Nopi_" + k in priors}
