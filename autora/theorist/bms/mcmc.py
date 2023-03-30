@@ -854,7 +854,7 @@ class Tree:
         # check/update canonical representative
         try:
             rep_res = self.update_representative(verbose=verbose)
-        except TypeError:  # funnels any suggestions which have a complex parameter to forbidden
+        except KeyError:  # funnels any suggestions which have a complex parameter to forbidden
             rep_res = -1
         if rep_res == -1:
             # this formula is forbidden
@@ -941,7 +941,7 @@ class Tree:
             # check/update canonical representative
             try:
                 rep_res = self.update_representative(verbose=verbose)
-            except TypeError:  # funnels any suggestions which have a complex parameter to forbidden
+            except KeyError:  # funnels any suggestions which have a complex parameter to forbidden
                 rep_res = -1
             if rep_res == -1:
                 # this formula is forbidden
@@ -1038,7 +1038,7 @@ class Tree:
             # check/update canonical representative
             try:
                 rep_res = self.update_representative(verbose=verbose)
-            except TypeError:  # funnels any suggestions which have a complex parameter to forbidden
+            except KeyError:  # funnels any suggestions which have a complex parameter to forbidden
                 rep_res = -1
             if rep_res == -1:
                 # this formula is forbidden
