@@ -323,7 +323,7 @@ class Tree:
             for pos, p in positions:
                 can = can.replace(p, "c%d" % pcount)
                 pcount += 1
-        except SyntaxError:
+        except:
             if verbose:
                 print(
                     "WARNING: Could not get canonical form for",
@@ -457,7 +457,7 @@ class Tree:
         self.nodes.remove(self.root)
         try:
             self.ets[len(self.root.offspring)].remove(self.root)
-        except ValueError:
+        except:
             pass
         self.nops[self.root.value] -= 1
         self.size -= 1
@@ -507,15 +507,15 @@ class Tree:
         node.value = et[0]
         try:
             self.nops[node.value] += 1
-        except KeyError:
+        except:
             pass
         node.offspring = [Node(v, parent=node, offspring=[]) for v in et[1]]
         self.ets[et_order].append(node)
         try:
             self.ets[len(node.parent.offspring)].remove(node.parent)
-        except ValueError:
+        except:
             pass
-        except AttributeError:
+        except:
             pass
         # Add the offspring to the list of nodes
         for n in node.offspring:
@@ -639,7 +639,7 @@ class Tree:
                     dic,
                 ],
             )
-        except (SyntaxError, KeyError):
+        except:
             self.sse = dict([(ds, np.inf) for ds in self.x])
             return self.sse
         if fit:
@@ -680,7 +680,7 @@ class Tree:
                                 self.par_values[ds][p] = 1.0
                         # Save this fit
                         self.fit_par[str(self)][ds] = deepcopy(self.par_values[ds])
-                    except (TypeError, RuntimeError):
+                    except:
                         # Save this (unsuccessful) fit and print warning
                         self.fit_par[str(self)][ds] = deepcopy(self.par_values[ds])
                         if verbose:
@@ -703,7 +703,7 @@ class Tree:
                     raise ValueError
                 else:
                     self.sse[ds] = np.sum(se)
-            except ValueError:
+            except:
                 if verbose:
                     print("> Cannot calculate SSE for %s: inf" % self, file=sys.stderr)
                 self.sse[ds] = np.inf
@@ -762,11 +762,11 @@ class Tree:
         for op, nop in list(self.nops.items()):
             try:
                 EP += self.prior_par["Nopi_%s" % op] * nop
-            except KeyError:
+            except:
                 pass
             try:
                 EP += self.prior_par["Nopi2_%s" % op] * nop**2
-            except KeyError:
+            except:
                 pass
         # Reset the value, if necessary
         if reset:
@@ -799,7 +799,7 @@ class Tree:
         canonical = self.canonical(verbose=verbose)
         try:  # We've seen this canonical before!
             rep, rep_energy, rep_par_values = self.representative[canonical]
-        except KeyError:  # Never seen this canonical formula before:
+        except:  # Never seen this canonical formula before:
             # save it and return 1
             self.get_bic(reset=True, fit=True, verbose=verbose)
             new_energy = self.get_energy(bic=False, verbose=verbose)
@@ -852,7 +852,10 @@ class Tree:
             ]
         )
         # check/update canonical representative
-        rep_res = self.update_representative(verbose=verbose)
+        try:
+            rep_res = self.update_representative(verbose=verbose)
+        except:  # funnels any suggestions which have a complex parameter to forbidden
+            rep_res = -1
         if rep_res == -1:
             # this formula is forbidden
             self.et_replace(added, old, update_gof=False, verbose=verbose)
@@ -866,23 +869,23 @@ class Tree:
         # Prior: change due to the numbers of each operation
         try:
             dEP -= self.prior_par["Nopi_%s" % target.value]
-        except KeyError:
+        except:
             pass
         try:
             dEP += self.prior_par["Nopi_%s" % new[0]]
-        except KeyError:
+        except:
             pass
         try:
             dEP += self.prior_par["Nopi2_%s" % target.value] * (
                 (self.nops[target.value] - 1) ** 2 - (self.nops[target.value]) ** 2
             )
-        except KeyError:
+        except:
             pass
         try:
             dEP += self.prior_par["Nopi2_%s" % new[0]] * (
                 (self.nops[new[0]] + 1) ** 2 - (self.nops[new[0]]) ** 2
             )
-        except KeyError:
+        except:
             pass
 
         # Data
@@ -908,7 +911,7 @@ class Tree:
             dEB = float(dEB)
             dEP = float(dEP)
             dE = dEB + dEP
-        except (ValueError, TypeError):
+        except:
             dEB, dEP, dE = np.inf, np.inf, np.inf
         return dE, dEB, dEP, par_valuesNew, nif, nfi
 
@@ -933,17 +936,20 @@ class Tree:
             try:
                 self.nops[old] -= 1
                 self.nops[new] += 1
-            except KeyError:
+            except:
                 pass
             # check/update canonical representative
-            rep_res = self.update_representative(verbose=verbose)
+            try:
+                rep_res = self.update_representative(verbose=verbose)
+            except:  # funnels any suggestions which have a complex parameter to forbidden
+                rep_res = -1
             if rep_res == -1:
                 # this formula is forbidden
                 target.value = old
                 try:
                     self.nops[old] += 1
                     self.nops[new] -= 1
-                except KeyError:
+                except:
                     pass
                 self.bic, self.sse, self.E = old_bic, deepcopy(old_sse), old_energy
                 self.par_values = old_par_values
@@ -953,7 +959,7 @@ class Tree:
             try:
                 self.nops[old] += 1
                 self.nops[new] -= 1
-            except KeyError:
+            except:
                 pass
             self.bic, self.sse, self.E = old_bic, deepcopy(old_sse), old_energy
             self.par_values = old_par_values
@@ -961,23 +967,23 @@ class Tree:
             # Prior: change due to the numbers of each operation
             try:
                 dEP -= self.prior_par["Nopi_%s" % target.value]
-            except KeyError:
+            except:
                 pass
             try:
                 dEP += self.prior_par["Nopi_%s" % new]
-            except KeyError:
+            except:
                 pass
             try:
                 dEP += self.prior_par["Nopi2_%s" % target.value] * (
                     (self.nops[target.value] - 1) ** 2 - (self.nops[target.value]) ** 2
                 )
-            except KeyError:
+            except:
                 pass
             try:
                 dEP += self.prior_par["Nopi2_%s" % new] * (
                     (self.nops[new] + 1) ** 2 - (self.nops[new]) ** 2
                 )
-            except KeyError:
+            except:
                 pass
 
             # Data
@@ -1004,7 +1010,7 @@ class Tree:
             dEP = float(dEP)
             dE = dEB + dEP
             return dE, dEB, dEP, par_valuesNew
-        except (ValueError, TypeError):
+        except:
             return np.inf, np.inf, np.inf, None
 
     # -------------------------------------------------------------------------
@@ -1030,7 +1036,10 @@ class Tree:
             oldrr = [self.root.value, [o.value for o in self.root.offspring[1:]]]
             self.prune_root(update_gof=False, verbose=verbose)
             # check/update canonical representative
-            rep_res = self.update_representative(verbose=verbose)
+            try:
+                rep_res = self.update_representative(verbose=verbose)
+            except:  # funnels any suggestions which have a complex parameter to forbidden
+                rep_res = -1
             if rep_res == -1:
                 # this formula is forbidden
                 self.replace_root(rr=oldrr, update_gof=False, verbose=verbose)
@@ -1049,7 +1058,7 @@ class Tree:
                     (self.nops[self.root.value] - 1) ** 2
                     - (self.nops[self.root.value]) ** 2
                 )
-            except KeyError:
+            except:
                 pass
 
             # Data correction
@@ -1075,7 +1084,7 @@ class Tree:
                 dEB = float(dEB)
                 dEP = float(dEP)
                 dE = dEB + dEP
-            except (ValueError, TypeError):
+            except:
                 dEB, dEP, dE = np.inf, np.inf, np.inf
             return dE, dEB, dEP, par_valuesNew
 
@@ -1107,7 +1116,7 @@ class Tree:
                 dEP += self.prior_par["Nopi2_%s" % rr[0]] * (
                     (self.nops[rr[0]] + 1) ** 2 - (self.nops[rr[0]]) ** 2
                 )
-            except KeyError:
+            except:
                 pass
 
             # Data
@@ -1134,7 +1143,7 @@ class Tree:
                 dEB = float(dEB)
                 dEP = float(dEP)
                 dE = dEB + dEP
-            except (ValueError, TypeError):
+            except:
                 dEB, dEP, dE = np.inf, np.inf, np.inf
             return dE, dEB, dEP, par_valuesNew
 
@@ -1207,7 +1216,7 @@ class Tree:
             dE, dEB, dEP, par_valuesNew = self.dE_lr(target, new, verbose=verbose)
             try:
                 paccept = np.exp(-dEB / self.BT - dEP / self.PT)
-            except ValueError:
+            except:
                 _logger.warning("Potentially failing to set paccept properly")
                 if (dEB / self.BT + dEP / self.PT) < 0:
                     paccept = 1.0
@@ -1264,7 +1273,7 @@ class Tree:
                 paccept = (
                     float(nif) * omegai * sf * np.exp(-dEB / self.BT - dEP / self.PT)
                 ) / (float(nfi) * omegaf * si)
-            except ValueError:
+            except:
                 if (dEB / self.BT + dEP / self.PT) < -200:
                     paccept = 1.0
             # Accept / reject
@@ -1409,7 +1418,7 @@ class Tree:
             # Predict
             try:
                 prediction = flam(*args)
-            except (SyntaxError, KeyError):
+            except:
                 # Do it point by point
                 prediction = [np.nan for i in range(len(this_x[ds]))]
             predictions[ds] = pd.Series(prediction, index=list(this_x[ds].index))
