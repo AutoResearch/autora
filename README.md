@@ -368,8 +368,6 @@ def first_order_linear(
     return y
 ```
 
-For an example of a file with docstrings, see [docs/docstrings.py](./docs/docstrings.py).
-
 *Pro-Tip: Write the docstring for your new high-level object before starting on the code. In particular, writing examples of how you expect it should be used can help clarify the right level of abstraction.*
 
 ## Online Documentation
