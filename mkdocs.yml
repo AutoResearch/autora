@@ -72,9 +72,7 @@ nav:
     - How it works: 'theorist/bsr/how_it_works.md'
     - Meta parameters: 'theorist/bsr/meta_parameters.md'
     - Search space: 'theorist/bsr/search_space.md'
-    - Examples:
-      - Example 1: 'theorist/bsr/example.md'
-      - Example 2: 'theorist/bsr/bsr.ipynb'
+    - Example: 'theorist/bsr/bsr.ipynb'
 - Cycle:
   - Scoring:
     - Logistic Regression: 'cycle/cycle_scoring.ipynb'
