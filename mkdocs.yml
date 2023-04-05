@@ -1,10 +1,14 @@
 # yaml-language-server: $schema=https://squidfunk.github.io/mkdocs-material/schema.json
 
 site_name: Autonomous Empirical Research
+repo_url: 'https://github.com/autoresearch/autora'
+edit_uri: 'blob/main/docs/'
 
 theme:
   name: material
   custom_dir: mkdocs/overrides
+  features:
+    - content.action.edit
 
 watch:
   - autora/
