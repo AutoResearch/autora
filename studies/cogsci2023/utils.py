@@ -16,18 +16,18 @@ from autora.experimentalist.sampler import (
 from autora.skl.bms import BMSRegressor
 from autora.skl.darts import DARTSRegressor
 from autora.skl.bsr import BSRRegressor
-from autora.theorist.bms.prior import get_priors
 from autora.theorist.bsr.funcs import get_all_nodes
 from autora.theorist.bsr.prior import get_prior_dict
 from autora.variable import ValueType
 from studies.bms.utils import mountain, threshold2, threshold3
+from studies.bms.prior_formula import get_priors
 
 
 def sigmoid(x):
     return scipy.special.expit(x)
 
 
-def fit_theorist(X, y, theorist_name, metadata, theorist_epochs=None):
+def fit_theorist(X, y, theorist_name, metadata, theorist_epochs=None, num_param=1, num_var=1):
 
     output_type = metadata.dependent_variables[0].type
 
@@ -35,30 +35,22 @@ def fit_theorist(X, y, theorist_name, metadata, theorist_epochs=None):
         if theorist_epochs is not None:
             epochs = theorist_epochs
         else:
-            epochs = 1500  # 1500
-        if 'PriorStudy' in theorist_name:
+            epochs = 15  # 1500
+        if 'Default' in theorist_name:
             theorist = BMSRegressor(epochs=epochs,
-                                    prior_par=get_priors('PriorStudy')[0])
+                                    prior_par=get_priors('Default', num_param, num_var))
         elif 'Williams2023Psychophysics' in theorist_name:
             theorist = BMSRegressor(epochs=epochs,
-                                    prior_par=get_priors('Williams2023Psychophysics')[0])
-        elif 'Williams2023PsychophysicsUpWeighted' in theorist_name:
-            theorist = BMSRegressor(epochs=epochs,
-                                    prior_par=get_priors('Williams2023PsychophysicsUpWeighted')[0])
+                                    prior_par=get_priors('Williams2023Psychophysics', num_param, num_var))
         elif 'Williams2023CognitivePsychology' in theorist_name:
             theorist = BMSRegressor(epochs=epochs,
-                                    prior_par=get_priors('Williams2023CognitivePsychology')[0])
-        elif 'Williams2023CognitivePsychologyUpWeighted' in theorist_name:
-            theorist = BMSRegressor(epochs=epochs,
-                                    prior_par=get_priors('Williams2023CognitivePsychologyUpWeighted')[0])
+                                    prior_par=get_priors('Williams2023CognitivePsychology', num_param, num_var))
         elif 'Williams2023BehavioralEconomics' in theorist_name:
             theorist = BMSRegressor(epochs=epochs,
-                                    prior_par=get_priors('Williams2023BehavioralEconomics')[0])
-        elif 'Williams2023BehavioralEconomicsUpWeighted' in theorist_name:
-            theorist = BMSRegressor(epochs=epochs,
-                                    prior_par=get_priors('Williams2023BehavioralEconomicsUpWeighted')[0])
+                                    prior_par=get_priors('Williams2023BehavioralEconomics', num_param, num_var))
         else:
-            theorist = BMSRegressor(epochs=epochs)
+            theorist = BMSRegressor(epochs=epochs,
+                                    prior_par=get_priors('Guimera2020', num_param, num_var))
     elif theorist_name == "DARTS 2 Nodes":
         if theorist_epochs is not None:
             epochs = theorist_epochs
@@ -115,6 +107,8 @@ def fit_theorist(X, y, theorist_name, metadata, theorist_epochs=None):
             theorist.fit(X, y, ignore_penalty=True)
         elif theorist_name == "BMS Lite":
             theorist.fit(X, y, ignore_prior=True, ignore_penalty=True)
+        elif theorist_name == "BMS":
+            theorist.fit(X, y, num_param=num_param)
         else:
             theorist.fit(X, y)
         found_theory = True
