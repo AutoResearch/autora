@@ -13,7 +13,7 @@ with two lines of different lengths, and are asked to indicate which line is lon
 There are two factors in this experiment: the length of the first line and 
 the length of the second line. Instances of the two line lengths 
 (e.g., 2.0 cm for the first line and 2.1 cm for the sceond line) 
-can be considered levels of the two factors, respectively. Thus, *an experiment condition is a vector of values,
+can be considered levels of the two factors, respectively. Thus, *an experiment condition is a vector of values that
 corresponds to a specific combination of experiment levels $x_i$, 
 each of which is an instance of an experiment factor.*
 
