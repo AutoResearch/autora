@@ -1,6 +1,6 @@
 repos:
   - repo: https://github.com/ambv/black
-    rev: 22.12.0
+    rev: 23.3.0
     hooks:
       - id: black
   - repo: https://github.com/pycqa/isort
@@ -8,7 +8,6 @@ repos:
     hooks:
       - id: isort
         args:
-        - "--profile=black"
         - "--filter-files"
         - "--project=autora"
   - repo: https://github.com/pycqa/flake8

@@ -6,7 +6,7 @@ import numpy as np
 import pytest
 import torch
 
-from autora.skl.darts import DARTSRegressor
+from autora.theorist.darts import DARTSRegressor
 
 non_interchangeable_primitives = [
     "none",
