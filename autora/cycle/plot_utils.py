@@ -12,9 +12,11 @@ from matplotlib.ticker import MaxNLocator
 from .simple import SimpleCycle as Cycle
 
 # Change default plot styles
-rcParams["axes.spines.top"] = False
-rcParams["axes.spines.right"] = False
-rcParams["legend.frameon"] = False
+controller_plotting_rc_context = {
+    "axes.spines.top": False,
+    "axes.spines.right": False,
+    "legend.frameon": False,
+}
 
 
 def _get_variable_index(
@@ -295,54 +297,61 @@ def plot_results_panel_2d(
         shape = (1, n_cycles_to_plot)
     else:
         shape = (int(np.ceil(n_cycles_to_plot / wrap)), wrap)
-    fig, axs = plt.subplots(*shape, **d_kw["subplot_kw"])
-    # Place axis object in an array if plotting single panel
-    if shape == (1, 1):
-        axs = np.array([axs])
 
-    # Loop by panel
-    for i, ax in enumerate(axs.flat):
-        if i + 1 <= n_cycles_to_plot:
-            # Get index of cycle to plot
-            i_cycle = cycle_idx[i]
+    with plt.rc_context(controller_plotting_rc_context):
+        fig, axs = plt.subplots(*shape, **d_kw["subplot_kw"])
+        # Place axis object in an array if plotting single panel
+        if shape == (1, 1):
+            axs = np.array([axs])
 
-            # ---Plot observed data---
-            # Independent variable values
-            x_vals = df_observed.loc[:, iv[0]]
-            # Dependent values masked by current cycle vs previous data
-            dv_previous = np.ma.masked_where(
-                df_observed["cycle"] >= i_cycle, df_observed[dv[0]]
-            )
-            dv_current = np.ma.masked_where(
-                df_observed["cycle"] != i_cycle, df_observed[dv[0]]
-            )
-            # Plotting scatter
-            ax.scatter(x_vals, dv_previous, **d_kw["scatter_previous_kw"])
-            ax.scatter(x_vals, dv_current, **d_kw["scatter_current_kw"])
+        # Loop by panel
+        for i, ax in enumerate(axs.flat):
+            if i + 1 <= n_cycles_to_plot:
+                # Get index of cycle to plot
+                i_cycle = cycle_idx[i]
 
-            # ---Plot Theory---
-            conditions = condition_space[:, iv[0]]
-            ax.plot(conditions, l_predictions[i_cycle], **d_kw["plot_theory_kw"])
+                # ---Plot observed data---
+                # Independent variable values
+                x_vals = df_observed.loc[:, iv[0]]
+                # Dependent values masked by current cycle vs previous data
+                dv_previous = np.ma.masked_where(
+                    df_observed["cycle"] >= i_cycle, df_observed[dv[0]]
+                )
+                dv_current = np.ma.masked_where(
+                    df_observed["cycle"] != i_cycle, df_observed[dv[0]]
+                )
+                # Plotting scatter
+                ax.scatter(x_vals, dv_previous, **d_kw["scatter_previous_kw"])
+                ax.scatter(x_vals, dv_current, **d_kw["scatter_current_kw"])
 
-            # Label Panels
-            ax.text(
-                0.05, 1, f"Cycle {i_cycle}", ha="left", va="top", transform=ax.transAxes
-            )
+                # ---Plot Theory---
+                conditions = condition_space[:, iv[0]]
+                ax.plot(conditions, l_predictions[i_cycle], **d_kw["plot_theory_kw"])
 
-        else:
-            ax.axis("off")
+                # Label Panels
+                ax.text(
+                    0.05,
+                    1,
+                    f"Cycle {i_cycle}",
+                    ha="left",
+                    va="top",
+                    transform=ax.transAxes,
+                )
 
-    # Super Labels
-    fig.supxlabel(iv_label, y=0.07)
-    fig.supylabel(dv_label)
+            else:
+                ax.axis("off")
 
-    # Legend
-    fig.legend(
-        ["Previous Data", "New Data", "Theory"],
-        ncols=3,
-        bbox_to_anchor=(0.5, 0),
-        loc="lower center",
-    )
+        # Super Labels
+        fig.supxlabel(iv_label, y=0.07)
+        fig.supylabel(dv_label)
+
+        # Legend
+        fig.legend(
+            ["Previous Data", "New Data", "Theory"],
+            ncols=3,
+            bbox_to_anchor=(0.5, 0),
+            loc="lower center",
+        )
 
     return fig
 
@@ -442,61 +451,61 @@ def plot_results_panel_3d(
         shape = (1, n_cycles)
     else:
         shape = (int(np.ceil(n_cycles / wrap)), wrap)
+    with plt.rc_context(controller_plotting_rc_context):
+        fig, axs = plt.subplots(*shape, **d_kw["subplot_kw"])
 
-    fig, axs = plt.subplots(*shape, **d_kw["subplot_kw"])
+        # Loop by panel
+        for i, ax in enumerate(axs.flat):
+            if i + 1 <= n_cycles:
 
-    # Loop by panel
-    for i, ax in enumerate(axs.flat):
-        if i + 1 <= n_cycles:
+                # ---Plot observed data---
+                # Independent variable values
+                l_x = [df_observed.loc[:, s[0]] for s in iv]
+                # Dependent values masked by current cycle vs previous data
+                dv_previous = np.ma.masked_where(
+                    df_observed["cycle"] >= i, df_observed[dv[0]]
+                )
+                dv_current = np.ma.masked_where(
+                    df_observed["cycle"] != i, df_observed[dv[0]]
+                )
+                # Plotting scatter
+                ax.scatter(*l_x, dv_previous, **d_kw["scatter_previous_kw"])
+                ax.scatter(*l_x, dv_current, **d_kw["scatter_current_kw"])
 
-            # ---Plot observed data---
-            # Independent variable values
-            l_x = [df_observed.loc[:, s[0]] for s in iv]
-            # Dependent values masked by current cycle vs previous data
-            dv_previous = np.ma.masked_where(
-                df_observed["cycle"] >= i, df_observed[dv[0]]
-            )
-            dv_current = np.ma.masked_where(
-                df_observed["cycle"] != i, df_observed[dv[0]]
-            )
-            # Plotting scatter
-            ax.scatter(*l_x, dv_previous, **d_kw["scatter_previous_kw"])
-            ax.scatter(*l_x, dv_current, **d_kw["scatter_current_kw"])
+                # ---Plot Theory---
+                ax.plot_surface(
+                    x1, x2, l_predictions[i].reshape(x1.shape), **d_kw["surface_kw"]
+                )
+                # ---Labels---
+                # Title
+                ax.set_title(f"Cycle {i}")
 
-            # ---Plot Theory---
-            ax.plot_surface(
-                x1, x2, l_predictions[i].reshape(x1.shape), **d_kw["surface_kw"]
-            )
-            # ---Labels---
-            # Title
-            ax.set_title(f"Cycle {i}")
+                # Axis
+                ax.set_xlabel(iv_labels[0])
+                ax.set_ylabel(iv_labels[1])
+                ax.set_zlabel(dv_label)
 
-            # Axis
-            ax.set_xlabel(iv_labels[0])
-            ax.set_ylabel(iv_labels[1])
-            ax.set_zlabel(dv_label)
+                # Viewing angle
+                if view:
+                    ax.view_init(*view)
 
-            # Viewing angle
-            if view:
-                ax.view_init(*view)
+            else:
+                ax.axis("off")
 
-        else:
-            ax.axis("off")
-
-    # Legend
-    handles, labels = axs.flatten()[0].get_legend_handles_labels()
-    legend_elements = [
-        handles[0],
-        handles[1],
-        Patch(facecolor=handles[2].get_facecolors()[0]),
-    ]
-    fig.legend(
-        handles=legend_elements,
-        labels=labels,
-        ncols=3,
-        bbox_to_anchor=(0.5, 0),
-        loc="lower center",
-    )
+        # Legend
+        handles, labels = axs.flatten()[0].get_legend_handles_labels()
+        legend_elements = [
+            handles[0],
+            handles[1],
+            Patch(facecolor=handles[2].get_facecolors()[0]),
+        ]
+        fig.legend(
+            handles=legend_elements,
+            labels=labels,
+            ncols=3,
+            bbox_to_anchor=(0.5, 0),
+            loc="lower center",
+        )
 
     return fig
 
@@ -583,24 +592,25 @@ def plot_cycle_score(
     else:
         l_scores = cycle_specified_score(scorer, cycle, X, y_true, **scorer_kw)
 
-    # Plotting
-    fig, ax = plt.subplots(figsize=figsize)
-    ax.plot(np.arange(len(cycle.data.theories)), l_scores, **plot_kw)
+    with plt.rc_context(controller_plotting_rc_context):
+        # Plotting
+        fig, ax = plt.subplots(figsize=figsize)
+        ax.plot(np.arange(len(cycle.data.theories)), l_scores, **plot_kw)
 
-    # Adjusting axis limits
-    if ylim:
-        ax.set_ylim(*ylim)
-    if xlim:
-        ax.set_xlim(*xlim)
+        # Adjusting axis limits
+        if ylim:
+            ax.set_ylim(*ylim)
+        if xlim:
+            ax.set_xlim(*xlim)
 
-    # Labeling
-    ax.set_xlabel(x_label)
-    if y_label is None:
-        if scorer is not None:
-            y_label = scorer.__name__
-        else:
-            y_label = "Score"
-    ax.set_ylabel(y_label)
-    ax.xaxis.set_major_locator(MaxNLocator(integer=True))
+        # Labeling
+        ax.set_xlabel(x_label)
+        if y_label is None:
+            if scorer is not None:
+                y_label = scorer.__name__
+            else:
+                y_label = "Score"
+        ax.set_ylabel(y_label)
+        ax.xaxis.set_major_locator(MaxNLocator(integer=True))
 
     return fig
