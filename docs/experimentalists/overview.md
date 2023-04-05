@@ -26,7 +26,7 @@ to the level of an experimental factor $i$.
 Experimentalists may use information about candidate models $M$ obtained from a theorist, 
 experiment conditions that have already been probed $\vec{x}' \in X'$, or 
 respective dependent measures $\vec{y}' \in Y'$. The following table includes the experimentalists currently implemented
-of experimentalists in AutoRA.
+ in AutoRA.
 
 | Experimentalist  | Function                                                                                                                      | Arguments  |
 |------------------|-------------------------------------------------------------------------------------------------------------------------------|------------|
