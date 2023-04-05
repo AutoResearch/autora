@@ -6,7 +6,7 @@ of novel experiments.
 
 An experiment consists of a series of **experiment conditions** $\vec{x} \in X$. 
 The experimental variables manipulated in each experiment condition 
-are defined as factors, and the values of each variable to be sampled 
+are defined as **factors**, and the values of each variable to be sampled 
 in the experiment are defined as **levels** of the corresponding **factors**. 
 As an example, consider a visual discrimination tasks in which participants are presented
 with two lines of different lengths, and are asked to indicate which line is longer.
