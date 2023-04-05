@@ -49,5 +49,11 @@ nav:
       - Meta parameters: 'theorist/bms/meta_parameters.md'
       - Search space: 'theorist/bms/search_space.md'
       - Example: 'theorist/bms/example.md'
+    BSR:
+      - Introduction: 'theorist/bsr/introduction.md'
+      - How it works: 'theorist/bsr/how_it_works.md'
+      - Meta parameters: 'theorist/bsr/meta_parameters.md'
+      - Search space: 'theorist/bsr/search_space.md'
+      - Example: 'theorist/bsr/example.md'
 - Code Reference: reference/  #
 
