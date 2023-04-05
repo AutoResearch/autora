@@ -49,5 +49,7 @@ nav:
       - Meta parameters: 'theorist/bms/meta_parameters.md'
       - Search space: 'theorist/bms/search_space.md'
       - Example: 'theorist/bms/example.md'
+- Experimentalists:
+    - Overview: 'experimentalists/overview.md'
 - Code Reference: reference/  #
 
