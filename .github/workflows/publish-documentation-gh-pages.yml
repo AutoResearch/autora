@@ -2,6 +2,8 @@ name: Publish documentation to GitHub Pages
 on:
   release:
     types: [released]
+  workflow_call:
+
 jobs:
   deploy:
     runs-on: ubuntu-latest

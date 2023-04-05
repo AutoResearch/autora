@@ -3,6 +3,7 @@ name: Publish package to Anaconda.org
 on:
   release:
     types: [ published ]
+  workflow_call:
 
 jobs:
   build-conda:

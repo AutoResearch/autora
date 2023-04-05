@@ -3,11 +3,14 @@ from functools import partial
 import numpy as np
 import pytest
 
-from autora.experimentalist.filter import weber_filter
 from autora.experimentalist.pipeline import make_pipeline
-from autora.experimentalist.pooler.general_pool import grid_pool
-from autora.experimentalist.sampler import random_sampler
+from autora.experimentalist.pooler.grid import grid_pool
+from autora.experimentalist.sampler.random_ import random_sampler
 from autora.variable import DV, IV, ValueType, VariableCollection
+
+
+def weber_filter(values):
+    return filter(lambda s: s[0] <= s[1], values)
 
 
 def test_random_experimentalist(metadata):

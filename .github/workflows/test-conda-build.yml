@@ -3,6 +3,7 @@ name: Test Conda Build
 on:
   pull_request:
   merge_group:
+  workflow_call:
 
 jobs:
   build-conda:

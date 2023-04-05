@@ -8,7 +8,6 @@ repos:
     hooks:
       - id: isort
         args:
-        - "--profile=black"
         - "--filter-files"
         - "--project=autora"
   - repo: https://github.com/pycqa/flake8
@@ -23,7 +22,11 @@ repos:
     rev: "v0.991"
     hooks:
       - id: mypy
-        additional_dependencies: [types-requests]
+        additional_dependencies: [types-requests,scipy,pytest]
         language_version: python3.8
+        args:
+          - "--namespace-packages"
+          - "--explicit-package-bases"
+
 default_language_version:
   python: python3

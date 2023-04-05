@@ -6,6 +6,7 @@ name: Test pre-commit-hooks
 on:
   pull_request:
   merge_group:
+  workflow_call:
 
 jobs:
   build:

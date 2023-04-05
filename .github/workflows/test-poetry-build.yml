@@ -3,6 +3,7 @@ name: Test Poetry Build
 on:
   pull_request:
   merge_group:
+  workflow_call:
 
 jobs:
   build-poetry:
