@@ -20,11 +20,11 @@ num_repetitions = 20                 # specifies how many times to repeat the st
 test_size = 0.2                # proportion of test set size to training set size
 
 theorists = [
-    'Regression',
-    'MLP',
-    'DARTS 3 Nodes',
     'BMS',
-    'BSR'
+    'BMS Default',
+    'BMS Williams2023Psychophysics',
+    'BMS Williams2023CognitivePsychology',
+    'BMS Williams2023BehavioralEconomics',
     ]
 
 gts = ['weber_fechner',
@@ -106,7 +106,7 @@ for theorist_name in theorists:
     theorist_name_log.append(theorist_name)
 
 # save and load pickle file
-file_name = "data_theorist/" + ground_truth_name + "_" + str(rep) + ".pickle"
+file_name = "data_prior/" + ground_truth_name + "_" + str(rep) + ".pickle"
 
 with open(file_name, 'wb') as f:
     # simulation configuration
