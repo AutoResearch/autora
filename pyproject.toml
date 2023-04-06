@@ -13,30 +13,8 @@ documentation = "https://autoresearch.github.io/autora/"
 
 [tool.poetry.dependencies]
 python = ">=3.8.10,<3.11"
-numpy = ">=1.22.1"
-scipy = "^1.9.3"
-imageio = "^2.9.0"
-matplotlib = "^3.2.1"
-pandas = ">=1.4.2,<3.0.0"
-graphviz = ">=0.14.1,<0.21.0"
-seaborn = ">=0.11.1,<0.13.0"
-scikit-learn = "^1.1.1"
-sympy = "^1.10.1"
-tinkerforge = {version = "^2.1.25", optional=true}
-torch = "2.0.0"
-tqdm = "^4.64.0"
-
-[tool.poetry.extras]
-tinkerforge = ["tinkerforge"]
-
-[tool.poetry.group.dev.dependencies]
-jupyter = "^1.0.0"
-ipython = "^8.4.0"
-ipywidgets = ">=7.7.1,<9.0.0"
-flake8 = "^6.0.0"
-
-[tool.poetry.group.test.dependencies]
-pytest = "^7.2.0"
+autora-core = "*"
+autora-darts = "*"
 
 [tool.poetry.group.pre-commit.dependencies]
 pre-commit = ">=2.20,<4.0"
@@ -48,6 +26,7 @@ mkdocs-literate-nav = ">=0.4.1,<0.7.0"
 mkdocs-section-index = "^0.3.4"
 mkdocstrings-python = ">=0.7.1,<0.10.0"
 mkdocs-jupyter = "^0.24.1"
+mkdocs-multirepo-plugin = "^0.6.1"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
