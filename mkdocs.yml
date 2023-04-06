@@ -1,0 +1,26 @@
+# yaml-language-server: $schema=https://squidfunk.github.io/mkdocs-material/schema.json
+
+site_name: Differentiable Architecture Search
+repo_url: 'https://github.com/autoresearch/autora-darts'
+edit_uri: 'blob/main/docs/'
+
+theme:
+  name: material
+
+watch:
+  - src/
+
+plugins:
+  - mkdocs-jupyter:
+      include_source: true
+      execute: false
+      ignore_h1_titles: True
+
+nav:
+  - Introduction: 'introduction.md'
+  - How it works: 'how_it_works.md'
+  - Meta parameters: 'meta_parameters.md'
+  - Search space: 'search_space.md'
+  - Examples:
+    - Basic Usage: 'example.ipynb'
+    - Weber-Fechner Law: 'weber.ipynb'
