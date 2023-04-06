@@ -25,9 +25,6 @@ theme:
   features:
     - content.action.edit
 
-watch:
-  - autora/
-
 plugins:
   - search
   - gen-files:
@@ -45,6 +42,7 @@ plugins:
       include_source: true
       execute: false
       ignore_h1_titles: True
+  - mkdocs-multirepo-plugin:
 
 
 markdown_extensions:
