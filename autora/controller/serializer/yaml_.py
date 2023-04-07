@@ -1,20 +1,14 @@
 import pickle
 from pathlib import Path
-from typing import Any, Protocol, runtime_checkable
 
 import yaml
 
-from autora.controller.protocol import ResultKind, SupportsControllerStateHistory
+from autora.controller.protocol import (
+    ResultKind,
+    SupportsControllerStateHistory,
+    SupportsLoadDump,
+)
 from autora.controller.state import History
-
-
-@runtime_checkable
-class SupportsLoadDump(Protocol):
-    def dump(self, data, file) -> None:
-        ...
-
-    def load(self, file) -> Any:
-        ...
 
 
 class YAMLSerializer:

@@ -1,5 +1,16 @@
 from enum import Enum
-from typing import Any, Dict, Mapping, Optional, Protocol, Sequence, Set, TypeVar, Union
+from typing import (
+    Any,
+    Dict,
+    Mapping,
+    Optional,
+    Protocol,
+    Sequence,
+    Set,
+    TypeVar,
+    Union,
+    runtime_checkable,
+)
 
 from numpy.typing import ArrayLike
 from sklearn.base import BaseEstimator
@@ -117,3 +128,12 @@ class Executor(Protocol):
 ExecutorName = TypeVar("ExecutorName", bound=str)
 
 ExecutorCollection = Mapping[ExecutorName, Executor]
+
+
+@runtime_checkable
+class SupportsLoadDump(Protocol):
+    def dump(self, data, file) -> None:
+        ...
+
+    def load(self, file) -> Any:
+        ...
