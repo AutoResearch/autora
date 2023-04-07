@@ -6,7 +6,7 @@ on:
     types: [ released ]  # only deploy when we make a new `latest` release
 
 permissions:
-  pages: write
+  repo: write
 
 jobs:
 
