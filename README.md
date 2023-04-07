@@ -398,8 +398,7 @@ The release process is automated using GitHub Actions.
 - Before you start, ensure that the tokens are up-to-date. If in doubt, try to create and publish a new release 
   candidate version of the package first. The tokens are stored as "organization secrets" enabled for the autora 
   repository, and are called:
-  - PYPI_TOKEN: a token from pypi.org with upload permissions on the AutoResearch/AutoRA project. Current token 
-    expires on 2023-03-01.
+  - PYPI_TOKEN: a token from pypi.org with upload permissions on the AutoResearch/AutoRA project.
   - ANACONDA_TOKEN: a token from anaconda.org with the following scopes on the AutoResearch organization: `repos conda
     api:read api:write`. Current token expires on 2023-03-01.
 - Update [conda recipe](./conda/autora/meta.yaml): 
