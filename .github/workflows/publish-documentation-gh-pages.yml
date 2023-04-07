@@ -1,4 +1,4 @@
-name: Publish to PyPI
+name: Publish Documentation to GitHub Pages
 
 on:
   workflow_dispatch:  # this allows us to run it manually
