@@ -19,12 +19,11 @@ requirements:
     - pip
     - poetry
   run:
-    - graphviz
     - imageio >=2.9.0,<3.0.0
     - matplotlib >=3.2.1,<4.0.0
-    - numpy >=1.23.1,<2.0.0
+    - numpy >=1.22.1,<2.0.0
     - pandas >=1.4.2,<2.0.0
-    - pytorch >=1.12.1,<2.0.0
+    - pytorch =2.0.0
     - python-graphviz >=0.14.1,<0.21.0
     - scikit-learn >=1.1.1,<2.0.0
     - scipy >=1.9.3,<2.0.0
@@ -40,6 +39,8 @@ test:
   imports:
     - autora
     - autora.cycle
+    - autora.cycle.plot_utils
+    - autora.cycle.simple
     - autora.experimentalist
     - autora.experimentalist.sampler
     - autora.experimentalist.filter
@@ -49,6 +50,8 @@ test:
     - autora.skl.darts
     - autora.skl.bms
     - autora.skl.bsr
+    - autora.synthetic
+    - autora.synthetic.inventory
     - autora.theorist
     - autora.theorist.darts
     - autora.theorist.bms
