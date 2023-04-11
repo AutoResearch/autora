@@ -15,7 +15,7 @@ class Snapshot(SupportsControllerStateFields):
 
     # Single values
     variables: VariableCollection = field(default_factory=VariableCollection)
-    params: Dict = field(default_factory=dict)
+    parameters: Dict = field(default_factory=dict)
 
     # Sequences
     experiments: List[ArrayLike] = field(default_factory=list)
@@ -25,7 +25,7 @@ class Snapshot(SupportsControllerStateFields):
     def update(
         self,
         variables=None,
-        params=None,
+        parameters=None,
         experiments=None,
         observations=None,
         models=None,
@@ -36,20 +36,22 @@ class Snapshot(SupportsControllerStateFields):
         The initial object is empty:
         >>> s0 = Snapshot()
         >>> s0  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
-        Snapshot(variables=VariableCollection(...), params={}, experiments=[],
+        Snapshot(variables=VariableCollection(...), parameters={}, experiments=[],
                         observations=[], models=[])
 
-        We can update the params using the `.update` method:
-        >>> s0.update(params={'first': 'params'})  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
-        Snapshot(..., params={'first': 'params'}, ...)
+        We can update the parameters using the `.update` method:
+        >>> s0.update(parameters={'first': 'parameters'}
+        ... )  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
+        Snapshot(..., parameters={'first': 'parameters'}, ...)
 
         ... but the original object is unchanged:
         >>> s0  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
-        Snapshot(..., params={}, ...)
+        Snapshot(..., parameters={}, ...)
 
-        For params, only one object is returned from the respective property:
-        >>> s0.update(params={'first': 'params'}).update(params={'second': 'params'}).params
-        {'second': 'params'}
+        For parameters, only one object is returned from the respective property:
+        >>> s0.update(parameters={'first': 'parameters'}
+        ...  ).update(parameters={'second': 'parameters'}).parameters
+        {'second': 'parameters'}
 
         ... and the same applies to variables:
         >>> from autora.variable import VariableCollection, IV
@@ -116,8 +118,8 @@ class Snapshot(SupportsControllerStateFields):
                 return old
 
         variables_ = variables or self.variables
-        params_ = params or self.params
+        parameters_ = parameters or self.parameters
         experiments_ = _coalesce_lists(self.experiments, experiments)
         observations_ = _coalesce_lists(self.observations, observations)
         models_ = _coalesce_lists(self.models, models)
-        return Snapshot(variables_, params_, experiments_, observations_, models_)
+        return Snapshot(variables_, parameters_, experiments_, observations_, models_)

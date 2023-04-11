@@ -55,7 +55,7 @@ class SupportsControllerStateFields(Protocol):
     """Support representing snapshots of a controller state as mutable fields."""
 
     variables: VariableCollection
-    params: Dict
+    parameters: Dict
     experiments: Sequence[ArrayLike]
     observations: Sequence[ArrayLike]
     models: Sequence[BaseEstimator]
@@ -75,7 +75,7 @@ class SupportsControllerStateProperties(Protocol):
         ...
 
     @property
-    def params(self) -> Dict:
+    def parameters(self) -> Dict:
         ...
 
     @property

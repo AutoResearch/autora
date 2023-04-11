@@ -24,7 +24,7 @@ class History(SupportsControllerStateHistory):
     def __init__(
         self,
         variables: Optional[VariableCollection] = None,
-        params: Optional[Dict] = None,
+        parameters: Optional[Dict] = None,
         experiments: Optional[List[ArrayLike]] = None,
         observations: Optional[List[ArrayLike]] = None,
         models: Optional[List[BaseEstimator]] = None,
@@ -34,7 +34,7 @@ class History(SupportsControllerStateHistory):
 
         Args:
             variables: a single datum to be marked as "variables"
-            params: a single datum to be marked as "params"
+            parameters: a single datum to be marked as "parameters"
             experiments: an iterable of data, each to be marked as "experiments"
             observations: an iterable of data, each to be marked as "observations"
             models: an iterable of data, each to be marked as "models"
@@ -50,8 +50,8 @@ class History(SupportsControllerStateHistory):
             >>> History(variables=VariableCollection()) # doctest: +ELLIPSIS
             History([Result(data=VariableCollection(...), kind=ResultKind.VARIABLES)])
 
-            >>> History(params={"some": "params"})
-            History([Result(data={'some': 'params'}, kind=ResultKind.PARAMETERS)])
+            >>> History(parameters={"some": "parameters"})
+            History([Result(data={'some': 'parameters'}, kind=ResultKind.PARAMETERS)])
 
             >>> History(experiments=["a experiment"])
             History([Result(data='a experiment', kind=ResultKind.EXPERIMENT)])
@@ -64,9 +64,9 @@ class History(SupportsControllerStateHistory):
             History([Result(data=LinearRegression(), kind=ResultKind.MODEL)])
 
             Parameters passed to the constructor are included in the history in the following order:
-            `history`, `variables`, `params`, `experiments`, `observations`, `models`
+            `history`, `variables`, `parameters`, `experiments`, `observations`, `models`
             >>> History(models=['t1', 't2'], experiments=['c1', 'c2'],
-            ...     observations=['o1', 'o2'], params={'a': 'param'},
+            ...     observations=['o1', 'o2'], parameters={'a': 'param'},
             ...     variables=VariableCollection(),
             ...     history=[Result("from history", ResultKind.VARIABLES)]
             ... )  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
@@ -89,7 +89,7 @@ class History(SupportsControllerStateHistory):
 
         self._history += _init_result_list(
             variables=variables,
-            params=params,
+            parameters=parameters,
             experiments=experiments,
             observations=observations,
             models=models,
@@ -98,7 +98,7 @@ class History(SupportsControllerStateHistory):
     def update(
         self,
         variables=None,
-        params=None,
+        parameters=None,
         experiments=None,
         observations=None,
         models=None,
@@ -131,19 +131,20 @@ class History(SupportsControllerStateHistory):
             ... and we see that there is only ever one variables object returned.
 
             Params is treated the same way as variables:
-            >>> hp = h0.update(params={'first': 'params'})
+            >>> hp = h0.update(parameters={'first': 'parameters'})
             >>> hp
-            History([Result(data={'first': 'params'}, kind=ResultKind.PARAMETERS)])
+            History([Result(data={'first': 'parameters'}, kind=ResultKind.PARAMETERS)])
 
-            ... where only the most recent "params" object is returned from the `.params` property.
-            >>> hp = hp.update(params={'second': 'params'})
-            >>> hp.params
-            {'second': 'params'}
+            ... where only the most recent "parameters" object is returned from the
+            `.parameters` property.
+            >>> hp = hp.update(parameters={'second': 'parameters'})
+            >>> hp.parameters
+            {'second': 'parameters'}
 
-            ... however, the full history of the params objects remains available, if needed:
+            ... however, the full history of the parameters objects remains available, if needed:
             >>> hp  # doctest: +NORMALIZE_WHITESPACE
-            History([Result(data={'first': 'params'}, kind=ResultKind.PARAMETERS),
-                                    Result(data={'second': 'params'}, kind=ResultKind.PARAMETERS)])
+            History([Result(data={'first': 'parameters'}, kind=ResultKind.PARAMETERS),
+                     Result(data={'second': 'parameters'}, kind=ResultKind.PARAMETERS)])
 
             When we update the experiments, observations or models, a new entry is added to the
             history:
@@ -218,7 +219,7 @@ class History(SupportsControllerStateHistory):
 
         history_extension += _init_result_list(
             variables=variables,
-            params=params,
+            parameters=parameters,
             experiments=experiments,
             observations=observations,
             models=models,
@@ -261,7 +262,7 @@ class History(SupportsControllerStateHistory):
         return self._by_kind.variables
 
     @property
-    def params(self) -> Dict:
+    def parameters(self) -> Dict:
         """
 
         Returns:
@@ -269,21 +270,22 @@ class History(SupportsControllerStateHistory):
         Examples:
             Params is treated the same way as variables:
             >>> h = History()
-            >>> h = h.update(params={'first': 'params'})
-            >>> h.params
-            {'first': 'params'}
+            >>> h = h.update(parameters={'first': 'parameters'})
+            >>> h.parameters
+            {'first': 'parameters'}
 
-            ... where only the most recent "params" object is returned from the `.params` property.
-            >>> h = h.update(params={'second': 'params'})
-            >>> h.params
-            {'second': 'params'}
+            ... where only the most recent "parameters" object is returned
+            from the `.parameters` property.
+            >>> h = h.update(parameters={'second': 'parameters'})
+            >>> h.parameters
+            {'second': 'parameters'}
 
-            ... however, the full history of the params objects remains available, if needed:
+            ... however, the full history of the parameters objects remains available, if needed:
             >>> h  # doctest: +NORMALIZE_WHITESPACE
-            History([Result(data={'first': 'params'}, kind=ResultKind.PARAMETERS),
-                                    Result(data={'second': 'params'}, kind=ResultKind.PARAMETERS)])
+            History([Result(data={'first': 'parameters'}, kind=ResultKind.PARAMETERS),
+                     Result(data={'second': 'parameters'}, kind=ResultKind.PARAMETERS)])
         """
-        return self._by_kind.params
+        return self._by_kind.parameters
 
     @property
     def experiments(self) -> List[ArrayLike]:
@@ -350,12 +352,12 @@ class History(SupportsControllerStateHistory):
         Examples:
             We initialze some history:
             >>> h = History(models=['t1', 't2'], experiments=['c1', 'c2'],
-            ...     observations=['o1', 'o2'], params={'a': 'param'},
+            ...     observations=['o1', 'o2'], parameters={'a': 'param'},
             ...     variables=VariableCollection(),
             ...     history=[Result("from history", ResultKind.VARIABLES)])
 
             Parameters passed to the constructor are included in the history in the following order:
-            `history`, `variables`, `params`, `experiments`, `observations`, `models`
+            `history`, `variables`, `parameters`, `experiments`, `observations`, `models`
 
             >>> h.history  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
             [Result(data='from history', kind=ResultKind.VARIABLES),
@@ -368,9 +370,9 @@ class History(SupportsControllerStateHistory):
              Result(data='t1', kind=ResultKind.MODEL),
              Result(data='t2', kind=ResultKind.MODEL)]
 
-            If we add a new value, like the params object, the updated value is added to the
+            If we add a new value, like the parameters object, the updated value is added to the
             end of the history:
-            >>> h = h.update(params={'new': 'param'})
+            >>> h = h.update(parameters={'new': 'param'})
             >>> h.history  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
             [..., Result(data={'new': 'param'}, kind=ResultKind.PARAMETERS)]
 
@@ -383,7 +385,7 @@ class History(SupportsControllerStateHistory):
 
         Examples:
             >>> h = History(models=['t1', 't2'], experiments=['c1', 'c2'],
-            ...     observations=['o1', 'o2'], params={'a': 'param'},
+            ...     observations=['o1', 'o2'], parameters={'a': 'param'},
             ...     variables=VariableCollection(),
             ...     history=[Result("from history", ResultKind.VARIABLES)])
 
@@ -449,7 +451,7 @@ class Result(SupportsDataKind):
 
 def _init_result_list(
     variables: Optional[VariableCollection] = None,
-    params: Optional[Dict] = None,
+    parameters: Optional[Dict] = None,
     experiments: Optional[Iterable[ArrayLike]] = None,
     observations: Optional[Iterable[ArrayLike]] = None,
     models: Optional[Iterable[BaseEstimator]] = None,
@@ -461,7 +463,7 @@ def _init_result_list(
 
     Args:
         variables: a single datum to be marked as "variables"
-        params: a single datum to be marked as "params"
+        parameters: a single datum to be marked as "parameters"
         experiments: an iterable of data, each to be marked as "experiments"
         observations: an iterable of data, each to be marked as "observations"
         models: an iterable of data, each to be marked as "models"
@@ -476,8 +478,8 @@ def _init_result_list(
         >>> _init_result_list(variables=VariableCollection()) # doctest: +ELLIPSIS
         [Result(data=VariableCollection(...), kind=ResultKind.VARIABLES)]
 
-        >>> _init_result_list(params={"some": "params"})
-        [Result(data={'some': 'params'}, kind=ResultKind.PARAMETERS)]
+        >>> _init_result_list(parameters={"some": "parameters"})
+        [Result(data={'some': 'parameters'}, kind=ResultKind.PARAMETERS)]
 
         >>> _init_result_list(experiments=["a experiment"])
         [Result(data='a experiment', kind=ResultKind.EXPERIMENT)]
@@ -490,15 +492,15 @@ def _init_result_list(
         [Result(data=LinearRegression(), kind=ResultKind.MODEL)]
 
         The input arguments are added to the data in the order `variables`,
-        `params`, `experiments`, `observations`, `models`:
+        `parameters`, `experiments`, `observations`, `models`:
         >>> _init_result_list(variables=VariableCollection(),
-        ...                  params={"some": "params"},
+        ...                  parameters={"some": "parameters"},
         ...                  experiments=["a experiment"],
         ...                  observations=["an observation", "another observation"],
         ...                  models=[LinearRegression()],
         ... ) # doctest: +NORMALIZE_WHITESPACE +ELLIPSIS
         [Result(data=VariableCollection(...), kind=ResultKind.VARIABLES),
-         Result(data={'some': 'params'}, kind=ResultKind.PARAMETERS),
+         Result(data={'some': 'parameters'}, kind=ResultKind.PARAMETERS),
          Result(data='a experiment', kind=ResultKind.EXPERIMENT),
          Result(data='an observation', kind=ResultKind.OBSERVATION),
          Result(data='another observation', kind=ResultKind.OBSERVATION),
@@ -510,8 +512,8 @@ def _init_result_list(
     if variables is not None:
         data.append(Result(variables, ResultKind.VARIABLES))
 
-    if params is not None:
-        data.append(Result(params, ResultKind.PARAMETERS))
+    if parameters is not None:
+        data.append(Result(parameters, ResultKind.PARAMETERS))
 
     for seq, kind in [
         (experiments, ResultKind.EXPERIMENT),
@@ -533,24 +535,24 @@ def _history_to_kind(history: Sequence[Result]) -> Snapshot:
         History might be empty
         >>> history_ = []
         >>> _history_to_kind(history_) # doctest: +NORMALIZE_WHITESPACE +ELLIPSIS
-        Snapshot(variables=VariableCollection(...), params={},
+        Snapshot(variables=VariableCollection(...), parameters={},
                         experiments=[], observations=[], models=[])
 
         ... or with values for any or all of the parameters:
-        >>> history_ = _init_result_list(params={"some": "params"})
+        >>> history_ = _init_result_list(parameters={"some": "parameters"})
         >>> _history_to_kind(history_) # doctest: +NORMALIZE_WHITESPACE +ELLIPSIS
-        Snapshot(..., params={'some': 'params'}, ...)
+        Snapshot(..., parameters={'some': 'parameters'}, ...)
 
         >>> history_ += _init_result_list(experiments=["a experiment"])
         >>> _history_to_kind(history_) # doctest: +NORMALIZE_WHITESPACE +ELLIPSIS
-        Snapshot(..., params={'some': 'params'}, experiments=['a experiment'], ...)
+        Snapshot(..., parameters={'some': 'parameters'}, experiments=['a experiment'], ...)
 
-        >>> _history_to_kind(history_).params
-        {'some': 'params'}
+        >>> _history_to_kind(history_).parameters
+        {'some': 'parameters'}
 
         >>> history_ += _init_result_list(observations=["an observation"])
         >>> _history_to_kind(history_) # doctest: +NORMALIZE_WHITESPACE +ELLIPSIS
-        Snapshot(..., params={'some': 'params'}, experiments=['a experiment'],
+        Snapshot(..., parameters={'some': 'parameters'}, experiments=['a experiment'],
                         observations=['an observation'], ...)
 
         >>> from sklearn.linear_model import LinearRegression
@@ -564,16 +566,16 @@ def _history_to_kind(history: Sequence[Result]) -> Snapshot:
         >>> _history_to_kind(history_) # doctest: +ELLIPSIS
         Snapshot(variables=VariableCollection(independent_variables=[IV(name='example', ...
 
-        >>> history_ = [Result({'some': 'params'}, kind=ResultKind.PARAMETERS)]
+        >>> history_ = [Result({'some': 'parameters'}, kind=ResultKind.PARAMETERS)]
         >>> _history_to_kind(history_) # doctest: +ELLIPSIS
-        Snapshot(..., params={'some': 'params'}, ...)
+        Snapshot(..., parameters={'some': 'parameters'}, ...)
 
     """
     namespace = Snapshot(
         variables=_get_last_data_with_default(
             history, kind={ResultKind.VARIABLES}, default=VariableCollection()
         ),
-        params=_get_last_data_with_default(
+        parameters=_get_last_data_with_default(
             history, kind={ResultKind.PARAMETERS}, default={}
         ),
         observations=_list_data(
