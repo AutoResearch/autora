@@ -110,6 +110,9 @@ SupportsControllerState = Union[
 class SupportsControllerStateHistory(SupportsControllerStateProperties, Protocol):
     """Represents controller state as a linear sequence of entries."""
 
+    def __init__(self, history: Sequence[SupportsDataKind]):
+        ...
+
     def filter_by(self: State, kind: Optional[Set[Union[str, ResultKind]]]) -> State:
         ...
 
