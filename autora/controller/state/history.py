@@ -23,7 +23,7 @@ class History(SupportsControllerStateHistory):
 
     def __init__(
         self,
-        metadata: Optional[VariableCollection] = None,
+        variables: Optional[VariableCollection] = None,
         params: Optional[Dict] = None,
         conditions: Optional[List[ArrayLike]] = None,
         observations: Optional[List[ArrayLike]] = None,
@@ -33,7 +33,7 @@ class History(SupportsControllerStateHistory):
         """
 
         Args:
-            metadata: a single datum to be marked as "metadata"
+            variables: a single datum to be marked as "variables"
             params: a single datum to be marked as "params"
             conditions: an iterable of data, each to be marked as "conditions"
             observations: an iterable of data, each to be marked as "observations"
@@ -47,7 +47,7 @@ class History(SupportsControllerStateHistory):
 
             ... or with values for any or all of the parameters:
             >>> from autora.variable import VariableCollection
-            >>> History(metadata=VariableCollection()) # doctest: +ELLIPSIS
+            >>> History(variables=VariableCollection()) # doctest: +ELLIPSIS
             History([Result(data=VariableCollection(...), kind=ResultKind.VARIABLES)])
 
             >>> History(params={"some": "params"})
@@ -64,9 +64,10 @@ class History(SupportsControllerStateHistory):
             History([Result(data=LinearRegression(), kind=ResultKind.MODEL)])
 
             Parameters passed to the constructor are included in the history in the following order:
-            `history`, `metadata`, `params`, `conditions`, `observations`, `theories`
+            `history`, `variables`, `params`, `conditions`, `observations`, `theories`
             >>> History(theories=['t1', 't2'], conditions=['c1', 'c2'],
-            ...     observations=['o1', 'o2'], params={'a': 'param'}, metadata=VariableCollection(),
+            ...     observations=['o1', 'o2'], params={'a': 'param'},
+            ...     variables=VariableCollection(),
             ...     history=[Result("from history", ResultKind.VARIABLES)]
             ... )  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
             History([Result(data='from history', kind=ResultKind.VARIABLES),
@@ -87,7 +88,7 @@ class History(SupportsControllerStateHistory):
             self._history = []
 
         self._history += _init_result_list(
-            metadata=metadata,
+            variables=variables,
             params=params,
             conditions=conditions,
             observations=observations,
@@ -96,7 +97,7 @@ class History(SupportsControllerStateHistory):
 
     def update(
         self,
-        metadata=None,
+        variables=None,
         params=None,
         conditions=None,
         observations=None,
@@ -112,9 +113,9 @@ class History(SupportsControllerStateHistory):
             >>> h0
             History([])
 
-            We can update the metadata using the `.update` method:
+            We can update the variables using the `.update` method:
             >>> from autora.variable import VariableCollection
-            >>> h1 = h0.update(metadata=VariableCollection())
+            >>> h1 = h0.update(variables=VariableCollection())
             >>> h1  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
             History([Result(data=VariableCollection(...), kind=ResultKind.VARIABLES)])
 
@@ -122,14 +123,14 @@ class History(SupportsControllerStateHistory):
             >>> h0
             History([])
 
-            We can update the metadata again:
-            >>> h2 = h1.update(metadata=VariableCollection(["some IV"]))
+            We can update the variables again:
+            >>> h2 = h1.update(variables=VariableCollection(["some IV"]))
             >>> h2._by_kind  # doctest: +ELLIPSIS
-            Snapshot(metadata=VariableCollection(independent_variables=['some IV'],...), ...)
+            Snapshot(variables=VariableCollection(independent_variables=['some IV'],...), ...)
 
-            ... and we see that there is only ever one metadata object returned.
+            ... and we see that there is only ever one variables object returned.
 
-            Params is treated the same way as metadata:
+            Params is treated the same way as variables:
             >>> hp = h0.update(params={'first': 'params'})
             >>> hp
             History([Result(data={'first': 'params'}, kind=ResultKind.PARAMETERS)])
@@ -185,12 +186,13 @@ class History(SupportsControllerStateHistory):
             History([Result(data='c1', kind=ResultKind.EXPERIMENT),
                                     Result(data='c2', kind=ResultKind.EXPERIMENT)])
 
-            >>> h0.update(theories=['t1', 't2'], metadata={'m': 1}) # doctest: +NORMALIZE_WHITESPACE
+            >>> h0.update(theories=['t1', 't2'], variables={'m': 1}
+            ... ) # doctest: +NORMALIZE_WHITESPACE
             History([Result(data={'m': 1}, kind=ResultKind.VARIABLES),
                                     Result(data='t1', kind=ResultKind.MODEL),
                                     Result(data='t2', kind=ResultKind.MODEL)])
 
-            >>> h0.update(theories=['t1'], observations=['o1'], metadata={'m': 1}
+            >>> h0.update(theories=['t1'], observations=['o1'], variables={'m': 1}
             ... )  # doctest: +NORMALIZE_WHITESPACE
             History([Result(data={'m': 1}, kind=ResultKind.VARIABLES),
                      Result(data='o1', kind=ResultKind.OBSERVATION),
@@ -215,7 +217,7 @@ class History(SupportsControllerStateHistory):
             history_extension = []
 
         history_extension += _init_result_list(
-            metadata=metadata,
+            variables=variables,
             params=params,
             conditions=conditions,
             observations=observations,
@@ -233,30 +235,30 @@ class History(SupportsControllerStateHistory):
         return _history_to_kind(self._history)
 
     @property
-    def metadata(self) -> VariableCollection:
+    def variables(self) -> VariableCollection:
         """
 
         Examples:
             The initial object is empty:
             >>> h = History()
 
-            ... and returns an emtpy metadata object
-            >>> h.metadata
+            ... and returns an emtpy variables object
+            >>> h.variables
             VariableCollection(independent_variables=[], dependent_variables=[], covariates=[])
 
-            We can update the metadata using the `.update` method:
+            We can update the variables using the `.update` method:
             >>> from autora.variable import VariableCollection
-            >>> h = h.update(metadata=VariableCollection(independent_variables=['some IV']))
-            >>> h.metadata  # doctest: +ELLIPSIS
+            >>> h = h.update(variables=VariableCollection(independent_variables=['some IV']))
+            >>> h.variables  # doctest: +ELLIPSIS
             VariableCollection(independent_variables=['some IV'], ...)
 
-            We can update the metadata again:
-            >>> h = h.update(metadata=VariableCollection(["some other IV"]))
-            >>> h.metadata  # doctest: +ELLIPSIS
+            We can update the variables again:
+            >>> h = h.update(variables=VariableCollection(["some other IV"]))
+            >>> h.variables  # doctest: +ELLIPSIS
             VariableCollection(independent_variables=['some other IV'], ...)
 
-            ... and we see that there is only ever one metadata object returned."""
-        return self._by_kind.metadata
+            ... and we see that there is only ever one variables object returned."""
+        return self._by_kind.variables
 
     @property
     def params(self) -> Dict:
@@ -265,7 +267,7 @@ class History(SupportsControllerStateHistory):
         Returns:
 
         Examples:
-            Params is treated the same way as metadata:
+            Params is treated the same way as variables:
             >>> h = History()
             >>> h = h.update(params={'first': 'params'})
             >>> h.params
@@ -348,11 +350,12 @@ class History(SupportsControllerStateHistory):
         Examples:
             We initialze some history:
             >>> h = History(theories=['t1', 't2'], conditions=['c1', 'c2'],
-            ...     observations=['o1', 'o2'], params={'a': 'param'}, metadata=VariableCollection(),
+            ...     observations=['o1', 'o2'], params={'a': 'param'},
+            ...     variables=VariableCollection(),
             ...     history=[Result("from history", ResultKind.VARIABLES)])
 
             Parameters passed to the constructor are included in the history in the following order:
-            `history`, `metadata`, `params`, `conditions`, `observations`, `theories`
+            `history`, `variables`, `params`, `conditions`, `observations`, `theories`
 
             >>> h.history  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
             [Result(data='from history', kind=ResultKind.VARIABLES),
@@ -380,7 +383,8 @@ class History(SupportsControllerStateHistory):
 
         Examples:
             >>> h = History(theories=['t1', 't2'], conditions=['c1', 'c2'],
-            ...     observations=['o1', 'o2'], params={'a': 'param'}, metadata=VariableCollection(),
+            ...     observations=['o1', 'o2'], params={'a': 'param'},
+            ...     variables=VariableCollection(),
             ...     history=[Result("from history", ResultKind.VARIABLES)])
 
             >>> h.filter_by(kind={"MODEL"})   # doctest: +NORMALIZE_WHITESPACE
@@ -416,7 +420,7 @@ class History(SupportsControllerStateHistory):
 @dataclass(frozen=True)
 class Result(SupportsDataKind):
     """
-    Container class for data and metadata.
+    Container class for data and variables.
 
     Examples:
         >>> Result()
@@ -444,7 +448,7 @@ class Result(SupportsDataKind):
 
 
 def _init_result_list(
-    metadata: Optional[VariableCollection] = None,
+    variables: Optional[VariableCollection] = None,
     params: Optional[Dict] = None,
     conditions: Optional[Iterable[ArrayLike]] = None,
     observations: Optional[Iterable[ArrayLike]] = None,
@@ -456,7 +460,7 @@ def _init_result_list(
     Returns:
 
     Args:
-        metadata: a single datum to be marked as "metadata"
+        variables: a single datum to be marked as "variables"
         params: a single datum to be marked as "params"
         conditions: an iterable of data, each to be marked as "conditions"
         observations: an iterable of data, each to be marked as "observations"
@@ -469,7 +473,7 @@ def _init_result_list(
 
         ... or with values for any or all of the parameters:
         >>> from autora.variable import VariableCollection
-        >>> _init_result_list(metadata=VariableCollection()) # doctest: +ELLIPSIS
+        >>> _init_result_list(variables=VariableCollection()) # doctest: +ELLIPSIS
         [Result(data=VariableCollection(...), kind=ResultKind.VARIABLES)]
 
         >>> _init_result_list(params={"some": "params"})
@@ -485,9 +489,9 @@ def _init_result_list(
         >>> _init_result_list(theories=[LinearRegression()])
         [Result(data=LinearRegression(), kind=ResultKind.MODEL)]
 
-        The input arguments are added to the data in the order `metadata`,
+        The input arguments are added to the data in the order `variables`,
         `params`, `conditions`, `observations`, `theories`:
-        >>> _init_result_list(metadata=VariableCollection(),
+        >>> _init_result_list(variables=VariableCollection(),
         ...                  params={"some": "params"},
         ...                  conditions=["a condition"],
         ...                  observations=["an observation", "another observation"],
@@ -503,8 +507,8 @@ def _init_result_list(
     """
     data = []
 
-    if metadata is not None:
-        data.append(Result(metadata, ResultKind.VARIABLES))
+    if variables is not None:
+        data.append(Result(variables, ResultKind.VARIABLES))
 
     if params is not None:
         data.append(Result(params, ResultKind.PARAMETERS))
@@ -529,7 +533,7 @@ def _history_to_kind(history: Sequence[Result]) -> Snapshot:
         History might be empty
         >>> history_ = []
         >>> _history_to_kind(history_) # doctest: +NORMALIZE_WHITESPACE +ELLIPSIS
-        Snapshot(metadata=VariableCollection(...), params={},
+        Snapshot(variables=VariableCollection(...), params={},
                         conditions=[], observations=[], theories=[])
 
         ... or with values for any or all of the parameters:
@@ -555,10 +559,10 @@ def _history_to_kind(history: Sequence[Result]) -> Snapshot:
         Snapshot(..., theories=[LinearRegression()])
 
         >>> from autora.variable import VariableCollection, IV
-        >>> metadata = VariableCollection(independent_variables=[IV(name="example")])
-        >>> history_ = [Result(metadata, kind=ResultKind.VARIABLES)]
+        >>> variables = VariableCollection(independent_variables=[IV(name="example")])
+        >>> history_ = [Result(variables, kind=ResultKind.VARIABLES)]
         >>> _history_to_kind(history_) # doctest: +ELLIPSIS
-        Snapshot(metadata=VariableCollection(independent_variables=[IV(name='example', ...
+        Snapshot(variables=VariableCollection(independent_variables=[IV(name='example', ...
 
         >>> history_ = [Result({'some': 'params'}, kind=ResultKind.PARAMETERS)]
         >>> _history_to_kind(history_) # doctest: +ELLIPSIS
@@ -566,7 +570,7 @@ def _history_to_kind(history: Sequence[Result]) -> Snapshot:
 
     """
     namespace = Snapshot(
-        metadata=_get_last_data_with_default(
+        variables=_get_last_data_with_default(
             history, kind={ResultKind.VARIABLES}, default=VariableCollection()
         ),
         params=_get_last_data_with_default(

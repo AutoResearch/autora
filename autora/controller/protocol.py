@@ -54,7 +54,7 @@ class SupportsDataKind(Protocol):
 class SupportsControllerStateFields(Protocol):
     """Support representing snapshots of a controller state as mutable fields."""
 
-    metadata: VariableCollection
+    variables: VariableCollection
     params: Dict
     conditions: Sequence[ArrayLike]
     observations: Sequence[ArrayLike]
@@ -71,7 +71,7 @@ class SupportsControllerStateProperties(Protocol):
         ...
 
     @property
-    def metadata(self) -> VariableCollection:
+    def variables(self) -> VariableCollection:
         ...
 
     @property

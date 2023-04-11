@@ -14,7 +14,7 @@ class Snapshot(SupportsControllerStateFields):
     """An object passed between and updated by processing steps in the Controller."""
 
     # Single values
-    metadata: VariableCollection = field(default_factory=VariableCollection)
+    variables: VariableCollection = field(default_factory=VariableCollection)
     params: Dict = field(default_factory=dict)
 
     # Sequences
@@ -24,7 +24,7 @@ class Snapshot(SupportsControllerStateFields):
 
     def update(
         self,
-        metadata=None,
+        variables=None,
         params=None,
         conditions=None,
         observations=None,
@@ -36,7 +36,7 @@ class Snapshot(SupportsControllerStateFields):
         The initial object is empty:
         >>> s0 = Snapshot()
         >>> s0  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
-        Snapshot(metadata=VariableCollection(...), params={}, conditions=[],
+        Snapshot(variables=VariableCollection(...), params={}, conditions=[],
                         observations=[], theories=[])
 
         We can update the params using the `.update` method:
@@ -51,10 +51,10 @@ class Snapshot(SupportsControllerStateFields):
         >>> s0.update(params={'first': 'params'}).update(params={'second': 'params'}).params
         {'second': 'params'}
 
-        ... and the same applies to metadata:
+        ... and the same applies to variables:
         >>> from autora.variable import VariableCollection, IV
-        >>> (s0.update(metadata=VariableCollection([IV("1st IV")]))
-        ...    .update(metadata=VariableCollection([IV("2nd IV")]))).metadata
+        >>> (s0.update(variables=VariableCollection([IV("1st IV")]))
+        ...    .update(variables=VariableCollection([IV("2nd IV")]))).variables
         VariableCollection(independent_variables=[IV(name='2nd IV',...)], ...)
 
         When we update the conditions, observations or theories, the respective list is extended:
@@ -87,11 +87,11 @@ class Snapshot(SupportsControllerStateFields):
         >>> s0.update(conditions=['c1', 'c2'])
         Snapshot(..., conditions=['c1', 'c2'], ...)
 
-        >>> s0.update(theories=['t1', 't2'], metadata={'m': 1})
-        Snapshot(metadata={'m': 1}, ..., theories=['t1', 't2'])
+        >>> s0.update(theories=['t1', 't2'], variables={'m': 1})
+        Snapshot(variables={'m': 1}, ..., theories=['t1', 't2'])
 
-        >>> s0.update(theories=['t1'], observations=['o1'], metadata={'m': 1})
-        Snapshot(metadata={'m': 1}, ..., observations=['o1'], theories=['t1'])
+        >>> s0.update(theories=['t1'], observations=['o1'], variables={'m': 1})
+        Snapshot(variables={'m': 1}, ..., observations=['o1'], theories=['t1'])
 
 
         Inputs to theories, observations and conditions must be Lists
@@ -115,9 +115,9 @@ class Snapshot(SupportsControllerStateFields):
             else:
                 return old
 
-        metadata_ = metadata or self.metadata
+        variables_ = variables or self.variables
         params_ = params or self.params
         conditions_ = _coalesce_lists(self.conditions, conditions)
         observations_ = _coalesce_lists(self.observations, observations)
         theories_ = _coalesce_lists(self.theories, theories)
-        return Snapshot(metadata_, params_, conditions_, observations_, theories_)
+        return Snapshot(variables_, params_, conditions_, observations_, theories_)
