@@ -33,11 +33,11 @@ class ResultKind(str, Enum):
         False
     """
 
+    VARIABLES = "VARIABLES"
+    PARAMETERS = "PARAMETERS"
     EXPERIMENT = "EXPERIMENT"
     OBSERVATION = "OBSERVATION"
     MODEL = "MODEL"
-    PARAMETERS = "PARAMETERS"
-    VARIABLES = "VARIABLES"
 
     def __repr__(self):
         cls_name = self.__class__.__name__
