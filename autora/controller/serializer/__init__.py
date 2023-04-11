@@ -14,117 +14,42 @@ from autora.controller.serializer import yaml_ as YAMLSerializer
 from autora.controller.state import History
 
 
-class DumpSpec(NamedTuple):
+class _DumpSpec(NamedTuple):
     extension: str
     serializer: SupportsLoadDump
     mode: str
 
 
-class LoadSpec(NamedTuple):
+class _LoadSpec(NamedTuple):
     serializer: SupportsLoadDump
     mode: str
 
 
 class HistorySerializer:
-    """Serializes and deserializes History objects.
-
-    Examples:
-        Custom types
-
-        We can specify a different method for saving (and loading) different result types.
-        Here we specify a custom json encoder which works for dataclasses like the `Result`
-        object used by the `History` class.
-        >>> import dataclasses, json, pathlib, importlib
-        >>> from autora.controller.state.history import Result
-        >>> class EnhancedJSONEncoder(json.JSONEncoder):
-        ...     # Inspired by https://stackoverflow.com/a/51286749
-        ...     def default(self, o):
-        ...         if dataclasses.is_dataclass(o) and not isinstance(o, type):
-        ...             cls = ".".join([type(o).__module__, type(o).__name__])
-        ...             if cls == "autora.controller.state.history.Result":
-        ...                 return (cls, self.default(o.data))
-        ...             else:
-        ...                 return (cls, dataclasses.asdict(o))
-        ...         return super().default(o)
-
-        >>> class JSONSerializer:
-        ...     @staticmethod
-        ...     def dump(data, file):
-        ...         json.dump(data, file, cls=EnhancedJSONEncoder)
-        ...     @staticmethod
-        ...     def load(file):
-        ...         d: Dict = json.load(file)
-        ...         cls, data, kind = d["cls"], d["data"]["data"], d["data"]["kind"]
-        ...         o = importlib.import_module(cls)(**data)
-        ...         return Result(data=o, kind=kind)
-
-        >>> custom_dump_mapping = {
-        ...     None: DumpSpec("yaml", YAMLSerializer, "w+"),
-        ...     ResultKind.METADATA: DumpSpec("json", JSONSerializer, "w+"),
-        ...     ResultKind.PARAMS: DumpSpec("json", JSONSerializer, "w+"),
-        ...     ResultKind.CONDITION: DumpSpec("yaml", YAMLSerializer, "w+"),
-        ...     ResultKind.OBSERVATION: DumpSpec("yaml", YAMLSerializer, "w+"),
-        ...     ResultKind.THEORY: DumpSpec("pickle", pickle, "w+b"),
-        ... }
-        >>> custom_load_mapping = {
-        ...     ".yaml": (YAMLSerializer, "r"),
-        ...     ".pickle": (pickle, "rb"),
-        ...     ".json": (JSONSerializer, "r"),
-        ... }
-
-        >>> from autora.variable import VariableCollection
-        >>> c = History(params={"a": "param", "nested": {"param": "dict"}},
-        ...             metadata=VariableCollection())
-        >>> with tempfile.TemporaryDirectory() as d:
-        ...     sc = HistorySerializer(d,
-        ...                            result_kind_serializer_mapping=custom_dump_mapping,
-        ...                            extension_loader_mapping=custom_load_mapping)
-        ...     sc.dump(c)
-        ...     with open(pathlib.Path(d, "00000000-METADATA.json")) as f:
-        ...         print("METADATA: ", '\\n'.join(f.readlines()))
-        ...     with open(pathlib.Path(d, "00000001-PARAMS.json")) as f:
-        ...         print("PARAMS: ", '\\n'.join(f.readlines()))
-        ... # doctest: +NORMALIZE_WHITESPACE
-        METADATA:  ["autora.controller.state.history.Result", {"data": {"independent_variables": [], "dependent_variables": [], "covariates": []}, "kind": "METADATA"}]
-        PARAMS:  ["autora.controller.state.history.Result", {"data": {"a": "param", "nested": {"param": "dict"}}, "kind": "PARAMS"}]
-
-
-
-
-
-    """
+    """Serializes and deserializes History objects."""
 
     def __init__(
         self,
         path: Path,
-        result_kind_serializer_mapping: Optional[
-            Mapping[Union[None, ResultKind], DumpSpec]
-        ] = None,
-        extension_loader_mapping: Optional[Mapping[str, LoadSpec]] = None,
     ):
         self.path = path
         self._check_path()
-        if result_kind_serializer_mapping is None:
-            result_kind_serializer_mapping = {
-                None: DumpSpec("yaml", YAMLSerializer, "w+"),
-                ResultKind.METADATA: DumpSpec("yaml", YAMLSerializer, "w+"),
-                ResultKind.PARAMS: DumpSpec("yaml", YAMLSerializer, "w+"),
-                ResultKind.CONDITION: DumpSpec("yaml", YAMLSerializer, "w+"),
-                ResultKind.OBSERVATION: DumpSpec("yaml", YAMLSerializer, "w+"),
-                ResultKind.THEORY: DumpSpec("pickle", pickle, "w+b"),
-            }
 
-        self.result_kind_serializer_mapping: Mapping[
-            Union[None, ResultKind], DumpSpec
-        ] = result_kind_serializer_mapping
+        self._result_kind_serializer_mapping: Mapping[
+            Union[None, ResultKind], _DumpSpec
+        ] = {
+            None: _DumpSpec("yaml", YAMLSerializer, "w+"),
+            ResultKind.METADATA: _DumpSpec("yaml", YAMLSerializer, "w+"),
+            ResultKind.PARAMS: _DumpSpec("yaml", YAMLSerializer, "w+"),
+            ResultKind.CONDITION: _DumpSpec("yaml", YAMLSerializer, "w+"),
+            ResultKind.OBSERVATION: _DumpSpec("yaml", YAMLSerializer, "w+"),
+            ResultKind.THEORY: _DumpSpec("pickle", pickle, "w+b"),
+        }
 
-        if extension_loader_mapping is None:
-            extension_loader_mapping = {
-                ".yaml": LoadSpec(YAMLSerializer, "r"),
-                ".pickle": LoadSpec(pickle, "rb"),
-            }
-
-        self.extension_loader_mapping: Mapping[str, LoadSpec] = extension_loader_mapping
+        self._extension_loader_mapping: Mapping[str, _LoadSpec] = {
+            ".yaml": _LoadSpec(YAMLSerializer, "r"),
+            ".pickle": _LoadSpec(pickle, "rb"),
+        }
 
     def dump(self, data_collection: SupportsControllerStateHistory):
         """
@@ -195,7 +120,7 @@ class HistorySerializer:
         self._check_path()
 
         for i, container in enumerate(data_collection.history):
-            extension, serializer, mode = self.result_kind_serializer_mapping[
+            extension, serializer, mode = self._result_kind_serializer_mapping[
                 container.kind
             ]
 
@@ -255,7 +180,7 @@ class HistorySerializer:
         data = []
 
         for file in sorted(Path(path).glob("*")):
-            serializer, mode = self.extension_loader_mapping[file.suffix]
+            serializer, mode = self._extension_loader_mapping[file.suffix]
             with open(file, mode) as f:
                 loaded_object = serializer.load(f)
                 data.append(loaded_object)
