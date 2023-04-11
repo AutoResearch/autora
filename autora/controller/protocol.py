@@ -58,7 +58,7 @@ class SupportsControllerStateFields(Protocol):
     params: Dict
     experiments: Sequence[ArrayLike]
     observations: Sequence[ArrayLike]
-    theories: Sequence[BaseEstimator]
+    models: Sequence[BaseEstimator]
 
     def update(self: State, **kwargs) -> State:
         ...
@@ -87,7 +87,7 @@ class SupportsControllerStateProperties(Protocol):
         ...
 
     @property
-    def theories(self) -> Sequence[BaseEstimator]:
+    def models(self) -> Sequence[BaseEstimator]:
         ...
 
 
