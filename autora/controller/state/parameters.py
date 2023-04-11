@@ -60,7 +60,7 @@ def _resolve_properties(parameters: Dict, state_dependent_properties: Mapping):
 
     In this context, a state-dependent-property is a string which is meant to be replaced by its
     updated, current value before the dictionary is used. A state-dependent property might be
-    something like "the last theorist available" or "all the experimental results until now".
+    something like "the last model available" or "all the experimental results until now".
 
     Args:
         parameters: a (nested) dictionary of keys and values, where some values might be
