@@ -54,7 +54,7 @@ class History(SupportsControllerStateHistory):
             History([Result(data={'some': 'params'}, kind=ResultKind.PARAMS)])
 
             >>> History(conditions=["a condition"])
-            History([Result(data='a condition', kind=ResultKind.CONDITION)])
+            History([Result(data='a condition', kind=ResultKind.EXPERIMENT)])
 
             >>> History(observations=["an observation"])
             History([Result(data='an observation', kind=ResultKind.OBSERVATION)])
@@ -72,8 +72,8 @@ class History(SupportsControllerStateHistory):
             History([Result(data='from history', kind=ResultKind.METADATA),
                                     Result(data=VariableCollection(...), kind=ResultKind.METADATA),
                                     Result(data={'a': 'param'}, kind=ResultKind.PARAMS),
-                                    Result(data='c1', kind=ResultKind.CONDITION),
-                                    Result(data='c2', kind=ResultKind.CONDITION),
+                                    Result(data='c1', kind=ResultKind.EXPERIMENT),
+                                    Result(data='c2', kind=ResultKind.EXPERIMENT),
                                     Result(data='o1', kind=ResultKind.OBSERVATION),
                                     Result(data='o2', kind=ResultKind.OBSERVATION),
                                     Result(data='t1', kind=ResultKind.THEORY),
@@ -174,16 +174,16 @@ class History(SupportsControllerStateHistory):
             The same for the conditions:
             >>> h5 = h0.update(conditions=["1st condition"])
             >>> h5
-            History([Result(data='1st condition', kind=ResultKind.CONDITION)])
+            History([Result(data='1st condition', kind=ResultKind.EXPERIMENT)])
 
             >>> h5.update(conditions=["2nd condition"])  # doctest: +NORMALIZE_WHITESPACE
-            History([Result(data='1st condition', kind=ResultKind.CONDITION),
-                                    Result(data='2nd condition', kind=ResultKind.CONDITION)])
+            History([Result(data='1st condition', kind=ResultKind.EXPERIMENT),
+                                    Result(data='2nd condition', kind=ResultKind.EXPERIMENT)])
 
             You can also update with multiple conditions, observations and theories:
             >>> h0.update(conditions=['c1', 'c2'])  # doctest: +NORMALIZE_WHITESPACE
-            History([Result(data='c1', kind=ResultKind.CONDITION),
-                                    Result(data='c2', kind=ResultKind.CONDITION)])
+            History([Result(data='c1', kind=ResultKind.EXPERIMENT),
+                                    Result(data='c2', kind=ResultKind.EXPERIMENT)])
 
             >>> h0.update(theories=['t1', 't2'], metadata={'m': 1}) # doctest: +NORMALIZE_WHITESPACE
             History([Result(data={'m': 1}, kind=ResultKind.METADATA),
@@ -205,7 +205,7 @@ class History(SupportsControllerStateHistory):
             History([Result(data={'m': 2}, kind=ResultKind.METADATA),
                      Result(data='o1', kind=ResultKind.OBSERVATION),
                      Result(data='t1', kind=ResultKind.THEORY),
-                     Result(data='c1', kind=ResultKind.CONDITION)])
+                     Result(data='c1', kind=ResultKind.EXPERIMENT)])
 
         """
 
@@ -358,8 +358,8 @@ class History(SupportsControllerStateHistory):
             [Result(data='from history', kind=ResultKind.METADATA),
              Result(data=VariableCollection(...), kind=ResultKind.METADATA),
              Result(data={'a': 'param'}, kind=ResultKind.PARAMS),
-             Result(data='c1', kind=ResultKind.CONDITION),
-             Result(data='c2', kind=ResultKind.CONDITION),
+             Result(data='c1', kind=ResultKind.EXPERIMENT),
+             Result(data='c2', kind=ResultKind.EXPERIMENT),
              Result(data='o1', kind=ResultKind.OBSERVATION),
              Result(data='o2', kind=ResultKind.OBSERVATION),
              Result(data='t1', kind=ResultKind.THEORY),
@@ -396,8 +396,8 @@ class History(SupportsControllerStateHistory):
             History([Result(data='from history', kind=ResultKind.METADATA),
                      Result(data=VariableCollection(...), kind=ResultKind.METADATA),
                      Result(data={'a': 'param'}, kind=ResultKind.PARAMS),
-                     Result(data='c1', kind=ResultKind.CONDITION),
-                     Result(data='c2', kind=ResultKind.CONDITION),
+                     Result(data='c1', kind=ResultKind.EXPERIMENT),
+                     Result(data='c2', kind=ResultKind.EXPERIMENT),
                      Result(data='o1', kind=ResultKind.OBSERVATION),
                      Result(data='o2', kind=ResultKind.OBSERVATION),
                      Result(data='t1', kind=ResultKind.THEORY),
@@ -476,7 +476,7 @@ def _init_result_list(
         [Result(data={'some': 'params'}, kind=ResultKind.PARAMS)]
 
         >>> _init_result_list(conditions=["a condition"])
-        [Result(data='a condition', kind=ResultKind.CONDITION)]
+        [Result(data='a condition', kind=ResultKind.EXPERIMENT)]
 
         >>> _init_result_list(observations=["an observation"])
         [Result(data='an observation', kind=ResultKind.OBSERVATION)]
@@ -495,7 +495,7 @@ def _init_result_list(
         ... ) # doctest: +NORMALIZE_WHITESPACE +ELLIPSIS
         [Result(data=VariableCollection(...), kind=ResultKind.METADATA),
          Result(data={'some': 'params'}, kind=ResultKind.PARAMS),
-         Result(data='a condition', kind=ResultKind.CONDITION),
+         Result(data='a condition', kind=ResultKind.EXPERIMENT),
          Result(data='an observation', kind=ResultKind.OBSERVATION),
          Result(data='another observation', kind=ResultKind.OBSERVATION),
          Result(data=LinearRegression(), kind=ResultKind.THEORY)]
@@ -510,7 +510,7 @@ def _init_result_list(
         data.append(Result(params, ResultKind.PARAMS))
 
     for seq, kind in [
-        (conditions, ResultKind.CONDITION),
+        (conditions, ResultKind.EXPERIMENT),
         (observations, ResultKind.OBSERVATION),
         (theories, ResultKind.THEORY),
     ]:
@@ -576,7 +576,7 @@ def _history_to_kind(history: Sequence[Result]) -> Snapshot:
             _filter_history(history, kind={ResultKind.OBSERVATION})
         ),
         theories=_list_data(_filter_history(history, kind={ResultKind.THEORY})),
-        conditions=_list_data(_filter_history(history, kind={ResultKind.CONDITION})),
+        conditions=_list_data(_filter_history(history, kind={ResultKind.EXPERIMENT})),
     )
     return namespace
 

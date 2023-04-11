@@ -14,26 +14,26 @@ class ResultKind(str, Enum):
     Kinds of results which can be held in the Result object.
 
     Examples:
-        >>> ResultKind.CONDITION is ResultKind.CONDITION
+        >>> ResultKind.EXPERIMENT is ResultKind.EXPERIMENT
         True
 
-        >>> ResultKind.CONDITION is ResultKind.METADATA
+        >>> ResultKind.EXPERIMENT is ResultKind.METADATA
         False
 
-        >>> ResultKind.CONDITION == "CONDITION"
+        >>> ResultKind.EXPERIMENT == "EXPERIMENT"
         True
 
-        >>> ResultKind.CONDITION == "METADATA"
+        >>> ResultKind.EXPERIMENT == "METADATA"
         False
 
-        >>> ResultKind.CONDITION in {ResultKind.CONDITION, ResultKind.PARAMS}
+        >>> ResultKind.EXPERIMENT in {ResultKind.EXPERIMENT, ResultKind.PARAMS}
         True
 
-        >>> ResultKind.METADATA in {ResultKind.CONDITION, ResultKind.PARAMS}
+        >>> ResultKind.METADATA in {ResultKind.EXPERIMENT, ResultKind.PARAMS}
         False
     """
 
-    CONDITION = "CONDITION"
+    EXPERIMENT = "EXPERIMENT"
     OBSERVATION = "OBSERVATION"
     THEORY = "THEORY"
     PARAMS = "PARAMS"
