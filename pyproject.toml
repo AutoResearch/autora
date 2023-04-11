@@ -25,6 +25,9 @@ sympy = "^1.10.1"
 tinkerforge = {version = "^2.1.25", optional=true}
 torch = "1.13.1"
 tqdm = "^4.64.0"
+typer = "^0.7.0"
+rich = "^13.3.3"
+shellingham = "^1.5.0.post1"
 
 [tool.poetry.extras]
 tinkerforge = ["tinkerforge"]
