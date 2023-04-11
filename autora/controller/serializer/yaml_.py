@@ -1,5 +1,7 @@
 import pickle
 from pathlib import Path
+from types import MappingProxyType
+from typing import Mapping, NamedTuple, Union
 
 import yaml
 
@@ -24,10 +26,35 @@ class YAMLSerializer:
         return result
 
 
-class YAMLResultCollectionSerializer:
-    def __init__(self, path: Path):
+class _SerializerSpec(NamedTuple):
+    extension: str
+    serializer: SupportsLoadDump
+    mode: str
+
+
+default_result_kind_serializer_mapping: Mapping[
+    Union[None, ResultKind], _SerializerSpec
+] = MappingProxyType(
+    {
+        None: _SerializerSpec("yaml", YAMLSerializer, "w+"),
+        ResultKind.METADATA: _SerializerSpec("yaml", YAMLSerializer, "w+"),
+        ResultKind.PARAMS: _SerializerSpec("yaml", YAMLSerializer, "w+"),
+        ResultKind.CONDITION: _SerializerSpec("yaml", YAMLSerializer, "w+"),
+        ResultKind.OBSERVATION: _SerializerSpec("yaml", YAMLSerializer, "w+"),
+        ResultKind.THEORY: _SerializerSpec("pickle", pickle, "w+b"),
+    }
+)
+
+
+class HistorySerializer:
+    def __init__(
+        self,
+        path: Path,
+        result_kind_serializer_mapping: Mapping = default_result_kind_serializer_mapping,
+    ):
         self.path = path
         self._check_path()
+        self.result_kind_serializer_mapping = result_kind_serializer_mapping
 
     def dump(self, data_collection: SupportsControllerStateHistory):
         """
@@ -54,7 +81,7 @@ class YAMLResultCollectionSerializer:
             >>> import os
             >>> def dump_and_list(data, cat=False):
             ...     with tempfile.TemporaryDirectory() as d:
-            ...         s = YAMLResultCollectionSerializer(d)
+            ...         s = HistorySerializer(d)
             ...         s.dump(c)
             ...         print(sorted(os.listdir(d)))
 
@@ -62,6 +89,7 @@ class YAMLResultCollectionSerializer:
             []
 
             Each immutable part gets its own file.
+            >>> from autora.variable import VariableCollection
             >>> c = c.update(metadata=[VariableCollection()])
             >>> dump_and_list(c)
             ['00000000-METADATA.yaml']
@@ -97,14 +125,9 @@ class YAMLResultCollectionSerializer:
         self._check_path()
 
         for i, container in enumerate(data_collection.history):
-            extension, serializer, mode = {
-                None: ("yaml", YAMLSerializer, "w+"),
-                ResultKind.METADATA: ("yaml", YAMLSerializer, "w+"),
-                ResultKind.PARAMS: ("yaml", YAMLSerializer, "w+"),
-                ResultKind.CONDITION: ("yaml", YAMLSerializer, "w+"),
-                ResultKind.OBSERVATION: ("yaml", YAMLSerializer, "w+"),
-                ResultKind.THEORY: ("pickle", pickle, "w+b"),
-            }[container.kind]
+            extension, serializer, mode = self.result_kind_serializer_mapping[
+                container.kind
+            ]
 
             assert isinstance(serializer, SupportsLoadDump)
             filename = f"{str(i).rjust(8, '0')}-{container.kind}.{extension}"
@@ -118,6 +141,7 @@ class YAMLResultCollectionSerializer:
             First, we need to initialize a FilesystemCycleDataCollection. This is usually handled
             by the cycle itself. We construct a full set of results:
             >>> from sklearn.linear_model import LinearRegression
+            >>> from autora.variable import VariableCollection
             >>> import numpy as np
             >>> from autora.controller.state.history import History
             >>> import tempfile
@@ -129,7 +153,7 @@ class YAMLResultCollectionSerializer:
 
             Now we can serialize the data using _dumper, and reload the data using _loader:
             >>> with tempfile.TemporaryDirectory() as d:
-            ...     s = YAMLResultCollectionSerializer(d)
+            ...     s = HistorySerializer(d)
             ...     s.dump(c)
             ...     e = s.load()
 
