@@ -18,7 +18,7 @@ class Snapshot(SupportsControllerStateFields):
     params: Dict = field(default_factory=dict)
 
     # Sequences
-    experiments: List[ArrayLike] = field(default_factory=list)
+    conditions: List[ArrayLike] = field(default_factory=list)
     observations: List[ArrayLike] = field(default_factory=list)
     theories: List[BaseEstimator] = field(default_factory=list)
 
@@ -26,7 +26,7 @@ class Snapshot(SupportsControllerStateFields):
         self,
         variables=None,
         params=None,
-        experiments=None,
+        conditions=None,
         observations=None,
         theories=None,
     ):
@@ -36,7 +36,7 @@ class Snapshot(SupportsControllerStateFields):
         The initial object is empty:
         >>> s0 = Snapshot()
         >>> s0  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
-        Snapshot(variables=VariableCollection(...), params={}, experiments=[],
+        Snapshot(variables=VariableCollection(...), params={}, conditions=[],
                         observations=[], theories=[])
 
         We can update the params using the `.update` method:
@@ -57,7 +57,7 @@ class Snapshot(SupportsControllerStateFields):
         ...    .update(variables=VariableCollection([IV("2nd IV")]))).variables
         VariableCollection(independent_variables=[IV(name='2nd IV',...)], ...)
 
-        When we update the experiments, observations or theories, the respective list is extended:
+        When we update the conditions, observations or theories, the respective list is extended:
         >>> s3 = s0.update(theories=["1st theory"])
         >>> s3
         Snapshot(..., theories=['1st theory'])
@@ -75,17 +75,17 @@ class Snapshot(SupportsControllerStateFields):
         Snapshot(..., observations=['1st observation', '2nd observation'], ...)
 
 
-        The same applies to experiments:
-        >>> s5 = s0.update(experiments=["1st condition"])
+        The same applies to conditions:
+        >>> s5 = s0.update(conditions=["1st condition"])
         >>> s5
-        Snapshot(..., experiments=['1st condition'], ...)
+        Snapshot(..., conditions=['1st condition'], ...)
 
-        >>> s5.update(experiments=["2nd condition"])  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
-        Snapshot(..., experiments=['1st condition', '2nd condition'], ...)
+        >>> s5.update(conditions=["2nd condition"])  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
+        Snapshot(..., conditions=['1st condition', '2nd condition'], ...)
 
-        You can also update with multiple experiments, observations and theories:
-        >>> s0.update(experiments=['e1', 'e1'])
-        Snapshot(..., experiments=['e1', 'e1'], ...)
+        You can also update with multiple conditions, observations and theories:
+        >>> s0.update(conditions=['c1', 'c2'])
+        Snapshot(..., conditions=['c1', 'c2'], ...)
 
         >>> s0.update(theories=['t1', 't2'], variables={'m': 1})
         Snapshot(variables={'m': 1}, ..., theories=['t1', 't2'])
@@ -94,7 +94,7 @@ class Snapshot(SupportsControllerStateFields):
         Snapshot(variables={'m': 1}, ..., observations=['o1'], theories=['t1'])
 
 
-        Inputs to theories, observations and experiments must be Lists
+        Inputs to theories, observations and conditions must be Lists
         which can be cast to lists:
         >>> s0.update(theories='t1')  # doctest: +ELLIPSIS
         Traceback (most recent call last):
@@ -117,7 +117,7 @@ class Snapshot(SupportsControllerStateFields):
 
         variables_ = variables or self.variables
         params_ = params or self.params
-        experiments_ = _coalesce_lists(self.experiments, experiments)
+        conditions_ = _coalesce_lists(self.conditions, conditions)
         observations_ = _coalesce_lists(self.observations, observations)
         theories_ = _coalesce_lists(self.theories, theories)
-        return Snapshot(variables_, params_, experiments_, observations_, theories_)
+        return Snapshot(variables_, params_, conditions_, observations_, theories_)
