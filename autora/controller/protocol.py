@@ -56,7 +56,7 @@ class SupportsControllerStateFields(Protocol):
 
     variables: VariableCollection
     params: Dict
-    conditions: Sequence[ArrayLike]
+    experiments: Sequence[ArrayLike]
     observations: Sequence[ArrayLike]
     theories: Sequence[BaseEstimator]
 
@@ -79,7 +79,7 @@ class SupportsControllerStateProperties(Protocol):
         ...
 
     @property
-    def conditions(self) -> Sequence[ArrayLike]:
+    def experiments(self) -> Sequence[ArrayLike]:
         ...
 
     @property
