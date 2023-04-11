@@ -26,17 +26,17 @@ class ResultKind(str, Enum):
         >>> ResultKind.EXPERIMENT == "METADATA"
         False
 
-        >>> ResultKind.EXPERIMENT in {ResultKind.EXPERIMENT, ResultKind.PARAMS}
+        >>> ResultKind.EXPERIMENT in {ResultKind.EXPERIMENT, ResultKind.PARAMETERS}
         True
 
-        >>> ResultKind.METADATA in {ResultKind.EXPERIMENT, ResultKind.PARAMS}
+        >>> ResultKind.METADATA in {ResultKind.EXPERIMENT, ResultKind.PARAMETERS}
         False
     """
 
     EXPERIMENT = "EXPERIMENT"
     OBSERVATION = "OBSERVATION"
     THEORY = "THEORY"
-    PARAMS = "PARAMS"
+    PARAMETERS = "PARAMETERS"
     METADATA = "METADATA"
 
     def __repr__(self):

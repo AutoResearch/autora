@@ -51,7 +51,7 @@ class History(SupportsControllerStateHistory):
             History([Result(data=VariableCollection(...), kind=ResultKind.METADATA)])
 
             >>> History(params={"some": "params"})
-            History([Result(data={'some': 'params'}, kind=ResultKind.PARAMS)])
+            History([Result(data={'some': 'params'}, kind=ResultKind.PARAMETERS)])
 
             >>> History(conditions=["a condition"])
             History([Result(data='a condition', kind=ResultKind.EXPERIMENT)])
@@ -71,7 +71,7 @@ class History(SupportsControllerStateHistory):
             ... )  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
             History([Result(data='from history', kind=ResultKind.METADATA),
                                     Result(data=VariableCollection(...), kind=ResultKind.METADATA),
-                                    Result(data={'a': 'param'}, kind=ResultKind.PARAMS),
+                                    Result(data={'a': 'param'}, kind=ResultKind.PARAMETERS),
                                     Result(data='c1', kind=ResultKind.EXPERIMENT),
                                     Result(data='c2', kind=ResultKind.EXPERIMENT),
                                     Result(data='o1', kind=ResultKind.OBSERVATION),
@@ -132,7 +132,7 @@ class History(SupportsControllerStateHistory):
             Params is treated the same way as metadata:
             >>> hp = h0.update(params={'first': 'params'})
             >>> hp
-            History([Result(data={'first': 'params'}, kind=ResultKind.PARAMS)])
+            History([Result(data={'first': 'params'}, kind=ResultKind.PARAMETERS)])
 
             ... where only the most recent "params" object is returned from the `.params` property.
             >>> hp = hp.update(params={'second': 'params'})
@@ -141,8 +141,8 @@ class History(SupportsControllerStateHistory):
 
             ... however, the full history of the params objects remains available, if needed:
             >>> hp  # doctest: +NORMALIZE_WHITESPACE
-            History([Result(data={'first': 'params'}, kind=ResultKind.PARAMS),
-                                    Result(data={'second': 'params'}, kind=ResultKind.PARAMS)])
+            History([Result(data={'first': 'params'}, kind=ResultKind.PARAMETERS),
+                                    Result(data={'second': 'params'}, kind=ResultKind.PARAMETERS)])
 
             When we update the conditions, observations or theories, a new entry is added to the
             history:
@@ -278,8 +278,8 @@ class History(SupportsControllerStateHistory):
 
             ... however, the full history of the params objects remains available, if needed:
             >>> h  # doctest: +NORMALIZE_WHITESPACE
-            History([Result(data={'first': 'params'}, kind=ResultKind.PARAMS),
-                                    Result(data={'second': 'params'}, kind=ResultKind.PARAMS)])
+            History([Result(data={'first': 'params'}, kind=ResultKind.PARAMETERS),
+                                    Result(data={'second': 'params'}, kind=ResultKind.PARAMETERS)])
         """
         return self._by_kind.params
 
@@ -357,7 +357,7 @@ class History(SupportsControllerStateHistory):
             >>> h.history  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
             [Result(data='from history', kind=ResultKind.METADATA),
              Result(data=VariableCollection(...), kind=ResultKind.METADATA),
-             Result(data={'a': 'param'}, kind=ResultKind.PARAMS),
+             Result(data={'a': 'param'}, kind=ResultKind.PARAMETERS),
              Result(data='c1', kind=ResultKind.EXPERIMENT),
              Result(data='c2', kind=ResultKind.EXPERIMENT),
              Result(data='o1', kind=ResultKind.OBSERVATION),
@@ -369,7 +369,7 @@ class History(SupportsControllerStateHistory):
             end of the history:
             >>> h = h.update(params={'new': 'param'})
             >>> h.history  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
-            [..., Result(data={'new': 'param'}, kind=ResultKind.PARAMS)]
+            [..., Result(data={'new': 'param'}, kind=ResultKind.PARAMETERS)]
 
         """
         return self._history
@@ -395,7 +395,7 @@ class History(SupportsControllerStateHistory):
             >>> h.filter_by()   # doctest: +NORMALIZE_WHITESPACE +ELLIPSIS
             History([Result(data='from history', kind=ResultKind.METADATA),
                      Result(data=VariableCollection(...), kind=ResultKind.METADATA),
-                     Result(data={'a': 'param'}, kind=ResultKind.PARAMS),
+                     Result(data={'a': 'param'}, kind=ResultKind.PARAMETERS),
                      Result(data='c1', kind=ResultKind.EXPERIMENT),
                      Result(data='c2', kind=ResultKind.EXPERIMENT),
                      Result(data='o1', kind=ResultKind.OBSERVATION),
@@ -473,7 +473,7 @@ def _init_result_list(
         [Result(data=VariableCollection(...), kind=ResultKind.METADATA)]
 
         >>> _init_result_list(params={"some": "params"})
-        [Result(data={'some': 'params'}, kind=ResultKind.PARAMS)]
+        [Result(data={'some': 'params'}, kind=ResultKind.PARAMETERS)]
 
         >>> _init_result_list(conditions=["a condition"])
         [Result(data='a condition', kind=ResultKind.EXPERIMENT)]
@@ -494,7 +494,7 @@ def _init_result_list(
         ...                  theories=[LinearRegression()],
         ... ) # doctest: +NORMALIZE_WHITESPACE +ELLIPSIS
         [Result(data=VariableCollection(...), kind=ResultKind.METADATA),
-         Result(data={'some': 'params'}, kind=ResultKind.PARAMS),
+         Result(data={'some': 'params'}, kind=ResultKind.PARAMETERS),
          Result(data='a condition', kind=ResultKind.EXPERIMENT),
          Result(data='an observation', kind=ResultKind.OBSERVATION),
          Result(data='another observation', kind=ResultKind.OBSERVATION),
@@ -507,7 +507,7 @@ def _init_result_list(
         data.append(Result(metadata, ResultKind.METADATA))
 
     if params is not None:
-        data.append(Result(params, ResultKind.PARAMS))
+        data.append(Result(params, ResultKind.PARAMETERS))
 
     for seq, kind in [
         (conditions, ResultKind.EXPERIMENT),
@@ -560,7 +560,7 @@ def _history_to_kind(history: Sequence[Result]) -> Snapshot:
         >>> _history_to_kind(history_) # doctest: +ELLIPSIS
         Snapshot(metadata=VariableCollection(independent_variables=[IV(name='example', ...
 
-        >>> history_ = [Result({'some': 'params'}, kind=ResultKind.PARAMS)]
+        >>> history_ = [Result({'some': 'params'}, kind=ResultKind.PARAMETERS)]
         >>> _history_to_kind(history_) # doctest: +ELLIPSIS
         Snapshot(..., params={'some': 'params'}, ...)
 
@@ -570,7 +570,7 @@ def _history_to_kind(history: Sequence[Result]) -> Snapshot:
             history, kind={ResultKind.METADATA}, default=VariableCollection()
         ),
         params=_get_last_data_with_default(
-            history, kind={ResultKind.PARAMS}, default={}
+            history, kind={ResultKind.PARAMETERS}, default={}
         ),
         observations=_list_data(
             _filter_history(history, kind={ResultKind.OBSERVATION})
