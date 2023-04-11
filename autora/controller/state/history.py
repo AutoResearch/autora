@@ -48,7 +48,7 @@ class History(SupportsControllerStateHistory):
             ... or with values for any or all of the parameters:
             >>> from autora.variable import VariableCollection
             >>> History(metadata=VariableCollection()) # doctest: +ELLIPSIS
-            History([Result(data=VariableCollection(...), kind=ResultKind.METADATA)])
+            History([Result(data=VariableCollection(...), kind=ResultKind.VARIABLES)])
 
             >>> History(params={"some": "params"})
             History([Result(data={'some': 'params'}, kind=ResultKind.PARAMETERS)])
@@ -67,10 +67,10 @@ class History(SupportsControllerStateHistory):
             `history`, `metadata`, `params`, `conditions`, `observations`, `theories`
             >>> History(theories=['t1', 't2'], conditions=['c1', 'c2'],
             ...     observations=['o1', 'o2'], params={'a': 'param'}, metadata=VariableCollection(),
-            ...     history=[Result("from history", ResultKind.METADATA)]
+            ...     history=[Result("from history", ResultKind.VARIABLES)]
             ... )  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
-            History([Result(data='from history', kind=ResultKind.METADATA),
-                                    Result(data=VariableCollection(...), kind=ResultKind.METADATA),
+            History([Result(data='from history', kind=ResultKind.VARIABLES),
+                                    Result(data=VariableCollection(...), kind=ResultKind.VARIABLES),
                                     Result(data={'a': 'param'}, kind=ResultKind.PARAMETERS),
                                     Result(data='c1', kind=ResultKind.EXPERIMENT),
                                     Result(data='c2', kind=ResultKind.EXPERIMENT),
@@ -116,7 +116,7 @@ class History(SupportsControllerStateHistory):
             >>> from autora.variable import VariableCollection
             >>> h1 = h0.update(metadata=VariableCollection())
             >>> h1  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
-            History([Result(data=VariableCollection(...), kind=ResultKind.METADATA)])
+            History([Result(data=VariableCollection(...), kind=ResultKind.VARIABLES)])
 
             ... the original object is unchanged:
             >>> h0
@@ -186,23 +186,23 @@ class History(SupportsControllerStateHistory):
                                     Result(data='c2', kind=ResultKind.EXPERIMENT)])
 
             >>> h0.update(theories=['t1', 't2'], metadata={'m': 1}) # doctest: +NORMALIZE_WHITESPACE
-            History([Result(data={'m': 1}, kind=ResultKind.METADATA),
+            History([Result(data={'m': 1}, kind=ResultKind.VARIABLES),
                                     Result(data='t1', kind=ResultKind.THEORY),
                                     Result(data='t2', kind=ResultKind.THEORY)])
 
             >>> h0.update(theories=['t1'], observations=['o1'], metadata={'m': 1}
             ... )  # doctest: +NORMALIZE_WHITESPACE
-            History([Result(data={'m': 1}, kind=ResultKind.METADATA),
+            History([Result(data={'m': 1}, kind=ResultKind.VARIABLES),
                      Result(data='o1', kind=ResultKind.OBSERVATION),
                      Result(data='t1', kind=ResultKind.THEORY)])
 
             We can also update with a complete history:
-            >>> History().update(history=[Result(data={'m': 2}, kind=ResultKind.METADATA),
+            >>> History().update(history=[Result(data={'m': 2}, kind=ResultKind.VARIABLES),
             ...                           Result(data='o1', kind=ResultKind.OBSERVATION),
             ...                           Result(data='t1', kind=ResultKind.THEORY)],
             ...                  conditions=['c1']
             ... )  # doctest: +NORMALIZE_WHITESPACE
-            History([Result(data={'m': 2}, kind=ResultKind.METADATA),
+            History([Result(data={'m': 2}, kind=ResultKind.VARIABLES),
                      Result(data='o1', kind=ResultKind.OBSERVATION),
                      Result(data='t1', kind=ResultKind.THEORY),
                      Result(data='c1', kind=ResultKind.EXPERIMENT)])
@@ -349,14 +349,14 @@ class History(SupportsControllerStateHistory):
             We initialze some history:
             >>> h = History(theories=['t1', 't2'], conditions=['c1', 'c2'],
             ...     observations=['o1', 'o2'], params={'a': 'param'}, metadata=VariableCollection(),
-            ...     history=[Result("from history", ResultKind.METADATA)])
+            ...     history=[Result("from history", ResultKind.VARIABLES)])
 
             Parameters passed to the constructor are included in the history in the following order:
             `history`, `metadata`, `params`, `conditions`, `observations`, `theories`
 
             >>> h.history  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
-            [Result(data='from history', kind=ResultKind.METADATA),
-             Result(data=VariableCollection(...), kind=ResultKind.METADATA),
+            [Result(data='from history', kind=ResultKind.VARIABLES),
+             Result(data=VariableCollection(...), kind=ResultKind.VARIABLES),
              Result(data={'a': 'param'}, kind=ResultKind.PARAMETERS),
              Result(data='c1', kind=ResultKind.EXPERIMENT),
              Result(data='c2', kind=ResultKind.EXPERIMENT),
@@ -381,7 +381,7 @@ class History(SupportsControllerStateHistory):
         Examples:
             >>> h = History(theories=['t1', 't2'], conditions=['c1', 'c2'],
             ...     observations=['o1', 'o2'], params={'a': 'param'}, metadata=VariableCollection(),
-            ...     history=[Result("from history", ResultKind.METADATA)])
+            ...     history=[Result("from history", ResultKind.VARIABLES)])
 
             >>> h.filter_by(kind={"THEORY"})   # doctest: +NORMALIZE_WHITESPACE
             History([Result(data='t1', kind=ResultKind.THEORY),
@@ -393,8 +393,8 @@ class History(SupportsControllerStateHistory):
 
             If we don't specify any filter criteria, we get the full history back:
             >>> h.filter_by()   # doctest: +NORMALIZE_WHITESPACE +ELLIPSIS
-            History([Result(data='from history', kind=ResultKind.METADATA),
-                     Result(data=VariableCollection(...), kind=ResultKind.METADATA),
+            History([Result(data='from history', kind=ResultKind.VARIABLES),
+                     Result(data=VariableCollection(...), kind=ResultKind.VARIABLES),
                      Result(data={'a': 'param'}, kind=ResultKind.PARAMETERS),
                      Result(data='c1', kind=ResultKind.EXPERIMENT),
                      Result(data='c2', kind=ResultKind.EXPERIMENT),
@@ -470,7 +470,7 @@ def _init_result_list(
         ... or with values for any or all of the parameters:
         >>> from autora.variable import VariableCollection
         >>> _init_result_list(metadata=VariableCollection()) # doctest: +ELLIPSIS
-        [Result(data=VariableCollection(...), kind=ResultKind.METADATA)]
+        [Result(data=VariableCollection(...), kind=ResultKind.VARIABLES)]
 
         >>> _init_result_list(params={"some": "params"})
         [Result(data={'some': 'params'}, kind=ResultKind.PARAMETERS)]
@@ -493,7 +493,7 @@ def _init_result_list(
         ...                  observations=["an observation", "another observation"],
         ...                  theories=[LinearRegression()],
         ... ) # doctest: +NORMALIZE_WHITESPACE +ELLIPSIS
-        [Result(data=VariableCollection(...), kind=ResultKind.METADATA),
+        [Result(data=VariableCollection(...), kind=ResultKind.VARIABLES),
          Result(data={'some': 'params'}, kind=ResultKind.PARAMETERS),
          Result(data='a condition', kind=ResultKind.EXPERIMENT),
          Result(data='an observation', kind=ResultKind.OBSERVATION),
@@ -504,7 +504,7 @@ def _init_result_list(
     data = []
 
     if metadata is not None:
-        data.append(Result(metadata, ResultKind.METADATA))
+        data.append(Result(metadata, ResultKind.VARIABLES))
 
     if params is not None:
         data.append(Result(params, ResultKind.PARAMETERS))
@@ -556,7 +556,7 @@ def _history_to_kind(history: Sequence[Result]) -> Snapshot:
 
         >>> from autora.variable import VariableCollection, IV
         >>> metadata = VariableCollection(independent_variables=[IV(name="example")])
-        >>> history_ = [Result(metadata, kind=ResultKind.METADATA)]
+        >>> history_ = [Result(metadata, kind=ResultKind.VARIABLES)]
         >>> _history_to_kind(history_) # doctest: +ELLIPSIS
         Snapshot(metadata=VariableCollection(independent_variables=[IV(name='example', ...
 
@@ -567,7 +567,7 @@ def _history_to_kind(history: Sequence[Result]) -> Snapshot:
     """
     namespace = Snapshot(
         metadata=_get_last_data_with_default(
-            history, kind={ResultKind.METADATA}, default=VariableCollection()
+            history, kind={ResultKind.VARIABLES}, default=VariableCollection()
         ),
         params=_get_last_data_with_default(
             history, kind={ResultKind.PARAMETERS}, default={}
