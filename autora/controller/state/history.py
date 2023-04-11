@@ -65,7 +65,7 @@ class History(SupportsControllerStateHistory):
 
             Parameters passed to the constructor are included in the history in the following order:
             `history`, `variables`, `parameters`, `experiments`, `observations`, `models`
-            >>> History(models=['t1', 't2'], experiments=['c1', 'c2'],
+            >>> History(models=['t1', 't2'], experiments=['e1', 'e2'],
             ...     observations=['o1', 'o2'], parameters={'a': 'param'},
             ...     variables=VariableCollection(),
             ...     history=[Result("from history", ResultKind.VARIABLES)]
@@ -73,8 +73,8 @@ class History(SupportsControllerStateHistory):
             History([Result(data='from history', kind=ResultKind.VARIABLES),
                                     Result(data=VariableCollection(...), kind=ResultKind.VARIABLES),
                                     Result(data={'a': 'param'}, kind=ResultKind.PARAMETERS),
-                                    Result(data='c1', kind=ResultKind.EXPERIMENT),
-                                    Result(data='c2', kind=ResultKind.EXPERIMENT),
+                                    Result(data='e1', kind=ResultKind.EXPERIMENT),
+                                    Result(data='e2', kind=ResultKind.EXPERIMENT),
                                     Result(data='o1', kind=ResultKind.OBSERVATION),
                                     Result(data='o2', kind=ResultKind.OBSERVATION),
                                     Result(data='t1', kind=ResultKind.MODEL),
@@ -183,9 +183,9 @@ class History(SupportsControllerStateHistory):
                                     Result(data='2nd experiment', kind=ResultKind.EXPERIMENT)])
 
             You can also update with multiple experiments, observations and models:
-            >>> h0.update(experiments=['c1', 'c2'])  # doctest: +NORMALIZE_WHITESPACE
-            History([Result(data='c1', kind=ResultKind.EXPERIMENT),
-                                    Result(data='c2', kind=ResultKind.EXPERIMENT)])
+            >>> h0.update(experiments=['e1', 'e2'])  # doctest: +NORMALIZE_WHITESPACE
+            History([Result(data='e1', kind=ResultKind.EXPERIMENT),
+                                    Result(data='e2', kind=ResultKind.EXPERIMENT)])
 
             >>> h0.update(models=['t1', 't2'], variables={'m': 1}
             ... ) # doctest: +NORMALIZE_WHITESPACE
@@ -203,12 +203,12 @@ class History(SupportsControllerStateHistory):
             >>> History().update(history=[Result(data={'m': 2}, kind=ResultKind.VARIABLES),
             ...                           Result(data='o1', kind=ResultKind.OBSERVATION),
             ...                           Result(data='t1', kind=ResultKind.MODEL)],
-            ...                  experiments=['c1']
+            ...                  experiments=['e1']
             ... )  # doctest: +NORMALIZE_WHITESPACE
             History([Result(data={'m': 2}, kind=ResultKind.VARIABLES),
                      Result(data='o1', kind=ResultKind.OBSERVATION),
                      Result(data='t1', kind=ResultKind.MODEL),
-                     Result(data='c1', kind=ResultKind.EXPERIMENT)])
+                     Result(data='e1', kind=ResultKind.EXPERIMENT)])
 
         """
 
@@ -351,7 +351,7 @@ class History(SupportsControllerStateHistory):
 
         Examples:
             We initialze some history:
-            >>> h = History(models=['t1', 't2'], experiments=['c1', 'c2'],
+            >>> h = History(models=['t1', 't2'], experiments=['e1', 'e2'],
             ...     observations=['o1', 'o2'], parameters={'a': 'param'},
             ...     variables=VariableCollection(),
             ...     history=[Result("from history", ResultKind.VARIABLES)])
@@ -363,8 +363,8 @@ class History(SupportsControllerStateHistory):
             [Result(data='from history', kind=ResultKind.VARIABLES),
              Result(data=VariableCollection(...), kind=ResultKind.VARIABLES),
              Result(data={'a': 'param'}, kind=ResultKind.PARAMETERS),
-             Result(data='c1', kind=ResultKind.EXPERIMENT),
-             Result(data='c2', kind=ResultKind.EXPERIMENT),
+             Result(data='e1', kind=ResultKind.EXPERIMENT),
+             Result(data='e2', kind=ResultKind.EXPERIMENT),
              Result(data='o1', kind=ResultKind.OBSERVATION),
              Result(data='o2', kind=ResultKind.OBSERVATION),
              Result(data='t1', kind=ResultKind.MODEL),
@@ -384,7 +384,7 @@ class History(SupportsControllerStateHistory):
         Return a copy of the object with only data belonging to the specified kinds.
 
         Examples:
-            >>> h = History(models=['t1', 't2'], experiments=['c1', 'c2'],
+            >>> h = History(models=['t1', 't2'], experiments=['e1', 'e2'],
             ...     observations=['o1', 'o2'], parameters={'a': 'param'},
             ...     variables=VariableCollection(),
             ...     history=[Result("from history", ResultKind.VARIABLES)])
@@ -402,8 +402,8 @@ class History(SupportsControllerStateHistory):
             History([Result(data='from history', kind=ResultKind.VARIABLES),
                      Result(data=VariableCollection(...), kind=ResultKind.VARIABLES),
                      Result(data={'a': 'param'}, kind=ResultKind.PARAMETERS),
-                     Result(data='c1', kind=ResultKind.EXPERIMENT),
-                     Result(data='c2', kind=ResultKind.EXPERIMENT),
+                     Result(data='e1', kind=ResultKind.EXPERIMENT),
+                     Result(data='e2', kind=ResultKind.EXPERIMENT),
                      Result(data='o1', kind=ResultKind.OBSERVATION),
                      Result(data='o2', kind=ResultKind.OBSERVATION),
                      Result(data='t1', kind=ResultKind.MODEL),

@@ -86,8 +86,8 @@ class Snapshot(SupportsControllerStateFields):
         Snapshot(..., experiments=['1st experiment', '2nd experiment'], ...)
 
         You can also update with multiple experiments, observations and models:
-        >>> s0.update(experiments=['c1', 'c2'])
-        Snapshot(..., experiments=['c1', 'c2'], ...)
+        >>> s0.update(experiments=['e1', 'e2'])
+        Snapshot(..., experiments=['e1', 'e2'], ...)
 
         >>> s0.update(models=['t1', 't2'], variables={'m': 1})
         Snapshot(variables={'m': 1}, ..., models=['t1', 't2'])
