@@ -26,7 +26,73 @@ class LoadSpec(NamedTuple):
 
 
 class HistorySerializer:
-    """Serializes and deserializes History objects."""
+    """Serializes and deserializes History objects.
+
+    Examples:
+        Custom types
+
+        We can specify a different method for saving (and loading) different result types.
+        Here we specify a custom json encoder which works for dataclasses like the `Result`
+        object used by the `History` class.
+        >>> import dataclasses, json, pathlib, importlib
+        >>> from autora.controller.state.history import Result
+        >>> class EnhancedJSONEncoder(json.JSONEncoder):
+        ...     # Inspired by https://stackoverflow.com/a/51286749
+        ...     def default(self, o):
+        ...         if dataclasses.is_dataclass(o) and not isinstance(o, type):
+        ...             cls = ".".join([type(o).__module__, type(o).__name__])
+        ...             if cls == "autora.controller.state.history.Result":
+        ...                 return (cls, self.default(o.data))
+        ...             else:
+        ...                 return (cls, dataclasses.asdict(o))
+        ...         return super().default(o)
+
+        >>> class JSONSerializer:
+        ...     @staticmethod
+        ...     def dump(data, file):
+        ...         json.dump(data, file, cls=EnhancedJSONEncoder)
+        ...     @staticmethod
+        ...     def load(file):
+        ...         d: Dict = json.load(file)
+        ...         cls, data, kind = d["cls"], d["data"]["data"], d["data"]["kind"]
+        ...         o = importlib.import_module(cls)(**data)
+        ...         return Result(data=o, kind=kind)
+
+        >>> custom_dump_mapping = {
+        ...     None: DumpSpec("yaml", YAMLSerializer, "w+"),
+        ...     ResultKind.METADATA: DumpSpec("json", JSONSerializer, "w+"),
+        ...     ResultKind.PARAMS: DumpSpec("json", JSONSerializer, "w+"),
+        ...     ResultKind.CONDITION: DumpSpec("yaml", YAMLSerializer, "w+"),
+        ...     ResultKind.OBSERVATION: DumpSpec("yaml", YAMLSerializer, "w+"),
+        ...     ResultKind.THEORY: DumpSpec("pickle", pickle, "w+b"),
+        ... }
+        >>> custom_load_mapping = {
+        ...     ".yaml": (YAMLSerializer, "r"),
+        ...     ".pickle": (pickle, "rb"),
+        ...     ".json": (JSONSerializer, "r"),
+        ... }
+
+        >>> from autora.variable import VariableCollection
+        >>> c = History(params={"a": "param", "nested": {"param": "dict"}},
+        ...             metadata=VariableCollection())
+        >>> with tempfile.TemporaryDirectory() as d:
+        ...     sc = HistorySerializer(d,
+        ...                            result_kind_serializer_mapping=custom_dump_mapping,
+        ...                            extension_loader_mapping=custom_load_mapping)
+        ...     sc.dump(c)
+        ...     with open(pathlib.Path(d, "00000000-METADATA.json")) as f:
+        ...         print("METADATA: ", '\\n'.join(f.readlines()))
+        ...     with open(pathlib.Path(d, "00000001-PARAMS.json")) as f:
+        ...         print("PARAMS: ", '\\n'.join(f.readlines()))
+        ... # doctest: +NORMALIZE_WHITESPACE
+        METADATA:  ["autora.controller.state.history.Result", {"data": {"independent_variables": [], "dependent_variables": [], "covariates": []}, "kind": "METADATA"}]
+        PARAMS:  ["autora.controller.state.history.Result", {"data": {"a": "param", "nested": {"param": "dict"}}, "kind": "PARAMS"}]
+
+
+
+
+
+    """
 
     def __init__(
         self,
@@ -122,56 +188,6 @@ class HistorySerializer:
             >>> dump_and_list(c)  # doctest: +NORMALIZE_WHITESPACE
             ['00000000-METADATA.yaml', '00000001-CONDITION.yaml', '00000002-OBSERVATION.yaml',
              '00000003-THEORY.pickle']
-
-            We can specify a different method for saving (and loading) different result types.
-            Here we specify a custom json encoder which works for dataclasses like the `Result`
-            object used by the `History` class.
-            >>> import dataclasses, json, pathlib
-            >>> class EnhancedJSONEncoder(json.JSONEncoder):
-            ...     # From https://stackoverflow.com/a/51286749
-            ...     def default(self, o):
-            ...         if dataclasses.is_dataclass(o):
-            ...             return dataclasses.asdict(o)
-            ...         return super().default(o)
-
-            >>> class JSONSerializer:
-            ...     @staticmethod
-            ...     def dump(data, file):
-            ...         json.dump(data, file, cls=EnhancedJSONEncoder)
-            ...     @staticmethod
-            ...     def load(file):
-            ...         d: Dict = json.load(file)
-            ...         return Result(**d)
-
-            >>> custom_dump_mapping = {
-            ...     None: DumpSpec("yaml", YAMLSerializer, "w+"),
-            ...     ResultKind.METADATA: DumpSpec("json", JSONSerializer, "w+"),
-            ...     ResultKind.PARAMS: DumpSpec("json", JSONSerializer, "w+"),
-            ...     ResultKind.CONDITION: DumpSpec("yaml", YAMLSerializer, "w+"),
-            ...     ResultKind.OBSERVATION: DumpSpec("yaml", YAMLSerializer, "w+"),
-            ...     ResultKind.THEORY: DumpSpec("pickle", pickle, "w+b"),
-            ... }
-            >>> custom_load_mapping = {
-            ...     ".yaml": (YAMLSerializer, "r"),
-            ...     ".pickle": (pickle, "rb"),
-            ...     ".json": (JSONSerializer, "r"),
-            ... }
-            >>> c = c.update(params={"a": "param", "nested": {"param": "dict"}})
-            >>> with tempfile.TemporaryDirectory() as d:
-            ...     sc = HistorySerializer(d,
-            ...                            result_kind_serializer_mapping=custom_dump_mapping,
-            ...                            extension_loader_mapping=custom_load_mapping)
-            ...     sc.dump(c)
-            ...     with open(pathlib.Path(d, "00000004-PARAMS.json")) as f:
-            ...         print("PARAMS: ", '\\n'.join(f.readlines()))
-            ...     with open(pathlib.Path(d, "00000000-METADATA.json")) as f:
-            ...         print("METADATA: ", '\\n'.join(f.readlines()))
-            ... # doctest: +NORMALIZE_WHITESPACE
-            PARAMS:  {"data": {"a": "param", "nested": {"param": "dict"}}, "kind": "PARAMS"}
-            METADATA:  {"data": [{"independent_variables": [],
-                                  "dependent_variables": [],
-                                  "covariates": []}],
-                        "kind": "METADATA"}
 
 
         """
