@@ -20,7 +20,7 @@ class Snapshot(SupportsControllerStateFields):
     # Sequences
     experiments: List[ArrayLike] = field(default_factory=list)
     observations: List[ArrayLike] = field(default_factory=list)
-    models: List[BaseEstimator] = field(default_factory=list)
+    theories: List[BaseEstimator] = field(default_factory=list)
 
     def update(
         self,
@@ -28,7 +28,7 @@ class Snapshot(SupportsControllerStateFields):
         params=None,
         experiments=None,
         observations=None,
-        models=None,
+        theories=None,
     ):
         """
         Create a new object with updated values.
@@ -37,7 +37,7 @@ class Snapshot(SupportsControllerStateFields):
         >>> s0 = Snapshot()
         >>> s0  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
         Snapshot(variables=VariableCollection(...), params={}, experiments=[],
-                        observations=[], models=[])
+                        observations=[], theories=[])
 
         We can update the params using the `.update` method:
         >>> s0.update(params={'first': 'params'})  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
@@ -57,14 +57,14 @@ class Snapshot(SupportsControllerStateFields):
         ...    .update(variables=VariableCollection([IV("2nd IV")]))).variables
         VariableCollection(independent_variables=[IV(name='2nd IV',...)], ...)
 
-        When we update the experiments, observations or models, the respective list is extended:
-        >>> s3 = s0.update(models=["1st theory"])
+        When we update the experiments, observations or theories, the respective list is extended:
+        >>> s3 = s0.update(theories=["1st theory"])
         >>> s3
-        Snapshot(..., models=['1st theory'])
+        Snapshot(..., theories=['1st theory'])
 
-        ... so we can see the history of all the models, for instance.
-        >>> s3.update(models=["2nd theory"])
-        Snapshot(..., models=['1st theory', '2nd theory'])
+        ... so we can see the history of all the theories, for instance.
+        >>> s3.update(theories=["2nd theory"])
+        Snapshot(..., theories=['1st theory', '2nd theory'])
 
         The same applies to observations:
         >>> s4 = s0.update(observations=["1st observation"])
@@ -83,20 +83,20 @@ class Snapshot(SupportsControllerStateFields):
         >>> s5.update(experiments=["2nd condition"])  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
         Snapshot(..., experiments=['1st condition', '2nd condition'], ...)
 
-        You can also update with multiple experiments, observations and models:
+        You can also update with multiple experiments, observations and theories:
         >>> s0.update(experiments=['e1', 'e1'])
         Snapshot(..., experiments=['e1', 'e1'], ...)
 
-        >>> s0.update(models=['t1', 't2'], variables={'m': 1})
-        Snapshot(variables={'m': 1}, ..., models=['t1', 't2'])
+        >>> s0.update(theories=['t1', 't2'], variables={'m': 1})
+        Snapshot(variables={'m': 1}, ..., theories=['t1', 't2'])
 
-        >>> s0.update(models=['t1'], observations=['o1'], variables={'m': 1})
-        Snapshot(variables={'m': 1}, ..., observations=['o1'], models=['t1'])
+        >>> s0.update(theories=['t1'], observations=['o1'], variables={'m': 1})
+        Snapshot(variables={'m': 1}, ..., observations=['o1'], theories=['t1'])
 
 
-        Inputs to models, observations and experiments must be Lists
+        Inputs to theories, observations and experiments must be Lists
         which can be cast to lists:
-        >>> s0.update(models='t1')  # doctest: +ELLIPSIS
+        >>> s0.update(theories='t1')  # doctest: +ELLIPSIS
         Traceback (most recent call last):
         ...
         AssertionError: 't1' must be a list, e.g. `['t1']`?)
@@ -119,5 +119,5 @@ class Snapshot(SupportsControllerStateFields):
         params_ = params or self.params
         experiments_ = _coalesce_lists(self.experiments, experiments)
         observations_ = _coalesce_lists(self.observations, observations)
-        models_ = _coalesce_lists(self.models, models)
-        return Snapshot(variables_, params_, experiments_, observations_, models_)
+        theories_ = _coalesce_lists(self.theories, theories)
+        return Snapshot(variables_, params_, experiments_, observations_, theories_)

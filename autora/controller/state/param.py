@@ -21,7 +21,7 @@ def _get_state_dependent_properties(state: SupportsControllerState):
         >>> state_dependent_properties = _get_state_dependent_properties(Snapshot())
 
         ... but it will raise an exception if a value isn't yet available when we try to use it
-        >>> state_dependent_properties["%models[-1]%"] # doctest: +ELLIPSIS
+        >>> state_dependent_properties["%theories[-1]%"] # doctest: +ELLIPSIS
         Traceback (most recent call last):
         ...
         IndexError: list index out of range
@@ -29,7 +29,7 @@ def _get_state_dependent_properties(state: SupportsControllerState):
         Nevertheless, we can iterate through its keys no problem:
         >>> [key for key in state_dependent_properties.keys()] # doctest: +NORMALIZE_WHITESPACE
         ['%observations.ivs[-1]%', '%observations.dvs[-1]%', '%observations.ivs%',
-        '%observations.dvs%', '%models[-1]%', '%models%']
+        '%observations.dvs%', '%theories[-1]%', '%theories%']
 
     """
 
@@ -47,8 +47,8 @@ def _get_state_dependent_properties(state: SupportsControllerState):
                 [np.empty([0, n_ivs + n_dvs])] + list(state.observations)
             )[:, 0:n_ivs],
             "%observations.dvs%": lambda: np.row_stack(state.observations)[:, n_ivs:],
-            "%models[-1]%": lambda: state.models[-1],
-            "%models%": lambda: state.models,
+            "%theories[-1]%": lambda: state.theories[-1],
+            "%theories%": lambda: state.theories,
         }
     )
     return state_dependent_property_dict
@@ -106,8 +106,8 @@ def resolve_state_params(params: Dict, state: SupportsControllerState) -> Dict:
 
     Examples:
         >>> from autora.controller.state import History
-        >>> params = {"experimentalist": {"source": "%models[-1]%"}}
-        >>> s = History(models=["the first theory", "the second theory"])
+        >>> params = {"experimentalist": {"source": "%theories[-1]%"}}
+        >>> s = History(theories=["the first theory", "the second theory"])
         >>> resolve_state_params(params, s)
         {'experimentalist': {'source': 'the second theory'}}
 
