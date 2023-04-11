@@ -87,19 +87,19 @@ class Snapshot(SupportsControllerStateFields):
         >>> s0.update(experiments=['e1', 'e1'])
         Snapshot(..., experiments=['e1', 'e1'], ...)
 
-        >>> s0.update(models=['m1', 'm1'], variables={'m': 1})
-        Snapshot(variables={'m': 1}, ..., models=['m1', 'm1'])
+        >>> s0.update(models=['t1', 't2'], variables={'m': 1})
+        Snapshot(variables={'m': 1}, ..., models=['t1', 't2'])
 
-        >>> s0.update(models=['m1'], observations=['o1'], variables={'m': 1})
-        Snapshot(variables={'m': 1}, ..., observations=['o1'], models=['m1'])
+        >>> s0.update(models=['t1'], observations=['o1'], variables={'m': 1})
+        Snapshot(variables={'m': 1}, ..., observations=['o1'], models=['t1'])
 
 
         Inputs to models, observations and experiments must be Lists
         which can be cast to lists:
-        >>> s0.update(models='m1')  # doctest: +ELLIPSIS
+        >>> s0.update(models='t1')  # doctest: +ELLIPSIS
         Traceback (most recent call last):
         ...
-        AssertionError: 'm1' must be a list, e.g. `['m1']`?)
+        AssertionError: 't1' must be a list, e.g. `['t1']`?)
 
         """
 
