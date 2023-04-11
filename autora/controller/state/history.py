@@ -65,7 +65,7 @@ class History(SupportsControllerStateHistory):
 
             Parameters passed to the constructor are included in the history in the following order:
             `history`, `variables`, `parameters`, `experiments`, `observations`, `models`
-            >>> History(models=['t1', 't2'], experiments=['e1', 'e2'],
+            >>> History(models=['m1', 'm2'], experiments=['e1', 'e2'],
             ...     observations=['o1', 'o2'], parameters={'a': 'param'},
             ...     variables=VariableCollection(),
             ...     history=[Result("from history", ResultKind.VARIABLES)]
@@ -77,8 +77,8 @@ class History(SupportsControllerStateHistory):
                                     Result(data='e2', kind=ResultKind.EXPERIMENT),
                                     Result(data='o1', kind=ResultKind.OBSERVATION),
                                     Result(data='o2', kind=ResultKind.OBSERVATION),
-                                    Result(data='t1', kind=ResultKind.MODEL),
-                                    Result(data='t2', kind=ResultKind.MODEL)])
+                                    Result(data='m1', kind=ResultKind.MODEL),
+                                    Result(data='m2', kind=ResultKind.MODEL)])
         """
         self._history: List
 
@@ -187,27 +187,27 @@ class History(SupportsControllerStateHistory):
             History([Result(data='e1', kind=ResultKind.EXPERIMENT),
                                     Result(data='e2', kind=ResultKind.EXPERIMENT)])
 
-            >>> h0.update(models=['t1', 't2'], variables={'m': 1}
+            >>> h0.update(models=['m1', 'm2'], variables={'m': 1}
             ... ) # doctest: +NORMALIZE_WHITESPACE
             History([Result(data={'m': 1}, kind=ResultKind.VARIABLES),
-                                    Result(data='t1', kind=ResultKind.MODEL),
-                                    Result(data='t2', kind=ResultKind.MODEL)])
+                                    Result(data='m1', kind=ResultKind.MODEL),
+                                    Result(data='m2', kind=ResultKind.MODEL)])
 
-            >>> h0.update(models=['t1'], observations=['o1'], variables={'m': 1}
+            >>> h0.update(models=['m1'], observations=['o1'], variables={'m': 1}
             ... )  # doctest: +NORMALIZE_WHITESPACE
             History([Result(data={'m': 1}, kind=ResultKind.VARIABLES),
                      Result(data='o1', kind=ResultKind.OBSERVATION),
-                     Result(data='t1', kind=ResultKind.MODEL)])
+                     Result(data='m1', kind=ResultKind.MODEL)])
 
             We can also update with a complete history:
             >>> History().update(history=[Result(data={'m': 2}, kind=ResultKind.VARIABLES),
             ...                           Result(data='o1', kind=ResultKind.OBSERVATION),
-            ...                           Result(data='t1', kind=ResultKind.MODEL)],
+            ...                           Result(data='m1', kind=ResultKind.MODEL)],
             ...                  experiments=['e1']
             ... )  # doctest: +NORMALIZE_WHITESPACE
             History([Result(data={'m': 2}, kind=ResultKind.VARIABLES),
                      Result(data='o1', kind=ResultKind.OBSERVATION),
-                     Result(data='t1', kind=ResultKind.MODEL),
+                     Result(data='m1', kind=ResultKind.MODEL),
                      Result(data='e1', kind=ResultKind.EXPERIMENT)])
 
         """
@@ -351,7 +351,7 @@ class History(SupportsControllerStateHistory):
 
         Examples:
             We initialze some history:
-            >>> h = History(models=['t1', 't2'], experiments=['e1', 'e2'],
+            >>> h = History(models=['m1', 'm2'], experiments=['e1', 'e2'],
             ...     observations=['o1', 'o2'], parameters={'a': 'param'},
             ...     variables=VariableCollection(),
             ...     history=[Result("from history", ResultKind.VARIABLES)])
@@ -367,8 +367,8 @@ class History(SupportsControllerStateHistory):
              Result(data='e2', kind=ResultKind.EXPERIMENT),
              Result(data='o1', kind=ResultKind.OBSERVATION),
              Result(data='o2', kind=ResultKind.OBSERVATION),
-             Result(data='t1', kind=ResultKind.MODEL),
-             Result(data='t2', kind=ResultKind.MODEL)]
+             Result(data='m1', kind=ResultKind.MODEL),
+             Result(data='m2', kind=ResultKind.MODEL)]
 
             If we add a new value, like the parameters object, the updated value is added to the
             end of the history:
@@ -384,14 +384,14 @@ class History(SupportsControllerStateHistory):
         Return a copy of the object with only data belonging to the specified kinds.
 
         Examples:
-            >>> h = History(models=['t1', 't2'], experiments=['e1', 'e2'],
+            >>> h = History(models=['m1', 'm2'], experiments=['e1', 'e2'],
             ...     observations=['o1', 'o2'], parameters={'a': 'param'},
             ...     variables=VariableCollection(),
             ...     history=[Result("from history", ResultKind.VARIABLES)])
 
             >>> h.filter_by(kind={"MODEL"})   # doctest: +NORMALIZE_WHITESPACE
-            History([Result(data='t1', kind=ResultKind.MODEL),
-                                    Result(data='t2', kind=ResultKind.MODEL)])
+            History([Result(data='m1', kind=ResultKind.MODEL),
+                                    Result(data='m2', kind=ResultKind.MODEL)])
 
             >>> h.filter_by(kind={ResultKind.OBSERVATION})  # doctest: +NORMALIZE_WHITESPACE
             History([Result(data='o1', kind=ResultKind.OBSERVATION),
@@ -406,8 +406,8 @@ class History(SupportsControllerStateHistory):
                      Result(data='e2', kind=ResultKind.EXPERIMENT),
                      Result(data='o1', kind=ResultKind.OBSERVATION),
                      Result(data='o2', kind=ResultKind.OBSERVATION),
-                     Result(data='t1', kind=ResultKind.MODEL),
-                     Result(data='t2', kind=ResultKind.MODEL)])
+                     Result(data='m1', kind=ResultKind.MODEL),
+                     Result(data='m2', kind=ResultKind.MODEL)])
 
         """
         if kind is None:
