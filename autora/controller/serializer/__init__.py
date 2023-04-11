@@ -1,8 +1,7 @@
 import pickle
 import tempfile
 from pathlib import Path
-from types import MappingProxyType
-from typing import Mapping, NamedTuple, Optional, Tuple, Type, Union
+from typing import Mapping, NamedTuple, Optional, Type, Union
 
 import numpy as np
 
