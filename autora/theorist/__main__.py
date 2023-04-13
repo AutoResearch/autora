@@ -16,25 +16,6 @@ from autora.variable import VariableCollection
 _logger = logging.getLogger(__name__)
 
 
-def import_class(name: str) -> Type[BaseEstimator]:
-    """
-    Load a class from a module by name.
-
-    Args:
-        name:
-
-    Examples:
-        >>> import_class("sklearn.linear_model.LinearRegressor")
-
-    """
-    components = name.split(".")
-    module_name, class_name = ".".join(components[:-1]), components[-1]
-    _logger.info(f"loading {module_name=}, {class_name=}")
-    module = importlib.import_module(module_name)
-    cls = getattr(module, class_name)
-    return cls
-
-
 def main(
     variables: pathlib.Path,
     parameters: pathlib.Path,
@@ -94,6 +75,25 @@ def load_regressor_class(regressor):
     regressor_class = import_class(regressor)
     _logger.info(f"{regressor}: {regressor_class}")
     return regressor_class
+
+
+def import_class(name: str) -> Type[BaseEstimator]:
+    """
+    Load a class from a module by name.
+
+    Args:
+        name:
+
+    Examples:
+        >>> import_class("sklearn.linear_model.LinearRegressor")
+
+    """
+    components = name.split(".")
+    module_name, class_name = ".".join(components[:-1]), components[-1]
+    _logger.info(f"loading {module_name=}, {class_name=}")
+    module = importlib.import_module(module_name)
+    cls = getattr(module, class_name)
+    return cls
 
 
 def load_data(data: pathlib.Path) -> DataFrame:
