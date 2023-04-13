@@ -1,0 +1,10 @@
+!!python/object:autora.variable.VariableCollection
+covariates: []
+dependent_variables:
+  - !!python/object:autora.variable.Variable
+    name: y
+independent_variables:
+  - !!python/object:autora.variable.Variable
+    name: x1
+  - !!python/object:autora.variable.Variable
+    name: x2

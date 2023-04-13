@@ -1,0 +1,25 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="autora.theorist basic-usage" type="PythonConfigurationType" factoryName="Python">
+    <module name="autora" />
+    <option name="INTERPRETER_OPTIONS" value="" />
+    <option name="PARENT_ENVS" value="true" />
+    <envs>
+      <env name="PYTHONUNBUFFERED" value="1" />
+    </envs>
+    <option name="SDK_HOME" value="$USER_HOME$/Library/Caches/pypoetry/virtualenvs/autora-17yK3Jyq-py3.8/bin/python" />
+    <option name="SDK_NAME" value="Poetry (autora)" />
+    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/tests/cli/theorist/basic-usage" />
+    <option name="IS_MODULE_SDK" value="false" />
+    <option name="ADD_CONTENT_ROOTS" value="true" />
+    <option name="ADD_SOURCE_ROOTS" value="true" />
+    <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+    <option name="SCRIPT_NAME" value="autora.theorist" />
+    <option name="PARAMETERS" value="variables.yml parameters.yml sklearn.linear_model.LinearRegression data.csv out.pickle --overwrite --verbose --debug" />
+    <option name="SHOW_COMMAND_LINE" value="false" />
+    <option name="EMULATE_TERMINAL" value="false" />
+    <option name="MODULE_MODE" value="true" />
+    <option name="REDIRECT_INPUT" value="false" />
+    <option name="INPUT_FILE" value="" />
+    <method v="2" />
+  </configuration>
+</component>
