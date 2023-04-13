@@ -45,14 +45,19 @@ def main(
     debug: bool = False,
     overwrite: bool = False,
 ):
-
+    # Initialization
     configure_logger(debug, verbose)
 
+    # Data Loading
     regressor_class_ = load_regressor_class(regressor)
     data_ = load_data(data)
     variables_ = load_variables(variables)
     parameters_ = load_parameters(parameters)
+
+    # Fitting
     model = fit_model(data_, parameters_, regressor_class_, variables_)
+
+    # Writing results
     dump_model(model, output, overwrite)
 
     return
@@ -61,8 +66,10 @@ def main(
 def dump_model(model_, output, overwrite):
     if overwrite:
         mode = "wb"
+        _logger.info(f"overwriting {output=} if it already exists")
     else:
         mode = "xb"
+        _logger.info(f"writing to new file {output=}")
     with open(output, mode) as o:
         pickle.dump(model_, o)
 
