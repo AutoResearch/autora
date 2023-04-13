@@ -49,10 +49,10 @@ def main(
     configure_logger(debug, verbose)
 
     # Data Loading
-    regressor_class_ = load_regressor_class(regressor)
-    data_ = load_data(data)
     variables_ = load_variables(variables)
     parameters_ = load_parameters(parameters)
+    regressor_class_ = load_regressor_class(regressor)
+    data_ = load_data(data)
 
     # Fitting
     model = fit_model(data_, parameters_, regressor_class_, variables_)
@@ -63,15 +63,44 @@ def main(
     return
 
 
-def dump_model(model_, output, overwrite):
-    if overwrite:
-        mode = "wb"
-        _logger.info(f"overwriting {output=} if it already exists")
-    else:
-        mode = "xb"
-        _logger.info(f"writing to new file {output=}")
-    with open(output, mode) as o:
-        pickle.dump(model_, o)
+def configure_logger(debug, verbose):
+    if debug:
+        logging.basicConfig(level=logging.DEBUG)
+        _logger.debug("using DEBUG logging level")
+    if verbose:
+        logging.basicConfig(level=logging.INFO)
+        _logger.info("using INFO logging level")
+
+
+def load_variables(path: pathlib.Path) -> VariableCollection:
+    _logger.debug(f"load_variables: loading from {path=}")
+    variables_: VariableCollection
+    with open(path, "r") as fv:
+        variables_ = yaml.load(fv, yaml.Loader)
+    assert isinstance(variables_, VariableCollection)
+    return variables_
+
+
+def load_parameters(path: pathlib.Path) -> Dict:
+    _logger.debug(f"load_parameters: loading from {path=}")
+    with open(path, "r") as fp:
+        parameters_: Optional[Dict] = yaml.load(fp, yaml.Loader)
+        if parameters_ is None:
+            parameters_ = dict()
+    return parameters_
+
+
+def load_regressor_class(regressor):
+    regressor_class = import_class(regressor)
+    _logger.info(f"{regressor}: {regressor_class}")
+    return regressor_class
+
+
+def load_data(data: pathlib.Path) -> DataFrame:
+    _logger.debug(f"load_data: loading from {data=}")
+    with open(data, "r") as fd:
+        data_: DataFrame = pd.read_csv(fd)
+    return data_
 
 
 def fit_model(data_, parameters_, regressor_class_, variables_):
@@ -92,44 +121,15 @@ def fit_model(data_, parameters_, regressor_class_, variables_):
     return model
 
 
-def configure_logger(debug, verbose):
-    if debug:
-        logging.basicConfig(level=logging.DEBUG)
-        _logger.debug("using DEBUG logging level")
-    if verbose:
-        logging.basicConfig(level=logging.INFO)
-        _logger.info("using INFO logging level")
-
-
-def load_regressor_class(regressor):
-    regressor_class = import_class(regressor)
-    _logger.info(f"{regressor}: {regressor_class}")
-    return regressor_class
-
-
-def load_data(data: pathlib.Path) -> DataFrame:
-    _logger.debug(f"load_data: loading from {data=}")
-    with open(data, "r") as fd:
-        data_: DataFrame = pd.read_csv(fd)
-    return data_
-
-
-def load_variables(path: pathlib.Path) -> VariableCollection:
-    _logger.debug(f"load_variables: loading from {path=}")
-    variables_: VariableCollection
-    with open(path, "r") as fv:
-        variables_ = yaml.load(fv, yaml.Loader)
-    assert isinstance(variables_, VariableCollection)
-    return variables_
-
-
-def load_parameters(path: pathlib.Path) -> Dict:
-    _logger.debug(f"load_parameters: loading from {path=}")
-    with open(path, "r") as fp:
-        parameters_: Optional[Dict] = yaml.load(fp, yaml.Loader)
-        if parameters_ is None:
-            parameters_ = dict()
-    return parameters_
+def dump_model(model_, output, overwrite):
+    if overwrite:
+        mode = "wb"
+        _logger.info(f"overwriting {output=} if it already exists")
+    else:
+        mode = "xb"
+        _logger.info(f"writing to new file {output=}")
+    with open(output, mode) as o:
+        pickle.dump(model_, o)
 
 
 if __name__ == "__main__":
