@@ -1,0 +1,6 @@
+!!python/object:sklearn.linear_model._base.LinearRegression
+  _sklearn_version: 1.2.2
+  copy_X: true
+  fit_intercept: true
+  n_jobs: null
+  positive: false
