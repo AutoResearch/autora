@@ -26,7 +26,7 @@ def main(
     controller_.load(directory)
 
     if step_name is not None:
-        _set_next_step_name(controller_, step_name)
+        controller_ = _set_next_step_name(controller_, step_name)
 
     _logger.info("running next step")
     next(controller_)
@@ -52,6 +52,7 @@ def _load_manager(path: pathlib.Path) -> Controller:
 def _set_next_step_name(controller: Controller, step_name: str):
     _logger.info(f"setting next {step_name=}")
     controller.planner = lambda _: step_name
+    return controller
 
 
 if __name__ == "__main__":
