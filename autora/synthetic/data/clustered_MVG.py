@@ -80,9 +80,7 @@ class clustered_multivariate_gaussian:
         posteriors = self.cluster_priors * np.array([c.marginal_pdf(fixed_dims, values) for c in self.clusters])
         posteriors = posteriors / np.sum(posteriors)
 
-        return self.sample(cluster_probs=posteriors, cond_dims=fixed_dims,
-                                                     cond_vals=values,
-                                                     return_full=return_full)
+        return self.sample(cond_dims=fixed_dims, cond_vals=values, return_full=return_full, cluster_probs=posteriors)
 
 
 def clustered_MVG(
