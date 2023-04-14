@@ -39,11 +39,6 @@ def main(
     return
 
 
-def _set_next_step_name(controller: Controller, step_name: str):
-    _logger.info(f"setting next {step_name=}")
-    controller.planner = lambda _: step_name
-
-
 def _load_manager(path: pathlib.Path) -> Controller:
     _logger.debug(f"_load_manager: loading from {path=}")
     with open(path, "r") as f:
@@ -52,6 +47,11 @@ def _load_manager(path: pathlib.Path) -> Controller:
         controller_, Controller
     ), f"controller type {type(controller_)=} unsupported"
     return controller_
+
+
+def _set_next_step_name(controller: Controller, step_name: str):
+    _logger.info(f"setting next {step_name=}")
+    controller.planner = lambda _: step_name
 
 
 if __name__ == "__main__":
