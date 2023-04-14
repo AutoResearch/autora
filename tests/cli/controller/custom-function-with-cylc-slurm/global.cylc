@@ -1,0 +1,8 @@
+[platforms]
+    [[oscar]]
+        hosts = localhost
+        install target = localhost
+        job runner = slurm
+        retrieve job logs = True
+        cylc path = /users/jholla10/anaconda/cylc/bin/cylc
+
