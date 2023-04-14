@@ -2567,7 +2567,7 @@ files = [
 name = "pyyaml"
 version = "6.0"
 description = "YAML parser and emitter for Python"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.6"
 files = [
@@ -3553,4 +3553,4 @@ tinkerforge = ["tinkerforge"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8.10,<3.11"
-content-hash = "be2c95a830dc249a8c33600793aa41c6f842fc6266db8b4363a53afd95fe8b30"
+content-hash = "cc78e9181360d93680975fa7f6918744d64267fff2ee382872c023e2b2ceca54"
