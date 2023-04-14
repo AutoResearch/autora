@@ -1,0 +1,25 @@
+[runtime]
+    [[setup]]
+        script = """
+            cp $CYLC_WORKFLOW_RUN_DIR/controller.yml $CYLC_WORKFLOW_SHARE_DIR;
+            cp -R $CYLC_WORKFLOW_RUN_DIR/history $CYLC_WORKFLOW_SHARE_DIR/history
+            conda create -p $CYLC_WORKFLOW_SHARE_DIR/env --clone autora-cylc
+        """
+    [[experimentalist]]
+        script = $CYLC_WORKFLOW_SHARE_DIR/env/bin/python -m autora.controller "$CYLC_WORKFLOW_SHARE_DIR/controller.yml" "$CYLC_WORKFLOW_SHARE_DIR/history/." --step-name=experimentalist --verbose --debug
+    [[experiment_runner]]
+        script = /$CYLC_WORKFLOW_SHARE_DIR/env/bin/python -m autora.controller "$CYLC_WORKFLOW_SHARE_DIR/controller.yml" "$CYLC_WORKFLOW_SHARE_DIR/history/." --step-name=experiment_runner --verbose --debug
+    [[theorist]]
+        script = $CYLC_WORKFLOW_SHARE_DIR/env/bin/python -m autora.controller "$CYLC_WORKFLOW_SHARE_DIR/controller.yml" "$CYLC_WORKFLOW_SHARE_DIR/history/." --step-name=theorist --verbose --debug
+
+[scheduling]
+    cycling mode = integer
+    initial cycle point = 1
+    [[graph]]
+        R1 = """
+        setup => experimentalist
+        """
+        P1 = """
+            experimentalist => experiment_runner => theorist
+            theorist[-P1] => experimentalist
+        """

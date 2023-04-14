@@ -1,0 +1,27 @@
+!!python/object:autora.controller.state.history.Result
+data: !!python/object:autora.variable.VariableCollection
+  covariates: []
+  dependent_variables:
+  - !!python/object:autora.variable.Variable
+    allowed_values: null
+    is_covariate: false
+    name: y
+    rescale: 1
+    type: !!python/object/apply:autora.variable.ValueType
+    - real
+    units: ''
+    value_range: null
+    variable_label: ''
+  independent_variables:
+  - !!python/object:autora.variable.Variable
+    allowed_values: null
+    is_covariate: false
+    name: x
+    rescale: 1
+    type: !!python/object/apply:autora.variable.ValueType
+    - real
+    units: ''
+    value_range: null
+    variable_label: ''
+kind: !!python/object/apply:autora.controller.protocol.ResultKind
+- METADATA
