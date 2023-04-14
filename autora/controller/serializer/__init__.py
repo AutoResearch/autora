@@ -1,15 +1,11 @@
 import pickle
 import tempfile
 from pathlib import Path
-from typing import Mapping, NamedTuple, Optional, Type, Union
+from typing import Mapping, NamedTuple, Union
 
 import numpy as np
 
-from autora.controller.protocol import (
-    ResultKind,
-    SupportsControllerStateHistory,
-    SupportsLoadDump,
-)
+from autora.controller.protocol import ResultKind, SupportsLoadDump
 from autora.controller.serializer import yaml_ as YAMLSerializer
 from autora.controller.state import History
 
@@ -51,7 +47,7 @@ class HistorySerializer:
             ".pickle": _LoadSpec(pickle, "rb"),
         }
 
-    def dump(self, data_collection: SupportsControllerStateHistory):
+    def dump(self, data_collection: History):
         """
 
         Args:
@@ -129,7 +125,7 @@ class HistorySerializer:
             with open(Path(path, filename), mode) as f:
                 serializer.dump(container, f)
 
-    def load(self, cls: Type[SupportsControllerStateHistory] = History):
+    def load(self) -> History:
         """
 
         Examples:
@@ -185,7 +181,7 @@ class HistorySerializer:
                 loaded_object = serializer.load(f)
                 data.append(loaded_object)
 
-        data_collection = cls(history=data)
+        data_collection = History(history=data)
 
         return data_collection
 
