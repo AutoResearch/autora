@@ -84,3 +84,10 @@ class BaseController:
 
     def __iter__(self):
         return self
+
+    def run_fn(self, function_name: ExecutorName):
+        initial_planner = self.planner
+        self.planner = lambda s: function_name
+        next(self)
+        self.planner = initial_planner
+        return self

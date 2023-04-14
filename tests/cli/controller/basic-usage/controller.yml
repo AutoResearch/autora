@@ -1,0 +1,17 @@
+!!python/object:autora.controller.controller.Controller
+  _experiment_runner_callable: null
+  _experimentalist_pipeline: null
+  _theorist_estimator: null
+  executor_collection:
+    experiment_runner: &id001 !!python/name:autora.controller.executor.no_op ''
+    experimentalist: *id001
+    theorist: *id001
+  monitor: null
+  planner: !!python/name:autora.controller.planner.last_result_kind_planner ''
+  state: !!python/object:autora.controller.state.history.History
+    _history:
+    - !!python/object:autora.controller.state.history.Result
+      data: {}
+      kind: !!python/object/apply:autora.controller.protocol.ResultKind
+      - PARAMS
+

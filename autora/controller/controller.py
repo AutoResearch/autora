@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import logging
+import pathlib
 from typing import Callable, Dict, Optional
 
 from sklearn.base import BaseEstimator
@@ -9,6 +10,7 @@ from sklearn.base import BaseEstimator
 from autora.controller.base import BaseController, ExecutorName
 from autora.controller.executor import make_online_executor_collection
 from autora.controller.planner import last_result_kind_planner
+from autora.controller.serializer import HistorySerializer
 from autora.controller.state import History
 from autora.experimentalist.pipeline import Pipeline
 from autora.variable import VariableCollection
@@ -33,7 +35,7 @@ class Controller(BaseController):
 
     def __init__(
         self,
-        metadata: Optional[VariableCollection],
+        metadata: Optional[VariableCollection] = None,
         theorist: Optional[BaseEstimator] = None,
         experimentalist: Optional[Pipeline] = None,
         experiment_runner: Optional[Callable] = None,
@@ -102,3 +104,14 @@ class Controller(BaseController):
     def seed(self, **kwargs):
         for key, value in kwargs.items():
             self.state = self.state.update(**{key: value})
+
+    def load(self, directory: pathlib.Path):
+        serializer = HistorySerializer(directory)
+        state: History = serializer.load(History)
+        self.state = state
+        return
+
+    def dump(self, directory: pathlib.Path):
+        serializer = HistorySerializer(directory)
+        serializer.dump(self.state)
+        return

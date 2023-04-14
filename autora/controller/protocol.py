@@ -140,3 +140,15 @@ class SupportsLoadDump(Protocol):
 
     def load(self, file) -> Any:
         ...
+
+
+@runtime_checkable
+class SupportsControllerStateLoadDumpTarget(Protocol):
+    def dump(self, directory) -> None:
+        ...
+
+    def load(self, directory) -> None:
+        ...
+
+    def run_fn(self, next_function_name):
+        ...
