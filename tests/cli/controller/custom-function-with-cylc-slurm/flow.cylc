@@ -1,18 +1,23 @@
 [runtime]
+    [[root]]
+        [[[environment]]]
+            PYTHON=$CYLC_WORKFLOW_SHARE_DIR/env/bin/python
+            HISTORYDIR="$CYLC_WORKFLOW_SHARE_DIR/history/."
+            CONTROLLERPATH="$CYLC_WORKFLOW_SHARE_DIR/controller.yml"
     [[setup]]
         script = """
-            cp $CYLC_WORKFLOW_RUN_DIR/controller.yml $CYLC_WORKFLOW_SHARE_DIR;
-            cp -R $CYLC_WORKFLOW_RUN_DIR/history $CYLC_WORKFLOW_SHARE_DIR/history
+            cp $CYLC_WORKFLOW_RUN_DIR/controller.yml "$CONTROLLERPATH"
+            cp -R $CYLC_WORKFLOW_RUN_DIR/history "$HISTORYDIR"
             conda create -p $CYLC_WORKFLOW_SHARE_DIR/env --clone /users/jholla10/anaconda/autora-cylc
         """
     [[experimentalist]]
-        script = $CYLC_WORKFLOW_SHARE_DIR/env/bin/python -m autora.controller "$CYLC_WORKFLOW_SHARE_DIR/controller.yml" "$CYLC_WORKFLOW_SHARE_DIR/history/." --step-name=experimentalist --verbose --debug
+        script = $PYTHON -m autora.controller "$CONTROLLERPATH" "$HISTORYDIR" --step-name=experimentalist --verbose --debug
         platform = oscar
     [[experiment_runner]]
-        script = /$CYLC_WORKFLOW_SHARE_DIR/env/bin/python -m autora.controller "$CYLC_WORKFLOW_SHARE_DIR/controller.yml" "$CYLC_WORKFLOW_SHARE_DIR/history/." --step-name=experiment_runner --verbose --debug
+        script = $PYTHON -m autora.controller "$CONTROLLERPATH" "$HISTORYDIR" --step-name=experiment_runner --verbose --debug
         platform = oscar
     [[theorist]]
-        script = $CYLC_WORKFLOW_SHARE_DIR/env/bin/python -m autora.controller "$CYLC_WORKFLOW_SHARE_DIR/controller.yml" "$CYLC_WORKFLOW_SHARE_DIR/history/." --step-name=theorist --verbose --debug
+        script = $PYTHON -m autora.controller "$CONTROLLERPATH" "$HISTORYDIR" --step-name=theorist --verbose --debug
         platform = oscar
 
 [scheduling]
