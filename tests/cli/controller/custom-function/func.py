@@ -9,7 +9,8 @@ def plus_1(df: pd.DataFrame):
     return df
 
 
-def ten_random_samples(rng=np.random.default_rng(180)):
+def ten_random_samples(random_state: int = 180):
+    rng = np.random.default_rng(random_state)
     values = rng.uniform(0, 10, 10)
     df = pd.DataFrame({"x": values})
     return df
