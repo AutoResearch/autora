@@ -2,14 +2,11 @@
 from __future__ import annotations
 
 import logging
-from typing import Callable, Mapping, Optional, TypeVar
+from typing import Callable, Mapping, Optional
 
-from autora.controller.protocol import ExecutorName
+from autora.controller.protocol import ExecutorName, State
 
 _logger = logging.getLogger(__name__)
-
-
-State = TypeVar("State")
 
 
 class BaseController:
