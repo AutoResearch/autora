@@ -1,11 +1,12 @@
 import pickle
 import tempfile
+from abc import abstractmethod
 from pathlib import Path
-from typing import Mapping, NamedTuple, Union
+from typing import Generic, Mapping, NamedTuple, Union
 
 import numpy as np
 
-from autora.controller.protocol import ResultKind, SupportsLoadDump
+from autora.controller.protocol import ResultKind, State, SupportsLoadDump
 from autora.controller.serializer import yaml_ as YAMLSerializer
 from autora.controller.state import History
 
@@ -21,7 +22,17 @@ class _LoadSpec(NamedTuple):
     mode: str
 
 
-class HistorySerializer:
+class StateSerializer(Generic[State]):
+    @abstractmethod
+    def load(self) -> State:
+        ...
+
+    @abstractmethod
+    def dump(self, ___state: State):
+        ...
+
+
+class HistorySerializer(StateSerializer[History]):
     """Serializes and deserializes History objects."""
 
     def __init__(

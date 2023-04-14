@@ -7,7 +7,7 @@ from typing import Callable, Dict, Optional
 
 from sklearn.base import BaseEstimator
 
-from autora.controller.base import BaseController, ExecutorName
+from autora.controller.base import BaseController
 from autora.controller.executor import make_online_executor_collection
 from autora.controller.planner import last_result_kind_planner
 from autora.controller.serializer import HistorySerializer
@@ -18,7 +18,7 @@ from autora.variable import VariableCollection
 _logger = logging.getLogger(__name__)
 
 
-class Controller(BaseController):
+class Controller(BaseController[History]):
     """
     Runs an experimentalist, experiment runner, and theorist in order.
 
@@ -41,7 +41,7 @@ class Controller(BaseController):
         experiment_runner: Optional[Callable] = None,
         params: Optional[Dict] = None,
         monitor: Optional[Callable[[History], None]] = None,
-        planner: Callable[[History], ExecutorName] = last_result_kind_planner,
+        planner: Callable[[History], str] = last_result_kind_planner,
     ):
         """
         Args:
@@ -107,7 +107,7 @@ class Controller(BaseController):
 
     def load(self, directory: pathlib.Path):
         serializer = HistorySerializer(directory)
-        state: History = serializer.load(History)
+        state = serializer.load()
         self.state = state
         return
 

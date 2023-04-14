@@ -2,14 +2,14 @@
 from __future__ import annotations
 
 import logging
-from typing import Callable, Mapping, Optional
+from typing import Callable, Generic, Mapping, Optional
 
-from autora.controller.protocol import ExecutorName, State
+from autora.controller.protocol import State
 
 _logger = logging.getLogger(__name__)
 
 
-class BaseController:
+class BaseController(Generic[State]):
     """
     Runs an experimentalist, theorist and experiment runner in a loop.
 
@@ -34,8 +34,8 @@ class BaseController:
     def __init__(
         self,
         state: State,
-        planner: Callable[[State], ExecutorName],
-        executor_collection: Mapping[ExecutorName, Callable[[State], State]],
+        planner: Callable[[State], str],
+        executor_collection: Mapping[str, Callable[[State], State]],
         monitor: Optional[Callable[[State], None]] = None,
     ):
         """

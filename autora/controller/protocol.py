@@ -128,9 +128,7 @@ class Executor(Protocol):
         ...
 
 
-ExecutorName = TypeVar("ExecutorName", bound=str)
-
-ExecutorCollection = Mapping[ExecutorName, Executor]
+ExecutorCollection = Mapping[str, Executor]
 
 
 @runtime_checkable
