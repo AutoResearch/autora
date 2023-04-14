@@ -26,10 +26,7 @@ def main(
     controller_.load(directory)
 
     if step_name is not None:
-        step_name_: str = step_name
-        _logger.info(f"setting next {step_name=}")
-        assert isinstance(step_name_, str)
-        controller_.planner = lambda _: step_name_
+        set_next_step_name(controller_, step_name)
 
     _logger.info("running next step")
     next(controller_)
@@ -40,6 +37,11 @@ def main(
     controller_.dump(directory)
 
     return
+
+
+def set_next_step_name(controller: Controller, step_name: str):
+    _logger.info(f"setting next {step_name=}")
+    controller.planner = lambda _: step_name
 
 
 def _load_manager(path: pathlib.Path) -> Controller:
