@@ -1,4 +1,5 @@
 import logging
+import os
 import pathlib
 from typing import Optional
 
@@ -40,7 +41,7 @@ def main(
 
 
 def _load_manager(path: pathlib.Path) -> Controller:
-    _logger.debug(f"_load_manager: loading from {path=}")
+    _logger.debug(f"_load_manager: loading from {path=} (currently in {os.getcwd()})")
     with open(path, "r") as f:
         controller_ = yaml.load(f, yaml.Loader)
     assert isinstance(
