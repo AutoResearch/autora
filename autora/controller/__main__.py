@@ -1,5 +1,6 @@
 import logging
 import pathlib
+from typing import Optional
 
 import typer
 import yaml
@@ -13,7 +14,7 @@ _logger = logging.getLogger(__name__)
 def main(
     manager: pathlib.Path,
     directory: pathlib.Path,
-    step_name: str,
+    step_name: Optional[str] = None,
     verbose: bool = False,
     debug: bool = False,
 ):
@@ -24,9 +25,16 @@ def main(
     _logger.debug(f"loading manager state from {directory=}")
     controller_.load(directory)
 
-    _logger.info(f"running {step_name=}")
-    controller_.planner = lambda _: step_name
+    if step_name is not None:
+        step_name_: str = step_name
+        _logger.info(f"setting next {step_name=}")
+        assert isinstance(step_name_, str)
+        controller_.planner = lambda _: step_name_
+
+    _logger.info("running next step")
     next(controller_)
+
+    _logger.debug(f"last result: {controller_.state.history[-1]}")
 
     _logger.info("writing out results")
     controller_.dump(directory)
