@@ -26,7 +26,7 @@ def main(
     controller_.load(directory)
 
     if step_name is not None:
-        set_next_step_name(controller_, step_name)
+        _set_next_step_name(controller_, step_name)
 
     _logger.info("running next step")
     next(controller_)
@@ -39,7 +39,7 @@ def main(
     return
 
 
-def set_next_step_name(controller: Controller, step_name: str):
+def _set_next_step_name(controller: Controller, step_name: str):
     _logger.info(f"setting next {step_name=}")
     controller.planner = lambda _: step_name
 
