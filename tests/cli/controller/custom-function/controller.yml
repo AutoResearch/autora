@@ -1,0 +1,41 @@
+!!python/object:autora.controller.controller.Controller
+_experiment_runner_callable: &id002 !!python/name:lib.plus_1 ''
+_experimentalist_pipeline: &id004 !!python/object:autora.experimentalist.pipeline.Pipeline
+  params: {}
+  steps:
+  - !!python/tuple
+    - ten_random_samples
+    - !!python/name:lib.ten_random_samples ''
+_theorist_estimator: &id006 !!python/object:sklearn.linear_model._base.LinearRegression
+  _sklearn_version: 1.2.2
+  copy_X: true
+  fit_intercept: true
+  n_jobs: null
+  positive: false
+executor_collection:
+  experiment_runner: !!python/object/apply:functools.partial
+    args:
+    - &id001 !!python/name:autora.controller.executor.experiment_runner_wrapper ''
+    state: !!python/tuple
+    - *id001
+    - !!python/tuple []
+    - callable: *id002
+    - null
+  experimentalist: !!python/object/apply:functools.partial
+    args:
+    - &id003 !!python/name:autora.controller.executor.experimentalist_wrapper ''
+    state: !!python/tuple
+    - *id003
+    - !!python/tuple []
+    - pipeline: *id004
+    - null
+  theorist: !!python/object/apply:functools.partial
+    args:
+    - &id005 !!python/name:autora.controller.executor.theorist_wrapper ''
+    state: !!python/tuple
+    - *id005
+    - !!python/tuple []
+    - estimator: *id006
+    - null
+monitor: null
+planner: !!python/name:autora.controller.planner.last_result_kind_planner ''

@@ -1,0 +1,4 @@
+!!python/object:autora.controller.state.history.Result
+data: {}
+kind: !!python/object/apply:autora.controller.protocol.ResultKind
+- PARAMS
