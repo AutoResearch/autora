@@ -11,7 +11,7 @@ State = TypeVar("State")
 
 class RecordKind(str, Enum):
     """
-    Kinds of results which can be held in the Result object.
+    Kinds of results which can be held in the Record object.
 
     Examples:
         >>> RecordKind.EXPERIMENT is RecordKind.EXPERIMENT

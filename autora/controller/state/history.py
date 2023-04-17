@@ -28,7 +28,7 @@ class History(SupportsControllerStateHistory):
         experiments: Optional[List[ArrayLike]] = None,
         observations: Optional[List[ArrayLike]] = None,
         models: Optional[List[BaseEstimator]] = None,
-        history: Optional[Sequence[Result]] = None,
+        history: Optional[Sequence[Record]] = None,
     ):
         """
 
@@ -38,7 +38,7 @@ class History(SupportsControllerStateHistory):
             experiments: an iterable of data, each to be marked as "experiments"
             observations: an iterable of data, each to be marked as "observations"
             models: an iterable of data, each to be marked as "models"
-            history: an iterable of Result objects to be used as the initial history.
+            history: an iterable of Record objects to be used as the initial history.
 
         Examples:
             Empty input leads to an empty state:
@@ -48,37 +48,37 @@ class History(SupportsControllerStateHistory):
             ... or with values for any or all of the parameters:
             >>> from autora.variable import VariableCollection
             >>> History(variables=VariableCollection()) # doctest: +ELLIPSIS
-            History([Result(data=VariableCollection(...), kind=RecordKind.VARIABLES)])
+            History([Record(data=VariableCollection(...), kind=RecordKind.VARIABLES)])
 
             >>> History(parameters={"some": "parameters"})
-            History([Result(data={'some': 'parameters'}, kind=RecordKind.PARAMETERS)])
+            History([Record(data={'some': 'parameters'}, kind=RecordKind.PARAMETERS)])
 
             >>> History(experiments=["a experiment"])
-            History([Result(data='a experiment', kind=RecordKind.EXPERIMENT)])
+            History([Record(data='a experiment', kind=RecordKind.EXPERIMENT)])
 
             >>> History(observations=["an observation"])
-            History([Result(data='an observation', kind=RecordKind.OBSERVATION)])
+            History([Record(data='an observation', kind=RecordKind.OBSERVATION)])
 
             >>> from sklearn.linear_model import LinearRegression
             >>> History(models=[LinearRegression()])
-            History([Result(data=LinearRegression(), kind=RecordKind.MODEL)])
+            History([Record(data=LinearRegression(), kind=RecordKind.MODEL)])
 
             Parameters passed to the constructor are included in the history in the following order:
             `history`, `variables`, `parameters`, `experiments`, `observations`, `models`
             >>> History(models=['m1', 'm2'], experiments=['e1', 'e2'],
             ...     observations=['o1', 'o2'], parameters={'a': 'param'},
             ...     variables=VariableCollection(),
-            ...     history=[Result("from history", RecordKind.VARIABLES)]
+            ...     history=[Record("from history", RecordKind.VARIABLES)]
             ... )  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
-            History([Result(data='from history', kind=RecordKind.VARIABLES),
-                     Result(data=VariableCollection(...), kind=RecordKind.VARIABLES),
-                     Result(data={'a': 'param'}, kind=RecordKind.PARAMETERS),
-                     Result(data='e1', kind=RecordKind.EXPERIMENT),
-                     Result(data='e2', kind=RecordKind.EXPERIMENT),
-                     Result(data='o1', kind=RecordKind.OBSERVATION),
-                     Result(data='o2', kind=RecordKind.OBSERVATION),
-                     Result(data='m1', kind=RecordKind.MODEL),
-                     Result(data='m2', kind=RecordKind.MODEL)])
+            History([Record(data='from history', kind=RecordKind.VARIABLES),
+                     Record(data=VariableCollection(...), kind=RecordKind.VARIABLES),
+                     Record(data={'a': 'param'}, kind=RecordKind.PARAMETERS),
+                     Record(data='e1', kind=RecordKind.EXPERIMENT),
+                     Record(data='e2', kind=RecordKind.EXPERIMENT),
+                     Record(data='o1', kind=RecordKind.OBSERVATION),
+                     Record(data='o2', kind=RecordKind.OBSERVATION),
+                     Record(data='m1', kind=RecordKind.MODEL),
+                     Record(data='m2', kind=RecordKind.MODEL)])
         """
         self._history: List
 
@@ -87,7 +87,7 @@ class History(SupportsControllerStateHistory):
         else:
             self._history = []
 
-        self._history += _init_result_list(
+        self._history += _init_record_list(
             variables=variables,
             parameters=parameters,
             experiments=experiments,
@@ -117,7 +117,7 @@ class History(SupportsControllerStateHistory):
             >>> from autora.variable import VariableCollection
             >>> h1 = h0.update(variables=VariableCollection())
             >>> h1  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
-            History([Result(data=VariableCollection(...), kind=RecordKind.VARIABLES)])
+            History([Record(data=VariableCollection(...), kind=RecordKind.VARIABLES)])
 
             ... the original object is unchanged:
             >>> h0
@@ -133,7 +133,7 @@ class History(SupportsControllerStateHistory):
             Params is treated the same way as variables:
             >>> hp = h0.update(parameters={'first': 'parameters'})
             >>> hp
-            History([Result(data={'first': 'parameters'}, kind=RecordKind.PARAMETERS)])
+            History([Record(data={'first': 'parameters'}, kind=RecordKind.PARAMETERS)])
 
             ... where only the most recent "parameters" object is returned from the
             `.parameters` property.
@@ -143,20 +143,20 @@ class History(SupportsControllerStateHistory):
 
             ... however, the full history of the parameters objects remains available, if needed:
             >>> hp  # doctest: +NORMALIZE_WHITESPACE
-            History([Result(data={'first': 'parameters'}, kind=RecordKind.PARAMETERS),
-                     Result(data={'second': 'parameters'}, kind=RecordKind.PARAMETERS)])
+            History([Record(data={'first': 'parameters'}, kind=RecordKind.PARAMETERS),
+                     Record(data={'second': 'parameters'}, kind=RecordKind.PARAMETERS)])
 
             When we update the experiments, observations or models, a new entry is added to the
             history:
             >>> h3 = h0.update(models=["1st model"])
             >>> h3  # doctest: +NORMALIZE_WHITESPACE
-            History([Result(data='1st model', kind=RecordKind.MODEL)])
+            History([Record(data='1st model', kind=RecordKind.MODEL)])
 
             ... so we can see the history of all the models, for instance.
             >>> h3 = h3.update(models=["2nd model"])  # doctest: +NORMALIZE_WHITESPACE
             >>> h3  # doctest: +NORMALIZE_WHITESPACE
-            History([Result(data='1st model', kind=RecordKind.MODEL),
-                                    Result(data='2nd model', kind=RecordKind.MODEL)])
+            History([Record(data='1st model', kind=RecordKind.MODEL),
+                                    Record(data='2nd model', kind=RecordKind.MODEL)])
 
             ... and the full history of models is available using the `.models` parameter:
             >>> h3.models
@@ -165,50 +165,50 @@ class History(SupportsControllerStateHistory):
             The same for the observations:
             >>> h4 = h0.update(observations=["1st observation"])
             >>> h4
-            History([Result(data='1st observation', kind=RecordKind.OBSERVATION)])
+            History([Record(data='1st observation', kind=RecordKind.OBSERVATION)])
 
             >>> h4.update(observations=["2nd observation"]
             ... )  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
-            History([Result(data='1st observation', kind=RecordKind.OBSERVATION),
-                                    Result(data='2nd observation', kind=RecordKind.OBSERVATION)])
+            History([Record(data='1st observation', kind=RecordKind.OBSERVATION),
+                                    Record(data='2nd observation', kind=RecordKind.OBSERVATION)])
 
 
             The same for the experiments:
             >>> h5 = h0.update(experiments=["1st experiment"])
             >>> h5
-            History([Result(data='1st experiment', kind=RecordKind.EXPERIMENT)])
+            History([Record(data='1st experiment', kind=RecordKind.EXPERIMENT)])
 
             >>> h5.update(experiments=["2nd experiment"])  # doctest: +NORMALIZE_WHITESPACE
-            History([Result(data='1st experiment', kind=RecordKind.EXPERIMENT),
-                                    Result(data='2nd experiment', kind=RecordKind.EXPERIMENT)])
+            History([Record(data='1st experiment', kind=RecordKind.EXPERIMENT),
+                                    Record(data='2nd experiment', kind=RecordKind.EXPERIMENT)])
 
             You can also update with multiple experiments, observations and models:
             >>> h0.update(experiments=['e1', 'e2'])  # doctest: +NORMALIZE_WHITESPACE
-            History([Result(data='e1', kind=RecordKind.EXPERIMENT),
-                                    Result(data='e2', kind=RecordKind.EXPERIMENT)])
+            History([Record(data='e1', kind=RecordKind.EXPERIMENT),
+                                    Record(data='e2', kind=RecordKind.EXPERIMENT)])
 
             >>> h0.update(models=['m1', 'm2'], variables={'m': 1}
             ... ) # doctest: +NORMALIZE_WHITESPACE
-            History([Result(data={'m': 1}, kind=RecordKind.VARIABLES),
-                                    Result(data='m1', kind=RecordKind.MODEL),
-                                    Result(data='m2', kind=RecordKind.MODEL)])
+            History([Record(data={'m': 1}, kind=RecordKind.VARIABLES),
+                                    Record(data='m1', kind=RecordKind.MODEL),
+                                    Record(data='m2', kind=RecordKind.MODEL)])
 
             >>> h0.update(models=['m1'], observations=['o1'], variables={'m': 1}
             ... )  # doctest: +NORMALIZE_WHITESPACE
-            History([Result(data={'m': 1}, kind=RecordKind.VARIABLES),
-                     Result(data='o1', kind=RecordKind.OBSERVATION),
-                     Result(data='m1', kind=RecordKind.MODEL)])
+            History([Record(data={'m': 1}, kind=RecordKind.VARIABLES),
+                     Record(data='o1', kind=RecordKind.OBSERVATION),
+                     Record(data='m1', kind=RecordKind.MODEL)])
 
             We can also update with a complete history:
-            >>> History().update(history=[Result(data={'m': 2}, kind=RecordKind.VARIABLES),
-            ...                           Result(data='o1', kind=RecordKind.OBSERVATION),
-            ...                           Result(data='m1', kind=RecordKind.MODEL)],
+            >>> History().update(history=[Record(data={'m': 2}, kind=RecordKind.VARIABLES),
+            ...                           Record(data='o1', kind=RecordKind.OBSERVATION),
+            ...                           Record(data='m1', kind=RecordKind.MODEL)],
             ...                  experiments=['e1']
             ... )  # doctest: +NORMALIZE_WHITESPACE
-            History([Result(data={'m': 2}, kind=RecordKind.VARIABLES),
-                     Result(data='o1', kind=RecordKind.OBSERVATION),
-                     Result(data='m1', kind=RecordKind.MODEL),
-                     Result(data='e1', kind=RecordKind.EXPERIMENT)])
+            History([Record(data={'m': 2}, kind=RecordKind.VARIABLES),
+                     Record(data='o1', kind=RecordKind.OBSERVATION),
+                     Record(data='m1', kind=RecordKind.MODEL),
+                     Record(data='e1', kind=RecordKind.EXPERIMENT)])
 
         """
 
@@ -217,7 +217,7 @@ class History(SupportsControllerStateHistory):
         else:
             history_extension = []
 
-        history_extension += _init_result_list(
+        history_extension += _init_record_list(
             variables=variables,
             parameters=parameters,
             experiments=experiments,
@@ -282,8 +282,8 @@ class History(SupportsControllerStateHistory):
 
             ... however, the full history of the parameters objects remains available, if needed:
             >>> h  # doctest: +NORMALIZE_WHITESPACE
-            History([Result(data={'first': 'parameters'}, kind=RecordKind.PARAMETERS),
-                     Result(data={'second': 'parameters'}, kind=RecordKind.PARAMETERS)])
+            History([Record(data={'first': 'parameters'}, kind=RecordKind.PARAMETERS),
+                     Record(data={'second': 'parameters'}, kind=RecordKind.PARAMETERS)])
         """
         return self._by_kind.parameters
 
@@ -346,7 +346,7 @@ class History(SupportsControllerStateHistory):
         return self._by_kind.models
 
     @property
-    def history(self) -> List[Result]:
+    def history(self) -> List[Record]:
         """
 
         Examples:
@@ -354,27 +354,27 @@ class History(SupportsControllerStateHistory):
             >>> h = History(models=['m1', 'm2'], experiments=['e1', 'e2'],
             ...     observations=['o1', 'o2'], parameters={'a': 'param'},
             ...     variables=VariableCollection(),
-            ...     history=[Result("from history", RecordKind.VARIABLES)])
+            ...     history=[Record("from history", RecordKind.VARIABLES)])
 
             Parameters passed to the constructor are included in the history in the following order:
             `history`, `variables`, `parameters`, `experiments`, `observations`, `models`
 
             >>> h.history  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
-            [Result(data='from history', kind=RecordKind.VARIABLES),
-             Result(data=VariableCollection(...), kind=RecordKind.VARIABLES),
-             Result(data={'a': 'param'}, kind=RecordKind.PARAMETERS),
-             Result(data='e1', kind=RecordKind.EXPERIMENT),
-             Result(data='e2', kind=RecordKind.EXPERIMENT),
-             Result(data='o1', kind=RecordKind.OBSERVATION),
-             Result(data='o2', kind=RecordKind.OBSERVATION),
-             Result(data='m1', kind=RecordKind.MODEL),
-             Result(data='m2', kind=RecordKind.MODEL)]
+            [Record(data='from history', kind=RecordKind.VARIABLES),
+             Record(data=VariableCollection(...), kind=RecordKind.VARIABLES),
+             Record(data={'a': 'param'}, kind=RecordKind.PARAMETERS),
+             Record(data='e1', kind=RecordKind.EXPERIMENT),
+             Record(data='e2', kind=RecordKind.EXPERIMENT),
+             Record(data='o1', kind=RecordKind.OBSERVATION),
+             Record(data='o2', kind=RecordKind.OBSERVATION),
+             Record(data='m1', kind=RecordKind.MODEL),
+             Record(data='m2', kind=RecordKind.MODEL)]
 
             If we add a new value, like the parameters object, the updated value is added to the
             end of the history:
             >>> h = h.update(parameters={'new': 'param'})
             >>> h.history  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
-            [..., Result(data={'new': 'param'}, kind=RecordKind.PARAMETERS)]
+            [..., Record(data={'new': 'param'}, kind=RecordKind.PARAMETERS)]
 
         """
         return self._history
@@ -387,27 +387,27 @@ class History(SupportsControllerStateHistory):
             >>> h = History(models=['m1', 'm2'], experiments=['e1', 'e2'],
             ...     observations=['o1', 'o2'], parameters={'a': 'param'},
             ...     variables=VariableCollection(),
-            ...     history=[Result("from history", RecordKind.VARIABLES)])
+            ...     history=[Record("from history", RecordKind.VARIABLES)])
 
             >>> h.filter_by(kind={"MODEL"})   # doctest: +NORMALIZE_WHITESPACE
-            History([Result(data='m1', kind=RecordKind.MODEL),
-                                    Result(data='m2', kind=RecordKind.MODEL)])
+            History([Record(data='m1', kind=RecordKind.MODEL),
+                                    Record(data='m2', kind=RecordKind.MODEL)])
 
             >>> h.filter_by(kind={RecordKind.OBSERVATION})  # doctest: +NORMALIZE_WHITESPACE
-            History([Result(data='o1', kind=RecordKind.OBSERVATION),
-                                    Result(data='o2', kind=RecordKind.OBSERVATION)])
+            History([Record(data='o1', kind=RecordKind.OBSERVATION),
+                                    Record(data='o2', kind=RecordKind.OBSERVATION)])
 
             If we don't specify any filter criteria, we get the full history back:
             >>> h.filter_by()   # doctest: +NORMALIZE_WHITESPACE +ELLIPSIS
-            History([Result(data='from history', kind=RecordKind.VARIABLES),
-                     Result(data=VariableCollection(...), kind=RecordKind.VARIABLES),
-                     Result(data={'a': 'param'}, kind=RecordKind.PARAMETERS),
-                     Result(data='e1', kind=RecordKind.EXPERIMENT),
-                     Result(data='e2', kind=RecordKind.EXPERIMENT),
-                     Result(data='o1', kind=RecordKind.OBSERVATION),
-                     Result(data='o2', kind=RecordKind.OBSERVATION),
-                     Result(data='m1', kind=RecordKind.MODEL),
-                     Result(data='m2', kind=RecordKind.MODEL)])
+            History([Record(data='from history', kind=RecordKind.VARIABLES),
+                     Record(data=VariableCollection(...), kind=RecordKind.VARIABLES),
+                     Record(data={'a': 'param'}, kind=RecordKind.PARAMETERS),
+                     Record(data='e1', kind=RecordKind.EXPERIMENT),
+                     Record(data='e2', kind=RecordKind.EXPERIMENT),
+                     Record(data='o1', kind=RecordKind.OBSERVATION),
+                     Record(data='o2', kind=RecordKind.OBSERVATION),
+                     Record(data='m1', kind=RecordKind.MODEL),
+                     Record(data='m2', kind=RecordKind.MODEL)])
 
         """
         if kind is None:
@@ -420,25 +420,25 @@ class History(SupportsControllerStateHistory):
 
 
 @dataclass(frozen=True)
-class Result(SupportsDataKind):
+class Record(SupportsDataKind):
     """
     Container class for data and variables.
 
     Examples:
-        >>> Result()
-        Result(data=None, kind=None)
+        >>> Record()
+        Record(data=None, kind=None)
 
-        >>> Result("a")
-        Result(data='a', kind=None)
+        >>> Record("a")
+        Record(data='a', kind=None)
 
-        >>> Result(None, "MODEL")
-        Result(data=None, kind=RecordKind.MODEL)
+        >>> Record(None, "MODEL")
+        Record(data=None, kind=RecordKind.MODEL)
 
-        >>> Result(data="b")
-        Result(data='b', kind=None)
+        >>> Record(data="b")
+        Record(data='b', kind=None)
 
-        >>> Result("c", "OBSERVATION")
-        Result(data='c', kind=RecordKind.OBSERVATION)
+        >>> Record("c", "OBSERVATION")
+        Record(data='c', kind=RecordKind.OBSERVATION)
     """
 
     data: Optional[Any] = None
@@ -449,15 +449,15 @@ class Result(SupportsDataKind):
             object.__setattr__(self, "kind", RecordKind(self.kind))
 
 
-def _init_result_list(
+def _init_record_list(
     variables: Optional[VariableCollection] = None,
     parameters: Optional[Dict] = None,
     experiments: Optional[Iterable[ArrayLike]] = None,
     observations: Optional[Iterable[ArrayLike]] = None,
     models: Optional[Iterable[BaseEstimator]] = None,
-) -> List[Result]:
+) -> List[Record]:
     """
-    Initialize a list of Result objects
+    Initialize a list of Record objects
 
     Returns:
 
@@ -470,50 +470,50 @@ def _init_result_list(
 
     Examples:
         Empty input leads to an empty state:
-        >>> _init_result_list()
+        >>> _init_record_list()
         []
 
         ... or with values for any or all of the parameters:
         >>> from autora.variable import VariableCollection
-        >>> _init_result_list(variables=VariableCollection()) # doctest: +ELLIPSIS
-        [Result(data=VariableCollection(...), kind=RecordKind.VARIABLES)]
+        >>> _init_record_list(variables=VariableCollection()) # doctest: +ELLIPSIS
+        [Record(data=VariableCollection(...), kind=RecordKind.VARIABLES)]
 
-        >>> _init_result_list(parameters={"some": "parameters"})
-        [Result(data={'some': 'parameters'}, kind=RecordKind.PARAMETERS)]
+        >>> _init_record_list(parameters={"some": "parameters"})
+        [Record(data={'some': 'parameters'}, kind=RecordKind.PARAMETERS)]
 
-        >>> _init_result_list(experiments=["a experiment"])
-        [Result(data='a experiment', kind=RecordKind.EXPERIMENT)]
+        >>> _init_record_list(experiments=["a experiment"])
+        [Record(data='a experiment', kind=RecordKind.EXPERIMENT)]
 
-        >>> _init_result_list(observations=["an observation"])
-        [Result(data='an observation', kind=RecordKind.OBSERVATION)]
+        >>> _init_record_list(observations=["an observation"])
+        [Record(data='an observation', kind=RecordKind.OBSERVATION)]
 
         >>> from sklearn.linear_model import LinearRegression
-        >>> _init_result_list(models=[LinearRegression()])
-        [Result(data=LinearRegression(), kind=RecordKind.MODEL)]
+        >>> _init_record_list(models=[LinearRegression()])
+        [Record(data=LinearRegression(), kind=RecordKind.MODEL)]
 
         The input arguments are added to the data in the order `variables`,
         `parameters`, `experiments`, `observations`, `models`:
-        >>> _init_result_list(variables=VariableCollection(),
+        >>> _init_record_list(variables=VariableCollection(),
         ...                  parameters={"some": "parameters"},
         ...                  experiments=["a experiment"],
         ...                  observations=["an observation", "another observation"],
         ...                  models=[LinearRegression()],
         ... ) # doctest: +NORMALIZE_WHITESPACE +ELLIPSIS
-        [Result(data=VariableCollection(...), kind=RecordKind.VARIABLES),
-         Result(data={'some': 'parameters'}, kind=RecordKind.PARAMETERS),
-         Result(data='a experiment', kind=RecordKind.EXPERIMENT),
-         Result(data='an observation', kind=RecordKind.OBSERVATION),
-         Result(data='another observation', kind=RecordKind.OBSERVATION),
-         Result(data=LinearRegression(), kind=RecordKind.MODEL)]
+        [Record(data=VariableCollection(...), kind=RecordKind.VARIABLES),
+         Record(data={'some': 'parameters'}, kind=RecordKind.PARAMETERS),
+         Record(data='a experiment', kind=RecordKind.EXPERIMENT),
+         Record(data='an observation', kind=RecordKind.OBSERVATION),
+         Record(data='another observation', kind=RecordKind.OBSERVATION),
+         Record(data=LinearRegression(), kind=RecordKind.MODEL)]
 
     """
     data = []
 
     if variables is not None:
-        data.append(Result(variables, RecordKind.VARIABLES))
+        data.append(Record(variables, RecordKind.VARIABLES))
 
     if parameters is not None:
-        data.append(Result(parameters, RecordKind.PARAMETERS))
+        data.append(Record(parameters, RecordKind.PARAMETERS))
 
     for seq, kind in [
         (experiments, RecordKind.EXPERIMENT),
@@ -522,12 +522,12 @@ def _init_result_list(
     ]:
         if seq is not None:
             for i in seq:
-                data.append(Result(i, kind=kind))
+                data.append(Record(i, kind=kind))
 
     return data
 
 
-def _history_to_kind(history: Sequence[Result]) -> Snapshot:
+def _history_to_kind(history: Sequence[Record]) -> Snapshot:
     """
     Convert a sequence of results into a Snapshot instance:
 
@@ -539,34 +539,34 @@ def _history_to_kind(history: Sequence[Result]) -> Snapshot:
                         experiments=[], observations=[], models=[])
 
         ... or with values for any or all of the parameters:
-        >>> history_ = _init_result_list(parameters={"some": "parameters"})
+        >>> history_ = _init_record_list(parameters={"some": "parameters"})
         >>> _history_to_kind(history_) # doctest: +NORMALIZE_WHITESPACE +ELLIPSIS
         Snapshot(..., parameters={'some': 'parameters'}, ...)
 
-        >>> history_ += _init_result_list(experiments=["a experiment"])
+        >>> history_ += _init_record_list(experiments=["a experiment"])
         >>> _history_to_kind(history_) # doctest: +NORMALIZE_WHITESPACE +ELLIPSIS
         Snapshot(..., parameters={'some': 'parameters'}, experiments=['a experiment'], ...)
 
         >>> _history_to_kind(history_).parameters
         {'some': 'parameters'}
 
-        >>> history_ += _init_result_list(observations=["an observation"])
+        >>> history_ += _init_record_list(observations=["an observation"])
         >>> _history_to_kind(history_) # doctest: +NORMALIZE_WHITESPACE +ELLIPSIS
         Snapshot(..., parameters={'some': 'parameters'}, experiments=['a experiment'],
                         observations=['an observation'], ...)
 
         >>> from sklearn.linear_model import LinearRegression
-        >>> history_ = [Result(LinearRegression(), kind=RecordKind.MODEL)]
+        >>> history_ = [Record(LinearRegression(), kind=RecordKind.MODEL)]
         >>> _history_to_kind(history_) # doctest: +ELLIPSIS
         Snapshot(..., models=[LinearRegression()])
 
         >>> from autora.variable import VariableCollection, IV
         >>> variables = VariableCollection(independent_variables=[IV(name="example")])
-        >>> history_ = [Result(variables, kind=RecordKind.VARIABLES)]
+        >>> history_ = [Record(variables, kind=RecordKind.VARIABLES)]
         >>> _history_to_kind(history_) # doctest: +ELLIPSIS
         Snapshot(variables=VariableCollection(independent_variables=[IV(name='example', ...
 
-        >>> history_ = [Result({'some': 'parameters'}, kind=RecordKind.PARAMETERS)]
+        >>> history_ = [Record({'some': 'parameters'}, kind=RecordKind.PARAMETERS)]
         >>> _history_to_kind(history_) # doctest: +ELLIPSIS
         Snapshot(..., parameters={'some': 'parameters'}, ...)
 
@@ -595,7 +595,7 @@ def _list_data(data: Sequence[SupportsDataKind]):
         >>> _list_data([])
         []
 
-        >>> _list_data([Result("a"), Result("b")])
+        >>> _list_data([Record("a"), Record("b")])
         ['a', 'b']
     """
     return list(r.data for r in data)
