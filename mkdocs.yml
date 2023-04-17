@@ -59,42 +59,50 @@ extra_javascript:
 
 nav:
 - Introduction: 'index.md'
-- Experimentalists:
-  - Overview: 'experimentalists/overview.md'
-  - Pipeline: 'pipeline/Experimentalist Pipeline Examples.ipynb'
-- Synthetic Experiments:
-  - Inventory: 'synthetic/inventory.ipynb'
-- Theorists:
-  - Overview: 'theorist/overview.md'
-  - DARTS:
-    - Introduction: 'theorist/darts/introduction.md'
-    - How it works: 'theorist/darts/how_it_works.md'
-    - Meta parameters: 'theorist/darts/meta_parameters.md'
-    - Search space: 'theorist/darts/search_space.md'
+- Tutorials:
+  - Automated Theorist
+  - Automated Experimentalist
+  - Closed-Loop Discovery
+- User Guide:
+  - Theorists:
+    - Overview: 'theorist/overview.md'
+    - DARTS:
+      - Introduction: 'theorist/darts/introduction.md'
+      - How it works: 'theorist/darts/how_it_works.md'
+      - Meta parameters: 'theorist/darts/meta_parameters.md'
+      - Search space: 'theorist/darts/search_space.md'
+      - Examples:
+        - Basic Usage: 'theorist/darts/example.ipynb'
+        - Weber-Fechner Law: 'theorist/darts/weber.ipynb'
+    - BMS:
+      - Introduction: 'theorist/bms/introduction.md'
+      - How it works: 'theorist/bms/how_it_works.md'
+      - Meta parameters: 'theorist/bms/meta_parameters.md'
+      - Search space: 'theorist/bms/search_space.ipynb'
+      - Examples:
+        - Basic Usage: 'theorist/bms/example.ipynb'
+        - Weber-Fechner Law: 'theorist/bms/weber.ipynb'
+    - BSR:
+      - Introduction: 'theorist/bsr/introduction.md'
+      - How it works: 'theorist/bsr/how_it_works.md'
+      - Meta parameters: 'theorist/bsr/meta_parameters.md'
+      - Search space: 'theorist/bsr/search_space.md'
+      - Example: 'theorist/bsr/bsr.ipynb'
+  - Experimentalists:
+    - Overview: 'experimentalists/overview.md'
+    - Pipeline: 'pipeline/Experimentalist Pipeline Examples.ipynb'
+  - Synthetic Experiments:
+    - Inventory: 'synthetic/inventory.ipynb'
+  - Cycle:
+    - Scoring:
+      - Logistic Regression: 'cycle/cycle_scoring.ipynb'
+      - BMS: 'cycle/cycle_scoring_bms.ipynb'
+    - Plotting: 'cycle/cycle_results_plots.ipynb'
     - Examples:
-      - Basic Usage: 'theorist/darts/example.ipynb'
-      - Weber-Fechner Law: 'theorist/darts/weber.ipynb'
-  - BMS:
-    - Introduction: 'theorist/bms/introduction.md'
-    - How it works: 'theorist/bms/how_it_works.md'
-    - Meta parameters: 'theorist/bms/meta_parameters.md'
-    - Search space: 'theorist/bms/search_space.ipynb'
-    - Examples:
-      - Basic Usage: 'theorist/bms/example.ipynb'
-      - Weber-Fechner Law: 'theorist/bms/weber.ipynb'
-  - BSR: 
-    - Introduction: 'theorist/bsr/introduction.md'
-    - How it works: 'theorist/bsr/how_it_works.md'
-    - Meta parameters: 'theorist/bsr/meta_parameters.md'
-    - Search space: 'theorist/bsr/search_space.md'
-    - Example: 'theorist/bsr/bsr.ipynb'
-- Cycle:
-  - Scoring:
-    - Logistic Regression: 'cycle/cycle_scoring.ipynb'
-    - BMS: 'cycle/cycle_scoring_bms.ipynb'
-  - Plotting: 'cycle/cycle_results_plots.ipynb'
-  - Examples:
-    - DARTS & BMS: 'cycle/simple_cycle_bms_darts.ipynb'
-    - BMS & Poppernet: 'cycle/simple_cycle_bms_model_poppernet.ipynb'
-    - Uncertainty Experimentalist: 'cycle/simple_cycle_uncertainty_experimentalist.ipynb'
+      - DARTS & BMS: 'cycle/simple_cycle_bms_darts.ipynb'
+      - BMS & Poppernet: 'cycle/simple_cycle_bms_model_poppernet.ipynb'
+      - Uncertainty Experimentalist: 'cycle/simple_cycle_uncertainty_experimentalist.ipynb'
+- Contributor Guide:
+    - Module Contributions
+    - Core Contributions
 - Code Reference: reference/autora/
