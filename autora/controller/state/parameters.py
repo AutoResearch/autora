@@ -21,7 +21,7 @@ def _get_state_dependent_properties(state: SupportsControllerState):
         >>> state_dependent_properties = _get_state_dependent_properties(Snapshot())
 
         ... but it will raise an exception if a value isn't yet available when we try to use it
-        >>> state_dependent_properties["%theories[-1]%"] # doctest: +ELLIPSIS
+        >>> state_dependent_properties["%models[-1]%"] # doctest: +ELLIPSIS
         Traceback (most recent call last):
         ...
         IndexError: list index out of range
@@ -29,12 +29,12 @@ def _get_state_dependent_properties(state: SupportsControllerState):
         Nevertheless, we can iterate through its keys no problem:
         >>> [key for key in state_dependent_properties.keys()] # doctest: +NORMALIZE_WHITESPACE
         ['%observations.ivs[-1]%', '%observations.dvs[-1]%', '%observations.ivs%',
-        '%observations.dvs%', '%theories[-1]%', '%theories%']
+        '%observations.dvs%', '%models[-1]%', '%models%']
 
     """
 
-    n_ivs = len(state.metadata.independent_variables)
-    n_dvs = len(state.metadata.dependent_variables)
+    n_ivs = len(state.variables.independent_variables)
+    n_dvs = len(state.variables.dependent_variables)
     state_dependent_property_dict = LazyDict(
         {
             "%observations.ivs[-1]%": lambda: np.array(state.observations[-1])[
@@ -47,23 +47,23 @@ def _get_state_dependent_properties(state: SupportsControllerState):
                 [np.empty([0, n_ivs + n_dvs])] + list(state.observations)
             )[:, 0:n_ivs],
             "%observations.dvs%": lambda: np.row_stack(state.observations)[:, n_ivs:],
-            "%theories[-1]%": lambda: state.theories[-1],
-            "%theories%": lambda: state.theories,
+            "%models[-1]%": lambda: state.models[-1],
+            "%models%": lambda: state.models,
         }
     )
     return state_dependent_property_dict
 
 
-def _resolve_properties(params: Dict, state_dependent_properties: Mapping):
+def _resolve_properties(parameters: Dict, state_dependent_properties: Mapping):
     """
     Resolve state-dependent properties inside a nested dictionary.
 
     In this context, a state-dependent-property is a string which is meant to be replaced by its
     updated, current value before the dictionary is used. A state-dependent property might be
-    something like "the last theorist available" or "all the experimental results until now".
+    something like "the last model available" or "all the experimental results until now".
 
     Args:
-        params: a (nested) dictionary of keys and values, where some values might be
+        parameters: a (nested) dictionary of keys and values, where some values might be
             "cycle property names"
         state_dependent_properties: a dictionary of "property names" and their "real values"
 
@@ -71,47 +71,47 @@ def _resolve_properties(params: Dict, state_dependent_properties: Mapping):
 
     Examples:
 
-        >>> params_0 = {"key": "%foo%"}
+        >>> parameters_0 = {"key": "%foo%"}
         >>> cycle_properties_0 = {"%foo%": 180}
-        >>> _resolve_properties(params_0,cycle_properties_0)
+        >>> _resolve_properties(parameters_0,cycle_properties_0)
         {'key': 180}
 
-        >>> params_1 = {"key": "%bar%", "nested_dict": {"inner_key": "%foobar%"}}
+        >>> parameters_1 = {"key": "%bar%", "nested_dict": {"inner_key": "%foobar%"}}
         >>> cycle_properties_1 = {"%bar%": 1, "%foobar%": 2}
-        >>> _resolve_properties(params_1,cycle_properties_1)
+        >>> _resolve_properties(parameters_1,cycle_properties_1)
         {'key': 1, 'nested_dict': {'inner_key': 2}}
 
-        >>> params_2 = {"key": "baz"}
-        >>> _resolve_properties(params_2,cycle_properties_1)
+        >>> parameters_2 = {"key": "baz"}
+        >>> _resolve_properties(parameters_2,cycle_properties_1)
         {'key': 'baz'}
 
     """
-    params_ = copy.copy(params)
-    for key, value in params_.items():
+    parameters_ = copy.copy(parameters)
+    for key, value in parameters_.items():
         if isinstance(value, dict):
-            params_[key] = _resolve_properties(value, state_dependent_properties)
+            parameters_[key] = _resolve_properties(value, state_dependent_properties)
         elif isinstance(value, str) and (
             value in state_dependent_properties
         ):  # value is a key in the cycle_properties dictionary
-            params_[key] = state_dependent_properties[value]
+            parameters_[key] = state_dependent_properties[value]
         else:
-            _logger.debug(f"leaving {params=} unchanged")
+            _logger.debug(f"leaving {parameters=} unchanged")
 
-    return params_
+    return parameters_
 
 
-def resolve_state_params(params: Dict, state: SupportsControllerState) -> Dict:
+def resolve_state_parameters(parameters: Dict, state: SupportsControllerState) -> Dict:
     """
-    Returns the `params` attribute of the input, with `cycle properties` resolved.
+    Returns the `parameters` attribute of the input, with `cycle properties` resolved.
 
     Examples:
         >>> from autora.controller.state import History
-        >>> params = {"experimentalist": {"source": "%theories[-1]%"}}
-        >>> s = History(theories=["the first theory", "the second theory"])
-        >>> resolve_state_params(params, s)
-        {'experimentalist': {'source': 'the second theory'}}
+        >>> parameters = {"experimentalist": {"source": "%models[-1]%"}}
+        >>> s = History(models=["the first model", "the second model"])
+        >>> resolve_state_parameters(parameters, s)
+        {'experimentalist': {'source': 'the second model'}}
 
     """
     state_dependent_properties = _get_state_dependent_properties(state)
-    resolved_params = _resolve_properties(params, state_dependent_properties)
-    return resolved_params
+    resolved_parameters = _resolve_properties(parameters, state_dependent_properties)
+    return resolved_parameters

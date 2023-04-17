@@ -9,35 +9,35 @@ from autora.variable import VariableCollection
 State = TypeVar("State")
 
 
-class ResultKind(str, Enum):
+class RecordKind(str, Enum):
     """
-    Kinds of results which can be held in the Result object.
+    Kinds of results which can be held in the Record object.
 
     Examples:
-        >>> ResultKind.CONDITION is ResultKind.CONDITION
+        >>> RecordKind.EXPERIMENT is RecordKind.EXPERIMENT
         True
 
-        >>> ResultKind.CONDITION is ResultKind.METADATA
+        >>> RecordKind.EXPERIMENT is RecordKind.VARIABLES
         False
 
-        >>> ResultKind.CONDITION == "CONDITION"
+        >>> RecordKind.EXPERIMENT == "EXPERIMENT"
         True
 
-        >>> ResultKind.CONDITION == "METADATA"
+        >>> RecordKind.EXPERIMENT == "VARIABLES"
         False
 
-        >>> ResultKind.CONDITION in {ResultKind.CONDITION, ResultKind.PARAMS}
+        >>> RecordKind.EXPERIMENT in {RecordKind.EXPERIMENT, RecordKind.PARAMETERS}
         True
 
-        >>> ResultKind.METADATA in {ResultKind.CONDITION, ResultKind.PARAMS}
+        >>> RecordKind.VARIABLES in {RecordKind.EXPERIMENT, RecordKind.PARAMETERS}
         False
     """
 
-    CONDITION = "CONDITION"
+    VARIABLES = "VARIABLES"
+    PARAMETERS = "PARAMETERS"
+    EXPERIMENT = "EXPERIMENT"
     OBSERVATION = "OBSERVATION"
-    THEORY = "THEORY"
-    PARAMS = "PARAMS"
-    METADATA = "METADATA"
+    MODEL = "MODEL"
 
     def __repr__(self):
         cls_name = self.__class__.__name__
@@ -48,17 +48,17 @@ class SupportsDataKind(Protocol):
     """Object with attributes for `data` and `kind`"""
 
     data: Optional[Any]
-    kind: Optional[ResultKind]
+    kind: Optional[RecordKind]
 
 
 class SupportsControllerStateFields(Protocol):
     """Support representing snapshots of a controller state as mutable fields."""
 
-    metadata: VariableCollection
-    params: Dict
-    conditions: Sequence[ArrayLike]
+    variables: VariableCollection
+    parameters: Dict
+    experiments: Sequence[ArrayLike]
     observations: Sequence[ArrayLike]
-    theories: Sequence[BaseEstimator]
+    models: Sequence[BaseEstimator]
 
     def update(self: State, **kwargs) -> State:
         ...
@@ -71,15 +71,15 @@ class SupportsControllerStateProperties(Protocol):
         ...
 
     @property
-    def metadata(self) -> VariableCollection:
+    def variables(self) -> VariableCollection:
         ...
 
     @property
-    def params(self) -> Dict:
+    def parameters(self) -> Dict:
         ...
 
     @property
-    def conditions(self) -> Sequence[ArrayLike]:
+    def experiments(self) -> Sequence[ArrayLike]:
         ...
 
     @property
@@ -87,7 +87,7 @@ class SupportsControllerStateProperties(Protocol):
         ...
 
     @property
-    def theories(self) -> Sequence[BaseEstimator]:
+    def models(self) -> Sequence[BaseEstimator]:
         ...
 
 
@@ -99,7 +99,7 @@ SupportsControllerState = Union[
 class SupportsControllerStateHistory(SupportsControllerStateProperties, Protocol):
     """Represents controller state as a linear sequence of entries."""
 
-    def filter_by(self: State, kind: Optional[Set[Union[str, ResultKind]]]) -> State:
+    def filter_by(self: State, kind: Optional[Set[Union[str, RecordKind]]]) -> State:
         ...
 
     @property
