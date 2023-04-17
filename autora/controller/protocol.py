@@ -9,27 +9,27 @@ from autora.variable import VariableCollection
 State = TypeVar("State")
 
 
-class ResultKind(str, Enum):
+class RecordKind(str, Enum):
     """
     Kinds of results which can be held in the Result object.
 
     Examples:
-        >>> ResultKind.EXPERIMENT is ResultKind.EXPERIMENT
+        >>> RecordKind.EXPERIMENT is RecordKind.EXPERIMENT
         True
 
-        >>> ResultKind.EXPERIMENT is ResultKind.VARIABLES
+        >>> RecordKind.EXPERIMENT is RecordKind.VARIABLES
         False
 
-        >>> ResultKind.EXPERIMENT == "EXPERIMENT"
+        >>> RecordKind.EXPERIMENT == "EXPERIMENT"
         True
 
-        >>> ResultKind.EXPERIMENT == "VARIABLES"
+        >>> RecordKind.EXPERIMENT == "VARIABLES"
         False
 
-        >>> ResultKind.EXPERIMENT in {ResultKind.EXPERIMENT, ResultKind.PARAMETERS}
+        >>> RecordKind.EXPERIMENT in {RecordKind.EXPERIMENT, RecordKind.PARAMETERS}
         True
 
-        >>> ResultKind.VARIABLES in {ResultKind.EXPERIMENT, ResultKind.PARAMETERS}
+        >>> RecordKind.VARIABLES in {RecordKind.EXPERIMENT, RecordKind.PARAMETERS}
         False
     """
 
@@ -48,7 +48,7 @@ class SupportsDataKind(Protocol):
     """Object with attributes for `data` and `kind`"""
 
     data: Optional[Any]
-    kind: Optional[ResultKind]
+    kind: Optional[RecordKind]
 
 
 class SupportsControllerStateFields(Protocol):
@@ -99,7 +99,7 @@ SupportsControllerState = Union[
 class SupportsControllerStateHistory(SupportsControllerStateProperties, Protocol):
     """Represents controller state as a linear sequence of entries."""
 
-    def filter_by(self: State, kind: Optional[Set[Union[str, ResultKind]]]) -> State:
+    def filter_by(self: State, kind: Optional[Set[Union[str, RecordKind]]]) -> State:
         ...
 
     @property
