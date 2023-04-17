@@ -14,21 +14,21 @@ class Snapshot(SupportsControllerStateFields):
     """An object passed between and updated by processing steps in the Controller."""
 
     # Single values
-    metadata: VariableCollection = field(default_factory=VariableCollection)
-    params: Dict = field(default_factory=dict)
+    variables: VariableCollection = field(default_factory=VariableCollection)
+    parameters: Dict = field(default_factory=dict)
 
     # Sequences
-    conditions: List[ArrayLike] = field(default_factory=list)
+    experiments: List[ArrayLike] = field(default_factory=list)
     observations: List[ArrayLike] = field(default_factory=list)
-    theories: List[BaseEstimator] = field(default_factory=list)
+    models: List[BaseEstimator] = field(default_factory=list)
 
     def update(
         self,
-        metadata=None,
-        params=None,
-        conditions=None,
+        variables=None,
+        parameters=None,
+        experiments=None,
         observations=None,
-        theories=None,
+        models=None,
     ):
         """
         Create a new object with updated values.
@@ -36,35 +36,37 @@ class Snapshot(SupportsControllerStateFields):
         The initial object is empty:
         >>> s0 = Snapshot()
         >>> s0  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
-        Snapshot(metadata=VariableCollection(...), params={}, conditions=[],
-                        observations=[], theories=[])
+        Snapshot(variables=VariableCollection(...), parameters={}, experiments=[],
+                        observations=[], models=[])
 
-        We can update the params using the `.update` method:
-        >>> s0.update(params={'first': 'params'})  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
-        Snapshot(..., params={'first': 'params'}, ...)
+        We can update the parameters using the `.update` method:
+        >>> s0.update(parameters={'first': 'parameters'}
+        ... )  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
+        Snapshot(..., parameters={'first': 'parameters'}, ...)
 
         ... but the original object is unchanged:
         >>> s0  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
-        Snapshot(..., params={}, ...)
+        Snapshot(..., parameters={}, ...)
 
-        For params, only one object is returned from the respective property:
-        >>> s0.update(params={'first': 'params'}).update(params={'second': 'params'}).params
-        {'second': 'params'}
+        For parameters, only one object is returned from the respective property:
+        >>> s0.update(parameters={'first': 'parameters'}
+        ...  ).update(parameters={'second': 'parameters'}).parameters
+        {'second': 'parameters'}
 
-        ... and the same applies to metadata:
+        ... and the same applies to variables:
         >>> from autora.variable import VariableCollection, IV
-        >>> (s0.update(metadata=VariableCollection([IV("1st IV")]))
-        ...    .update(metadata=VariableCollection([IV("2nd IV")]))).metadata
+        >>> (s0.update(variables=VariableCollection([IV("1st IV")]))
+        ...    .update(variables=VariableCollection([IV("2nd IV")]))).variables
         VariableCollection(independent_variables=[IV(name='2nd IV',...)], ...)
 
-        When we update the conditions, observations or theories, the respective list is extended:
-        >>> s3 = s0.update(theories=["1st theory"])
+        When we update the experiments, observations or models, the respective list is extended:
+        >>> s3 = s0.update(models=["1st model"])
         >>> s3
-        Snapshot(..., theories=['1st theory'])
+        Snapshot(..., models=['1st model'])
 
-        ... so we can see the history of all the theories, for instance.
-        >>> s3.update(theories=["2nd theory"])
-        Snapshot(..., theories=['1st theory', '2nd theory'])
+        ... so we can see the history of all the models, for instance.
+        >>> s3.update(models=["2nd model"])
+        Snapshot(..., models=['1st model', '2nd model'])
 
         The same applies to observations:
         >>> s4 = s0.update(observations=["1st observation"])
@@ -75,31 +77,31 @@ class Snapshot(SupportsControllerStateFields):
         Snapshot(..., observations=['1st observation', '2nd observation'], ...)
 
 
-        The same applies to conditions:
-        >>> s5 = s0.update(conditions=["1st condition"])
+        The same applies to experiments:
+        >>> s5 = s0.update(experiments=["1st experiment"])
         >>> s5
-        Snapshot(..., conditions=['1st condition'], ...)
+        Snapshot(..., experiments=['1st experiment'], ...)
 
-        >>> s5.update(conditions=["2nd condition"])  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
-        Snapshot(..., conditions=['1st condition', '2nd condition'], ...)
+        >>> s5.update(experiments=["2nd experiment"])  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
+        Snapshot(..., experiments=['1st experiment', '2nd experiment'], ...)
 
-        You can also update with multiple conditions, observations and theories:
-        >>> s0.update(conditions=['c1', 'c2'])
-        Snapshot(..., conditions=['c1', 'c2'], ...)
+        You can also update with multiple experiments, observations and models:
+        >>> s0.update(experiments=['e1', 'e2'])
+        Snapshot(..., experiments=['e1', 'e2'], ...)
 
-        >>> s0.update(theories=['t1', 't2'], metadata={'m': 1})
-        Snapshot(metadata={'m': 1}, ..., theories=['t1', 't2'])
+        >>> s0.update(models=['m1', 'm2'], variables={'m': 1})
+        Snapshot(variables={'m': 1}, ..., models=['m1', 'm2'])
 
-        >>> s0.update(theories=['t1'], observations=['o1'], metadata={'m': 1})
-        Snapshot(metadata={'m': 1}, ..., observations=['o1'], theories=['t1'])
+        >>> s0.update(models=['m1'], observations=['o1'], variables={'m': 1})
+        Snapshot(variables={'m': 1}, ..., observations=['o1'], models=['m1'])
 
 
-        Inputs to theories, observations and conditions must be Lists
+        Inputs to models, observations and experiments must be Lists
         which can be cast to lists:
-        >>> s0.update(theories='t1')  # doctest: +ELLIPSIS
+        >>> s0.update(models='m1')  # doctest: +ELLIPSIS
         Traceback (most recent call last):
         ...
-        AssertionError: 't1' must be a list, e.g. `['t1']`?)
+        AssertionError: 'm1' must be a list, e.g. `['m1']`?)
 
         """
 
@@ -115,9 +117,9 @@ class Snapshot(SupportsControllerStateFields):
             else:
                 return old
 
-        metadata_ = metadata or self.metadata
-        params_ = params or self.params
-        conditions_ = _coalesce_lists(self.conditions, conditions)
+        variables_ = variables or self.variables
+        parameters_ = parameters or self.parameters
+        experiments_ = _coalesce_lists(self.experiments, experiments)
         observations_ = _coalesce_lists(self.observations, observations)
-        theories_ = _coalesce_lists(self.theories, theories)
-        return Snapshot(metadata_, params_, conditions_, observations_, theories_)
+        models_ = _coalesce_lists(self.models, models)
+        return Snapshot(variables_, parameters_, experiments_, observations_, models_)

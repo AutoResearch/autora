@@ -1,13 +1,14 @@
 """Generate the code reference pages and navigation."""
 
 from pathlib import Path
+from typing import List
 
 import mkdocs_gen_files
 
 nav = mkdocs_gen_files.Nav()
 
 source_paths = sorted(Path("./autora").rglob("*.py"))
-special_paths = [Path("./docs/docstrings.py")]
+special_paths: List[Path] = []
 
 for path in source_paths + special_paths:
     module_path = path.relative_to(".").with_suffix("")
