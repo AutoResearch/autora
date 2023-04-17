@@ -50,7 +50,7 @@ are the result of three primary bottlenecks—a lack of formal modeling, the
 demanding requirements of open science, and a shortage of resources to reproduce 
 individual studies. Empirical scientists face difficulties in formalizing their 
 theories, find it arduous to document their research activities, and often lack 
-sufficient time and funds to conduct follow-up experiments to test and revise their
+time and funds to conduct follow-up experiments to test and revise their
 hypotheses. These limitations serve as impediments to scientific progress and hinder
 the development of new knowledge. We seek to overcome these limitations by providing
 a tool for the generation, estimation, and empirical testing of scientific models. 
