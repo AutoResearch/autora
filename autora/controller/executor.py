@@ -14,7 +14,7 @@ import numpy as np
 from sklearn.base import BaseEstimator
 
 from autora.controller.protocol import SupportsControllerState
-from autora.controller.state import resolve_state_params
+from autora.controller.state import resolve_state_parameters
 from autora.experimentalist.pipeline import Pipeline
 
 _logger = logging.getLogger(__name__)
@@ -24,19 +24,19 @@ def experimentalist_wrapper(
     state: SupportsControllerState, pipeline: Pipeline, params: Dict
 ) -> SupportsControllerState:
     """Interface for running the experimentalist pipeline."""
-    params_ = resolve_state_params(params, state)
-    new_conditions = pipeline(**params_)
+    params_ = resolve_state_parameters(params, state)
+    new_experiments = pipeline(**params_)
 
-    assert isinstance(new_conditions, Iterable)
+    assert isinstance(new_experiments, Iterable)
     # If the pipeline gives us an iterable, we need to make it into a concrete array.
     # We can't move this logic to the Pipeline, because the pipeline doesn't know whether
     # it's within another pipeline and whether it should convert the iterable to a
     # concrete array.
-    new_conditions_values = list(new_conditions)
-    new_conditions_array = np.array(new_conditions_values)
+    new_experiments_values = list(new_experiments)
+    new_experiments_array = np.array(new_experiments_values)
 
-    assert isinstance(new_conditions_array, np.ndarray)  # Check the object is bounded
-    new_state = state.update(conditions=[new_conditions_array])
+    assert isinstance(new_experiments_array, np.ndarray)  # Check the object is bounded
+    new_state = state.update(experiments=[new_experiments_array])
     return new_state
 
 
@@ -44,8 +44,8 @@ def experiment_runner_wrapper(
     state: SupportsControllerState, callable: Callable, params: Dict
 ) -> SupportsControllerState:
     """Interface for running the experiment runner callable."""
-    params_ = resolve_state_params(params, state)
-    x = state.conditions[-1]
+    params_ = resolve_state_parameters(params, state)
+    x = state.experiments[-1]
     y = callable(x, **params_)
     new_observations = np.column_stack([x, y])
     new_state = state.update(observations=[new_observations])
@@ -56,11 +56,11 @@ def theorist_wrapper(
     state: SupportsControllerState, estimator: BaseEstimator, params: Dict
 ) -> SupportsControllerState:
     """Interface for running the theorist estimator given some State."""
-    params_ = resolve_state_params(params, state)
-    metadata = state.metadata
+    params_ = resolve_state_parameters(params, state)
+    variables = state.variables
     observations = state.observations
     all_observations = np.row_stack(observations)
-    n_xs = len(metadata.independent_variables)
+    n_xs = len(variables.independent_variables)
     x, y = all_observations[:, :n_xs], all_observations[:, n_xs:]
     if y.shape[1] == 1:
         y = y.ravel()
