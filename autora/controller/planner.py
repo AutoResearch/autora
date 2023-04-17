@@ -3,7 +3,7 @@ Functions which look at state and output the next function name to execute.
 """
 import random
 
-from autora.controller.protocol import ResultKind, SupportsControllerStateHistory
+from autora.controller.protocol import RecordKind, SupportsControllerStateHistory
 
 
 def full_cycle_planner(_):
@@ -20,7 +20,7 @@ def full_cycle_planner(_):
 
 def last_result_kind_planner(state: SupportsControllerStateHistory):
     """
-    Chooses the operation based on the last result, e.g. new theory -> run experimentalist.
+    Chooses the operation based on the last result, e.g. new model -> run experimentalist.
 
     Interpretation: The "traditional" AutoRA Controller – a systematic research assistant.
 
@@ -34,8 +34,8 @@ def last_result_kind_planner(state: SupportsControllerStateHistory):
         >>> last_result_kind_planner(state_)
         'experimentalist'
 
-        ... or if we had produced conditions, then we could run an experiment
-        >>> state_ = state_.update(conditions=["some condition"])
+        ... or if we had produced an experiment (definition), then we could run it
+        >>> state_ = state_.update(experiments=["some experiment"])
         >>> last_result_kind_planner(state_)
         'experiment_runner'
 
@@ -44,15 +44,15 @@ def last_result_kind_planner(state: SupportsControllerStateHistory):
         >>> last_result_kind_planner(state_)
         'theorist'
 
-        ... or if we last produced a theory, then we could now run the experimentalist:
-        >>> state_ = state_.update(theories=["some theory"])
+        ... or if we last produced a model, then we could now run the experimentalist:
+        >>> state_ = state_.update(models=["some model"])
         >>> last_result_kind_planner(state_)
         'experimentalist'
 
     """
 
     filtered_history = state.filter_by(
-        kind={ResultKind.CONDITION, ResultKind.OBSERVATION, ResultKind.THEORY}
+        kind={RecordKind.EXPERIMENT, RecordKind.OBSERVATION, RecordKind.MODEL}
     ).history
 
     try:
@@ -62,9 +62,9 @@ def last_result_kind_planner(state: SupportsControllerStateHistory):
 
     executor_name = {
         None: "experimentalist",
-        ResultKind.THEORY: "experimentalist",
-        ResultKind.CONDITION: "experiment_runner",
-        ResultKind.OBSERVATION: "theorist",
+        RecordKind.MODEL: "experimentalist",
+        RecordKind.EXPERIMENT: "experiment_runner",
+        RecordKind.OBSERVATION: "theorist",
     }[last_result_kind]
 
     return executor_name
