@@ -44,7 +44,7 @@ neuroscience, economics, physics, or material science. Usages include:
 ## Motivation
 
 Various empirical sciences are beset by a replication crisis, 
-which can be attributed to inadequate precision of hypotheses, lack of transparency
+which can be attributed to inadequately precise hypotheses, lack of transparency
 in research procedures, and insufficient rigor in testing findings. These limitations
 are the result of three primary bottlenecks, namely, a lack of formal modeling, the
 demanding requirements of open science, and a shortage of resources to reproduce 
