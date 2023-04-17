@@ -46,7 +46,7 @@ neuroscience, economics, physics, or material science. Usages include:
 Various empirical sciences are beset by a replication crisis, 
 which can be attributed to inadequately precise hypotheses, lack of transparency
 in research procedures, and insufficient rigor in testing findings. These limitations
-are the result of three primary bottlenecks, namely, a lack of formal modeling, the
+are the result of three primary bottlenecks—a lack of formal modeling, the
 demanding requirements of open science, and a shortage of resources to reproduce 
 individual studies. Empirical scientists face difficulties in formalizing their 
 theories, find it arduous to document their research activities, and often lack 
