@@ -1,8 +1,7 @@
 # Automated Research Assistant
 
 <b>[AutoRA](https://pypi.org/project/autora/)</b> (<b>Au</b>tomated <b>R</b>esearch <b>A</b>ssistant) is an open-source framework for 
-automating multiple stages of the empirical research process, from the construction of a scientific 
-hypothesis to conducting novel experiments.
+automating multiple stages of the empirical research process, including model discovery, experimental design, data collection, and documentation for open science.
 
 ![Autonomous Empirical Research Paradigm](img/overview.png)
 
