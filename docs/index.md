@@ -43,7 +43,7 @@ neuroscience, economics, physics, or material science. Usages include:
 
 ## Motivation
 
-The current state of various empirical sciences is beset by a replication crisis, 
+Various empirical sciences are beset by a replication crisis, 
 which can be attributed to inadequate precision of hypotheses, lack of transparency
 in research procedures, and insufficient rigor in testing findings. These limitations
 are the result of three primary bottlenecks, namely, a lack of formal modeling, the
