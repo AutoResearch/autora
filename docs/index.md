@@ -6,7 +6,7 @@ hypothesis to conducting novel experiments.
 
 ![Autonomous Empirical Research Paradigm](img/overview.png)
 
-AutoRA implements the <b>Autonomous Empirical Research Paradigm</b> that involves the dynamic interplay
+AutoRA implements the <b>Autonomous Empirical Research Paradigm</b>, which involves a dynamic interplay
 between two artificial agents. The first agent, a theorist, is primarily responsible for constructing 
 computational models through the linkage of experimental conditions to dependent measures, using 
 existing data as a basis. The second agent, an experimentalist, is tasked with designing follow-up
