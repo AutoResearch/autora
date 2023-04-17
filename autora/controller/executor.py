@@ -6,11 +6,13 @@ from __future__ import annotations
 
 import copy
 import logging
+import pprint
 from functools import partial
 from types import MappingProxyType
 from typing import Callable, Dict, Iterable, Literal, Optional, Tuple, Union
 
 import numpy as np
+import pandas as pd
 from sklearn.base import BaseEstimator
 
 from autora.controller.protocol import SupportsControllerState
@@ -27,15 +29,27 @@ def experimentalist_wrapper(
     params_ = resolve_state_parameters(params, state)
     new_experiments = pipeline(**params_)
 
-    assert isinstance(new_experiments, Iterable)
-    # If the pipeline gives us an iterable, we need to make it into a concrete array.
-    # We can't move this logic to the Pipeline, because the pipeline doesn't know whether
-    # it's within another pipeline and whether it should convert the iterable to a
-    # concrete array.
-    new_experiments_values = list(new_experiments)
-    new_experiments_array = np.array(new_experiments_values)
+    if isinstance(new_experiments, pd.DataFrame):
+        new_experiments_array = new_experiments
+    elif isinstance(new_experiments, np.ndarray):
+        _logger.warning(
+            f"{new_experiments=} is an ndarray, so variable confusion is a possibility"
+        )
+        new_experiments_array = new_experiments
+    elif isinstance(new_experiments, np.recarray):
+        new_experiments_array = new_experiments
+    elif isinstance(new_experiments, Iterable):
+        # If the pipeline gives us an iterable, we need to make it into a concrete array.
+        # We can't move this logic to the Pipeline, because the pipeline doesn't know whether
+        # it's within another pipeline and whether it should convert the iterable to a
+        # concrete array.
+        new_experiments_values = list(new_experiments)
+        new_experiments_array = np.array(new_experiments_values)
+    else:
+        raise NotImplementedError(
+            f"Can't handle experimentalist output {new_experiments=}"
+        )
 
-    assert isinstance(new_experiments_array, np.ndarray)  # Check the object is bounded
     new_state = state.update(experiments=[new_experiments_array])
     return new_state
 
@@ -46,8 +60,15 @@ def experiment_runner_wrapper(
     """Interface for running the experiment runner callable."""
     params_ = resolve_state_parameters(params, state)
     x = state.experiments[-1]
-    y = callable(x, **params_)
-    new_observations = np.column_stack([x, y])
+    output = callable(x, **params_)
+
+    if isinstance(x, pd.DataFrame):
+        new_observations = output
+    elif isinstance(x, np.ndarray):
+        new_observations = np.column_stack([x, output])
+    else:
+        raise NotImplementedError(f"type {x=} not supported")
+
     new_state = state.update(observations=[new_observations])
     return new_state
 
@@ -59,13 +80,35 @@ def theorist_wrapper(
     params_ = resolve_state_parameters(params, state)
     variables = state.variables
     observations = state.observations
-    all_observations = np.row_stack(observations)
-    n_xs = len(variables.independent_variables)
-    x, y = all_observations[:, :n_xs], all_observations[:, n_xs:]
-    if y.shape[1] == 1:
-        y = y.ravel()
+
+    if isinstance(observations[-1], pd.DataFrame):
+        all_observations = pd.concat(observations)
+        iv_names = [iv.name for iv in variables.independent_variables]
+        dv_names = [dv.name for dv in variables.dependent_variables]
+        x, y = all_observations[iv_names], all_observations[dv_names]
+    elif isinstance(observations[-1], np.ndarray):
+        all_observations = np.row_stack(observations)
+        n_xs = len(variables.independent_variables)
+        x, y = all_observations[:, :n_xs], all_observations[:, n_xs:]
+        if y.shape[1] == 1:
+            y = y.ravel()
+    else:
+        raise NotImplementedError(f"type {observations[-1]=} not supported")
+
     new_theorist = copy.deepcopy(estimator)
     new_theorist.fit(x, y, **params_)
+
+    try:
+        _logger.debug(
+            f"fitted {new_theorist=}\nnew_theorist.__dict__:"
+            f"\n{pprint.pformat(new_theorist.__dict__)}"
+        )
+    except AttributeError:
+        _logger.debug(
+            f"fitted {new_theorist=} "
+            f"new_theorist has no __dict__ attribute, so no results are shown"
+        )
+
     new_state = state.update(theories=[new_theorist])
     return new_state
 
