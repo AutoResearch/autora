@@ -70,21 +70,21 @@ def theorist_wrapper(
         raise NotImplementedError(f"type {observations[-1]=} not supported")
 
     x, y = all_observations[iv_names], all_observations[dv_names]
-    new_theorist = copy.deepcopy(estimator)
-    new_theorist.fit(x, y, **params_)
+    new_model = copy.deepcopy(estimator)
+    new_model.fit(x, y, **params_)
 
     try:
         _logger.debug(
-            f"fitted {new_theorist=}\nnew_theorist.__dict__:"
-            f"\n{pprint.pformat(new_theorist.__dict__)}"
+            f"fitted {new_model=}\nnew_model.__dict__:"
+            f"\n{pprint.pformat(new_model.__dict__)}"
         )
     except AttributeError:
         _logger.debug(
-            f"fitted {new_theorist=} "
-            f"new_theorist has no __dict__ attribute, so no results are shown"
+            f"fitted {new_model=} "
+            f"new_model has no __dict__ attribute, so no results are shown"
         )
 
-    new_state = state.update(theories=[new_theorist])
+    new_state = state.update(models=[new_model])
     return new_state
 
 
