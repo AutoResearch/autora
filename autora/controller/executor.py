@@ -34,20 +34,12 @@ def experimentalist_wrapper(
 
 
 def experiment_runner_wrapper(
-    state: SupportsControllerState, callable: Callable, params: Dict
+    state: SupportsControllerState, runner: Callable, params: Dict
 ) -> SupportsControllerState:
     """Interface for running the experiment runner callable."""
     params_ = resolve_state_parameters(params, state)
-    x = state.experiments[-1]
-    output = callable(x, **params_)
-
-    if isinstance(x, pd.DataFrame):
-        new_observations = output
-    elif isinstance(x, np.ndarray):
-        new_observations = np.column_stack([x, output])
-    else:
-        raise NotImplementedError(f"type {x=} not supported")
-
+    experiment = state.experiments[-1]
+    new_observations = runner(experiment, **params_)
     new_state = state.update(observations=[new_observations])
     return new_state
 
