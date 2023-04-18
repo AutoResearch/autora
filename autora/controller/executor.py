@@ -45,9 +45,9 @@ def experiment_runner_wrapper(
 
 
 def theorist_wrapper(
-    state: SupportsControllerState, estimator: BaseEstimator, params: Dict
+    state: SupportsControllerState, theorist: BaseEstimator, params: Dict
 ) -> SupportsControllerState:
-    """Interface for running the theorist estimator given some State."""
+    """Interface for running the theorist given some State."""
     params_ = resolve_state_parameters(params, state)
     variables = state.variables
     observations = state.observations
@@ -70,7 +70,7 @@ def theorist_wrapper(
         raise NotImplementedError(f"type {observations[-1]=} not supported")
 
     x, y = all_observations[iv_names], all_observations[dv_names]
-    new_model = copy.deepcopy(estimator)
+    new_model = copy.deepcopy(theorist)
     new_model.fit(x, y, **params_)
 
     try:
@@ -191,7 +191,7 @@ def make_online_executor_collection(
         >>> from sklearn.linear_model import LinearRegression
         >>> make_online_executor_collection([("t", "theorist", LinearRegression())]
         ... ) # doctest: +ELLIPSIS
-        {'t': functools.partial(<function theorist_wrapper at 0x...>, estimator=LinearRegression())}
+        {'t': functools.partial(<function theorist_wrapper at 0x...>, theorist=LinearRegression())}
 
         ... or with two different theorists (e.g., if a Planner had several options)
         >>> make_online_executor_collection([
@@ -199,9 +199,9 @@ def make_online_executor_collection(
         ...     ("t1", "theorist", LinearRegression(fit_intercept=True))
         ... ]) # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
         {'t0': functools.partial(<function theorist_wrapper at 0x...>,
-                                 estimator=LinearRegression(fit_intercept=False)),
+                                 theorist=LinearRegression(fit_intercept=False)),
         't1': functools.partial(<function theorist_wrapper at 0x...>,
-                                estimator=LinearRegression())}
+                                theorist=LinearRegression())}
 
         The same applies for experiment runners:
         >>> make_online_executor_collection([("er", "experiment_runner", lambda x_: x_ + 1)]
@@ -235,7 +235,7 @@ def make_default_online_executor_collection(
     Args:
         experimentalist_pipeline: an experimentalist Pipeline to be wrapped
         experiment_runner_callable: an experiment runner function to be wrapped
-        theorist_estimator: a scikit learn-compatible estimator to be wrapped
+        theorist_estimator: a scikit learn-compatible theorist to be wrapped
 
     Returns: A dictionary with keys "experimentalist", "experiment_runner", "theorist" and
         "full_cycle", with values which are Callables.
@@ -283,7 +283,7 @@ def make_default_online_executor_collection(
         ...
         >>> c["theorist"]  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
         functools.partial(<function theorist_wrapper at 0x...>,
-                          estimator=LinearRegression())
+                          theorist=LinearRegression())
 
         ...
         >>> c["full_cycle"]  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
@@ -294,7 +294,7 @@ def make_default_online_executor_collection(
 
         You cannot update the collection. To replace a value, create a new collection.
         >>> other_theorist = LinearRegression(fit_intercept=False)
-        >>> c["theorist"] = partial(theorist_wrapper, estimator=other_theorist)
+        >>> c["theorist"] = partial(theorist_wrapper, theorist=other_theorist)
         Traceback (most recent call last):
         ...
         TypeError: 'mappingproxy' object does not support item assignment
