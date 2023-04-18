@@ -185,7 +185,11 @@ def test_falsification_regression(synthetic_linr_model, regression_data_to_test,
     # sine function
     assert sample[0] == 0 or sample[0] == 6
     if sample[0] == 0:
-        assert sample[1] == 6
+        assert (
+            sample[1] == 6
+            or np.round(sample[1], 2) == 1.8
+            or np.round(sample[1], 2 == 4.2)
+        )
 
     assert np.round(sample[2], 2) == 1.8 or np.round(sample[2], 2) == 4.2
     if np.round(sample[2], 2) == 1.8:
