@@ -24,34 +24,12 @@ _logger = logging.getLogger(__name__)
 
 
 def experimentalist_wrapper(
-    state: SupportsControllerState, pipeline: Pipeline, params: Dict
+    state: SupportsControllerState, experimentalist: Pipeline, params: Dict
 ) -> SupportsControllerState:
     """Interface for running the experimentalist pipeline."""
     params_ = resolve_state_parameters(params, state)
-    new_experiments = pipeline(**params_)
-
-    if isinstance(new_experiments, pd.DataFrame):
-        new_experiments_array = new_experiments
-    elif isinstance(new_experiments, np.ndarray):
-        _logger.warning(
-            f"{new_experiments=} is an ndarray, so variable confusion is a possibility"
-        )
-        new_experiments_array = new_experiments
-    elif isinstance(new_experiments, np.recarray):
-        new_experiments_array = new_experiments
-    elif isinstance(new_experiments, Iterable):
-        # If the pipeline gives us an iterable, we need to make it into a concrete array.
-        # We can't move this logic to the Pipeline, because the pipeline doesn't know whether
-        # it's within another pipeline and whether it should convert the iterable to a
-        # concrete array.
-        new_experiments_values = list(new_experiments)
-        new_experiments_array = np.array(new_experiments_values)
-    else:
-        raise NotImplementedError(
-            f"Can't handle experimentalist output {new_experiments=}"
-        )
-
-    new_state = state.update(experiments=[new_experiments_array])
+    new_experiment = experimentalist(**params_)
+    new_state = state.update(experiments=[new_experiment])
     return new_state
 
 
