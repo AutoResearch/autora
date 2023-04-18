@@ -321,3 +321,64 @@ def make_default_online_executor_collection(
     )
 
     return MappingProxyType(c)
+
+
+def wrap_pure_runner_callable(func):
+    """
+    A wrapper for runners of the form f(x) -> y, which stacks input x's and output y's together.
+
+    Examples:
+        We have a simple ground truth function which only returns y's, without making any
+        other transformations:
+        >>> from numpy.typing import ArrayLike
+        >>> def x_plus_ten(x: ArrayLike):
+        ...     return x + 10
+
+        If we run this function, wrapped, on some input data `x`, it returns both x's and y's in a
+        single array:
+        >>> x = np.array([1,2,3])
+        >>> wrap_pure_runner_callable(x_plus_ten)(x)
+        array([[ 1, 11],
+               [ 2, 12],
+               [ 3, 13]])
+
+        If we run the original function on some input data, then we get only the y's back:
+        >>> x_plus_ten(x)
+        array([11, 12, 13])
+
+        If we have a function of more than one x, where the x's are given as a single array the
+        results are also as expected:
+        >>> def multiply(x: ArrayLike):
+        ...     \"\"\"Multiply values in zeroth and first columns.\"\"\"
+        ...     return x[:, 0] * x[:, 1]
+        >>> x0, x1 = [0,1,2,3], [10, 20, 30, 40]
+        >>> x = np.column_stack([x0, x1])
+        >>> x
+        array([[ 0, 10],
+               [ 1, 20],
+               [ 2, 30],
+               [ 3, 40]])
+        >>> wrap_pure_runner_callable(multiply)(x)
+        array([[  0,  10,   0],
+               [  1,  20,  20],
+               [  2,  30,  60],
+               [  3,  40, 120]])
+
+        The wrapped function retains its name:
+        >>> wrap_pure_runner_callable(multiply).__name__
+        'multiply'
+
+        ... and its docstring:
+        >>> wrap_pure_runner_callable(multiply).__doc__
+        'Multiply values in zeroth and first columns.'
+
+    """
+
+    def _wrapped(x, *args, **kwargs):
+        y = func(x, *args, **kwargs)
+        result = np.column_stack([x, y])
+        return result
+
+    _wrapped.__name__ = func.__name__
+    _wrapped.__doc__ = func.__doc__
+    return _wrapped
