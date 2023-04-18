@@ -13,6 +13,7 @@ from typing import Callable, Dict, Iterable, Literal, Optional, Tuple, Union
 
 import numpy as np
 import pandas as pd
+from numpy.lib import recfunctions as rfn
 from sklearn.base import BaseEstimator
 
 from autora.controller.protocol import SupportsControllerState
@@ -81,20 +82,24 @@ def theorist_wrapper(
     variables = state.variables
     observations = state.observations
 
+    iv_names = [iv.name for iv in variables.independent_variables]
+    dv_names = [dv.name for dv in variables.dependent_variables]
     if isinstance(observations[-1], pd.DataFrame):
         all_observations = pd.concat(observations)
-        iv_names = [iv.name for iv in variables.independent_variables]
-        dv_names = [dv.name for dv in variables.dependent_variables]
-        x, y = all_observations[iv_names], all_observations[dv_names]
+    elif isinstance(observations[-1], np.recarray):
+        all_observations = rfn.stack_arrays(observations)
     elif isinstance(observations[-1], np.ndarray):
-        all_observations = np.row_stack(observations)
-        n_xs = len(variables.independent_variables)
-        x, y = all_observations[:, :n_xs], all_observations[:, n_xs:]
-        if y.shape[1] == 1:
-            y = y.ravel()
+        _logger.warning(
+            "observations are a numpy ndarray:  setting field names based on order. "
+            "Consider using a recarray or a DataFrame to avoid column confusion."
+        )
+        all_observations = rfn.unstructured_to_structured(
+            np.row_stack(observations), names=iv_names + dv_names
+        )
     else:
         raise NotImplementedError(f"type {observations[-1]=} not supported")
 
+    x, y = all_observations[iv_names], all_observations[dv_names]
     new_theorist = copy.deepcopy(estimator)
     new_theorist.fit(x, y, **params_)
 
