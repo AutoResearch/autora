@@ -143,7 +143,7 @@ def make_online_executor(
         >>> make_online_executor("experiment_runner", lambda x: x + 1
         ... )  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
         functools.partial(<function experiment_runner_wrapper at 0x...>,
-                          callable=<function <lambda> at 0x...>)
+                          runner=<function <lambda> at 0x...>)
 
         >>> make_online_executor("not_allowed_kind", lambda x: x + 1)
         Traceback (most recent call last):
@@ -155,13 +155,13 @@ def make_online_executor(
         curried_function = no_op
     elif kind == "experimentalist":
         assert isinstance(core, Pipeline)
-        curried_function = partial(experimentalist_wrapper, pipeline=core)
+        curried_function = partial(experimentalist_wrapper, experimentalist=core)
     elif kind == "experiment_runner":
         assert callable(core)
-        curried_function = partial(experiment_runner_wrapper, callable=core)
+        curried_function = partial(experiment_runner_wrapper, runner=core)
     elif kind == "theorist":
         assert isinstance(core, BaseEstimator)
-        curried_function = partial(theorist_wrapper, estimator=core)
+        curried_function = partial(theorist_wrapper, theorist=core)
     else:
         raise NotImplementedError(
             f"{kind=} is not implemented for executor definitions."
@@ -207,14 +207,14 @@ def make_online_executor_collection(
         >>> make_online_executor_collection([("er", "experiment_runner", lambda x_: x_ + 1)]
         ... ) # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
         {'er': functools.partial(<function experiment_runner_wrapper at 0x...>,
-                                 callable=<function <lambda> at 0x...>)}
+                                 runner=<function <lambda> at 0x...>)}
 
         ... and experimentalists:
         >>> from autora.experimentalist.pipeline import make_pipeline
         >>> make_online_executor_collection([("ex", "experimentalist", make_pipeline([(1,2,3)]))]
         ... ) # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
         {'ex': functools.partial(<function experimentalist_wrapper at 0x...>,
-                                 pipeline=Pipeline(steps=[('step', (1, 2, 3))], params={}))}
+                                 experimentalist=Pipeline(steps=[('step', (1, 2, 3))], params={}))}
 
     """
     c = {}
@@ -273,12 +273,12 @@ def make_default_online_executor_collection(
         We can access the collection as a mapping:
         >>> c["experimentalist"]  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
         functools.partial(<function experimentalist_wrapper at 0x...>,
-        pipeline=Pipeline(steps=[('p', (1, 2))], params={}))
+                          experimentalist=Pipeline(steps=[('p', (1, 2))], params={}))
 
         ...
         >>> c["experiment_runner"]  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
         functools.partial(<function experiment_runner_wrapper at 0x...>,
-                          callable=<function experiment_runner_ at 0x...>)
+                          runner=<function experiment_runner_ at 0x...>)
 
         ...
         >>> c["theorist"]  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
