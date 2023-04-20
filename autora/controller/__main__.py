@@ -13,11 +13,11 @@ _logger = logging.getLogger(__name__)
 
 
 def main(
-    manager: pathlib.Path,
-    directory: pathlib.Path,
-    step_name: Optional[str] = None,
-    verbose: bool = False,
-    debug: bool = False,
+    manager: pathlib.Path=typer.Argument(..., help="Manager path"),
+    directory: pathlib.Path=typer.Argument(..., help="Directory path"),
+    step_name: Optional[str] = typer.Argument(None, help="Name of step"),
+    verbose: bool = typer.Option(False, help="Turns on info logging level."),
+    debug: bool = typer.Option(False, help="Turns on debug logging level."),
 ):
     _logger.debug("initializing")
     _configure_logger(debug, verbose)
