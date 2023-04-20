@@ -40,19 +40,19 @@ neuroscience, economics, physics, or materials science. Usages include:
 
 ## Motivation
 
-Various empirical sciences are beset by a replication crisis, 
+Various empirical sciences are beset by replication crises, 
 which can be attributed to inadequately precise hypotheses, lack of transparency
-in research procedures, and insufficient rigor in testing findings. These limitations
-are the result of three primary bottlenecks—a lack of formal modeling, the
-demanding requirements of open science, and a shortage of resources to reproduce 
-individual studies. Empirical scientists face difficulties in formalizing their 
+in research procedures, and insufficient rigor in testing findings. These causes
+stem from three primary bottlenecks—a lack of formal modeling, onerous
+ requirements of open science, and too few resources to reproduce 
+individual studies. Empirical scientists struggle to formalize their 
 theories, find it arduous to document their research activities, and often lack 
 time and funds to conduct follow-up experiments to test and revise their
 hypotheses. These limitations impede scientific progress and hinder
 the development of new knowledge. We seek to overcome these limitations by providing
-a tool for the generation, estimation, and empirical testing of scientific models. 
-It is our hope that AutoRA will help accelerate scientific discovery by overcoming
-these limitations and promoting greater transparency and rigor in empirical research.
+a framework and corresponding tools for the generation, estimation, and empirical testing of scientific models. 
+It is our hope that AutoRA will accelerate scientific discovery 
+as well as promote greater transparency and rigor in empirical research.
 
 ## Pointers
 
@@ -62,8 +62,8 @@ these limitations and promoting greater transparency and rigor in empirical rese
 
 ## About
 
-This project is in active development by the [Autonomous Empirical Research Group](https://musslick.github.io/AER_website/Research.html), led by [Sebastian Musslick](https://smusslick.com), in collaboration with the [Center for Computation and Visualization at Brown University](https://ccv.brown.edu).
+This project is being developed by the [Autonomous Empirical Research Group](https://musslick.github.io/AER_website/Research.html), which is led by [Sebastian Musslick](https://smusslick.com), in collaboration with the [Center for Computation and Visualization at Brown University](https://ccv.brown.edu).
 
-The development of this package is supported by Schmidt Science Fellows, in partnership with the Rhodes Trust, as well as the Carney BRAINSTORM program at Brown University.
+Development of this package is supported by Schmidt Science Fellows, in partnership with the Rhodes Trust, as well as the Carney BRAINSTORM program at Brown University.
 
 
