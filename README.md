@@ -1,5 +1,7 @@
 # Automated Research Assistant
-Automated Research Assistant (AutoRA) is an open source AI-based system for automating each aspect of empirical research in the behavioral sciences, from the construction of a scientific hypothesis to conducting novel experiments. The documentation is here: [https://autoresearch.github.io/autora/](https://autoresearch.github.io/autora/)
+Automated Research Assistant (AutoRA) is an open source system that automates multiple stages of the empirical research process, including model discovery, experimental design, data collection, and documentation for open science.
+
+ Documentation can be found here: [https://autoresearch.github.io/autora/](https://autoresearch.github.io/autora/)
 
 # Getting started
 
