@@ -28,17 +28,6 @@ theme:
 
 plugins:
   - search
-  - gen-files:
-      scripts:
-        - mkdocs/_gen_ref_pages.py
-  - literate-nav:
-        nav_file: SUMMARY.md
-  - section-index
-  - mkdocstrings:
-      handlers:
-        python:
-          import:
-            - https://scikit-learn.org/stable/objects.inv
   - multirepo:
       # (optional) tells multirepo to clean up the temporary directory after site is built.
       cleanup: false
@@ -110,4 +99,3 @@ nav:
 - Contributor Guide:
     - Module Contributions
     - Core Contributions
-- Code Reference: reference/autora/
