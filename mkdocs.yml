@@ -65,34 +65,37 @@ nav:
   - Closed-Loop Discovery
 - User Guide:
   - Theorists:
-    - Overview: 'theorist/overview.md'
+    - Overview: 'theorists/overview.md'
     - DARTS:
-      - Introduction: 'theorist/darts/introduction.md'
-      - How it works: 'theorist/darts/how_it_works.md'
-      - Meta parameters: 'theorist/darts/meta_parameters.md'
-      - Search space: 'theorist/darts/search_space.md'
+      - Introduction: 'theorists/darts/introduction.md'
+      - How it works: 'theorists/darts/how_it_works.md'
+      - Meta parameters: 'theorists/darts/meta_parameters.md'
+      - Search space: 'theorists/darts/search_space.md'
       - Examples:
-        - Basic Usage: 'theorist/darts/example.ipynb'
-        - Weber-Fechner Law: 'theorist/darts/weber.ipynb'
+        - Basic Usage: 'theorists/darts/example.ipynb'
+        - Weber-Fechner Law: 'theorists/darts/weber.ipynb'
     - BMS:
-      - Introduction: 'theorist/bms/introduction.md'
-      - How it works: 'theorist/bms/how_it_works.md'
-      - Meta parameters: 'theorist/bms/meta_parameters.md'
-      - Search space: 'theorist/bms/search_space.ipynb'
+      - Introduction: 'theorists/bms/introduction.md'
+      - How it works: 'theorists/bms/how_it_works.md'
+      - Meta parameters: 'theorists/bms/meta_parameters.md'
+      - Search space: 'theorists/bms/search_space.ipynb'
       - Examples:
-        - Basic Usage: 'theorist/bms/example.ipynb'
-        - Weber-Fechner Law: 'theorist/bms/weber.ipynb'
+        - Basic Usage: 'theorists/bms/example.ipynb'
+        - Weber-Fechner Law: 'theorists/bms/weber.ipynb'
     - BSR:
-      - Introduction: 'theorist/bsr/introduction.md'
-      - How it works: 'theorist/bsr/how_it_works.md'
-      - Meta parameters: 'theorist/bsr/meta_parameters.md'
-      - Search space: 'theorist/bsr/search_space.md'
-      - Example: 'theorist/bsr/bsr.ipynb'
+      - Introduction: 'theorists/bsr/introduction.md'
+      - How it works: 'theorists/bsr/how_it_works.md'
+      - Meta parameters: 'theorists/bsr/meta_parameters.md'
+      - Search space: 'theorists/bsr/search_space.md'
+      - Example: 'theorists/bsr/bsr.ipynb'
   - Experimentalists:
     - Overview: 'experimentalists/overview.md'
     - Pipeline: 'pipeline/Experimentalist Pipeline Examples.ipynb'
-  - Synthetic Experiments:
-    - Inventory: 'synthetic/inventory.ipynb'
+  - Data Collection:
+    - Overview: 'data collection/overview.md'
+    - Behavioral:
+    - Synthetic:
+      - Inventory: 'synthetic/inventory.ipynb'
   - Cycle:
     - Scoring:
       - Logistic Regression: 'cycle/cycle_scoring.ipynb'
@@ -106,3 +109,4 @@ nav:
     - Module Contributions
     - Core Contributions
 - Code Reference: reference/autora/
+
