@@ -28,6 +28,15 @@ theme:
 
 plugins:
   - search
+
+  - multirepo:
+      cleanup: false
+      keep_docs_dir: true
+      nav_repos:
+        - name: workflow
+          import_url: ../../autora-workflow?branch=main&multi_docs=True
+          imports: [mkdocs.yml, docs/*, src/*]
+
   - gen-files:
       scripts:
         - mkdocs/_gen_ref_pages.py
@@ -39,20 +48,12 @@ plugins:
         python:
           import:
             - https://scikit-learn.org/stable/objects.inv
-  - multirepo:
-      # if set the docs directory will not be removed when importing docs.
-      # When using this with a nav section in an imported repo you must keep the
-      # docs directory in the path (e.g., docs/path/to/file.md).
-      cleanup: false
-      keep_docs_dir: true
-      nav_repos:
-        - name: workflow
-          import_url: https://github.com/autoresearch/autora-workflow?branch=main&multi_docs=True
-          imports: [mkdocs.yml, docs/*]
+
   - mkdocs-jupyter:
       include_source: true
       execute: false
       ignore_h1_titles: true
+      include: ["*.ipynb"]
 
 markdown_extensions:
   - pymdownx.arithmatex:
