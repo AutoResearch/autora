@@ -38,10 +38,6 @@ plugins:
         python:
           import:
             - https://scikit-learn.org/stable/objects.inv
-  - mkdocs-jupyter:
-      include_source: true
-      execute: false
-      ignore_h1_titles: True
   - multirepo:
       # (optional) tells multirepo to clean up the temporary directory after site is built.
       cleanup: false
@@ -49,6 +45,10 @@ plugins:
       # When using this with a nav section in an imported repo you must keep the
       # docs directory in the path (e.g., docs/path/to/file.md).
       keep_docs_dir: true
+  - mkdocs-jupyter:
+      include_source: true
+      execute: false
+      ignore_h1_titles: true
 
 markdown_extensions:
   - pymdownx.arithmatex:
@@ -105,6 +105,7 @@ nav:
       - DARTS & BMS: 'cycle/simple_cycle_bms_darts.ipynb'
       - BMS & Poppernet: 'cycle/simple_cycle_bms_model_poppernet.ipynb'
       - Uncertainty Experimentalist: 'cycle/simple_cycle_uncertainty_experimentalist.ipynb'
+- Workflow (local): '!import ../../autora-workflow/?branch=main&docs_dir=docs&multi_docs=True'
 - Contributor Guide:
     - Module Contributions
     - Core Contributions
