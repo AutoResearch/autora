@@ -3,6 +3,7 @@
 site_name: Autonomous Empirical Research
 repo_url: 'https://github.com/autoresearch/autora'
 edit_uri: 'blob/main/docs/'
+colab_base_url: 'https://colab.research.google.com/github/AutoResearch/autora/blob/gh-pages'
 
 theme:
   name: material
