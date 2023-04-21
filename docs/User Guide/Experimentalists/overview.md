@@ -21,7 +21,7 @@ Experimentalists in AutoRA serve to identify novel
 experiment conditions $\vec{x} \in X$, where $x_i$ corresponds 
 to the level of an experimental factor $i$.
 
-![Overview](../img/experimentalist.png)
+![Overview](experimentalist.png)
 
 Experimentalists may use information about candidate models $M$ obtained from a theorist, 
 experiment conditions that have already been probed $\vec{x}' \in X'$, or 
