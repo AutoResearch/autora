@@ -1,4 +1,4 @@
-# Experimentalist Overview
+# Experimentalists Overview
 
 The primary goal of an experimentalist is to identify experiments that yield 
 scientific merit. AutoRA implements techniques for automating the identification 

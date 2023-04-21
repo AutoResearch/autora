@@ -1,3 +1,3 @@
-# Theorist Overview
+# Theorists Overview
 
 Scientific models are often expressed in the form of interpretable equations or programs that link experimental parameters (independent variables) to observable outcomes (dependent variables). Constructing scientific models in a mathematical or computational form poses two main challenges: (1) determining the architecture of the model, which involves identifying the composition and sequence of operations, and (2) identifying parameters of the model that can best fit available data. To address these challenges, we rely on a combination of techniques derived from machine learning and automated scientific discovery. These models are produced by a theorist in the AER paradigm. Our goal is to automate the construction and fitting of scientific models, thus enabling researchers to more efficiently and effectively uncover meaningful insights into the phenomena they study.
