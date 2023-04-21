@@ -106,7 +106,7 @@ nav:
       - DARTS & BMS: 'cycle/simple_cycle_bms_darts.ipynb'
       - BMS & Poppernet: 'cycle/simple_cycle_bms_model_poppernet.ipynb'
       - Uncertainty Experimentalist: 'cycle/simple_cycle_uncertainty_experimentalist.ipynb'
-- Workflow (local): '!import ../../autora-workflow/?branch=main&docs_dir=docs&multi_docs=True'
+  - Workflow: '!import https://github.com/autoresearch/autora-workflow/?branch=main&docs_dir=docs&multi_docs=True'
 - Contributor Guide:
     - Module Contributions
     - Core Contributions
