@@ -40,12 +40,15 @@ plugins:
           import:
             - https://scikit-learn.org/stable/objects.inv
   - multirepo:
-      # (optional) tells multirepo to clean up the temporary directory after site is built.
-      cleanup: false
       # if set the docs directory will not be removed when importing docs.
       # When using this with a nav section in an imported repo you must keep the
       # docs directory in the path (e.g., docs/path/to/file.md).
+      cleanup: false
       keep_docs_dir: true
+      nav_repos:
+        - name: workflow
+          import_url: https://github.com/autoresearch/autora-workflow?branch=main&multi_docs=True
+          imports: [mkdocs.yml, docs/*]
   - mkdocs-jupyter:
       include_source: true
       execute: false
@@ -106,7 +109,7 @@ nav:
       - DARTS & BMS: 'cycle/simple_cycle_bms_darts.ipynb'
       - BMS & Poppernet: 'cycle/simple_cycle_bms_model_poppernet.ipynb'
       - Uncertainty Experimentalist: 'cycle/simple_cycle_uncertainty_experimentalist.ipynb'
-  - Workflows: '!import ../../autora-workflow/?branch=main&docs_dir=docs&multi_docs=True'
+  - Workflows: workflow/docs/
 - Contributor Guide:
     - Module Contributions
     - Core Contributions
