@@ -191,6 +191,13 @@ class Architect(object):
             self._backward_step(input_valid, target_valid)
         # move Adam one step
         self.optimizer.step()
+        if torch.any(torch.isnan(self.model.alphas_normal)):
+            raise ValueError(
+                "NaN was found in the architecture weights after updating the "
+                "weights. This can happen if "
+                "the input data contains values that are too large. Consider "
+                "scaling the input data."
+            )
 
     # backward step (using non-approximate architecture gradient, i.e., full training)
     def _backward_step(self, input_valid: torch.Tensor, target_valid: torch.Tensor):
