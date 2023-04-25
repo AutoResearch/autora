@@ -1,5 +1,5 @@
 import os
-from prior_frequencies import get_raw_priors
+from studies.bms.prior_frequencies import get_raw_priors
 import numpy as np
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
@@ -35,7 +35,7 @@ def freq_to_prior(freq, op_type, num_param, num_var, prior_name, refit=False):
                 value += params_2[5]
         else:
             raise KeyError('This prior is not available')
-        prior.update({op: value})
+        prior.update({'Nopi_' + op: value})
     return prior
 
 
@@ -84,7 +84,7 @@ def get_prior_dicts(op_type):
     return prior_dicts, idx
 
 
-def fit_formula(raw_prior_name, op_type):
+def fit_formula(raw_prior_name, op_type, rep=1000):
     dics, idx = get_prior_dicts(op_type=op_type)
     raw, raw_type = get_raw_priors(raw_prior_name)
     dic_length = len(dics[0])
@@ -94,6 +94,7 @@ def fit_formula(raw_prior_name, op_type):
         for dic in dics:
             for op in dic.keys():
                 if op not in ['nv', 'np']:
+                    print(op)
                     new_line = [dic['np'], dic['nv'], np.log(raw[op]), dic[op]]
                     data[idx] = new_line
                     idx += 1
@@ -101,8 +102,8 @@ def fit_formula(raw_prior_name, op_type):
         b = 0
         c = 0
         d = 0
-        score = 0
-        repetitions = 1000
+        score = []
+        repetitions = rep
         for rep in range(repetitions):
             X_train, X_test, y_train, y_test = train_test_split(data[:, 0:3], data[:, 3], test_size=0.2)
             model = LinearRegression().fit(X_train, y_train)
@@ -110,8 +111,8 @@ def fit_formula(raw_prior_name, op_type):
             b += model.coef_[0] / repetitions
             c += model.coef_[1] / repetitions
             d += model.coef_[2] / repetitions
-            score += model.score(X_test, y_test) / repetitions
-        return [a, b, c, d]
+            score += [model.score(X_test, y_test)]
+        return [a, b, c, d, score]
     elif op_type == 2:
         data = np.zeros((idx * dic_length, 6))
         idx = 0
@@ -128,9 +129,9 @@ def fit_formula(raw_prior_name, op_type):
         d = 0
         e = 0
         f = 0
-        score = 0
-        repetitions = 1000
-        for rep in range(repetitions):
+        score = []
+        repetitions = rep
+        for i in range(repetitions):
             X_train, X_test, y_train, y_test = train_test_split(data[:, 0:5], data[:, 5], test_size=0.2)
             model = LinearRegression().fit(X_train, y_train)
             a += model.intercept_ / repetitions
@@ -139,39 +140,31 @@ def fit_formula(raw_prior_name, op_type):
             d += model.coef_[2] / repetitions
             e += model.coef_[3] / repetitions
             f += model.coef_[4] / repetitions
-            score += model.score(X_test, y_test) / repetitions
-        return [a, b, c, d, e, f]
+            score += [model.score(X_test, y_test)]
+        return [a, b, c, d, e, f, score]
 
 
 if __name__ == '__main__':
-    dics, idx = get_prior_dicts(op_type=1)
-    print(idx-141*2)
-    raw, raw_type = get_raw_priors('Guimera2020')
-    dic_length = len(dics[0])
-    # np, nv, log(freq), log(np+nv), prior
-    data = np.zeros((idx*dic_length, 5))
-    idx = 0
-    for dic in dics:
-        for op in dic.keys():
-            if op not in ['nv', 'np']:
-                new_line = [dic['np'], dic['nv'], np.log(raw[op]), np.log(dic['np']+dic['nv']), dic[op]]
-                data[idx] = new_line
-                idx += 1
-    a = 0
-    b = 0
-    c = 0
-    d = 0
-    e = 0
-    score = 0
-    repetitions = 1000
-    for rep in range(repetitions):
-        X_train, X_test, y_train, y_test = train_test_split(data[:, 0:4], data[:, 4], test_size=0.2)
-        model = LinearRegression().fit(X_train, y_train)
-        a += model.intercept_/repetitions
-        b += model.coef_[0]/repetitions
-        c += model.coef_[1]/repetitions
-        d += model.coef_[2]/repetitions
-        e += model.coef_[3]/repetitions
-        score += model.score(X_test, y_test)/repetitions
-    print((a, b, c, d, e))
-    print(score)
+    for OP_TYPE in [1, 2]:
+        PRIOR_NAME = 'Guimera2020'
+        # OP_TYPE = 2
+        REP = 10000
+        results = fit_formula(raw_prior_name=PRIOR_NAME, op_type=OP_TYPE, rep=REP)
+        scores = results[-1]
+        mean = sum(scores) / REP
+        std = np.sqrt(sum([((x - mean) ** 2) for x in scores]) / REP)
+        print('Number of operands: '+str(OP_TYPE))
+        if OP_TYPE == 1:
+            a, b, c, d = results[0:4]
+            print('Prior(op, np, nv) = ' + str(np.round(a, 3)) + ' + ' + str(np.round(b, 3)) + \
+                  ' * np + ' + str(np.round(c, 3)) + ' * nv + ' + str(np.round(d, 3)) + \
+                  ' * log(freq(op))')
+        elif OP_TYPE == 2:
+            a, b, c, d, e, f = results[0:6]
+            print('Prior(op, np, nv) = ' + str(np.round(a, 3)) + ' + ' + str(np.round(b, 3)) + \
+                  ' * np + ' + str(np.round(c, 3)) + ' * nv + ' + str(np.round(d, 3)) + \
+                  ' * log(freq(op)) + ' + str(np.round(e, 3)) + ' * log(np + nv) + ' + \
+                  str(np.round(f, 3)) + ' * commutative(op) ')
+
+        print('Accuracy: ' + str(np.round(mean * 100, 4)) + ' +/- ' + str(np.round(std * 100, 4)))
+        print('Number of repetitions: ' + str(REP))

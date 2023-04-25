@@ -107,7 +107,7 @@ def fit_theorist(X, y, theorist_name, metadata, theorist_epochs=None, num_param=
             theorist.fit(X, y, ignore_penalty=True)
         elif theorist_name == "BMS Lite":
             theorist.fit(X, y, ignore_prior=True, ignore_penalty=True)
-        elif theorist_name == "BMS":
+        elif "BMS" in theorist_name:
             theorist.fit(X, y, num_param=num_param)
         else:
             theorist.fit(X, y)
@@ -316,16 +316,16 @@ def get_LL(mse):
     return np.log(mse)
 
 
-def get_BIC(theorist, theorist_name, mse, num_obs):
-    # BIC = n * LL + k * log(n)
+def get_BIC(theorist, theorist_name, mse, num_obs, num_param, num_var):
+    # BIC = k * log(n) + n * (log(2pi) + log(mse) + 1)
     num_params = get_num_params(theorist, theorist_name)
-    return num_params * np.log(num_obs) + 2 * get_LL(mse)
+    return num_params * np.log(num_obs) + num_obs * (np.log(2*np.pi) + get_LL(mse) + 1)
 
 
-def get_DL(theorist, theorist_name, mse, num_obs):
+def get_DL(theorist, theorist_name, mse, num_obs, num_param, num_var):
     # DL = BIC/2 + PRIORS
-    bic = get_BIC(theorist, theorist_name, mse, num_obs)
-    prior = get_prior(theorist, theorist_name)
+    bic = get_BIC(theorist, theorist_name, mse, num_obs, num_param, num_var)
+    prior = get_prior(theorist, theorist_name, num_param, num_var)
     return bic / 2.0 + prior
 
 
@@ -359,9 +359,12 @@ def get_num_params(theorist, theorist_name):
         raise
 
 
-def get_prior(theorist, theorist_name):
+def get_prior(theorist, theorist_name, num_param, num_var):
     prior = 0.0
-    prior_par, _ = get_priors()
+    if 'BMS Prior' in theorist_name:
+        prior_par = get_priors(theorist_name[10:], num_param, num_var)
+    else:
+        prior_par = get_priors('Default', num_param, num_var)
     if "BMS" in theorist_name:
         for op, nop in list(theorist.model_.nops.items()):
             try:

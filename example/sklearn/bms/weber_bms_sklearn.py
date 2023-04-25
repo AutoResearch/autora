@@ -26,10 +26,10 @@ prior_par, _ = get_priors()
 ts = [1.0] + [1.04**k for k in range(1, 20)]
 
 # epoch num
-epochs = 1500
+epochs = 10000
 
 estimator = BMSRegressor(prior_par, ts, epochs)
-estimator = estimator.fit(x, y)
+estimator = estimator.fit(x, y, num_param=1)
 
 print(estimator.model_)
 

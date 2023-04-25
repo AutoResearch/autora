@@ -3,7 +3,7 @@ from autora.skl.bms import BMSRegressor
 from sklearn.metrics import log_loss
 from scipy.special import expit
 import numpy as np
-from studies.cogsci2023.fleming_theorist import FlemingTheorist
+from autora.studies.cogsci2023.fleming_theorist import FlemingTheorist
 
 
 def sigmoid(x):

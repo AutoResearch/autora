@@ -1,41 +1,30 @@
 import pickle
 import time
-
+import pandas as pd
 from sklearn.model_selection import train_test_split
 
-from studies.cogsci2023.models.models import model_inventory, param_dict
+from studies.cogsci2023.models.models import model_inventory
 from studies.cogsci2023.utils import fit_theorist, get_MSE, get_LL, get_BIC, get_DL
 
 # META PARAMETERS
 repetitions = 1  # specifies how many times to repeat the study (20)
 test_size = 0.2  # proportion of test set size to training set size
 
-# SELECT GROUND TRUTH MODEL
-ground_truth_name = "weber_fechner"  # OPTIONS: see models.py
-
 theorists = [
-    'BMS',
-    'BMS Prior Default',
-    'BMS Prior Williams2023Psychophysics',
-    'BMS Prior Williams2023CognitivePsychology',
-    'BMS Prior Williams2023BehavioralEconomics',
+    "BMS",
+    "BMS Fixed Root",
+    "Logit Regression",
+    "DARTS 3 Nodes",
+    "MLP",
+    "BSR"
 ]
 
 for rep in range(repetitions):
+    df = pd.read_csv('baseline_datasets/data_fleming')
 
-    # get information from the ground truth model
-    if ground_truth_name not in model_inventory.keys():
-        raise ValueError(f"Study {ground_truth_name} not found in model inventory.")
-    (metadata, data_fnc, experiment) = model_inventory[ground_truth_name]
-
-    # split data_closed_loop into training and test sets
-    X_full, y_full = data_fnc(metadata)
     X_train, X_test, y_train, y_test = train_test_split(
         X_full, y_full, test_size=test_size, random_state=rep
     )
-
-    num_var = X_train.shape[1]
-    num_param = param_dict[ground_truth_name]
 
     MSE_log = list()
     LL_log = list()
@@ -49,7 +38,7 @@ for rep in range(repetitions):
 
         # fit the theorist
         st = time.time()
-        theorist = fit_theorist(X_train, y_train, theorist_name, metadata, None, num_param, num_var)
+        theorist = fit_theorist(X_train, y_train, theorist_name, metadata)
         et = time.time()
         elapsed_time = et - st
         elapsed_time_log.append(elapsed_time)
@@ -63,8 +52,8 @@ for rep in range(repetitions):
         mse = get_MSE(theorist, X_test, y_test)
         ll = get_LL(mse)
         num_obs = X_test.shape[0]
-        bic = get_BIC(theorist, theorist_name, mse, num_obs, num_param, num_var)
-        dl = get_DL(theorist, theorist_name, mse, num_obs, num_param, num_var)
+        bic = get_BIC(theorist, theorist_name, mse, num_obs)
+        dl = get_DL(theorist, theorist_name, mse, num_obs)
 
         MSE_log.append(mse)
         LL_log.append(ll)

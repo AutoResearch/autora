@@ -108,3 +108,18 @@ plot_inventory["evc_demand_selection"] = (plot_evc_demand, "EVC: Demand Selectio
 plot_inventory["evc_congruency"] = (plot_evc_congruency, "EVC: Distractor Effect")
 plot_inventory["shepard_luce_choice"] = (plot_shepard_luce, "Shepard-Luce Choice Ratio")
 plot_inventory["tva"] = (plot_tva, "Visual Attention Model")
+
+param_dict = {
+    'weber_fechner': 1,
+    'stevens_power_law': 2,
+    'expected_value': 2,
+    'prospect_theory': 7,
+    'exp_learning': 2,
+    'stroop_model': 1,
+    'task_switching': 7,
+    'evc_coged': 2,
+    'evc_demand_selection': 3,
+    'evc_congruency': 2,
+    'shepard_luce_choice': 2,
+    'tva': 2
+}

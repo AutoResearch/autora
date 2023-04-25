@@ -515,8 +515,6 @@ class Tree:
             self.ets[len(node.parent.offspring)].remove(node.parent)
         except:
             pass
-        except:
-            pass
         # Add the offspring to the list of nodes
         for n in node.offspring:
             self.nodes.append(n)
