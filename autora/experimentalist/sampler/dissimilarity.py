@@ -33,7 +33,7 @@ def summed_dissimilarity_sampler(
     X_ref: np.ndarray,
     n: int = 1,
     metric: AllowedMetrics = "euclidean",
-    integration: str = "sum",
+    integration: str = "min",
 ) -> np.ndarray:
     """
     This dissimilarity samples re-arranges the pool of IV conditions according to their
