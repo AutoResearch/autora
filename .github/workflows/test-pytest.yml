@@ -24,3 +24,5 @@ jobs:
         cache: "poetry"
     - run: poetry install --only main,test
     - run: poetry run pytest
+    - run: poetry run pytest --doctest-modules autora/controller
+
