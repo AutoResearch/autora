@@ -16,7 +16,7 @@ core = [
 theorists = [
     "autora-darts",
 ]
-dev = [
+dev = [  # TODO: move these to autora-core[dev] dependencies
     "build",
     "pre-commit",
     "mkdocs-material>=8.5.10,<10.0.0",
