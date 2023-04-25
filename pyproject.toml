@@ -8,14 +8,17 @@ authors = [
 ]
 readme = "README.md"
 requires-python = ">=3.8,<3.11"
-dependencies = ["autora-core"]
 
 [project.optional-dependencies]
+core = [
+    "autora-core"
+]
 theorists = [
     "autora-darts",
 ]
 dev = [
-    "pre-commit>=2.20,<4.0",
+    "build",
+    "pre-commit",
     "mkdocs-material>=8.5.10,<10.0.0",
     "mkdocs-gen-files>=0.3.4,<0.5.0",
     "mkdocs-literate-nav>=0.4.1,<0.7.0",
