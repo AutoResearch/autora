@@ -1,0 +1,1 @@
+# file to ensure that the src/ directory always exists so setuptools works
