@@ -8,6 +8,7 @@ authors = [
 ]
 readme = "README.md"
 requires-python = ">=3.8,<3.11"
+license = { file = "LICENSE.md" }
 
 [project.optional-dependencies]
 core = [
