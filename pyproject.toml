@@ -1,9 +1,8 @@
 [project]
 name = "autora"
 description = "Autonomous Research Assistant (AutoRA) is a framework for automating steps of the empirical research process."
-authors = [
-    {name = "Sebastian Musslick", email="sebastian_musslick@brown.edu"},
-    {name = "John Gerrard Holland", email="john_holland1@brown.edu"},
+authors = [{ name = "Sebastian Musslick", email = "sebastian_musslick@brown.edu" },
+  { name = "John Gerrard Holland", email = "john_holland1@brown.edu" },
 ]
 readme = "README.md"
 requires-python = ">=3.8,<3.11"
@@ -11,30 +10,26 @@ license = { file = "LICENSE.md" }
 dynamic = ["version"]
 
 [project.optional-dependencies]
-core = [
-    "autora-core"
-]
-theorists = [
-    "autora-darts",
-]
+core = ["autora-core"]
+theorists = ["autora-darts"]
 dev = [
-    "build",
-    "twine",
-    "autora[docs]",
-    "autora[core-dev]",
-    ]
-docs = [  # TODO: move these to autora-core[docs] dependencies
-    "mkdocs-material>=8.5.10,<10.0.0",
-    "mkdocs-gen-files>=0.3.4,<0.5.0",
-    "mkdocs-literate-nav>=0.4.1,<0.7.0",
-    "mkdocs-section-index>=0.3.4",
-    "mkdocstrings-python>=0.7.1,<0.10.0",
-    "mkdocs-jupyter>=0.24.1",
-    "mkdocs-multirepo-plugin>=0.6.1",
+  "build",
+  "twine",
+  "autora[docs]",
+  "autora[core-dev]",
 ]
-core-dev = [  # TODO: move these to autora-core[dev] dependencies
-    "autora[dev]",
-    "pre-commit",
+docs = [# TODO: move these to autora-core[docs] dependencies
+  "mkdocs-material>=8.5.10,<10.0.0",
+  "mkdocs-gen-files>=0.3.4,<0.5.0",
+  "mkdocs-literate-nav>=0.4.1,<0.7.0",
+  "mkdocs-section-index>=0.3.4",
+  "mkdocstrings-python>=0.7.1,<0.10.0",
+  "mkdocs-jupyter>=0.24.1",
+  "mkdocs-multirepo-plugin>=0.6.1",
+]
+core-dev = [# TODO: move these to autora-core[dev] dependencies
+  "autora[dev]",
+  "pre-commit",
 ]
 
 [project.urls]
