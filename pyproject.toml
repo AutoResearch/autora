@@ -1,6 +1,13 @@
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools_scm]
+write_to = "src/autora/_version.py"
+
 [project]
 name = "autora"
-version = "0.0.0"
+dynamic = ["version"]
 description = "Autonomous Research Assistant (AutoRA) is a framework for automating steps of the empirical research process."
 authors = [
     {name = "Sebastian Musslick", email="sebastian_musslick@brown.edu"},
@@ -33,9 +40,3 @@ homepage = "https://musslick.github.io/AER_website/Research.html"
 repository = "https://github.com/AutoResearch/autora"
 documentation = "https://autoresearch.github.io/autora/"
 
-[build-system]
-requires = ["setuptools", "setuptools-scm"]
-build-backend = "setuptools.build_meta"
-
-[tool.setuptools.packages.find]
-where = ["src"]
