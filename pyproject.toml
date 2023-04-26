@@ -1,6 +1,5 @@
 [project]
 name = "autora"
-dynamic = ["version"]
 description = "Autonomous Research Assistant (AutoRA) is a framework for automating steps of the empirical research process."
 authors = [
     {name = "Sebastian Musslick", email="sebastian_musslick@brown.edu"},
@@ -9,6 +8,7 @@ authors = [
 readme = "README.md"
 requires-python = ">=3.8,<3.11"
 license = { file = "LICENSE.md" }
+dynamic = ["version"]
 
 [project.optional-dependencies]
 core = [
