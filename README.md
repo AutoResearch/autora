@@ -422,3 +422,35 @@ The release process is automated using GitHub Actions.
   - Click on "Publish release"
 - GitHub actions will run to create and publish the PyPI and Anaconda packages, and publish the documentation. Check in 
   GitHub actions whether they run without errors and fix any errors which occur.
+
+
+# How to Develop
+
+Install this in an environment using your chosen package manager. 
+
+## Using `virtualenv`
+
+Create a new virtual environment:
+```shell
+virtualenv venv
+```
+
+Activate it:
+```shell
+source venv/bin/activate
+```
+
+Use `pip install` to install the current project (`"."`) in editable mode (`-e`) with dev-dependencies (`[dev]`):
+```shell
+pip install -e ".[dev]"
+```
+
+Build the package using:
+```shell
+python -m build
+```
+
+Publish the package to PyPI using `twine`:
+```shell
+twine upload dist/* 
+```
