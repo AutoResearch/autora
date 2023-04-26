@@ -1,38 +1,52 @@
-[tool.poetry]
+[project]
 name = "autora-core"
-version = "0.0.0"
-description = "Autonomous Research Assistant (AutoRA) is a framework for automating steps of the empirical research process. This framework implements tools for autonomously and iteratively generating 1) new theories to describe real-world data, and 2) experiments to invalidate those theories and seed a new cycle of theory-making. The experiments will be run online via crowd-sourcing platforms (MTurk, Prolific)."
+description = "Autonomous Research Assistant (AutoRA) is a framework for automating steps of the empirical research process. "
 authors = [
-    "Sebastian Musslick <sebastian_musslick@brown.edu>",
-    "John Gerrard Holland <john_holland1@brown.edu>",
+    { name="Sebastian Musslick", email="sebastian_musslick@brown.edu" },
+    { name="John Gerrard Holland", email="john_holland1@brown.edu" },
 ]
 readme = "README.md"
-homepage = "https://musslick.github.io/AER_website/Research.html"
-repository = "https://github.com/AutoResearch/autora"
-documentation = "https://autoresearch.github.io/autora/"
+requires-python = ">=3.8.10,<3.11"
+dynamic = ["version"]
 
-packages = [ { include = "autora", from = "src"}]
+dependencies = [
+    "numpy",
+    "matplotlib",
+    "pandas",
+    "scikit-learn"
+]
 
-[tool.poetry.dependencies]
-python = ">=3.8.10,<3.11"
-numpy = ">=1.22.1"
-matplotlib = "^3.2.1"
-pandas = ">=1.4.2,<3.0.0"
-scikit-learn = "^1.1.1"
 
-[tool.poetry.group.dev.dependencies]
-jupyter = "^1.0.0"
-ipython = "^8.4.0"
-ipywidgets = ">=7.7.1,<9.0.0"
-flake8 = "^6.0.0"
-pre-commit = ">=2.20,<4.0"
-
-[tool.poetry.group.test.dependencies]
-pytest = "^7.2.0"
-
-[build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+[project.optional-dependencies]
+dev = [
+    "autora-core[test]",
+    "autora-core[build]",
+    "autora-core[notebook]",
+    "autora-core[docs]",
+]
+test = [
+    "pytest",
+]
+build = [
+    "build",
+    "twine",
+    "flake8",
+    "pre-commit",
+]
+notebook = [
+    "jupyter",
+    "ipython",
+    "ipywidgets",
+]
+docs = [
+    "mkdocs-material",
+    "mkdocs-gen-files",
+    "mkdocs-literate-nav",
+    "mkdocs-section-index",
+    "mkdocstrings-python",
+    "mkdocs-jupyter",
+    "pymdown-extensions",
+]
 
 [tool.isort]
 profile = "black"
@@ -43,3 +57,15 @@ mypy_path="./src"
 [[tool.mypy.overrides]]
 module = ["matplotlib.*", "sklearn.*", "pandas.*", "numpy.*"]
 ignore_missing_imports=true
+
+[project.urls]
+homepage = "https://www.empiricalresearch.ai"
+repository = "https://github.com/AutoResearch/autora-theorist-template"
+documentation = "https://autoresearch.github.io/autora/"
+
+
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools_scm]
