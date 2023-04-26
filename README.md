@@ -430,6 +430,10 @@ Install this in an environment using your chosen package manager.
 
 ## Using `virtualenv`
 
+Install:
+- python: https://www.python.org/downloads/
+- virtualenv: https://virtualenv.pypa.io/en/latest/installation.html
+
 Create a new virtual environment:
 ```shell
 virtualenv venv
