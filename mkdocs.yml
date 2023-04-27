@@ -26,16 +26,9 @@ theme:
         icon: material/brightness-4
         name: Switch to light mode
   custom_dir: mkdocs/overrides
-
-plugins:
-  - multirepo:
-      # (optional) tells multirepo to clean up the temporary directory after site is built.
-      cleanup: false
-      # if set the docs directory will not be removed when importing docs.
-      # When using this with a nav section in an imported repo you must keep the
-      # docs directory in the path (e.g., docs/path/to/file.md).
-      keep_docs_dir: true
-
+  features:
+    - content.action.edit
+    - content.action.view
 
 nav:
 - Introduction: 'index.md'
