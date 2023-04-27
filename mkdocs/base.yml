@@ -2,9 +2,6 @@
 
 # Shared configuration matching the rest of the AutoRA documentation. 
 
-site_name: Autonomous Empirical Research
-repo_url: 'https://github.com/autoresearch/autora'
-
 theme:
   name: material
   features:
