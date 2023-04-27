@@ -7,12 +7,12 @@ import mkdocs_gen_files
 
 nav = mkdocs_gen_files.Nav()
 
-source_paths = sorted(Path("./autora").rglob("*.py"))
+source_paths = sorted(Path("./src/autora").rglob("*.py"))
 special_paths: List[Path] = []
 
 for path in source_paths + special_paths:
-    module_path = path.relative_to(".").with_suffix("")
-    doc_path = path.relative_to(".").with_suffix(".md")
+    module_path = path.relative_to("./src/").with_suffix("")
+    doc_path = path.relative_to("./src/").with_suffix(".md")
     full_doc_path = Path("reference", doc_path)
 
     parts = tuple(module_path.parts)

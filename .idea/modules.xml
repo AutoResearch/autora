@@ -3,6 +3,8 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/autora.iml" filepath="$PROJECT_DIR$/.idea/autora.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../autora-core/.idea/autora-core.iml" filepath="$PROJECT_DIR$/../autora-core/.idea/autora-core.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../autora-darts/.idea/autora-darts.iml" filepath="$PROJECT_DIR$/../autora-darts/.idea/autora-darts.iml" />
     </modules>
   </component>
 </project>

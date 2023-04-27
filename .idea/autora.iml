@@ -13,6 +13,8 @@
     </content>
     <orderEntry type="jdk" jdkName="Python 3.8 (autora)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module" module-name="autora-darts" />
+    <orderEntry type="module" module-name="autora-core" />
   </component>
   <component name="PackageRequirementsSettings">
     <option name="requirementsPath" value="" />
