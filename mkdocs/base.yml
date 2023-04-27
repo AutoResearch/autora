@@ -6,6 +6,7 @@ theme:
   name: material
 
 plugins:
+  multirepo: {}
   gen-files:
     scripts: [ "mkdocs/gen_ref_pages.py" ]
   literate-nav:
