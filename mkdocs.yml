@@ -39,11 +39,16 @@ nav:
 - User Guide:
   - Theorists:
     - Overview: 'theorist/overview.md'
-    - DARTS: '!import file:///Users/jholla10/Developer/autora-darts/?branch=main&docs_dir=docs&multi_docs=True'
+    - DARTS: '!import https://github.com/autoresearch/autora-theorist-darts/?branch=main&docs_dir=docs&extra_imports=["mkdocs    /base.yml"]'
+    - BSR
+    - BMS
   - Experimentalists:
     - Overview: 'experimentalists/overview.md'
-  - Synthetic Experiments
-  - Workflow: '!import https://github.com/autoresearch/autora-workflow/?branch=main&docs_dir=docs&multi_docs=True'
+  - Experiment Runners:
+    - Overview: 'experiment-runner/overview.md'
+  - Synthetic Datasets
+  - Workflow: '!import https://github.com/autoresearch/autora-workflow/?branch=main&docs_dir=docs&multi_docs=False'
 - Contributor Guide:
   - Module Contributions
   - Core Contributions
+
