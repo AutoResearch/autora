@@ -10,7 +10,8 @@ license = { file = "LICENSE.md" }
 dynamic = ["version"]
 
 dependencies = [
-  "autora-core"
+  "autora-core",
+  "autora-workflow",
 ]
 
 [project.optional-dependencies]
@@ -19,14 +20,11 @@ dev = [
 ]
 
 all = [
-  "autora[core]",
   "autora[all-theorists]",
   "autora[all-experimentalists]",
   "autora[all-experiment-runners]",
   "autora[synthetic-experiments]",
 ]
-
-core = ["autora-core"]
 
 all-theorists = [
   "autora-theorist-darts",
