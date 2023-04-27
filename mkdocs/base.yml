@@ -1,7 +1,6 @@
 # yaml-language-server: $schema=https://squidfunk.github.io/mkdocs-material/schema.json
 
-# Shared configuration matching the rest of the AutoRA documentation. 
-
+# Shared configuration matching the rest of the AutoRA documentation.
 theme:
   name: material
 
