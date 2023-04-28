@@ -34,6 +34,7 @@ all-experimentalists = [
 all-experiment-runners = [
 ]
 synthetic-experiments = [
+  "autora-synthetic-data"
 ]
 
 
