@@ -28,14 +28,13 @@ all = [
 
 all-theorists = [
   "autora-theorist-darts",
-  "autora-theorist-bms",
-  "autora-theorist-bsr",
 ]
-theorist-darts = ["autora-theorist-darts"]
-
-all-experimentalists = []
-all-experiment-runners = []
-synthetic-experiments = []
+all-experimentalists = [
+]
+all-experiment-runners = [
+]
+synthetic-experiments = [
+]
 
 
 [project.urls]
