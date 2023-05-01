@@ -804,14 +804,14 @@ files = [
 
 [[package]]
 name = "imageio"
-version = "2.28.0"
+version = "2.28.1"
 description = "Library for reading and writing a wide range of image, video, scientific, and volumetric data formats."
 category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "imageio-2.28.0-py3-none-any.whl", hash = "sha256:889d9eca66ac9f664d480b78447db1774e7f386bd3b0a06be7e32362d5390f4c"},
-    {file = "imageio-2.28.0.tar.gz", hash = "sha256:467763bdb6e614d1ea8b4565e42c53fb2eb2fd4307a4601e97102a958c09812a"},
+    {file = "imageio-2.28.1-py3-none-any.whl", hash = "sha256:b9b456146aab459e648cde633b81bf487eb45248948f79c033e55af3bf1e6d70"},
+    {file = "imageio-2.28.1.tar.gz", hash = "sha256:5db5087be5c814ecf7e2c7d30a1a15c97eca97d8c26f31ddc54d767d4a43bce8"},
 ]
 
 [package.dependencies]
@@ -822,16 +822,16 @@ pillow = ">=8.3.2"
 all-plugins = ["astropy", "av", "imageio-ffmpeg", "psutil", "tifffile"]
 all-plugins-pypy = ["av", "imageio-ffmpeg", "psutil", "tifffile"]
 build = ["wheel"]
-dev = ["black", "flake8", "fsspec[github]", "invoke", "pytest", "pytest-cov"]
+dev = ["black", "flake8", "fsspec[github]", "pytest", "pytest-cov"]
 docs = ["numpydoc", "pydata-sphinx-theme", "sphinx (<6)"]
 ffmpeg = ["imageio-ffmpeg", "psutil"]
 fits = ["astropy"]
-full = ["astropy", "av", "black", "flake8", "fsspec[github]", "gdal", "imageio-ffmpeg", "invoke", "itk", "numpydoc", "psutil", "pydata-sphinx-theme", "pytest", "pytest-cov", "sphinx (<6)", "tifffile", "wheel"]
+full = ["astropy", "av", "black", "flake8", "fsspec[github]", "gdal", "imageio-ffmpeg", "itk", "numpydoc", "psutil", "pydata-sphinx-theme", "pytest", "pytest-cov", "sphinx (<6)", "tifffile", "wheel"]
 gdal = ["gdal"]
 itk = ["itk"]
 linting = ["black", "flake8"]
 pyav = ["av"]
-test = ["fsspec[github]", "invoke", "pytest", "pytest-cov"]
+test = ["fsspec[github]", "pytest", "pytest-cov"]
 tifffile = ["tifffile"]
 
 [[package]]
