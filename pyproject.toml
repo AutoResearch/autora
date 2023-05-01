@@ -43,9 +43,9 @@ synthetic-experiments = [
 
 
 [project.urls]
-homepage = "www.empiricalresearch.ai"
-repository = "github.com/AutoResearch/autora"
-documentation = "autoresearch.github.io/autora"
+homepage = "http://www.empiricalresearch.ai/"
+repository = "https://github.com/AutoResearch/autora"
+documentation = "https://autoresearch.github.io/autora/"
 
 [build-system]
 requires = ["setuptools", "setuptools-scm"]
