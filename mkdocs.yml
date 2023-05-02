@@ -39,7 +39,7 @@ nav:
 - User Guide:
   - Theorists:
     - Overview: 'theorist/overview.md'
-    - DARTS: '!import https://github.com/autoresearch/autora-theorist-darts/?branch=main&docs_dir=docs&extra_imports=["mkdocs    /base.yml"]'
+    - DARTS: '!import https://github.com/autoresearch/autora-theorist-darts/?branch=main&docs_dir=docs&extra_imports=["mkdocs/base.yml"]'
     - BSR
     - BMS
   - Experimentalists:
