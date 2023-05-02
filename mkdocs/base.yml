@@ -6,15 +6,6 @@ theme:
 
 plugins:
   multirepo: {}
-  gen-files:
-    scripts: [ "mkdocs/gen_ref_pages.py" ]
-  literate-nav:
-    nav_file: SUMMARY.md
-  section-index: {}
-  mkdocstrings:
-      handlers:
-        python: 
-          import: ["https://scikit-learn.org/stable/objects.inv"]
   mkdocs-jupyter:  # required to convert Jupyter notebooks
     include_source: true
     execute: false
