@@ -46,7 +46,7 @@ nav:
     - Overview: 'experimentalists/overview.md'
   - Experiment Runners:
     - Overview: 'experiment-runner/overview.md'
-  - Synthetic Datasets
+  - Synthetic Datasets: '!import https://github.com/autoresearch/autora-synthetic-data/?branch=main&extra_imports=["mkdocs/base.yml"]'
   - Workflow: '!import https://github.com/autoresearch/autora-workflow/?branch=main&extra_imports=["mkdocs/base.yml"]'
 - Contributor Guide:
   - Module Contributions
