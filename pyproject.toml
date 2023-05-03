@@ -33,6 +33,10 @@ theorist-darts = [
   "autora-theorist-darts",
 ]
 all-experimentalists = [
+  "autora[experimentalist-inequality-sampler]",
+]
+experimentalist-inequality-sampler =[
+  "autora-experimentalist-inequality-sampler"
 ]
 all-experiment-runners = [
 ]
