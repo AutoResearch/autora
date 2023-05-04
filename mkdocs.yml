@@ -29,6 +29,7 @@ theme:
   features:
     - content.action.edit
     - content.action.view
+    - navigation.indexes
 
 nav:
 - Introduction: 'index.md'
