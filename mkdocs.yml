@@ -39,16 +39,16 @@ nav:
   - Closed-Loop Discovery
 - User Guide:
   - Theorists:
-    - Overview: 'theorist/overview.md'
+    - Home: 'theorist/index.md'
     - DARTS: '!import https://github.com/autoresearch/autora-theorist-darts/?branch=main&extra_imports=["mkdocs/base.yml"]'
     - BSR
     - BMS
   - Experimentalists:
-    - Overview: 'experimentalists/overview.md'
+    - Home: 'experimentalists/index.md'
     - Novelty Sampler: '!import https://github.com/autoresearch/autora-novelty-sampler/?branch=main&extra_imports=["mkdocs/base.yml"]'
     - Inequality Sampler: '!import https://github.com/autoresearch/autora-experimentalist-inequality-sampler/?branch=main&extra_imports=["mkdocs/base.yml"]'
   - Experiment Runners:
-    - Overview: 'experiment-runner/overview.md'
+    - Home: 'experiment-runner/index.md'
   - Synthetic Datasets: '!import https://github.com/autoresearch/autora-synthetic-data/?branch=main&extra_imports=["mkdocs/base.yml"]'
   - Workflow: '!import https://github.com/autoresearch/autora-workflow/?branch=main&extra_imports=["mkdocs/base.yml"]'
 - Contributor Guide:
