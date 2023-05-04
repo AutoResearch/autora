@@ -3,6 +3,48 @@ import numpy as np
 from functools import partial
 from ..inventory import SyntheticExperimentCollection, register
 
+def get_metadata(minimum_value, maximum_value, resolution, n_iv, n_dv):
+    # n_iv -- number of independent variable dimensions
+    # n_dv --  number of dependent variable dimensions
+    independent_vars = []
+    dependent_vars = []
+    for i in range(n_iv):
+        i_v = IV(
+            name=i, # name is just the dimension ordinal number 
+            allowed_values=np.linspace(
+                minimum_value,
+                maximum_value,
+                resolution,
+            ),
+            value_range=(minimum_value, maximum_value),
+            units="NA",
+            variable_label=i,
+            type=ValueType.REAL,
+        )
+        independent_vars.append(i_v)
+    
+    for n in range(n_iv,n_dv+n_iv): # range of dependent variables starts with the ordinal number of the last independent variable+1
+        d_v = DV(
+            name=n,
+            allowed_values=np.linspace(
+                minimum_value,
+                maximum_value,
+                resolution,
+            ),
+            units="NA",
+            variable_label=n,
+            type=ValueType.REAL,
+        )
+        dependent_vars.append(d_v)
+        
+
+    metadata_ = VariableCollection(
+        independent_variables=independent_vars,
+        dependent_variables=dependent_vars,
+    )
+    return metadata_
+
+
 
 class multivariate_gaussian:
 
@@ -89,18 +131,29 @@ def clustered_MVG(
         scales = [], # scales of the clusters
         # locs and scales must have the same length
         cluster_priors = [], # prior weights of the clusters; if not specified, clusters get equal weight
-        n_samples = 1 # N of points to sample per each experimental condition
+        n_samples = 1, # N of points to sample per each experimental condition
+        n_iv = 1,
+        resolution=10,
+        minimum_value=0,
+        maximum_value=100,
         ):
     
     
     if len(cluster_priors)==0: # cluster priors are not provided -> assign uniform priors
             cluster_priors = np.full(len(locs), 1 / len(locs))
 
+    metadata = get_metadata(
+        minimum_value=minimum_value, maximum_value=maximum_value, resolution=resolution
+    )
+    
     params = dict(locs = locs,
                   scales = scales,
                   cluster_priors = cluster_priors,
                   n_samples = n_samples,
                   name = name,
+                  minimum_value=minimum_value,
+                  maximum_value=maximum_value,
+                  resolution=resolution,
                   )    
     
     def experiment_runner(D: np.ndarray, V = np.ndarray):
@@ -112,17 +165,26 @@ def clustered_MVG(
         Obs = []
         for i in len(D):
             for _ in n_samples: # N of samples per each experiment
-                Obs.append(MVG.sample(cond_dims=D[i],cond_vals=V[i]))
+                observation = MVG.sample(cond_dims=D[i],cond_vals=V[i])
+                observation[observation<minimum_value] = minimum_value # check
+                observation[observation<maximum_value] = maximum_value # check 
+                Obs.append(observation)
         return Obs
 
-
+    
     ground_truth = partial(experiment_runner)
+    
+    def domain():
+        X = np.array(
+            np.meshgrid([x.allowed_values for x in metadata.independent_variables]) # not sure how to make this work
+        ).T.reshape(-1, n_iv)
+        return X
         
     collection = SyntheticExperimentCollection(
         name=name,
         params=params,
-        metadata=None,
-        domain=None,
+        metadata=metadata,
+        domain=domain,
         experiment_runner=experiment_runner,
         ground_truth=ground_truth,
         plotter=None,
