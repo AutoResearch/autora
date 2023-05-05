@@ -28,9 +28,13 @@ all = [
 
 all-theorists = [
   "autora[theorist-darts]",
+  "autora[theorist-bms]",
 ]
 theorist-darts = [
   "autora-theorist-darts",
+]
+theorist-bms = [
+  "autora-theorist-bms",
 ]
 all-experimentalists = [
   "autora[experimentalist-inequality-sampler]",
