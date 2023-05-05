@@ -41,8 +41,8 @@ nav:
   - Theorists:
     - Home: 'theorist/index.md'
     - DARTS: '!import https://github.com/autoresearch/autora-theorist-darts/?branch=main&extra_imports=["mkdocs/base.yml"]'
+    - BMS: '!import https://github.com/autoresearch/autora-theorist-bms/?branch=main&extra_imports=["mkdocs/base.yml"]'
     - BSR
-    - BMS
   - Experimentalists:
     - Home: 'experimentalists/index.md'
     - Novelty Sampler: '!import https://github.com/autoresearch/autora-novelty-sampler/?branch=main&extra_imports=["mkdocs/base.yml"]'
