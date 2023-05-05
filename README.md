@@ -423,6 +423,35 @@ The release process is automated using GitHub Actions.
 - GitHub actions will run to create and publish the PyPI and Anaconda packages, and publish the documentation. Check in 
   GitHub actions whether they run without errors and fix any errors which occur.
 
+# How to add new packages
+
+This demonstrates how to add a package published under autora-theorist-example in pyPI in the GitHub repository 
+example-contributor/contributor-theorist
+
+## Add the package as optional dependency
+In the `pyorject.toml` file add an optional dependency for the package in the [project.optional-dependencies] section:
+```toml
+example-theorist = ["autora-theorits-example"]
+```
+Add the example-theorist to be part of the all-theorists dependency:
+```toml
+all-theorists = [
+    ...
+    "autora[example-theorist]",
+    ...
+]
+```
+
+## Import documentation from the package repository
+Import the documentation in the `mkdocs.yml` file:
+```yml
+- User Guide:
+  - Theorists:
+    - Overview: 'theorist/overview.md'
+    ...
+    - Example Theorist: '!import https://github.com/example-contributor/contributor-theorist/?branch=main&extra_imports=["mkdocs/base.yml"]'
+    ...
+```
 
 # How to Develop
 
