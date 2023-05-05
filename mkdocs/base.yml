@@ -17,6 +17,7 @@ markdown_extensions:
   pymdownx.superfences: {}
   pymdownx.arithmatex: # required for equation display
     generic: true
+  pymdownx.snippets: {}
 
 extra_javascript: [ 
   # requirements for pymdownx.arithmetex:
