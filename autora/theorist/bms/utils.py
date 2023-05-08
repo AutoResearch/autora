@@ -31,11 +31,6 @@ def run(
 
     """
     desc_len, model, model_len = [], pms.t1, np.inf
-    from datetime import datetime
-    laps = []
-    times = []
-    splits = []
-    start_time = datetime.now()
     for n in tqdm(range(num_steps)):
         pms.mcmc_step()
         pms.tree_swap()
