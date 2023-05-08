@@ -51,6 +51,16 @@ nav:
     - Home: 'experiment-runner/index.md'
   - Synthetic Datasets: '!import https://github.com/autoresearch/autora-synthetic-data/?branch=main&extra_imports=["mkdocs/base.yml"]'
   - Workflow: '!import https://github.com/autoresearch/autora-workflow/?branch=main&extra_imports=["mkdocs/base.yml"]'
+  - Closed Loop:
+      - Firebase:
+          - Home: 'closed-loop/firebase/index.md'
+          - Examples:
+              - Stroop JsPsych: 'closed-loop/firebase/examples/stroop.md'
+              - Super Experiment: 'closed-loop/firebase/examples/super-experiment.md'
+              - Sweet Bean: 'closed-loop/firebase/examples/sweet-bean.md'
+              - Upload JsPsych Script: 'closed-loop/firebase/examples/upload-javascript.md'
+
+
 - Contributor Guide:
   - Module Contributions
   - Core Contributions
