@@ -1831,14 +1831,14 @@ python-legacy = ["mkdocstrings-python-legacy (>=0.2.1)"]
 
 [[package]]
 name = "mkdocstrings-python"
-version = "0.9.0"
+version = "0.10.1"
 description = "A Python handler for mkdocstrings."
 category = "dev"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "mkdocstrings-python-0.9.0.tar.gz", hash = "sha256:da0a54d7d46523a25a5227f0ecc74b491291bd9d36fc71445bfb0ea64283e287"},
-    {file = "mkdocstrings_python-0.9.0-py3-none-any.whl", hash = "sha256:00e02b5d3d444f9abdec2398f9ba0c73e15deab78685f793f5801fd4d62a5b6f"},
+    {file = "mkdocstrings_python-0.10.1-py3-none-any.whl", hash = "sha256:ef239cee2c688e2b949a0a47e42a141d744dd12b7007311b3309dc70e3bafc5c"},
+    {file = "mkdocstrings_python-0.10.1.tar.gz", hash = "sha256:b72301fff739070ec517b5b36bf2f7c49d1360a275896a64efb97fc17d3f3968"},
 ]
 
 [package.dependencies]
@@ -3861,4 +3861,4 @@ tinkerforge = ["tinkerforge"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8.10,<3.11"
-content-hash = "99f68ef5e0e4cf363c5721ffaeef7de5f1260d3cffacc98ce89f000a78ccebb1"
+content-hash = "9a1d81d65a73c33d3b46d9e3326ecbc2dfbd6c8eec55de8cf603f8fc18dc941e"
