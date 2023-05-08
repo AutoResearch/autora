@@ -6,11 +6,12 @@ import pandas as pd
 import seaborn as sns
 from studies.cogsci2023.process_theorist_recovery import process_data
 
-path = "data_theorist/"
+path = "data_theorist_n0.1/"
 from_dataframe = True
 
 if not from_dataframe:
     process_data(path)
+    df_validation = pd.read_csv(path + 'df_validation.csv')
 else:
     try:
         df_validation = pd.read_csv(path+'df_validation.csv')
@@ -51,21 +52,35 @@ print(df_validation['Ground Truth'].unique())
 print(df_validation['Entry'])
 
 GT_order = ['Weber-Fechner Law', 'Steven’s Power Law', 'Exponential Learning', 'Luce-Choice-Ratio',
-           'Task Switching', 'Stroop Model', 'Incentivised Attention', 'Theory of Visual Attention',
-           'Demand Selection','Effort Discounting', 'Expected Utility Theory', 'Prospect Theory']
+            'Task Switching','Stroop Model', 'Incentivised Attention', 'Theory of Visual Attention',
+            'Demand Selection', 'Effort Discounting', 'Expected Utility Theory', 'Prospect Theory']
+
+fields = ['Psychophysics', 'Cognitive Psychology', 'Behavioral Economics']
+df_validation['Field'] = ''
+df_validation.loc[df_validation['Ground Truth'].isin(
+    ['Weber-Fechner Law', 'Steven’s Power Law', 'Exponential Learning', 'Luce-Choice-Ratio']
+), 'Field'] = fields[0]
+df_validation.loc[df_validation['Ground Truth'].isin(
+    ['Task Switching', 'Stroop Model', 'Incentivised Attention', 'Theory of Visual Attention']
+), 'Field'] = fields[1]
+df_validation.loc[df_validation['Ground Truth'].isin(
+    ['Demand Selection', 'Effort Discounting', 'Expected Utility Theory', 'Prospect Theory']
+), 'Field'] = fields[2]
 
 study = path[5:-1]
 measures = ['Mean Squared Error', 'Bayesian Information Criterion', 'Description Length']
 types = ['Average', 'Best']
-if path == 'data_theorist/' or path == 'data_prior/':
+if 'data_theorist' in path:
     theorist_order = df_validation['Theorist'].unique()[:-1]
+elif 'data_prior' in path:
+    theorist_order = df_validation['Theorist'].unique()
 elif path == 'data_paramter/':
     theorist_order = ['BMS Parameter['+str(i+1)+']' for i in range(8)]
 elif path == 'data+fixed_root/':
     theorist_order = ['BMS', 'BMS Fixed Root', 'Regression']
 
-theorist_order = ['Regression', 'BMS Parameter[5]', 'BMS Fixed Root Parameter[5]',
-                  'BMS Parameter[10]', 'BMS Fixed Root Parameter[10]']
+# theorist_order = ['Regression', 'BMS Parameter[5]', 'BMS Fixed Root Parameter[5]',
+#                   'BMS Parameter[10]', 'BMS Fixed Root Parameter[10]']
 
 for measure in measures:
     for type in types:
@@ -106,7 +121,48 @@ for measure in measures:
         figure.legend(handles=legend_elements)
         plt.show()
 
+# normalize errors by ground truth model
+for gt_model in GT_order:
+    for measure in measures:
+        df_validation.loc[df_validation['Ground Truth'] == gt_model, measure] = \
+            df_validation.loc[df_validation['Ground Truth'] == gt_model, measure] / \
+            df_validation.loc[df_validation['Ground Truth'] == gt_model, measure].min()
 
+for measure in measures:
+    for type in types:
+        figure, axis = plt.subplots(1, 3)
+        if type == 'Best':
+            df = df_validation.loc[df_validation.groupby(["Theorist", "Ground Truth"])[measure].idxmin()]
+            df = df.drop_duplicates(subset=['Ground Truth', 'Theorist'])
+        else:
+            df = df_validation
+        for i, field in enumerate(fields):
+            if field in df['Field'].unique():
+                x = 1
+                y = int(i)
+                g = sns.barplot(ax=axis[y], data=df.loc[df['Field'] == field],
+                                x='Theorist', y=measure,
+                                order=theorist_order,
+                                errorbar=('se'))
+                g.set_xlabel(field)
+                g.set_ylabel("")
+                g.set_xticklabels("")
+
+        plt.subplots_adjust(wspace=0.3)
+        figure.supxlabel('Theorist ' + type + ' Model')
+        figure.supylabel('Standardized ' + str(measure))
+        legend_elements=[]
+        colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
+        if study == 'theorist' and measure != 'Mean Squared Error':
+            colors = [colors[i] for i in [0, 2, 3, 4]]
+            order = [theorist_order[i] for i in [0, 2, 3, 4]]
+            print('EXCEPTION')
+        else:
+            order = theorist_order
+        for i, theorist_name in enumerate(order):
+            legend_elements.append(Patch(facecolor=colors[i], label=theorist_name))
+        figure.legend(handles=legend_elements)
+        plt.show()
 
 if __name__ == '__main__':
     ...

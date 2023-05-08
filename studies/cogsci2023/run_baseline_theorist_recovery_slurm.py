@@ -32,8 +32,8 @@ repetitions = np.arange(num_repetitions)
 gt_ids = np.arange(len(gts))
 conditions = np.array(np.meshgrid(repetitions, gt_ids)).T.reshape(-1,2)
 
-rep = conditions[args.slurm_id,0] # args.slurm_id
-gt_id = conditions[args.slurm_id,1]
+rep = conditions[args.slurm_id, 0] # args.slurm_id
+gt_id = conditions[args.slurm_id, 1]
 ground_truth_name = gts[gt_id]
 seed(rep)
 

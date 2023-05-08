@@ -3,7 +3,8 @@ from autora.skl.bms import BMSRegressor
 from sklearn.metrics import log_loss
 from scipy.special import expit
 import numpy as np
-from autora.studies.cogsci2023.fleming_theorist import FlemingTheorist
+from random import seed
+# from studies.cogsci2023.fleming_theorist import FlemingTheorist
 
 
 def sigmoid(x):
@@ -73,13 +74,14 @@ bms_theorists = [
 
 
 def run_fleming(iter: int = 1, bms_theorist: str = 'Regular Fixed'):
-    np.seed(iter)
+    seed(iter)
     # read in dataset for main experiment
     data = pd.read_csv('../baseline_datasets/data_fleming/mainexp-switch-effort.csv',
                        low_memory=False)
     data = filter_data(data)
     data = rename_data(data)
-    grouping_variable = 'g'
+    data = data.groupby(["g", "R", "E"]).mean().reset_index()
+    grouping_variable = "g"
 
     test_size = 0.2
 
@@ -99,7 +101,7 @@ def run_fleming(iter: int = 1, bms_theorist: str = 'Regular Fixed'):
 
     # DataFrame to hold final results
     results = pd.DataFrame(columns=['Theorist', 'Loss'])
-
+    predictions = pd.DataFrame(columns=['Theorist', 'Participant', 'Predictions'])
     # Fit and Test Hierarchical Logistic Regression models
     # for cond in logistic_models.keys():
     #     log_mod = FlemingTheorist()
@@ -116,13 +118,19 @@ def run_fleming(iter: int = 1, bms_theorist: str = 'Regular Fixed'):
         root = sigmoid
         root_string = 'Rooted'
     if 'Fixed' in bms_theorist:
-        bms = BMSRegressor(epochs=1500)
+        bms = BMSRegressor(epochs=15)
         bms.fit(X=data_train[['E', 'E2', 'R', 'R2']], y=data_train['y'], root=root)
         y_predict = bms.predict(data_test[['E', 'E2', 'R', 'R2']])
-        loss = log_loss(y_true=data_test['y'], y_pred=y_predict)
-        results.append(pd.Series(['BMS Fixed' + root_string, loss]), ignore_index=True)
+        predictions.append(pd.DataFrame(data=[['BMS Fixed' + root_string for _ in y_predict],
+                                              [0 for _ in y_predict],
+                                              y_predict]), ignore_index=True)
+        y_true = data_test['y'].to_numpy().reshape((-1, 1))
+        print(y_true.shape)
+        print(y_predict.shape)
+        # loss = log_loss(y_true=np.array(y_true), y_pred=np.array(y_predict))
+        # results.append(pd.Series(['BMS Fixed' + root_string, loss]), ignore_index=True)
     else:
-        bms = BMSRegressor(epochs=400)  # less epochs for much smaller data
+        bms = BMSRegressor(epochs=10)  # less epochs for much smaller data
         sle = 0
         num_par = 0
         for participant in data[grouping_variable].unique():
@@ -131,25 +139,28 @@ def run_fleming(iter: int = 1, bms_theorist: str = 'Regular Fixed'):
             data_test = df_ind.head(test_num)
             data_train = df_ind.head(df_ind.shape[0] - test_num)
             num_trials = df_ind.shape[0]
-            if len(data_test['y'].unique()) == 1:
-                print(
-                    'rejecting participant ' + str(participant) + 'from training due to either'
-                                                                  'always or never accepting')
-            else:
-                bms.fit(X=data_test[['E', 'E2', 'R', 'R2']], y=data_test['y'], root=root)
-                print(bms.model_)
-                y_predict = bms.predict(data_test[['E', 'E2', 'R', 'R2']])
-                loss = log_loss(y_true=data_test['y'], y_pred=y_predict)
-                num_par += test_num
-                # sse = get_MSE(theorist=bms, y_target=data_test['y'],
-                #               x=data_test[['E', 'E2', 'R', 'R2']]) * test_num
-                sle += loss * test_num
-        mle = sle / num_par
-        results.append(pd.Series(['BMS Variable' + root_string, mle]), ignore_index=True)
+            # if len(data_test['y'].unique()) == 1:
+            #    print(
+            #        'rejecting participant ' + str(participant) + 'from training due to either'
+            #                                                      'always or never accepting')
+            # else:
+            bms.fit(X=data_test[['E', 'E2', 'R', 'R2']], y=data_test['y'], root=root)
+            print(bms.model_)
+            y_predict = bms.predict(data_test[['E', 'E2', 'R', 'R2']])
+            predictions.append(pd.DataFrame(data=[['BMS Variable' + root_string for _ in y_predict],
+                                                  [participant for _ in y_predict],
+                                                  y_predict]), ignore_index=True)
+            # loss = log_loss(y_true=data_test['y'], y_pred=y_predict)
+            num_par += test_num
+            # sse = get_MSE(theorist=bms, y_target=data_test['y'],
+            #               x=data_test[['E', 'E2', 'R', 'R2']]) * test_num
+            # sle += loss * test_num
+        # mle = sle / num_par
+        # results.append(pd.Series(['BMS Variable' + root_string, mle]), ignore_index=True)
 
     # Save study data to csv
-    results.to_csv('baseline_models/fleming_implementation_'+str(iter)+'.csv', index=False)
+    results.to_csv('../baseline_models/fleming_implementation_'+str(iter)+'.csv', index=False)
 
 
 if __name__ == '__main__':
-    run_fleming()
+    run_fleming(bms_theorist='Regular Variable')

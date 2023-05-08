@@ -153,7 +153,7 @@ def process_data(path="data_theorist/", retrain=False):
 
 
 if __name__ == '__main__':
-    process_data('data_theorist/')
+    process_data('data_prior_n0.1/')
 
 # with open(os.path.join(path, 'evc_coged_8.pickle'), "rb") as f:
 #     pickle_data = pkl.load(f)
