@@ -1,4 +1,4 @@
-from models.models import model_inventory
+from models.models import model_inventory, param_dict
 from sklearn.model_selection import train_test_split
 
 from utils import (
@@ -21,12 +21,12 @@ test_size = 0.2                # proportion of test set size to training set siz
 low_memory = True
 
 theorists = [
-    'BMS Default',
-    'BMS Williams2023Psychophysics',
-    'BMS Williams2023CognitivePsychology',
-    'BMS Williams2023CognitivePsychologyUpWeighted',
-    'BMS Williams2023BehavioralEconomics',
-    'BMS Williams2023BehavioralEconomicsUpWeighted']
+    'Regression',
+    'MLP',
+    'DARTS 3 Nodes',
+    'BMS',
+    'BSR'
+    ]
 
 gts = ['weber_fechner',
        'stevens_power_law',
@@ -65,6 +65,10 @@ X_full, y_full = data_fnc(metadata)
 X_train, X_test, y_train, y_test = train_test_split(X_full, y_full,
                                                     test_size=test_size,
                                                     random_state=rep)
+
+num_var = X_train.shape[1]
+num_param = param_dict[ground_truth_name]
+
 MSE_log = list()
 DL_log = list()
 BIC_log = list()
@@ -77,7 +81,7 @@ for theorist_name in theorists:
 
     # fit the theorist
     st = time.time()
-    theorist = fit_theorist(X_train, y_train, theorist_name, metadata)
+    theorist = fit_theorist(X_train, y_train, theorist_name, metadata, num_param, num_var)
     et = time.time()
     elapsed_time = et - st
     elapsed_time_log.append(elapsed_time)
