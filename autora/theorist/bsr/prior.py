@@ -7,6 +7,7 @@ from .misc import normalize_prior_dict
 from .operation import (
     cos_op,
     exp_op,
+    log_op,
     inv_op,
     linear_op,
     make_pow_op,
@@ -30,6 +31,7 @@ def _get_ops_with_arity():
     ops_fn_and_arity = {
         "ln": [linear_op, 1],
         "exp": [exp_op, 1],
+        "log": [log_op, 1],
         "inv": [inv_op, 1],
         "neg": [neg_op, 1],
         "sin": [sin_op, 1],
@@ -74,8 +76,8 @@ def _get_ops_init() -> Dict[str, Union[Callable, object]]:
     """
     ops_init = {
         "ln": linear_init,
-        "inv": {"cutoff": 1e-10},
-        "exp": {"cutoff": 1e-10},
+        "inv": {"cutoff": 1e-7},
+        "exp": {"cutoff": 1e-7},
     }
     return ops_init
 
@@ -88,6 +90,7 @@ def _get_prior(prior_name: str, prob: bool = True) -> Dict[str, float]:
             "pow2": 1.0,
             "pow3": 1.0,
             "exp": 1.0,
+            "log": 1.0,
             "cos": 1.0,
             "+": 1.0,
             "*": 1.0,

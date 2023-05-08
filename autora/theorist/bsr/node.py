@@ -110,25 +110,26 @@ class Node:
         Return:
             result: the result of this calculation
         """
-        if X is None:
-            raise TypeError("input data X is non-existing")
-        if isinstance(X, np.ndarray):
-            X = pd.DataFrame(X)
-        if self.node_type == NodeType.LEAF:
-            result = np.array(X.iloc[:, self.params["feature"]]).flatten()
-        elif self.node_type == NodeType.UNARY:
-            assert self.left and self.operator
-            result = self.operator(self.left.evaluate(X), **self.params)
-        elif self.node_type == NodeType.BINARY:
-            assert self.left and self.right and self.operator
-            result = self.operator(
-                self.left.evaluate(X), self.right.evaluate(X), **self.params
-            )
-        else:
-            raise NotImplementedError("node evaluated before being setup")
-        if store_result:
-            self.result = result
-        return result
+        with np.errstate(invalid="ignore", divide="ignore"):
+            if X is None:
+                raise TypeError("input data X is non-existing")
+            if isinstance(X, np.ndarray):
+                X = pd.DataFrame(X)
+            if self.node_type == NodeType.LEAF:
+                result = np.array(X.iloc[:, self.params["feature"]]).flatten()
+            elif self.node_type == NodeType.UNARY:
+                assert self.left and self.operator
+                result = self.operator(self.left.evaluate(X), **self.params)
+            elif self.node_type == NodeType.BINARY:
+                assert self.left and self.right and self.operator
+                result = self.operator(
+                    self.left.evaluate(X), self.right.evaluate(X), **self.params
+                )
+            else:
+                raise NotImplementedError("node evaluated before being setup")
+            if store_result:
+                self.result = result
+            return result
 
     def get_expression(
         self,

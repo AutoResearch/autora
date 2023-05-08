@@ -23,13 +23,19 @@ def linear_op(operand: np.array, **params: Dict) -> np.array:
 
 # a safe `exp` operation that has a cutoff (default = 1e-10) and avoids overflow
 def exp_op(operand: np.array, **params: Dict) -> np.array:
-    cutoff = params.get("cutoff", 1e-10)
-    return 1 / (cutoff + np.exp(-operand))
+    cutoff = params.get("cutoff", 1e-7)
+    # ignore overflow since we have zero eventually
+    with np.errstate(over='ignore'):
+        return 1 / (cutoff + np.exp(-operand))
+
+
+def log_op(operand: np.array, **params: Dict) -> np.array:
+    return np.log(operand)
 
 
 # a safe `inv` operation that has a cutoff (default = 1e-10) and avoids overflow
 def inv_op(operand: np.array, **params: Dict) -> np.array:
-    cutoff = params.get("cutoff", 1e-10)
+    cutoff = params.get("cutoff", 1e-7)
     return 1 / (cutoff + operand)
 
 

@@ -125,7 +125,8 @@ def calc_tree_ll(
     # contribution of splitting the node or becoming leaf node
     if node.node_type == NodeType.LEAF:
         # contribution of choosing terminal
-        struct_ll += np.log(1 - 1 / np.power((1 + depth), -beta))
+        with np.errstate(divide="raise"):
+            struct_ll += np.log(1 - 1 / np.power((1 + depth), -beta))
         # contribution of feature selection
         struct_ll -= np.log(n_feature)
         return struct_ll, params_ll
@@ -143,7 +144,7 @@ def calc_tree_ll(
         if node.op_name == "ln":
             params_ll -= np.power((node.params["a"] - 1), 2) / (2 * sigma_a)
             params_ll -= np.power(node.params["b"], 2) / (2 * sigma_b)
-            params_ll -= 0.5 * np.log(4 * np.pi**2 * sigma_a * sigma_b)
+            params_ll -= 0.5 * np.log(4 * np.pi ** 2 * sigma_a * sigma_b)
     else:  # binary operator
         left = cast(Node, node.left)
         right = cast(Node, node.right)
@@ -184,7 +185,7 @@ def calc_y_ll(y: np.ndarray, outputs: Union[np.ndarray, pd.DataFrame], sigma_y: 
     # perform the linear combination
     output = np.matmul(outputs, beta)
     # calculate the squared error
-    error = np.sum(np.square(y - output[:, 0]))
+    error = np.sum(np.square(y - output))
 
     log_sum = error
     var = 2 * sigma_y * sigma_y
@@ -495,7 +496,14 @@ def _get_tree_classified_nodes(
             nterm_nodes.append(node)
             # rules for deciding whether a non-terminal node is de-transformable
             # 1. node is not root OR 2. children are not both terminal nodes
-            if node.depth or (node.left or node.right):
+            flag = True
+            if not node.depth:  # is root
+                if not node.right and node.left.node_type == NodeType.LEAF:
+                    flag = False
+                elif node.left.node_type == NodeType.LEAF \
+                    and node.right.node_type == NodeType.LEAF:
+                    flag = False
+            if flag:
                 de_trans_nodes.append(node)
         if node.op_name == "ln":
             lt_nodes.append(node)
@@ -553,7 +561,6 @@ def prop(
     )
     # flags indicating potential dimensionality change (expand or shrink) in node
     expand_node, shrink_node = False, False
-
     # ACTION 1: STAY
     # q and q_inv simply equal the probability of choosing this action
     if action == Action.STAY:
@@ -598,8 +605,9 @@ def prop(
             if new_lt_count > len(lt_nodes):
                 expand_node = True
     # ACTION 3: PRUNE
+    # we further require that the pruned node cannot be the root
     elif action == Action.PRUNE:
-        i = np.random.randint(0, len(nterm_nodes), 1)[0]
+        i = np.random.randint(1, len(nterm_nodes), 1)[0]
         pruned_node: Node = nterm_nodes[i]
         prune(pruned_node, n_feature)
         tree_ll, param_ll = calc_tree_ll(
@@ -805,7 +813,7 @@ def calc_aux_ll(node: Node, **hyper_params) -> Tuple[float, int]:
 
     all_nodes = get_all_nodes(node)
     lt_count = 0
-    for i in range(all_nodes):
+    for i in range(len(all_nodes)):
         if all_nodes[i].op_name == "ln":
             lt_count += 1
             a, b = all_nodes[i].params["a"], all_nodes[i].params["b"]
@@ -853,8 +861,8 @@ def prop_new(
     """
     # the hyper-param for linear combination, i.e. for `sigma_y`
     sig = 4
-    K = len(roots)
-    root = roots[index]
+    k_tree = len(roots)
+    root = copy.deepcopy(roots[index])
     use_aux_ll = True
 
     # sample new sigma_a and sigma_b
@@ -869,18 +877,20 @@ def prop_new(
     )
 
     n_feature = X.shape[0]
-    new_outputs = np.zeros((len(y), K))
-    old_outputs = np.zeros((len(y), K))
+    new_outputs = np.zeros((len(y), k_tree))
+    old_outputs = np.zeros((len(y), k_tree))
 
-    for i in np.arange(K):
-        tmp_old = root.evaluate(X)
-        old_outputs[:, i] = tmp_old
+    for i in np.arange(k_tree):
+        tmp_old = roots[i].evaluate(X)
         if i == index:
+            old_outputs[:, i] = tmp_old
             new_outputs[:, i] = new_root.evaluate(X)
         else:
+            old_outputs[:, i] = tmp_old
             new_outputs[:, i] = tmp_old
 
-    if np.linalg.matrix_rank(new_outputs) < K:  # rejection due to insufficient rank
+    # rejection due to invalid tree or insufficient rank
+    if not np.isfinite(new_outputs).all() or np.linalg.matrix_rank(new_outputs) < k_tree:
         return False, root, sigma_y, sigma_a, sigma_b
 
     y_ll_old = calc_y_ll(y, old_outputs, sigma_y)
@@ -899,7 +909,7 @@ def prop_new(
     else:
         log_struct_ratio = calc_tree_ll(
             new_root, ops_priors, n_feature, **hyper_params
-        )[0] - calc_tree_ll(root, ops_priors, n_feature, **hyper_params)
+        )[0] - calc_tree_ll(root, ops_priors, n_feature, **hyper_params)[0]
 
     # contribution of proposal Q and Qinv
     log_q_ratio = np.log(max(1e-5, q_inv / q))
@@ -920,7 +930,7 @@ def prop_new(
         log_r += np.log(max(1e-5, 1 / np.power(2, 2 * old_lt_count)))
 
     alpha = min(log_r, 0)
-    test = np.random.uniform(0, 1, 0)[0]
+    test = np.random.uniform(0, 1, 1)[0]
     if np.log(test) >= alpha:  # no accept
         return False, root, sigma_y, sigma_a, sigma_b
     else:  # accept
