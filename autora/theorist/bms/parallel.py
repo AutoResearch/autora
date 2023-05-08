@@ -108,12 +108,7 @@ class Parallel:
             p_rr = 0.0
         for T, tree in list(self.trees.items()):
             # MCMC step
-            start = datetime.now()
-            # split, type = tree.mcmc_step(verbose=verbose, p_rr=p_rr, p_long=p_long)
             tree.mcmc_step(verbose=verbose, p_rr=p_rr, p_long=p_long)
-            stop = datetime.now()
-            times.append((stop-start).total_seconds())
-            # splits.append((split, type))
         self.t1 = self.trees["1.0"]
         return times, splits
 
