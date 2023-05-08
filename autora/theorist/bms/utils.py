@@ -34,7 +34,6 @@ def run(
     for n in tqdm(range(num_steps)):
         pms.mcmc_step()
         pms.tree_swap()
-        times.append((datetime.now() - start_time).total_seconds())
         if num_steps % thinning == 0:  # sample less often if we thin more
             desc_len.append(pms.t1.E)  # Add the description length to the trace
         if pms.t1.E < model_len:  # Check if this is the MDL expression so far
