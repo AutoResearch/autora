@@ -100,17 +100,12 @@ class Parallel:
         """
         Perform a MCMC step in each of the trees
         """
-        # Loop over all trees
-        times = []
-        splits = []
-        from datetime import datetime
         if self.root is not None:
             p_rr = 0.0
         for T, tree in list(self.trees.items()):
             # MCMC step
             tree.mcmc_step(verbose=verbose, p_rr=p_rr, p_long=p_long)
         self.t1 = self.trees["1.0"]
-        return times, splits
 
     # -------------------------------------------------------------------------
     def tree_swap(self) -> Tuple[Optional[str], Optional[str]]:
