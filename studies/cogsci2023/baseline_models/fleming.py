@@ -80,7 +80,8 @@ def run_fleming(iter: int = 1, bms_theorist: str = 'Regular Fixed'):
                        low_memory=False)
     data = filter_data(data)
     data = rename_data(data)
-    data = data.groupby(["g", "R", "E"]).mean().reset_index()
+    if "Class" not in bms_theorist:
+        data = data.groupby(["g", "R", "E"]).mean().reset_index()
     grouping_variable = "g"
 
     test_size = 0.2
@@ -119,7 +120,7 @@ def run_fleming(iter: int = 1, bms_theorist: str = 'Regular Fixed'):
         root_string = 'Rooted'
     if 'Fixed' in bms_theorist:
         bms = BMSRegressor(epochs=15)
-        bms.fit(X=data_train[['E', 'E2', 'R', 'R2']], y=data_train['y'], root=root)
+        bms.fit(X=data_train[['E', 'E2', 'R', 'R2']], y=data_train['y'], root=root, data_type='class')
         y_predict = bms.predict(data_test[['E', 'E2', 'R', 'R2']])
         predictions.append(pd.DataFrame(data=[['BMS Fixed' + root_string for _ in y_predict],
                                               [0 for _ in y_predict],
@@ -163,4 +164,4 @@ def run_fleming(iter: int = 1, bms_theorist: str = 'Regular Fixed'):
 
 
 if __name__ == '__main__':
-    run_fleming(bms_theorist='Regular Variable')
+    run_fleming(bms_theorist='Regular Fixed Class')

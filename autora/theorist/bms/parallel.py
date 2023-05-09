@@ -35,6 +35,7 @@ class Parallel:
         ignore_prior=False,
         ignore_penalty=False,
         seed=None,
+        data_type='real'
     ) -> None:
         """
         Initialises Parallel Machine Scientist
@@ -70,6 +71,7 @@ class Parallel:
                 ignore_prior=ignore_prior,
                 ignore_penalty=ignore_penalty,
                 seed_value=seed,
+                data_type=data_type
             )
         }
         self.t1 = self.trees["1.0"]
@@ -89,6 +91,7 @@ class Parallel:
                 ignore_prior=ignore_prior,
                 ignore_penalty=ignore_penalty,
                 seed_value=seed,
+                data_type=data_type
             )
             self.trees[BT] = treetmp
             # Share fitted parameters and representative with other trees

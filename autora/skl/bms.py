@@ -87,6 +87,7 @@ class BMSRegressor(BaseEstimator, RegressorMixin):
         ignore_prior=False,
         ignore_penalty=False,
         seed=None,
+        data_type='real'
     ) -> BMSRegressor:
         """
         Runs the optimization for a given set of `X`s and `y`s.
@@ -122,20 +123,43 @@ class BMSRegressor(BaseEstimator, RegressorMixin):
                 self.add_primitive(op)
         if (root is not None) and (root not in self.ops.keys()):
             self.add_primitive(root)
-        self.pms = Parallel(
-            Ts=self.ts,
-            variables=self.variables,
-            parameters=["a%d" % i for i in range(num_param)],
-            x=X,
-            y=y,
-            prior_par=self.prior_par,
-            ops=self.ops,
-            custom_ops=self.custom_ops,
-            root=root,
-            ignore_prior=ignore_prior,
-            ignore_penalty=ignore_penalty,
-            seed=seed,
-        )
+        if data_type == 'real':
+            self.pms = Parallel(
+                Ts=self.ts,
+                variables=self.variables,
+                parameters=["a%d" % i for i in range(num_param)],
+                x=X,
+                y=y,
+                prior_par=self.prior_par,
+                ops=self.ops,
+                custom_ops=self.custom_ops,
+                root=root,
+                ignore_prior=ignore_prior,
+                ignore_penalty=ignore_penalty,
+                seed=seed,
+                data_type=data_type
+            )
+        elif data_type == 'class':
+            linear_func = self.get_linear(num_nodes=len(self.variables))
+            self.add_primitive(linear_func)
+            self.pms = Parallel(
+                Ts=self.ts,
+                variables=self.variables,
+                parameters=["a%d" % i for i in range(num_param)],
+                x=X,
+                y=y,
+                prior_par=self.prior_par,
+                ops=self.ops,
+                custom_ops=self.custom_ops,
+                root=linear_func,
+                ignore_prior=ignore_prior,
+                ignore_penalty=ignore_penalty,
+                seed=seed,
+                data_type=data_type
+            )
+        else:
+            raise KeyError('BMS not yet compatible with modeling this kind of data. Did you mean'
+                           '"Real" (for real continuous data) or "Class" (for noncontinuous data)?')
         self.model_, self.loss_, self.cache_ = utils.run(self.pms, self.epochs)
         self.models_ = list(self.pms.trees.values())
 
@@ -184,3 +208,22 @@ class BMSRegressor(BaseEstimator, RegressorMixin):
         self.custom_ops.update({op.__name__: op})
         self.ops.update({op.__name__: len(signature(op).parameters)})
         self.prior_par.update({"Nopi_" + op.__name__: 1})
+
+    @staticmethod
+    def get_linear(num_nodes):
+        args = ''
+        for n in range(num_nodes):
+            args += 'x'+str(n)+','
+        args = args[:-1]
+        linear_string = "def linear(" + args + '): return ' + '+'.join(args.split(','))
+        namespace = {}
+        exec(linear_string, namespace)
+        return namespace['linear']
+
+        # class Linear:
+        #     def __init__(self, name_space):
+        #         self.name_space: dict = name_space
+        #
+        #     def __call__(self):
+        #         return self.name_space['linear'].__call__
+        # return Linear(name_space)
