@@ -726,82 +726,18 @@ class Tree:
             if reset:
                 self.bic = 0
             return 0
-        if self.data_type == 'real':
-            # Get the sum of squared errors (fitting, if required)
-            sse = self.get_sse(fit=fit, verbose=verbose)
-            # Calculate the BIC
-            parameters = set([p.value for p in self.ets[0] if p.value in self.parameters])
-            if self.penalty:
-                k = 1 + len(parameters)
-            else:
-                k = 1
-            BIC = 0.0
-            for ds in self.y:
-                n = len(self.y[ds])
-                BIC += (k - n) * np.log(n) + n * (np.log(2.0 * np.pi) + log(sse[ds]) + 1)
-        elif 'class' in self.data_type:
-            X = None
-            for subroot in self.root.offspring:
-                ex = sympify(subroot.pr(custom_ops=self.custom_ops))
-                x = None
-                for par in self.parameters:
-                    if ex.is_Atom:
-                        if par == subroot.value:
-                            x = self.par_values["d0"][par]
-                    else:
-                        try:
-                            par_ex = sympy.symbols(par)
-                            if ex.find(lambda node: node == par_ex):
-                                ex = ex.sub(par_ex, self.par_values["d0"][par])
-                        except KeyError:
-                            pass
-                        except AttributeError:
-                            if par == subroot.value:
-                                ex = self.par_values["d0"][par]
-                ex = sympify(subroot.pr(custom_ops=self.custom_ops))
-                for var in self.variables:
-                    if ex.is_Atom:
-                        if var == subroot.value:
-                            x = self.x["d0"][var]
-                    else:
-                        try:
-                            var_ex = sympy.symbols(var)
-                            if ex.find(lambda node: node == var_ex):
-                                ex = ex.sub(var_ex, self.x["d0"][var])
-                        except KeyError:
-                            pass
-                        except AttributeError:
-                            if var == subroot.value:
-                                ex = self.x["d0"][var]
-                if type(x) == np.float64:
-                    x = np.ones(shape=(len(self.y["d0"]), 1)) * x
-                elif x is not None:
-                    x = np.array(x).astype(np.float64)
-                    x = np.expand_dims(x, axis=1)
-                else:
-                    x = np.array(ex).astype(np.float64)
-                    x = np.expand_dims(x, axis=1)
-                if X is None:
-                    X = x
-                else:
-                    X = np.concatenate([X, x], axis=1)
-            y = np.array(self.y["d0"])
-            try:
-                model = LogisticRegression().fit(X, y)
-            except ValueError:
-                raise ValueError("Continuous y-variable data is not 'Class'-type data")
-
-            # Calculate the BIC for the model
-            n_samples = len(y)
-            n_features = X.shape[1]
-            n_classes = len(y)
-            log_likelihood = model.score(X, y)
-            BIC = n_samples * np.log(n_classes) - 2 * log_likelihood + 2 * n_features * np.log(
-                n_samples)
+        # Get the sum of squared errors (fitting, if required)
+        sse = self.get_sse(fit=fit, verbose=verbose)
+        # Calculate the BIC
+        parameters = set([p.value for p in self.ets[0] if p.value in self.parameters])
+        if self.penalty:
+            k = 1 + len(parameters)
         else:
-            raise KeyError('BMS not yet compatible with modeling this kind of data. Did you mean'
-                           '"Real" (for real continuous data) or "Class" (for noncontinuous data)?')
-
+            k = 1
+        BIC = 0.0
+        for ds in self.y:
+            n = len(self.y[ds])
+            BIC += (k - n) * np.log(n) + n * (np.log(2.0 * np.pi) + log(sse[ds]) + 1)
         if reset:
             self.bic = BIC
         return BIC
