@@ -40,6 +40,7 @@ theorist-bms = [
 theorist-bsr = [
   "autora-theorist-bsr",
 ]
+
 all-experimentalists = [
   "autora[experimentalist-inequality-sampler]",
   "autora[experimentalist-novelty-sampler]",
@@ -50,8 +51,26 @@ experimentalist-novelty-sampler =[
 experimentalist-inequality-sampler =[
   "autora-experimentalist-inequality-sampler"
 ]
+
 all-experiment-runners = [
+  "autora[experiment-runner-firebase-prolific"]"
 ]
+experiment-runner-firebase-prolific = [
+  "autora-experiment-runner-firebase-prolific"
+]
+all-experiment-runner-experimentation-managers = [
+  "autora[experiment-runner-experimentation-manager-firebase]"
+]
+experiment-runner-experimentation-manager-firebase = [
+  "autora-experiment-runner-experimentation-manager-firebase"
+]
+all-experiment-runner-recruitment-managers=[
+  "autora[experiment-runner-recruitment-manager-prolific]"
+]
+experiment-runner-recruitment-manager-prolific = [
+  "autora-experiment-runner-recruitment-manager-prolific"
+]
+
 synthetic-experiments = [
   "autora-synthetic-data"
 ]
