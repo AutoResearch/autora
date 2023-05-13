@@ -53,7 +53,7 @@ experimentalist-inequality-sampler =[
 ]
 
 all-experiment-runners = [
-  "autora[experiment-runner-firebase-prolific"]"
+  "autora[experiment-runner-firebase-prolific]"
 ]
 experiment-runner-firebase-prolific = [
   "autora-experiment-runner-firebase-prolific"
