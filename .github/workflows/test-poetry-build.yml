@@ -22,3 +22,6 @@ jobs:
 
       - name: Build package
         run: poetry build
+
+      - name: Debug Torch
+        run: pip show torch
