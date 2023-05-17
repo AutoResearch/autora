@@ -45,6 +45,8 @@ all-experimentalists = [
   "autora[experimentalist-inequality-sampler]",
   "autora[experimentalist-novelty-sampler]",
   "autora[experimentalist-sampler-nearest-value-sampler]",
+  "autora[experimentalist-sampler-model-disagreement-sampler]",
+  "autora[experimentalist-sampler-uncertainty-sampler]",
 ]
 experimentalist-novelty-sampler =[
   "autora-experimentalist-novelty-sampler"
@@ -52,10 +54,15 @@ experimentalist-novelty-sampler =[
 experimentalist-sampler-nearest-value-sampler =[
   "autora-experimentalist-sampler-nearest-value-sampler"
 ]
-experimentalist-inequality-sampler =[
-  "autora-experimentalist-inequality-sampler"
+experimentalist-sampler-nearest-value-sampler =[
+  "autora-experimentalist-sampler-nearest-value-sampler"
 ]
-
+experimentalist-sampler-model-disagreement-sampler =[
+  "autora-experimentalist-sampler-model-disagreement-sampler"
+]
+experimentalist-sampler-uncertainty-sampler =[
+  "autora-experimentalist-sampler-uncertainty-sampler"
+]
 all-experiment-runners = [
   "autora[experiment-runner-firebase-prolific]"
 ]
