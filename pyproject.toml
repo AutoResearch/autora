@@ -34,7 +34,7 @@ torch = {version = "2.0.1", source = "pytorch-cpu"}
 [[tool.poetry.source]]
 name = "pytorch-cpu"
 url = "https://download.pytorch.org/whl/cpu"
-secondary = true
+secondary = false
 
 [tool.poetry.extras]
 tinkerforge = ["tinkerforge"]
