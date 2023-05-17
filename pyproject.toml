@@ -28,7 +28,6 @@ torch = [
     {version = "2.0.1", source="pypi", markers = "sys_platform == 'darwin' or sys_platform == 'win32'"},
     {version = "2.0.1", source = "pytorch-cpu", markers = "sys_platform == 'linux'"}
 ]
-# {version = "2.0.1", source="pypi", markers = "sys_platform == 'win32'"},
 
 [tool.poetry.extras]
 tinkerforge = ["tinkerforge"]
