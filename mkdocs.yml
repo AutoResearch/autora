@@ -47,6 +47,7 @@ nav:
     - Home: 'experimentalists/index.md'
     - Novelty Sampler: '!import https://github.com/autoresearch/autora-experimentalist-novelty-sampler/?branch=main&extra_imports=["mkdocs/base.yml"]'
     - Inequality Sampler: '!import https://github.com/autoresearch/autora-experimentalist-inequality-sampler/?branch=main&extra_imports=["mkdocs/base.yml"]'
+    - Nearest Value Sampler: '!import https://github.com/autoresearch/autora-experimentalist-sampler-nearest-value-sampler/?branch=main&extra_imports=["mkdocs/base.yml"]'
   - Experiment Runners:
     - Home: 'experiment-runner/index.md'
   - Synthetic Datasets: '!import https://github.com/autoresearch/autora-synthetic-data/?branch=main&extra_imports=["mkdocs/base.yml"]'
