@@ -54,9 +54,6 @@ experimentalist-novelty-sampler =[
 experimentalist-sampler-nearest-value-sampler =[
   "autora-experimentalist-sampler-nearest-value-sampler"
 ]
-experimentalist-sampler-nearest-value-sampler =[
-  "autora-experimentalist-sampler-nearest-value-sampler"
-]
 experimentalist-sampler-model-disagreement-sampler =[
   "autora-experimentalist-sampler-model-disagreement-sampler"
 ]
