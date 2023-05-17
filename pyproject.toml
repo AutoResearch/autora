@@ -31,11 +31,6 @@ torch = {version = "2.0.1", source = "pytorch-cpu"}
 #]
 #    {version = "2.0.1", markers = "sys_platform == 'win32'"},
 
-[[tool.poetry.source]]
-name = "pytorch-cpu"
-url = "https://download.pytorch.org/whl/cpu"
-secondary = false
-
 [tool.poetry.extras]
 tinkerforge = ["tinkerforge"]
 
@@ -65,3 +60,8 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.isort]
 profile = "black"
+
+[[tool.poetry.source]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+secondary = false

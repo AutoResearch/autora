@@ -24,4 +24,4 @@ jobs:
         run: poetry build
 
       - name: Debug Torch
-        run: pip show torch
+        run: poetry show torch
