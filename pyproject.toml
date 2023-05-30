@@ -46,7 +46,7 @@ mkdocs-material = ">=8.5.10,<10.0.0"
 mkdocs-gen-files = ">=0.3.4,<0.6.0"
 mkdocs-literate-nav = ">=0.4.1,<0.7.0"
 mkdocs-section-index = "^0.3.4"
-mkdocstrings-python = ">=0.7.1,<1.1.0"
+mkdocstrings-python = ">=0.7.1,<1.2.0"
 mkdocs-jupyter = "^0.24.1"
 
 [build-system]
