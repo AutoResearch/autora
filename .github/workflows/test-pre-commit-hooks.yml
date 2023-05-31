@@ -10,17 +10,16 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v3
-    - run: pipx install poetry
-    - uses: actions/setup-python@v4
+    - name: Set up Python
+      uses: actions/setup-python@v3
       with:
-        python-version: 3.8
-        cache: "poetry"
-    - run: poetry install --only pre-commit
+        python-version: '3.x'
+        cache: 'pip'
+    - run: pip install pre-commit
     - uses: actions/cache@v3
       with:
         path: ~/.cache/pre-commit
         key: pre-commit-3|${{ env.pythonLocation }}|${{ runner.os }}|${{ hashFiles('.pre-commit-config.yaml') }}
-    - run: poetry run pre-commit run --all-files --show-diff-on-failure --color=always
+    - run: pre-commit run --all-files --show-diff-on-failure --color=always
