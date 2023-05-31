@@ -45,7 +45,7 @@ nav:
     - BMS: '!import https://github.com/autoresearch/autora-theorist-bms/?branch=main&extra_imports=["mkdocs/base.yml"]'
     - BSR: '!import https://github.com/autoresearch/autora-theorist-bsr/?branch=main&extra_imports=["mkdocs/base.yml"]'
   - Experimentalists:
-    - Home: 'experimentalists/index.md'
+    - Home: 'experimentalist/index.md'
     - Novelty Sampler: '!import https://github.com/autoresearch/autora-experimentalist-novelty-sampler/?branch=main&extra_imports=["mkdocs/base.yml"]'
     - Inequality Sampler: '!import https://github.com/autoresearch/autora-experimentalist-inequality-sampler/?branch=main&extra_imports=["mkdocs/base.yml"]'
     - Nearest Value Sampler: '!import https://github.com/autoresearch/autora-experimentalist-sampler-nearest-value-sampler/?branch=main&extra_imports=["mkdocs/base.yml"]'
