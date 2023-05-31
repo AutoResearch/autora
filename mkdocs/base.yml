@@ -5,7 +5,6 @@ theme:
   name: material
 
 plugins:
-  multirepo: {}
   mkdocs-jupyter:  # required to convert Jupyter notebooks
     include_source: true
     execute: false
