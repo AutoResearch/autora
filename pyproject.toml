@@ -88,7 +88,7 @@ experiment-runner-recruitment-manager-prolific = [
 ]
 
 synthetic-data = [
-  "autora-synthetic-data"
+  "autora-synthetic"
 ]
 
 docs = [
