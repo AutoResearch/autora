@@ -23,7 +23,7 @@ all = [
   "autora[all-theorists]",
   "autora[all-experimentalists]",
   "autora[all-experiment-runners]",
-  "autora[synthetic-experiments]",
+  "autora[synthetic-data]",
 ]
 
 all-theorists = [
@@ -42,24 +42,32 @@ theorist-bsr = [
 ]
 
 all-experimentalists = [
-  "autora[experimentalist-inequality-sampler]",
-  "autora[experimentalist-novelty-sampler]",
-  "autora[experimentalist-sampler-nearest-value-sampler]",
-  "autora[experimentalist-sampler-model-disagreement-sampler]",
-  "autora[experimentalist-sampler-uncertainty-sampler]",
+  "autora[experimentalist-sampler-inequality]",
+  "autora[experimentalist-sampler-novelty]",
+  "autora[experimentalist-sampler-nearest-value]",
+  "autora[experimentalist-sampler-model-disagreement]",
+  "autora[experimentalist-sampler-uncertainty]",
+  "autora[experimentalist-falsification]",
 ]
-experimentalist-novelty-sampler =[
-  "autora-experimentalist-novelty-sampler"
+experimentalist-sampler-inequality =[
+  "autora-experimentalist-sampler-inequality"
 ]
-experimentalist-sampler-nearest-value-sampler =[
-  "autora-experimentalist-sampler-nearest-value-sampler"
+experimentalist-sampler-novelty =[
+  "autora-experimentalist-sampler-novelty"
 ]
-experimentalist-sampler-model-disagreement-sampler =[
-  "autora-experimentalist-sampler-model-disagreement-sampler"
+experimentalist-sampler-nearest-value =[
+  "autora-experimentalist-sampler-nearest-value"
 ]
-experimentalist-sampler-uncertainty-sampler =[
-  "autora-experimentalist-sampler-uncertainty-sampler"
+experimentalist-sampler-model-disagreement =[
+  "autora-experimentalist-sampler-model-disagreement"
 ]
+experimentalist-sampler-uncertainty =[
+  "autora-experimentalist-sampler-uncertainty"
+]
+experimentalist-falsification =[
+  "autora-experimentalist-falsification"
+]
+
 all-experiment-runners = [
   "autora[experiment-runner-firebase-prolific]"
 ]
@@ -79,7 +87,7 @@ experiment-runner-recruitment-manager-prolific = [
   "autora-experiment-runner-recruitment-manager-prolific"
 ]
 
-synthetic-experiments = [
+synthetic-data = [
   "autora-synthetic-data"
 ]
 
