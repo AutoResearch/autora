@@ -431,7 +431,7 @@ example-contributor/contributor-theorist
 ## Add the package as optional dependency
 In the `pyorject.toml` file add an optional dependency for the package in the [project.optional-dependencies] section:
 ```toml
-example-theorist = ["autora-theorits-example"]
+example-theorist = ["autora-theorist-example"]
 ```
 Add the example-theorist to be part of the all-theorists dependency:
 ```toml
