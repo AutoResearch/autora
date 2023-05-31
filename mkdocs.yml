@@ -83,6 +83,6 @@ nav:
   - Synthetic Data: '!import https://github.com/autoresearch/autora-synthetic/?branch=main&extra_imports=["mkdocs/base.yml"]'
   - Workflow: '!import https://github.com/autoresearch/autora-workflow/?branch=main&extra_imports=["mkdocs/base.yml"]'
 - Contributor Guide:
-  - Module Contributions
-  - Core Contributions
-
+  - Overview: 'contribute/index.md'
+  - Module Contributions: 'contribute/module.md'
+  - Core Contributions: 'contribute/core.md'

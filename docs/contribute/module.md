@@ -1,27 +1,27 @@
-# Contributor Guide
+# Contribute an Experimentalist, Experiment Runner, or Theorist
 
-Contributions to AutoRA are organized into one "parent" and many "child" packages. 
+Each experimentalist, experiment runner or theorist is a "child" package based on either
+- the [cookiecutter template (recommended)](https://github.com/AutoResearch/autora-template-cookiecutter), or
+- the [unguided template](https://github.com/AutoResearch/autora-template).
 
-[`autora`](https://github.com/autoresearch/autora) is the "parent" package which end users are expected to install.
-It includes all vetted "child" packages as optional dependencies which users can choose to install. 
+!!! hint
+    The easiest way to contribute a new child package for an experimentalist, experiment runner or theorist,
+    start from the [cookiecutter template](https://github.com/AutoResearch/autora-template-cookiecutter).
 
-[`autora-core`](https://github.com/autoresearch/autora-core), is the "core" package which includes fundamental utilities
-and building blocks for all the other packages. This is always installed when a user installs `autora` and can be 
-a dependency of other "child" packages.
-
-Each "child" package adds a new experimentalist, experiment runner or theorist. These are based on the 
-[cookiecutter template](https://github.com/AutoResearch/autora-template-cookiecutter).
-
-## Contributing a new child package
-
-> 🎁 To contribute a new child package,
-  start from the [cookiecutter template](https://github.com/AutoResearch/autora-template-cookiecutter).
+!!! success
+    New **synthetic** experiment runners may be submitted as pull requests to the 
+    [`autora-synthetic`](https://github.com/autoresearch/autora-synthetic) package, providing they require no 
+    additional dependencies. This is meant to simplify small contributions. 
+    However, if your contribution requires additional dependencies, you can submit it as a full package following 
+    this guide.
 
 Once your package is working, and you've published it on PyPI, you can **make a pull request** on 
 [`autora`](https://github.com/autoresearch/autora) to have it vetted and added to the "parent" package.
 
-The following demonstrates how to add a package published under autora-theorist-example in pyPI in the GitHub 
+The following demonstrates how to add a package published under autora-theorist-example in PyPI in the GitHub 
 repository example-contributor/contributor-theorist
+
+## Creating a new child package
 
 ### Install the "parent" package in development mode
 
@@ -61,7 +61,8 @@ In the `pyorject.toml` file add an optional dependency for the package in the `[
 example-theorist = ["autora-theorist-example==1.0.0"]
 ```
 
-> ✅ Ensure you include the version number.
+!!! success
+    Ensure you include the version number.
 
 Add the example-theorist to be part of the all-theorists dependency:
 ```toml
@@ -91,8 +92,9 @@ Import the documentation in the `mkdocs.yml` file:
     ...
 ```
 
-> ✅ Ensure you include the version number in the `!import` string after `?branch=`. Ensure that the commit you want 
-> to submit has a tag with the correct version number in the correct format.
+!!! success
+    Ensure you include the version number in the `!import` string after `?branch=`. Ensure that the commit you want 
+    to submit has a tag with the correct version number in the correct format.
 
 Check that the documentation builds correctly by running:
 ```shell
@@ -104,7 +106,8 @@ the right place and renders correctly.
 
 ## Updating a child package
 
-> ❗️Please note, that packages from external contributors need to be vetted each time they are updated.
+!!! warning
+    Please note, that packages need to be vetted each time they are updated.
 
 Update the version number in the  `pyproject.toml` file, in the [project.optional-dependencies] 
 section:

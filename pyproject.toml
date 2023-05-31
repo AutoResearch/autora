@@ -5,7 +5,7 @@ authors = [
   { name = "Sebastian Musslick", email = "sebastian_musslick@brown.edu" },
   { name = "John Gerrard Holland", email = "john_holland1@brown.edu" },
 ]
-readme = "docs/index.md"
+readme = "README.md"
 license = { file = "LICENSE.md" }
 dynamic = ["version"]
 
