@@ -34,6 +34,7 @@ theme:
 nav:
 - Introduction: 'index.md'
 - Tutorials:
+  - Introduction: 'tutorials/index.md'
   - Automated Theorist
   - Automated Experimentalist
   - Closed-Loop Discovery
