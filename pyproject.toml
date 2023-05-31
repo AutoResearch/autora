@@ -102,8 +102,9 @@ docs = [
   "pymdown-extensions",
 ]
 
-
-
+test = [
+  "pytest"
+]
 
 [project.urls]
 homepage = "http://www.empiricalresearch.ai/"
