@@ -46,12 +46,14 @@ nav:
     - BSR: '!import https://github.com/autoresearch/autora-theorist-bsr/?branch=main&extra_imports=["mkdocs/base.yml"]'
   - Experimentalists:
     - Home: 'experimentalist/index.md'
-    - Novelty Sampler: '!import https://github.com/autoresearch/autora-experimentalist-sampler-novelty/?branch=main&extra_imports=["mkdocs/base.yml"]'
-    - Inequality Sampler: '!import https://github.com/autoresearch/autora-experimentalist-sampler-inequality/?branch=main&extra_imports=["mkdocs/base.yml"]'
-    - Nearest Value Sampler: '!import https://github.com/autoresearch/autora-experimentalist-sampler-nearest-value/?branch=main&extra_imports=["mkdocs/base.yml"]'
-    - Model Disagreement Sampler: '!import https://github.com/autoresearch/autora-experimentalist-sampler-model-disagreement/?branch=main&extra_imports=["mkdocs/base.yml"]'
-    - Uncertainty Sampler: '!import https://github.com/autoresearch/autora-experimentalist-sampler-uncertainty/?branch=main&extra_imports=["mkdocs/base.yml"]'
     - Falsification: '!import https://github.com/autoresearch/autora-experimentalist-falsification/?branch=main&extra_imports=["mkdocs/base.yml"]'
+    - Samplers:
+      - Novelty: '!import https://github.com/autoresearch/autora-experimentalist-sampler-novelty/?branch=main&extra_imports=["mkdocs/base.yml"]'
+      - Inequality: '!import https://github.com/autoresearch/autora-experimentalist-sampler-inequality/?branch=main&extra_imports=["mkdocs/base.yml"]'
+      - Nearest Value: '!import https://github.com/autoresearch/autora-experimentalist-sampler-nearest-value/?branch=main&extra_imports=["mkdocs/base.yml"]'
+      - Model Disagreement: '!import https://github.com/autoresearch/autora-experimentalist-sampler-model-disagreement/?branch=main&extra_imports=["mkdocs/base.yml"]'
+      - Uncertainty: '!import https://github.com/autoresearch/autora-experimentalist-sampler-uncertainty/?branch=main&extra_imports=["mkdocs/base.yml"]'
+    - Poolers:
   - Experiment Runners:
     - Home: 'experiment-runner/index.md'
     - Firebase-Prolific: '!import https://github.com/autoresearch/autora-experiment-runner-firebase-prolific/?branch=main&extra_imports=["mkdocs/base.yml"]'
