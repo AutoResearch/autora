@@ -17,8 +17,6 @@ the [Autonomous Empirical Research Group](http://empiricalresearch.ai),
 led by [Sebastian Musslick](https://smusslick.com), 
 in collaboration with the [Center for Computation and Visualization at Brown University](https://ccv.brown.edu).
 
-If you would like to be involved, see the [Contributor Guide](https://autoresearch.github.io/autora/contribute).
-
 The development of this package is supported by Schmidt Science Fellows, in partnership with the Rhodes Trust, as well as the Carney BRAINSTORM program at Brown University.
 
 ## Read More
