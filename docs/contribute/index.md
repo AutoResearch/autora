@@ -13,3 +13,5 @@ For details on how to submit child packages for inclusion in `autora`, see
 and building blocks for all the other packages. This is always installed when a user installs `autora` and can be 
 a dependency of other "child" packages. For more details, see [the core contributor guide here](./core.md). 
 
+It's possible to set up your python environment in many different ways. 
+One setup which works for us is described in [the setup guide](./setup.md). 
