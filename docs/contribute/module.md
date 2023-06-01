@@ -10,10 +10,10 @@ Each experimentalist, experiment runner or theorist is a "child" package based o
 
 !!! success
     New **synthetic** experiment runners may be submitted as pull requests to the 
-    [`autora-synthetic`](https://github.com/autoresearch/autora-synthetic) package, providing they require no 
-    additional dependencies. This is meant to simplify small contributions. 
+    [`autora-synthetic`](https://github.com/autoresearch/autora-synthetic/CONTRIBUTING.md) package, providing they 
+    require no additional dependencies. This is meant to simplify small contributions. 
     However, if your contribution requires additional dependencies, you can submit it as a full package following 
-    this guide.
+    this guide. 
 
 Once your package is working, and you've published it on PyPI, you can **make a pull request** on 
 [`autora`](https://github.com/autoresearch/autora) to have it vetted and added to the "parent" package.
