@@ -76,6 +76,7 @@ nav:
     - BSR: '!import https://github.com/autoresearch/autora-theorist-bsr/?branch=main&extra_imports=["mkdocs/base.yml"]'
   - Experimentalists:
     - Home: 'experimentalist/index.md'
+    - Pipeline: 'core/docs/pipeline/Experimentalist Pipeline Examples.ipynb'
     - Samplers:
       - Novelty: '!import https://github.com/autoresearch/autora-experimentalist-sampler-novelty/?branch=main&extra_imports=["mkdocs/base.yml"]'
       - Inequality: '!import https://github.com/autoresearch/autora-experimentalist-sampler-inequality/?branch=main&extra_imports=["mkdocs/base.yml"]'
