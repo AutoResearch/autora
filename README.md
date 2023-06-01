@@ -1,5 +1,9 @@
 # Automated Research Assistant
 
+![PyPI](https://img.shields.io/pypi/v/autora)
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/autoresearch/autora/test-pytest.yml)
+![PyPI - Downloads](https://img.shields.io/pypi/dm/autora)
+
 <b>[AutoRA](https://pypi.org/project/autora/)</b> (<b>Auto</b>mated <b>R</b>esearch <b>A</b>ssistant) is an open-source framework for 
 automating multiple stages of the empirical research process, including model discovery, experimental design, data collection, and documentation for open science.
 
