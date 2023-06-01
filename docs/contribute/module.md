@@ -1,6 +1,7 @@
 # Contribute an Experimentalist, Experiment Runner, or Theorist
 
 Each experimentalist, experiment runner or theorist is a "child" package based on either
+
 - the [cookiecutter template (recommended)](https://github.com/AutoResearch/autora-template-cookiecutter), or
 - the [unguided template](https://github.com/AutoResearch/autora-template).
 
@@ -28,6 +29,7 @@ repository example-contributor/contributor-theorist
 Install this in an environment using your chosen package manager. In this example, we use pip and virtualenv.
 
 First, install:
+
 - python: https://www.python.org/downloads/
 - virtualenv: https://virtualenv.pypa.io/en/latest/installation.html
 
@@ -142,6 +144,7 @@ the right place and renders correctly.
 
 Once everything is working locally, make a new PR on [github.com](https://github.com/autoresearch/autora) with your 
 changes. Include: 
+
 - a description of the changes to the package, and 
 - a link to your release notes. 
 
