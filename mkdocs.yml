@@ -1,7 +1,5 @@
 # yaml-language-server: $schema=https://squidfunk.github.io/mkdocs-material/schema.json
 
-INHERIT: mkdocs/base.yml  # use the shared AutoRA configuration by default
-
 site_name: Autonomous Empirical Research
 repo_url: 'https://github.com/autoresearch/autora'
 edit_uri: 'blob/main/docs/'
@@ -10,6 +8,7 @@ extra:
   colab_base_url: 'https://colab.research.google.com/github/AutoResearch/autora/blob/gh-pages'
 
 theme:
+  name: material
   logo: img/logo.png
   palette:
     # Palette toggle for light mode
@@ -31,15 +30,37 @@ theme:
     - content.action.view
     - navigation.indexes
 
-
 plugins:
   multirepo:
     nav_repos:
       # There will be a navigation section with this section name
+      - name: core
+        import_url: https://github.com/autoresearch/autora-core/?branch=main&extra_imports=["mkdocs/base.yml"]
+        imports: ["docs/pipeline/*",]
       - name: falsification
         # you can define the edit uri path
         import_url: https://github.com/autoresearch/autora-experimentalist-falsification/?branch=main&extra_imports=["mkdocs/base.yml"]
         imports: ["docs/*", "docs/sampler/*", "docs/pooler/*"]
+  mkdocs-jupyter: # required to convert Jupyter notebooks
+    include_source: true
+    execute: false
+    ignore_h1_titles: true
+
+markdown_extensions:
+  admonition: {}
+  pymdownx.details: {}
+  pymdownx.superfences: {}
+  pymdownx.arithmatex: # required for equation display
+    generic: true
+  pymdownx.snippets: {}
+
+extra_javascript: [
+  # requirements for pymdownx.arithmetex:
+  "javascripts/mathjax.js",
+  "https://polyfill.io/v3/polyfill.min.js?features=es6",
+  "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"
+]
+
 nav:
 - Introduction: 'index.md'
 #- Tutorials:
