@@ -42,11 +42,11 @@ plugins:
         imports: ["docs/*", "docs/sampler/*", "docs/pooler/*"]
 nav:
 - Introduction: 'index.md'
-- Tutorials:
-  - Introduction: 'tutorials/index.md'
-  - Automated Theorist
-  - Automated Experimentalist
-  - Closed-Loop Discovery
+#- Tutorials:
+#  - Introduction: 'tutorials/index.md'
+#  - Automated Theorist         # TODO: add tutorial from somewhere
+#  - Automated Experimentalist  # TODO: add tutorial from somewhere
+#  - Closed-Loop Discovery      # TODO: add tutorial from somewhere
 - User Guide:
   - Theorists:
     - Home: 'theorist/index.md'
@@ -66,7 +66,6 @@ nav:
         - Quickstart: 'falsification/docs/sampler/quickstart.md'
         - Examples:
           - Basic Usage: 'falsification/docs/sampler/Basic Usage.ipynb'
-
     - Poolers:
       - Falsification:
         - Home: 'falsification/docs/pooler/index.md'
@@ -75,8 +74,7 @@ nav:
           - Basic Usage: 'falsification/docs/pooler/Basic Usage.ipynb'
   - Experiment Runners:
     - Home: 'experiment-runner/index.md'
-    - Synthetic: '!import https://github
-    .com/autoresearch/autora-synthetic/?branch=main&extra_imports=["mkdocs/base.yml"]'
+    - Synthetic: '!import https://github.com/autoresearch/autora-synthetic/?branch=main&extra_imports=["mkdocs/base.yml"]'
     - Firebase-Prolific: '!import https://github.com/autoresearch/autora-experiment-runner-firebase-prolific/?branch=main&extra_imports=["mkdocs/base.yml"]'
     - Experimentation Managers:
       - Firebase: '!import https://github.com/autoresearch/autora-experiment-runner-experimentation-manager-firebase/?branch=main&extra_imports=["mkdocs/base.yml"]'
