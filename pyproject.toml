@@ -12,6 +12,7 @@ dynamic = ["version"]
 dependencies = [
   "autora-core",
   "autora-workflow",
+  "autora-synthetic",
 ]
 
 [project.optional-dependencies]
@@ -23,7 +24,6 @@ all = [
   "autora[all-theorists]",
   "autora[all-experimentalists]",
   "autora[all-experiment-runners]",
-  "autora[synthetic-data]",
 ]
 
 all-theorists = [
@@ -85,10 +85,6 @@ all-experiment-runner-recruitment-managers=[
 ]
 experiment-runner-recruitment-manager-prolific = [
   "autora-experiment-runner-recruitment-manager-prolific"
-]
-
-synthetic-data = [
-  "autora-synthetic"
 ]
 
 docs = [
