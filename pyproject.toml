@@ -2,10 +2,10 @@
 name = "autora"
 description = "Autonomous Research Assistant (AutoRA) is a framework for automating steps of the empirical research process."
 authors = [
-  { name = "Sebastian Musslick", email = "sebastian_musslick@brown.edu" }
+  { name = "Sebastian Musslick", email = "sebastian@musslick.de" }
 ]
 maintainers = [
-  { name = "Ben Andrew", email = "benjamin_andrew@brown.edu" },
+  { name = "Ben Andrew", email = "benwallaceandrew@gmail.com" },
   { name = "George Dang", email = "george_dang@brown.edu" },
   { name = "John Gerrard Holland", email = "john_holland1@brown.edu" },
   { name = "Younes Strittmatter", email = "younes_strittmatter@brown.edu" },
