@@ -37,7 +37,16 @@ plugins:
         imports: ["docs/pipeline/*",]
       - name: falsification
         import_url: https://github.com/autoresearch/autora-experimentalist-falsification/?branch=main&extra_imports=["mkdocs/base.yml"]
-        imports: ["docs/*", "docs/sampler/*", "docs/pooler/*"]
+        imports: ["docs/*", "docs/sampler/*", "docs/pooler/*", ]
+      - name: bms-tutorial
+        import_url: https://github.com/autoresearch/autora-theorist-bms/?branch=main&extra_imports=["mkdocs/base.yml"]
+        imports: ["docs/*"]
+      - name: workflow-tutorial
+        import_url: https://github.com/autoresearch/autora-workflow/?branch=main&extra_imports=["mkdocs/base.yml"]
+        imports: ["docs/*"]
+      - name: falsification-tutorial
+        import_url: https://github.com/autoresearch/autora-experimentalist-falsification/?branch=main&extra_imports=["mkdocs/base.yml"]
+        imports: [ "docs/*"]
   mkdocs-jupyter: # required to convert Jupyter notebooks
     include_source: true
     execute: false
