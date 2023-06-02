@@ -1,8 +1,8 @@
 # yaml-language-server: $schema=https://squidfunk.github.io/mkdocs-material/schema.json
 
 site_name: Automated Research Assistant
-site_url: 'https://autoresearch.github.io/autora/'
 repo_url: 'https://github.com/autoresearch/autora/'
+site_url: 'https://autoresearch.github.io/autora/'
 edit_uri: 'blob/main/docs/'
 
 extra:
