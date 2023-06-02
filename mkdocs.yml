@@ -27,8 +27,6 @@ theme:
         name: Switch to light mode
   custom_dir: mkdocs/overrides
   features:
-    - content.action.edit
-    - content.action.view
     - navigation.indexes
 
 plugins:
