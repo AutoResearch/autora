@@ -3,26 +3,21 @@ name: Publish Documentation to GitHub Pages
 on:
   workflow_dispatch:  # this allows us to run it manually
   release:
-    types: [ released ]  # only deploy when we make a new `latest` release
+    types: [released]  # only deploy when we make a new `latest` release
 
 permissions:
   contents: write
 
 jobs:
-
-  build-publish:
+  publish:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-
-      - run: pipx install poetry
-
-      - uses: actions/setup-python@v4
+      - name: Set up Python
+        uses: actions/setup-python@v4
         with:
-          python-version: 3.8
-          cache: 'poetry'
-
+          python-version: '3.x'
+          cache: 'pip'
       - name: Install dependencies
-        run: poetry install
-
-      - run: poetry run mkdocs gh-deploy --force
+        run: pip install -U ".[docs]"
+      - run: mkdocs gh-deploy --force

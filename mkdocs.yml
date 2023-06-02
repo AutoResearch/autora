@@ -1,8 +1,11 @@
 # yaml-language-server: $schema=https://squidfunk.github.io/mkdocs-material/schema.json
 
-site_name: Autonomous Empirical Research
+site_name: Automated Research Assistant
 repo_url: 'https://github.com/autoresearch/autora'
 edit_uri: 'blob/main/docs/'
+
+extra:
+  colab_base_url: 'https://colab.research.google.com/github/AutoResearch/autora/blob/gh-pages'
 
 theme:
   name: material
@@ -24,85 +27,81 @@ theme:
   custom_dir: mkdocs/overrides
   features:
     - content.action.edit
-
-watch:
-  - autora/
+    - content.action.view
+    - navigation.indexes
 
 plugins:
-  - search
-  - gen-files:
-      scripts:
-        - mkdocs/_gen_ref_pages.py
-  - literate-nav:
-        nav_file: SUMMARY.md
-  - section-index
-  - mkdocstrings:
-      handlers:
-        python:
-          import:
-            - https://scikit-learn.org/stable/objects.inv
-  - mkdocs-jupyter:
-      include_source: true
-      execute: false
-      ignore_h1_titles: True
-
+  multirepo:
+    nav_repos:
+      - name: core
+        import_url: https://github.com/autoresearch/autora-core/?branch=main&extra_imports=["mkdocs/base.yml"]
+        imports: ["docs/pipeline/*",]
+      - name: falsification
+        import_url: https://github.com/autoresearch/autora-experimentalist-falsification/?branch=main&extra_imports=["mkdocs/base.yml"]
+        imports: ["docs/*", "docs/sampler/*", "docs/pooler/*"]
+  mkdocs-jupyter: # required to convert Jupyter notebooks
+    include_source: true
+    execute: false
+    ignore_h1_titles: true
+  search: {}
 
 markdown_extensions:
-  - pymdownx.arithmatex:
-      generic: true
+  admonition: {}
+  pymdownx.details: {}
+  pymdownx.superfences: {}
+  pymdownx.arithmatex: # required for equation display
+    generic: true
+  pymdownx.snippets: {}
+  pymdownx.tabbed:
+    alternate_style: true
 
-extra_javascript:
-  - javascripts/mathjax.js
-  - https://polyfill.io/v3/polyfill.min.js?features=es6
-  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
-
+extra_javascript: [
+  # requirements for pymdownx.arithmetex:
+  "javascripts/mathjax.js",
+  "https://polyfill.io/v3/polyfill.min.js?features=es6",
+  "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"
+]
 
 nav:
 - Introduction: 'index.md'
-- Tutorials:
-  - Automated Theorist
-  - Automated Experimentalist
-  - Closed-Loop Discovery
 - User Guide:
   - Theorists:
-    - Overview: 'theorist/overview.md'
-    - DARTS:
-      - Introduction: 'theorist/darts/introduction.md'
-      - How it works: 'theorist/darts/how_it_works.md'
-      - Meta parameters: 'theorist/darts/meta_parameters.md'
-      - Search space: 'theorist/darts/search_space.md'
-      - Examples:
-        - Basic Usage: 'theorist/darts/example.ipynb'
-        - Weber-Fechner Law: 'theorist/darts/weber.ipynb'
-    - BMS:
-      - Introduction: 'theorist/bms/introduction.md'
-      - How it works: 'theorist/bms/how_it_works.md'
-      - Meta parameters: 'theorist/bms/meta_parameters.md'
-      - Search space: 'theorist/bms/search_space.ipynb'
-      - Examples:
-        - Basic Usage: 'theorist/bms/example.ipynb'
-        - Weber-Fechner Law: 'theorist/bms/weber.ipynb'
-    - BSR:
-      - Introduction: 'theorist/bsr/introduction.md'
-      - How it works: 'theorist/bsr/how_it_works.md'
-      - Meta parameters: 'theorist/bsr/meta_parameters.md'
-      - Search space: 'theorist/bsr/search_space.md'
-      - Example: 'theorist/bsr/bsr.ipynb'
+    - Home: 'theorist/index.md'
+    - DARTS: '!import https://github.com/autoresearch/autora-theorist-darts/?branch=main&extra_imports=["mkdocs/base.yml"]'
+    - BMS: '!import https://github.com/autoresearch/autora-theorist-bms/?branch=main&extra_imports=["mkdocs/base.yml"]'
+    - BSR: '!import https://github.com/autoresearch/autora-theorist-bsr/?branch=main&extra_imports=["mkdocs/base.yml"]'
   - Experimentalists:
-    - Overview: 'experimentalists/overview.md'
-    - Pipeline: 'pipeline/Experimentalist Pipeline Examples.ipynb'
-  - Synthetic Experiments:
-    - Inventory: 'synthetic/inventory.ipynb'
-  - Cycle:
-    - Scoring:
-      - Logistic Regression: 'cycle/cycle_scoring.ipynb'
-      - BMS: 'cycle/cycle_scoring_bms.ipynb'
-    - Plotting: 'cycle/cycle_results_plots.ipynb'
-    - Examples:
-      - DARTS & BMS: 'cycle/simple_cycle_bms_darts.ipynb'
-      - BMS & Poppernet: 'cycle/simple_cycle_bms_model_poppernet.ipynb'
-      - Uncertainty Experimentalist: 'cycle/simple_cycle_uncertainty_experimentalist.ipynb'
+    - Home: 'experimentalist/index.md'
+    - Pipeline: 'core/docs/pipeline/Experimentalist Pipeline Examples.ipynb'
+    - Samplers:
+      - Novelty: '!import https://github.com/autoresearch/autora-experimentalist-sampler-novelty/?branch=main&extra_imports=["mkdocs/base.yml"]'
+      - Inequality: '!import https://github.com/autoresearch/autora-experimentalist-sampler-inequality/?branch=main&extra_imports=["mkdocs/base.yml"]'
+      - Nearest Value: '!import https://github.com/autoresearch/autora-experimentalist-sampler-nearest-value/?branch=main&extra_imports=["mkdocs/base.yml"]'
+      - Model Disagreement: '!import https://github.com/autoresearch/autora-experimentalist-sampler-model-disagreement/?branch=main&extra_imports=["mkdocs/base.yml"]'
+      - Uncertainty: '!import https://github.com/autoresearch/autora-experimentalist-sampler-uncertainty/?branch=main&extra_imports=["mkdocs/base.yml"]'
+      - Falsification:
+        - Home: 'falsification/docs/sampler/index.md'
+        - Quickstart: 'falsification/docs/sampler/quickstart.md'
+        - Examples:
+          - Basic Usage: 'falsification/docs/sampler/Basic Usage.ipynb'
+    - Poolers:
+      - Falsification:
+        - Home: 'falsification/docs/pooler/index.md'
+        - Quickstart: 'falsification/docs/pooler/quickstart.md'
+        - Examples:
+          - Basic Usage: 'falsification/docs/pooler/Basic Usage.ipynb'
+  - Experiment Runners:
+    - Home: 'experiment-runner/index.md'
+    - Synthetic: '!import https://github.com/autoresearch/autora-synthetic/?branch=main&extra_imports=["mkdocs/base.yml"]'
+    - Firebase-Prolific: '!import https://github.com/autoresearch/autora-experiment-runner-firebase-prolific/?branch=main&extra_imports=["mkdocs/base.yml"]'
+    - Experimentation Managers:
+      - Firebase: '!import https://github.com/autoresearch/autora-experiment-runner-experimentation-manager-firebase/?branch=main&extra_imports=["mkdocs/base.yml"]'
+    - Recruitment Managers:
+      - Prolific: '!import https://github.com/autoresearch/autora-experiment-runner-recruitment-manager-prolific/?branch=main&extra_imports=["mkdocs/base.yml"]'
+  - Workflow: '!import https://github.com/autoresearch/autora-workflow/?branch=main&extra_imports=["mkdocs/base.yml"]'
 - Contributor Guide:
-    - Module Contributions
-    - Core Contributions
-- Code Reference: reference/autora/
+  - Overview: 'contribute/index.md'
+  - Module Contributions: 'contribute/module.md'
+  - Core Contributions: 'contribute/core.md'
+  - Environment Setup: 'contribute/setup.md'
+  - Pre-Commit Hooks: 'contribute/pre-commit-hooks.md'

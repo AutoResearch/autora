@@ -1,57 +1,112 @@
-[tool.poetry]
+[project]
 name = "autora"
-version = "0.0.0"
-description = "Autonomous Research Assistant (AutoRA) is a framework for automating steps of the empirical research process. This framework implements tools for autonomously and iteratively generating 1) new theories to describe real-world data, and 2) experiments to invalidate those theories and seed a new cycle of theory-making. The experiments will be run online via crowd-sourcing platforms (MTurk, Prolific)."
+description = "Autonomous Research Assistant (AutoRA) is a framework for automating steps of the empirical research process."
 authors = [
-    "Sebastian Musslick <sebastian_musslick@brown.edu>",
-    "John Gerrard Holland <john_holland1@brown.edu>",
+  { name = "Sebastian Musslick", email = "sebastian@musslick.de" }
+]
+maintainers = [
+  { name = "Ben Andrew", email = "benwallaceandrew@gmail.com" },
+  { name = "George Dang", email = "george_dang@brown.edu" },
+  { name = "John Gerrard Holland", email = "john_holland1@brown.edu" },
+  { name = "Younes Strittmatter", email = "younes_strittmatter@brown.edu" },
 ]
 readme = "README.md"
-homepage = "https://musslick.github.io/AER_website/Research.html"
+license = { file = "LICENSE.md" }
+dynamic = ["version"]
+
+dependencies = [
+  "autora-core",
+  "autora-workflow",
+  "autora-synthetic",
+]
+
+[project.optional-dependencies]
+dev = [
+  "autora-core[dev]",
+]
+
+all = [
+  "autora[all-theorists]",
+  "autora[all-experimentalists]",
+  "autora[all-experiment-runners]",
+]
+
+all-theorists = [
+  "autora[theorist-darts]",
+  "autora[theorist-bms]",
+  "autora[theorist-bsr]",
+]
+theorist-darts = [
+  "autora-theorist-darts",
+]
+theorist-bms = [
+  "autora-theorist-bms",
+]
+theorist-bsr = [
+  "autora-theorist-bsr",
+]
+
+all-experimentalists = [
+  "autora[experimentalist-sampler-inequality]",
+  "autora[experimentalist-sampler-novelty]",
+  "autora[experimentalist-sampler-nearest-value]",
+  "autora[experimentalist-sampler-model-disagreement]",
+  "autora[experimentalist-sampler-uncertainty]",
+  "autora[experimentalist-falsification]",
+]
+experimentalist-sampler-inequality =[
+  "autora-experimentalist-sampler-inequality"
+]
+experimentalist-sampler-novelty =[
+  "autora-experimentalist-sampler-novelty"
+]
+experimentalist-sampler-nearest-value =[
+  "autora-experimentalist-sampler-nearest-value"
+]
+experimentalist-sampler-model-disagreement =[
+  "autora-experimentalist-sampler-model-disagreement"
+]
+experimentalist-sampler-uncertainty =[
+  "autora-experimentalist-sampler-uncertainty"
+]
+experimentalist-falsification =[
+  "autora-experimentalist-falsification"
+]
+
+all-experiment-runners = [
+  "autora[experiment-runner-firebase-prolific]"
+]
+experiment-runner-firebase-prolific = [
+  "autora-experiment-runner-firebase-prolific"
+]
+all-experiment-runner-experimentation-managers = [
+  "autora[experiment-runner-experimentation-manager-firebase]"
+]
+experiment-runner-experimentation-manager-firebase = [
+  "autora-experiment-runner-experimentation-manager-firebase"
+]
+all-experiment-runner-recruitment-managers=[
+  "autora[experiment-runner-recruitment-manager-prolific]"
+]
+experiment-runner-recruitment-manager-prolific = [
+  "autora-experiment-runner-recruitment-manager-prolific"
+]
+
+docs = [
+  "autora-core[docs]",
+]
+
+test = [
+  "pytest"
+]
+
+[project.urls]
+homepage = "http://www.empiricalresearch.ai/"
 repository = "https://github.com/AutoResearch/autora"
 documentation = "https://autoresearch.github.io/autora/"
 
-[tool.poetry.dependencies]
-python = ">=3.8.10,<3.11"
-numpy = ">=1.22.1"
-scipy = "^1.9.3"
-imageio = "^2.9.0"
-matplotlib = "^3.2.1"
-pandas = ">=1.4.2,<3.0.0"
-graphviz = ">=0.14.1,<0.21.0"
-seaborn = ">=0.11.1,<0.13.0"
-scikit-learn = "^1.1.1"
-sympy = "^1.10.1"
-tinkerforge = {version = "^2.1.25", optional=true}
-torch = "2.0.0"
-tqdm = "^4.64.0"
-
-[tool.poetry.extras]
-tinkerforge = ["tinkerforge"]
-
-[tool.poetry.group.dev.dependencies]
-jupyter = "^1.0.0"
-ipython = "^8.4.0"
-ipywidgets = ">=7.7.1,<9.0.0"
-flake8 = "^6.0.0"
-
-[tool.poetry.group.test.dependencies]
-pytest = "^7.2.0"
-
-[tool.poetry.group.pre-commit.dependencies]
-pre-commit = ">=2.20,<4.0"
-
-[tool.poetry.group.docs.dependencies]
-mkdocs-material = ">=8.5.10,<10.0.0"
-mkdocs-gen-files = ">=0.3.4,<0.6.0"
-mkdocs-literate-nav = ">=0.4.1,<0.7.0"
-mkdocs-section-index = "^0.3.4"
-mkdocstrings-python = ">=0.7.1,<1.2.0"
-mkdocs-jupyter = "^0.24.1"
-
 [build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
 
-[tool.isort]
-profile = "black"
+[tool.setuptools_scm]
