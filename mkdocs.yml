@@ -33,12 +33,10 @@ theme:
 plugins:
   multirepo:
     nav_repos:
-      # There will be a navigation section with this section name
       - name: core
         import_url: https://github.com/autoresearch/autora-core/?branch=main&extra_imports=["mkdocs/base.yml"]
         imports: ["docs/pipeline/*",]
       - name: falsification
-        # you can define the edit uri path
         import_url: https://github.com/autoresearch/autora-experimentalist-falsification/?branch=main&extra_imports=["mkdocs/base.yml"]
         imports: ["docs/*", "docs/sampler/*", "docs/pooler/*"]
   mkdocs-jupyter: # required to convert Jupyter notebooks
