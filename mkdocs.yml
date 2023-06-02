@@ -2,7 +2,7 @@
 
 site_name: Automated Research Assistant
 site_url: 'https://autoresearch.github.io/autora/'
-repo_url: 'https://github.com/autoresearch/autora'
+repo_url: 'https://github.com/autoresearch/autora/'
 edit_uri: 'blob/main/docs/'
 
 extra:
