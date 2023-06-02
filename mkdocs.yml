@@ -45,6 +45,9 @@ plugins:
     execute: false
     ignore_h1_titles: true
   search: {}
+  mkdocs-simple-hooks:
+    hooks:
+      on_env: "docs.hooks:on_env"
 
 markdown_extensions:
   admonition: {}
