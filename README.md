@@ -7,7 +7,7 @@
 <b>[AutoRA](https://pypi.org/project/autora/)</b> (<b>Auto</b>mated <b>R</b>esearch <b>A</b>ssistant) is an open-source framework for 
 automating multiple stages of the empirical research process, including model discovery, experimental design, data collection, and documentation for open science.
 
-![Autonomous Empirical Research Paradigm](https://github.com/AutoResearch/autora/raw/restructure/autora/docs/img/overview.png)
+![Autonomous Empirical Research Paradigm](https://github.com/AutoResearch/autora/raw/main/docs/img/overview.png)
 
 ## Getting Started
 
