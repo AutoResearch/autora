@@ -11,8 +11,8 @@ automating multiple stages of the empirical research process, including model di
 
 ## Getting Started
 
-Check out the tutorials at 
-[https://autoresearch.github.io/autora/tutorials](https://autoresearch.github.io/autora/tutorials).
+Check out the documentation at 
+[https://autoresearch.github.io/autora](https://autoresearch.github.io/autora).
 
 ## About
 
