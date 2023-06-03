@@ -76,7 +76,7 @@ extra_javascript: [
 nav:
 - Introduction: 'index.md'
 - Tutorials:
-  - Introduction: 'tutorials/index.md'
+  - Home: 'tutorials/index.md'
   - Automated Theorist: 'bms-tutorial/docs/Basic Usage.ipynb'
   - Automated Experimentalist: 'falsification-tutorial/docs/sampler/Basic Usage.ipynb'
   - Closed-Loop Discovery: 'workflow-tutorial/docs/interactive/Basic Usage.ipynb'
