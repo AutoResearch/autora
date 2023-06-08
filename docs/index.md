@@ -16,8 +16,8 @@ which enable the efficient acquisition of behavioral data from human participant
 is designed to support the automated documentation and dissemination of steps in the empirical research process.
 
 AutoRA was initially intended for accelerating research in the behavioral and brain sciences. 
-However, AutoRA is designed as a general framework that enables automation of the research processes in
-other empirical sciences, such as material science or physics.
+However, AutoRA is designed as a general framework that enables automation of research processes in
+other empirical sciences, such as materials science or physics.
 
 ## Features
 
