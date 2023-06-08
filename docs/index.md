@@ -32,7 +32,7 @@ AutoRA consists of different modules that can be used independently or in combin
 ## Usages
 
 AutoRA can be used for a variety of research purposes in empirical sciences, such as psychology, 
-neuroscience, economics, physics, or material science. Usages include:
+neuroscience, economics, physics, or materials science. Usages include:
 
 - <b>Equation discovery</b> from empirical data
 - <b>Experimental design</b> for follow-up experiments
