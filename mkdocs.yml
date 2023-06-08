@@ -34,7 +34,7 @@ plugins:
     nav_repos:
       - name: core
         import_url: https://github.com/autoresearch/autora-core/?branch=main&extra_imports=["mkdocs/base.yml"]
-        imports: ["docs/pipeline/*",]
+        imports: ["docs/pipeline/*", "docs/experimentalists/pooler/grid/*", "docs/experimentalists/pooler/random/*", "docs/experimentalists/sampler/random/*"]
       - name: falsification
         import_url: https://github.com/autoresearch/autora-experimentalist-falsification/?branch=main&extra_imports=["mkdocs/base.yml"]
         imports: ["docs/*", "docs/sampler/*", "docs/pooler/*", ]
@@ -90,6 +90,9 @@ nav:
     - Home: 'experimentalist/index.md'
     - Pipeline: 'core/docs/pipeline/Experimentalist Pipeline Examples.ipynb'
     - Samplers:
+      - Random:
+          - Home: 'core/docs/experimentalists/sampler/random/index.md'
+          - Quickstart: 'core/docs/experimentalists/sampler/random/quickstart.md'
       - Novelty: '!import https://github.com/autoresearch/autora-experimentalist-sampler-novelty/?branch=main&extra_imports=["mkdocs/base.yml"]'
       - Inequality: '!import https://github.com/autoresearch/autora-experimentalist-sampler-inequality/?branch=main&extra_imports=["mkdocs/base.yml"]'
       - Nearest Value: '!import https://github.com/autoresearch/autora-experimentalist-sampler-nearest-value/?branch=main&extra_imports=["mkdocs/base.yml"]'
@@ -101,6 +104,12 @@ nav:
         - Examples:
           - Basic Usage: 'falsification/docs/sampler/Basic Usage.ipynb'
     - Poolers:
+      - Grid:
+          - Home: 'core/docs/experimentalists/pooler/grid/index.md'
+          - Quickstart: 'core/docs/experimentalists/pooler/grid/quickstart.md'
+      - Random:
+          - Home: 'core/docs/experimentalists/pooler/random/index.md'
+          - Quickstart: 'core/docs/experimentalists/pooler/random/quickstart.md'
       - Falsification:
         - Home: 'falsification/docs/pooler/index.md'
         - Quickstart: 'falsification/docs/pooler/quickstart.md'
