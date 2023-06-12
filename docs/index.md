@@ -42,7 +42,7 @@ neuroscience, economics, physics, or materials science. Usages include:
 
 ## Motivation
 
-The pace of progress in empirical research is largely dictated by iteration speed — that is, for a given amount of resources, the rate at which researchers can cycle between formal theory development and experimentation while ensuring rigorous scientific practice. At present, a major limit to iteration speed stems from the time-intensive, manual nature of the research process. Most stages of this process rely on semi-directed trial and error of humans with years of narrow training. Such a limit impedes science as well as its translation and broader impact. We seek to overcome this bottleneck by developing an open-source platform for the generation, estimation, and empirical testing of scientific models. It is our hope that AutoRA will accelerate scientific discovery while promoting greater transparency and rigor in empirical research.
+The pace of empirical research is constrained by the rate at which scientists can alternate between the development of formal theories and the execution of experiments. However, attempts to increase this rate often compromise scientific rigor, leading to deficiencies such as the absence of formal modeling, non-replicable findings, and insufficient documentation. In order to surmount these limitations, we aim to develop AutoRA––an open-source framework that automates the generation, estimation, and empirical testing of scientific models. By automating steps of the empirical research process, we hope AutoRA can accelerate scientific discovery while promoting greater transparency and rigor in empirical research.
 
 ## Pointers
 
