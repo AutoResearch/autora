@@ -32,7 +32,7 @@ respective dependent measures $\vec{y}' \in Y'$. The following table includes th
 |------------------|-------------------------------------------------------------------------------------------------------------------------------|-------------|
 | Random           | $\vec{x_i} \sim U[a_i,b_i]$                                                                                                   |             |
 | Novelty          | $\underset{\vec{x}}{\arg\max}~\min(d(\vec{x}, \vec{x}'))$                                                                     | $X'$        |
-| Least Confident  | $\underset{\vec{x}}{\arg\max}~1 - P_M(\hat{y}^*, \vec{x})$, $\hat{y}^* = \underset{\hat{y}}{\arg\max}~P_M(\hat{y}_i \vec{x})$ | $M$         |
+| Least Confident  | $\underset{\vec{x}}{\arg\max}~1 - P_M(\hat{y}^*, \vec{x}), \hat{y}^* = \underset{\hat{y}}{\arg\max}~P_M(\hat{y}_i \vec{x})$   | $M$         |
 | Model Comparison | $\underset{\vec{x}}{\arg\max}~(P_{M_1}(\hat{y}, \vec{x}) - P_{M_2}(\hat{y} \vec{x}))^2$                                       | $M$         |
 | Falsification    | $\underset{\vec{x}}{\arg\max}~\hat{\mathcal{L}}(M,X',Y',\vec{x})$                                                             | $M, X', Y'$ |
 
