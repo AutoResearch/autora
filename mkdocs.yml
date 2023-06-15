@@ -126,7 +126,8 @@ nav:
   - Workflow: '!import https://github.com/autoresearch/autora-workflow/?branch=main&extra_imports=["mkdocs/base.yml"]'
 - Contributor Guide:
   - Overview: 'contribute/index.md'
-  - Module Contributions: 'contribute/module.md'
+  - Module Contributions: 
+    - Overview: 'contribute/module.md'
     - Theorist Contribution: 'contribute/theorist-module.md'
   - Core Contributions: 'contribute/core.md'
   - Environment Setup: 'contribute/setup.md'
