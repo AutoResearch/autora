@@ -64,7 +64,7 @@ For core contributions, it is possible to set up your python environment in many
 One setup which works for us is described in [the setup guide](./setup.md). 
 
 We welcome questions and feedback regarding core contributions on the 
-[AutoRA forum](https://github.com/orgs/AutoResearch/discussions/categories/module-contributions).
+[AutoRA forum](https://github.com/orgs/AutoResearch/discussions/categories/core-contributions).
 
 !!! hint
     If you would like to become actively involved in the development and maintenance of core AutoRA packages, 
