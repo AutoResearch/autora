@@ -1,6 +1,6 @@
 # Module Contributions
 
-Theorist, experimentalists, experiment runners and other functionalities are implemented as a "child" packages. 
+Theorist, experimentalists, experiment runners and other novel functionalities are implemented as a "child" packages. 
 They are based on either
 
 - the [cookiecutter template (recommended)](https://github.com/AutoResearch/autora-template-cookiecutter), or
@@ -18,7 +18,7 @@ They are based on either
     this guide. 
 
 Once your package is working, and you've published it on PyPI, you can **make a pull request** on 
-[`autora`](https://github.com/autoresearch/autora) to have it vetted and added to the "parent" package.
+[`autora`](https://github.com/autoresearch/autora) to have it vetted and added to the "parent" package (see below).
 
 The following demonstrates how to add a package published under autora-theorist-example in PyPI in the GitHub 
 repository example-contributor/contributor-theorist
