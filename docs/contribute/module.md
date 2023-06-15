@@ -149,3 +149,11 @@ changes. Include:
 - a link to your release notes. 
 
 Request a review from someone in the core team and wait for their feedback!
+
+## Adding your module to the autora parent package
+
+Once you've published your module on PyPI, you can announce it in the 
+[AutoRA forum](https://github.com/orgs/AutoResearch/discussions/categories/module-announcements). You can then indicate
+in your post if you wish your module to be included in the autora package. Alternatively, you can also
+[contact us directly](https://musslick.github.io/AER_website/Contact.html).
+
