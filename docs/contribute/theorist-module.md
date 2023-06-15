@@ -101,7 +101,7 @@ Please follow the instructions outlined in the [guideline for module contributio
 
 ## Adding your module to the autora parent package
 
-Once you published your theorist on PyPI, you can announce it in the 
+Once you've published your theorist on PyPI, you can announce it in the 
 [AutoRA forum](https://github.com/orgs/AutoResearch/discussions/categories/module-announcements). You can then indicate
 in your post if you wish your theorist to be included in the autora package. Alternatively, you can also directly
 [contact us directly](https://musslick.github.io/AER_website/Contact.html).
