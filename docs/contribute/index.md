@@ -1,8 +1,7 @@
 # Contributor Guide
 
 The AutoRA project is a collection of packages which together form a framework for closed-loop empirical research.
-We invite contributions to all parts of the project, including the [core package](core.md), the 
-[parent package](core.md), and the [modules](module.md). Below is a brief overview of the
+We invite contributions to all parts of the project, including the [core packages](core.md), and the [modules](module.md). Below is a brief overview of the
 project structure, along with pointers to more detailed contribution guides for each part of the project.
 
 ## Project Structure
@@ -41,9 +40,6 @@ Feel free to post questions and feedback regarding core contributions on the
 
 The following packages are considered "core" packages, and are actively maintained by the
 [Autonomous Empirical Research Group](https://musslick.github.io/AER_website/Team.html):
-
-- **autora** [`https://github.com/autoresearch/autora`](https://github.com/autoresearch/autora): The parent package use the one that users install, e.g., via `pip install autora`. The package determines which modules (child packages) are included and maintains the general documentation.
-
 
 - **autora-core** [`https://github.com/autoresearch/autora-core`](https://github.com/autoresearch/autora-core) This package  includes fundamental utilities
 and building blocks for all the other packages. This is always installed when a user installs `autora` and can be 
