@@ -83,7 +83,7 @@ tests to this folder if needed.
 ## Documentation
 
 To add documentation, you can edit the `docs` folder. In particular, you can edit the `docs/index.md` 
-file to add documentation for your theorist. You are also encouraged to the basic usage of your theorist in the 
+file to add documentation for your theorist. You are also encouraged to describe basic usage of your theorist in the 
 python notebook ``Basic Usage.ipynb`` in the `docs` folder. Finally you can outline the basic setup of your theorist in 
 the `docs/quickstart.md` file.
 
