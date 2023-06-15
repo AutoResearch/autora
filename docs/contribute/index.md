@@ -2,7 +2,7 @@
 
 The AutoRA project is a collection of packages which together form a framework for closed-loop empirical research.
 We invite contributions to all parts of the project, including the [core package](core.md), the 
-[parent package](core.md), and  the [modules](module.md). Below is a brief overview of the
+[parent package](core.md), and the [modules](module.md). Below is a brief overview of the
 project structure, along with pointers to more detailed contribution guides for each part of the project.
 
 ## Project Structure
