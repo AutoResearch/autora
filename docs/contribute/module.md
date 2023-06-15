@@ -17,13 +17,80 @@ They are based on either
     However, if your contribution requires additional dependencies, you can submit it as a full package following 
     this guide. 
 
-Once your package is working, and you've published it on PyPI, you can **make a pull request** on 
-[`autora`](https://github.com/autoresearch/autora) to have it vetted and added to the "parent" package (see below).
 
+## Implementing your module
+
+After setting up your repository and linking it to your GitHub account, you can start implementing your module.
+
+### Step 1: Implement Your Code
+
+You may implement your code in the ``init.py`` located in the respective feature folder in ``src/autora``.
+
+Please refer to the following guides on implementing
+- [theorists](theorist-module.md)
+- [experimentalists](experimentalist-module.md)
+- [experiment runners](experiment-runner-module.md)
+
+If the feature you seek to implement does not fit in any of these categories, then 
+you can you can create folders for new categories. If you are unsure how to proceed, you are always welcome 
+to ask for help in the [AutoRA forum](https://github.com/orgs/AutoResearch/discussions/categories/module-contributions).
+
+### Step 2 (Optional): Add Tests
+
+It is highly encouraged to add unit tests to ensure your code is working as intended. These can be [doctests](https://docs.python.org/3/library/doctest.html) or as test cases in `tests/test_your_contribution_name.py`.
+For example, if you are implementing an experiment sampler, you may rename and modify the 
+``tests/test_experimentalist_sampler_example.py``.
+
+*Note: Tests are required if you wish that your feature becomes part of the main 
+[autora](https://github.com/AutoResearch/autora) package. However, regardless of whether you choose to implement tests, 
+you will still be able to install your package separately, in addition to autora.* 
+
+### Step 3 (Optional): Add Documentation
+
+It is highly encouraged that you add documentation of your package in your `docs/index.md`. You can also add new pages 
+in the `docs` folder. Update the `mkdocs.yml` file to reflect structure of the documentation. For example, you can add 
+new pages or delete pages that you deleted from the `docs` folder.
+
+*Note: Docmentation is required if you wish that your feature becomes part of the main 
+[autora](https://github.com/AutoResearch/autora) package. However, regardless of whether you choose to write
+documentation, you will still be able to install your package separately, in addition to autora.*
+
+### Step 4: Add Dependencies
+
+In pyproject.toml add the new dependencies under `dependencies`
+
+Install the added dependencies
+```shell
+pip install -e ".[dev]"
+```
+
+## Publishing your module
+
+There are several ways to publish your package, depending on how you set up your repository.
+
+- If you used the **cookiecutter template**, and uploaded your repository to 
+github.com, then you can use Github Actions to automatically publish your package to PyPI. 
+
+- If you used the **unguided template**, or you want to manually publish your package, you can follow [step 7 in this guide](https://github.com/AutoResearch/autora-template).
+
+Once you've published your module on PyPI, you should take some time to celebrate and announce your contribution in the 
+[AutoRA forum](https://github.com/orgs/AutoResearch/discussions/categories/module-announcements).
+
+## Including your module into the autora parent package
+
+Once your package is working, and you've published it on PyPI, you can **make a pull request** on 
+[`autora`](https://github.com/autoresearch/autora) to have it vetted and added to the "parent" package.
 The following demonstrates how to add a package published under autora-theorist-example in PyPI in the GitHub 
 repository example-contributor/contributor-theorist
 
-## Creating a new child package
+!!! success
+    In order for your package to be included in the parent package, it must
+    - include basic documentation in ``docs/index.md``
+    - include a basic python notebook exposing how to use the module in ``docs/Basic Usage.ipynb``
+    - include basic tests in ``tests/``
+    - be published on PyPI
+    - be compatible with the current version of the parent package
+    - follow standard python coding guidelines including PEP8
 
 ### Install the "parent" package in development mode
 
@@ -107,7 +174,7 @@ mkdocs serve
 ... then view the documentation using the link in your terminal. Check that your new documentation is included in 
 the right place and renders correctly.
 
-## Updating a child package
+## Updating your module
 
 !!! warning
     Please note, that packages need to be vetted each time they are updated.
@@ -151,10 +218,5 @@ changes. Include:
 
 Request a review from someone in the core team and wait for their feedback!
 
-## Adding your module to the autora parent package
 
-Once you've published your module on PyPI, you can announce it in the 
-[AutoRA forum](https://github.com/orgs/AutoResearch/discussions/categories/module-announcements). You can then indicate
-in your post if you wish your module to be included in the autora package. Alternatively, you can also
-[contact us directly](https://musslick.github.io/AER_website/Contact.html).
 
