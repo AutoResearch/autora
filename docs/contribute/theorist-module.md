@@ -88,7 +88,7 @@ python notebook ``Basic Usage.ipynb`` in the `docs` folder. Finally you can outl
 the `docs/quickstart.md` file.
 
 You can also add additional documentation files and notebooks to the `docs/` folder if needed. 
-Should your package be selected for
+Should your package meet requirements for
 inclusion in the parent ``autora`` parent package, the theorist documentation will be automatically added to the 
 [main documentation](https://autoresearch.github.io/autora/) of AutoRA under the subcategory "Theorists". 
 
