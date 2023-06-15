@@ -12,7 +12,7 @@ They are based on either
 
 !!! success
     New **synthetic** experiment runners may be submitted as pull requests to the 
-    [`autora-synthetic`](https://github.com/autoresearch/autora-synthetic/CONTRIBUTING.md) package, providing they 
+    [`autora-synthetic`](https://github.com/AutoResearch/autora-synthetic/blob/main/CONTRIBUTING.md) package, providing they 
     require no additional dependencies. This is meant to simplify small contributions. 
     However, if your contribution requires additional dependencies, you can submit it as a full package following 
     this guide. 
