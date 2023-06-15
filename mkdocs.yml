@@ -127,6 +127,7 @@ nav:
 - Contributor Guide:
   - Overview: 'contribute/index.md'
   - Module Contributions: 'contribute/module.md'
+    - Theorist Contribution: 'contribute/theorist-module.md'
   - Core Contributions: 'contribute/core.md'
   - Environment Setup: 'contribute/setup.md'
   - Pre-Commit Hooks: 'contribute/pre-commit-hooks.md'
