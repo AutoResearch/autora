@@ -1,6 +1,7 @@
-# Contribute an Experimentalist, Experiment Runner, or Theorist
+# Module Contributions
 
-Each experimentalist, experiment runner or theorist is a "child" package based on either
+Theorist, experimentalists, experiment runners and other functionalities are implemented as a "child" packages. 
+They are based on either
 
 - the [cookiecutter template (recommended)](https://github.com/AutoResearch/autora-template-cookiecutter), or
 - the [unguided template](https://github.com/AutoResearch/autora-template).
