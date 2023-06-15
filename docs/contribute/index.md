@@ -53,7 +53,7 @@ a dependency of other "child" packages.
 - **autora-workflow** [`https://github.com/autoresearch/autora-workflow`](https://github.com/autoresearch/autora-workflow): The workflow packages includes basic utilities for managing the workflow of closed-loop research processes, e.g., coordinating workflows between the theorists, experimentalists, and experiment runners. This package is expected to be merged into autora-core.
 
 
-- **autora-synthetic** [`https://github.com/autoresearch/autora-synthetic`](https://github.com/autoresearch/autora-synthetic): This package a number of ground-truth models from different scientific disciplines that can be used for benchmarking automated scientific discovery. If you seek to contribute a scientific model, please see the [core contributor guide](core.md) for details.   
+- **autora-synthetic** [`https://github.com/autoresearch/autora-synthetic`](https://github.com/autoresearch/autora-synthetic): This package includes a number of ground-truth models from different scientific disciplines that can be used for benchmarking automated scientific discovery. If you seek to contribute a scientific model, please see the [core contributor guide](core.md) for details.   
 
 
 We welcome contributions to
