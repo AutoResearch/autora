@@ -27,7 +27,7 @@ You may contribute to any of the core packages or develop your own module as a s
 
 Each theorist, experimentalist, or experiment runner is a child package. Child packages are owned and maintained by you, the contributor, which provides several advantages:
 - *Easy setup*: We provide simple [templates](module.md) for child packages, which you can use to get started quickly
-- *Independence*: You can develop and maintain your package independently of other child packages (and avoid dependency conflicts)
+- *Independence*: You can develop and maintain your package independently of other child packages (and thereby avoid dependency conflicts)
 - *Ownership*: You can publish your package on PyPI, use it in other projects, and get credit for its use. 
 
 For details on how to submit child packages 
