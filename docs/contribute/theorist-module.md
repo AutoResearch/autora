@@ -8,7 +8,7 @@ a more complex neural network, or other models which
 
 ![Theorist Module](../img/theorist.png)
 
-All theorists are implemented as `sklearn` regressors. It is fitted based on experimental conditions and respective
+All theorists are implemented as `sklearn` regressors. They are fitted based on experimental conditions and respective
 observations, and can be used to predict observations for new experimental conditions.
 
 ## Repository Setup
