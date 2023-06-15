@@ -1,4 +1,4 @@
-# Contribute to the Core
+# Contribute to Core Packages
 
 Core contributions are changes to AutoRA which aren't experimentalists, (synthetic) experiment runners and theorists. 
 The primary purpose of the core is to provide utilities for:
