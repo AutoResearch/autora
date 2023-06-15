@@ -78,7 +78,7 @@ nav:
 - Tutorials:
   - Home: 'tutorials/index.md'
   - Automated Theorist: 'tutorials/theorist.ipynb'
-  - Automated Experimentalist: 'falsification-tutorial/docs/sampler/Basic Usage.ipynb'
+  - Automated Experimentalist: 'tutorials/experimentalist.ipynb'
   - Closed-Loop Discovery: 'workflow-tutorial/docs/interactive/Basic Usage.ipynb'
 - User Guide:
   - Theorists:
