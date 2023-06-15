@@ -32,7 +32,7 @@ Each theorist, experimentalist, or experiment runner is a child package. Child p
 
 For details on how to submit child packages 
 for inclusion in `autora`, see
-[the module contributor guide here](./module.md). 
+[the module contributor guide](./module.md). 
 
 Feel free to post questions and feedback regarding core contributions on the 
 [AutoRA forum](https://github.com/orgs/AutoResearch/discussions/categories/module-contributions).
