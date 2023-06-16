@@ -40,7 +40,7 @@ a numpy array, iterator variable or other data format.
 Once you've created your repository, you can implement your experimentalist pooler by editing the `init.py` file in 
 ``src/autora/experimentalist/pooler/name_of_your_experimentalist/``. 
 You may also add additional files to this directory if needed. 
-It is important that the `init.py` file contains a function called `name-of-your-experimentalist` 
+It is important that the `init.py` file contains a function called `name_of_your_experimentalist` 
 which returns a pool of experimental conditions (e.g., as an iterator object or numpy array).
 
 The following example ``init.py`` illustrates the implementation of a simple experimentalist pooler
