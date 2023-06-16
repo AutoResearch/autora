@@ -63,7 +63,7 @@ these packages in the form of pull requests, bug reports, and feature requests. 
 [core contributor guide](core.md). Feel free to ask any questions or provide any feedback regarding core contributions on the 
 [AutoRA forum](https://github.com/orgs/AutoResearch/discussions/categories/core-contributions).
 
-For core contributions, it is possible to set up your python environment in many different ways. 
+For core contributions, including contributions to [`autora-synthetic`](https://github.com/autoresearch/autora-synthetic), it is possible to set up your python environment in many different ways. 
 One setup which works for us is described in [the setup guide](./setup.md).
 
 !!! hint

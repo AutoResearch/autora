@@ -72,7 +72,7 @@ pip install -e ".[dev]"
 
 There are several ways to publish your package, depending on how you set up your repository.
 
-- If you used the **cookiecutter template**, and uploaded your repository to 
+- If you used the **cookiecutter template** with the advanced setup, and uploaded your repository to 
 github.com, then you can use Github Actions to automatically publish your package to PyPI or Conda. 
 
 - If you used the **unguided template**, or you want to manually publish your package, you can follow [step 7 in this guide](https://github.com/AutoResearch/autora-template).
