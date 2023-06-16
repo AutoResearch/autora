@@ -1,4 +1,4 @@
-# Contributor Guide
+# Contributor guide
 
 The AutoRA project is a collection of packages which together form a framework for closed-loop empirical research.
 We invite contributions to all parts of the project, including the ["core" packages](core.md), and the [modules](module.md). Below is a brief overview of the
@@ -10,7 +10,7 @@ project structure, along with pointers to more detailed contribution guides for 
 
 
 
-## Project Structure
+## Project structure
 
 Contributions to AutoRA are organized into one "parent" and many "child" packages. 
 Child packages are generally maintained by individual contributors. The parent package, along with some other 
@@ -28,7 +28,7 @@ to install.
 You may contribute to any of the core packages or develop your own module as a stand-alone package (see below).    
 
 
-## Module Contributions
+## Module contributions
 
 Modules include theorists, experimentalists, experiment runners, or other functionalities not covered by the core packages. 
 All modules are child packages and can become optional dependencies of the `autora` parent package. Modules packages are 
@@ -42,7 +42,7 @@ for inclusion in `autora`, see
 [the module contributor guide](./module.md). Feel free to post questions and feedback regarding module contributions on the 
 [AutoRA forum](https://github.com/orgs/AutoResearch/discussions/categories/module-contributions).
 
-## Core Contributions
+## Core contributions
 
 The following packages are considered core packages, and are actively maintained by the
 [Autonomous Empirical Research Group](https://musslick.github.io/AER_website/Team.html):

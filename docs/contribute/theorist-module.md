@@ -1,4 +1,4 @@
-# Contribute a Theorist
+# Contribute a theorist
 
 AutoRA theorists are meant to return scientific models describing the relationship between experimental conditions
 and observations. Such models may take the form of a simple linear regression, non-linear equations, causal graphs, 
@@ -11,7 +11,7 @@ a more complex neural network, or other models which
 All theorists are implemented as `sklearn` regressors. They are fitted based on experimental conditions and respective
 observations, and can be used to predict observations for new experimental conditions.
 
-## Repository Setup
+## Repository setup
 
 We recommend using the [cookiecutter template](https://github.com/AutoResearch/autora-template-cookiecutter) to set up
 a repository for your theorist. Alternatively, you use the 
@@ -67,7 +67,7 @@ class ExampleRegressor(BaseEstimator):
         return self.polynomial(conditions)
 ```
 
-## Next Steps: Testing, Documentation, Publishing
+## Next steps: testing, documentation, publishing
 
 For more information on how to test, document, and publish your theorist, please refer to the 
 [general guideline for module contributions](module.md) . 
