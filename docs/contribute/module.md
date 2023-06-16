@@ -49,7 +49,6 @@ you will still be able to install your package separately, in addition to `autor
 
 It is highly encouraged that you add documentation of your package in `docs/index.md`. You can also add new or delete unnecessary pages 
 in the `docs` folder. However you structure your documentation, be sure that structure is reflected in the `mkdocs.yml` file.
-new pages or delete pages that you deleted from the `docs` folder.
 
 You are also encouraged to describe basic usage of your theorist in the 
 python notebook ``Basic Usage.ipynb`` in the `docs` folder. Finally you can outline the basic setup of your theorist in 
