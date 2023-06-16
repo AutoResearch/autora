@@ -54,7 +54,7 @@ You are also encouraged to describe basic usage of your module in the
 python notebook ``Basic Usage.ipynb`` in the `docs` folder. Finally you can outline the basic setup of your module in 
 the `docs/quickstart.md` file.
 
-*Note: Docmentation is required if you wish that your feature becomes part of the main 
+*Note: Documentation is required for your module to become part of the main 
 [autora](https://github.com/AutoResearch/autora) package. However, regardless of whether you choose to write
 documentation, you will still be able to install your package separately, in addition to autora.*
 
