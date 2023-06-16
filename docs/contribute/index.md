@@ -5,7 +5,7 @@ We invite contributions to all parts of the project, including the ["core" packa
 project structure, along with pointers to more detailed contribution guides for each part of the project.
 
 !!! hint
-    If you run into any issues or have any questions regarding a contribution to AutoRA, please reach out to us at the  
+    If you run into any issues or have any questions regarding a contribution to AutoRA, please reach out to us on the  
     [AutoRA forum](https://github.com/orgs/AutoResearch/discussions). We look forward to hearing from you!
 
 
