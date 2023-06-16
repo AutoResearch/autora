@@ -44,7 +44,7 @@ It is important that the `init.py` file contains a function called `name_of_your
 which returns a pool of experimental conditions (e.g., as an iterator object or numpy array).
 
 The following example ``init.py`` illustrates the implementation of a simple experimentalist pooler
-that generates a grid of sampels within the specified bounds of each independent variable (IV):
+that generates a grid of samples within the specified bounds of each independent variable (IV):
 
 ```python 
 
