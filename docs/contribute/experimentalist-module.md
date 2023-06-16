@@ -85,7 +85,7 @@ def grid_pool(ivs: List[IV]):
 ### Implementing samplers
 
 Once you've created your repository, you can implement your experimentalist sampler by editing the `init.py` file in 
-``src/autora/experimentalist/sampler/name-of-your-experimentalist/``. 
+``src/autora/experimentalist/sampler/name_of_your_experimentalist/``. 
 You may also add additional files to this directory if needed. 
 It is important that the `init.py` file contains a function called `name-of-your-experimentalist` 
 which returns a set of experimental conditions (e.g., as a numpy array) given a pool of candidate experimental conditions.
