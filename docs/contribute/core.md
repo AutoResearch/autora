@@ -6,7 +6,7 @@ The primary purpose of the core is to provide utilities for:
 - describing experiments (in the [`autora-core` package](https://github.com/autoresearch/autora-core))
 - handle workflows for automated experiments
   (currently in the [`autora-workflow` package](https://github.com/autoresearch/autora-workflow))
-- run synthetic experiments (currently in the [`autora-synthetic` package](https://github.com/autoresearch/autora-synthetic/CONTRIBUTING.md). Synthetic experiment runners may be submitted as pull requests to the 
+- run synthetic experiments (currently in the [`autora-synthetic` package](https://github.com/autoresearch/autora-synthetic). Synthetic experiment runners may be submitted as pull requests to the 
     [`autora-synthetic`](https://github.com/autoresearch/autora-synthetic/CONTRIBUTING.md) package, providing they 
     require no additional dependencies. However, if your contribution requires additional dependencies, you can submit it as a full package following 
     the [module contribution guide](module.md).
