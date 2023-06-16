@@ -6,7 +6,7 @@ AutoRA experiment runners are designed to generate observations. They encompass 
 Experiment runners can be implemented as *synthetic runners*:
 To contribute a *synthetic experiment runner* follow the [core](core.md) contribution guide.
 
-Complete experiment runners are functions that return observations. Experiment runner contributions also encompass tools that help with the automation of conducting experiments. For example, tools that are already implemented are a automated [recruitment manager](https://autoresearch.github.io/autora/user-guide/experiment-runners/recruitment-managers/prolific/) for recruiting participants on  [Prolific](prolific.co) and a tool for automating [execution of online experiments](https://autoresearch.github.io/autora/user-guide/experiment-runners/experimentation-managers/firebase/) with [Firebase](https://firebase.google.com/).
+Contributions may be complete experiment runners, which are functions that return observations, or tools that help automate experiments. Examples of such tools that are already implemented include a [recruitment manager](https://autoresearch.github.io/autora/user-guide/experiment-runners/recruitment-managers/prolific/) for recruiting participants on [Prolific](prolific.co) and an [experimentation manager](https://autoresearch.github.io/autora/user-guide/experiment-runners/experimentation-managers/firebase/) for executing online experiments with [Firebase](https://firebase.google.com/).
 
 ## Repository setup
 
