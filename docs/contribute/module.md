@@ -37,7 +37,7 @@ to ask for help in the [AutoRA forum](https://github.com/orgs/AutoResearch/discu
 
 ### Step 2 (Optional): Add Tests
 
-It is highly encouraged to add unit tests to ensure your code is working as intended. These can be [doctests](https://docs.python.org/3/library/doctest.html) or as test cases in `tests/test_your_contribution_name.py`.
+It is highly encouraged to add unit tests to ensure your code is working as intended. These can be [doctests](https://docs.python.org/3/library/doctest.html) or test cases in `tests/test_your_contribution_name.py`.
 For example, if you are implementing an experiment sampler, you may rename and modify the 
 ``tests/test_experimentalist_sampler_example.py``.
 
