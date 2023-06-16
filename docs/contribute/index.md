@@ -47,7 +47,7 @@ for inclusion in `autora`, see
 The following packages are considered core packages, and are actively maintained by the
 [Autonomous Empirical Research Group](https://musslick.github.io/AER_website/Team.html):
 
-- **autora-core** [`https://github.com/autoresearch/autora-core`](https://github.com/autoresearch/autora-core) This package  includes fundamental utilities
+- **autora-core** [`https://github.com/autoresearch/autora-core`](https://github.com/autoresearch/autora-core) This package includes fundamental utilities
 and building blocks for all the other packages. This is always installed when a user installs `autora` and can be 
 a dependency of other child packages.   
 
