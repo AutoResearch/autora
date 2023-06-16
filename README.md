@@ -5,7 +5,9 @@
 ![PyPI - Downloads](https://img.shields.io/pypi/dm/autora)
 
 <b>[AutoRA](https://pypi.org/project/autora/)</b> (<b>Auto</b>mated <b>R</b>esearch <b>A</b>ssistant) is an open-source framework for 
-automating multiple stages of the empirical research process, including model discovery, experimental design, data collection, and documentation for open science.
+automating multiple stages of the empirical research process, including model discovery, experimental design, data collection, and documentation for open science. 
+
+AutoRA was initially intended for accelerating research in the behavioral and brain sciences. However, AutoRA is designed as a general framework that enables automation of the research processes in other empirical sciences, such as material science or physics.
 
 ![Autonomous Empirical Research Paradigm](https://github.com/AutoResearch/autora/raw/main/docs/img/overview.png)
 
@@ -18,7 +20,6 @@ Check out the documentation at
 
 This project is in active development by 
 the [Autonomous Empirical Research Group](http://empiricalresearch.ai), 
-led by [Sebastian Musslick](https://smusslick.com), 
 in collaboration with the [Center for Computation and Visualization at Brown University](https://ccv.brown.edu).
 
 The development of this package is supported by Schmidt Science Fellows, in partnership with the Rhodes Trust, as well as the Carney BRAINSTORM program at Brown University.

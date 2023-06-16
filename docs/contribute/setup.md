@@ -1,4 +1,4 @@
-# Setup Guide
+# Setup guide
 
 It's possible to set up your python environment in many different ways. 
 
@@ -26,9 +26,9 @@ The following sections describe how to install and configure the recommended set
     - **macOS**: Joe Kissell. [*Take Control of the Mac Command Line with Terminal, 3rd Edition*](https://bruknow.library.brown.edu/permalink/01BU_INST/528fgv/cdi_safari_books_v2_9781947282513). Take Control Books, 2022. Chapters *Read Me First* through *Bring the Command Line Into The Real World*.
     - **Linux**: William E. Shotts. [*The Linux Command Line: a Complete Introduction. 2nd edition.*](https://bruknow.library.brown.edu/permalink/01BU_INST/9mvq88/alma991043239704906966). No Starch Press, 2019. Parts *I: Learning the Shell* and *II: Configuration and the Environment*.
 
-## Development Setup
+## Development setup
 
-### Clone the Repository
+### Clone the repository
 
 The easiest way to clone the repo is to go to [the repository page on GitHub](https://github.com/AutoResearch/autora)
 and click the "<> Code" button and follow the prompts. 

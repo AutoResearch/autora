@@ -129,6 +129,7 @@ nav:
   - Module Contributions: 
     - Overview: 'contribute/module.md'
     - Theorist Contribution: 'contribute/theorist-module.md'
+    - Experimentalist Contribution: 'contribute/experimentalist-module.md'
   - Core Contributions: 'contribute/core.md'
   - Environment Setup: 'contribute/setup.md'
   - Pre-Commit Hooks: 'contribute/pre-commit-hooks.md'

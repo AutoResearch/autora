@@ -1,4 +1,4 @@
-# Pre-Commit Hooks
+# Pre-commit hooks
 
 We use [`pre-commit`](https://pre-commit.com) to manage pre-commit hooks. 
 
@@ -11,7 +11,7 @@ We use pre-commit hooks to:
 
 The hooks and their settings are specified in the `.pre-commit-config.yaml` in each repository.
 
-## Handling Pre-Commit Hook Errors
+## Handling pre-commit hook errors
 
 If your `git commit` fails because of the pre-commit hook, then you should:
 
