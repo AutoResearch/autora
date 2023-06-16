@@ -1,6 +1,6 @@
 # Contribute to Core Packages
 
-Core contributions are changes to AutoRA which aren't experimentalists, (synthetic) experiment runners and theorists. 
+Core contributions are changes to AutoRA which aren't experimentalists, (synthetic) experiment runners, or theorists. 
 The primary purpose of the core is to provide utilities for:
 
 - describing experiments (in the [`autora-core` package](https://github.com/autoresearch/autora-core))
