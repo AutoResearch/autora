@@ -28,5 +28,5 @@ To implement a complete experiment runner, be sure to define a function that ret
 
 ## Next steps: testing, documentation, publishing
 
-For more information on how to test, document, and publish your experimentalist, please refer to the 
+For more information on how to test, document, and publish your experiment runner, please refer to the 
 [general guideline for module contributions](module.md) . 
