@@ -27,7 +27,7 @@ Make sure to select the `theorist` option when prompted. You can skip all other 
 ## Implementation
 
 Once you've created your repository, you can implement your theorist by editing the `init.py` file in 
-``src/autora/theorist/name-of-your-theorist/``. You may also add additional files to this directory if needed. 
+``src/autora/theorist/name_of_your_theorist/``. You may also add additional files to this directory if needed. 
 It is important that the `init.py` file contains a class called `NameOfYourTheorist` which inherits from  
 `sklearn.base.BaseEstimator` and implements the following methods:
 
