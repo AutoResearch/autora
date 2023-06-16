@@ -23,7 +23,7 @@ Make sure to select the `experiment runner` option when prompted. If you want to
 
 ## Implementation
 
-If you want to implement a complete experiment runner this should be a function that returns observations. But the experiment runner category also encompasses tools that help with automation of conducting experiments. For a more detailed overview, you can look at the [list of tools](https://autoresearch.github.io/autora/experiment-runner/) that are already implemented.
+To implement a complete experiment runner, be sure to define a function that returns observations. To get an idea for tools that help automate experiments, see the [list of tools](https://autoresearch.github.io/autora/experiment-runner/) that are already implemented.
 
 
 ## Next steps: testing, documentation, publishing
