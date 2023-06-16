@@ -56,7 +56,7 @@ the `docs/quickstart.md` file.
 
 *Note: Documentation is required for your module to become part of the main 
 [autora](https://github.com/AutoResearch/autora) package. However, regardless of whether you choose to write
-documentation, you will still be able to install your package separately, in addition to autora.*
+documentation, you will still be able to install your package separately, in addition to `autora`.*
 
 ### Step 4: Add Dependencies
 
