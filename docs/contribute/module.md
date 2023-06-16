@@ -1,6 +1,6 @@
 # Module Contributions
 
-Theorist, experimentalists, experiment runners and other novel functionalities are implemented as a "child" packages. 
+Theorists, experimentalists, experiment runners and other novel functionalities are implemented as "child" packages. 
 They are based on either
 
 - the [cookiecutter template (recommended)](https://github.com/AutoResearch/autora-template-cookiecutter), or
