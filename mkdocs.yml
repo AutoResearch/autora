@@ -125,9 +125,9 @@ nav:
       - Prolific: '!import https://github.com/autoresearch/autora-experiment-runner-recruitment-manager-prolific/?branch=main&extra_imports=["mkdocs/base.yml"]'
   - Workflow: '!import https://github.com/autoresearch/autora-workflow/?branch=main&extra_imports=["mkdocs/base.yml"]'
 - Contributor Guide:
-  - Overview: 'contribute/index.md'
+  - Home: 'contribute/index.md'
   - Module Contributions: 
-    - Overview: 'contribute/module.md'
+    - Home: 'contribute/module.md'
     - Theorist Contribution: 'contribute/theorist-module.md'
     - Experimentalist Contribution: 'contribute/experimentalist-module.md'
   - Core Contributions: 'contribute/core.md'
