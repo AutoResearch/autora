@@ -32,7 +32,7 @@ Please refer to the following guides on implementing
 - [experiment runners](experiment-runner-module.md)
 
 If the feature you seek to implement does not fit in any of these categories, then 
-you can you can create folders for new categories. If you are unsure how to proceed, you are always welcome 
+you can create folders for new categories. If you are unsure how to proceed, you are always welcome 
 to ask for help in the [AutoRA forum](https://github.com/orgs/AutoResearch/discussions/categories/module-contributions).
 
 ### Step 2 (Optional): Add Tests
