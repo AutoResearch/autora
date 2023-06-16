@@ -1,4 +1,4 @@
-# Contribute an Experimentalist
+# Contribute an experimentalist
 
 AutoRA experimentalists are meant to return novel experimental conditions based on prior experimental conditions, prior
 observations, and/or prior models. Such conditions may serve as a basis for new, informative experiments conducted 
@@ -12,7 +12,7 @@ Experimentalists can be implemented as *poolers* or as *samplers*.
   a subset of conditions from the pool to be used in the next experiment.
 - **Samplers** directly return a subset of experimental conditions from a pool of candidate experimental conditions that already exist.
 
-## Repository Setup
+## Repository setup
 
 We recommend using the [cookiecutter template](https://github.com/AutoResearch/autora-template-cookiecutter) to set up
 a repository for your experimentalist. Alternatively, you can use the 
@@ -121,7 +121,7 @@ random_sample(conditions: Union[Iterable, Sequence], n: int = 1):
 ```
 
 
-## Next Steps: Testing, Documentation, Publishing
+## Next steps: testing, documentation, publishing
 
 For more information on how to test, document, and publish your experimentalist, please refer to the 
 [general guideline for module contributions](module.md) . 
