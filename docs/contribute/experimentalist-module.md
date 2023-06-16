@@ -95,7 +95,7 @@ that uniformly samples without replacement from a pool of candidate conditions.
 
 ```python 
 """
-Example Experimentalist Pooler
+Example Experimentalist Sampler
 """
 
 import random
