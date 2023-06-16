@@ -28,7 +28,7 @@ Make sure to select the `experimentalist` option when prompted. You may also sel
 ## Implementation
 
 Irrespective of whether you are implementing a pooler or a sampler, 
-you would want to implement a function that returns a set of experimental conditions. This set may be
+you should implement a function that returns a set of experimental conditions. This set may be
 a numpy array, iterator variable or other data format. 
 
 !!! hint
