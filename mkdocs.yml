@@ -126,10 +126,10 @@ nav:
   - Workflow: '!import https://github.com/autoresearch/autora-workflow/?branch=main&extra_imports=["mkdocs/base.yml"]'
 - Contributor Guide:
   - Home: 'contribute/index.md'
-  - Module Contributions: 
+  - Modules: 
     - Home: 'contribute/module.md'
-    - Theorist Contribution: 'contribute/theorist-module.md'
-    - Experimentalist Contribution: 'contribute/experimentalist-module.md'
-  - Core Contributions: 'contribute/core.md'
+    - Theorist: 'contribute/theorist-module.md'
+    - Experimentalist: 'contribute/experimentalist-module.md'
+  - Core: 'contribute/core.md'
   - Environment Setup: 'contribute/setup.md'
   - Pre-Commit Hooks: 'contribute/pre-commit-hooks.md'
