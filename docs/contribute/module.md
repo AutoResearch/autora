@@ -77,7 +77,7 @@ github.com, then you can use Github Actions to automatically publish your packag
 
 - If you used the **unguided template**, or you want to manually publish your package, you can follow [step 7 in this guide](https://github.com/AutoResearch/autora-template).
 
-Once you've published your module on PyPI, you should take some time to celebrate and announce your contribution in the 
+Once you've published your module, you should take some time to celebrate and announce your contribution in the 
 [AutoRA forum](https://github.com/orgs/AutoResearch/discussions/categories/module-announcements).
 
 ## Including your module into the autora parent package
