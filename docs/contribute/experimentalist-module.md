@@ -1,7 +1,7 @@
 # Contribute an Experimentalist
 
 AutoRA experimentalists are meant to return novel experimental conditions based on prior experimental conditions, prior
-observations, and/or prior models. Such conditions may then serve as a basis for new experiments conducted 
+observations, and/or prior models. Such conditions may serve as a basis for new, informative experiments conducted 
 by an experiment runner. Experimentalists are generally implemented as functions that can be integrated into an 
 [Experimentalist Pipeline](https://autoresearch.github.io/autora/core/docs/pipeline/Experimentalist%20Pipeline%20Examples/).
 
