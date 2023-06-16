@@ -10,7 +10,7 @@ by an experiment runner. Experimentalists are generally implemented as functions
 Experimentalists can be implemented as *poolers* or as *samplers*.
 - **Poolers** return a pool of candidate experimental conditions, which can be passed to a sampler that selects
   a subset of conditions from the pool to be used in the next experiment.
-- **Samplers** directly return a subset of experimental conditions from a pool of candidate experimental conditions.
+- **Samplers** directly return a subset of experimental conditions from a pool of candidate experimental conditions that already exist.
 
 ## Repository Setup
 
