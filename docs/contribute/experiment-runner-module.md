@@ -18,7 +18,7 @@ a repository for your experiment runner. Alternatively, you can use the
 cookiecutter https://github.com/AutoResearch/autora-template-cookiecutter
 ```
 
-Make sure to select the `experiment runner` option when prompted. If you want to design a tool to recruit participants, you may choose the option `recruitment manager`. If you want to design a tool to conduct experiments you may choose the option `experimentation manager`. You can also design a custom tool and name it yourself. You can skip all other prompts pertaining to other modules 
+Make sure to select the `experiment runner` option when prompted. If you want to design a tool to recruit participants, choose the `recruitment manager` option. If you want to design a tool to conduct experiments, choose the `experimentation manager` option. You can also design a custom tool and name it yourself. You can skip all prompts pertaining to other modules 
 (e.g., experimentalists) by pressing enter.
 
 ## Implementation
