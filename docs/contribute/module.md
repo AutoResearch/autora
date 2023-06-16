@@ -80,7 +80,7 @@ github.com, then you can use Github Actions to automatically publish your packag
 Once you've published your module, you should take some time to celebrate and announce your contribution in the 
 [AutoRA forum](https://github.com/orgs/AutoResearch/discussions/categories/module-announcements).
 
-## Including your module into the autora parent package
+## Incorporating your module into the `autora` parent package
 
 Once your package is working, and you've published it on PyPI, you can **make a pull request** on 
 [`autora`](https://github.com/autoresearch/autora) to have it vetted and added to the "parent" package.
