@@ -130,6 +130,7 @@ nav:
     - Home: 'contribute/module.md'
     - Theorist: 'contribute/theorist-module.md'
     - Experimentalist: 'contribute/experimentalist-module.md'
+    - Experiment Runner: 'contribute/experiment-runner-module.md'
   - Core: 'contribute/core.md'
   - Environment Setup: 'contribute/setup.md'
   - Pre-Commit Hooks: 'contribute/pre-commit-hooks.md'
