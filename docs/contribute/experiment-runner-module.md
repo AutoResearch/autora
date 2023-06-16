@@ -1,6 +1,6 @@
 # Contribute an experimentalist
 
-AutoRA experiment runners are designed with to generate observations. They encompass a range of tools for conducting both synthetic and real experiments. By combining the observations with the corresponding experimental conditions, they may provide the inputs for an AutoRA theorist that then formulates a model that elucidates the relationship between the conditions and the observed outcomes.
+AutoRA experiment runners are designed to generate observations. They encompass a range of tools for conducting both synthetic and real experiments. By combining observations with corresponding experimental conditions, they provide inputs necessary for an AutoRA theorist to perform model discovery.
 ![Experimentalist Runner Module](../img/experiment_runner.png)
 
 Experiment runners can be implemented as *synthetic runners*:
