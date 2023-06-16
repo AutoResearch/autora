@@ -16,7 +16,7 @@ Experimentalists can be implemented as *poolers* or as *samplers*.
 
 We recommend using the [cookiecutter template](https://github.com/AutoResearch/autora-template-cookiecutter) to set up
 a repository for your experimentalist. Alternatively, you can use the 
-[unguided template](https://github.com/AutoResearch/autora-template). If you are using the cookiecutter template, you can set up your repository using
+[unguided template](https://github.com/AutoResearch/autora-template). If you choose the cookiecutter template, you can set up your repository using
 
 ```shell
 cookiecutter https://github.com/AutoResearch/autora-template-cookiecutter
