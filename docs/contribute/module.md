@@ -60,7 +60,7 @@ documentation, you will still be able to install your package separately, in add
 
 ### Step 4: Add Dependencies
 
-In pyproject.toml add the new dependencies under `dependencies`
+In the `pyproject.toml` file, add the new dependencies under `dependencies`.
 
 Install the added dependencies
 ```shell
