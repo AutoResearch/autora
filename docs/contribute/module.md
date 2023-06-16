@@ -92,7 +92,7 @@ repository example-contributor/contributor-theorist
     - include basic documentation in ``docs/index.md``
     - include a basic python notebook exposing how to use the module in ``docs/Basic Usage.ipynb``
     - include basic tests in ``tests/``
-    - be published on PyPI
+    - be published via PyPI or Conda
     - be compatible with the current version of the parent package
     - follow standard python coding guidelines including PEP8
 
