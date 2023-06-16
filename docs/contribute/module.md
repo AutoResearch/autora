@@ -43,7 +43,7 @@ For example, if you are implementing a sampler experimentalist, you may rename a
 
 *Note: Tests are required for your module to become part of the main 
 [autora](https://github.com/AutoResearch/autora) package. However, regardless of whether you choose to implement tests, 
-you will still be able to install your package separately, in addition to autora.* 
+you will still be able to install your package separately, in addition to `autora`.* 
 
 ### Step 3 (Optional): Add Documentation
 
