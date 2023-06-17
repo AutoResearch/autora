@@ -1,4 +1,4 @@
-# Module contributions
+# Module Contributions
 
 Theorists, experimentalists, experiment runners and other novel functionalities are implemented as "child" packages. 
 They are based on either

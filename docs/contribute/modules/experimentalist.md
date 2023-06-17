@@ -1,4 +1,4 @@
-# Contribute an experimentalist
+# Contribute An Experimentalist
 
 AutoRA experimentalists are meant to return novel experimental conditions based on prior experimental conditions, prior
 observations, and/or prior models. Such conditions may serve as a basis for new, informative experiments conducted 

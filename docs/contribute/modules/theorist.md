@@ -1,4 +1,4 @@
-# Contribute a theorist
+# Contribute A Theorist
 
 AutoRA theorists are meant to return scientific models describing the relationship between experimental conditions
 and observations. Such models may take the form of a simple linear regression, non-linear equations, causal graphs, 
