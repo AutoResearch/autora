@@ -1,4 +1,4 @@
-# Contribute a theorist
+# Contribute A Theorist
 
 AutoRA theorists are meant to return scientific models describing the relationship between experimental conditions
 and observations. Such models may take the form of a simple linear regression, non-linear equations, causal graphs, 
@@ -6,7 +6,7 @@ a more complex neural network, or other models which
 - can be identified based on data (and prior knowledge)
 - can be used to make novel predictions about observations given experimental conditions.
 
-![Theorist Module](../img/theorist.png)
+![Theorist Module](../../img/theorist.png)
 
 All theorists are implemented as `sklearn` regressors. They are fitted based on experimental conditions and respective
 observations, and can be used to predict observations for new experimental conditions.
@@ -70,4 +70,4 @@ class ExampleRegressor(BaseEstimator):
 ## Next steps: testing, documentation, publishing
 
 For more information on how to test, document, and publish your theorist, please refer to the 
-[general guideline for module contributions](module.md) . 
+[general guideline for module contributions](index.md) . 
