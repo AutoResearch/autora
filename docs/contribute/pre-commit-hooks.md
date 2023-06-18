@@ -1,4 +1,4 @@
-# Pre-commit hooks
+# Pre-commit Hooks
 
 We use [`pre-commit`](https://pre-commit.com) to manage pre-commit hooks. 
 

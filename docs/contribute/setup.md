@@ -1,4 +1,4 @@
-# Setup guide
+# Setup Guide
 
 It's possible to set up your python environment in many different ways. 
 
