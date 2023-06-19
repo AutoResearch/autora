@@ -23,9 +23,9 @@ other empirical sciences, such as materials science or physics.
 
 AutoRA consists of different modules that can be used independently or in combination, such as:
 
-- <b>Automated theorists</b> that support the discovery of formal scientific models from data
-- <b>Automated experimentalists</b> that support the design of follow-up experiments
-- <b>Interfaces for automated data collection</b>, e.g., for behavioral experiments via Prolific or Amazon Mechanical Turk
+- <b>[Automated theorists](theorist/index.md)</b> that support the discovery of formal scientific models from data
+- <b>[Automated experimentalists](experimentalist/index.md)</b> that support the design of follow-up experiments
+- <b>[Interfaces for automated data collection](experiment-runner/index.md)</b>, e.g., for behavioral experiments via Prolific or Amazon Mechanical Turk
 - <b>Workflow logic</b> for defining interactions between different components of the research process
 - <b>Interfaces for automated documentation</b> of the research process
 
