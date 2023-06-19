@@ -103,6 +103,7 @@ nav:
         - Quickstart: 'falsification/docs/sampler/quickstart.md'
         - Examples:
           - Basic Usage: 'falsification/docs/sampler/Basic Usage.ipynb'
+      - Mixture: '!import https://github.com/blinodelka/mixture_experimental_strategies/?branch=main&extra_imports=["mkdocs/base.yml"]'
     - Poolers:
       - Grid:
           - Home: 'core/docs/experimentalists/pooler/grid/index.md'
