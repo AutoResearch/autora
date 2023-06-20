@@ -33,9 +33,12 @@ You may contribute to any of the core packages or develop your own module as a s
 Modules include theorists, experimentalists, experiment runners, or other functionalities not covered by the core packages. 
 All modules are child packages and can become optional dependencies of the autora parent package. Modules packages are 
 owned and maintained by you, the contributor, which provides several advantages:
-- *Easy setup*: We provide simple [templates](module.md) for modules, which you can use to get started quickly
-- *Independence*: You can develop and maintain your package independently of other modules packages (and thereby avoid dependency conflicts)
-- *Ownership*: You can publish your package on PyPI or Conda, use it in other projects, and get credit for its use. 
+
+<ul>
+<li> <b>Easy setup</b>: We provide simple [templates](module.md) for modules, which you can use to get started quickly
+<li> <b>Independence</b>: You can develop and maintain your package independently of other modules packages (and thereby avoid dependency conflicts)
+<li> <b>Ownership</b>: You can publish your package on PyPI or Conda, use it in other projects, and get credit for its use. 
+</ul>
 
 For details on how to submit child packages 
 for inclusion in `autora`, see
