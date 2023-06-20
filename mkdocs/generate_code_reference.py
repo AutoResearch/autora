@@ -1,18 +1,26 @@
 """Generate the code reference pages and navigation."""
 
 from pathlib import Path
-from typing import List
 
 import mkdocs_gen_files
 
 nav = mkdocs_gen_files.Nav()
 
-source_paths = sorted(Path("./src/autora").rglob("*.py"))
-special_paths: List[Path] = []
+src_paths = sorted(Path("./temp_dir/").rglob("**/src"))
 
-for path in source_paths + special_paths:
-    module_path = path.relative_to("./src/").with_suffix("")
-    doc_path = path.relative_to("./src/").with_suffix(".md")
+
+def source_file_generator(src_paths):
+    for src_path in src_paths:
+        for path in src_path.rglob("**/*.py"):
+            yield path, src_path
+
+
+print(source_file_generator(src_paths))
+print(list(source_file_generator(src_paths)))
+
+for path, src_path in source_file_generator(src_paths):
+    module_path = path.relative_to(src_path).with_suffix("")
+    doc_path = path.relative_to(src_path).with_suffix(".md")
     full_doc_path = Path("reference", doc_path)
 
     parts = tuple(module_path.parts)
@@ -34,3 +42,6 @@ for path in source_paths + special_paths:
 
 with mkdocs_gen_files.open("reference/SUMMARY.md", "w") as nav_file:
     nav_file.writelines(nav.build_literate_nav())
+
+with mkdocs_gen_files.open("reference/SUMMARY.md", "r") as nav_file:
+    print("".join(nav_file.readlines()))
