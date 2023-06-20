@@ -42,19 +42,7 @@ neuroscience, economics, physics, or materials science. Usages include:
 
 ## Motivation
 
-Various empirical sciences are beset by a replication crisis, 
-which can be attributed to inadequately precise hypotheses, lack of transparency
-in research procedures, and insufficient rigor in testing findings. These limitations
-are the result of three primary bottlenecks—a lack of formal modeling, the
-demanding requirements of open science, and a shortage of resources to reproduce 
-individual studies. Empirical scientists face difficulties in formalizing their 
-theories, find it arduous to document their research activities, and often lack 
-time and funds to conduct follow-up experiments to test and revise their
-hypotheses. These limitations impede scientific progress and hinder
-the development of new knowledge. We seek to overcome these limitations by providing
-a tool for the generation, estimation, and empirical testing of scientific models. 
-It is our hope that AutoRA will help accelerate scientific discovery by overcoming
-these limitations and promoting greater transparency and rigor in empirical research.
+The pace of empirical research is constrained by the rate at which scientists can alternate between the development of formal theories and the execution of experiments. However, attempts to increase this rate often compromise scientific rigor, leading to deficiencies such as the absence of formal modeling, non-replicable findings, and insufficient documentation. In order to surmount these limitations, we aim to develop AutoRA––an open-source framework that automates the generation, estimation, and empirical testing of scientific models. By automating steps of the empirical research process, we hope AutoRA can accelerate scientific discovery while promoting greater transparency and rigor in empirical research.
 
 ## Pointers
 

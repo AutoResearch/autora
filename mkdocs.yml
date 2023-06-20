@@ -77,8 +77,8 @@ nav:
 - Introduction: 'index.md'
 - Tutorials:
   - Home: 'tutorials/index.md'
-  - Automated Theorist: 'bms-tutorial/docs/Basic Usage.ipynb'
-  - Automated Experimentalist: 'falsification-tutorial/docs/sampler/Basic Usage.ipynb'
+  - Automated Theorist: 'tutorials/theorist.ipynb'
+  - Automated Experimentalist: 'tutorials/experimentalist.ipynb'
   - Closed-Loop Discovery: 'workflow-tutorial/docs/interactive/Basic Usage.ipynb'
 - User Guide:
   - Theorists:
@@ -125,8 +125,12 @@ nav:
       - Prolific: '!import https://github.com/autoresearch/autora-experiment-runner-recruitment-manager-prolific/?branch=main&extra_imports=["mkdocs/base.yml"]'
   - Workflow: '!import https://github.com/autoresearch/autora-workflow/?branch=main&extra_imports=["mkdocs/base.yml"]'
 - Contributor Guide:
-  - Overview: 'contribute/index.md'
-  - Module Contributions: 'contribute/module.md'
-  - Core Contributions: 'contribute/core.md'
+  - Home: 'contribute/index.md'
+  - Modules: 
+    - Home: 'contribute/modules/index.md'
+    - Theorist: 'contribute/modules/theorist.md'
+    - Experimentalist: 'contribute/modules/experimentalist.md'
+    - Experiment Runner: 'contribute/modules/experiment-runner.md'
+  - Core: 'contribute/core.md'
   - Environment Setup: 'contribute/setup.md'
   - Pre-Commit Hooks: 'contribute/pre-commit-hooks.md'
