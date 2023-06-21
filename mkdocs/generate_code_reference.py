@@ -24,7 +24,6 @@ for path, src_path in source_file_generator(src_paths):
     parts = tuple(module_path.parts)
 
     if parts[-1] == "__init__":
-        parts = parts[:-1]
         doc_path = doc_path.with_name("index.md")
         full_doc_path = full_doc_path.with_name("index.md")
     elif parts[-1] == "__main__":
@@ -33,7 +32,10 @@ for path, src_path in source_file_generator(src_paths):
     nav[parts] = doc_path.as_posix()
 
     with mkdocs_gen_files.open(full_doc_path, "w") as fd:
-        ident = ".".join(parts)
+        if parts[-1] == "__init__":
+            ident = ".".join(parts[:-1])
+        else:
+            ident = ".".join(parts)
         fd.write(f"::: {ident}")
 
     mkdocs_gen_files.set_edit_path(full_doc_path, path)
