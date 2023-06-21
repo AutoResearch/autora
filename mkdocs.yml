@@ -121,63 +121,63 @@ extra_javascript: [
 
 nav:
 - Introduction: 'index.md'
-#- Tutorials:
-#  - Home: 'tutorials/index.md'
-#  - Automated Theorist: 'tutorials/theorist.ipynb'
-#  - Automated Experimentalist: 'tutorials/experimentalist.ipynb'
-#  - Closed-Loop Discovery: 'workflow-tutorial/docs/interactive/Basic Usage.ipynb'
-#- User Guide:
-#  - Theorists:
-#    - Home: 'theorist/index.md'
-#    - DARTS: '!import https://github.com/autoresearch/autora-theorist-darts/?branch=main&extra_imports=["mkdocs/base.yml"]'
-#    - BMS: '!import https://github.com/autoresearch/autora-theorist-bms/?branch=main&extra_imports=["mkdocs/base.yml"]'
-#    - BSR: '!import https://github.com/autoresearch/autora-theorist-bsr/?branch=main&extra_imports=["mkdocs/base.yml"]'
-#  - Experimentalists:
-#    - Home: 'experimentalist/index.md'
-#    - Pipeline: 'core/docs/pipeline/Experimentalist Pipeline Examples.ipynb'
-#    - Samplers:
-#      - Random:
-#          - Home: 'core/docs/experimentalists/sampler/random/index.md'
-#          - Quickstart: 'core/docs/experimentalists/sampler/random/quickstart.md'
-#      - Novelty: '!import https://github.com/autoresearch/autora-experimentalist-sampler-novelty/?branch=main&extra_imports=["mkdocs/base.yml"]'
-#      - Inequality: '!import https://github.com/autoresearch/autora-experimentalist-sampler-inequality/?branch=main&extra_imports=["mkdocs/base.yml"]'
-#      - Nearest Value: '!import https://github.com/autoresearch/autora-experimentalist-sampler-nearest-value/?branch=main&extra_imports=["mkdocs/base.yml"]'
-#      - Model Disagreement: '!import https://github.com/autoresearch/autora-experimentalist-sampler-model-disagreement/?branch=main&extra_imports=["mkdocs/base.yml"]'
-#      - Uncertainty: '!import https://github.com/autoresearch/autora-experimentalist-sampler-uncertainty/?branch=main&extra_imports=["mkdocs/base.yml"]'
-#      - Falsification:
-#        - Home: 'falsification/docs/sampler/index.md'
-#        - Quickstart: 'falsification/docs/sampler/quickstart.md'
-#        - Examples:
-#          - Basic Usage: 'falsification/docs/sampler/Basic Usage.ipynb'
-#    - Poolers:
-#      - Grid:
-#          - Home: 'core/docs/experimentalists/pooler/grid/index.md'
-#          - Quickstart: 'core/docs/experimentalists/pooler/grid/quickstart.md'
-#      - Random:
-#          - Home: 'core/docs/experimentalists/pooler/random/index.md'
-#          - Quickstart: 'core/docs/experimentalists/pooler/random/quickstart.md'
-#      - Falsification:
-#        - Home: 'falsification/docs/pooler/index.md'
-#        - Quickstart: 'falsification/docs/pooler/quickstart.md'
-#        - Examples:
-#          - Basic Usage: 'falsification/docs/pooler/Basic Usage.ipynb'
-#  - Experiment Runners:
-#    - Home: 'experiment-runner/index.md'
-#    - Synthetic: '!import https://github.com/autoresearch/autora-synthetic/?branch=main&extra_imports=["mkdocs/base.yml"]'
-#    - Firebase-Prolific: '!import https://github.com/autoresearch/autora-experiment-runner-firebase-prolific/?branch=main&extra_imports=["mkdocs/base.yml"]'
-#    - Experimentation Managers:
-#      - Firebase: '!import https://github.com/autoresearch/autora-experiment-runner-experimentation-manager-firebase/?branch=main&extra_imports=["mkdocs/base.yml"]'
-#    - Recruitment Managers:
-#      - Prolific: '!import https://github.com/autoresearch/autora-experiment-runner-recruitment-manager-prolific/?branch=main&extra_imports=["mkdocs/base.yml"]'
-#  - Workflow: '!import https://github.com/autoresearch/autora-workflow/?branch=main&extra_imports=["mkdocs/base.yml"]'
-#- Contributor Guide:
-#  - Home: 'contribute/index.md'
-#  - Modules:
-#    - Home: 'contribute/modules/index.md'
-#    - Theorist: 'contribute/modules/theorist.md'
-#    - Experimentalist: 'contribute/modules/experimentalist.md'
-#    - Experiment Runner: 'contribute/modules/experiment-runner.md'
-#  - Core: 'contribute/core.md'
-#  - Environment Setup: 'contribute/setup.md'
-#  - Pre-Commit Hooks: 'contribute/pre-commit-hooks.md'
+- Tutorials:
+  - Home: 'tutorials/index.md'
+  - Automated Theorist: 'tutorials/theorist.ipynb'
+  - Automated Experimentalist: 'tutorials/experimentalist.ipynb'
+  - Closed-Loop Discovery: 'workflow-tutorial/docs/interactive/Basic Usage.ipynb'
+- User Guide:
+  - Theorists:
+    - Home: 'theorist/index.md'
+    - DARTS: '!import https://github.com/autoresearch/autora-theorist-darts/?branch=main&extra_imports=["mkdocs/base.yml"]'
+    - BMS: '!import https://github.com/autoresearch/autora-theorist-bms/?branch=main&extra_imports=["mkdocs/base.yml"]'
+    - BSR: '!import https://github.com/autoresearch/autora-theorist-bsr/?branch=main&extra_imports=["mkdocs/base.yml"]'
+  - Experimentalists:
+    - Home: 'experimentalist/index.md'
+    - Pipeline: 'core/docs/pipeline/Experimentalist Pipeline Examples.ipynb'
+    - Samplers:
+      - Random:
+          - Home: 'core/docs/experimentalists/sampler/random/index.md'
+          - Quickstart: 'core/docs/experimentalists/sampler/random/quickstart.md'
+      - Novelty: '!import https://github.com/autoresearch/autora-experimentalist-sampler-novelty/?branch=main&extra_imports=["mkdocs/base.yml"]'
+      - Inequality: '!import https://github.com/autoresearch/autora-experimentalist-sampler-inequality/?branch=main&extra_imports=["mkdocs/base.yml"]'
+      - Nearest Value: '!import https://github.com/autoresearch/autora-experimentalist-sampler-nearest-value/?branch=main&extra_imports=["mkdocs/base.yml"]'
+      - Model Disagreement: '!import https://github.com/autoresearch/autora-experimentalist-sampler-model-disagreement/?branch=main&extra_imports=["mkdocs/base.yml"]'
+      - Uncertainty: '!import https://github.com/autoresearch/autora-experimentalist-sampler-uncertainty/?branch=main&extra_imports=["mkdocs/base.yml"]'
+      - Falsification:
+        - Home: 'falsification/docs/sampler/index.md'
+        - Quickstart: 'falsification/docs/sampler/quickstart.md'
+        - Examples:
+          - Basic Usage: 'falsification/docs/sampler/Basic Usage.ipynb'
+    - Poolers:
+      - Grid:
+          - Home: 'core/docs/experimentalists/pooler/grid/index.md'
+          - Quickstart: 'core/docs/experimentalists/pooler/grid/quickstart.md'
+      - Random:
+          - Home: 'core/docs/experimentalists/pooler/random/index.md'
+          - Quickstart: 'core/docs/experimentalists/pooler/random/quickstart.md'
+      - Falsification:
+        - Home: 'falsification/docs/pooler/index.md'
+        - Quickstart: 'falsification/docs/pooler/quickstart.md'
+        - Examples:
+          - Basic Usage: 'falsification/docs/pooler/Basic Usage.ipynb'
+  - Experiment Runners:
+    - Home: 'experiment-runner/index.md'
+    - Synthetic: '!import https://github.com/autoresearch/autora-synthetic/?branch=main&extra_imports=["mkdocs/base.yml"]'
+    - Firebase-Prolific: '!import https://github.com/autoresearch/autora-experiment-runner-firebase-prolific/?branch=main&extra_imports=["mkdocs/base.yml"]'
+    - Experimentation Managers:
+      - Firebase: '!import https://github.com/autoresearch/autora-experiment-runner-experimentation-manager-firebase/?branch=main&extra_imports=["mkdocs/base.yml"]'
+    - Recruitment Managers:
+      - Prolific: '!import https://github.com/autoresearch/autora-experiment-runner-recruitment-manager-prolific/?branch=main&extra_imports=["mkdocs/base.yml"]'
+  - Workflow: '!import https://github.com/autoresearch/autora-workflow/?branch=main&extra_imports=["mkdocs/base.yml"]'
+- Contributor Guide:
+  - Home: 'contribute/index.md'
+  - Modules:
+    - Home: 'contribute/modules/index.md'
+    - Theorist: 'contribute/modules/theorist.md'
+    - Experimentalist: 'contribute/modules/experimentalist.md'
+    - Experiment Runner: 'contribute/modules/experiment-runner.md'
+  - Core: 'contribute/core.md'
+  - Environment Setup: 'contribute/setup.md'
+  - Pre-Commit Hooks: 'contribute/pre-commit-hooks.md'
 - Code Reference: reference/SUMMARY.md
