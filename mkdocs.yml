@@ -26,8 +26,8 @@ theme:
         icon: material/brightness-4
         name: Switch to light mode
   custom_dir: mkdocs/overrides
-  features:
-    - navigation.indexes
+#  features:
+#    - navigation.indexes
 
 plugins:
   multirepo:
