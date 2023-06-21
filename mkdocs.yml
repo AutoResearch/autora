@@ -82,7 +82,6 @@ plugins:
   gen-files:
     scripts: [ "mkdocs/generate_code_reference.py" ]
   literate-nav: {}
-  section-index: {}
   mkdocstrings:
     handlers:
       python:
