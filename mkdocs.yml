@@ -29,9 +29,6 @@ theme:
   features:
     - navigation.indexes
 
-hooks:
-  - mkdocs/hooks.py
-
 plugins:
   multirepo:
     nav_repos:
@@ -114,6 +111,9 @@ plugins:
     ]
 
   search: {}
+
+hooks:
+  - mkdocs/hooks.py
 
 markdown_extensions:
   admonition: {}
