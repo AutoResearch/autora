@@ -98,7 +98,20 @@ plugins:
     include_source: true
     execute: false
     ignore_h1_titles: true
-    ignore: [ "*.py" ]
+    ignore: [
+      # ignore all files in the src/ directories – these don't need to be converted
+      # this is needed because the pathlib PurePath.match doesn't allow for "**" patterns
+      # (see https://github.com/python/cpython/pull/11171)
+      # We don't want to just ignore all python files, because someone may at some point want to
+      # use a .py notebook.
+      # Alternatively, we could just have ignore: [ "*.py" ], but then we wouldn't be able to use
+      #
+      "src/autora/*.py",
+      "src/autora/*/*.py",
+      "src/autora/*/*/*.py",
+      "src/autora/*/*/*/*.py",
+      "src/autora/*/*/*/*/*.py",
+    ]
 
   search: {}
 
