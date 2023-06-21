@@ -29,6 +29,9 @@ theme:
   features:
     - navigation.indexes
 
+hooks:
+  - mkdocs/hooks.py
+
 plugins:
   multirepo:
     nav_repos:
@@ -64,9 +67,6 @@ plugins:
 #        paths: ["temp_dir/autora-core/src"]
 ##        import: [ "https://scikit-learn.org/stable/objects.inv" ]
   search: {}
-  mkdocs-simple-hooks:
-    hooks:
-      on_env: "docs.hooks:on_env"
 
 markdown_extensions:
   admonition: {}
