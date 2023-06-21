@@ -16,9 +16,6 @@ def source_file_generator(src_paths):
             yield path, src_path
 
 
-print(source_file_generator(src_paths))
-print(list(source_file_generator(src_paths)))
-
 for path, src_path in source_file_generator(src_paths):
     module_path = path.relative_to(src_path).with_suffix("")
     doc_path = path.relative_to(src_path).with_suffix(".md")
