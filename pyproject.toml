@@ -94,7 +94,6 @@ experiment-runner-recruitment-manager-prolific = [
 
 docs = [
   "autora-core[docs]",
-  "mkdocs-simple-hooks",
 ]
 
 test = [
