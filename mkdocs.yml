@@ -34,11 +34,21 @@ plugins:
     nav_repos:
       - name: core
         import_url: "https://github.com/autoresearch/autora-core/?branch=main"
-        imports: ["docs/pipeline/*", "docs/experimentalists/pooler/grid/*", "docs/experimentalists/pooler/random/*",
-                  "docs/experimentalists/sampler/random/*", "src/"]
+        imports: [
+          "docs/pipeline/*",
+          "docs/experimentalists/pooler/grid/*",
+          "docs/experimentalists/pooler/random/*",
+          "docs/experimentalists/sampler/random/*",
+          "src/",
+        ]
       - name: falsification
         import_url: "https://github.com/autoresearch/autora-experimentalist-falsification/?branch=main"
-        imports: ["docs/*", "docs/sampler/*", "docs/pooler/*", "src/"]
+        imports: [
+          "docs/*",
+          "docs/sampler/*",
+          "docs/pooler/*",
+          "src/"
+        ]
       - name: workflow-tutorial
         import_url: "https://github.com/autoresearch/autora-workflow/?branch=main"
         imports: ["docs/*"]
