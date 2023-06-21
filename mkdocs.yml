@@ -39,33 +39,67 @@ plugins:
         import_url: "https://github.com/autoresearch/autora-core/?branch=main"
         imports: ["docs/pipeline/*", "docs/experimentalists/pooler/grid/*", "docs/experimentalists/pooler/random/*",
                   "docs/experimentalists/sampler/random/*", "src/"]
+      - name: workflow-tutorial
+        import_url: "https://github.com/autoresearch/autora-workflow/?branch=main"
+        imports: ["docs/*"]
+      - name: workflow
+        import_url: "https://github.com/autoresearch/autora-workflow/?branch=main"
+        imports: [ "src/" ]
+      - name: darts
+        import_url: "https://github.com/autoresearch/autora-theorist-darts/?branch=main"
+        imports: [ "src/" ]
+      - name: bsr
+        import_url: "https://github.com/autoresearch/autora-theorist-bsr/?branch=main"
+        imports: [ "src/" ]
+      - name: bms
+        import_url: "https://github.com/autoresearch/autora-theorist-bms/?branch=main"
+        imports: [ "src/" ]
+      - name: novelty
+        import_url: "https://github.com/autoresearch/autora-experimentalist-sampler-novelty/?branch=main"
+        imports: [ "src/" ]
+      - name: inequality
+        import_url: "https://github.com/autoresearch/autora-experimentalist-sampler-inequality/?branch=main"
+        imports: [ "src/" ]
+      - name: nearest-value
+        import_url: "https://github.com/autoresearch/autora-experimentalist-sampler-nearest-value/?branch=main"
+        imports: [ "src/" ]
+      - name: disagreement
+        import_url: "https://github.com/autoresearch/autora-experimentalist-sampler-model-disagreement/?branch=main"
+        imports: [ "src/" ]
+      - name: uncertainty
+        import_url: "https://github.com/autoresearch/autora-experimentalist-sampler-uncertainty/?branch=main"
+        imports: [ "src/" ]
       - name: falsification
-        import_url: https://github.com/autoresearch/autora-experimentalist-falsification/?branch=main&extra_imports=["mkdocs/base.yml"]
+        import_url: "https://github.com/autoresearch/autora-experimentalist-falsification/?branch=main"
         imports: ["docs/*", "docs/sampler/*", "docs/pooler/*", "src/"]
-#      - name: bms-tutorial
-#        import_url: https://github.com/autoresearch/autora-theorist-bms/?branch=main&extra_imports=["mkdocs/base.yml"]
-#        imports: ["docs/*"]
-#      - name: workflow-tutorial
-#        import_url: https://github.com/autoresearch/autora-workflow/?branch=main&extra_imports=["mkdocs/base.yml"]
-#        imports: ["docs/*"]
-#      - name: falsification-tutorial
-#        import_url: https://github.com/autoresearch/autora-experimentalist-falsification/?branch=main&extra_imports=["mkdocs/base.yml"]
-#        imports: [ "docs/*"]
-#  mkdocs-jupyter: # required to convert Jupyter notebooks
-#    include_source: true
-#    execute: false
-#    ignore_h1_titles: true
-#    ignore: ["reference/*"]
   gen-files:
     scripts: [ "mkdocs/generate_code_reference.py" ]
-  literate-nav:
-    nav_file: SUMMARY.md
+  literate-nav: {}
   section-index: {}
-#  mkdocstrings:
-#    handlers:
-#      python:
-#        paths: ["temp_dir/autora-core/src"]
-##        import: [ "https://scikit-learn.org/stable/objects.inv" ]
+  mkdocstrings:
+    handlers:
+      python:
+        paths: [
+          # from nav_repos above
+          "./temp_dir/core/src/",
+          "./temp_dir/workflow/src/",
+          "./temp_dir/darts/src/",
+          "./temp_dir/bms/src/",
+          "./temp_dir/bsr/src/",
+          "./temp_dir/novelty/src/",
+          "./temp_dir/inequality/src/",
+          "./temp_dir/nearest-value/src/",
+          "./temp_dir/disagreement/src/",
+          "./temp_dir/uncertainty/src/",
+          "./temp_dir/falsification/src/",
+        ]
+
+  mkdocs-jupyter: # required to convert Jupyter notebooks
+    include_source: true
+    execute: false
+    ignore_h1_titles: true
+    ignore: [ "*.py" ]
+
   search: {}
 
 markdown_extensions:
