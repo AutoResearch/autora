@@ -99,6 +99,9 @@ plugins:
           "./temp_dir/uncertainty/src/",
           "./temp_dir/falsification/src/",
         ]
+        import:
+          - https://scikit-learn.org/stable/objects.inv
+
 
   mkdocs-jupyter: # required to convert Jupyter notebooks
     include_source: true
