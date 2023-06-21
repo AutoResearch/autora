@@ -180,4 +180,4 @@ nav:
   - Core: 'contribute/core.md'
   - Environment Setup: 'contribute/setup.md'
   - Pre-Commit Hooks: 'contribute/pre-commit-hooks.md'
-- Code Reference: reference/SUMMARY.md
+- Code Reference: reference/
