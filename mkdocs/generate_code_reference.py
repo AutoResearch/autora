@@ -42,6 +42,3 @@ for path, src_path in source_file_generator(src_paths):
 
 with mkdocs_gen_files.open("reference/SUMMARY.md", "w") as nav_file:
     nav_file.writelines(nav.build_literate_nav())
-
-with mkdocs_gen_files.open("reference/SUMMARY.md", "r") as nav_file:
-    print("".join(nav_file.readlines()))
