@@ -36,7 +36,7 @@ plugins:
   multirepo:
     nav_repos:
       - name: core
-        import_url: https://github.com/autoresearch/autora-core/?branch=main&extra_imports=["mkdocs/base.yml"]
+        import_url: "https://github.com/autoresearch/autora-core/?branch=main"
         imports: ["docs/pipeline/*", "docs/experimentalists/pooler/grid/*", "docs/experimentalists/pooler/random/*",
                   "docs/experimentalists/sampler/random/*", "src/"]
       - name: falsification
