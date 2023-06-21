@@ -26,8 +26,6 @@ for path, src_path in source_file_generator(src_paths):
     if parts[-1] == "__init__":
         doc_path = doc_path.with_name("index.md")
         full_doc_path = full_doc_path.with_name("index.md")
-    elif parts[-1] == "__main__":
-        continue
 
     nav[parts] = doc_path.as_posix()
 
