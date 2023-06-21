@@ -12,7 +12,7 @@ src_paths = sorted(Path("./temp_dir/").rglob("**/src"))
 def source_file_generator(src_paths):
     """Generate the paths and src directory paths of each python file."""
     for src_path in src_paths:
-        for path in src_path.rglob("**/*.py"):
+        for path in sorted(src_path.rglob("**/*.py")):
             yield path, src_path
 
 
