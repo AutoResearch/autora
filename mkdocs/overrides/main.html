@@ -8,7 +8,7 @@
     </a>
     <a href="{{ config.extra.colab_base_url }}{{ page.url }}{{ page.file.src_uri | basename | quote }}"
        title="Open Notebook in Google Colab" class="md-content__button md-icon">
-        {% include ".icons/material/play-circle-outline.svg" %}
+        <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
     </a>
 {% endif %}
 {{ super() }}
