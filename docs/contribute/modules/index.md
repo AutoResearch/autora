@@ -87,10 +87,10 @@ The following demonstrates how to add a package published under autora-theorist-
 repository example-contributor/contributor-theorist
 
 !!! success
-    In order for your package to be included in the parent package, it must
-    - include basic documentation in ``docs/index.md``
-    - include a basic python notebook exposing how to use the module in ``docs/Basic Usage.ipynb``
-    - include basic tests in ``tests/``
+    In order for your package to be included in the parent package, it must:
+    - have basic documentation in ``docs/index.md``
+    - have a basic python notebook exposing how to use the module in ``docs/Basic Usage.ipynb``
+    - have basic tests in ``tests/``
     - be published via PyPI or Conda
     - be compatible with the current version of the parent package
     - follow standard python coding guidelines including PEP8
