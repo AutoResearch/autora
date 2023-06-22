@@ -85,7 +85,7 @@ Once your package is working and published, you can **make a pull request** on
 [`autora`](https://github.com/autoresearch/autora) to have it vetted and added to the "parent" package.
 
 !!! success
-    In order for your package to be included in the parent package, it must:
+    In order for your package to be included in the parent package, it must meet the following criteria:
     - have basic documentation in ``docs/index.md``
     - have a basic python notebook exposing how to use the module in ``docs/Basic Usage.ipynb``
     - have basic tests in ``tests/``
