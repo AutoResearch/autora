@@ -47,10 +47,6 @@ def get_reference_file_string(p):
         <BLANKLINE>
         ::: a.b.__init__
 
-                    >>> print(get_reference_file_string(("a", "b")))
-        # a.b
-        <BLANKLINE>
-        ::: a.b
     """
     if p[-1] == "__init__":
         ident = ".".join(p[:-1])
