@@ -29,12 +29,55 @@ for path, src_path in source_file_generator(src_paths):
 
     nav[parts] = doc_path.as_posix()
 
-    with mkdocs_gen_files.open(full_doc_path, "w") as fd:
-        if parts[-1] == "__init__":
-            ident = ".".join(parts[:-1])
+    def get_reference_file_string(p):
+        """
+
+        Args:
+            p: a tuple of module names which combine to make an identifier
+
+        Returns:
+            A markdown string with the full combined module name (excluding any __init__ part) as
+            the L1-title and the mkdocstrings "::: <identifier>" below
+
+        Examples:
+            >>> print(get_reference_file_string(("a",)))
+            # a
+            <BLANKLINE>
+            ::: a
+
+            >>> print(get_reference_file_string(("__init__",)))
+            Traceback (most recent call last):
+            ...
+            AssertionError: __init__ must have a parent
+
+            >>> print(get_reference_file_string(("a", "b")))
+            # a.b
+            <BLANKLINE>
+            ::: a.b
+
+            >>> print(get_reference_file_string(("a", "b", "__init__")))
+            # a.b
+            <BLANKLINE>
+            ::: a.b.__init__
+
+                        >>> print(get_reference_file_string(("a", "b")))
+            # a.b
+            <BLANKLINE>
+            ::: a.b
+        """
+        if p[-1] == "__init__":
+            ident = ".".join(p[:-1])
+            assert ident != "", "__init__ must have a parent"
         else:
-            ident = ".".join(parts)
-        fd.write(f"::: {ident}")
+            ident = ".".join(p)
+        title = ident.replace("_", "\\_")
+        s = f"# {title}\n\n::: {ident}"
+        return s
+
+    docstring_stub = get_reference_file_string(parts)
+
+    with mkdocs_gen_files.open(full_doc_path, "w") as fd:
+        fd.write(docstring_stub)
 
     mkdocs_gen_files.set_edit_path(full_doc_path, path)
 
