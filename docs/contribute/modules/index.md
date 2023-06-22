@@ -129,7 +129,7 @@ mkdocs serve
 
 ### Create a new branch of the parent package
 
-Once you've successfully installed the parent package in development mode, you can begin the process of adding your contribution by creating a new branch off of the `main` branch. You should name your branch according to the name of your contribution. In the example we're using here, the branch would be called `feat/contributor-theorist`.
+Once you've successfully installed the parent package in development mode, you can begin the process of adding your contribution by creating a new branch off of the `main` branch. You should name your branch according to the name of your contribution. In the example we're using here, the branch would be called `feat/contributor-theorist`. After creating your branch, you can start making the modifications specified below. 
 
 ### Add the package as optional dependency
 
