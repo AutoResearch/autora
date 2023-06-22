@@ -159,6 +159,22 @@ pip install -U -e ".[dev]"
 
 Import the documentation in the `mkdocs.yml` file:
 ```yml
+plugins:
+  multirepo:
+    nav_repos:
+      ...
+      - name: example_theorist
+        import_url: "https://github.com/example-contributor/contributor-theorist/?branch=v1.0.0"
+        imports: [ "src/" ]
+  ...
+  mkdocstrings:
+    handlers:
+      python:
+        paths: [
+          ...,
+          "./temp_dir/example_theorist/src/"
+        ]
+...
 - User Guide:
   - Theorists:
     - Overview: 'theorist/overview.md'
@@ -192,6 +208,14 @@ example-theorist = ["autora-theorist-example==1.1.0"]
 
 Update the version number in the `mkdocs.yml`: 
 ```yml
+plugins:
+  multirepo:
+    nav_repos:
+      ...
+      - name: example_theorist
+        import_url: "https://github.com/example-contributor/contributor-theorist/?branch=v1.1.0"
+        imports: [ "src/" ]
+...
 - User Guide:
   - Theorists:
     ...
