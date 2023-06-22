@@ -83,8 +83,8 @@ Once you've published your module, you should take some time to celebrate and an
 
 Once your package is working and published, you can **make a pull request** on 
 [`autora`](https://github.com/autoresearch/autora) to have it vetted and added to the "parent" package.
-The following demonstrates how to add a package published under autora-theorist-example in PyPI in the GitHub 
-repository example-contributor/contributor-theorist
+The following demonstrates how to add a package published under `autora-theorist-example` in PyPI in the GitHub 
+repository `example-contributor/contributor-theorist`
 
 !!! success
     In order for your package to be included in the parent package, it must
