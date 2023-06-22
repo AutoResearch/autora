@@ -79,6 +79,9 @@ plugins:
       - name: uncertainty
         import_url: "https://github.com/autoresearch/autora-experimentalist-sampler-uncertainty/?branch=main"
         imports: [ "src/" ]
+      - name: mixture
+        import_url: "https://github.com/blinodelka/mixture_experimental_strategies/?branch=main"
+        imports: [ "src/" ]
   gen-files:
     scripts: [ "mkdocs/generate_code_reference.py" ]
   literate-nav: {}
@@ -98,6 +101,7 @@ plugins:
           "./temp_dir/disagreement/src/",
           "./temp_dir/uncertainty/src/",
           "./temp_dir/falsification/src/",
+          "./temp_dir/mixture/src/"
         ]
         import:
           - https://scikit-learn.org/stable/objects.inv
