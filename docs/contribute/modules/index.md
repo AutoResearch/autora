@@ -132,17 +132,17 @@ mkdocs serve
 In the `pyorject.toml` file add an optional dependency for the package in the `[project.optional-dependencies]` section:
 
 ```toml
-example-theorist = ["autora-theorist-example==1.0.0"]
+theorist-example = ["autora-theorist-example==1.0.0"]
 ```
 
 !!! success
     Ensure you include the version number.
 
-Add the example-theorist to be part of the all-theorists dependency:
+Add the `theorist-example` to be part of the `all-theorists` dependency:
 ```toml
 all-theorists = [
     ...
-    "autora[example-theorist]",
+    "autora[theorist-example]",
     ...
 ]
 ```
@@ -163,7 +163,7 @@ plugins:
   multirepo:
     nav_repos:
       ...
-      - name: example_theorist
+      - name: theorist-example
         import_url: "https://github.com/example-contributor/contributor-theorist/?branch=v1.0.0"
         imports: [ "src/" ]
   ...
@@ -172,12 +172,12 @@ plugins:
       python:
         paths: [
           ...,
-          "./temp_dir/example_theorist/src/"
+          "./temp_dir/theorist-example/src/"
         ]
 ...
 - User Guide:
   - Theorists:
-    - Overview: 'theorist/overview.md'
+    - Home: 'theorist/index.md'
     ...
     - Example Theorist: '!import https://github.com/example-contributor/contributor-theorist/?branch=v1.0.0&extra_imports=["mkdocs/base.yml"]'
     ...
@@ -203,7 +203,7 @@ the right place and renders correctly.
 Update the version number in the  `pyproject.toml` file, in the [project.optional-dependencies] 
 section:
 ```toml
-example-theorist = ["autora-theorist-example==1.1.0"]
+theorist-example = ["autora-theorist-example==1.1.0"]
 ```
 
 Update the version number in the `mkdocs.yml`: 
@@ -212,7 +212,7 @@ plugins:
   multirepo:
     nav_repos:
       ...
-      - name: example_theorist
+      - name: theorist-example
         import_url: "https://github.com/example-contributor/contributor-theorist/?branch=v1.1.0"
         imports: [ "src/" ]
 ...
