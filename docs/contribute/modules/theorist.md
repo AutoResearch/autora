@@ -11,7 +11,7 @@ a more complex neural network, or other models which
 All theorists are implemented as `sklearn` regressors. They are fitted based on experimental conditions and respective
 observations, and can be used to predict observations for new experimental conditions.
 
-## Repository setup
+## Repository Setup
 
 We recommend using the [cookiecutter template](https://github.com/AutoResearch/autora-template-cookiecutter) to set up
 a repository for your theorist. Alternatively, you use the 
@@ -67,7 +67,7 @@ class ExampleRegressor(BaseEstimator):
         return self.polynomial(conditions)
 ```
 
-## Next steps: testing, documentation, publishing
+## Next Steps: Testing, Documentation, Publishing
 
 For more information on how to test, document, and publish your theorist, please refer to the 
 [general guideline for module contributions](index.md) . 

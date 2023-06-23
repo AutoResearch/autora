@@ -8,8 +8,7 @@ We invite contributions to all parts of the project, including the ["core" packa
     [AutoRA forum](https://github.com/orgs/AutoResearch/discussions). We look forward to hearing from you!
 
 
-
-## Project structure
+## Project Structure
 
 Contributions to AutoRA are organized into one "parent" and many "child" packages. 
 Child packages are generally maintained by individual contributors. The parent package, along with some other 
@@ -55,7 +54,7 @@ for inclusion in `autora`, see
 [the module contributor guide](modules/index.md). Feel free to post questions and feedback regarding module contributions on the 
 [AutoRA forum](https://github.com/orgs/AutoResearch/discussions/categories/module-contributions).
 
-## Core contributions
+## Core Contributions
 
 The following packages are considered core packages, and are actively maintained by the
 [Autonomous Empirical Research Group](https://musslick.github.io/AER_website/Team.html):
