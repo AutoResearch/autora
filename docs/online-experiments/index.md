@@ -1,4 +1,4 @@
 # Online Experiments To Collect AutoRA Observations
 
-AutoRA offers functionality to set up websites that integrate with an AutoRA workflow. These websites enable the utilization of observations gathered from participants online in a closed loop system.
+AutoRA provides functionality to set up websites that integrate with AutoRA workflows. These websites allow observations gathered from participants online to be used in a closed-loop system.
 
