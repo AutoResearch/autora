@@ -1,8 +1,7 @@
 # Contributor Guide
 
 The AutoRA project is a collection of packages which together form a framework for closed-loop empirical research.
-We invite contributions to all parts of the project, including the ["core" packages](core.md), and the [modules](modules/index.md). Below is a brief overview of the
-project structure, along with pointers to more detailed contribution guides for each part of the project.
+We invite contributions to all parts of the project, including the ["core" packages](core.md), and the [modules](modules/index.md). Below is an overview of the project structure, along with brief mention of the style guide we follow as well as pointers to more detailed contribution guides for each part of the project.
 
 !!! hint
     If you run into any issues or have any questions regarding a contribution to AutoRA, please reach out to us on the  
@@ -26,6 +25,16 @@ parent depends on core packages, such as [`autora-core`](https://github.com/auto
 to install. 
 
 You may contribute to any of the core packages or develop your own module as a stand-alone package (see below).    
+
+
+## Style Guide
+
+In general, AutoRA follows the [PEP 8 – Style Guide for Python Code](https://peps.python.org/pep-0008/). We particularly encourage the following conventions:
+- Snake case for variables and module: `example_name`, `example_module.py`
+- Camel case for class name: `ExampleClass`
+- Camel case with spaces for Jupyter notebooks: `Example Notebook.ipynb`
+
+We also encourage a strong form of title case for headings in documentation — that is, for all titles and subtitles, capitalization of the first letter of each word: This Is An Example Title
 
 
 ## Module contributions
