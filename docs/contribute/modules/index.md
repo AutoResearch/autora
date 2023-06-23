@@ -99,21 +99,31 @@ repository example-contributor/contributor-theorist
 
 ### Install The Parent Package In Development Mode
 
-Install this in an environment using your chosen package manager. In this example, we use pip and virtualenv.
+!!! success
+    We recommend setting up your development environment using a manager like `venv`, which creates isolated python 
+    environments. Other environment managers, such as 
+    [virtualenv](https://virtualenv.pypa.io/en/latest/),
+    [pipenv](https://pipenv.pypa.io/en/latest/),
+    [virtualenvwrapper](https://virtualenvwrapper.readthedocs.io/en/latest/), 
+    [hatch](https://hatch.pypa.io/latest/), 
+    [poetry](https://python-poetry.org), 
+    are available and will likely work, but will have syntax different to that shown here. 
 
-First, install:
+Run the following command to create a new virtual environment in the `.venv` directory
 
-- python: https://www.python.org/downloads/
-- virtualenv: https://virtualenv.pypa.io/en/latest/installation.html
-
-Create a new virtual environment:
 ```shell
-virtualenv venv
+python3 -m "venv" ".venv" 
 ```
 
-Activate it:
+!!! hint
+    If you have multiple Python versions installed on your system, it may be necessary to specify the Python version when creating a virtual environment. For example, run the following command to specify Python 3.8 for the virtual environment. 
+    ```shell
+    python3.8 -m "venv" ".venv" 
+    ```
+
+Activate it by running
 ```shell
-source venv/bin/activate
+source ".venv/bin/activate"
 ```
 
 Use `pip install` to install the current project (`"."`) in editable mode (`-e`) with dev-dependencies (`[dev]`):
