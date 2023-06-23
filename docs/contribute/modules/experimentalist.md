@@ -12,7 +12,7 @@ Experimentalists can be implemented as *poolers* or as *samplers*.
   a subset of conditions from the pool to be used in the next experiment.
 - **Samplers** directly return a subset of experimental conditions from a pool of candidate experimental conditions that already exist.
 
-## Repository setup
+## Repository Setup
 
 We recommend using the [cookiecutter template](https://github.com/AutoResearch/autora-template-cookiecutter) to set up
 a repository for your experimentalist. Alternatively, you can use the 
@@ -35,7 +35,7 @@ a numpy array, iterator variable or other data format.
     We generally **recommend using 2-dimensional numpy arrays as outputs** in which
     each row represents a set of experimental conditions. The columns of the array correspond to the independent variables.
 
-### Implementing poolers
+### Implementing Poolers
 
 Once you've created your repository, you can implement your experimentalist pooler by editing the `init.py` file in 
 ``src/autora/experimentalist/pooler/name_of_your_experimentalist/``. 
@@ -82,7 +82,7 @@ def grid_pool(ivs: List[IV]):
 
 ```
 
-### Implementing samplers
+### Implementing Samplers
 
 Once you've created your repository, you can implement your experimentalist sampler by editing the `init.py` file in 
 ``src/autora/experimentalist/sampler/name_of_your_experimentalist/``. 
@@ -121,7 +121,7 @@ random_sample(conditions: Union[Iterable, Sequence], n: int = 1):
 ```
 
 
-## Next steps: testing, documentation, publishing
+## Next Steps: Testing, Documentation, Publishing
 
 For more information on how to test, document, and publish your experimentalist, please refer to the 
 [general guideline for module contributions](index.md) . 
