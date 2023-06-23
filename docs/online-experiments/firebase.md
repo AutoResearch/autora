@@ -97,7 +97,7 @@ During the development, the Firestore database will not be used. If you want to 
 If you want to recruit participants via Prolific (for example using the [AutoRA Prolific Recruitment Manager](user-guide/experiment-runners/recruitment-managers/prolific/)), we ***highly recommend*** setting `REACT_APP_useProlificId="True"`. This will speed up the recruitment of participants.
 
 ## Build and deploy the project to Firebase 
-To serve the website to the internet, you need to build and deploy it to Firebase.
+To serve the website on the internet, you must build and deploy it to Firebase.
 To build the project, run
 ```shell
 npm run build
