@@ -61,7 +61,7 @@ AutoRA includes cloud storage for task data using Firestore. Follow these steps 
 - Navigate to the current project in the developer console and select `Firestore Database` from the sidebar under `Build`.
 - Click `Create Database`
 - Select production mode and click `Next`
-- choose the current location and click `Enable`
+- Choose the current location and click `Enable`
 
 ### Configure your project for Firebase
 In the project folder, write the following commands in your terminal:
