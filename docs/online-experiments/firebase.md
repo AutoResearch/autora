@@ -106,6 +106,6 @@ To deploy to Firebase, run
 ```shell
 firebase deploy
 ```
-This will expose the website to the web. You can find the url of the website in the command line or on the Firebase console of your project under `Hosting`.
+This will make the website available on the web. You can find the URL of the website in the command line or on the Firebase console of your project under `Hosting`.
 
 
