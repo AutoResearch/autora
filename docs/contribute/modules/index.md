@@ -18,11 +18,11 @@ They are based on either
     this guide. 
 
 
-## Implementing your module
+## Implement Your Module
 
 After setting up your repository and linking it to your GitHub account, you can start implementing your module.
 
-### Step 1: implement your code
+### Implement Your Code
 
 You may implement your code in the ``init.py`` located in the respective feature folder in ``src/autora``.
 
@@ -35,7 +35,7 @@ If the feature you seek to implement does not fit in any of these categories, th
 you can create folders for new categories. If you are unsure how to proceed, you are always welcome 
 to ask for help in the [AutoRA forum](https://github.com/orgs/AutoResearch/discussions/categories/module-contributions).
 
-### Step 2 (optional): add tests
+### Add Tests (Optional)
 
 It is highly encouraged to add unit tests to ensure your code is working as intended. These can be [doctests](https://docs.python.org/3/library/doctest.html) or test cases in `tests/test_your_contribution_name.py`.
 For example, if you are implementing a sampler experimentalist, you may rename and modify the 
@@ -45,7 +45,7 @@ For example, if you are implementing a sampler experimentalist, you may rename a
 [autora](https://github.com/AutoResearch/autora) package. However, regardless of whether you choose to implement tests, 
 you will still be able to install your package separately, in addition to `autora`.* 
 
-### Step 3 (optional): add documentation
+### Add Documentation (Optional)
 
 It is highly encouraged that you add documentation of your package in `docs/index.md`. You can also add new or delete unnecessary pages 
 in the `docs` folder. However you structure your documentation, be sure that structure is reflected in the `mkdocs.yml` file.
@@ -58,7 +58,7 @@ the `docs/quickstart.md` file.
 [autora](https://github.com/AutoResearch/autora) package. However, regardless of whether you choose to write
 documentation, you will still be able to install your package separately, in addition to `autora`.*
 
-### Step 4: add dependencies
+### Add Dependencies
 
 In the `pyproject.toml` file, add the new dependencies under `dependencies`.
 
@@ -67,7 +67,7 @@ Install the added dependencies
 pip install -e ".[dev]"
 ```
 
-## Publishing your module
+## Publish Your Module
 
 There are several ways to publish your package, depending on how you set up your repository.
 
@@ -79,7 +79,7 @@ github.com, then you can use Github Actions to automatically publish your packag
 Once you've published your module, you should take some time to celebrate and announce your contribution in the 
 [AutoRA forum](https://github.com/orgs/AutoResearch/discussions/categories/module-announcements).
 
-## Incorporating your module into the `autora` parent package
+## Incorporate Your Module Into The AutoRA Parent Package
 
 Once your package is working and published, you can **make a pull request** on [`autora`](https://github.com/autoresearch/autora) to have it vetted and added to the "parent" package. Note, if you are not a member of the AutoResearch organization on GitHub, you will need to create a fork of the repository for the parent package and submit your pull request via that fork. If you are a member, you can create a pull request from a branch created directly from the parent package repository. Steps for creating a new branch to add your module are specified below.
 The following demonstrates how to add a package published under `autora-theorist-example` in PyPI in the GitHub 
@@ -97,7 +97,7 @@ repository `example-contributor/contributor-theorist`
 The following demonstrates how to add a package published under autora-theorist-example in PyPI in the GitHub 
 repository example-contributor/contributor-theorist
 
-### Install the "parent" package in development mode
+### Install The Parent Package In Development Mode
 
 Install this in an environment using your chosen package manager. In this example, we use pip and virtualenv.
 
@@ -128,11 +128,11 @@ mkdocs serve
 
 ... then viewing the documentation using the link in your terminal.
 
-### Create a new branch of the parent package
+### Create A New Branch Of The Parent Package
 
 Once you've successfully installed the parent package in development mode, you can begin the process of adding your contribution by creating a new branch off of the `main` branch. You should name your branch according to the name of your contribution. In the example we're using here, the branch would be called `feat/contributor-theorist`. After creating your branch, you can start making the modifications specified below. 
 
-### Add the package as optional dependency
+### Add The Package As An Optional Dependency
 
 In the `pyorject.toml` file add an optional dependency for the package in the `[project.optional-dependencies]` section:
 
@@ -160,7 +160,7 @@ pip install -U -e ".[dev]"
 
 ... and check that your package is still importable and works as expected.
 
-### Import documentation from the package repository
+### Import Documentation From The Package Repository
 
 Import the documentation in the `mkdocs.yml` file:
 ```yml
@@ -200,7 +200,7 @@ mkdocs serve
 ... then view the documentation using the link in your terminal. Check that your new documentation is included in 
 the right place and renders correctly.
 
-## Updating your module
+## Updating Your Module
 
 !!! warning
     Please note, that packages need to be vetted each time they are updated.
