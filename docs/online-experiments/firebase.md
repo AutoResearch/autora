@@ -33,7 +33,7 @@ This creates your ***project folder***. Before writing code for your website, yo
 - Create a Firebase project by clicking add project and enter a project name.
 - You can choose to disable google analytics in the next page if you are not planning on using it for your project.
 
-### Copying web app credentials
+### Copy Web App Credentials
 
 - Navigate to the [Firebase console](https://console.firebase.google.com/) and select the project
 - To create a new web app, click on `Add App` or the `<>` symbol and follow the prompts
