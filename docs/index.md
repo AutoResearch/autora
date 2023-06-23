@@ -23,22 +23,22 @@ other empirical sciences, such as materials science or physics.
 
 AutoRA consists of different modules that can be used independently or in combination, such as:
 
-- <b>Automated theorists</b> that support the discovery of formal scientific models from data
-- <b>Automated experimentalists</b> that support the design of follow-up experiments
-- <b>Interfaces for automated data collection</b>, e.g., for behavioral experiments via Prolific or Amazon Mechanical Turk
-- <b>Workflow logic</b> for defining interactions between different components of the research process
+- [**Theorists**](theorist/index.md) that support the discovery of formal scientific models from data
+- [**Experimentalists**](experimentalist/index.md) that support the design of follow-up experiments
+- [**Experiment runners**](experiment-runner/index.md) that support data collection from experimentation platforms (e.g., Prolific or Amazon Mechanical Turk)
+- [**Workflow logic**](user-guide/workflow) for defining interactions between different components of the research process
 - <b>Interfaces for automated documentation</b> of the research process
 
 ## Usages
 
 AutoRA can be used for a variety of research purposes in empirical sciences, such as psychology, 
-neuroscience, economics, physics, or materials science. Usages include:
+neuroscience, economics, physics, or materials science. Usages, as illustrated in the following tutorials, include:
 
-- <b>Equation discovery</b> from empirical data
-- <b>Experimental design</b> for follow-up experiments
-- <b>Research documentation and dissemination</b>
-- <b>Closed-loop empirical research</b>
-- <b>Computational analyses of the scientific process</b> (metascience, computational philosophy of science)
+- [**Equation discovery**](tutorials/theorist.ipynb) from empirical data
+- [**Experimental design**](tutorials/experimentalist.ipynb) for follow-up experiments
+- **Research documentation and dissemination**
+- **Closed-loop empirical research**
+- **Computational analyses of the scientific process** (metascience, computational philosophy of science)
 
 ## Motivation
 
