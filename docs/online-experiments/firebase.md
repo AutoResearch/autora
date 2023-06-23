@@ -77,7 +77,7 @@ An interactive initialization process will now run in your command line. For the
 
 - Firestore: Configure security rules and indexes files for Firestore
 - Hosting: Configure files for Firebase Hosting and (optionally) set up GitHub Action deploys
-- As a Firebase project, use the one, you created earlier
+- For a Firebase project, use the one you created earlier
 - Use the default options for the Firestore Rules and the Firestore indexes.
 - ***!!! IMPORTANT !!!*** Use the build directory instead of the public directory here.
 - When asked for the directory, write `build` and press `Enter`.
