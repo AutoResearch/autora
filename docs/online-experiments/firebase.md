@@ -94,7 +94,7 @@ npm start
 During the development, the Firestore database will not be used. If you want to load conditions from the database, you need to upload them first (for example using the [AutoRA Firebase experimentation manager](user-guide/experiment-runners/experimentation-managers/firebase/)) and set `REACT_APP_devNoDb="False"` in the .env file.
 
 ### Using Prolific Ids
-If you want to recruit participants via Prolific (for example using the [AutoRA Prolific participant manager](user-guide/experiment-runners/recruitment-managers/prolific/)), we ***highly recommend*** setting `REACT_APP_useProlificId="True"`. This will speed up the recruitment of participants.
+If you want to recruit participants via Prolific (for example using the [AutoRA Prolific Recruitment Manager](user-guide/experiment-runners/recruitment-managers/prolific/)), we ***highly recommend*** setting `REACT_APP_useProlificId="True"`. This will speed up the recruitment of participants.
 
 ## Build and deploy the project to Firebase 
 To serve the website to the internet, you need to build and deploy it to Firebase.
