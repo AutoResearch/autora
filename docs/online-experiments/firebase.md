@@ -81,7 +81,7 @@ An interactive initialization process will now run in your command line. For the
 - Use the default options for the Firestore rules and the Firestore indexes.
 - ***!!! IMPORTANT !!!*** Use the build directory instead of the public directory here.
 - When asked for the directory, write `build` and press `Enter`.
-- Configure as a single-page app, don't set up automatic builds and deploys with GitHub. 
+- Configure as a single-page app; don't set up automatic builds and deploys with GitHub. 
 - Don't overwrite the index.html file if the question pops up.
 
 ## Write code for your experiment
