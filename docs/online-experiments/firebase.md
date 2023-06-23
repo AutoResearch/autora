@@ -73,7 +73,7 @@ Then initialize the Firebase project in this folder by running:
 ```shell
 firebase init
 ```
-An interactive init process will now run in your command line. For the first question, select these options:
+An interactive initialization process will now run in your command line. For the first question, select these options:
 
 - Firestore: Configure security rules and indexes files for Firestore
 - Hosting: Configure files for Firebase Hosting and (optionally) set up GitHub Action deploys
