@@ -55,7 +55,7 @@ REACT_APP_useProlificId="False"
 - You will not need to run the command that is prompted in after clicking next, click `Next` again
 - Click `Continue to console`
 
-### Setting up Firestore
+### Firestore Setup
 Autora includes cloud storage for task data using Firestore. Follow these steps to initialize Firestore:
 
 - Navigate to the current project in the developer console and select Firestore Database from the sidebar under build.
