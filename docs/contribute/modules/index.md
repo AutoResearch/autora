@@ -83,8 +83,8 @@ Once you've published your module, you should take some time to celebrate and an
 
 Once your package is working and published, you can **make a pull request** on 
 [`autora`](https://github.com/autoresearch/autora) to have it vetted and added to the "parent" package.
-The following demonstrates how to add a package published under autora-theorist-example in PyPI in the GitHub 
-repository example-contributor/contributor-theorist
+The following demonstrates how to add a package published under `autora-theorist-example` in PyPI in the GitHub 
+repository `example-contributor/contributor-theorist`
 
 !!! success
     In order for your package to be included in the parent package, it must
@@ -132,17 +132,17 @@ mkdocs serve
 In the `pyorject.toml` file add an optional dependency for the package in the `[project.optional-dependencies]` section:
 
 ```toml
-example-theorist = ["autora-theorist-example==1.0.0"]
+theorist-example = ["autora-theorist-example==1.0.0"]
 ```
 
 !!! success
     Ensure you include the version number.
 
-Add the example-theorist to be part of the all-theorists dependency:
+Add the `theorist-example` to be part of the `all-theorists` dependency:
 ```toml
 all-theorists = [
     ...
-    "autora[example-theorist]",
+    "autora[theorist-example]",
     ...
 ]
 ```
@@ -159,9 +159,25 @@ pip install -U -e ".[dev]"
 
 Import the documentation in the `mkdocs.yml` file:
 ```yml
+plugins:
+  multirepo:
+    nav_repos:
+      ...
+      - name: theorist-example
+        import_url: "https://github.com/example-contributor/contributor-theorist/?branch=v1.0.0"
+        imports: [ "src/" ]
+  ...
+  mkdocstrings:
+    handlers:
+      python:
+        paths: [
+          ...,
+          "./temp_dir/theorist-example/src/"
+        ]
+...
 - User Guide:
   - Theorists:
-    - Overview: 'theorist/overview.md'
+    - Home: 'theorist/index.md'
     ...
     - Example Theorist: '!import https://github.com/example-contributor/contributor-theorist/?branch=v1.0.0&extra_imports=["mkdocs/base.yml"]'
     ...
@@ -187,11 +203,19 @@ the right place and renders correctly.
 Update the version number in the  `pyproject.toml` file, in the [project.optional-dependencies] 
 section:
 ```toml
-example-theorist = ["autora-theorist-example==1.1.0"]
+theorist-example = ["autora-theorist-example==1.1.0"]
 ```
 
 Update the version number in the `mkdocs.yml`: 
 ```yml
+plugins:
+  multirepo:
+    nav_repos:
+      ...
+      - name: theorist-example
+        import_url: "https://github.com/example-contributor/contributor-theorist/?branch=v1.1.0"
+        imports: [ "src/" ]
+...
 - User Guide:
   - Theorists:
     ...
