@@ -133,5 +133,5 @@ nav:
     - Experiment Runner: 'contribute/modules/experiment-runner.md'
   - Core: 'contribute/core.md'
   - Environment Setup: 'contribute/setup.md'
-  - Notebook: 'contribute/notebook.ipynb'
+  - Notebook: 'contribute/Notebook.ipynb'
   - Pre-Commit Hooks: 'contribute/pre-commit-hooks.md'
