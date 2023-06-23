@@ -1,6 +1,6 @@
 # Firebase Integration
 
-Here we explain how to set up a [Firebase](https://firebase.google.com/) website to collect observations for an AutoRA workflow. [Here](user-guide/experiment-runners/experimentation-managers/firebase/) you find information on how to connect AutoRA to a Firebase website. Additionally, [here](user-guide/experiment-runners/recruitment-managers/prolific/) we explain how to include [Prolific](https://www.prolific.co/) to automatically recruit participants.
+On this page, you can find information on how to set up a [Firebase](https://firebase.google.com/) website to collect observations for an AutoRA workflow. You can find information on how to connect such a website to AutoRA and how to automatically recruit participants via [Prolific](https://www.prolific.co/) at the following pages, respectively: [AutoRA Firebase Experimentation manager](user-guide/experiment-runners/experimentation-managers/firebase/), [AutoRA Prolific Recruitment Manager](user-guide/experiment-runners/recruitment-managers/prolific/).
 
 For setting up the online experiment, we recommend using either the [user cookiecutter template](https://github.com/AutoResearch/autora-user-cookiecutter) or the [create-react-app template](https://github.com/AutoResearch/cra-template-autora-firebase).
 
