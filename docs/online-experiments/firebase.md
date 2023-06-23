@@ -13,7 +13,7 @@ To make sure that `node` is installed on your system, run the following command.
 ```shell
 node -v
 ```
-If you don't see a version number or the version number is bellow 16.0, install or update node following the instruction on the [node.js website](https://nodejs.org/en/).
+If you don't see a version number or the version number is below 16.0, install or update `node` following the instruction on the [node.js website](https://nodejs.org/en/).
 
 When node is available on your system, you can use ***create-react-app*** by running the following command.
 ```shell
