@@ -9,7 +9,7 @@ For setting up the online experiment, we recommend using either the [user cookie
 
 ## Installation
 
-To make sure that node is installed on your system, run the following command. 
+To make sure that `node` is installed on your system, run the following command. 
 ```shell
 node -v
 ```
