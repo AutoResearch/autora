@@ -52,7 +52,7 @@ REACT_APP_devNoDb="True"
 REACT_APP_useProlificId="False"
 ```
 - Click on `Next`
-- You will not need to run the command that is prompted in after clicking next, click `Next` again
+- You will not need to run the command that is displayed after first clicking `Next`, so click `Next` again
 - Click `Continue to console`
 
 ### Firestore Setup
