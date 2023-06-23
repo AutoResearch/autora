@@ -69,7 +69,7 @@ First log in to your Firebase account using
 ```shell
 firebase login
 ```
-Then initialize the firebase project to this folder by running:
+Then initialize the Firebase project in this folder by running:
 ```shell
 firebase init
 ```
