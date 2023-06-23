@@ -82,7 +82,7 @@ Once you've published your module, you should take some time to celebrate and an
 ## Incorporating your module into the `autora` parent package
 
 Once your package is working and published, you can **make a pull request** on 
-[`autora`](https://github.com/autoresearch/autora) to have it vetted and added to the "parent" package.
+[`autora`](https://github.com/autoresearch/autora) to have it vetted and added to the "parent" package. Note, if you are not a member of the AutoResearch organization on GitHub, you will need to create a fork of the repository for the parent package and submit your pull request via a branch on that fork. If you are a member, you can create a pull request on a branch created directly from the parent package repository. Either way, steps for creating a new branch to add your module are specified below.
 
 !!! success
     In order for your package to be included in the parent package, it must meet the following criteria:
