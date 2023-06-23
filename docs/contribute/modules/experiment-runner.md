@@ -8,7 +8,7 @@ To contribute a *synthetic experiment runner* follow the [core](../core.md) cont
 
 Contributions may be complete experiment runners, which are functions that return observations, or tools that help automate experiments. Examples of such tools that are already implemented include a [recruitment manager](https://autoresearch.github.io/autora/user-guide/experiment-runners/recruitment-managers/prolific/) for recruiting participants on [Prolific](https://www.prolific.co/) and an [experimentation manager](https://autoresearch.github.io/autora/user-guide/experiment-runners/experimentation-managers/firebase/) for executing online experiments with [Firebase](https://firebase.google.com/).
 
-## Repository setup
+## Repository Setup
 
 For non-synthetic experiment runners, we recommend using the [cookiecutter template](https://github.com/AutoResearch/autora-template-cookiecutter) to set up
 a repository for your experiment runner. Alternatively, you can use the 
@@ -26,7 +26,7 @@ Make sure to select the `experiment runner` option when prompted. If you want to
 To implement a complete experiment runner, be sure to define a function that returns observations. To get an idea for tools that help automate experiments, see the [list of tools](https://autoresearch.github.io/autora/experiment-runner/) that are already implemented.
 
 
-## Next steps: testing, documentation, publishing
+## Next Steps: Testing, Documentation, Publishing
 
 For more information on how to test, document, and publish your experiment runner, please refer to the 
 [general guideline for module contributions](index.md) . 
