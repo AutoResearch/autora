@@ -29,12 +29,16 @@ You may contribute to any of the core packages or develop your own module as a s
 
 ## Style Guide
 
+### Code
+
 In general, AutoRA follows the [PEP 8 – Style Guide for Python Code](https://peps.python.org/pep-0008/). We particularly encourage the following conventions:
 - Snake case for variables and modules: `example_name`, `example_module.py`
 - Camel case for class names: `ExampleClass`
 - Camel case with spaces for Jupyter notebooks: `Example Notebook.ipynb`
 
-We also encourage a strong form of title case for headings in documentation — that is, for all titles and subtitles, capitalization of the first letter of each word: This Is An Example Title
+### Documentation
+
+For documenation, AutoRA adheres to the maxim, "Everything should be made as simple as possible, but no simpler." That is, we strive to make our documenation clear and comprehensive, but as concise and digestible as possible. We also encourage formatting and hyperlinking that facilitate understanding and make navigation of the docs intuitive. Finally, we encourage a strong form of title case for headings — that is, for all titles and subtitles, the first letter of each word should be capitalized, such as in the following example: This Is An Example Title
 
 
 ## Module contributions
