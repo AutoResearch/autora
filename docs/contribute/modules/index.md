@@ -81,19 +81,21 @@ Once you've published your module, you should take some time to celebrate and an
 
 ## Incorporating your module into the `autora` parent package
 
-Once your package is working and published, you can **make a pull request** on 
-[`autora`](https://github.com/autoresearch/autora) to have it vetted and added to the "parent" package.
-The following demonstrates how to add a package published under autora-theorist-example in PyPI in the GitHub 
-repository example-contributor/contributor-theorist
+Once your package is working and published, you can **make a pull request** on [`autora`](https://github.com/autoresearch/autora) to have it vetted and added to the "parent" package. Note, if you are not a member of the AutoResearch organization on GitHub, you will need to create a fork of the repository for the parent package and submit your pull request via that fork. If you are a member, you can create a pull request from a branch created directly from the parent package repository. Steps for creating a new branch to add your module are specified below.
+The following demonstrates how to add a package published under `autora-theorist-example` in PyPI in the GitHub 
+repository `example-contributor/contributor-theorist`
 
 !!! success
-    In order for your package to be included in the parent package, it must
-    - include basic documentation in ``docs/index.md``
-    - include a basic python notebook exposing how to use the module in ``docs/Basic Usage.ipynb``
-    - include basic tests in ``tests/``
+    In order for your package to be included in the parent package, it must meet the following criteria:
+    - have basic documentation in ``docs/index.md``
+    - have a basic python notebook exposing how to use the module in ``docs/Basic Usage.ipynb``
+    - have basic tests in ``tests/``
     - be published via PyPI or Conda
     - be compatible with the current version of the parent package
     - follow standard python coding guidelines including PEP8
+
+The following demonstrates how to add a package published under autora-theorist-example in PyPI in the GitHub 
+repository example-contributor/contributor-theorist
 
 ### Install the "parent" package in development mode
 
@@ -126,23 +128,26 @@ mkdocs serve
 
 ... then viewing the documentation using the link in your terminal.
 
+### Create a new branch of the parent package
+
+Once you've successfully installed the parent package in development mode, you can begin the process of adding your contribution by creating a new branch off of the `main` branch. You should name your branch according to the name of your contribution. In the example we're using here, the branch would be called `feat/contributor-theorist`. After creating your branch, you can start making the modifications specified below. 
 
 ### Add the package as optional dependency
 
 In the `pyorject.toml` file add an optional dependency for the package in the `[project.optional-dependencies]` section:
 
 ```toml
-example-theorist = ["autora-theorist-example==1.0.0"]
+theorist-example = ["autora-theorist-example==1.0.0"]
 ```
 
 !!! success
     Ensure you include the version number.
 
-Add the example-theorist to be part of the all-theorists dependency:
+Add the `theorist-example` to be part of the `all-theorists` dependency:
 ```toml
 all-theorists = [
     ...
-    "autora[example-theorist]",
+    "autora[theorist-example]",
     ...
 ]
 ```
@@ -159,9 +164,25 @@ pip install -U -e ".[dev]"
 
 Import the documentation in the `mkdocs.yml` file:
 ```yml
+plugins:
+  multirepo:
+    nav_repos:
+      ...
+      - name: theorist-example
+        import_url: "https://github.com/example-contributor/contributor-theorist/?branch=v1.0.0"
+        imports: [ "src/" ]
+  ...
+  mkdocstrings:
+    handlers:
+      python:
+        paths: [
+          ...,
+          "./temp_dir/theorist-example/src/"
+        ]
+...
 - User Guide:
   - Theorists:
-    - Overview: 'theorist/overview.md'
+    - Home: 'theorist/index.md'
     ...
     - Example Theorist: '!import https://github.com/example-contributor/contributor-theorist/?branch=v1.0.0&extra_imports=["mkdocs/base.yml"]'
     ...
@@ -187,11 +208,19 @@ the right place and renders correctly.
 Update the version number in the  `pyproject.toml` file, in the [project.optional-dependencies] 
 section:
 ```toml
-example-theorist = ["autora-theorist-example==1.1.0"]
+theorist-example = ["autora-theorist-example==1.1.0"]
 ```
 
 Update the version number in the `mkdocs.yml`: 
 ```yml
+plugins:
+  multirepo:
+    nav_repos:
+      ...
+      - name: theorist-example
+        import_url: "https://github.com/example-contributor/contributor-theorist/?branch=v1.1.0"
+        imports: [ "src/" ]
+...
 - User Guide:
   - Theorists:
     ...
