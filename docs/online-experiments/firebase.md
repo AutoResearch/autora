@@ -63,7 +63,7 @@ AutoRA includes cloud storage for task data using Firestore. Follow these steps 
 - Select production mode and click `Next`
 - Choose the current location and click `Enable`
 
-### Configure your project for Firebase
+### Configure Your Project For Firebase
 In the project folder, write the following commands in your terminal:
 First login to your firebase account using
 ```shell
