@@ -56,7 +56,7 @@ REACT_APP_useProlificId="False"
 - Click `Continue to console`
 
 ### Firestore Setup
-Autora includes cloud storage for task data using Firestore. Follow these steps to initialize Firestore:
+AutoRA includes cloud storage for task data using Firestore. Follow these steps to initialize Firestore:
 
 - Navigate to the current project in the developer console and select Firestore Database from the sidebar under build.
 - Click `Create Database`
