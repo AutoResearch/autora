@@ -58,7 +58,7 @@ REACT_APP_useProlificId="False"
 ### Firestore Setup
 AutoRA includes cloud storage for task data using Firestore. Follow these steps to initialize Firestore:
 
-- Navigate to the current project in the developer console and select Firestore Database from the sidebar under build.
+- Navigate to the current project in the developer console and select `Firestore Database` from the sidebar under `Build`.
 - Click `Create Database`
 - Select production mode and click `Next`
 - choose the current location and click `Enable`
