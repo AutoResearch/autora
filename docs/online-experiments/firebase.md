@@ -85,7 +85,7 @@ An interactive initialization process will now run in your command line. For the
 - Don't overwrite the index.html file if the question pops up.
 
 ## Write Code For Your Experiment
-To write code for your experiment, use the `main.js` file in the `src/design` folder. For example, you can use [jsPsych](https://www.jspsych.org/7.3/) and install packages using npm. The main function should return an observation (the data created by a participant).
+To write code for your experiment, use the `main.js` file in the `src/design` folder. For example, you can use [jsPsych](https://www.jspsych.org/7.3/) and install packages using `npm`. The main function should return an observation (the data created by a participant).
 
 You can test the experiment locally using
 ```shell
