@@ -30,7 +30,7 @@ This creates your ***project folder***. Before writing code for your website, yo
 ### Initialize Firebase Account And Project
 
 - Create and log in to a Firebase account on the [Firebase website](https://firebase.google.com/).
-- Create a firebase project by clicking add project and enter a project name.
+- Create a Firebase project by clicking add project and enter a project name.
 - You can choose to disable google analytics in the next page if you are not planning on using it for your project.
 
 ### Copying web app credentials
