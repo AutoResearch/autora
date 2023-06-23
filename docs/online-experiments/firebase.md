@@ -15,7 +15,7 @@ node -v
 ```
 If you don't see a version number or the version number is below 16.0, install or update `node` following the instruction on the [node.js website](https://nodejs.org/en/).
 
-When node is available on your system, you can use ***create-react-app*** by running the following command.
+When `node` is available on your system, you can use ***create-react-app*** by running the following command.
 ```shell
 npx create-react-app path/to/react/pp --template autora-firebase
 ```
