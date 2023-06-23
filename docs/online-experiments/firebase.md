@@ -40,7 +40,7 @@ This creates your ***project folder***. Before writing code for your website, yo
 - Enter a name for the Firebase app (could be the same as the project name)
 - Check `Also set up Firebase Hosting for this app`
 - Click `Register App`. This auto-generates a script with several values that you need to copy for the next step.
-- Copy the auto-generated values from the Firebase console to the corresponding variables in the .env file in the project folder that was created on your system using create-react-app or cookiecutter
+- Copy the auto-generated values from the Firebase console to the corresponding variables in the `.env` file in the project folder that was created on your system using create-react-app or cookiecutter
 ```dotenv
 REACT_APP_apiKey=
 REACT_APP_authDomain=
