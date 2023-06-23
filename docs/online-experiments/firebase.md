@@ -27,7 +27,7 @@ This creates your ***project folder***. Before writing code for your website, yo
  
 ## Firebase Project Setup
 
-### Initializing firebase account and project
+### Initialize Firebase Account And Project
 
 - Create and login to a firebase account on the [Firebase website](https://firebase.google.com/).
 - Create a firebase project by clicking add project and enter a project name.
