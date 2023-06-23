@@ -25,7 +25,7 @@ cookiecutter https://github.com/AutoResearch/autora-user-cookiecutter
 ```
 This creates your ***project folder***. Before writing code for your website, you also need to set up a Firebase project.
  
-## Setting up a Firebase project
+## Firebase Project Setup
 
 ### Initializing firebase account and project
 
