@@ -33,28 +33,99 @@ plugins:
   multirepo:
     nav_repos:
       - name: core
-        import_url: https://github.com/autoresearch/autora-core/?branch=main&extra_imports=["mkdocs/base.yml"]
-        imports: ["docs/pipeline/*", "docs/experimentalists/pooler/grid/*", "docs/experimentalists/pooler/random/*", "docs/experimentalists/sampler/random/*"]
+        import_url: "https://github.com/autoresearch/autora-core/?branch=main"
+        imports: [
+          "docs/pipeline/*",
+          "docs/experimentalists/pooler/grid/*",
+          "docs/experimentalists/pooler/random/*",
+          "docs/experimentalists/sampler/random/*",
+          "src/",
+        ]
       - name: falsification
-        import_url: https://github.com/autoresearch/autora-experimentalist-falsification/?branch=main&extra_imports=["mkdocs/base.yml"]
-        imports: ["docs/*", "docs/sampler/*", "docs/pooler/*", ]
-      - name: bms-tutorial
-        import_url: https://github.com/autoresearch/autora-theorist-bms/?branch=main&extra_imports=["mkdocs/base.yml"]
-        imports: ["docs/*"]
+        import_url: "https://github.com/autoresearch/autora-experimentalist-falsification/?branch=main"
+        imports: [
+          "docs/*",
+          "docs/sampler/*",
+          "docs/pooler/*",
+          "src/"
+        ]
       - name: workflow-tutorial
-        import_url: https://github.com/autoresearch/autora-workflow/?branch=main&extra_imports=["mkdocs/base.yml"]
+        import_url: "https://github.com/autoresearch/autora-workflow/?branch=main"
         imports: ["docs/*"]
-      - name: falsification-tutorial
-        import_url: https://github.com/autoresearch/autora-experimentalist-falsification/?branch=main&extra_imports=["mkdocs/base.yml"]
-        imports: [ "docs/*"]
+      - name: workflow
+        import_url: "https://github.com/autoresearch/autora-workflow/?branch=main"
+        imports: [ "src/" ]
+      - name: darts
+        import_url: "https://github.com/autoresearch/autora-theorist-darts/?branch=main"
+        imports: [ "src/" ]
+      - name: bsr
+        import_url: "https://github.com/autoresearch/autora-theorist-bsr/?branch=main"
+        imports: [ "src/" ]
+      - name: bms
+        import_url: "https://github.com/autoresearch/autora-theorist-bms/?branch=main"
+        imports: [ "src/" ]
+      - name: novelty
+        import_url: "https://github.com/autoresearch/autora-experimentalist-sampler-novelty/?branch=main"
+        imports: [ "src/" ]
+      - name: inequality
+        import_url: "https://github.com/autoresearch/autora-experimentalist-sampler-inequality/?branch=main"
+        imports: [ "src/" ]
+      - name: nearest-value
+        import_url: "https://github.com/autoresearch/autora-experimentalist-sampler-nearest-value/?branch=main"
+        imports: [ "src/" ]
+      - name: disagreement
+        import_url: "https://github.com/autoresearch/autora-experimentalist-sampler-model-disagreement/?branch=main"
+        imports: [ "src/" ]
+      - name: uncertainty
+        import_url: "https://github.com/autoresearch/autora-experimentalist-sampler-uncertainty/?branch=main"
+        imports: [ "src/" ]
+  gen-files:
+    scripts: [ "mkdocs/generate_code_reference.py" ]
+  literate-nav: {}
+  mkdocstrings:
+    handlers:
+      python:
+        paths: [
+          # from nav_repos above
+          "./temp_dir/core/src/",
+          "./temp_dir/workflow/src/",
+          "./temp_dir/darts/src/",
+          "./temp_dir/bms/src/",
+          "./temp_dir/bsr/src/",
+          "./temp_dir/novelty/src/",
+          "./temp_dir/inequality/src/",
+          "./temp_dir/nearest-value/src/",
+          "./temp_dir/disagreement/src/",
+          "./temp_dir/uncertainty/src/",
+          "./temp_dir/falsification/src/",
+        ]
+        import:
+          - https://scikit-learn.org/stable/objects.inv
+
+
   mkdocs-jupyter: # required to convert Jupyter notebooks
     include_source: true
     execute: false
     ignore_h1_titles: true
+    ignore: [
+      # ignore all files in the src/ directories – these don't need to be converted
+      # this is needed because the pathlib PurePath.match doesn't allow for "**" patterns
+      # (see https://github.com/python/cpython/pull/11171)
+      # We don't want to just ignore all python files, because someone may at some point want to
+      # use a .py notebook.
+      # Alternatively, we could just have ignore: [ "*.py" ], but then we wouldn't be able to use
+      #
+      "src/autora/*.py",
+      "src/autora/*/*.py",
+      "src/autora/*/*/*.py",
+      "src/autora/*/*/*/*.py",
+      "src/autora/*/*/*/*/*.py",
+    ]
+
   search: {}
-  mkdocs-simple-hooks:
-    hooks:
-      on_env: "docs.hooks:on_env"
+
+hooks:
+  - mkdocs/hooks.py
 
 markdown_extensions:
   admonition: {}
@@ -77,8 +148,8 @@ nav:
 - Introduction: 'index.md'
 - Tutorials:
   - Home: 'tutorials/index.md'
-  - Automated Theorist: 'tutorials/theorist.ipynb'
-  - Automated Experimentalist: 'tutorials/experimentalist.ipynb'
+  - Automated Theorist: 'tutorials/Theorist.ipynb'
+  - Automated Experimentalist: 'tutorials/Experimentalist.ipynb'
   - Closed-Loop Discovery: 'workflow-tutorial/docs/interactive/Basic Usage.ipynb'
 - User Guide:
   - Theorists:
@@ -124,11 +195,18 @@ nav:
     - Recruitment Managers:
       - Prolific: '!import https://github.com/autoresearch/autora-experiment-runner-recruitment-manager-prolific/?branch=main&extra_imports=["mkdocs/base.yml"]'
   - Workflow: '!import https://github.com/autoresearch/autora-workflow/?branch=main&extra_imports=["mkdocs/base.yml"]'
+  - Online Experiments:
+    - Home: 'online-experiments/index.md'
+    - Firebase: 'online-experiments/firebase.md'
 - Contributor Guide:
-  - Overview: 'contribute/index.md'
-  - Module Contributions: 
-    - Overview: 'contribute/module.md'
-    - Theorist Contribution: 'contribute/theorist-module.md'
-  - Core Contributions: 'contribute/core.md'
+  - Home: 'contribute/index.md'
+  - Modules:
+    - Home: 'contribute/modules/index.md'
+    - Theorist: 'contribute/modules/theorist.md'
+    - Experimentalist: 'contribute/modules/experimentalist.md'
+    - Experiment Runner: 'contribute/modules/experiment-runner.md'
+  - Core: 'contribute/core.md'
   - Environment Setup: 'contribute/setup.md'
+  - Notebook: 'contribute/Notebook.ipynb'
   - Pre-Commit Hooks: 'contribute/pre-commit-hooks.md'
+- Code Reference: reference/

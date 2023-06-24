@@ -1,22 +1,22 @@
-# Contribute an Experimentalist
+# Contribute An Experimentalist
 
 AutoRA experimentalists are meant to return novel experimental conditions based on prior experimental conditions, prior
 observations, and/or prior models. Such conditions may serve as a basis for new, informative experiments conducted 
 by an experiment runner. Experimentalists are generally implemented as functions that can be integrated into an 
 [Experimentalist Pipeline](https://autoresearch.github.io/autora/core/docs/pipeline/Experimentalist%20Pipeline%20Examples/).
 
-![Experimentalist Module](../img/experimentalist.png)
+![Experimentalist Module](../../img/experimentalist.png)
 
 Experimentalists can be implemented as *poolers* or as *samplers*.
 - **Poolers** return a pool of candidate experimental conditions, which can be passed to a sampler that selects
   a subset of conditions from the pool to be used in the next experiment.
-- **Samplers** directly return a subset of experimental conditions from a pool of candidate experimental conditions.
+- **Samplers** directly return a subset of experimental conditions from a pool of candidate experimental conditions that already exist.
 
 ## Repository Setup
 
 We recommend using the [cookiecutter template](https://github.com/AutoResearch/autora-template-cookiecutter) to set up
-a repository for your experimentalist. Alternatively, you use the 
-[unguided template](https://github.com/AutoResearch/autora-template). If you are using the cookiecutter template, you can set up your repository using
+a repository for your experimentalist. Alternatively, you can use the 
+[unguided template](https://github.com/AutoResearch/autora-template). If you choose the cookiecutter template, you can set up your repository using
 
 ```shell
 cookiecutter https://github.com/AutoResearch/autora-template-cookiecutter
@@ -28,23 +28,23 @@ Make sure to select the `experimentalist` option when prompted. You may also sel
 ## Implementation
 
 Irrespective of whether you are implementing a pooler or a sampler, 
-you would want to implement a function that returns a set of experimental conditions. This set may be
+you should implement a function that returns a set of experimental conditions. This set may be
 a numpy array, iterator variable or other data format. 
 
 !!! hint
     We generally **recommend using 2-dimensional numpy arrays as outputs** in which
     each row represents a set of experimental conditions. The columns of the array correspond to the independent variables.
 
-### Implementing poolers
+### Implementing Poolers
 
 Once you've created your repository, you can implement your experimentalist pooler by editing the `init.py` file in 
-``src/autora/experimentalist/pooler/name-of-your-experimentalist/``. 
+``src/autora/experimentalist/pooler/name_of_your_experimentalist/``. 
 You may also add additional files to this directory if needed. 
-It is important that the `init.py` file contains a function called `name-of-your-experimentalist` 
+It is important that the `init.py` file contains a function called `name_of_your_experimentalist` 
 which returns a pool of experimental conditions (e.g., as an iterator object or numpy array).
 
 The following example ``init.py`` illustrates the implementation of a simple experimentalist pooler
-that generates a grid of sampels within the specified bounds of each independent variable (IV):
+that generates a grid of samples within the specified bounds of each independent variable (IV):
 
 ```python 
 
@@ -82,12 +82,12 @@ def grid_pool(ivs: List[IV]):
 
 ```
 
-### Implementing samplers
+### Implementing Samplers
 
 Once you've created your repository, you can implement your experimentalist sampler by editing the `init.py` file in 
-``src/autora/experimentalist/sampler/name-of-your-experimentalist/``. 
+``src/autora/experimentalist/sampler/name_of_your_experimentalist/``. 
 You may also add additional files to this directory if needed. 
-It is important that the `init.py` file contains a function called `name-of-your-experimentalist` 
+It is important that the `init.py` file contains a function called `name_of_your_experimentalist` 
 which returns a set of experimental conditions (e.g., as a numpy array) given a pool of candidate experimental conditions.
 
 The following example ``init.py`` illustrates the implementation of a simple experimentalist sampler
@@ -95,12 +95,11 @@ that uniformly samples without replacement from a pool of candidate conditions.
 
 ```python 
 """
-Example Experimentalist Pooler
+Example Experimentalist Sampler
 """
 
 import random
 from typing import Iterable, Sequence, Union
-from autora.utils.deprecation import deprecated_alias
 
 random_sample(conditions: Union[Iterable, Sequence], n: int = 1):
     """
@@ -125,4 +124,4 @@ random_sample(conditions: Union[Iterable, Sequence], n: int = 1):
 ## Next Steps: Testing, Documentation, Publishing
 
 For more information on how to test, document, and publish your experimentalist, please refer to the 
-[general guideline for module contributions](module.md) . 
+[general guideline for module contributions](index.md) . 

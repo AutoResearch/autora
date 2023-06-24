@@ -28,7 +28,7 @@ The following sections describe how to install and configure the recommended set
 
 ## Development Setup
 
-### Clone the Repository
+### Clone The Repository
 
 The easiest way to clone the repo is to go to [the repository page on GitHub](https://github.com/AutoResearch/autora)
 and click the "<> Code" button and follow the prompts. 
@@ -39,7 +39,7 @@ and click the "<> Code" button and follow the prompts.
     - the [GitHub Desktop Application](https://desktop.github.com) on macOS or Windows, or 
     - the [GitHub command line utility](https://cli.github.com) on Linux.
 
-### Install `python`
+### Install `Python`
 
 !!! success
     All contributions to the AutoRA core packages should work under **python 3.8**, so we recommend using that version 
@@ -67,7 +67,7 @@ Python 3.11.3 (main, Apr  7 2023, 20:13:31) [Clang 14.0.0 (clang-1400.0.29.202)]
 Type "help", "copyright", "credits" or "license" for more information.
 ```
 
-#### Create a virtual environment
+#### Create A Virtual Environment
 
 !!! success
     We recommend setting up your development environment using a manager like `venv`, which creates isolated python 
@@ -87,12 +87,18 @@ In the `<project directory>`, run the following command to create a new virtual 
 python3 -m "venv" ".venv" 
 ```
 
+!!! hint
+    If you have multiple Python versions installed on your system, it may be necessary to specify the Python version when creating a virtual environment. For example, run the following command to specify Python 3.8 for the virtual environment. 
+    ```shell
+    python3.8 -m "venv" ".venv" 
+    ```
+
 Activate it by running
 ```shell
 source ".venv/bin/activate"
 ```
 
-#### Install dependencies
+#### Install Dependencies
 
 Upgrade pip:
 ```shell
@@ -110,7 +116,7 @@ Your IDE may have special support for python environments. For IDE-specific setu
 - [VSCode Documentation](https://code.visualstudio.com/docs/python/environments)
 
 
-### Activating and using the environment
+### Activating And Using The Environment
 
 To run interactive commands, you can activate the virtualenv environment. From the `<project directory>` 
 directory, run:
@@ -169,7 +175,7 @@ OK
     ```
 
 
-### Running code non-interactively
+### Running Code Non-Interactively
 
 You can run python programs without activating the environment, by using `/path/to/python run {command}`. For example,
 to run unittests tests, execute:
@@ -189,7 +195,7 @@ Ran 1 test in 0.000s
 OK
 ```
 
-### Pre-commit hooks
+### Pre-Commit Hooks
 
 If you wish to commit to the repository, you should install and activate `pre-commit` as follows. 
 ```shell

@@ -1,4 +1,4 @@
-# Contribute a Theorist
+# Contribute A Theorist
 
 AutoRA theorists are meant to return scientific models describing the relationship between experimental conditions
 and observations. Such models may take the form of a simple linear regression, non-linear equations, causal graphs, 
@@ -6,7 +6,7 @@ a more complex neural network, or other models which
 - can be identified based on data (and prior knowledge)
 - can be used to make novel predictions about observations given experimental conditions.
 
-![Theorist Module](../img/theorist.png)
+![Theorist Module](../../img/theorist.png)
 
 All theorists are implemented as `sklearn` regressors. They are fitted based on experimental conditions and respective
 observations, and can be used to predict observations for new experimental conditions.
@@ -27,7 +27,7 @@ Make sure to select the `theorist` option when prompted. You can skip all other 
 ## Implementation
 
 Once you've created your repository, you can implement your theorist by editing the `init.py` file in 
-``src/autora/theorist/name-of-your-theorist/``. You may also add additional files to this directory if needed. 
+``src/autora/theorist/name_of_your_theorist/``. You may also add additional files to this directory if needed. 
 It is important that the `init.py` file contains a class called `NameOfYourTheorist` which inherits from  
 `sklearn.base.BaseEstimator` and implements the following methods:
 
@@ -70,4 +70,4 @@ class ExampleRegressor(BaseEstimator):
 ## Next Steps: Testing, Documentation, Publishing
 
 For more information on how to test, document, and publish your theorist, please refer to the 
-[general guideline for module contributions](module.md) . 
+[general guideline for module contributions](index.md) . 
