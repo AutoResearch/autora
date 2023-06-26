@@ -29,7 +29,7 @@ AutoRA consists of different modules that can be used independently or in combin
 - [**Workflow logic**](user-guide/workflow) for defining interactions between different components of the research process
 - <b>Interfaces for automated documentation</b> of the research process
 
-## Usages
+## Uses
 
 AutoRA can be used for a variety of research purposes in empirical sciences, such as psychology, 
 neuroscience, economics, physics, or materials science. Usages, as illustrated in the following tutorials, include:

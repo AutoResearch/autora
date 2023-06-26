@@ -49,6 +49,11 @@ plugins:
           "docs/pooler/*",
           "src/"
         ]
+      - name: user-cookiecutter
+        import_url: "https://github.com/autoresearch/autora-user-cookiecutter/?branch=main"
+        imports: [
+          "docs/*",
+        ]
       - name: workflow-tutorial
         import_url: "https://github.com/autoresearch/autora-workflow/?branch=main"
         imports: ["docs/*"]
@@ -155,6 +160,7 @@ nav:
   - Automated Theorist: 'tutorials/Theorist.ipynb'
   - Automated Experimentalist: 'tutorials/Experimentalist.ipynb'
   - Closed-Loop Discovery: 'workflow-tutorial/docs/interactive/Basic Usage.ipynb'
+  - Online Closed-Loop Discovery: 'user-cookiecutter/docs/index.md'
 - User Guide:
   - Theorists:
     - Home: 'theorist/index.md'

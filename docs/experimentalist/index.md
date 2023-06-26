@@ -4,8 +4,8 @@ The primary goal of an experimentalist is to identify experiments that yield
 scientific merit. AutoRA implements techniques for automating the identification 
 of novel experiments.
 
-An experiment consists of a series of **experiment conditions** $\vec{x} \in X$. 
-The experimental variables manipulated in each experiment condition 
+An experiment consists of a series of **experimental conditions** $\vec{x} \in X$. 
+The experimental variables manipulated in each experimental condition 
 are defined as **factors**, and the values of each variable to be sampled 
 in the experiment are defined as **levels** of the corresponding **factors**. 
 As an example, consider a visual discrimination tasks in which participants are presented
@@ -13,18 +13,18 @@ with two lines of different lengths, and are asked to indicate which line is lon
 There are two factors in this experiment: the length of the first line and 
 the length of the second line. Instances of the two line lengths 
 (e.g., 2.0 cm for the first line and 2.1 cm for the sceond line) 
-can be considered levels of the two factors, respectively. Thus, *an experiment condition is a vector of values that
+can be considered levels of the two factors, respectively. Thus, *an experimental condition is a vector of values that
 corresponds to a specific combination of experiment levels $x_i$, 
 each of which is an instance of an experiment factor.*
 
 Experimentalists in AutoRA serve to identify novel 
-experiment conditions $\vec{x} \in X$, where $x_i$ corresponds 
+experimental conditions $\vec{x} \in X$, where $x_i$ corresponds 
 to the level of an experimental factor $i$.
 
 ![Overview](../img/experimentalist.png)
 
 Experimentalists may use information about candidate models $M$ obtained from a theorist, 
-experiment conditions that have already been probed $\vec{x}' \in X'$, or 
+experimental conditions that have already been probed $\vec{x}' \in X'$, or 
 respective dependent measures $\vec{y}' \in Y'$. The following table includes the experimentalists currently implemented
  in AutoRA.
 

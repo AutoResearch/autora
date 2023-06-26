@@ -1,6 +1,9 @@
 name: Publish Documentation to GitHub Pages
 
 on:
+  push:
+    branches:
+      - 'main' # when someone pushes to the 'main' branch
   schedule:
     - cron: '59 3 * * *' # this triggers deployment every night at 3:59 UTC / 23:59 EST
   workflow_dispatch:  # this allows us to run it manually
