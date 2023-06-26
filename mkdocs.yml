@@ -153,8 +153,8 @@ nav:
 - Introduction: 'index.md'
 - Tutorials:
   - Home: 'tutorials/index.md'
-  - Automated Theorist: 'tutorials/Theorist.ipynb'
-  - Automated Experimentalist: 'tutorials/Experimentalist.ipynb'
+  - Theorists: 'tutorials/Theorist.ipynb'
+  - Experimentalists: 'tutorials/Experimentalist.ipynb'
   - Closed-Loop Discovery: 'workflow-tutorial/docs/interactive/Basic Usage.ipynb'
   - Online Closed-Loop Discovery: 'user-cookiecutter/docs/index.md'
 - User Guide:
