@@ -35,7 +35,7 @@ In general, AutoRA follows the [PEP 8 – Style Guide for Python Code](https://p
 - Snake case for variables and modules: `example_name`, `example_module.py`
 - Camel case for class names: `ExampleClass`
 - Camel case with spaces for Jupyter notebooks: `Example Notebook.ipynb`
-- Write docstrings for all public modules, functions, classes, and methods.
+- Write docstrings for all public modules, functions, classes, methods, and at the top of each file.
 
 ### Documentation Style
 
