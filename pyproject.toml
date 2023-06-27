@@ -74,7 +74,7 @@ experimentalist-falsification =[
   "autora-experimentalist-falsification"
 ]
 
-experimentalist-mixture =[
+experimentalist-sampler-mixture =[
   "mixture-experimentalist==1.0.0a2"
 ]
 
