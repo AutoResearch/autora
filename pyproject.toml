@@ -53,7 +53,7 @@ all-experimentalists = [
   "autora[experimentalist-sampler-model-disagreement]",
   "autora[experimentalist-sampler-uncertainty]",
   "autora[experimentalist-falsification]",
-  "autora[experimentalist-mixture]",
+  "autora[experimentalist-sampler-mixture]",
 ]
 experimentalist-sampler-inequality =[
   "autora-experimentalist-sampler-inequality"
