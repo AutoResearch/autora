@@ -75,7 +75,7 @@ experimentalist-falsification =[
 ]
 
 experimentalist-sampler-mixture =[
-  "mixture-experimentalist==1.0.0a2"
+  "mixture-experimentalist==1.0.0a3"
 ]
 
 all-experiment-runners = [
