@@ -73,7 +73,6 @@ experimentalist-sampler-uncertainty =[
 experimentalist-falsification =[
   "autora-experimentalist-falsification"
 ]
-
 experimentalist-sampler-mixture =[
   "mixture-experimentalist==1.0.0a3"
 ]
