@@ -1,6 +1,6 @@
 # Firebase Integration
 
-On this page, you can find information on how to set up a [Firebase](https://firebase.google.com/) website to collect observations for an AutoRA workflow. You can find information on how to connect such a website to AutoRA and how to automatically recruit participants via [Prolific](https://www.prolific.co/) at the following pages, respectively: [AutoRA Firebase Experimentation manager](user-guide/experiment-runners/experimentation-managers/firebase/), [AutoRA Prolific Recruitment Manager](user-guide/experiment-runners/recruitment-managers/prolific/).
+On this page, you can find information on how to set up a [Firebase](https://firebase.google.com/) website to collect observations for an AutoRA workflow. You can find information on how to connect such a website to AutoRA and how to automatically recruit participants via [Prolific](https://www.prolific.co/) at the following pages, respectively: [AutoRA Firebase Experimentation manager](../../user-guide/experiment-runners/experimentation-managers/firebase), [AutoRA Prolific Recruitment Manager](../../user-guide/experiment-runners/recruitment-managers/prolific/).
 
 For setting up the online experiment, we recommend using either the [user cookiecutter template](https://github.com/AutoResearch/autora-user-cookiecutter) or the [create-react-app template](https://github.com/AutoResearch/cra-template-autora-firebase).
 
@@ -91,10 +91,10 @@ You can test the experiment locally using
 ```shell
 npm start
 ```
-During development, the Firestore database will not be used. If you want to load conditions from the database, you need to upload them first (for example using the [AutoRA Firebase Experimentation Manager](user-guide/experiment-runners/experimentation-managers/firebase/)) and set `REACT_APP_devNoDb="False"` in the `.env` file.
+During development, the Firestore database will not be used. If you want to load conditions from the database, you need to upload them first (for example using the [AutoRA Firebase Experimentation Manager](../../user-guide/experiment-runners/experimentation-managers/firebase/)) and set `REACT_APP_devNoDb="False"` in the `.env` file.
 
 ### Using Prolific Id's
-If you want to recruit participants via Prolific (for example using the [AutoRA Prolific Recruitment Manager](user-guide/experiment-runners/recruitment-managers/prolific/)), we ***highly recommend*** setting `REACT_APP_useProlificId="True"`. This will speed up the recruitment of participants.
+If you want to recruit participants via Prolific (for example using the [AutoRA Prolific Recruitment Manager](../../user-guide/experiment-runners/recruitment-managers/prolific/)), we ***highly recommend*** setting `REACT_APP_useProlificId="True"`. This will speed up the recruitment of participants.
 
 ## Build And Deploy To Firebase 
 To serve the website on the internet, you must build and deploy it to Firebase.
