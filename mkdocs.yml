@@ -162,6 +162,7 @@ nav:
   - Closed-Loop Discovery: 'workflow-tutorial/docs/interactive/Basic Usage.ipynb'
   - Online Closed-Loop Discovery: 'user-cookiecutter/docs/index.md'
 - User Guide:
+  - Installation: 'installation.md'
   - Theorists:
     - Home: 'theorist/index.md'
     - DARTS: '!import https://github.com/autoresearch/autora-theorist-darts/?branch=main&extra_imports=["mkdocs/base.yml"]'
