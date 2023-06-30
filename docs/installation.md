@@ -71,6 +71,6 @@ pip install -U "autora[theorist-bms]"
 
 To check that installation was successful, a user can try importing one of the main classes of the corresponding child package. For BMS, such a check would be:
 ```shell
-python -c from autora.theorist.bms import BMSRegressor; BMSRegressor() 
+python -c "from autora.theorist.bms import BMSRegressor; BMSRegressor()"
 ```
 
