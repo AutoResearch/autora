@@ -60,7 +60,7 @@ For a complete list of optional dependencies that have been vetted by the core A
 To install any (combintation) of optional dependencies, users should run the relevant analogue of the following command, with the name in brackets matching the name as specified in the parent `pyproject.toml` file:
 
 ```shell
-pip install -U autora[desired-dependency]
+pip install -U "autora[desired-dependency]"
 ```
 
 For example, to install one of the [Theorists](theorist/index.md), such as the Bayesian Machine Scientist (BMS), a user should run:
