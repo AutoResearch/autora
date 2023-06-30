@@ -55,7 +55,9 @@ AutoRA is organized into one "parent" and many "child" packages.
 
 For a complete list of optional dependencies that have been vetted by the core AutoRA team, see the `[project.optional-dependencies]` section of the `pyproject.toml` file in the parent `autora` package.
 
-To install any (combintation) of these optional dependencies, users should run the relevant analogue of the following command, with the name in brackets matching the name as specified in the parent `pyproject.toml` file:
+## Install Optional Dependencies
+
+To install any (combintation) of optional dependencies, users should run the relevant analogue of the following command, with the name in brackets matching the name as specified in the parent `pyproject.toml` file:
 
 ```shell
 pip install -U autora[desired-dependency]
