@@ -29,7 +29,7 @@ Type "help", "copyright", "credits" or "license" for more information.
 ```
 ## Install `autora`
 
-To install the PyPI `autora` package, run the following command in your terminal:
+To install the PyPI `autora` package, run the following command:
 
 ```shell
 pip install "autora"
