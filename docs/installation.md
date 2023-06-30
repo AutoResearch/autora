@@ -66,7 +66,7 @@ pip install -U "autora[desired-dependency]"
 For example, to install one of the [Theorists](theorist/index.md), such as the Bayesian Machine Scientist (BMS), a user should run:
 
 ```shell
-pip install -U autora[theorist-bms]
+pip install -U "autora[theorist-bms]"
 ```
 
 To check that installation was successful, a user can try importing one of the main classes of the corresponding child package. For BMS, such a check would be:
