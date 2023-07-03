@@ -34,8 +34,8 @@ AutoRA consists of different modules that can be used independently or in combin
 AutoRA can be used for a variety of research purposes in empirical sciences, such as psychology, 
 neuroscience, economics, physics, or materials science. Usages, as illustrated in the following tutorials, include:
 
-- [**Equation discovery**](tutorials/theorist.ipynb) from empirical data
-- [**Experimental design**](tutorials/experimentalist.ipynb) for follow-up experiments
+- [**Equation discovery**](tutorials/Theorist.ipynb) from empirical data
+- [**Experimental design**](tutorials/Experimentalist.ipynb) for follow-up experiments
 - **Research documentation and dissemination**
 - **Closed-loop empirical research**
 - **Computational analyses of the scientific process** (metascience, computational philosophy of science)

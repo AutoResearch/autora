@@ -31,9 +31,11 @@ You may contribute to any of the core packages or develop your own module as a s
 ### Code Style
 
 In general, AutoRA follows the [PEP 8 – Style Guide for Python Code](https://peps.python.org/pep-0008/). We particularly encourage the following conventions:
+
 - Snake case for variables and modules: `example_name`, `example_module.py`
 - Camel case for class names: `ExampleClass`
 - Camel case with spaces for Jupyter notebooks: `Example Notebook.ipynb`
+- Write docstrings for all public modules, functions, classes, methods, and at the top of each file.
 
 ### Documentation Style
 
@@ -45,9 +47,11 @@ For documenation, AutoRA adheres to the maxim, "Everything should be made as sim
 Modules include theorists, experimentalists, experiment runners, or other functionalities not covered by the core packages. 
 All modules are child packages and can become optional dependencies of the `autora` parent package. Modules packages are 
 owned and maintained by you, the contributor, which provides several advantages:
-- *Easy setup*: We provide simple [templates](modules/index.md) for modules, which you can use to get started quickly
-- *Independence*: You can develop and maintain your package independently of other child packages (and thereby avoid dependency conflicts)
-- *Ownership*: You can publish your package on PyPI or Conda, use it in other projects, and get credit for its use. 
+
+- **Easy setup**: We provide simple [templates](modules/index.md) for modules, which you can use to get started quickly
+- **Independence**: You can develop and maintain your package independently of other child packages (and thereby avoid dependency conflicts)
+- **Ownership**: You can publish your package on PyPI or Conda, use it in other projects, and get credit for its use. 
+
 
 For details on how to submit child packages 
 for inclusion in `autora`, see
