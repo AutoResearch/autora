@@ -45,7 +45,6 @@ and click the "<> Code" button and follow the prompts.
     All contributions to the AutoRA core packages should work under **python 3.8**, so we recommend using that version 
     for development.
     
-
 You can install python:
 
 - Using the instructions at [python.org](https://www.python.org), or
