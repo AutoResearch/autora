@@ -5,7 +5,7 @@ We use [`pre-commit`](https://pre-commit.com) to manage pre-commit hooks.
 Pre-commit hooks are programs which run before each git commit, and can read and potentially modify the files which are to be committed. 
 
 We use pre-commit hooks to:
-- enforce coding guidelines, including the `python` style-guide [PEP8](https://peps.python.org/pep-0008/) (`black` and `flake8`), 
+- enforce coding guidelines, including the `python` style-guide [PEP8](https://peps.python.org/pep-0008/) (`black` and `flake8`),
 - to check the order of `import` statements (`isort`),
 - to check the types of `python` objects (`mypy`).
 

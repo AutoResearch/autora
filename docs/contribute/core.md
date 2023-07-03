@@ -1,4 +1,4 @@
-# Contribute To Core Packages
+# Contributions To Core Packages
 
 Core contributions are changes to AutoRA which aren't experimentalists, (synthetic) experiment runners, or theorists. 
 The primary purpose of the core is to provide utilities for:
@@ -11,6 +11,15 @@ The primary purpose of the core is to provide utilities for:
     require no additional dependencies. However, if your contribution requires additional dependencies, you can submit it as a full package following 
     the [module contribution guide](modules/index.md).
 
+## How to Contribute
+
+In order to make a contribution to autora core, you may start by cloning the repository:
+```bash
+git clone https://github.com/AutoResearch/autora-core.git
+```
+
+You should then follow the [Development Setup Guide](https://autoresearch.github.io/autora/contribute/setup/), to set up your environment. 
+
 Suggested changes to the core should be submitted as follows, depending on their content:
 
 - For fixes or new features closely associated with existing core functionality: pull request to the existing 
@@ -21,6 +30,8 @@ Suggested changes to the core should be submitted as follows, depending on their
 !!! success
     Reach out to the core team about new core contributions to discuss how best to incorporate them by posting your 
     idea on the [discussions page](https://github.com/orgs/AutoResearch/discussions/categories/ideas).
+
+## Development Requirements
 
 Core packages should as a minimum:
 

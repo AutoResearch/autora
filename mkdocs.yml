@@ -157,6 +157,7 @@ nav:
 - Introduction: 'index.md'
 - Tutorials:
   - Home: 'tutorials/index.md'
+  - Introduction to AutoRA: 'tutorials/Introduction.ipynb'
   - Theorists: 'tutorials/Theorist.ipynb'
   - Experimentalists: 'tutorials/Experimentalist.ipynb'
   - Closed-Loop Discovery: 'workflow-tutorial/docs/interactive/Basic Usage.ipynb'

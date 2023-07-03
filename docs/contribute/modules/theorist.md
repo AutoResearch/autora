@@ -57,6 +57,13 @@ class ExampleRegressor(BaseEstimator):
         self.degree = degree
 
     def fit(self, conditions, observations):
+    
+        # polyfit expects a 1D array
+        if conditions.ndim > 1:
+            conditions = conditions.flatten()
+
+        if observations.ndim > 1:
+            observations = observations.flatten()
 
         # fit polynomial
         self.coeff = np.polyfit(conditions, observations, 2)
