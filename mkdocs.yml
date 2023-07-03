@@ -207,7 +207,7 @@ nav:
     - Experimentalist: 'contribute/modules/experimentalist.md'
     - Experiment Runner: 'contribute/modules/experiment-runner.md'
   - Core: 'contribute/core.md'
-  - Environment Setup: 'contribute/setup.md'
-  - Notebook: 'contribute/Notebook.ipynb'
+  - Notebooks: 'contribute/Notebook.ipynb'
+  - Development Setup: 'contribute/setup.md'
   - Pre-Commit Hooks: 'contribute/pre-commit-hooks.md'
 - Code Reference: reference/
