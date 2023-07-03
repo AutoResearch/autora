@@ -157,6 +157,7 @@ nav:
 - Introduction: 'index.md'
 - Tutorials:
   - Home: 'tutorials/index.md'
+  - Introduction to AutoRA: 'tutorials/Introduction.ipynb'
   - Theorists: 'tutorials/Theorist.ipynb'
   - Experimentalists: 'tutorials/Experimentalist.ipynb'
   - Closed-Loop Discovery: 'workflow-tutorial/docs/interactive/Basic Usage.ipynb'
@@ -218,7 +219,7 @@ nav:
     - Experimentalist: 'contribute/modules/experimentalist.md'
     - Experiment Runner: 'contribute/modules/experiment-runner.md'
   - Core: 'contribute/core.md'
-  - Environment Setup: 'contribute/setup.md'
-  - Notebook: 'contribute/Notebook.ipynb'
+  - Notebooks: 'contribute/Notebook.ipynb'
+  - Development Setup: 'contribute/setup.md'
   - Pre-Commit Hooks: 'contribute/pre-commit-hooks.md'
 - Code Reference: reference/
