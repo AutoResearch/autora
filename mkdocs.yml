@@ -158,10 +158,10 @@ nav:
 - Tutorials:
   - Home: 'tutorials/index.md'
   - Basic Tutorial:
-    -I - Components: 'tutorials/basic/Tutorial-I-Components.ipynb'
-    -II - Loop Constructs: 'tutorials/basic/Tutorial-II-Loop-Constructs.ipynb'
-    -III - Workflow Logic: 'tutorials/basic/Tutorial-III-Workflow-Logic.ipynb'
-    -IV - Customization: 'tutorials/basic/Tutorial-IV-Customization.ipynb'
+    - I - Components: 'tutorials/basic/Tutorial-I-Components.ipynb'
+    - II - Loop Constructs: 'tutorials/basic/Tutorial-II-Loop-Constructs.ipynb'
+    - III - Workflow Logic: 'tutorials/basic/Tutorial-III-Workflow-Logic.ipynb'
+    - IV - Customization: 'tutorials/basic/Tutorial-IV-Customization.ipynb'
   - Theorists: 'tutorials/Theorist.ipynb'
   - Experimentalists: 'tutorials/Experimentalist.ipynb'
   - Closed-Loop Discovery: 'workflow-tutorial/docs/interactive/Basic Usage.ipynb'
