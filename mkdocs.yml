@@ -35,6 +35,7 @@ plugins:
       - name: core
         import_url: "https://github.com/autoresearch/autora-core/?branch=main"
         imports: [
+          "docs/cycle/*",
           "docs/pipeline/*",
           "docs/experimentalists/pooler/grid/*",
           "docs/experimentalists/pooler/random/*",
@@ -164,6 +165,7 @@ nav:
     - IV - Customization: 'tutorials/basic/Tutorial-IV-Customization.ipynb'
   - Theorists: 'tutorials/Theorist.ipynb'
   - Experimentalists: 'tutorials/Experimentalist.ipynb'
+  - Functional Workflow: 'core/docs/cycle/Linear and Cyclical Workflows using Functions and States.ipynb'
   - Closed-Loop Discovery: 'workflow-tutorial/docs/interactive/Basic Usage.ipynb'
   - Online Closed-Loop Discovery: 'user-cookiecutter/docs/index.md'
 - User Guide:
