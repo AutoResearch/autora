@@ -70,6 +70,9 @@ plugins:
       - name: bms
         import_url: "https://github.com/autoresearch/autora-theorist-bms/?branch=main"
         imports: [ "src/" ]
+      - name: theorist-toolkit
+        import_url: "https://github.com/TheLemonPig/autora-theorist-toolkit"
+        imports: [ "src/" ]
       - name: novelty
         import_url: "https://github.com/autoresearch/autora-experimentalist-sampler-novelty/?branch=main"
         imports: [ "src/" ]
@@ -171,6 +174,7 @@ nav:
     - DARTS: '!import https://github.com/autoresearch/autora-theorist-darts/?branch=main&extra_imports=["mkdocs/base.yml"]'
     - BMS: '!import https://github.com/autoresearch/autora-theorist-bms/?branch=main&extra_imports=["mkdocs/base.yml"]'
     - BSR: '!import https://github.com/autoresearch/autora-theorist-bsr/?branch=main&extra_imports=["mkdocs/base.yml"]'
+    - Toolkit: '!import https://github.com/TheLemonPig/autora-theorist-toolkit/?branch=main&extra_imports=["mkdocs/base.yml"]'
   - Experimentalists:
     - Home: 'experimentalist/index.md'
     - Pipeline: 'core/docs/pipeline/Experimentalist Pipeline Examples.ipynb'
