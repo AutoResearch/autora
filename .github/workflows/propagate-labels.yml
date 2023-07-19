@@ -1,0 +1,29 @@
+# This workflow adds all labels from the AutoResearch/autora repo to the repos provided by the list
+
+name: Propagate labels
+
+# Controls when the workflow will run
+on:
+  workflow_dispatch:
+
+jobs:
+  run-command:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      
+      - name: Install GH CLI
+        uses: dev-hanz-ops/install-gh-cli-action@v0.1.0
+
+      
+      - name: Run command on repos
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: |
+          repos=("AutoResearch/autora-core" "AutoResearch/autora-synthetic" "AutoResearch/autora-workflow")
+          
+          for repo in "${repos[@]}"; do
+            gh label clone AutoResearch/autora --repo "$repo"
+          done
