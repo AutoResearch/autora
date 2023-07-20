@@ -24,6 +24,10 @@ in collaboration with the [Center for Computation and Visualization at Brown Uni
 
 The development of this package is supported by Schmidt Science Fellows, in partnership with the Rhodes Trust, as well as the Carney BRAINSTORM program at Brown University.
 
+<a href="https://ccbs.carney.brown.edu/brainstorm"><img src="docs/img/brainstorm.png" alt="BRAINSTORM Program" height="100"></img></a>&nbsp;&nbsp;&nbsp;&nbsp;
+<a href="https://schmidtsciencefellows.org/"><img src="docs/img/ssf.png" alt="BRAINSTORM Program" height="80"></img></a>
+
+
 ## Read More
 
 - [Package Documentation](https://autoresearch.github.io/autora/)
