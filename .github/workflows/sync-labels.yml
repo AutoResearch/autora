@@ -1,0 +1,19 @@
+name: Sync labels
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/labels.yml
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: micnncim/action-label-syncer@v1
+        with:
+          manifest: path/to/manifest/labels.yml
+          repository: |
+              AutoResearch/autora
+              AutoResearch/autora-core
+          token: ${{ secrets.LABEL_SYNCER }}
