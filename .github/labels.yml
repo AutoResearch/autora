@@ -1,0 +1,34 @@
+# Labels for AutoResearch repos
+- name: bug
+  description: Something isn't working.
+  color: d73a4a
+- name: documentation
+  description: Improvements or additions to documentation.
+  color: 0075ca
+- name: duplicate
+  description: This issue or pull request already exists.
+  color: cfd3d7
+- name: enhancement
+  description: New feature or request.
+  color: a2eeef
+- name: good first issue
+  description: Good for newcomers.
+  color: 7057ff
+- name: invalid
+  description: This doesn't seem right.
+  color: e4e669
+- name: priority 0 - emergency
+  description: These can be blockers, or security issues, and should be resolved immediately.
+  color: f01b0c
+- name: priority 1 - needed
+  description: These are highly desirable to be fixed, ideally within 2 weeks.
+  color: f0580c
+- name: priority 2 - wanted
+  description: These should be addressed within 2 months.
+  color: f0910c
+- name: priority 3 - optional
+  description: Not time sensitive.
+  color: f0dd0c
+- name: wontfix
+  description: This will not be worked on.
+  color: ffffff
