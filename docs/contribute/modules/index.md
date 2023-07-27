@@ -88,7 +88,7 @@ Note, if your repository is part of the [AutoResearch Organization](https://gith
     - Once you create a new release, the GitHub Action will automatically trigger, and your package will be built and published to PyPI using the provided API token.
 
 ### Manually Publishing
-If you used the **unguided template**, or you want to manually publish your package, you can follow [step 7 in this guide](https://github.com/AutoResearch/autora-template).
+If you used the **unguided template**, or you want to manually publish your package, you can follow [step 7 in this guide](https://github.com/AutoResearch/autora-template#step-7-publish-your-package).
 
 Once you've published your module, you should take some time to celebrate and announce your contribution in the 
 [AutoRA forum](https://github.com/orgs/AutoResearch/discussions/categories/module-announcements).
