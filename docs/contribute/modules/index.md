@@ -74,7 +74,7 @@ There are several ways to publish your package, depending on how you set up your
 ### Publishing Via GitHub Actions
 If you used the **cookiecutter template** with the advanced setup, and uploaded your repository to github.com, then you can use Github Actions to automatically publish your package to PyPI or Conda. 
 
-Note that if your repository is part of the [AutoRA Organisation](https://github.com/AutoResearch) you can skip the creation of a secret in your repository.
+Note, if your repository is part of the [AutoResearch Organization](https://github.com/AutoResearch) you can skip the step below for creating a new secret in your repository.
 
 1. Add an API Token to the GitHub Secrets
     - Create a [PyPi account](https://pypi.org/) if you don't have one already.
