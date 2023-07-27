@@ -71,10 +71,23 @@ pip install -e ".[dev]"
 
 There are several ways to publish your package, depending on how you set up your repository.
 
-- If you used the **cookiecutter template** with the advanced setup, and uploaded your repository to 
-github.com, then you can use Github Actions to automatically publish your package to PyPI or Conda. 
+### Publishing Via GitHub Actions
+If you used the **cookiecutter template** with the advanced setup, and uploaded your repository to github.com, then you can use Github Actions to automatically publish your package to PyPI or Conda. 
 
-- If you used the **unguided template**, or you want to manually publish your package, you can follow [step 7 in this guide](https://github.com/AutoResearch/autora-template).
+Note that if your repository is part of the [AutoRA Organisation](https://github.com/AutoResearch) you can skip the creation of a secret in your repository.
+
+1. Add an API Token to the GitHub Secrets
+    - Create a [PyPi account](https://pypi.org/) if you don't have one already.
+    - Once you have an account, generate an API token for your account.
+    - In your GitHub repository, go `Settings`.
+    - Under `Secrets and Variables`, create a new secret named `PYPI_API_TOKEN` and paste your PyPI API token as the value.
+
+2. Create A New Release
+    - Follow the steps outlined in the [GitHub documentation](https://docs.github.com/en/repositories/releasing-projects-on-github/managing-releases-in-a-repository) for creating a new release. 
+    - Once you create a new release, the GitHub Action will automatically trigger, and your package will be built and published to PyPI using the provided API token.
+
+### Manually Publishing
+If you used the **unguided template**, or you want to manually publish your package, you can follow [step 7 in this guide](https://github.com/AutoResearch/autora-template).
 
 Once you've published your module, you should take some time to celebrate and announce your contribution in the 
 [AutoRA forum](https://github.com/orgs/AutoResearch/discussions/categories/module-announcements).
