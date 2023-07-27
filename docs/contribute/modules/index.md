@@ -83,7 +83,7 @@ Note, if your repository is part of the [AutoResearch Organization](https://gith
     - Under `Secrets and variables` in the left-hand menu, select `Actions`. 
     - Create a new secret named `PYPI_API_TOKEN` and paste in your PyPI API token as the value.
 
-2. Create A New Release
+2. Create a new release
     - Follow the steps outlined in the [GitHub documentation](https://docs.github.com/en/repositories/releasing-projects-on-github/managing-releases-in-a-repository) for creating a new release. 
     - Once you create a new release, the GitHub Action will automatically trigger, and your package will be built and published to PyPI using the provided API token.
 
