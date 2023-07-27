@@ -76,7 +76,7 @@ If you used the **cookiecutter template** with the advanced setup, and uploaded 
 
 Note, if your repository is part of the [AutoResearch Organization](https://github.com/AutoResearch) you can skip the step below for creating a new secret in your repository.
 
-1. Add an API Token to the GitHub Secrets
+1. Add an API token to the GitHub Secrets
     - Create a [PyPI account](https://pypi.org/) if you don't have one already.
     - Once you have an account, generate an API token for your account.
     - In your GitHub repository, go `Settings`.
