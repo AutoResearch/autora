@@ -79,7 +79,7 @@ Note, if your repository is part of the [AutoResearch Organization](https://gith
 1. Add an API token to the GitHub Secrets
     - Create a [PyPI account](https://pypi.org/) if you don't have one already.
     - Once you have an account, generate an API token for your account.
-    - In your GitHub repository, go `Settings`.
+    - In your GitHub repository, go to `Settings`.
     - Under `Secrets and Variables`, create a new secret named `PYPI_API_TOKEN` and paste your PyPI API token as the value.
 
 2. Create A New Release
