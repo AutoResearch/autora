@@ -71,10 +71,24 @@ pip install -e ".[dev]"
 
 There are several ways to publish your package, depending on how you set up your repository.
 
-- If you used the **cookiecutter template** with the advanced setup, and uploaded your repository to 
-github.com, then you can use Github Actions to automatically publish your package to PyPI or Conda. 
+### Publishing Via GitHub Actions
+If you used the **cookiecutter template** with the advanced setup, and uploaded your repository to github.com, then you can use Github Actions to automatically publish your package to PyPI or Conda. 
 
-- If you used the **unguided template**, or you want to manually publish your package, you can follow [step 7 in this guide](https://github.com/AutoResearch/autora-template).
+Note, if your repository is part of the [AutoResearch Organization](https://github.com/AutoResearch) you can skip the step below for creating a new secret in your repository.
+
+1. Add an API token to the GitHub Secrets
+    - Create a [PyPI account](https://pypi.org/) if you don't have one already.
+    - Once you have an account, generate an API token for your account.
+    - In your GitHub repository, go to `Settings`.
+    - Under `Secrets and variables` in the left-hand menu, select `Actions`. 
+    - Create a new secret named `PYPI_API_TOKEN` and paste in your PyPI API token as the value.
+
+2. Create a new release
+    - Follow the steps outlined in the [GitHub documentation](https://docs.github.com/en/repositories/releasing-projects-on-github/managing-releases-in-a-repository) for creating a new release. 
+    - Once you create a new release, the GitHub Action will automatically trigger, and your package will be built and published to PyPI using the provided API token.
+
+### Manually Publishing
+If you used the **unguided template**, or you want to manually publish your package, you can follow [step 7 in this guide](https://github.com/AutoResearch/autora-template#step-7-publish-your-package).
 
 Once you've published your module, you should take some time to celebrate and announce your contribution in the 
 [AutoRA forum](https://github.com/orgs/AutoResearch/discussions/categories/module-announcements).
@@ -82,8 +96,6 @@ Once you've published your module, you should take some time to celebrate and an
 ## Incorporate Your Module Into The AutoRA Parent Package
 
 Once your package is working and published, you can **make a pull request** on [`autora`](https://github.com/autoresearch/autora) to have it vetted and added to the "parent" package. Note, if you are not a member of the AutoResearch organization on GitHub, you will need to create a fork of the repository for the parent package and submit your pull request via that fork. If you are a member, you can create a pull request from a branch created directly from the parent package repository. Steps for creating a new branch to add your module are specified below.
-The following demonstrates how to add a package published under `autora-theorist-example` in PyPI in the GitHub 
-repository `example-contributor/contributor-theorist`
 
 !!! success
     In order for your package to be included in the parent package, it must meet the following criteria:
@@ -94,8 +106,8 @@ repository `example-contributor/contributor-theorist`
     - be compatible with the current version of the parent package
     - follow standard python coding guidelines including PEP8
 
-The following demonstrates how to add a package published under autora-theorist-example in PyPI in the GitHub 
-repository example-contributor/contributor-theorist
+The following demonstrates how to add a package published under `autora-theorist-example` in PyPI in the GitHub 
+repository `example-contributor/contributor-theorist`.
 
 ### Install The Parent Package In Development Mode
 
@@ -215,13 +227,12 @@ the right place and renders correctly.
 !!! warning
     Please note, that packages need to be vetted each time they are updated.
 
-Update the version number in the  `pyproject.toml` file, in the [project.optional-dependencies] 
-section:
+In the `[project.optional-dependencies]` section of the `pyproject.toml` file, update the version number:
 ```toml
 theorist-example = ["autora-theorist-example==1.1.0"]
 ```
 
-Update the version number in the `mkdocs.yml`: 
+Also update the version number in the `mkdocs.yml`: 
 ```yml
 plugins:
   multirepo:
@@ -238,7 +249,7 @@ plugins:
     ...
 ```
 
-Update the environment:
+Next, update the environment:
 ```shell
 pip install -U -e ".[dev]"
 ```
@@ -261,6 +272,8 @@ changes. Include:
 - a link to your release notes. 
 
 Request a review from someone in the core team and wait for their feedback!
+
+Note, whenever you update and release a new version of your module, you will need to add the new version number in the places described above and create a new PR to have it included in `autora`.
 
 
 
