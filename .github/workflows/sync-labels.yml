@@ -1,0 +1,31 @@
+name: Sync labels
+on:
+  workflow_dispatch: 
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: micnncim/action-label-syncer@v1
+        with:
+          manifest: .github/labels.yml
+          repository: |
+              AutoResearch/autora
+              AutoResearch/autora-core
+              AutoResearch/autora-experimentalist-falsification
+              AutoResearch/autora-experimentalist-sampler-assumption
+              AutoResearch/autora-experimentalist-sampler-inequality
+              AutoResearch/autora-experimentalist-sampler-leverage
+              AutoResearch/autora-experimentalist-sampler-model-disagreement
+              AutoResearch/autora-experimentalist-sampler-nearest-value
+              AutoResearch/autora-experimentalist-sampler-novelty
+              AutoResearch/autora-experimentalist-sampler-uncertainty
+              AutoResearch/autora-experiment-runner-experimentation-manager-firebase
+              AutoResearch/autora-experiment-runner-firebase-prolific
+              AutoResearch/autora-experiment-runner-recruitment-manager-prolific
+              AutoResearch/autora-synthetic
+              AutoResearch/autora-theorist-bms
+              AutoResearch/autora-theorist-bsr
+              AutoResearch/autora-theorist-darts
+              AutoResearch/autora-workflow
+          token: ${{ secrets.LABEL_SYNCER }}
