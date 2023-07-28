@@ -1,6 +1,6 @@
 name: Sync labels
 on:
-  workflow_dispatch:  # this allows us to run it manually
+  workflow_dispatch: 
 jobs:
   build:
     runs-on: ubuntu-latest
