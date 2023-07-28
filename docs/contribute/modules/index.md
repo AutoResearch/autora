@@ -227,8 +227,7 @@ the right place and renders correctly.
 !!! warning
     Please note, that packages need to be vetted each time they are updated.
 
-Update the version number in the  `pyproject.toml` file, in the [project.optional-dependencies] 
-section:
+In the `[project.optional-dependencies]` section of the `pyproject.toml` file, update the version number:
 ```toml
 theorist-example = ["autora-theorist-example==1.1.0"]
 ```
