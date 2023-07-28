@@ -96,8 +96,6 @@ Once you've published your module, you should take some time to celebrate and an
 ## Incorporate Your Module Into The AutoRA Parent Package
 
 Once your package is working and published, you can **make a pull request** on [`autora`](https://github.com/autoresearch/autora) to have it vetted and added to the "parent" package. Note, if you are not a member of the AutoResearch organization on GitHub, you will need to create a fork of the repository for the parent package and submit your pull request via that fork. If you are a member, you can create a pull request from a branch created directly from the parent package repository. Steps for creating a new branch to add your module are specified below.
-The following demonstrates how to add a package published under `autora-theorist-example` in PyPI in the GitHub 
-repository `example-contributor/contributor-theorist`
 
 !!! success
     In order for your package to be included in the parent package, it must meet the following criteria:
@@ -108,8 +106,8 @@ repository `example-contributor/contributor-theorist`
     - be compatible with the current version of the parent package
     - follow standard python coding guidelines including PEP8
 
-The following demonstrates how to add a package published under autora-theorist-example in PyPI in the GitHub 
-repository example-contributor/contributor-theorist
+The following demonstrates how to add a package published under `autora-theorist-example` in PyPI in the GitHub 
+repository `example-contributor/contributor-theorist`.
 
 ### Install The Parent Package In Development Mode
 
@@ -229,13 +227,12 @@ the right place and renders correctly.
 !!! warning
     Please note, that packages need to be vetted each time they are updated.
 
-Update the version number in the  `pyproject.toml` file, in the [project.optional-dependencies] 
-section:
+In the `[project.optional-dependencies]` section of the `pyproject.toml` file, update the version number:
 ```toml
 theorist-example = ["autora-theorist-example==1.1.0"]
 ```
 
-Update the version number in the `mkdocs.yml`: 
+Also update the version number in the `mkdocs.yml`: 
 ```yml
 plugins:
   multirepo:
@@ -252,7 +249,7 @@ plugins:
     ...
 ```
 
-Update the environment:
+Next, update the environment:
 ```shell
 pip install -U -e ".[dev]"
 ```
@@ -275,6 +272,8 @@ changes. Include:
 - a link to your release notes. 
 
 Request a review from someone in the core team and wait for their feedback!
+
+Note, whenever you update and release a new version of your module, you will need to add the new version number in the places described above and create a new PR to have it included in `autora`.
 
 
 
