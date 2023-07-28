@@ -232,7 +232,7 @@ In the `[project.optional-dependencies]` section of the `pyproject.toml` file, u
 theorist-example = ["autora-theorist-example==1.1.0"]
 ```
 
-Update the version number in the `mkdocs.yml`: 
+Also update the version number in the `mkdocs.yml`: 
 ```yml
 plugins:
   multirepo:
