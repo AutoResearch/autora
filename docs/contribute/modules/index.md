@@ -249,7 +249,7 @@ plugins:
     ...
 ```
 
-Update the environment:
+Next, update the environment:
 ```shell
 pip install -U -e ".[dev]"
 ```
@@ -272,6 +272,8 @@ changes. Include:
 - a link to your release notes. 
 
 Request a review from someone in the core team and wait for their feedback!
+
+Note, whenever you update and release a new version of your module, you will need to add the new version number in the places described above and create a new PR to have it included in `autora`.
 
 
 
