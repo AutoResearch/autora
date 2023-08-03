@@ -12,7 +12,7 @@ As an example, consider a visual discrimination tasks in which participants are 
 with two lines of different lengths, and are asked to indicate which line is longer.
 There are two factors in this experiment: the length of the first line and 
 the length of the second line. Instances of the two line lengths 
-(e.g., 2.0 cm for the first line and 2.1 cm for the sceond line) 
+(e.g., 2.0 cm for the first line and 2.1 cm for the second line) 
 can be considered levels of the two factors, respectively. Thus, *an experimental condition is a vector of values that
 corresponds to a specific combination of experiment levels $x_i$, 
 each of which is an instance of an experiment factor.*
@@ -28,12 +28,15 @@ experimental conditions that have already been probed $\vec{x}' \in X'$, or
 respective dependent measures $\vec{y}' \in Y'$. The following table includes the experimentalists currently implemented
  in AutoRA.
 
-| Experimentalist    | Function                                                                                                                      | Arguments   |
-|--------------------|-------------------------------------------------------------------------------------------------------------------------------|-------------|
-| Random             | $\vec{x_i} \sim U[a_i,b_i]$                                                                                                   |             |
-| Novelty            | $\underset{\vec{x}}{\arg\max}~\min(d(\vec{x}, \vec{x}'))$                                                                     | $X'$        |
-| Uncertainty        | $\underset{\vec{x}}{\arg\max}~1 - P_M(\hat{y}^*, \vec{x})$, $\hat{y}^* = \underset{\hat{y}}{\arg\max}~P_M(\hat{y}_i \vec{x})$ | $M$         |
-| Model Disagreement | $\underset{\vec{x}}{\arg\max}~(P_{M_1}(\hat{y}, \vec{x}) - P_{M_2}(\hat{y} \vec{x}))^2$                                       | $M$         |
-| Falsification      | $\underset{\vec{x}}{\arg\max}~\hat{\mathcal{L}}(M,X',Y',\vec{x})$                                                             | $M, X', Y'$ |
-
-
+| Name                                                                                              | Docs | Function                                                                                                                      | Arguments   |
+|---------------------------------------------------------------------------------------------------|------|-------------------------------------------------------------------------------------------------------------------------------|-------------|
+| [Random](https://pypi.org/project/autora-core/)                                                   |      | $\vec{x_i} \sim U[a_i,b_i]$                                                                                                   |             |
+| [Novelty](https://pypi.org/project/autora-experimentalist-sampler-novelty/)                       |      | $\underset{\vec{x}}{\arg\max}~\min(d(\vec{x}, \vec{x}'))$                                                                     | $X'$        |
+| [Uncertainty](https://pypi.org/project/autora-experimentalist-sampler-uncertainty/)               |      | $\underset{\vec{x}}{\arg\max}~1 - P_M(\hat{y}^*, \vec{x})$, $\hat{y}^* = \underset{\hat{y}}{\arg\max}~P_M(\hat{y}_i \vec{x})$ | $M$         |
+| [Model Disagreement](https://pypi.org/project/autora-experimentalist-sampler-model-disagreement/) |      | $\underset{\vec{x}}{\arg\max}~(P_{M_1}(\hat{y}, \vec{x}) - P_{M_2}(\hat{y} \vec{x}))^2$                                       | $M$         |
+| [Falsification](https://pypi.org/project/autora-experimentalist-falsification/)                   |      | $\underset{\vec{x}}{\arg\max}~\hat{\mathcal{L}}(M,X',Y',\vec{x})$                                                             | $M, X', Y'$ |
+| [Mixture](https://pypi.org/project/mixture-experimentalist/)                                      |      | [ ]                                                                                                                           | [ ]         |
+| [Nearest Value](https://pypi.org/project/autora-experimentalist-sampler-nearest-value/)           |      | [ ]                                                                                                                           | [ ]         |
+| Leverage                                                                                          |      | [ ]                                                                                                                           | [ ]         |
+| [Inequality](https://pypi.org/project/autora-experimentalist-sampler-inequality/)                 |      | [ ]                                                                                                                           | [ ]         |
+| Assumption                                                                                        |      | [ ]                                                                                                                           | [ ]         |
