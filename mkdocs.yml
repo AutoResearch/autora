@@ -85,6 +85,9 @@ plugins:
       - name: uncertainty
         import_url: "https://github.com/autoresearch/autora-experimentalist-sampler-uncertainty/?branch=main"
         imports: [ "src/" ]
+      - name: leverage
+        import_url: "https://github.com/autoresearch/autora-experimentalist-sampler-leverage/?branch=main"
+        imports: [ "src/" ]  
       - name: mixture
         import_url: "https://github.com/blinodelka/mixture_experimental_strategies/?branch=main"
         imports: [ "src/" ]
@@ -106,6 +109,7 @@ plugins:
           "./temp_dir/nearest-value/src/",
           "./temp_dir/disagreement/src/",
           "./temp_dir/uncertainty/src/",
+          "./temp_dir/leverage/src/",
           "./temp_dir/falsification/src/",
           "./temp_dir/mixture/src/"
         ]
@@ -183,6 +187,7 @@ nav:
       - Nearest Value: '!import https://github.com/autoresearch/autora-experimentalist-sampler-nearest-value/?branch=main&extra_imports=["mkdocs/base.yml"]'
       - Model Disagreement: '!import https://github.com/autoresearch/autora-experimentalist-sampler-model-disagreement/?branch=main&extra_imports=["mkdocs/base.yml"]'
       - Uncertainty: '!import https://github.com/autoresearch/autora-experimentalist-sampler-uncertainty/?branch=main&extra_imports=["mkdocs/base.yml"]'
+      - Leverage: '!import https://github.com/autoresearch/autora-experimentalist-sampler-leverage/?branch=main&extra_imports=["mkdocs/base.yml"]'
       - Falsification:
         - Home: 'falsification/docs/sampler/index.md'
         - Quickstart: 'falsification/docs/sampler/quickstart.md'
