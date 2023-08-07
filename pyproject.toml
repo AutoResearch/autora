@@ -11,7 +11,7 @@ maintainers = [
   { name = "Younes Strittmatter", email = "younes_strittmatter@brown.edu" },
 ]
 readme = "README.md"
-license = { file = "LICENSE.md" }
+license = { file = "LICENSE" }
 dynamic = ["version"]
 
 dependencies = [
