@@ -4,7 +4,8 @@ AutoRA consists of a set of techniques designed to automate the construction of 
 
 ![Overview](../img/theorist.png)
 
-The following table includes the theorists currently implemented in AutoRA.
+Theorist use information about experimental conditions that have already been probed $\vec{x}' \in X'$ and 
+respective dependent measures $\vec{y}' \in Y'$. The following table includes the theorists currently implemented in AutoRA.
 
 | Name                                       | Links                                                                                                                                 | Description                                                                                                                                                                                       | Arguments |
 |--------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|
