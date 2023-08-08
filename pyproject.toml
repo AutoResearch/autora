@@ -52,6 +52,7 @@ all-experimentalists = [
   "autora[experimentalist-sampler-nearest-value]",
   "autora[experimentalist-sampler-model-disagreement]",
   "autora[experimentalist-sampler-uncertainty]",
+  "autora[experimentalist-sampler-leverage]",
   "autora[experimentalist-falsification]",
   "autora[experimentalist-sampler-mixture]",
 ]
@@ -69,6 +70,9 @@ experimentalist-sampler-model-disagreement =[
 ]
 experimentalist-sampler-uncertainty =[
   "autora-experimentalist-sampler-uncertainty"
+]
+experimentalist-sampler-leverage =[
+  "autora-experimentalist-sampler-leverage"
 ]
 experimentalist-falsification =[
   "autora-experimentalist-falsification"
