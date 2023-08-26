@@ -4,7 +4,7 @@
 ![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/autoresearch/autora/test-pytest.yml)
 ![PyPI - Downloads](https://img.shields.io/pypi/dm/autora)
 ![Link to docs](https://img.shields.io/badge/Docs-autoresearch.github.io-purple)
-![PyPI - License](https://img.shields.io/pypi/l/autora)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 ![GitHub Discussions](https://img.shields.io/github/discussions/autoresearch/autora)
 
 <b>[AutoRA](https://pypi.org/project/autora/)</b> (<b>Auto</b>mated <b>R</b>esearch <b>A</b>ssistant) is an open-source framework for 
