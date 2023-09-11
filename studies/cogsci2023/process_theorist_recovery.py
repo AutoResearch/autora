@@ -12,7 +12,7 @@ from studies.cogsci2023.models.models import model_inventory, plot_inventory
 
 
 def change_gt_names(df):
-    df.loc[df['Theorist'] == 'DARTS 3 Nodes', 'Theorist'] = 'DARTS'
+    # df.loc[df['Theorist'] == 'DARTS 3 Nodes', 'Theorist'] = 'DARTS'
     df.loc[df['Ground Truth'] == 'weber_fechner', 'Ground Truth'] = 'Weber-Fechner Law'
     df.loc[df['Ground Truth'] == 'stevens_power_law', 'Ground Truth'] = 'Steven’s Power Law'
     df.loc[df['Ground Truth'] == 'exp_learning', 'Ground Truth'] = 'Exponential Learning'
@@ -43,6 +43,13 @@ def process_data(path="data_theorist/", retrain=False):
         print((stop-start).total_seconds())
         start = stop
         if gt_model == '__init__.py' or gt_model == 'models.py' or not gt_model.endswith('.py'):
+            continue
+        found = False
+        for file in os.listdir(path):
+            # check if the file is a pickle file
+            if file.endswith(".pickle") and file.startswith(gt_model[:-3]):
+                found = True
+        if found is False:
             continue
         if gt_model.startswith('df_validation') or (gt_model in trained and not retrain):
             print('skipped because already trained')
@@ -97,7 +104,7 @@ def process_data(path="data_theorist/", retrain=False):
                 df_validation = df_validation.append(row, ignore_index=True)
                 entry = entry + 1
         theory_logs.update({ground_truth_name: full_theory_log})
-
+        print(f'columns:{df_validation.columns}')
         # remove MSE outliers
         theorists = df_validation["Theorist"].unique()
         gts = df_validation["Ground Truth"].unique()
@@ -140,20 +147,21 @@ def process_data(path="data_theorist/", retrain=False):
     df_validation = change_gt_names(df_validation)
     df_validation.to_csv(path + "df_validation.csv", index=False)
 
-    theory_log = pd.DataFrame()
-    for gt_model in os.listdir('models/'):
-        df_file = path + "full_theory_log_"+gt_model[:-3]+".pickle"
-        if df_file in os.listdir(path):
-            with open(path + df_file, "rb") as f:
-                df = pkl.load(f)
-            theory_log = theory_log.append(df)
+    theory_log = pd.DataFrame(theory_logs)
+    # for gt_model in os.listdir('models/'):
+    #     df_file = path + "full_theory_log_"+gt_model[:-3]+".pickle"
+    #     if df_file in os.listdir(path):
+    #         with open(path + df_file, "rb") as f:
+    #             df = pkl.load(f)
+    #         theory_log = theory_log.append(df)
+    #         print(df)
 
     # theory_log = change_gt_names(theory_log)
     theory_log.to_csv(path + "theory_log.csv", index=False)
 
 
 if __name__ == '__main__':
-    process_data('data_prior_n0.1/')
+    process_data('prior_0.25/')
 
 # with open(os.path.join(path, 'evc_coged_8.pickle'), "rb") as f:
 #     pickle_data = pkl.load(f)
