@@ -1,8 +1,17 @@
 import pandas as pd
 import pickle
 import os
+import numpy as np
 
 path = 'prior_0.25/'
+
+theorists = ['BMS UniformNew',
+    'BMS Prior Williams2023SUPERCognitivePsychologyNew',
+    'BMS Prior Williams2023SUPERCognitiveScienceNew',
+    'BMS Prior Williams2023SUPERMaterialsScienceNew',
+    'BMS Prior Williams2023SUPERNeuroscienceNew',
+    'BMS Average'
+             ]
 
 # df = pd.read_csv(path+'theory_log.csv')
 
@@ -19,9 +28,12 @@ for key in dic.keys():
 for gt in dic.keys():
     print(gt)
     data = dic[gt]
-    for val in data:
-        print(val)
-    print('\n\n')
+    for i, theorist in enumerate(theorists):
+        print(f'--------{theorist}----------')
+        for j in range(int(np.floor(len(data)/6))):
+            print(data[i+j*6])
+        print('\n')
+    print('\n\n\n')
 
 if __name__ == '__main__':
     ...
