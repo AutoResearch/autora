@@ -31,7 +31,7 @@ def change_gt_names(df):
 def process_data(path="data_theorist/", retrain=False):
     df_validation = pd.DataFrame()
     theory_logs = dict()
-    full_theory_log = []
+    # full_theory_log = []
     entry = 0
     trained = []
     for gt_model in os.listdir('models/'):
@@ -75,7 +75,7 @@ def process_data(path="data_theorist/", retrain=False):
                 loaded_pickles.append(pickle_data)
 
         # df_validation = pd.DataFrame()
-        # full_theory_log = []
+        full_theory_log = []
         # entry = 0
 
         # import the loaded pickles into data_closed_loop frame
@@ -100,7 +100,8 @@ def process_data(path="data_theorist/", retrain=False):
                 row['Description Length'] = DL_log[idx]
                 row['Bayesian Information Criterion'] = BIC_log[idx]
                 row['Log Likelihood'] = LL_log[idx]
-                full_theory_log.append((theory_log[idx], MSE_log[idx]))
+                # full_theory_log.append((theory_log[idx], MSE_log[idx]))
+                full_theory_log.append(theory_log[idx])
                 df_validation = df_validation.append(row, ignore_index=True)
                 entry = entry + 1
         theory_logs.update({ground_truth_name: full_theory_log})
@@ -135,7 +136,7 @@ def process_data(path="data_theorist/", retrain=False):
         # save and load pickle file
         file_name = path + "full_theory_log_"+ground_truth_name+".pickle"
         with open(file_name, "wb") as g:
-            pkl.dump(theory_logs, g)
+            pkl.dump(theory_logs[ground_truth_name], g)
     df_validation = pd.DataFrame()
     for gt_model in os.listdir('models/'):
         df_file = 'df_validation_' + gt_model[:-3] + '.pickle'
@@ -146,8 +147,9 @@ def process_data(path="data_theorist/", retrain=False):
 
     df_validation = change_gt_names(df_validation)
     df_validation.to_csv(path + "df_validation.csv", index=False)
-
-    theory_log = pd.DataFrame(theory_logs)
+    with open(path+'theory_log.pickle', "wb") as g:
+        pkl.dump(theory_logs, g)
+    # theory_log = pd.DataFrame(theory_logs)
     # for gt_model in os.listdir('models/'):
     #     df_file = path + "full_theory_log_"+gt_model[:-3]+".pickle"
     #     if df_file in os.listdir(path):
@@ -157,7 +159,7 @@ def process_data(path="data_theorist/", retrain=False):
     #         print(df)
 
     # theory_log = change_gt_names(theory_log)
-    theory_log.to_csv(path + "theory_log.csv", index=False)
+    # theory_log.to_csv(path + "theory_log.csv", index=False)
 
 
 if __name__ == '__main__':
