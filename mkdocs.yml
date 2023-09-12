@@ -168,7 +168,7 @@ nav:
     - III - Functional Workflow: 'tutorials/basic/Tutorial-III-Functional-Workflow.ipynb'
     - IV - Customization: 'tutorials/basic/Tutorial-IV-Customization.ipynb'
   - Advanced:
-    - Equation Discovery: 'tutorials/Theorist.ipynb'
+    - Equation Discovery: 'tutorials/Equation Discovery.ipynb'
     - Experimentalists: 'tutorials/Experimentalist.ipynb'
     #- Functional Workflow: 'core/docs/cycle/Linear and Cyclical Workflows using Functions and States.ipynb'
     - Closed-Loop Discovery: 'workflow-tutorial/docs/interactive/Basic Usage.ipynb'
