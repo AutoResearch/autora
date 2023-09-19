@@ -1,12 +1,12 @@
 # Experiment Runner Overview
 
-AutoRA includes tools for running synthetic and real-world experiments.
+``autora`` includes tools for running synthetic and real-world experiments.
 
 ![Overview](../img/experiment_runner.png)
 
-For synthetic experiments, these tools consist of ground-truth models from various disciplines that can be used to generate synthetic data. For real-world experiments, these tools consist of (i) experimentation managers, (ii) recruitment managers, and (iii) experiment runners, which combine experimentation managers with recruitment managers. Experimentation managers facilitate communication of conditions and observations between AutoRA and environments in which experiments are hosted. Recruitment managers facilitate recruitment and coordination of study participants.
+For synthetic experiments, these tools consist of ground-truth models from various disciplines that can be used to generate synthetic data. For real-world experiments, these tools consist of (i) experimentation managers, (ii) recruitment managers, and (iii) experiment runners, which combine experimentation managers with recruitment managers. Experimentation managers facilitate communication of conditions and observations between ``autora`` and environments in which experiments are hosted. Recruitment managers facilitate recruitment and coordination of study participants.
 
-Experiment runner tools may take in information about new experimental conditions or entire experiments. The following table includes the various experiment runner tools currently implemented in AutoRA.
+Experiment runner tools may take in information about new experimental conditions or entire experiments. The following table includes the various experiment runner tools currently implemented in ``autora``.
 
 | Name                                  | Links                                                                                                                                                                                                          | Description                                                                                                                                                     |
 |---------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------|
