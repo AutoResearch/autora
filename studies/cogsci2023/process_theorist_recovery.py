@@ -101,33 +101,14 @@ def process_data(path="data_theorist/", retrain=False):
                 row['Bayesian Information Criterion'] = BIC_log[idx]
                 row['Log Likelihood'] = LL_log[idx]
                 # full_theory_log.append((theory_log[idx], MSE_log[idx]))
-                full_theory_log.append(theory_log[idx])
                 df_validation = df_validation.append(row, ignore_index=True)
                 entry = entry + 1
+            full_theory_log.append(theory_log[0])
         theory_logs.update({ground_truth_name: full_theory_log})
         print(f'columns:{df_validation.columns}')
         # remove MSE outliers
         theorists = df_validation["Theorist"].unique()
         gts = df_validation["Ground Truth"].unique()
-        for theorist in theorists:
-            for gt in gts:
-                # compute the mean MSE for each experimentalist in the data_closed_loop frame
-                mean_MSE = df_validation[
-                    (df_validation["Theorist"] == theorist)
-                    & (df_validation["Ground Truth"] == gt)
-                    ]["Mean Squared Error"].mean()
-                std_MSE = df_validation[
-                    (df_validation["Theorist"] == theorist)
-                    & (df_validation["Ground Truth"] == gt)
-                    ]["Mean Squared Error"].std()
-                # remove all rows with MSE above the mean + 3 standard deviations
-                df_validation = df_validation.drop(
-                    df_validation[
-                        (df_validation["Theorist"] == theorist)
-                        & (df_validation["Ground Truth"] == gt)
-                        & (df_validation["Mean Squared Error"] > mean_MSE + 3 * std_MSE)
-                        ].index
-                )
 
         # save and load pickle file
         file_name = path + "df_validation_"+ground_truth_name+".pickle"
@@ -135,8 +116,11 @@ def process_data(path="data_theorist/", retrain=False):
             pkl.dump(df_validation, f)
         # save and load pickle file
         file_name = path + "full_theory_log_"+ground_truth_name+".pickle"
-        with open(file_name, "wb") as g:
-            pkl.dump(theory_logs[ground_truth_name], g)
+        with open(file_name, "wb") as f:
+            pkl.dump(theory_logs[ground_truth_name], f)
+    file_name = path + "full_theory_log.pickle"
+    with open(file_name, "wb") as f:
+        pkl.dump(theory_logs, f)
     df_validation = pd.DataFrame()
     for gt_model in os.listdir('models/'):
         df_file = 'df_validation_' + gt_model[:-3] + '.pickle'
@@ -163,7 +147,7 @@ def process_data(path="data_theorist/", retrain=False):
 
 
 if __name__ == '__main__':
-    process_data('prior_0.25/')
+    process_data('data_noise_1.0/')
 
 # with open(os.path.join(path, 'evc_coged_8.pickle'), "rb") as f:
 #     pickle_data = pkl.load(f)

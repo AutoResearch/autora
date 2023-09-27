@@ -3,14 +3,14 @@ import pickle
 import os
 import numpy as np
 
-path = 'prior_0.25/'
+path = 'data_noise_0.5/'
 
-theorists = ['BMS UniformNew',
+theorists = ['BMS Prior Williams2023SUPERUniformNew',
     'BMS Prior Williams2023SUPERCognitivePsychologyNew',
     'BMS Prior Williams2023SUPERCognitiveScienceNew',
     'BMS Prior Williams2023SUPERMaterialsScienceNew',
     'BMS Prior Williams2023SUPERNeuroscienceNew',
-    'BMS Average'
+    'BMS Prior Williams2023SUPERAverageNew'
              ]
 
 # df = pd.read_csv(path+'theory_log.csv')
