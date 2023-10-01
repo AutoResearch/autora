@@ -58,7 +58,7 @@ def weber_fechner_experiment(X: np.ndarray,
 
     return Y
 
-def weber_fechner_data(metadata):
+def weber_fechner_data(metadata, std=added_noise):
 
     s1_values = metadata.independent_variables[0].allowed_values
     s2_values = metadata.independent_variables[1].allowed_values
@@ -67,7 +67,7 @@ def weber_fechner_data(metadata):
     # remove all combinations where s1 > s2
     X = X[X[:,0] <= X[:,1]]
 
-    y = weber_fechner_experiment(X, std=0)
+    y = weber_fechner_experiment(X, std=std)
 
     return X, y
 

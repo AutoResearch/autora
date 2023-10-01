@@ -3,7 +3,7 @@ import pickle
 import os
 import numpy as np
 
-path = 'data_noise_0.1/'
+path = 'data_noise_1.0/'
 
 for file in os.listdir(path):
     if "full_theory_log" in file:
@@ -17,8 +17,8 @@ with open(path + 'full_theory_log.pickle', "rb") as f:
     dic = pickle.load(f)
 for k in dic.keys():
     eqs = dic[k]
-    print('\n'+k+'\n')
-    for i in range(15):
+    print('\n'+k+' - ' + str(len(eqs)) + '\n')
+    for i in range(len(eqs)):
         print(eqs[i])
 
 if __name__ == '__main__':

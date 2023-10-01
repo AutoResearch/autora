@@ -1,11 +1,11 @@
 Noise,Ground Truth,Correct,Total
 0.01,Steven's Power Law,20,20
-0.01,Weber-Fechner Law,13,19
-0.01,Shepard Luce Choice,12,16
+0.01,Weber-Fechner Law,13,20
+0.01,Shepard Luce Choice,14,20
 0.01,Exponential Learning,12,20
 0.025,Steven's Power Law,20,20
-0.025,Weber-Fechner Law,13,19
-0.025,Shepard Luce Choice,12,18
+0.025,Weber-Fechner Law,13,20
+0.025,Shepard Luce Choice,13,20
 0.025,Exponential Learning,11,20
 0.05,Steven's Power Law,20,20
 0.05,Weber-Fechner Law,13,20
@@ -13,17 +13,17 @@ Noise,Ground Truth,Correct,Total
 0.05,Exponential Learning,10,20
 0.1,Steven's Power Law,19,20
 0.1,Weber-Fechner Law,13,20
-0.1,Shepard Luce Choice,9,18
-0.1,Exponential Learning,9,19
+0.1,Shepard Luce Choice,10,20
+0.1,Exponential Learning,9,20
 0.25,Steven's Power Law,14,20
-0.25,Weber-Fechner Law,11,19
-0.25,Shepard Luce Choice,4,17
-0.25,Exponential Learning,4,19
+0.25,Weber-Fechner Law,12,20
+0.25,Shepard Luce Choice,6,20
+0.25,Exponential Learning,4,20
 0.5,Steven's Power Law,11,20
 0.5,Weber-Fechner Law,10,20
-0.5,Shepard Luce Choice,4,19
-0.5,Exponential Learning,3,17
+0.5,Shepard Luce Choice,5,20
+0.5,Exponential Learning,3,20
 1.0,Steven's Power Law,9,20
 1.0,Weber-Fechner Law,8,20
-1.0,Shepard Luce Choice,3,19
-1.0,Exponential Learning,2,18
+1.0,Shepard Luce Choice,4,20
+1.0,Exponential Learning,2,20

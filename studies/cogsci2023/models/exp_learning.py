@@ -75,13 +75,13 @@ def exp_learning_experiment(X: np.ndarray,
 
     return Y
 
-def exp_learning_data(metadata):
+def exp_learning_data(metadata, std=added_noise):
 
     p_initial_values = metadata.independent_variables[0].allowed_values
     trial_values = metadata.independent_variables[1].allowed_values
 
     X = np.array(np.meshgrid(p_initial_values, trial_values)).T.reshape(-1,2)
-    y = exp_learning_experiment(X, std=0)
+    y = exp_learning_experiment(X, std=std)
 
     return X, y
 

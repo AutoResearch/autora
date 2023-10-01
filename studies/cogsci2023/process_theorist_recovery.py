@@ -51,9 +51,9 @@ def process_data(path="data_theorist/", retrain=False):
                 found = True
         if found is False:
             continue
-        if gt_model.startswith('df_validation') or (gt_model in trained and not retrain):
-            print('skipped because already trained')
-            continue
+        # if gt_model.startswith('df_validation') or (gt_model in trained and not retrain):
+        #     print('skipped because already trained')
+        #     continue
         print(gt_model)
         ground_truth_name = str(gt_model)[0:-3]  # remove '.py' from file name
         print(ground_truth_name)
@@ -63,27 +63,35 @@ def process_data(path="data_theorist/", retrain=False):
 
         # create an empty list to store the loaded pickle files
         loaded_pickles = []
-
+        pickle_names = []
         # iterate through all files in the data_closed_loop directory
         for file in os.listdir(path):
+            print(file)
             # check if the file is a pickle file
             if file.endswith(".pickle") and file.startswith(ground_truth_name):
                 # open the pickle file and load the contents
-                with open(os.path.join(path, file), "rb") as f:
+                full = os.path.join(path, file)
+                print(full)
+                with open(full, "rb") as f:
                     pickle_data = pkl.load(f)
                 # append the loaded data_closed_loop to the list of loaded pickles
                 loaded_pickles.append(pickle_data)
+                pickle_names.append(file)
 
         # df_validation = pd.DataFrame()
         full_theory_log = []
         # entry = 0
 
         # import the loaded pickles into data_closed_loop frame
-        for pickle in loaded_pickles:
+        for idx, pickle in enumerate(loaded_pickles):
 
             configuration = pickle[0]
             MSE_log = pickle[1]
             theory_log = pickle[2]
+            if 'BMS' in theory_log:
+                raise KeyError(f'Found in: {pickle_names[idx]}')
+            if 'RegressionMLP' in theory_log:
+                raise KeyError(f'Found in: {pickle_names[idx]}')
             theorist_name_log = pickle[3]
             DL_log = pickle[5]
             BIC_log = pickle[6]
@@ -103,7 +111,8 @@ def process_data(path="data_theorist/", retrain=False):
                 # full_theory_log.append((theory_log[idx], MSE_log[idx]))
                 df_validation = df_validation.append(row, ignore_index=True)
                 entry = entry + 1
-            full_theory_log.append(theory_log[0])
+            for i in range(len(theory_log)):
+                full_theory_log.append(theory_log[i])
         theory_logs.update({ground_truth_name: full_theory_log})
         print(f'columns:{df_validation.columns}')
         # remove MSE outliers
@@ -147,7 +156,7 @@ def process_data(path="data_theorist/", retrain=False):
 
 
 if __name__ == '__main__':
-    process_data('data_noise_1.0/')
+    process_data('data_noise_0.01/')
 
 # with open(os.path.join(path, 'evc_coged_8.pickle'), "rb") as f:
 #     pickle_data = pkl.load(f)

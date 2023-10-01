@@ -1,6 +1,6 @@
 import pickle
 import time
-
+import numpy as np
 from sklearn.model_selection import train_test_split
 
 from studies.cogsci2023.models.models import model_inventory, param_dict
@@ -8,18 +8,26 @@ from studies.cogsci2023.utils import fit_theorist, get_MSE, get_LL, get_BIC, get
 
 # META PARAMETERS
 repetitions = 1  # specifies how many times to repeat the study (20)
+seed = 20
 test_size = 0.2  # proportion of test set size to training set size
+noise = 0.5
 
 # SELECT GROUND TRUTH MODEL
-ground_truth_name = "weber_fechner"  # OPTIONS: see models.py
+ground_truth_name = "shepard_luce_choice"  # OPTIONS: see models.py
+
+# theorists = [
+#     'BMS',
+#     'BMS Prior Default',
+#     'BMS Prior Williams2023Psychophysics',
+#     'BMS Prior Williams2023CognitivePsychology',
+#     'BMS Prior Williams2023BehavioralEconomics',
+# ]
 
 theorists = [
-    'BMS',
-    'BMS Prior Default',
-    'BMS Prior Williams2023Psychophysics',
-    'BMS Prior Williams2023CognitivePsychology',
-    'BMS Prior Williams2023BehavioralEconomics',
-]
+    "BMS"
+    # 'Regression',
+    # 'MLP'
+    ]
 
 for rep in range(repetitions):
 
@@ -29,7 +37,7 @@ for rep in range(repetitions):
     (metadata, data_fnc, experiment) = model_inventory[ground_truth_name]
 
     # split data_closed_loop into training and test sets
-    X_full, y_full = data_fnc(metadata)
+    X_full, y_full = data_fnc(metadata, std=noise)
     X_train, X_test, y_train, y_test = train_test_split(
         X_full, y_full, test_size=test_size, random_state=rep
     )
@@ -70,17 +78,27 @@ for rep in range(repetitions):
         LL_log.append(ll)
         BIC_log.append(bic)
         DL_log.append(dl)
-        if hasattr(theorist, "model_") and 'BMS' not in theorist_name:
-            theory_log.append(theorist.model_)
-        elif 'BSR' in theorist_name:
-            print('BSR not compatible with pickle')
-            pass
-        else:
-            theory_log.append(theorist)
+        # if hasattr(theorist, "model_") and 'BMS' not in theorist_name:
+        #     theory_log.append(theorist.model_)
+        # elif 'BSR' in theorist_name:
+        #     print('BSR not compatible with pickle')
+        #     pass
+        # else:
+        #     theory_log.append(theorist)
+        # theorist_name_log.append(theorist_name)
+
+        if 'BMS' in theorist_name:
+            eq = str(theorist.model_)
+            for par in theorist.model_.par_values['d0'].keys():
+                eq = eq.replace(par, str(np.round(np.float64(theorist.model_.par_values['d0'][par]),
+                                                  decimals=2)))
+            theory_log.append(eq)
+
         theorist_name_log.append(theorist_name)
 
     # save and load pickle file
-    file_name = "data_theorist/" + ground_truth_name + "_" + str(rep) + ".pickle"
+    file_name = "data_noise_"+str(noise)+"/" + ground_truth_name + "_" + str(rep+seed) + ".pickle"
+
 
     with open(file_name, "wb") as f:
         # simulation configuration

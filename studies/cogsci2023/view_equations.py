@@ -3,7 +3,7 @@ import pickle
 import os
 import numpy as np
 
-path = 'data_noise_0.5/'
+path = 'data_noise_0.025/'
 
 theorists = ['BMS Prior Williams2023SUPERUniformNew',
     'BMS Prior Williams2023SUPERCognitivePsychologyNew',
@@ -13,6 +13,11 @@ theorists = ['BMS Prior Williams2023SUPERUniformNew',
     'BMS Prior Williams2023SUPERAverageNew'
              ]
 
+for file in os.listdir(path):
+    if not file.endswith('.pickle'):
+        continue
+
+
 # df = pd.read_csv(path+'theory_log.csv')
 
 # for file in os.listdir(path):
@@ -20,7 +25,7 @@ theorists = ['BMS Prior Williams2023SUPERUniformNew',
 #         with open(path + file, "rb") as f:
 #             dic = pickle.load(f)
 #         print(dic.keys())
-with open(path + 'theory_log.pickle', "rb") as f:
+with open(path + 'full_theory_log.pickle', "rb") as f:
     dic = pickle.load(f)
 for key in dic.keys():
     print(len(dic[key]))

@@ -113,7 +113,7 @@ def shepard_luce_experiment(X: np.ndarray,
 
     return Y
 
-def shepard_luce_data(metadata):
+def shepard_luce_data(metadata, std=added_noise):
 
     similarity_A1 = metadata.independent_variables[0].allowed_values
     similarity_A2 = metadata.independent_variables[1].allowed_values
@@ -132,7 +132,7 @@ def shepard_luce_data(metadata):
     # X = X[~((X[:,4] == 1) & ((X[:,2] == 0) | (X[:,3] == 0)))]
     X = X[~((X[:,0] == 0) & (X[:,1] == 0) & (X[:,2] == 0) & (X[:,3] == 0))]
 
-    y = shepard_luce_experiment(X, std=0)
+    y = shepard_luce_experiment(X, std=std)
 
     return X, y
 

@@ -35,7 +35,7 @@ def fit_theorist(X, y, theorist_name, metadata, theorist_epochs=None, num_param=
         if theorist_epochs is not None:
             epochs = theorist_epochs
         else:
-            epochs = 15  # 1500
+            epochs = 3000  # 1500
         if 'Default' in theorist_name:
             theorist = BMSRegressor(epochs=epochs,
                                     prior_par=get_priors('Default', num_param, num_var))

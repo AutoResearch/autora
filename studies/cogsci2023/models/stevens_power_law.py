@@ -48,13 +48,13 @@ def stevens_power_law_experiment(X: np.ndarray,
 
     return Y
 
-def stevens_power_law_data(metadata):
+def stevens_power_law_data(metadata, std=added_noise):
 
     s_values = metadata.independent_variables[0].allowed_values
 
     X = np.array(np.meshgrid(s_values)).T.reshape(-1,1)
 
-    y = stevens_power_law_experiment(X, std=0)
+    y = stevens_power_law_experiment(X, std=std)
 
     return X, y
 
