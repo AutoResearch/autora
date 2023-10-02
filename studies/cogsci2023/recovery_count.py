@@ -4,9 +4,9 @@ import glob
 import pickle
 ###########################
 
-files = glob.glob(r'Chads priors/*.pickle')
-
-files += glob.glob(r'data_prior_0.025/*.pickle')
+# files = glob.glob(r'Chads priors/*.pickle')
+files = glob.glob(r'BMS_Priors_299/*.pickle')
+# files += glob.glob(r'data_prior_0.025/*.pickle')
 
 num_repetitions = 15
 

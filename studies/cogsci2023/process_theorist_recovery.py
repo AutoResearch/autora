@@ -156,7 +156,7 @@ def process_data(path="data_theorist/", retrain=False):
 
 
 if __name__ == '__main__':
-    process_data('data_noise_0.01/')
+    process_data('data_noise_0.025/')
 
 # with open(os.path.join(path, 'evc_coged_8.pickle'), "rb") as f:
 #     pickle_data = pkl.load(f)

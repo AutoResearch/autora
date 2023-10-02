@@ -3,7 +3,7 @@ import pickle
 import os
 import numpy as np
 
-path = 'data_noise_1.0/'
+path = 'data_noise_0.025/'
 
 for file in os.listdir(path):
     if "full_theory_log" in file:
