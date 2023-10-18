@@ -17,5 +17,5 @@ The following table includes naming conventions used throughout AutoRA.
 | Experiment Runner  | A module that takes in conditions and collects corresponding observations.                                                                  | Experiment Runners                              |
 | Wrapper            | Special functions that make the components of AutoRA able to operate on State objects.                                                      | Experimentalists, Experiment Runners, Theorists |
 | Workflow           | A collection of tools that enable closed-loop empirical research with the AutoRA framework.                                                 | Experimentalists, Experiment Runners, Theorists |
-| Cycle              | A workflow tool that allows AutoRA components to be chained together in serial loop.                                                        | Experimentalists, Experiment Runners, Theorists |
+| Cycle              | A workflow tool that allows AutoRA components to be chained together in serial loops.                                                       | Experimentalists, Experiment Runners, Theorists |
 | Cylc               | A workflow engine for cycling systems that orchestrates distributed workflows of interdependent cycling tasks.                              | Experimentalists, Experiment Runners, Theorists |
