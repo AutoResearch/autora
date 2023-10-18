@@ -2,8 +2,6 @@
 
 The following table includes naming conventions used throughout AutoRA.
 
-## [ ]
-
 | Term               | Description                                                                                                                                 | Relevant Modules                                |
 |--------------------|---------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------|
 | State              | Base object that has all relevant fields and which uses the Delta mechanism to modify those fields.                                         | Core                                            |
