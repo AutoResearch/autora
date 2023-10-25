@@ -4,7 +4,7 @@ The following table includes naming conventions used throughout AutoRA.
 
 | Term               | Description                                                                                                                                 | Relevant Modules                                |
 |--------------------|---------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------|
-| State              | Base object that has all relevant fields and which uses the Delta mechanism to modify those fields.                                         | Core                                            |
+| State              | Object representing data from an experiment, like the conditions, observed experiment data and models. The State also includes rules on how to update those data if new data are provided using the "Delta mechanism".                                           | Core                                            |
 | Delta              | An object with new data that can be added to a State, returning a new State which includes the new data.                                                                          | Core                                            |
 | StandardState      | An optional default State that has the following fields: variables, conditions, experiment_data, models.                                    | Core                                            |
 | Variables          | A State field that holds experimental variables, which are defined according to name, type, units, allowed values, and range.               | Experimentalists, Experiment Runners, Theorists |
