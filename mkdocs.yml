@@ -28,6 +28,7 @@ theme:
   custom_dir: mkdocs/overrides
   features:
     - navigation.indexes
+    - content.code.copy
 
 plugins:
   multirepo:
