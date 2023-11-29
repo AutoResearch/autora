@@ -38,8 +38,8 @@ to ask for help in the [AutoRA forum](https://github.com/orgs/AutoResearch/discu
 ### Add Tests (Optional)
 
 It is highly encouraged to add unit tests to ensure your code is working as intended. These can be [doctests](https://docs.python.org/3/library/doctest.html) or test cases in `tests/test_your_contribution_name.py`.
-For example, if you are implementing a sampler experimentalist, you may rename and modify the 
-``tests/test_experimentalist_sampler_example.py``.
+For example, if you are implementing an experimentalist, you may rename and modify the 
+``tests/test_experimentalist_example.py``.
 
 *Note: Tests are required for your module to become part of the main 
 [autora](https://github.com/AutoResearch/autora) package. However, regardless of whether you choose to implement tests, 
@@ -102,7 +102,7 @@ Once your package is working and published, you can **make a pull request** on [
     - have basic documentation in ``docs/index.md``
     - have a basic python notebook exposing how to use the module in ``docs/Basic Usage.ipynb``
     - have basic tests in ``tests/``
-    - be published via PyPI or Conda
+    - be published via PyPI
     - be compatible with the current version of the parent package
     - follow standard python coding guidelines including PEP8
 
