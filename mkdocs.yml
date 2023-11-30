@@ -28,6 +28,7 @@ theme:
   custom_dir: mkdocs/overrides
   features:
     - navigation.indexes
+    - content.code.copy
 
 plugins:
   multirepo:
@@ -142,7 +143,7 @@ markdown_extensions:
   pymdownx.superfences: {}
   pymdownx.arithmatex: # required for equation display
     generic: true
-  pymdownx.snippets: {}
+  pymdownx.snippets: { url_download: True }
   pymdownx.tabbed:
     alternate_style: true
 
