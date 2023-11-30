@@ -16,7 +16,6 @@ dynamic = ["version"]
 
 dependencies = [
   "autora-core",
-  "autora-workflow",
   "autora-synthetic",
 ]
 
