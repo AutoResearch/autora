@@ -20,7 +20,7 @@ AutoRA was initially intended for accelerating research in the behavioral and br
 ## Installation
 
 
-We recommended using a `Python` environment manager like `virtualenv`. You may refer to the Development Guide on how to [set up a virtual environment](https://autoresearch.github.io/autora/contribute/setup/#create-a-virtual-environment).  
+We recommend using a `Python` environment manager like `virtualenv`. You may refer to the Development Guide on how to [set up a virtual environment](https://autoresearch.github.io/autora/contribute/setup/#create-a-virtual-environment).  
 
 Before installing the PyPI ``autora`` package, you may [activate your environment](https://autoresearch.github.io/autora/contribute/setup/#activating-and-using-the-environment). To install the PyPI `autora` package, run the following command:
 
