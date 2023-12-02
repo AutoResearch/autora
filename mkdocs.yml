@@ -36,6 +36,7 @@ plugins:
       - name: core
         import_url: "https://github.com/autoresearch/autora-core/?branch=main"
         imports: [
+          "docs/*",
           "docs/cycle/*",
           "docs/pipeline/*",
           "docs/experimentalists/grid/*",
@@ -163,6 +164,12 @@ nav:
     - Online Closed-Loop Discovery: 'user-cookiecutter/docs/index.md'
 - User Guide:
   - Installation: 'installation.md'
+  - Core:
+    - Home: 'core/docs/index.md'
+    - Examples:
+      - 'core/docs/cycle/Basic Introduction to Functions and States.ipynb'
+      - 'core/docs/cycle/Combining Experimentalists with State.ipynb'
+      - 'core/docs/cycle/Linear and Cyclical Workflows using Functions and States.ipynb'
   - Theorists:
     - Home: 'theorist/index.md'
     - DARTS: '!import https://github.com/autoresearch/autora-theorist-darts/?branch=main&extra_imports=["mkdocs/base.yml"]'
