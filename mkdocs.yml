@@ -93,7 +93,6 @@ plugins:
         paths: [
           # from nav_repos above
           "./temp_dir/core/src/",
-          # "./temp_dir/workflow/src/",
           "./temp_dir/darts/src/",
           "./temp_dir/bms/src/",
           "./temp_dir/bsr/src/",
