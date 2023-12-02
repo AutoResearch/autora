@@ -40,6 +40,7 @@ plugins:
           "docs/pipeline/*",
           "docs/experimentalists/grid/*",
           "docs/experimentalists/random/*",
+          "docs/cli/*/*",
           "src/",
         ]
       - name: user-cookiecutter
@@ -47,12 +48,6 @@ plugins:
         imports: [
           "docs/*",
         ]
-      - name: workflow-tutorial
-        import_url: "https://github.com/autoresearch/autora-workflow/?branch=main"
-        imports: ["docs/*"]
-      - name: workflow
-        import_url: "https://github.com/autoresearch/autora-workflow/?branch=main"
-        imports: [ "src/" ]
       - name: darts
         import_url: "https://github.com/autoresearch/autora-theorist-darts/?branch=main"
         imports: [ "src/" ]
@@ -96,7 +91,6 @@ plugins:
         paths: [
           # from nav_repos above
           "./temp_dir/core/src/",
-          "./temp_dir/workflow/src/",
           "./temp_dir/darts/src/",
           "./temp_dir/bms/src/",
           "./temp_dir/bsr/src/",
@@ -166,8 +160,6 @@ nav:
   - Advanced:
     - Equation Discovery: 'tutorials/Equation Discovery.ipynb'
     - Experimentalists: 'tutorials/Experimentalist.ipynb'
-    #- Functional Workflow: 'core/docs/cycle/Linear and Cyclical Workflows using Functions and States.ipynb'
-    - Closed-Loop Discovery: 'workflow-tutorial/docs/interactive/Basic Usage.ipynb'
     - Online Closed-Loop Discovery: 'user-cookiecutter/docs/index.md'
 - User Guide:
   - Installation: 'installation.md'
@@ -201,7 +193,10 @@ nav:
       - Firebase: '!import https://github.com/autoresearch/autora-experiment-runner-experimentation-manager-firebase/?branch=main&extra_imports=["mkdocs/base.yml"]'
     - Recruitment Managers:
       - Prolific: '!import https://github.com/autoresearch/autora-experiment-runner-recruitment-manager-prolific/?branch=main&extra_imports=["mkdocs/base.yml"]'
-  - Workflow: '!import https://github.com/autoresearch/autora-workflow/?branch=main&extra_imports=["mkdocs/base.yml"]'
+  - "Command Line Interface":
+    - "Home": "core/docs/cli/basic-usage/README.md"
+    - "Using Cylc": "core/docs/cli/cylc-pip/README.md"
+    - "Using Cylc and Slurm": "core/docs/cli/cylc-slurm-pip/README.md"
   - Online Experiments:
     - Home: 'online-experiments/index.md'
     - Firebase: 'online-experiments/firebase.md'
