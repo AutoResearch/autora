@@ -50,9 +50,6 @@ plugins:
       - name: workflow-tutorial
         import_url: "https://github.com/autoresearch/autora-workflow/?branch=main"
         imports: ["docs/*"]
-      # - name: workflow
-      #   import_url: "https://github.com/autoresearch/autora-workflow/?branch=main"
-      #   imports: [ "src/" ]
       - name: darts
         import_url: "https://github.com/autoresearch/autora-theorist-darts/?branch=main"
         imports: [ "src/" ]
