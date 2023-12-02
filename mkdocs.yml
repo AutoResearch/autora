@@ -165,6 +165,7 @@ nav:
       - 'user-cookiecutter/docs/index.md'
 - User Guide:
   - Installation: 'installation.md'
+  - Terminology: 'terminology.md'
   - Core:
     - Home: 'core/docs/index.md'
     - Examples:
