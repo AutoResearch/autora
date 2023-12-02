@@ -161,7 +161,8 @@ nav:
   - Advanced:
     - Equation Discovery: 'tutorials/Equation Discovery.ipynb'
     - Experimentalists: 'tutorials/Experimentalist.ipynb'
-    - Online Closed-Loop Discovery: 'user-cookiecutter/docs/index.md'
+    - Online Closed-Loop Discovery: 
+      - 'user-cookiecutter/docs/index.md'
 - User Guide:
   - Installation: 'installation.md'
   - Core:
