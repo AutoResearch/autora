@@ -159,7 +159,7 @@ nav:
     - III - Functional Workflow: 'tutorials/basic/Tutorial-III-Functional-Workflow.ipynb'
     - IV - Customization: 'tutorials/basic/Tutorial-IV-Customization.ipynb'
   - Advanced:
-    - Equation Discovery: 'tutorials/Equation Discovery.ipynb'
+    - Equation Discovery: 'theorist/Equation Discovery.ipynb'
     - Experimentalists: 'tutorials/Experimentalist.ipynb'
     - Online Closed-Loop Discovery: 
       - 'user-cookiecutter/docs/index.md'
