@@ -36,17 +36,13 @@ plugins:
       - name: core
         import_url: "https://github.com/autoresearch/autora-core/?branch=main"
         imports: [
-          "docs/cycle/*",
-          "docs/pipeline/*",
-          "docs/experimentalists/grid/*",
-          "docs/experimentalists/random/*",
-          "docs/cli/*/*",
+          "docs/",
           "src/",
         ]
       - name: user-cookiecutter
         import_url: "https://github.com/autoresearch/autora-user-cookiecutter/?branch=main"
         imports: [
-          "docs/*",
+          "docs/",
         ]
       - name: darts
         import_url: "https://github.com/autoresearch/autora-theorist-darts/?branch=main"
@@ -158,11 +154,19 @@ nav:
     - III - Functional Workflow: 'tutorials/basic/Tutorial-III-Functional-Workflow.ipynb'
     - IV - Customization: 'tutorials/basic/Tutorial-IV-Customization.ipynb'
   - Advanced:
-    - Equation Discovery: 'tutorials/Equation Discovery.ipynb'
+    - Equation Discovery: 'theorist/Equation Discovery.ipynb'
     - Experimentalists: 'tutorials/Experimentalist.ipynb'
-    - Online Closed-Loop Discovery: 'user-cookiecutter/docs/index.md'
+    - Online Closed-Loop Discovery: 
+      - 'user-cookiecutter/docs/index.md'
 - User Guide:
   - Installation: 'installation.md'
+  - Terminology: 'terminology.md'
+  - Core:
+    - Home: 'core/docs/index.md'
+    - Examples:
+      - 'core/docs/cycle/Basic Introduction to Functions and States.ipynb'
+      - 'core/docs/cycle/Combining Experimentalists with State.ipynb'
+      - 'core/docs/cycle/Linear and Cyclical Workflows using Functions and States.ipynb'
   - Theorists:
     - Home: 'theorist/index.md'
     - DARTS: '!import https://github.com/autoresearch/autora-theorist-darts/?branch=main&extra_imports=["mkdocs/base.yml"]'
