@@ -36,18 +36,13 @@ plugins:
       - name: core
         import_url: "https://github.com/autoresearch/autora-core/?branch=main"
         imports: [
-          "docs/*",
-          "docs/cycle/*",
-          "docs/pipeline/*",
-          "docs/experimentalists/grid/*",
-          "docs/experimentalists/random/*",
-          "docs/cli/*/*",
+          "docs/",
           "src/",
         ]
       - name: user-cookiecutter
         import_url: "https://github.com/autoresearch/autora-user-cookiecutter/?branch=main"
         imports: [
-          "docs/*",
+          "docs/",
         ]
       - name: darts
         import_url: "https://github.com/autoresearch/autora-theorist-darts/?branch=main"
