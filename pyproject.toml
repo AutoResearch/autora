@@ -27,6 +27,7 @@ dev = [
 all = [
   "autora[all-theorists]",
   "autora[all-experimentalists]",
+  "autora[all-synthetic]",
   "autora[all-experiment-runners]",
 ]
 
@@ -78,6 +79,14 @@ experimentalist-falsification =[
 ]
 experimentalist-mixture =[
   "mixture-experimentalist==1.0.0a4"
+]
+
+all-synthetic = [
+  "autora[synthetic-abstract-equation]"
+]
+
+synthetic-abstract-equation = [
+  "autora-synthetic-abstract-equation"
 ]
 
 all-experiment-runners = [
