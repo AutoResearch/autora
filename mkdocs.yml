@@ -149,10 +149,10 @@ nav:
 - Tutorials:
   - Home: 'tutorials/index.md'
   - Basic:
-    - I - Components: 'tutorials/basic/Tutorial-I-Components.ipynb'
-    - II - Loop Constructs: 'tutorials/basic/Tutorial-II-Loop-Constructs.ipynb'
-    - III - Functional Workflow: 'tutorials/basic/Tutorial-III-Functional-Workflow.ipynb'
-    - IV - Customization: 'tutorials/basic/Tutorial-IV-Customization.ipynb'
+    - I - Components: 'tutorials/basic/Tutorial I Components.ipynb'
+    - II - Loop Constructs: 'tutorials/basic/Tutorial II Loop Constructs.ipynb'
+    - III - Functional Workflow: 'tutorials/basic/Tutorial III Functional Workflow.ipynb'
+    - IV - Customization: 'tutorials/basic/Tutorial IV Customization.ipynb'
   - Advanced:
     - Equation Discovery: 'theorist/Equation Discovery.ipynb'
     - Experimentalists: 'tutorials/Experimentalist.ipynb'
