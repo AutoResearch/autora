@@ -84,7 +84,7 @@ experimentalist-mixture =[
 
 
 all-experiment-runners = [
-  "autora[experiment-runner-firebase-prolific]"
+  "autora[experiment-runner-firebase-prolific]",
   "autora[all-experiment-runners-synthetic]"
 ]
 
