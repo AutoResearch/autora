@@ -7,6 +7,9 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 ![GitHub Discussions](https://img.shields.io/github/discussions/autoresearch/autora)
 
+<a href="https://ccbs.carney.brown.edu/brainstorm"><img src="docs/img/brainstorm.png" alt="BRAINSTORM Program" height="60"></img></a>&nbsp;&nbsp;&nbsp;&nbsp;
+<a href="https://schmidtsciencefellows.org/"><img src="docs/img/ssf.png" alt="BRAINSTORM Program" height="60"></img></a>
+
 <b>[AutoRA](https://pypi.org/project/autora/)</b> (<b>Auto</b>mated <b>R</b>esearch <b>A</b>ssistant) is an open-source framework for 
 automating multiple stages of the empirical research process, including model discovery, experimental design, data collection, and documentation for open science. 
 
@@ -14,10 +17,118 @@ AutoRA was initially intended for accelerating research in the behavioral and br
 
 ![Autonomous Empirical Research Paradigm](https://github.com/AutoResearch/autora/raw/main/docs/img/overview.png)
 
-## Getting Started
+## Installation
 
-Check out the documentation at 
-[https://autoresearch.github.io/autora](https://autoresearch.github.io/autora).
+
+We recommend using a `Python` environment manager like `virtualenv`. You may refer to the Development Guide on how to [set up a virtual environment](https://autoresearch.github.io/autora/contribute/setup/#create-a-virtual-environment).  
+
+Before installing the PyPI ``autora`` package, you may [activate your environment](https://autoresearch.github.io/autora/contribute/setup/#activating-and-using-the-environment). To install the PyPI `autora` package, run the following command:
+
+```shell
+pip install "autora"
+```
+
+## Documentation
+
+Check out tutorials and documentation at 
+[https://autoresearch.github.io/autora](https://autoresearch.github.io/autora). If you run into any issues or questions regarding the use of AutoRA, please reach out to us at the [AutoRA forum](https://github.com/orgs/AutoResearch/discussions/categories/using-autora).
+
+## Example
+
+The following example demonstrates how to use AutoRA to automate the process of model discovery, experimental design, and data collection. 
+
+The discovery problem is defined by a single independent variable $x \in [0, 2 \pi]$ and dependent variable $y$.
+The experiment amounts to a simple sine wave, $y = \sin(x)$, which is the model we are trying to discover.
+
+Th discovery cycle iterates between the experimentalist, experiment runner, and theorist. Here, we us a "random" experimentalist, which samples novel experimental conditions for $x$ every cycle. 
+The experiment runner then collects data for the corresponding $y$ values. Finally, the theorist uses a [Bayesian Machine Scientist](https://autoresearch.github.io/autora/user-guide/theorists/bms/) (BMS; Guimerà et al., in Science Advances) to identify a scientific model that explains the data. 
+
+The workflow relies on the ``StandardState`` object, which stores the current state of the discovery process, such as ``conditions``, ``experiment_data``, or ``models``. The state is passed between the experimentalist, experiment runner, and theorist.
+
+
+```python
+####################################################################################
+## Import statements
+####################################################################################
+
+import pandas as pd 
+import numpy as np
+import sympy as sp
+
+from autora.variable import Variable, ValueType, VariableCollection
+
+from autora.experimentalist.random import random_pool
+from autora.experiment_runner.synthetic.abstract.equation import equation_experiment
+from autora.theorist.bms import BMSRegressor
+
+from autora.state import StandardState, on_state, estimator_on_state
+
+####################################################################################
+## Define initial data
+####################################################################################
+
+#### Define variable data ####
+iv = Variable(name="x", value_range=(0, 2 * np.pi), allowed_values=np.linspace(0, 2 * np.pi, 30))
+dv = Variable(name="y", type=ValueType.REAL)
+variables = VariableCollection(independent_variables=[iv],dependent_variables=[dv])
+
+#### Define seed condition data ####
+conditions = random_pool(variables, num_samples=10, random_state=0)
+
+####################################################################################
+## Define experimentalist
+####################################################################################
+
+experimentalist = on_state(random_pool, output=["conditions"])
+
+####################################################################################
+## Define experiment runner
+####################################################################################
+
+sin_experiment = equation_experiment(sp.simplify('sin(x)'), variables.independent_variables, variables.dependent_variables[0])
+sin_runner = sin_experiment.experiment_runner
+
+experiment_runner = on_state(sin_runner, output=["experiment_data"])
+
+####################################################################################
+## Define theorist
+####################################################################################
+
+theorist = estimator_on_state(BMSRegressor(epochs=100))
+
+####################################################################################
+## Define state
+####################################################################################
+
+s = StandardState(
+    variables = variables,
+    conditions = conditions,
+    experiment_data = pd.DataFrame(columns=["x","y"])
+)
+
+####################################################################################
+## Cycle through the state
+####################################################################################
+
+print('Pre-Defined State:')
+print(f"Number of datapoints collected: {len(s['experiment_data'])}")
+print(f"Derived models: {s['models']}")
+print('\n')
+
+for i in range(5):
+    s = experimentalist(s, num_samples=10, random_state=42)
+    s = experiment_runner(s, added_noise=1.0, random_state=42)
+    s = theorist(s)
+    print(f"\nCycle {i+1} Results:")
+    print(f"Number of datapoints collected: {len(s['experiment_data'])}")
+    print(f"Derived models: {s['models']}")
+    print('\n')
+```
+
+
+## Contributions
+
+We welcome contributions to the AutoRA project. Please refer to the [contributor guide](https://autoresearch.github.io/autora/contribute/) for more information. Also, feel free to ask any questions or provide any feedback regarding core contributions on the [AutoRA forum](https://github.com/orgs/AutoResearch/discussions/). 
 
 ## About
 
@@ -26,9 +137,6 @@ the [Autonomous Empirical Research Group](http://empiricalresearch.ai),
 in collaboration with the [Center for Computation and Visualization at Brown University](https://ccv.brown.edu).
 
 The development of this package is supported by Schmidt Science Fellows, in partnership with the Rhodes Trust, as well as the Carney BRAINSTORM program at Brown University.
-
-<a href="https://ccbs.carney.brown.edu/brainstorm"><img src="docs/img/brainstorm.png" alt="BRAINSTORM Program" height="100"></img></a>&nbsp;&nbsp;&nbsp;&nbsp;
-<a href="https://schmidtsciencefellows.org/"><img src="docs/img/ssf.png" alt="BRAINSTORM Program" height="80"></img></a>
 
 
 ## Read More
