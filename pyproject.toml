@@ -81,17 +81,20 @@ experimentalist-mixture =[
   "mixture-experimentalist==1.0.0a4"
 ]
 
-all-synthetic = [
-  "autora[synthetic-abstract-equation]"
+
+
+all-experiment-runners = [
+  "autora[experiment-runner-firebase-prolific]",
+  "autora[all-experiment-runners-synthetic]"
 ]
 
-synthetic-abstract-equation = [
+all-experiment-runners-synthetic = [
+  "autora[experiment-runner-synthetic-abstract-equation]"
+]
+experiment-runner-synthetic-abstract-equation = [
   "autora-synthetic-abstract-equation"
 ]
 
-all-experiment-runners = [
-  "autora[experiment-runner-firebase-prolific]"
-]
 experiment-runner-firebase-prolific = [
   "autora-experiment-runner-firebase-prolific"
 ]
