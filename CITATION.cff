@@ -1,0 +1,16 @@
+cff-version: 0.1.1
+message: "If you use this software, please cite it as below."
+authors:
+- family-names: "Musslick"
+  given-names: "Sebastian"
+  orcid: "https://orcid.org/0000-0002-8896-639X"
+- family-names: "Strittmatter"
+  given-names: "Younes"
+  orcid: "https://orcid.org/0000-0002-3414-2838"
+- family-names: "Holland"
+  given-names: "John"
+  orcid: "https://orcid.org/0000-0001-6845-8657"
+title: "AutoRA: Automated Research Assistant for Closed-Loop Computational Discovery"
+version: 3.1.1
+date-released: 2023-08-26
+url: "https://github.com/AutoResearch/autora"
