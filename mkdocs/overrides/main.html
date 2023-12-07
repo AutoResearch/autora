@@ -1,4 +1,28 @@
 {% extends "base.html" %}
+{% block announce %}
+<span style="display:flex; justify-content:space-between">
+<span class="show-on-small">
+    <span class="twemoji right-margin show-on-small move-down">
+        {% include ".icons/fontawesome/solid/angles-down.svg" %}
+    </span>
+    Navigate the site here!
+</span>
+<span>
+    Newest release: <a style="vertical-align: middle;" href="https://pypi.org/project/autora/">
+        <img src="https://img.shields.io/pypi/v/autora" alt="PyPI">
+    </a>
+</span>
+<span>
+    <span class="twemoji">
+        {% include ".icons/material/head-question.svg" %}
+    </span>
+    Questions?
+    <a href="https://github.com/orgs/AutoResearch/discussions">
+        Open a discussion here!
+    </a>
+</span>
+</span>
+{% endblock %}
 
 {% block content %}
 {% if page.nb_url %}
