@@ -40,6 +40,11 @@ plugins:
           "docs/",
           "src/",
         ]
+      - name: synthetic
+        import_url: "https://github.com/AutoResearch/autora-synthetic/?branch=main"
+        imports: [
+          "src/"
+        ]
       - name: user-cookiecutter
         import_url: "https://github.com/autoresearch/autora-user-cookiecutter/?branch=main"
         imports: [
@@ -98,7 +103,8 @@ plugins:
           "./temp_dir/uncertainty/src/",
           "./temp_dir/leverage/src/",
           "./temp_dir/falsification/src/",
-          "./temp_dir/mixture/src/"
+          "./temp_dir/mixture/src/",
+          "./temp_dir/synthetic/src/"
         ]
         import:
           - https://scikit-learn.org/stable/objects.inv
