@@ -8,7 +8,7 @@
 ![GitHub Discussions](https://img.shields.io/github/discussions/autoresearch/autora)
 
 <a href="https://ccbs.carney.brown.edu/brainstorm"><img src="docs/img/brainstorm.png" alt="BRAINSTORM Program" height="60"></img></a>&nbsp;&nbsp;&nbsp;&nbsp;
-<a href="https://schmidtsciencefellows.org/"><img src="docs/img/ssf.png" alt="BRAINSTORM Program" height="60"></img></a>
+<a href="https://schmidtsciencefellows.org/"><img src="docs/img/ssf.png" alt="Schmidt Science Fellows" height="60"></img></a>
 
 <b>[AutoRA](https://pypi.org/project/autora/)</b> (<b>Auto</b>mated <b>R</b>esearch <b>A</b>ssistant) is an open-source framework for 
 automating multiple stages of the empirical research process, including model discovery, experimental design, data collection, and documentation for open science. 
