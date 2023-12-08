@@ -6,6 +6,7 @@
 ![Link to docs](https://img.shields.io/badge/Docs-autoresearch.github.io-purple)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 ![GitHub Discussions](https://img.shields.io/github/discussions/autoresearch/autora)
+[![DOI](https://zenodo.org/badge/261852986.svg)](https://zenodo.org/doi/10.5281/zenodo.10277414)
 
 <a href="https://ccbs.carney.brown.edu/brainstorm"><img src="docs/img/brainstorm.png" alt="BRAINSTORM Program" height="60"></img></a>&nbsp;&nbsp;&nbsp;&nbsp;
 <a href="https://schmidtsciencefellows.org/"><img src="docs/img/ssf.png" alt="Schmidt Science Fellows" height="60"></img></a>
