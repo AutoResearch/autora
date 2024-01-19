@@ -170,6 +170,8 @@ nav:
   - Terminology: 'terminology.md'
   - Core:
     - Home: 'core/docs/index.md'
+    - State: 'core/docs/The State Mechanism.ipynb'
+    - Variable: 'core/docs/Variable.ipynb'
     - Examples:
       - 'core/docs/cycle/Basic Introduction to Functions and States.ipynb'
       - 'core/docs/cycle/Combining Experimentalists with State.ipynb'
