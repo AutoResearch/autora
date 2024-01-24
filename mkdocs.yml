@@ -170,6 +170,8 @@ nav:
   - Terminology: 'terminology.md'
   - Core:
     - Home: 'core/docs/index.md'
+    - State: 'core/docs/The State Mechanism.ipynb'
+    - Variable: 'core/docs/Variable.ipynb'
     - Examples:
       - 'core/docs/cycle/Basic Introduction to Functions and States.ipynb'
       - 'core/docs/cycle/Combining Experimentalists with State.ipynb'
@@ -205,7 +207,8 @@ nav:
     - Recruitment Managers:
       - Prolific: '!import https://github.com/autoresearch/autora-experiment-runner-recruitment-manager-prolific/?branch=main&extra_imports=["mkdocs/base.yml"]'
   - "Command Line Interface":
-    - "Home": "core/docs/cli/basic-usage/README.md"
+    - "Home": "core/docs/cli/index.md"
+    - "Basic Usage": "core/docs/cli/basic-usage/README.md"
     - "Using Cylc": "core/docs/cli/cylc-pip/README.md"
     - "Using Cylc and Slurm": "core/docs/cli/cylc-slurm-pip/README.md"
   - Online Experiments:
