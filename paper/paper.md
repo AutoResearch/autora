@@ -24,7 +24,7 @@ authors:
   - name: Ioana Marinescu
     affiliation: 4
   - name: Marina Dubova
-    orcid: orcid: 0000-0001-5264-0489
+    orcid: 0000-0001-5264-0489
     affiliation: 5
   - name: George T. Dang
     affiliation: 1
