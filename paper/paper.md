@@ -14,7 +14,7 @@ authors:
   - name: Benjamin Andrew
     affiliation: 1
   - name: Chad C. Williams
-    orcid: orcid: 0000-0003-2016-5614
+    orcid: 0000-0003-2016-5614
     affiliation: 1
   - name: Joshua T. S. Hewson
     affiliation: 1
