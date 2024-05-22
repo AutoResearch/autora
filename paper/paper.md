@@ -14,17 +14,17 @@ authors:
   - name: Benjamin Andrew
     affiliation: 1
   - name: Chad C. Williams
-    orcid: orcid: 0000-0003-2016-5614
+    orcid: 0000-0003-2016-5614
     affiliation: 1
   - name: Joshua T. S. Hewson
     affiliation: 1
   - name: Star Li
-    orcid: orcid: 0009-0009-7849-1923
+    orcid: 0009-0009-7849-1923
     affiliation: 3
   - name: Ioana Marinescu
     affiliation: 4
   - name: Marina Dubova
-    orcid: orcid: 0000-0001-5264-0489
+    orcid: 0000-0001-5264-0489
     affiliation: 5
   - name: George T. Dang
     affiliation: 1
