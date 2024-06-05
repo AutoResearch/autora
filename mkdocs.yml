@@ -83,6 +83,9 @@ plugins:
       - name: mixture
         import_url: "https://github.com/blinodelka/mixture_experimental_strategies/?branch=main"
         imports: [ "src/" ]
+      - name: prediction-filter
+        import_url: "https://github.com/AutoResearch/autora-experimentalist-prediction-filter/?branch=main"
+        imports: ["src/"]
 
   gen-files:
     scripts: [ "mkdocs/generate_code_reference.py" ]
@@ -104,7 +107,8 @@ plugins:
           "./temp_dir/leverage/src/",
           "./temp_dir/falsification/src/",
           "./temp_dir/mixture/src/",
-          "./temp_dir/synthetic/src/"
+          "./temp_dir/synthetic/src/",
+          "./temp_dir/prediction-filter/src/",
         ]
         import:
           - https://scikit-learn.org/stable/objects.inv
@@ -197,6 +201,7 @@ nav:
     - Leverage: '!import https://github.com/autoresearch/autora-experimentalist-leverage/?branch=main&extra_imports=["mkdocs/base.yml"]'
     - Falsification: '!import https://github.com/autoresearch/autora-experimentalist-falsification/?branch=main&extra_imports=["mkdocs/base.yml"]'
     - Mixture: '!import https://github.com/blinodelka/mixture_experimental_strategies/?branch=main&extra_imports=["mkdocs/base.yml"]'
+    - Prediction Filter: '!import https://github.com/AutoResearch/autora-experimentalist-prediction-filter/?branch=main&extra_imports=["mkdocs/base.yml"]'
   - Experiment Runners:
     - Home: 'experiment-runner/index.md'
     - Synthetic: '!import https://github.com/autoresearch/autora-synthetic/?branch=main&extra_imports=["mkdocs/base.yml"]'
