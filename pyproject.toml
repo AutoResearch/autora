@@ -55,6 +55,7 @@ all-experimentalists = [
   "autora[experimentalist-leverage]",
   "autora[experimentalist-falsification]",
   "autora[experimentalist-mixture]",
+  "autora[experimentalist-prediction-filter]"
 ]
 experimentalist-inequality =[
   "autora-experimentalist-inequality"
@@ -79,6 +80,9 @@ experimentalist-falsification =[
 ]
 experimentalist-mixture =[
   "mixture-experimentalist==1.0.0a4"
+]
+experimentalist-prediction-filter =[
+  "autora-experimentalist-prediction-filter"
 ]
 
 
