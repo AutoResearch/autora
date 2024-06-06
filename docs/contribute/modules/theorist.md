@@ -45,6 +45,8 @@ Example Theorist
 """
 
 import numpy as np
+import pandas as pd
+from typing import Union
 from sklearn.base import BaseEstimator
 
 
@@ -56,21 +58,67 @@ class ExampleRegressor(BaseEstimator):
     def __init__(self, degree: int = 2):
         self.degree = degree
 
-    def fit(self, conditions, observations):
-    
-        # polyfit expects a 1D array
-        if conditions.ndim > 1:
-            conditions = conditions.flatten()
+    def fit(self, conditions: Union[pd.DataFrame, np.ndarray],
+            observations: Union[pd.DataFrame, np.ndarray]):
 
-        if observations.ndim > 1:
-            observations = observations.flatten()
-
-        # fit polynomial
-        self.coeff = np.polyfit(conditions, observations, 2)
+        # fit polynomial function: observations ~ conditions 
+        self.coeff = np.polyfit(conditions, observations, deg = 2)
         self.polynomial = np.poly1d(self.coeff)
         pass
 
     def predict(self, conditions):
+            
+        return self.polynomial(conditions)
+```
+
+Note, however, that it is best practice to make sure the conditions are compatible with the `polyfit`. In this case, we will make sure to add some checks:
+
+```python 
+
+"""
+Example Theorist
+"""
+
+import numpy as np
+import pandas as pd
+from typing import Union
+from sklearn.base import BaseEstimator
+
+
+class ExampleRegressor(BaseEstimator):
+    """
+    This theorist fits a polynomial function to the data.
+    """
+
+    def __init__(self, degree: int = 2):
+        self.degree = degree
+
+    def fit(self, conditions: Union[pd.DataFrame, np.ndarray],
+            observations: Union[pd.DataFrame, np.ndarray]):
+    
+        # polyfit expects a 1D array, convert pandas data frame to 1D vector
+        if isinstance(conditions, pd.DataFrame):
+          conditions = conditions.squeeze()
+        
+        # polyfit expects a 1D array, flatten nd array
+        if isinstance(conditions, np.ndarray) and conditions.ndim > 1:
+            conditions = conditions.flatten()
+
+        # fit polynomial function: observations ~ conditions 
+        self.coeff = np.polyfit(conditions, observations, deg = 2)
+        self.polynomial = np.poly1d(self.coeff)
+        pass
+
+    def predict(self, conditions):
+        
+        # polyfit expects a 1D array, convert pandas data frame to 1D vector
+        if isinstance(conditions, pd.DataFrame):
+          conditions = conditions.squeeze()
+        
+        # polyfit expects a 1D array, flatten nd array
+        if isinstance(conditions, np.ndarray) and conditions.ndim > 1:
+            conditions = conditions.flatten()
+            
         return self.polynomial(conditions)
 ```
 
