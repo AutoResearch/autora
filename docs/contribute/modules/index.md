@@ -27,9 +27,9 @@ After setting up your repository and linking it to your GitHub account, you can 
 You may implement your code in the ``init.py`` located in the respective feature folder in ``src/autora``.
 
 Please refer to the following guides on implementing
-- [theorists](theorist.md)
-- [experimentalists](experimentalist.md)
-- [experiment runners](experiment-runner.md)
+* [theorists](theorist.md)
+* [experimentalists](experimentalist.md)
+* [experiment runners](experiment-runner.md)
 
 If the feature you seek to implement does not fit in any of these categories, then 
 you can create folders for new categories. If you are unsure how to proceed, you are always welcome 
@@ -99,12 +99,12 @@ Once your package is working and published, you can **make a pull request** on [
 
 !!! success
     In order for your package to be included in the parent package, it must meet the following criteria:
-    - have basic documentation in ``docs/index.md``
-    - have a basic python notebook exposing how to use the module in ``docs/Basic Usage.ipynb``
-    - have basic tests in ``tests/``
-    - be published via PyPI or Conda
-    - be compatible with the current version of the parent package
-    - follow standard python coding guidelines including PEP8
+    * have basic documentation in ``docs/index.md``
+    * have a basic python notebook exposing how to use the module in ``docs/Basic Usage.ipynb``
+    * have basic tests in ``tests/``
+    * be published via PyPI or Conda
+    * be compatible with the current version of the parent package
+    * follow standard python coding guidelines including PEP8
 
 The following demonstrates how to add a package published under `autora-theorist-example` in PyPI in the GitHub 
 repository `example-contributor/contributor-theorist`.
