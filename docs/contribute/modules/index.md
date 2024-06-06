@@ -105,6 +105,7 @@ Once your package is working and published, you can **make a pull request** on [
     * be published via PyPI or Conda
     * be compatible with the current version of the parent package
     * follow standard python coding guidelines including PEP8
+    * the repository in which your package is hosted must be public
 
 The following demonstrates how to add a package published under `autora-theorist-example` in PyPI in the GitHub 
 repository `example-contributor/contributor-theorist`.
