@@ -18,8 +18,7 @@ as well as external contributors.
 ![image](../img/package_overview.png)
 
 [`autora`](https://github.com/autoresearch/autora) is the parent package which end users are expected to install. The
-parent depends on core packages, such as [`autora-core`](https://github.com/autoresearch/autora-core), 
-[`autora-workflow`](https://github.com/autoresearch/autora-workflow), and
+parent depends on core packages, such as [`autora-core`](https://github.com/autoresearch/autora-core) and
 [`autora-synthetic`](https://github.com/autoresearch/autora-synthetic). It also includes vetted modules (child packages) as optional dependencies which users can choose 
 to install. 
 
@@ -64,11 +63,8 @@ The following packages are considered core packages, and are actively maintained
 [Autonomous Empirical Research Group](https://musslick.github.io/AER_website/Team.html):
 
 - **autora-core** [`https://github.com/autoresearch/autora-core`](https://github.com/autoresearch/autora-core) This package includes fundamental utilities
-and building blocks for all the other packages. This is always installed when a user installs `autora` and can be 
-a dependency of other child packages.   
-
-
-- **autora-workflow** [`https://github.com/autoresearch/autora-workflow`](https://github.com/autoresearch/autora-workflow): The workflow package includes basic utilities for managing the workflow of closed-loop research processes, e.g., coordinating workflows between the theorists, experimentalists, and experiment runners. Though it currently stands alone, this package will ultimately be merged into autora-core.
+and building blocks for all the other packages. This includes basic utilities for managing the workflow of closed-loop research processes, e.g., coordinating workflows between the theorists, experimentalists, and experiment runners. The `autora-core` package is always installed when a user installs `autora` and can be 
+a dependency of other child packages.
 
 
 - **autora-synthetic** [`https://github.com/autoresearch/autora-synthetic`](https://github.com/autoresearch/autora-synthetic): This package includes a number of ground-truth models from different scientific disciplines that can be used for benchmarking automated scientific discovery. If you seek to contribute a scientific model, please see the [core contributor guide](core.md) for details.   
@@ -76,7 +72,7 @@ a dependency of other child packages.
 
 We welcome contributions to
 these packages in the form of pull requests, bug reports, and feature requests. For more details, see the
-[core contributor guide](core.md). Feel free to ask any questions or provide any feedback regarding core contributions on the 
+[core contributor guide](core.md). Feel free to ask any questions or provide any feedback regarding core contributions in the 
 [AutoRA forum](https://github.com/orgs/AutoResearch/discussions/categories/core-contributions).
 
 For core contributions, including contributions to [`autora-synthetic`](https://github.com/autoresearch/autora-synthetic), it is possible to set up your python environment in many different ways. 

@@ -23,19 +23,21 @@ Make sure to select the `experimentalist` option when prompted. You can skip all
 ## Implementation
 
 For an experimentalist, you should implement a function that returns a set of experimental conditions. This set may be
-a numpy array, iterator variable or other data format. 
+a `pandas` data frame, `numpy` array, iterator variable or other data format. 
 
 !!! hint
-    We generally **recommend using 2-dimensional numpy arrays as outputs** in which
-    each row represents a set of experimental conditions. The columns of the array correspond to the independent variables.
+    We generally **recommend using pandas data frames as outputs** in which
+columns correspond to the independent variables of an experiment. 
 
-Once you've created your repository, you can implement your experimentalist by editing the `init.py` file in 
+Once you've created your repository, you can implement your experimentalist by editing the 
+`__init__.py` file in 
 ``src/autora/experimentalist/name_of_your_experimentalist/``. 
 You may also add additional files to this directory if needed. 
-It is important that the `init.py` file contains a function called `name_of_your_experimentalist` 
+It is important that the `__init__.py` file contains a function called 
+`name_of_your_experimentalist` 
 which returns a set of experimental conditions (e.g., as a numpy array).
 
-The following example ``init.py`` illustrates the implementation of a simple experimentalist
+The following example ``__init__.py`` illustrates the implementation of a simple experimentalist
 that uniformly samples without replacement from a pool of candidate conditions.
 
 ```python 
@@ -44,25 +46,34 @@ Example Experimentalist
 """
 
 import random
-from typing import Iterable, Sequence, Union
+import pandas as pd
+import numpy as np
+from typing import Iterable, Union
 
-random_sample(conditions: Union[Iterable, Sequence], n: int = 1):
+def random_sample(conditions: Union[pd.DataFrame, np.ndarray], 
+              num_samples: int = 1) -> pd.DataFrame:
     """
     Uniform random sampling without replacement from a pool of conditions.
     Args:
         conditions: Pool of conditions
-        n: number of samples to collect
+        num_samples: number of samples to collect
 
-    Returns: Sampled pool
+    Returns: Sampled pool of conditions
 
     """
 
-    if isinstance(conditions, Iterable):
-        conditions = list(conditions)
-    random.shuffle(conditions)
-    samples = conditions[0:n]
+    if isinstance(conditions, pd.DataFrame):
+        # Randomly sample N rows from DataFrame
+        sampled_data = conditions.sample(n=num_samples)
+        return sampled_data
 
-    return samples
+    elif isinstance(conditions, np.ndarray):
+        # Randomly sample N rows from NumPy array
+        if num_samples > conditions.shape[0]:
+            raise ValueError("num_samples cannot be greater than the number of rows in the array.")
+        indices = np.random.choice(conditions.shape[0], size=num_samples, replace=False)
+        sampled_conditions = conditions[indices]
+        return sampled_conditions
 ```
 
 ## Next Steps: Testing, Documentation, Publishing

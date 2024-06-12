@@ -24,12 +24,13 @@ After setting up your repository and linking it to your GitHub account, you can 
 
 ### Implement Your Code
 
-You may implement your code in the ``init.py`` located in the respective feature folder in ``src/autora``.
+You may implement your code in the ``__init__.py`` located in the respective feature folder in ``src/autora``.
 
 Please refer to the following guides on implementing
-- [theorists](theorist.md)
-- [experimentalists](experimentalist.md)
-- [experiment runners](experiment-runner.md)
+
+* [theorists](theorist.md)
+* [experimentalists](experimentalist.md)
+* [experiment runners](experiment-runner.md)
 
 If the feature you seek to implement does not fit in any of these categories, then 
 you can create folders for new categories. If you are unsure how to proceed, you are always welcome 
@@ -98,13 +99,16 @@ Once you've published your module, you should take some time to celebrate and an
 Once your package is working and published, you can **make a pull request** on [`autora`](https://github.com/autoresearch/autora) to have it vetted and added to the "parent" package. Note, if you are not a member of the AutoResearch organization on GitHub, you will need to create a fork of the repository for the parent package and submit your pull request via that fork. If you are a member, you can create a pull request from a branch created directly from the parent package repository. Steps for creating a new branch to add your module are specified below.
 
 !!! success
+    
     In order for your package to be included in the parent package, it must meet the following criteria:
-    - have basic documentation in ``docs/index.md``
-    - have a basic python notebook exposing how to use the module in ``docs/Basic Usage.ipynb``
-    - have basic tests in ``tests/``
-    - be published via PyPI or Conda
-    - be compatible with the current version of the parent package
-    - follow standard python coding guidelines including PEP8
+    
+    * have basic documentation in ``docs/index.md``
+    * have a basic python notebook exposing how to use the module in ``docs/Basic Usage.ipynb``
+    * have basic tests in ``tests/``
+    * be published via PyPI or Conda
+    * be compatible with the current version of the parent package
+    * follow standard python coding guidelines including PEP8
+    * the repository in which your package is hosted must be public
 
 The following demonstrates how to add a package published under `autora-theorist-example` in PyPI in the GitHub 
 repository `example-contributor/contributor-theorist`.

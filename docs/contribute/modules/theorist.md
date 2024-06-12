@@ -2,7 +2,8 @@
 
 AutoRA theorists are meant to return scientific models describing the relationship between experimental conditions
 and observations. Such models may take the form of a simple linear regression, non-linear equations, causal graphs, 
-a more complex neural network, or other models which 
+a more complex neural network, or other models which
+
 - can be identified based on data (and prior knowledge)
 - can be used to make novel predictions about observations given experimental conditions.
 
@@ -26,16 +27,19 @@ Make sure to select the `theorist` option when prompted. You can skip all other 
 
 ## Implementation
 
-Once you've created your repository, you can implement your theorist by editing the `init.py` file in 
+Once you've created your repository, you can implement your theorist by editing the `__init__.py` 
+file in 
 ``src/autora/theorist/name_of_your_theorist/``. You may also add additional files to this directory if needed. 
-It is important that the `init.py` file contains a class called `NameOfYourTheorist` which inherits from  
+It is important that the `__init__.py` file contains a class called `NameOfYourTheorist` which 
+inherits from  
 `sklearn.base.BaseEstimator` and implements the following methods:
 
 - `fit(self, conditions, observations)`
 - `predict(self, conditions)`
 
 See the [sklearn documentation](https://scikit-learn.org/stable/developers/develop.html) for more information on 
-how to implement the methods. The following example ``init.py`` illustrates the implementation of a simple theorist
+how to implement the methods. The following example ``__init__.py`` illustrates the implementation 
+of a simple theorist
 that fits a polynomial function to the data:
 
 ```python 
@@ -45,6 +49,8 @@ Example Theorist
 """
 
 import numpy as np
+import pandas as pd
+from typing import Union
 from sklearn.base import BaseEstimator
 
 
@@ -56,21 +62,67 @@ class ExampleRegressor(BaseEstimator):
     def __init__(self, degree: int = 2):
         self.degree = degree
 
-    def fit(self, conditions, observations):
-    
-        # polyfit expects a 1D array
-        if conditions.ndim > 1:
-            conditions = conditions.flatten()
+    def fit(self, conditions: Union[pd.DataFrame, np.ndarray],
+            observations: Union[pd.DataFrame, np.ndarray]):
 
-        if observations.ndim > 1:
-            observations = observations.flatten()
-
-        # fit polynomial
-        self.coeff = np.polyfit(conditions, observations, 2)
+        # fit polynomial function: observations ~ conditions 
+        self.coeff = np.polyfit(conditions, observations, deg = 2)
         self.polynomial = np.poly1d(self.coeff)
         pass
 
     def predict(self, conditions):
+            
+        return self.polynomial(conditions)
+```
+
+Note, however, that it is best practice to make sure the conditions are compatible with the `polyfit`. In this case, we will make sure to add some checks:
+
+```python 
+
+"""
+Example Theorist
+"""
+
+import numpy as np
+import pandas as pd
+from typing import Union
+from sklearn.base import BaseEstimator
+
+
+class ExampleRegressor(BaseEstimator):
+    """
+    This theorist fits a polynomial function to the data.
+    """
+
+    def __init__(self, degree: int = 2):
+        self.degree = degree
+
+    def fit(self, conditions: Union[pd.DataFrame, np.ndarray],
+            observations: Union[pd.DataFrame, np.ndarray]):
+    
+        # polyfit expects a 1D array, convert pandas data frame to 1D vector
+        if isinstance(conditions, pd.DataFrame):
+          conditions = conditions.squeeze()
+        
+        # polyfit expects a 1D array, flatten nd array
+        if isinstance(conditions, np.ndarray) and conditions.ndim > 1:
+            conditions = conditions.flatten()
+
+        # fit polynomial function: observations ~ conditions 
+        self.coeff = np.polyfit(conditions, observations, deg = 2)
+        self.polynomial = np.poly1d(self.coeff)
+        pass
+
+    def predict(self, conditions):
+        
+        # polyfit expects a 1D array, convert pandas data frame to 1D vector
+        if isinstance(conditions, pd.DataFrame):
+          conditions = conditions.squeeze()
+        
+        # polyfit expects a 1D array, flatten nd array
+        if isinstance(conditions, np.ndarray) and conditions.ndim > 1:
+            conditions = conditions.flatten()
+            
         return self.polynomial(conditions)
 ```
 
