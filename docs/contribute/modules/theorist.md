@@ -2,7 +2,8 @@
 
 AutoRA theorists are meant to return scientific models describing the relationship between experimental conditions
 and observations. Such models may take the form of a simple linear regression, non-linear equations, causal graphs, 
-a more complex neural network, or other models which 
+a more complex neural network, or other models which
+
 - can be identified based on data (and prior knowledge)
 - can be used to make novel predictions about observations given experimental conditions.
 
