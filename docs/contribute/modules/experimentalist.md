@@ -29,13 +29,15 @@ a `pandas` data frame, `numpy` array, iterator variable or other data format.
     We generally **recommend using pandas data frames as outputs** in which
 columns correspond to the independent variables of an experiment. 
 
-Once you've created your repository, you can implement your experimentalist by editing the `init.py` file in 
+Once you've created your repository, you can implement your experimentalist by editing the 
+`__init__.py` file in 
 ``src/autora/experimentalist/name_of_your_experimentalist/``. 
 You may also add additional files to this directory if needed. 
-It is important that the `init.py` file contains a function called `name_of_your_experimentalist` 
+It is important that the `__init__.py` file contains a function called 
+`name_of_your_experimentalist` 
 which returns a set of experimental conditions (e.g., as a numpy array).
 
-The following example ``init.py`` illustrates the implementation of a simple experimentalist
+The following example ``__init__.py`` illustrates the implementation of a simple experimentalist
 that uniformly samples without replacement from a pool of candidate conditions.
 
 ```python 
