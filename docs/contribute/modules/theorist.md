@@ -2,7 +2,8 @@
 
 AutoRA theorists are meant to return scientific models describing the relationship between experimental conditions
 and observations. Such models may take the form of a simple linear regression, non-linear equations, causal graphs, 
-a more complex neural network, or other models which 
+a more complex neural network, or other models which
+
 - can be identified based on data (and prior knowledge)
 - can be used to make novel predictions about observations given experimental conditions.
 
@@ -26,16 +27,19 @@ Make sure to select the `theorist` option when prompted. You can skip all other 
 
 ## Implementation
 
-Once you've created your repository, you can implement your theorist by editing the `init.py` file in 
+Once you've created your repository, you can implement your theorist by editing the `__init__.py` 
+file in 
 ``src/autora/theorist/name_of_your_theorist/``. You may also add additional files to this directory if needed. 
-It is important that the `init.py` file contains a class called `NameOfYourTheorist` which inherits from  
+It is important that the `__init__.py` file contains a class called `NameOfYourTheorist` which 
+inherits from  
 `sklearn.base.BaseEstimator` and implements the following methods:
 
 - `fit(self, conditions, observations)`
 - `predict(self, conditions)`
 
 See the [sklearn documentation](https://scikit-learn.org/stable/developers/develop.html) for more information on 
-how to implement the methods. The following example ``init.py`` illustrates the implementation of a simple theorist
+how to implement the methods. The following example ``__init__.py`` illustrates the implementation 
+of a simple theorist
 that fits a polynomial function to the data:
 
 ```python 
