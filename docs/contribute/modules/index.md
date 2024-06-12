@@ -24,10 +24,10 @@ After setting up your repository and linking it to your GitHub account, you can 
 
 ### Implement Your Code
 
-You may implement your code in the ``__init__.py`` located in the respective feature folder in 
-``src/autora``.
+You may implement your code in the ``__init__.py`` located in the respective feature folder in ``src/autora``.
 
 Please refer to the following guides on implementing
+
 * [theorists](theorist.md)
 * [experimentalists](experimentalist.md)
 * [experiment runners](experiment-runner.md)
