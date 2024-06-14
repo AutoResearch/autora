@@ -27,7 +27,6 @@ dev = [
 all = [
   "autora[all-theorists]",
   "autora[all-experimentalists]",
-  "autora[all-synthetic]",
   "autora[all-experiment-runners]",
 ]
 
