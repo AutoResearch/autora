@@ -43,7 +43,14 @@ plugins:
       - name: synthetic
         import_url: "https://github.com/AutoResearch/autora-synthetic/?branch=main"
         imports: [
-          "src/"
+          "docs/",
+          "src/",
+        ]
+      - name: abstract-equation
+        import_url: "https://github.com/AutoResearch/autora-synthetic-abstract-equation/?branch=main"
+        imports: [
+          "docs/",
+          "src",
         ]
       - name: user-cookiecutter
         import_url: "https://github.com/autoresearch/autora-user-cookiecutter/?branch=main"
@@ -108,6 +115,7 @@ plugins:
           "./temp_dir/falsification/src/",
           "./temp_dir/mixture/src/",
           "./temp_dir/synthetic/src/",
+          "./temp_dir/abstract-equation/src/",
           "./temp_dir/prediction-filter/src/",
         ]
         import:
@@ -204,7 +212,25 @@ nav:
     - Prediction Filter: '!import https://github.com/AutoResearch/autora-experimentalist-prediction-filter/?branch=main&extra_imports=["mkdocs/base.yml"]'
   - Experiment Runners:
     - Home: 'experiment-runner/index.md'
-    - Synthetic: '!import https://github.com/autoresearch/autora-synthetic/?branch=main&extra_imports=["mkdocs/base.yml"]'
+    - Synthetic:
+        - Home: 'synthetic/docs/index.md'
+        - Quickstart: 'synthetic/docs/quickstart.md'
+        - Example:
+            - Abstract:
+                - 'synthetic/docs/Examples/Abstract/LMM.ipynb'
+                - Basic Equation: 'abstract-equation/docs/Basic Usage.ipynb'
+                - Equation Sampling: 'abstract-equation/docs/Equation Sampler.ipynb'
+            - Economics:
+                - 'synthetic/docs/Examples/Economics/Expected-Value-Theory.ipynb'
+                - 'synthetic/docs/Examples/Economics/Prospect-Theory.ipynb'
+            - Neuroscience:
+                - 'synthetic/docs/Examples/Neuroscience/Task-Switching.ipynb'
+            - Psychology:
+                - 'synthetic/docs/Examples/Psychology/Exponential-Learning.ipynb'
+                - 'synthetic/docs/Examples/Psychology/Luce-Choice-Ratio.ipynb'
+                - 'synthetic/docs/Examples/Psychology/Q-Learning.ipynb'
+            - Psychophysics:
+                - 'synthetic/docs/Examples/Psychophysics/Weber-Fechner-Law.ipynb'
     - Firebase-Prolific: '!import https://github.com/autoresearch/autora-experiment-runner-firebase-prolific/?branch=main&extra_imports=["mkdocs/base.yml"]'
     - Experimentation Managers:
       - Firebase: '!import https://github.com/autoresearch/autora-experiment-runner-experimentation-manager-firebase/?branch=main&extra_imports=["mkdocs/base.yml"]'
