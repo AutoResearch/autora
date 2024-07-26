@@ -78,7 +78,7 @@ experimentalist-falsification =[
   "autora-experimentalist-falsification"
 ]
 experimentalist-mixture =[
-  "mixture-experimentalist==1.0.0a4"
+  "mixture-experimentalist==1.0.0a7"
 ]
 experimentalist-prediction-filter =[
   "autora-experimentalist-prediction-filter"
