@@ -54,35 +54,40 @@ all-experimentalists = [
   "autora[experimentalist-leverage]",
   "autora[experimentalist-falsification]",
   "autora[experimentalist-mixture]",
-  "autora[experimentalist-prediction-filter]"
+  "autora[experimentalist-prediction-filter]",
+  "autora[experimentalist-bandit-random]"
 ]
-experimentalist-inequality =[
+experimentalist-inequality = [
   "autora-experimentalist-inequality"
 ]
-experimentalist-novelty =[
+experimentalist-novelty = [
   "autora-experimentalist-novelty"
 ]
-experimentalist-nearest-value =[
+experimentalist-nearest-value = [
   "autora-experimentalist-nearest-value"
 ]
-experimentalist-model-disagreement =[
+experimentalist-model-disagreement = [
   "autora-experimentalist-model-disagreement"
 ]
-experimentalist-uncertainty =[
+experimentalist-uncertainty = [
   "autora-experimentalist-uncertainty"
 ]
-experimentalist-leverage =[
+experimentalist-leverage = [
   "autora-experimentalist-leverage"
 ]
-experimentalist-falsification =[
+experimentalist-falsification = [
   "autora-experimentalist-falsification"
 ]
-experimentalist-mixture =[
+experimentalist-mixture = [
   "mixture-experimentalist==1.0.0a7"
 ]
-experimentalist-prediction-filter =[
+experimentalist-prediction-filter = [
   "autora-experimentalist-prediction-filter"
 ]
+experimentalist-bandit-random = [
+  "autora-experimentalist-bandit-random"
+]
+
 
 
 
@@ -107,7 +112,7 @@ all-experiment-runner-experimentation-managers = [
 experiment-runner-experimentation-manager-firebase = [
   "autora-experiment-runner-experimentation-manager-firebase"
 ]
-all-experiment-runner-recruitment-managers=[
+all-experiment-runner-recruitment-managers = [
   "autora[experiment-runner-recruitment-manager-prolific]"
 ]
 experiment-runner-recruitment-manager-prolific = [

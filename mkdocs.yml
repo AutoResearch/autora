@@ -93,6 +93,9 @@ plugins:
       - name: prediction-filter
         import_url: "https://github.com/AutoResearch/autora-experimentalist-prediction-filter/?branch=main"
         imports: ["src/"]
+      - name: bandit-random
+        import_url: "https://github.com/AutoResearch/autora-experimentalist-bandit-random/?branch=main"
+        imports: [ "src/" ]
 
   gen-files:
     scripts: [ "mkdocs/generate_code_reference.py" ]
@@ -117,6 +120,7 @@ plugins:
           "./temp_dir/synthetic/src/",
           "./temp_dir/abstract-equation/src/",
           "./temp_dir/prediction-filter/src/",
+          "./temp_dir/bandit-random/src/",
         ]
         import:
           - https://scikit-learn.org/stable/objects.inv
@@ -210,6 +214,7 @@ nav:
     - Falsification: '!import https://github.com/autoresearch/autora-experimentalist-falsification/?branch=main&extra_imports=["mkdocs/base.yml"]'
     - Mixture: '!import https://github.com/blinodelka/mixture_experimental_strategies/?branch=main&extra_imports=["mkdocs/base.yml"]'
     - Prediction Filter: '!import https://github.com/AutoResearch/autora-experimentalist-prediction-filter/?branch=main&extra_imports=["mkdocs/base.yml"]'
+    - Bandit Random: '!import https://github.com/AutoResearch/autora-experimentalist-bandit-random/?branch=main&extra_imports=["mkdocs/base.yml"]'
   - Experiment Runners:
     - Home: 'experiment-runner/index.md'
     - Synthetic:
