@@ -1,0 +1,9 @@
+[platforms]
+    [[oscar]]
+        hosts = localhost
+        install target = localhost
+        job runner = slurm
+        retrieve job logs = True
+        global init-script = """
+            module load python/3.9.0
+        """
