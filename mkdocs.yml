@@ -190,6 +190,7 @@ nav:
     - Examples:
       - 'core/docs/cycle/Basic Introduction to Functions and States.ipynb'
       - 'core/docs/cycle/Combining Experimentalists with State.ipynb'
+      - 'core/docs/cycle/Dynamically Extending and Altering the State.ipynb'
       - 'core/docs/cycle/Linear and Cyclical Workflows using Functions and States.ipynb'
   - Theorists:
     - Home: 'theorist/index.md'
