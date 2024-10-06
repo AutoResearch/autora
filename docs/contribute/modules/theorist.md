@@ -130,7 +130,7 @@ class ExampleRegressor(BaseEstimator):
 
 When working with `sklearn`'s `BaseEstimator`, it's crucial to ensure that any arguments passed to the `__init__` function of a derived class are assigned as instance attributes. This is a requirement in sklearn to maintain consistency and functionality across its estimators. 
 
-For instance, the following code will raise an error because `input_argument` is not assigned as a class attribute:
+For instance, the following code will raise an error because `input_argument` does exist as an input to the `init`-method but not as a class member:
 
 ```python
 from sklearn.base import BaseEstimator
