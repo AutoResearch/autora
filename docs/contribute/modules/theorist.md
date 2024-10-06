@@ -153,7 +153,7 @@ from sklearn.base import BaseEstimator
 
 class ExampleRegressor(BaseEstimator):
     def __init__(self, input_argument):
-        self.arbitrary = input_argument
+        self.input_argument = 'something arbitrary'
         print(input_argument)
 
 
