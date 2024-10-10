@@ -1,0 +1,3 @@
+# autora.variable
+
+::: autora.variable

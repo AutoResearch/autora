@@ -1,0 +1,3 @@
+# autora.state
+
+::: autora.state
