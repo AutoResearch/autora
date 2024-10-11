@@ -176,6 +176,13 @@ nav:
   - III - Functional Workflow: 'tutorials/basic/Tutorial III Functional Workflow.ipynb'
   - IV - Customization: 'tutorials/basic/Tutorial IV Customization.ipynb'
 - Examples:
+  - Home: 'examples/index.md'
+  - Basic Closed-Loop Psychophysics Study:
+    - Home: 'examples/closed-loop-basic/index.md'
+    - I - Set Up Project: 'examples/closed-loop-basic/setup.md'
+    - II - Set Up Firebase: 'examples/closed-loop-basic/firebase.md'
+    - III - Connect Project With Firebase: 'examples/closed-loop-basic/testingzone.md'
+    - IV - Connect Workflow With Forestore: 'examples/closed-loop-basic/init_autora.md'
   - Equation Discovery: 'theorist/Equation Discovery.ipynb'
   - Experimentalists: 'tutorials/Experimentalist.ipynb'
   - Online Closed-Loop Discovery:
