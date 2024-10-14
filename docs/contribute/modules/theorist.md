@@ -126,6 +126,44 @@ class ExampleRegressor(BaseEstimator):
         return self.polynomial(conditions)
 ```
 
+## Important Considerations for `sklearn` BaseEstimators
+
+When working with `sklearn`'s `BaseEstimator`, it's crucial to ensure that any arguments passed to the `__init__` function of a derived class are assigned as instance attributes. This is a requirement in sklearn to maintain consistency and functionality across its estimators. 
+
+For instance, the following code will raise an error because `input_argument` does exist as an input to the `init`-method but not as a class member:
+
+```python
+from sklearn.base import BaseEstimator
+
+
+class ExampleRegressor(BaseEstimator):
+    def __init__(self, input_argument):
+        print(input_argument)
+
+
+theorist = ExampleRegressor('test')
+
+print(theorist)
+```
+To avoid this issue, `input_argument` should be explicitly set as a class attribute, like this:
+
+```python
+from sklearn.base import BaseEstimator
+
+
+class ExampleRegressor(BaseEstimator):
+    def __init__(self, input_argument):
+        self.input_argument = 'something arbitrary'
+        print(input_argument)
+
+
+theorist = ExampleRegressor('test')
+
+print(theorist)
+```
+
+By assigning arguments as instance attributes (e.g., `self.input_argument`), your class will behave as expected within the `sklearn` framework.
+
 ## Next Steps: Testing, Documentation, Publishing
 
 For more information on how to test, document, and publish your theorist, please refer to the 
