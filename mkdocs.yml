@@ -183,6 +183,7 @@ nav:
     - II - Set Up Firebase: 'examples/closed-loop-basic/firebase.md'
     - III - Connect Project With Firebase: 'examples/closed-loop-basic/testingzone.md'
     - IV - Connect Workflow With Forestore: 'examples/closed-loop-basic/init_autora.md'
+    - V - Generating the Experiment: 'examples/closed-loop-basic/init_autora.md'
   - Equation Discovery: 'theorist/Equation Discovery.ipynb'
   - Experimentalists: 'tutorials/Experimentalist.ipynb'
   - Online Closed-Loop Discovery:
