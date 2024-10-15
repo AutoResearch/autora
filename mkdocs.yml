@@ -169,13 +169,13 @@ extra_javascript: [
 
 nav:
 - Introduction: 'index.md'
-- Tutorials:
+- Basic Tutorials:
   - Home: 'tutorials/index.md'
   - I - Components: 'tutorials/basic/Tutorial I Components.ipynb'
   - II - Loop Constructs: 'tutorials/basic/Tutorial II Loop Constructs.ipynb'
   - III - Functional Workflow: 'tutorials/basic/Tutorial III Functional Workflow.ipynb'
   - IV - Customization: 'tutorials/basic/Tutorial IV Customization.ipynb'
-- Examples:
+- Advanced Tutorials:
   - Home: 'examples/index.md'
   - Basic Closed-Loop Psychophysics Study:
     - Home: 'examples/closed-loop-basic/index.md'
@@ -183,7 +183,8 @@ nav:
     - II - Set Up Firebase: 'examples/closed-loop-basic/firebase.md'
     - III - Connect Project With Firebase: 'examples/closed-loop-basic/testingzone.md'
     - IV - Connect Workflow With Forestore: 'examples/closed-loop-basic/init_autora.md'
-    - V - Generating the Experiment: 'examples/closed-loop-basic/init_autora.md'
+    - V - Generating the Experiment: 'examples/closed-loop-basic/experiment.md'
+    - VI - Update the Workflow: 'examples/closed-loop-basic/workflow.md'
   - Equation Discovery: 'theorist/Equation Discovery.ipynb'
   - Experimentalists: 'tutorials/Experimentalist.ipynb'
   - Online Closed-Loop Discovery:

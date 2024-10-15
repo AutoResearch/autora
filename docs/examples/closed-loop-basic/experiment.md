@@ -28,32 +28,32 @@ Next, we want to write a function that generates a counterbalanced sequence of t
 Here, we will generate such a sequence of trials using [SweetPea](https://sites.google.com/view/sweetpea-ai). SweetPea is a declarative language implemented in Python that allows you to define experimental designs in a concise and readable way, and to automatically generate counterbalanced sequences of trials.
 
 !!! hint
-    If you want to tinker with the SweetPea code just for this example, you can open the corresponding notebook in Google Colab by clicking the badge below:
+    If you want to tinker with the SweetPea code just for this example, you can open the corresponding notebook in Google Colab by clicking the following badge:
     [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/AutoResearch/autora/docs/examples/closed-loop-basic/notebooks/sweetpea.ipynb)
 
-The following function generates an experimental sequence of ``n_trials`` trials. Each trial consists of two conditions: the number of dots in the first set (``num_dots_1``) and the number of dots in the second set (``num_dots_2``). The function ``trial_sequence`` returns a list of dictionaries, where each dictionary represents a trial of a counterbalanced experiment sequence
+The following function generates an experimental sequence of at least ``min_trials`` trials. Each trial consists of two conditions: the number of dots in the first set (``num_dots_1``) and the number of dots in the second set (``num_dots_2``). The function ``trial_sequence`` returns a list of dictionaries, where each dictionary represents a trial of a counterbalanced experiment sequence
 
 ```python
 from sweetpea import Factor, MinimumTrials, CrossBlock, synthesize_trials, CMSGen, experiments_to_dicts
 
-def trial_sequence(num_dots_1, num_dots_2, n_trials):
+def trial_sequence(num_dots_1, num_dots_2, min_trials):
 
   # define regular factors
-  num_dots_left = Factor('Number of Dots in Left Stimulus', [40, 70])
-  num_dots_right = Factor('Number of Dots in Right Stimulus', [70, 40])
+  num_dots_left = Factor('dots left', [num_dots_1, num_dots_2])
+  num_dots_right = Factor('dots right', [num_dots_1, num_dots_2])
 
   # define experimental block
   design = [num_dots_left, num_dots_right]
   crossing = [num_dots_left, num_dots_right]
-  constraints = [MinimumTrials(nr_trials)]
+  constraints = [MinimumTrials(min_trials)]
 
   block = CrossBlock(design, crossing, constraints)
 
   # synthesize trialsequence
   experiment = synthesize_trials(block, 1, CMSGen)
 
-  # export as dict:
-  return experiments_to_dicts(block, experiment)
+  # export as dictionary
+  return experiments_to_dicts(block, experiment)[0]
 ```
 
 ### Integrating the Code Into the Researcher Hub
@@ -84,9 +84,9 @@ The next line defines the crossing of the experimental factors, i.e., the condit
 crossing = [num_dots_left, num_dots_right]
 ```
 
-Then, we define the constraints of the experimental design. Here, we only have one constraint, which is to have a minimum number of trials, which is given by ``n_trials``.
+Then, we define the constraints of the experimental design. Here, we only have one constraint, which is to have a minimum number of trials, which is given by ``min_trials``.
 ```python
-constraints = [MinimumTrials(n_trials)]
+constraints = [MinimumTrials(min_trials)]
 ```
 
 Finally, we define the experimental block, which includes the design, crossing, and constraints.
@@ -99,9 +99,9 @@ The next line synthesizes the experimental sequence. The function ``synthesize_t
 experiment = synthesize_trials(block, 1, CMSGen)
 ```
 
-The last line exports the experimental sequence as a list of dictionaries.
+The last line exports the experimental sequence as a list of dictionaries. Here, we only care about a single experiment, so we select the first one in the list.
 ```python
-return experiments_to_dicts(block, experiment)
+return experiments_to_dicts(block, experiment)[0]
 ```
 
 ## Generating the Stimulus Sequences With SweetBean
@@ -111,7 +111,7 @@ Next, we need to write a function that automates the generation of our web-based
 Here, we will generate such a web experiment using [SweetBean](https://autoresearch.github.io/sweetbean/). SweetBean is a declarative language implemented in Python that allows you to define describe a sequence of events for an experiment in Python, and then generate a corresponding web-based experiment in JavaScript.
 
 !!! hint
-    If you want to tinker with the SweetBean code just for this example, you can open the corresponding notebook in Google Colab by clicking the badge below:
+    If you want to tinker with the SweetBean code just for this example, you can open the corresponding notebook in Google Colab by clicking the following badge:
     [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/AutoResearch/autora/docs/examples/closed-loop-basic/notebooks/sweetbean.ipynb)
 
 
@@ -208,7 +208,16 @@ def stimulus_sequence(timeline, num_dots_1, num_dots_2):
 - If sweetbean isn't already installed in your virtual environment, you will also need to install it with``pip install sweetbean``.
 - If it isn't already added, make sure to add ``sweetbean`` as a dependency in the ``requirements.txt`` file within the ``researcher_hub`` folder.
 
+Once both functions are integrated both functions, your researcher hub should contain the following files:
+- ``autora_workflow.py``
+- ``trial_sequence.py``
+- ``stimulus_sequence.py``
+
+![researcher_hub.png](img/researcher_hub.png)
+
 Below, we elaborate a bit more on the code. However, if you are already familiar with SweetBean, you may skip the "Explanation" section. Alternatively, you can gain an intuition for the code in the corresponding notebook:  [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/AutoResearch/autora/docs/examples/closed-loop-basic/notebooks/sweetbean.ipynb). 
+
+
 
 ### Code Explanation
 
@@ -322,3 +331,73 @@ The last line returns the experiment as a JavaScript string, which can be sent t
 # return a js string to transfer to autora
   return experiment.to_js_string(as_function=True, is_async=True)
 ```
+
+## Updating the Testing Zone
+
+Now that we have code for generating auf jsPsych experiment, we want to make sure that our testing_zone can deploy it to firebase.
+
+Head over to the `testing_zone` folder:
+
+```shell
+cd testing_zone
+```
+
+Next, install the dependency for the dot stimulus jspsych plugin: 
+
+```shell
+npm install @jspsych-contrib/plugin-rok
+```
+
+Also make sure to include the following lines in the `main.js` file in `testing_zone/src/design`:
+```javascript
+import jsPsychRok from '@jspsych-contrib/plugin-rok'
+global.jsPsychRok = jsPsychRok
+```
+
+In this example, we will generate the entire js Psych experiment in the workflow, we will be sending the full Java Script code to the testing zone. Replace the `main` function in the `main.js` file with the following code:
+
+```javascript
+const main = async (id, condition) => {
+    const observation = await eval(condition['experiment_code'] + "\nrunExperiment();");
+    return JSON.stringify(observation)
+}
+```
+
+Your ``main.js`` file should now look like this:
+
+```javascript
+import { initJsPsych } from 'jspsych';
+import 'jspsych/css/jspsych.css'
+import htmlKeyboardResponse from '@jspsych/plugin-html-keyboard-response';
+import jsPsychRok from '@jspsych-contrib/plugin-rok'
+
+global.jsPsychRok = jsPsychRok
+global.initJsPsych = initJsPsych;
+global.jsPsychHtmlKeyboardResponse = htmlKeyboardResponse
+
+/**
+ * This is the main function where you program your experiment. For example, you can install jsPsych via node and
+ * use functions from there
+ * @param id this is a number between 0 and number of participants. You can use it for example to counterbalance between subjects
+ * @param condition this is a condition (for example uploaded to the database with the experiment runner in autora)
+ * @returns {Promise<*>} after running the experiment for the subject return the observation in this function, it will be uploaded to autora
+ */
+const main = async (id, condition) => {
+    const observation = await eval(condition['experiment_code'] + "\nrunExperiment();");
+    return JSON.stringify(observation)
+}
+
+export default main
+```
+
+Once the ``main.js`` file is updated, you can rebuild and deploy the website:
+
+```shell
+npm run build
+firebase deploy
+```
+
+
+## Next Steps
+
+Next, we will [update our AutoRA workflow](workflow.md) in the ``researcher_hub`` to use the experiment functions we coded up above. 

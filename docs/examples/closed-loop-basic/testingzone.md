@@ -103,3 +103,7 @@ If everything worked, you should see something like this:
 ![deployed.png](img/deployed.png)
 
 This includes a link to your web-based experiment. You can now open this link in your browser. However, at this moment, we haven't built an experiment yet, so you will see nothing interesting. Next, we will set up the AutoRA workflow and generate the experiment.
+
+## Next Steps
+
+Next, we can [initialize the AutoRA workflow in the researcher hub](init_autora.md).

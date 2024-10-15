@@ -40,3 +40,7 @@ For our closed-loop study, we will use a Firestore Database to communicate betwe
 4. Select `Start in production mode` selected and click `Create`.
 
 You have now configured Firebase for your project. Next, we will connect your local project to Firebase and deploy your web-based experiment.
+
+## Next Steps
+
+Next, we can [connect our local project with Firebase](testingzone.md).

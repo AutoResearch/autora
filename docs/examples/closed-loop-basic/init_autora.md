@@ -60,5 +60,7 @@ To check the database, go to the Firebase console and select your project. On th
 
 ![firestore_data.png](img/firestore_data.png)
 
-Next, we will add functions that automatically design and build a simple psychophysics experiment. 
+## Next Steps
+
+Next, we will add functions that automatically [design and build a simple psychophysics experiment](experiment.md). 
 

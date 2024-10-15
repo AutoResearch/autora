@@ -117,4 +117,8 @@ You should now have the following project structure:
 
 ![project_structure.png](img/project_structure.png)
 
+## Next Steps
+
+Next, we will [set up Firebase](firebase) to host our experiment.
+
 
