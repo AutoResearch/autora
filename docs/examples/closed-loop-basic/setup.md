@@ -2,7 +2,7 @@
 
 First, we need to set up our local AutoRA project.
 
-![Setup](img/system_project.png)
+![Setup](../img/system_project.png)
 
 ## Create Repository
 To ease the setup process for this example, we provide a template repository that contains all the necessary files and configurations. 
@@ -10,7 +10,7 @@ To ease the setup process for this example, we provide a template repository tha
 Simply visit the following repository on Github: https://github.com/AutoResearch/autora-closed-loop-firebase-prolific
 
 Next, click on the green "Use this template" button to create a new repository in your account.
-![use_template.png](img/use_template.png)
+![use_template.png](../img/use_template.png)
 
 You may then enter the name of the repository (e.g., "closed-loop-study") and click on the "Create repository" button.
 
@@ -19,7 +19,7 @@ You may then enter the name of the repository (e.g., "closed-loop-study") and cl
 Once you created your own repository from the template, you can clone it to your local machine using ``git clone``. However, we recommend using GitHub Codespaces for this example, as it provides a more streamlined development environment.
 
 To open the repository in Github Codespaces, click on the "Code" button and select "Create codespace on main".
-![img.png](img/open_codespace.png)
+![open_codespace.png](../img/open_codespace.png)
 
 ## Set Up Environment
 
@@ -42,7 +42,7 @@ In the `<project directory>`, run the following command to create a new virtual 
 ```shell
 python3 -m "venv" ".venv" 
 ```
-![venv.png](img/venv.png)
+![venv.png](../img/venv.png)
 
 !!! hint
     If you have multiple Python versions installed on your system, it may be necessary to specify the Python version when creating a virtual environment. For example, run the following command to specify Python 3.8 for the virtual environment. 
@@ -121,7 +121,7 @@ You will be prompted to enter some information about your project. You can selec
 
 You should now have the following project structure:
 
-![project_structure.png](img/project_structure.png)
+![project_structure.png](../img/project_structure.png)
 
 ## Next Steps
 

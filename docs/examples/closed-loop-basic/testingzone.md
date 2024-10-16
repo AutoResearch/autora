@@ -2,7 +2,7 @@
 
 Next, we need to connect your project with Firebase, so we can deploy web experiments.
 
-![Setup](img/system_testingzone.png)
+![Setup](../img/system_testingzone.png)
 
 Move to the `testing_zone` folder in your project (e.g., locally or on GitHub Codespaces). The `testing_zone` contains a basic template for a website that is compatible with the [AutoRA Experimentation Manager for Firebase](https://autoresearch.github.io/autora/user-guide/experiment-runners/experimentation-managers/firebase/) and the [AutoRA Recruitment Manager for Prolific](https://autoresearch.github.io/autora/user-guide/experiment-runners/recruitment-managers/prolific/).
 
@@ -10,7 +10,7 @@ Move to the `testing_zone` folder in your project (e.g., locally or on GitHub Co
 
 1. Navigate to the [Firebase console](https://console.firebase.google.com/) and select the project you created.
 2. On the gear-symbol next to `Project Overview`, you can find `project settings`.
-![project_settings.png](img/project_settings.png)
+![project_settings.png](../img/project_settings.png)
 3. You will find credentials in the tab `general` (you might have to scroll down). They should contain something like this
 ```javascript
 // Your web app's Firebase configuration
@@ -100,7 +100,7 @@ To deploy the experiment to Firebase, run
 firebase deploy
 ```
 If everything worked, you should see something like this:
-![deployed.png](img/deployed.png)
+![deployed.png](../img/deployed.png)
 
 This includes a link to your web-based experiment. You can now open this link in your browser. However, at this moment, we haven't built an experiment yet, so you will see nothing interesting. Next, we will set up the AutoRA workflow and generate the experiment.
 

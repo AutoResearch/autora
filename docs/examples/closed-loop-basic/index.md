@@ -20,7 +20,7 @@ This example provides a hands-on approach to understanding closed-loop behaviora
 ## Overview
 
 Our closed-loop system consists of a bunch of interacting components. Here is a high-level overview of the system:
-![System Overview](img/system_overview.png)
+![System Overview](../img/system_overview.png)
 
 Our closed-loop system will have two projects talking to each other. The **Firebase project** will host and run the web experiment that participants interact with. Our **local AutoRA project** will host the code that runs the AutoRA workflow, which will generate new experiment conditions, collect data from the web experiment, and update the model based on the collected data. 
 
