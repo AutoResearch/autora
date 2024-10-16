@@ -41,5 +41,5 @@ Each step in the example will lead guide you to set up each component of the clo
 
 By the end of this example, you’ll be able to create a fully automated behavioral closed-loop study that adapts based on the collected participant data.
 
-[next](setup.md)
+[Next: Set up the local project.](setup.md)
 

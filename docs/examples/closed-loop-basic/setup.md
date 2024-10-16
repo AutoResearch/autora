@@ -125,6 +125,6 @@ You should now have the following project structure:
 
 ## Next Steps
 
-Next, we will [set up Firebase](firebase) to host our experiment.
+[Next: Set up Firebase to host our experiment.](firebase.md)
 
 

@@ -43,4 +43,4 @@ You have now configured Firebase for your project. Next, we will connect your lo
 
 ## Next Steps
 
-Next, we can [connect our local project with Firebase](testingzone.md).
+[Next: Connect your local project with Firebase.](testingzone.md)

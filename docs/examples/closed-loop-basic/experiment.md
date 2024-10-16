@@ -400,4 +400,5 @@ firebase deploy
 
 ## Next Steps
 
-Next, we will [update our AutoRA workflow](workflow.md) in the ``researcher_hub`` to use the experiment functions we coded up above. 
+[Next: Update the AutoRA workflow to use the functions above.](workflow.md)
+

@@ -62,5 +62,5 @@ To check the database, go to the Firebase console and select your project. On th
 
 ## Next Steps
 
-Next, we will add functions that automatically [design and build a simple psychophysics experiment](experiment.md). 
+[Next: Add functions to automatically design and build a simple psychophysics experiment.](experiment.md)
 
