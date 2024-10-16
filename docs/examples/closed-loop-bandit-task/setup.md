@@ -2,12 +2,12 @@
 
 First, we need to set up our local AutoRA project.
 
-![Setup](img/system_project.png)
+![Setup](../img/system_project.png)
 
 ## Create Repository
 To ease the setup process for this example, we provide a template repository that contains all the necessary files and configurations. 
 
-Simply visit the following repository on Github: https://github.com/AutoResearch/autora-closed-loop-firebase-prolific
+Simply visit the following repository on GitHub: https://github.com/AutoResearch/autora-closed-loop-firebase-prolific-bandit-task
 
 Next, click on the green "Use this template" button to create a new repository in your account.
 ![use_template.png](img/use_template.png)
@@ -18,7 +18,7 @@ You may then enter the name of the repository (e.g., "closed-loop-study") and cl
 
 Once you created your own repository from the template, you can clone it to your local machine using ``git clone``. However, we recommend using GitHub Codespaces for this example, as it provides a more streamlined development environment.
 
-To open the repository in Github Codespaces, click on the "Code" button and select "Create codespace on main".
+To open the repository in GitHub Codespaces, click on the "Code" button and select "Create codespace on main".
 ![img.png](img/open_codespace.png)
 
 ## Set Up Environment
@@ -113,18 +113,16 @@ You will be prompted to enter some information about your project. You can selec
 
 1. You may first enter a project name, e.g., "closed-loop-study".
 2. Select ``yes`` to use advanced features.
-3. You may select any theorist for automated model discovery. Here, we will select the ``autora[theorist-bms]`` option.
-4. You may select any experimentalist for determining novel experiment conditions. Here, we will select the ``autora[experimentalist-model-disagreement]`` option.
+3. We are going to use a theorist from a different package so we don't need to select any theorist here.
+4. Choose at least ``autora[experimentalist-bandit-random]`` and ``autora[experimentalist-model-disagreement]``.
 5. Make sure to select the ``autora[experiment-runner-firebase-prolific]`` option
 6. Select ``yes`` to set up a firebase experiment. When asked to install further packages (create-react-app@5.0.1), select yes (y). This may take some time.
-7. Finally, select ``Sweetbean`` as project type.
+7. Finally, select ``JsPsych - Bandit`` as project type.
 
 You should now have the following project structure:
 
-![project_structure.png](img/project_structure.png)
+![project_structure.png](../img/project_structure.png)
 
-## Next Steps
-
-Next, we will [set up Firebase](firebase) to host our experiment.
+[next](firebase.md)
 
 
