@@ -1,16 +1,27 @@
 # Basic Closed-Loop Two-Armed Bandit Study 
 
-In this example, we will guide you through setting up a closed-loop behavioral study for a two-armed bandit experiment. By leveraging AutoRA, you’ll build a dynamic research workflow that iterates between model discovery, experimental design, and behavioral data collection, all within the context of a two-armed bandit experiment. The ultimate goal is to make AutoRA iteratively uncover an equation that characterizes human participants' learning equations in a two-armed bandit task.
+In this example, we will guide you through setting up a closed-loop computational discovery study for a human reinforcement learning task. In this behavioral study, participants will interact with a two-armed bandit task, where they must choose between two options to maximize their reward. Using AutoRA, you will build dynamic research workflow that iterates between computational model discovery, experimental design, and behavioral data collection. The ultimate goal is to make AutoRA iteratively uncover a learning rule that characterizes human participants' behavior in a two-armed bandit task.
 
-This example provides a hands-on approach to understanding closed-loop behavioral research in the context of the AutoRA framework. 
+The code builds in a method for automating the discovery of reinforcement learning rules:
+
+[Weinhardt, W. Eckstein, M., & Musslick, S. (2024). Computational discovery of human reinforcement learning dynamics from choice behavior. *NeurIPS 2024 Workshop on Behavioral ML*.](https://openreview.net/forum?id=x2WDZrpgmB)
+
+This example provides a **hands-on approach to understanding closed-loop computational discovery** of human behavior using the AutoRA framework. 
+
+It may also serve as a **starting point** for developing your own computational discovery project.
+
 
 ## What You’ll Learn:
-- **Set up a closed-loop AutoRA workflow**: Learn how to create an automated discovery process, iterating between hypothesis generation and data collection.
+- **Set up a closed-loop AutoRA workflow**: Learn how to create an automated discovery process, iterating between computational model discovery, experimental design, and data collection.
 - **Automate experimental design with [SweetPea](https://sites.google.com/view/sweetpea-ai)**: Use SweetPea to generate experimental designs that adapt as the study progresses.
-- **Generate behavioral experiments with [JsPsych](https://www.jspsych.org/v7/)**: Creation of simple behavioral experiment with jsPsych.
+- **Interfacing with web experiments**: Use AutoRA to update the parameterization of an existing web-based experiment writtin in jsPsych.
 - **Host experiments using [Google Firebase](https://firebase.google.com/)**: Set up a server for hosting your behavioral experiments, making them accessible to participants.
 - **Store experimental data with [Google Firestore](https://firebase.google.com/)**: Efficiently manage and store participant data collected from your experiment.
 - **Collect data from real participants with [Prolific](https://www.prolific.com/)**: Recruit and manage participants through Prolific, ensuring high-quality behavioral data.
+
+!!! hint
+    This example set up most of your workflow automatically, so it will not cover how to write the code for the two-armed bandit task, or how to implement
+    a method for discovering reinforcement learning rules from behavior. Instead, we will leverage existing templates and packages. 
 
 ## Prerequisites:
 - **Basic Python knowledge**: While most of the workflow is Python-based, only a basic level of understanding is needed to follow along.
@@ -39,6 +50,6 @@ The **researcher_hub** folder will contain the AutoRA workflow.
 
 Each step in the example will lead guide you to set up each component of the closed-loop system. 
 
-By the end of this example, you’ll be able to create a fully automated behavioral closed-loop study that adapts based on the collected participant data.
+By the end of this example, you’ll be able to run a closed-loop computational discovery study.
 
-[next](setup.md)
+[Next: Set up the Project.](setup.md)
