@@ -7,18 +7,18 @@ First, we need to set up our local AutoRA project.
 ## Create Repository
 To ease the setup process for this example, we provide a template repository that contains all the necessary files and configurations. 
 
-Simply visit the following repository on Github: https://github.com/AutoResearch/autora-closed-loop-firebase-prolific
+- Simply visit the following repository on Github: https://github.com/AutoResearch/autora-closed-loop-firebase-prolific
 
-Next, click on the green "Use this template" button to create a new repository in your account.
+- Next, click on the green "Use this template" button to create a new repository in your account.
 ![use_template.png](../img/use_template.png)
 
-You may then enter the name of the repository (e.g., "closed-loop-study") and click on the "Create repository" button.
+- You may then enter the name of the repository (e.g., "closed-loop-study") and click on the "Create repository" button.
 
 ## Clone Repository or Open it in GitHub Codespace
 
-Once you created your own repository from the template, you can clone it to your local machine using ``git clone``. However, we recommend using GitHub Codespaces for this example, as it provides a more streamlined development environment.
+- Once you created your own repository from the template, you can clone it to your local machine using ``git clone``. However, we recommend using GitHub Codespaces for this example, as it provides a more streamlined development environment.
 
-To open the repository in Github Codespaces, click on the "Code" button and select "Create codespace on main".
+- To open the repository in Github Codespaces, click on the "Code" button and select "Create codespace on main".
 ![open_codespace.png](../img/open_codespace.png)
 
 ## Set Up Environment
@@ -37,7 +37,7 @@ Once you cloned your repository or opened it in codespaces, it is time to set up
 
     Our packages are set up using `virtualenv` with `pip`  
 
-In the `<project directory>`, run the following command to create a new virtual environment in the `.venv` directory
+- In the `<project directory>`, run the following command to create a new virtual environment in the `.venv` directory
 
 ```shell
 python3 -m "venv" ".venv" 
@@ -50,14 +50,14 @@ python3 -m "venv" ".venv"
     python3.8 -m "venv" ".venv" 
     ```
 
-Activate it by running
+- Activate it by running
 ```shell
 source ".venv/bin/activate"
 ```
 
 ## Install Dependencies
 
-First, install the cookiecutter package using pip via
+- First, install the cookiecutter package using pip via
 
 ```shell
 pip install cookiecutter
@@ -65,12 +65,12 @@ pip install cookiecutter
 
 We will use this package to automatically configure our project folder structure. 
 
-Then we install some python dependencies:
+- Then we install some python dependencies:
 ```shell
 pip install -r requirements.txt
 ```
 
-We  will also use firebase-tools:
+- We  will also need to install firebase-tools:
 ```shell
 npm install -g firebase-tools
 ```
@@ -97,7 +97,7 @@ To simplify the setup process, we provide a `cookiecutter` template that generat
 2. **Testing Zone**:
     - This directory provides a basic example of a website served with Firebase, ensuring compatibility with the AutoRA workflow.
 
-Once you installed the packages above, you can create the project by running the following command in the root directory of your project:
+- Once you installed the packages above, you can create the project by running the following command in the root directory of your project:
 
 ```shell
 cookiecutter https://github.com/AutoResearch/autora-user-cookiecutter
@@ -109,17 +109,16 @@ if cookecutter is not recognized, you may need to run the following command:
 python -m cookiecutterhttps://github.com/AutoResearch/autora-user-cookiecutter
 ```
 
-You will be prompted to enter some information about your project. You can select single options by pressing SPACE and confirm your selection by pressing ENTER.
+- You will be prompted to enter some information about your project. You can select single options by pressing SPACE and confirm your selection by pressing ENTER.
+  1. You may first enter a project name, e.g., "closed-loop-study".
+  2. Select ``yes`` to use advanced features.
+  3. You may select any theorist for automated model discovery. Here, we will select the ``autora[theorist-bms]`` option.
+  4. You may select any experimentalist for determining novel experiment conditions. Here, we will select the ``autora[experimentalist-model-disagreement]`` option.
+  5. Make sure to select the ``autora[experiment-runner-firebase-prolific]`` option
+  6. Select ``yes`` to set up a firebase experiment. When asked to install further packages (create-react-app@5.0.1), select yes (y). This may take some time.
+  7. Finally, select ``Sweetbean`` as project type.
 
-1. You may first enter a project name, e.g., "closed-loop-study".
-2. Select ``yes`` to use advanced features.
-3. You may select any theorist for automated model discovery. Here, we will select the ``autora[theorist-bms]`` option.
-4. You may select any experimentalist for determining novel experiment conditions. Here, we will select the ``autora[experimentalist-model-disagreement]`` option.
-5. Make sure to select the ``autora[experiment-runner-firebase-prolific]`` option
-6. Select ``yes`` to set up a firebase experiment. When asked to install further packages (create-react-app@5.0.1), select yes (y). This may take some time.
-7. Finally, select ``Sweetbean`` as project type.
-
-You should now have the following project structure:
+- Confirm that you have the following project folders:
 
 ![project_structure.png](../img/project_structure.png)
 
