@@ -31,9 +31,9 @@ Our experiment is configured by experiment conditions, which are stored in a **G
 
 ### Our Local AutoRA Project
 
-The local project will consist of two folders. The **testing_zone** folder will contain the web app that participants interact with. 
+The local project will consist of two folders. The ``testing_zone```` folder will contain the web app that participants interact with. 
 
-The **researcher_hub** folder will contain the AutoRA workflow. 
+The ``researcher_hub`` folder will contain the AutoRA workflow. 
 
 ## Next Steps 
 

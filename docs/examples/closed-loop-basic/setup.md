@@ -18,7 +18,7 @@ To ease the setup process for this example, we provide a template repository tha
 
 - Once you created your own repository from the template, you can clone it to your local machine using ``git clone``. However, we recommend using GitHub Codespaces for this example, as it provides a more streamlined development environment.
 
-- To open the repository in Github Codespaces, click on the "Code" button and select "Create codespace on main".
+- To open the repository in Github Codespaces, click on the ``Code`` button and select ``Create codespace on main``.
 ![open_codespace.png](../img/open_codespace.png)
 
 ## Set Up Environment
@@ -91,10 +91,10 @@ To establish an online closed-loop for AutoRA, there are two key components that
 
 To simplify the setup process, we provide a `cookiecutter` template that generates a project folder containing the following two directories:
 
-1. **Researcher Hub**:
+1. ``researcher_hub``:
     - This directory includes a basic example of an AutoRA workflow.
 
-2. **Testing Zone**:
+2. ``testing_zone``:
     - This directory provides a basic example of a website served with Firebase, ensuring compatibility with the AutoRA workflow.
 
 - Once you installed the packages above, you can create the project by running the following command in the root directory of your project:
@@ -103,10 +103,10 @@ To simplify the setup process, we provide a `cookiecutter` template that generat
 cookiecutter https://github.com/AutoResearch/autora-user-cookiecutter
 ```
 
-if cookecutter is not recognized, you may need to run the following command:
+If cookecutter is not recognized, you may need to run the following command:
 
 ```shell
-python -m cookiecutterhttps://github.com/AutoResearch/autora-user-cookiecutter
+python -m cookiecutter https://github.com/AutoResearch/autora-user-cookiecutter
 ```
 
 - You will be prompted to enter some information about your project. You can select single options by pressing SPACE and confirm your selection by pressing ENTER.

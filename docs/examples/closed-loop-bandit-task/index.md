@@ -42,9 +42,9 @@ Our experiment is configured by experiment conditions, which are stored in a **G
 
 ### Our Local AutoRA Project
 
-The local project will consist of two folders. The **testing_zone** folder will contain the web app that participants interact with. 
+The local project will consist of two folders. The ``testing_zone`` folder will contain the web app that participants interact with. 
 
-The **researcher_hub** folder will contain the AutoRA workflow. 
+The ``researcher_hub`` folder will contain the AutoRA workflow. 
 
 ## Next Steps 
 
@@ -52,4 +52,4 @@ Each step in the example will lead guide you to set up each component of the clo
 
 By the end of this example, you’ll be able to run a closed-loop computational discovery study.
 
-[Next: Set up the Project.](setup.md)
+[Next: Set up the project.](setup.md)
