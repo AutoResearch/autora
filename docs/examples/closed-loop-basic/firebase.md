@@ -16,7 +16,7 @@ You'll need a [Google account](https://www.google.com/account/about/) to use Fir
 
   1. Click on `Get started`.
   2. Click on the plus sign with `Create a project`.
-  3. Name your project (e.g., "closed-loop=study") and click on `Continue`.
+  3. Name your project (e.g., ``closed-loop-study``) and click on `Continue`.
   4. As we don't need Google Analytics, we can leave it disabled (you can leave it enabled if you want to use it in the future).
   5. Click `Create project`.
 
