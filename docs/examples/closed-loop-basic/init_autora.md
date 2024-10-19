@@ -32,7 +32,7 @@ The AutoRA workflow (specifically the `autora-firebase-runner`) will need access
 - Click on the little gear on the left and then select ``Project settings``. 
 - Click on ``Service accounts``.
 ![service_account.png](../img/service_account.png)
-- Having ``Node.js`` selected, generate a new private key. This should generate a json file that you can download.
+- Having ``Node.js`` selected, click ``Generate a new private key``. This should generate a json file that you can download.
 - Open the file `autora_workflow.py` in the `research_hub`-folder and navigate to the part of the code that contains a placeholder for the credentials. It should look like this
 ```python
 firebase_credentials = {
@@ -52,7 +52,10 @@ firebase_credentials = {
 
 ## Try out the Workflow
 
-- Within your environment, you can now run `python autora_workflow.py` and head over to your website to test your first online experiment.
+- Within your environment, you can now run `python autora_workflow.py`
+- Head over to your website to test your first online experiment. You can find the link in the [Firebase console](https://console.firebase.google.com/). Navigate to your project and select ``Hosting`` in the left navigation menu. The domain of your experiment is listed on top under ``Domains``.
+
+![domain.png](../img/domain.png)
 
 There shouldn't be much happening with the web experiment. However, you can check whether the workflow is running correctly by looking at Firestore database. The workflow uploads experiment conditions to this database which should be visible.
 

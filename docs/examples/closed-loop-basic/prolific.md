@@ -101,9 +101,9 @@ experiment_runner = firebase_prolific_runner(
 
 The ``firebase_prolific_runner`` optimally allocates slots for the experiments you submit to Prolific. If you are done with testing, and are ready for data collection you may want to update the ``.env`` file in the ``testing_zone`` folder.
 
-- Navigate to the ``testing_zone`` folder
-- Open the ``.env`` file
-- Set the ``REACT_APP_useProlificId`` variable to ``True``
+- Navigate to the ``testing_zone`` folder.
+- Open the ``.env`` file.
+- Set the ``REACT_APP_useProlificId`` variable to ``True``.
 ```shell
 REACT_APP_useProlificId="True"
 ```

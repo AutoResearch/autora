@@ -28,7 +28,35 @@ It may also serve as a **starting point** for developing your own computational 
 - **Minimal JavaScript knowledge**: Since the behavioral experiments are implemented in JavaScript (via jsPsych), a minimal understanding of JavaScript is required.
 - **A Google account**: You will need a Google account to use Google Firebase and Firestore.
 
-## Overview
+## Study Overview
+
+The goal of this closed-loop study is to iteratively discover learning rules that explain participant's choice behavior in a simple two-armed bandit task.
+
+### Experiment
+
+In this experiment, participants are tasked to maximize the reward they obtain by selecting between differently colored boxes. On each trial, the participant is presented with a red box and a blue box:
+
+![stimulus.png](img/stimulus.png)
+
+Selecting one of the boxes will either result in a reward (```+1``` point) or not (``0`` points). The reward probability of each box changes over time, and participants must learn to select the box that provides the most reward.
+
+### Computational Model Discovery
+
+Our goal is to automatically discover a learning rule that best explains the choice behavior of all participants. We will accomplish this using a reinforcement learning model discovery method described in 
+
+[Weinhardt, W. Eckstein, M., & Musslick, S. (2024). Computational discovery of human reinforcement learning dynamics from choice behavior. *NeurIPS 2024 Workshop on Behavioral ML*.](https://openreview.net/forum?id=x2WDZrpgmB)
+
+![rnn_theorist.png](img/rnn_theorist.png)
+
+This method, available in the ``autora[theorist-rnn-sindy-rl]`` package, fits the choice behavior of participants with a recurrent neural network, which computes values for both of the two options (the red box and the blue box), and then chooses between the options based on their relative value. Once the neural network is fit, the method applies an equation discovery technique called "Sparse Identification of Non-Linear Systems" ([SINDy](https://pysindy.readthedocs.io/en/latest/examples/2_introduction_to_sindy/example.html)) to extract the learning rule that the network has discovered. 
+
+### Experimental Sampling
+
+The AutoRA workflow will generate new experiment conditions based on best two learning rules that were discovered. Specifically, the workflow will generate reward trajectories that best distinguish between the two learning rules using the ``autora[experimentalist-model-disagreement]`` package.
+
+These reward trajectories will be uploaded to the Firebase project, where the next batch of participants can interact with the web-based experiment. Data collected from the next batch will be used to update the model and discover new learning rules.
+
+## System Overview
 
 Our closed-loop system consists of a bunch of interacting components. Here is a high-level overview of the system:
 ![System Overview](../img/system_overview.png)
