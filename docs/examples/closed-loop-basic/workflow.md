@@ -168,12 +168,12 @@ firebase_credentials = {
 
 # Simple experiment runner that runs the experiment on firebase
 # The runner defines a timeout of 100 seconds, which means that a participant
-# has 100 seconds to complete an experiment. Afterward, it will be freed for another participant.
-# The sleep time is set to 5 seconds, which means that the runner will check every 5 seconds for data.
+# has 5 *minutes* to complete an experiment. Afterward, it will be freed for another participant.
+# The sleep time is set to 3 *seconds*, which means that the runner will check every 5 seconds for data.
 experiment_runner = firebase_runner(
     firebase_credentials=firebase_credentials,
-    time_out=100,
-    sleep_time=5)
+    time_out=5,
+    sleep_time=3)
 
 # Again, we need to wrap the experiment runner to use it on the state.
 # Specifically, the runner compiles the identified conditions (i.e., number of tested dots)
@@ -299,6 +299,13 @@ python autora_workflow.py
 
 
 - Try to run the workflow for three cycles. Once completed, you should see the plot (also stored in the file ``model_comparison.png``) that compares the logistic regression model with the Bayesian Machine Scientist model.
+
+!!! hint
+    Note that you need to wait until the experiment is finished until you see a page with white background. If you end the experiment before, the ``firebase_runner`` will wait the minutes specified in ``time_out`` before it will be available for the next participant, i.e., run. If no more slots are currently available, you should see something like "We are sorry, there has been an unexpected technical issue.
+Thank you for your understanding." 
+
+!!! hint
+    You can check which experiments were successfully completed by looking into the Firestore database. In your project on the [Firebase Console](https://console.firebase.google.com/), simply navigate to ``FireStore Database``. The fields in ``autora`` > ``autora_out`` > ``observations`` list all the conditions. "null" means that no data has been collected for that condition yet.
 
 - **Congratulations**, you just set up and ran a closed-loop behavioral study!
 
@@ -427,11 +434,11 @@ Here, we define the Firebase credentials required to run the experiment on Fireb
 ```python
 experiment_runner = firebase_runner(
     firebase_credentials=firebase_credentials,
-    time_out=100,
-    sleep_time=5)
+    time_out=5,
+    sleep_time=3)
 ```
 
-We then define the experiment runner that runs the experiment on Firebase. The runner is wrapped with the ``on_state`` decorator, allowing it to update the state object. The runner takes the Firebase credentials, the timeout, and the sleep time as input and returns a ``Delta`` object that updates the state with the experiment data. The ``time_out`` determines the amount of time a participant has available to complete the experiment, while the ``sleep_time`` determines how often the runner checks for experimental data.
+We then define the experiment runner that runs the experiment on Firebase. The runner is wrapped with the ``on_state`` decorator, allowing it to update the state object. The runner takes the Firebase credentials, the timeout, and the sleep time as input and returns a ``Delta`` object that updates the state with the experiment data. The ``time_out`` determines the amount of time **in minutes** a participant has available to complete the experiment, while the ``sleep_time`` determines how many **seconds** the runner waits run another check for experimental data.
 
 ```python
 @on_state()

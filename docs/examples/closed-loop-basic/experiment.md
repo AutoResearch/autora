@@ -9,6 +9,8 @@ In this part of the example, we will code up two functions, one function ``trial
 
 ## Experiment Overview
 
+![stimulus.png](img/stimulus.png)
+
 ### Independent and Dependent Variables
 
 The experiment has two independent variables: The number of dots in the first set and the number of dots in the second set. The dependent variable is the participant's response, i.e., whether they correctly identified which set has more dots.

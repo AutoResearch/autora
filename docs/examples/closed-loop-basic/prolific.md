@@ -80,7 +80,7 @@ study_completion_time = 5
 # Prolific Token: You can generate a token on your Prolific account
 prolific_token = 'my prolific token'
 
-# Completion code: The code a participant gets to prove they participated. If you are using the standard project set up (with cookiecutter), please make sure this is the same code that you have provided in the .env file of the testing zone.
+# Completion code: The code a participant gets to prove they participated. If you are using the standard project set up (with cookiecutter), please make sure this is the same code that you have provided in the .env file of the testing zone. The code can be anything you want.
 completion_code = 'my completion code'
 
 experiment_runner = firebase_prolific_runner(

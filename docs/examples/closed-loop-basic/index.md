@@ -17,7 +17,22 @@ This example provides a hands-on approach to understanding closed-loop behaviora
 - **Minimal JavaScript knowledge**: Since the behavioral experiments are implemented in JavaScript (via jsPsych), SweetBean will handle much of the complexity for you. The code is generated in Python and converted into JavaScript, so only a minimal understanding of JavaScript is required.
 - **A Google account**: You will need a Google account to use Google Firebase and Firestore.
 
-## Overview
+## Study Overview
+
+In this example study, we are interested in quantifying participant's ability to differentiate between two visual stimuli. Specifically, we will ask participants to indicate whether the number of dots in a left stimulus is the same as the number of dots in a right stimulus.
+
+![stimulus.png](img/stimulus.png)
+
+Our goal is to predict the participant's response based on the number of dots in the left and right stimuli. We will use two methods of predicting the response:
+- a simple logistic regression model
+- an equation discovery algorithm ([Bayesian Machine Scientist](https://autoresearch.github.io/autora/user-guide/theorists/bms/))
+
+After each data collection phase, we will fit the logistic regression model and the Bayesian Machine Scientist from the  ``autora[theorist-bms]`` package to the collected data. We will then use both models to determine the next set of experimental conditions worth testing. Specifically, we will identify experimental conditions for which the [models disagree the most](https://autoresearch.github.io/autora/user-guide/experimentalists/model-disagreement/), using the ``autora[experimentalist-model-disagreement]`` package.
+
+Critically, we will leverage AutoRA to embed the entire research process into a closed-loop system. This system will automatically generate new experimental conditions, collect data from the web experiment, and update the models based on the collected data.
+
+
+## System Overview
 
 Our closed-loop system consists of a bunch of interacting components. Here is a high-level overview of the system:
 ![System Overview](../img/system_overview.png)
