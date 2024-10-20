@@ -17,6 +17,7 @@ It may also serve as a **starting point** for developing your own computational 
 - **Interfacing with web experiments**: Use AutoRA to update the parameterization of an existing web-based experiment written in jsPsych.
 - **Host experiments using [Google Firebase](https://firebase.google.com/)**: Set up a server for hosting your behavioral experiments, making them accessible to participants.
 - **Store experimental data with [Google Firestore](https://firebase.google.com/)**: Efficiently manage and store participant data collected from your experiment.
+- **Automate the discovery of reinforcement learning rules**: Use AutoRA to discover reinforcement learning rules that explain participant behavior.
 - **Collect data from real participants with [Prolific](https://www.prolific.com/)**: Recruit and manage participants through Prolific, ensuring high-quality behavioral data.
 
 !!! hint
