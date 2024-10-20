@@ -192,6 +192,7 @@ def stimulus_sequence(timeline, num_dots_1, num_dots_2):
       number_of_oobs=[dot_stimulus_left, dot_stimulus_right],
       number_of_apertures=2,
       choices=["y", "n"],
+      background_color="black",
   )
 
   # define the sequence of events within a trial
@@ -310,6 +311,7 @@ Next, we define the random dot pattern stimulus, as a ``RandomDotPatternsStimulu
       number_of_oobs=[dot_stimulus_left, dot_stimulus_right],
       number_of_apertures=2,
       choices=["y", "n"],
+      background_color="black",
   )
 ```
 
