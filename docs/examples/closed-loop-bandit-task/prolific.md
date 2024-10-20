@@ -72,3 +72,5 @@ REACT_APP_useProlificId="True"
 ## Summary
 
 - **This is it!** Running the ``autora_workflow.py`` in the ``researcher_hub`` should now result in closed-loop reinforcement learning study that recruits human participants from Prolific to participate in your web-based experiment hosted on Firebase.
+
+[Next: Custumize your experiment.](customization.md)

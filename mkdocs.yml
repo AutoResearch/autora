@@ -199,6 +199,7 @@ nav:
     - 5 - Workflow Explanation: 'examples/closed-loop-bandit-task/workflow.md'
     - 6 - Testing the Workflow: 'examples/closed-loop-bandit-task/testing.md'
     - 7 - Connect Project with Prolific: 'examples/closed-loop-bandit-task/prolific.md'
+    - 8 - Customization: 'examples/closed-loop-bandit-task/customization.md'
 - User Guide:
   - Installation: 'installation.md'
   - Terminology: 'terminology.md'
