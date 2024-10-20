@@ -301,8 +301,7 @@ python autora_workflow.py
 - Try to run the workflow for three cycles. Once completed, you should see the plot (also stored in the file ``model_comparison.png``) that compares the logistic regression model with the Bayesian Machine Scientist model.
 
 !!! hint
-    Note that you need to wait until the experiment is finished until you see a page with white background. If you end the experiment before, the ``firebase_runner`` will wait the minutes specified in ``time_out`` before it will be available for the next participant, i.e., run. If no more slots are currently available, you should see something like "We are sorry, there has been an unexpected technical issue.
-Thank you for your understanding." 
+    Note that you need to wait until the experiment is finished until you see a page with white background. If you end the experiment before, the ``firebase_runner`` will wait the minutes specified in ``time_out`` before it will be available for the next participant, i.e., run. If no more slots are currently available, you should see something like "We are sorry, there has been an unexpected technical issue. Thank you for your understanding." 
 
 !!! hint
     You can check which experiments were successfully completed by looking into the Firestore database. In your project on the [Firebase Console](https://console.firebase.google.com/), simply navigate to ``FireStore Database``. The fields in ``autora`` > ``autora_out`` > ``observations`` list all the conditions. "null" means that no data has been collected for that condition yet.

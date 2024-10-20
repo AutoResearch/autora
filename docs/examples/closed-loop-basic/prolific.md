@@ -97,7 +97,7 @@ experiment_runner = firebase_prolific_runner(
 
 - Make sure to update the input arguments above according to your configuration on Prolific and Firebase.
 
-## Update .env in testingzone (Optional)
+## Update .env in testing_zone (Optional)
 
 The ``firebase_prolific_runner`` optimally allocates slots for the experiments you submit to Prolific. If you are done with testing, and are ready for data collection you may want to update the ``.env`` file in the ``testing_zone`` folder.
 

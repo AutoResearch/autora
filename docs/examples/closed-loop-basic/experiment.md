@@ -1,6 +1,6 @@
 # Constructing the Experiment
 
-In this study, we will want to design a simple phychophysics experiment in which participants are tasked to decide which of two sets of dots has more dots. 
+In this study, we will want to design a simple psychophysics experiment in which participants are tasked to decide which of two sets of dots has more dots. 
 
 In this part of the example, we will code up two functions, one function ``trial_sequence`` for generating a sequence of experiment conditions, and another function ``stimulus_sequence`` for compiling the corresponding experiment. We will need both functions to run the AutoRA workflow. Accordingly, we will integrate these functions into the Researcher Hub.
 
@@ -51,7 +51,7 @@ def trial_sequence(num_dots_1, num_dots_2, min_trials):
 
   block = CrossBlock(design, crossing, constraints)
 
-  # synthesize trialsequence
+  # synthesize trial sequence
   experiment = synthesize_trials(block, 1, CMSGen)
 
   # export as dictionary
@@ -267,7 +267,7 @@ The following code turns these stimuli into a list, which is then compiled into 
   instruction_block = Block(introduction_list)
 ```
 
-Similarly, we can define instructions for the end of the experiment. In this case, we present just a single sentence for the duration of 3000 miliseconds.
+Similarly, we can define instructions for the end of the experiment. In this case, we present just a single sentence for the duration of 3000 milliseconds.
 
 ```python
 # EXIT BLOCK
@@ -302,7 +302,7 @@ The random dot pattern stimulus is parameterized by two stimulus features, ``dot
   dot_stimulus_right = TimelineVariable('dots right', [num_dots_1, num_dots_2])
 ```
 
-Next, we define the random dot pattern stimulus, as a ``RandomDotPatternsStimulus`` object, which is shown for 2000ms (``duration=2000``). It consits of two set of dots (``number_of_apertures=2``), which are parameterized by the two timeline variables ``number_of_oobs=[dot_stimulus_left, dot_stimulus_right]``. Finally, we allow participants to record a response on each stimulus, indicating whether the dots match or not by pressing the respective keys for `y` and `n` (``choices=["y", "n"]``)
+Next, we define the random dot pattern stimulus, as a ``RandomDotPatternsStimulus`` object, which is shown for 2000ms (``duration=2000``). It consists of two set of dots (``number_of_apertures=2``), which are parameterized by the two timeline variables ``number_of_oobs=[dot_stimulus_left, dot_stimulus_right]``. Finally, we allow participants to record a response on each stimulus, indicating whether the dots match or not by pressing the respective keys for `y` and `n` (``choices=["y", "n"]``)
 
 ```python
 # We can define a stimulus as a function of those stimulus features
@@ -351,7 +351,7 @@ Head over to the `testing_zone` folder:
 cd testing_zone
 ```
 
-Next, install the dependency for the dot stimulus jspsych plugin: 
+Next, install the dependency for the dot stimulus jsPsych plugin: 
 
 ```shell
 npm install @jspsych-contrib/plugin-rok
@@ -363,7 +363,7 @@ import jsPsychRok from '@jspsych-contrib/plugin-rok'
 global.jsPsychRok = jsPsychRok
 ```
 
-In this example, we will generate the entire js Psych experiment in the workflow, we will be sending the full Java Script code to the testing zone. Replace the `main` function in the `main.js` file with the following code:
+In this example, we will generate the entire js Psych experiment in the workflow, we will be sending the full JavaScript code to the testing zone. Replace the `main` function in the `main.js` file with the following code:
 
 ```javascript
 const main = async (id, condition) => {

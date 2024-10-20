@@ -54,11 +54,11 @@ study_completion_time = 5
 # Prolific Token: You can generate a token on your Prolific account
 prolific_token = 'my prolific token'
 
-# Completion code: The code a participant gets to prove they participated. If you are using the standard set up (with cookiecutter), please make sure this is the same code that you have providede in the .env file of the testing zone.
+# Completion code: The code a participant gets to prove they participated. If you are using the standard set up (with cookiecutter), please make sure this is the same code that you have provided in the .env file of the testing zone.
 completion_code = 'my completion code'
 ```
 
-## Update .env in testingzone (Optional)
+## Update .env in testing_zone (Optional)
 
 The ``firebase_prolific_runner`` optimally allocates slots for the experiments you submit to Prolific. If you are done with testing, and are ready for data collection you may want to update the ``.env`` file in the ``testing_zone`` folder.
 

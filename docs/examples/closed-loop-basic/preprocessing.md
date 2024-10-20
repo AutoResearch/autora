@@ -25,7 +25,7 @@ def trial_list_to_experiment_data(trial_sequence):
         'accuracy': []
     }
     for trial in trial_sequence:
-        # Filter expeirment events that are not displaying the dots
+        # Filter experiment events that are not displaying the dots
         if trial['trial_type'] != 'rok':
             continue
             
@@ -64,7 +64,7 @@ First, note that we are looping through the trial sequence and filtering out eve
 
 ```python
     for trial in trial_sequence:
-        # Filter expeirment events that are not displaying the dots
+        # Filter experiment events that are not displaying the dots
         if trial['trial_type'] != 'rok':
             continue
             
@@ -103,7 +103,7 @@ Finally, we store the results in a dictionary and convert it to a pandas DataFra
     experiment_data = pd.DataFrame(results_dict)
 ```
 
-Note that this is a simple example of preprocessing. Depending on the complexity of your experiment and the analyses you wish to perform, you may need to implement more sophisticated preprocessing steps, such as averaging the accuarcy across trials:
+Note that this is a simple example of preprocessing. Depending on the complexity of your experiment and the analyses you wish to perform, you may need to implement more sophisticated preprocessing steps, such as averaging the accuracy across trials:
 
             
 ```python
