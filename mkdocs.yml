@@ -171,26 +171,34 @@ nav:
 - Introduction: 'index.md'
 - Basic Tutorials:
   - Home: 'tutorials/index.md'
-  - I - Components: 'tutorials/basic/Tutorial I Components.ipynb'
-  - II - Loop Constructs: 'tutorials/basic/Tutorial II Loop Constructs.ipynb'
-  - III - Functional Workflow: 'tutorials/basic/Tutorial III Functional Workflow.ipynb'
-  - IV - Customization: 'tutorials/basic/Tutorial IV Customization.ipynb'
-- Advanced Tutorials:
-  - Home: 'examples/index.md'
-  - Basic Closed-Loop Psychophysics Study:
-    - Home: 'examples/closed-loop-basic/index.md'
-    - I - Set Up Project: 'examples/closed-loop-basic/setup.md'
-    - II - Set Up Firebase: 'examples/closed-loop-basic/firebase.md'
-    - III - Connect Project With Firebase: 'examples/closed-loop-basic/testingzone.md'
-    - IV - Connect Workflow With Forestore: 'examples/closed-loop-basic/init_autora.md'
-    - V - Generating the Experiment: 'examples/closed-loop-basic/experiment.md'
-    - VI - Create Proprocessing Pipeline: 'examples/closed-loop-basic/preprocessing.md'
-    - VII - Update the Workflow: 'examples/closed-loop-basic/workflow.md'
-    - VIII - Connect Project with Prolific: 'examples/closed-loop-basic/prolific.md'
-  - Equation Discovery: 'theorist/Equation Discovery.ipynb'
-  - Experimentalists: 'tutorials/Experimentalist.ipynb'
-  - Online Closed-Loop Discovery:
-    - 'user-cookiecutter/docs/index.md'
+  - 1 - Components:
+    - Overview: 'tutorials/basic/Tutorial I Components.ipynb'
+    - 1a - Theorists: 'tutorials/basic/Tutorial Ia Theorists.ipynb'
+    - 1b - Experimentalists: 'tutorials/basic/Tutorial Ib Experimentalists.ipynb'
+  - 2 - Loop Constructs: 'tutorials/basic/Tutorial II Loop Constructs.ipynb'
+  - 3 - Functional Workflow: 'tutorials/basic/Tutorial III Functional Workflow.ipynb'
+  - 4 - Customization: 'tutorials/basic/Tutorial IV Customization.ipynb'
+- Use Case Tutorials:
+  - Introduction: 'examples/index.md'
+  - Closed-Loop Psychophysics Study:
+    - Overview: 'examples/closed-loop-basic/index.md'
+    - 1 - Set Up Project: 'examples/closed-loop-basic/setup.md'
+    - 2 - Set Up Firebase: 'examples/closed-loop-basic/firebase.md'
+    - 3 - Connect Project With Firebase: 'examples/closed-loop-basic/testingzone.md'
+    - 4 - Connect Workflow With Forestore: 'examples/closed-loop-basic/init_autora.md'
+    - 5 - Generating the Experiment: 'examples/closed-loop-basic/experiment.md'
+    - 6 - Create Proprocessing Pipeline: 'examples/closed-loop-basic/preprocessing.md'
+    - 7 - Update the Workflow: 'examples/closed-loop-basic/workflow.md'
+    - 8 - Connect Project with Prolific: 'examples/closed-loop-basic/prolific.md'
+  - Closed-Loop Two-Armed Bandit Study:
+    - Overview: 'examples/closed-loop-bandit-task/index.md'
+    - 1 - Set Up Project: 'examples/closed-loop-bandit-task/setup.md'
+    - 2 - Set Up Firebase: 'examples/closed-loop-bandit-task/firebase.md'
+    - 3 - Connect Project With Firebase: 'examples/closed-loop-bandit-task/testingzone.md'
+    - 4 - Connect Workflow With Forestore: 'examples/closed-loop-bandit-task/init_autora.md'
+    - 5 - Workflow Explanation: 'examples/closed-loop-bandit-task/workflow.md'
+    - 6 - Testing the Workflow: 'examples/closed-loop-bandit-task/testing.md'
+    - 7 - Connect Project with Prolific: 'examples/closed-loop-bandit-task/prolific.md'
 - User Guide:
   - Installation: 'installation.md'
   - Terminology: 'terminology.md'
@@ -261,6 +269,7 @@ nav:
   - Online Experiments:
     - Home: 'online-experiments/index.md'
     - Firebase: 'online-experiments/firebase.md'
+    - Example: 'user-cookiecutter/docs/index.md'
 - Contributor Guide:
   - Home: 'contribute/index.md'
   - Modules:
