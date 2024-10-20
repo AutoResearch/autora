@@ -187,7 +187,7 @@ nav:
     - 3 - Connect Project With Firebase: 'examples/closed-loop-basic/testingzone.md'
     - 4 - Connect Workflow With Firestore: 'examples/closed-loop-basic/init_autora.md'
     - 5 - Generating the Experiment: 'examples/closed-loop-basic/experiment.md'
-    - 6 - Create Proprocessing Pipeline: 'examples/closed-loop-basic/preprocessing.md'
+    - 6 - Create Preprocessing Pipeline: 'examples/closed-loop-basic/preprocessing.md'
     - 7 - Update the Workflow: 'examples/closed-loop-basic/workflow.md'
     - 8 - Connect Project with Prolific: 'examples/closed-loop-basic/prolific.md'
   - Closed-Loop Two-Armed Bandit Study:
