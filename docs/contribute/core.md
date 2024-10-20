@@ -3,7 +3,7 @@
 Core contributions are changes to AutoRA which aren't experimentalists, (synthetic) experiment runners, or theorists. 
 The primary purpose of the core is to provide utilities for:
 
-- describing experiments and handling workflows (in the [`autora-core` package](https://github.com/autoresearch/autora-core))
+- describing experiments and handling workflows (in the [`autora-core` package](https://github.com/autoresearch/autora-core)
 - run synthetic experiments (currently in the [`autora-synthetic` package](https://github.com/autoresearch/autora-synthetic). Synthetic experiment runners may be submitted as pull requests to the 
     [`autora-synthetic`](https://github.com/AutoResearch/autora-synthetic/blob/main/CONTRIBUTING.md) package, providing they 
     require no additional dependencies. However, if your contribution requires additional dependencies, you can submit it as a full package following 

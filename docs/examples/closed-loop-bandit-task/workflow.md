@@ -65,7 +65,7 @@ The dependent variable corresponds to the choice trajectory of the participant. 
 
 ## AutoRA State
 
-In this exapmple, we choose a non-standard state for the AutoRA workflow. We use a `RnnState` that extends the `StandardState` with additional models. 
+In this example, we choose a non-standard state for the AutoRA workflow. We use a `RnnState` that extends the `StandardState` with additional models. 
 ```python
 @dataclass(frozen=True)
 class RnnState(StandardState):
@@ -78,7 +78,7 @@ class RnnState(StandardState):
 state = RnnState(variables=variables)
 ```
 
-The `RnnState` is a dataclass that is used to store the state of the AutoRA workflow. You cann learn more about non-standard states in the [User Guide](https://autoresearch.github.io/autora/core/docs/cycle/Dynamically%20Extending%20and%20Altering%20the%20State/).
+The `RnnState` is a dataclass that is used to store the state of the AutoRA workflow. You can learn more about non-standard states in the [User Guide](https://autoresearch.github.io/autora/core/docs/cycle/Dynamically%20Extending%20and%20Altering%20the%20State/).
 
 ## Experimentalists
 
@@ -112,7 +112,7 @@ Note that it is important to use the `@on_state()` decorator to ensure that the 
 
 The `ModelDisagreementPooler` is used to generate new experiment conditions in each cycle. It uses the best two models discovered so far to generate new reward trajectories that best distinguish between the two models.
 
-Since the predictions of a model has a non-standard format (it isn't a single number but a 2 x ``n_trials`` arrat), we need to create a custom distance function. 
+Since the predictions of a model has a non-standard format (it isn't a single number but a 2 x ``n_trials`` array), we need to create a custom distance function. 
 
 The prediction for a model is a list of two-dimensional vectors, e.g., ``array([[0.5, 0.5], [0.68..., 0.31...], ...])``, indicating the reward probability for the boxes on each trial. The following code specifies how to compute a distance between two proposed reward trajectories specified in this format:
 
@@ -144,7 +144,7 @@ The experiment runners are responsible for generating data. Here, we provide thr
 
 ### Synthetic Runner
 
-The `SyntheticRunner` is used to generate synthetic data for testing the workflow. It generates synthetic data by simulating a known reinforcement learning rule (Q-learning) on the reward trajectories. The runner is part of of the ``autora-synthetic`` package.
+The `SyntheticRunner` is used to generate synthetic data for testing the workflow. It generates synthetic data by simulating a known reinforcement learning rule (Q-learning) on the reward trajectories. The runner is part of the ``autora-synthetic`` package.
 
 ```python
 runner = q_learning()
@@ -215,7 +215,7 @@ Here, we won't explain how to program jsPsych experiments. Please refer to the [
 
 Note that the ``main`` function of the ``main.js`` file starts like this
 
-```python
+```javascript
 const main = async (id, condition) => {
 
     const timeline_variables = JSON.parse(condition)
@@ -228,7 +228,7 @@ Our workflow uses a helper function to ensure that the `condition` is correctly 
 
 #### Helper Function for Uploading Experiment Conditions to Web Experiment
 
-The follwing helper function transforms a condition (the output of a experimentalist) to a trial sequence, that is readable by the jsPsych experiment. jsPsych expects a trial sequence in the following format: ``trial_sequence = {'feature_a': [1, 2, 3, ...], 'feature_b': ['red', 'green', ...], ...}``.
+The following helper function transforms a condition (the output of an experimentalist) to a trial sequence, that is readable by the jsPsych experiment. jsPsych expects a trial sequence in the following format: ``trial_sequence = {'feature_a': [1, 2, 3, ...], 'feature_b': ['red', 'green', ...], ...}``.
 
 ```python
 def _condition_to_trial_sequence(conditions):
@@ -323,7 +323,7 @@ study_completion_time = 5
 # Prolific Token: You can generate a token on your Prolific account
 prolific_token = 'my prolific token'
 
-# Completion code: The code a participant gets to prove they participated. If you are using the standard set up (with cookiecutter), please make sure this is the same code that you have providede in the .env file of the testing zone.
+# Completion code: The code a participant gets to prove they participated. If you are using the standard set up (with cookiecutter), please make sure this is the same code that you have provided in the .env file of the testing zone.
 completion_code = 'my completion code'
 ```
 

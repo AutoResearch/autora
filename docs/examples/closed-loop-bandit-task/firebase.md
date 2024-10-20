@@ -4,7 +4,7 @@ Next, we want to set up Firebase for our project.
 
 ![Setup](../img/system_firebase.png)
 
-Firebase is a platform developed by Google for creating mobile and web applications. Here, we will leverge firebase as a platform for hosting our web-based behavioral experiment, and firestore for hosting associated experimental data.
+Firebase is a platform developed by Google for creating mobile and web applications. Here, we will leverage firebase as a platform for hosting our web-based behavioral experiment, and firestore for hosting associated experimental data.
 
 To serve a website via Firebase and use the Firestore Database, it is necessary to set up a Firebase project. Follow the steps below to get started:
 
@@ -26,8 +26,8 @@ You'll need a [Google account](https://www.google.com/account/about/) to use Fir
   ![webapp.png](../img/webapp.png)
   2. Name the app (can be the same as your project) and check the box `Also set up Firebase Hosting`. Click on `Register app`.
   3. Select `Use npm`. We will use the configuration details later, but for now, click on `Next`.
-  3. We will install firebase tools later, for now, click on `Next`.
-  4. We will login and deploy our website later, for now, click on `Continue to console`.
+  4. We will install firebase tools later, for now, click on `Next`.
+  5. We will log in and deploy our website later, for now, click on `Continue to console`.
 
 ## Adding Firestore To Your Project
 For our closed-loop study, we will use a Firestore Database to communicate between the AutoRA workflow and the website conducting the experiment. We will upload experiment conditions to the database and also store experiment data in the database. 

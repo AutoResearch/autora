@@ -42,7 +42,7 @@ REACT_APP_completionCode="complete"
 
 ## Configure Your Project For Firebase
 
-- Make sure to ``cd`` into the `testing_zone` folder in your terminal.
+- ***!!! IMPORTANT !!!*** Make sure to ``cd`` into the `testing_zone` folder in your terminal.
 
 - In the `testing_zone` folder, enter the following commands in your terminal:
 First log in to your Firebase account using

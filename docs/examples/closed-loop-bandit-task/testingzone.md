@@ -48,7 +48,7 @@ First log in to your Firebase account using
 ```shell
 firebase login
 ```
-or (if you run this in codespace)
+or (if you run this in Codespaces)
 ```shell
 firebase login --no-localhost
 ```
@@ -65,10 +65,8 @@ firebase init
 - An interactive initialization process will now run in your command line. You can select options with SPACE and confirm your selection with ENTER.
 
   1. For the first question, select the following options. Once you selected both options, press ENTER.
-
-  - `Firestore: Configure security rules and indexes files for Firestore`
-  - `Hosting: Configure files for Firebase Hosting and (optionally) set up GitHub Action deploys`
-
+     - `Firestore: Configure security rules and indexes files for Firestore`
+     - `Hosting: Configure files for Firebase Hosting and (optionally) set up GitHub Action deploys`
   2. Select `use an existing project`. Press ENTER.
   3. Select the project you created earlier. You should recognize it by the project name you entered when setting up Firebase. Press ENTER.
   4. Confirm the default option `(firestore.rules)` with ENTER. 
@@ -78,8 +76,8 @@ firebase init
   8. Don't set up automatic builds and deploys with GitHub. Enter `N` and press ENTER. 
   9. Don't overwrite the index.html file if the question pops up.
 
-## Install jspsych
-- Next, we install jspsych (still within the testing_zone folder):
+## Install jsPsych
+- Next, we install jsPsych (still within the testing_zone folder):
 ```shell
 npm install jspsych@7.3.1
 ```

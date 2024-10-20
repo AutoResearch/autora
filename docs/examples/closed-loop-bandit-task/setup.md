@@ -23,7 +23,7 @@ To open the repository in GitHub Codespaces, click on the ``Code`` button and se
 
 ## Set Up Environment
 
-Once you cloned your repository or opened it in codespaces, it is time to set up your environment. Here, we will use a Python virtual environment to manage dependencies.
+Once you cloned your repository or opened it in Codespaces, it is time to set up your environment. Here, we will use a Python virtual environment to manage dependencies.
 
 !!! success
     We recommend setting up your development environment using a manager like `venv`, which creates isolated python 
@@ -101,7 +101,7 @@ Once you installed the packages above, you can create the project by running the
 cookiecutter https://github.com/AutoResearch/autora-user-cookiecutter
 ```
 
-If cookecutter is not recognized, you may need to run the following command:
+If cookiecutter is not recognized, you may need to run the following command:
 
 ```shell
 python -m cookiecutter https://github.com/AutoResearch/autora-user-cookiecutter
@@ -110,7 +110,7 @@ python -m cookiecutter https://github.com/AutoResearch/autora-user-cookiecutter
 - You will be prompted to enter some information about your project. You can select single options by pressing SPACE and confirm your selection by pressing ENTER.
   1. You may first enter a project name, e.g., "closed-loop-study".
   2. Select ``yes`` to use advanced features.
-  3. We are going to use a theorist from a different package so we don't need to select any theorist here.
+  3. We are going to use a theorist from a different package, so we don't need to select any theorist here.
   4. Choose at least ``autora[experimentalist-bandit-random]`` and ``autora[experimentalist-model-disagreement]``.
   5. Make sure to select the ``autora[experiment-runner-firebase-prolific]`` option
   6. Select ``yes`` to set up a firebase experiment. When asked to install further packages (create-react-app@5.0.1), select yes (y). This may take some time.

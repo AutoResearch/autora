@@ -7,7 +7,7 @@ First, we need to set up our local AutoRA project.
 ## Create Repository
 To ease the setup process for this example, we provide a template repository that contains all the necessary files and configurations. 
 
-- Simply visit the following repository on Github: https://github.com/AutoResearch/autora-closed-loop-firebase-prolific
+- Simply visit the following repository on GitHub: [https://github.com/AutoResearch/autora-closed-loop-firebase-prolific](https://github.com/AutoResearch/autora-closed-loop-firebase-prolific)
 
 - Next, click on the green "Use this template" button to create a new repository in your account.
 ![use_template.png](../img/use_template.png)
@@ -18,12 +18,12 @@ To ease the setup process for this example, we provide a template repository tha
 
 - Once you created your own repository from the template, you can clone it to your local machine using ``git clone``. However, we recommend using GitHub Codespaces for this example, as it provides a more streamlined development environment.
 
-- To open the repository in Github Codespaces, click on the ``Code`` button and select ``Create codespace on main``.
+- To open the repository in GitHub Codespaces, click on the ``Code`` button and select ``Create codespace on main``.
 ![open_codespace.png](../img/open_codespace.png)
 
 ## Set Up Environment
 
-Once you cloned your repository or opened it in codespaces, it is time to set up your environment. Here, we will use a Python virtual environment to manage dependencies.
+Once you cloned your repository or opened it in Codespaces, it is time to set up your environment. Here, we will use a Python virtual environment to manage dependencies.
 
 !!! success
     We recommend setting up your development environment using a manager like `venv`, which creates isolated python 
@@ -103,7 +103,7 @@ To simplify the setup process, we provide a `cookiecutter` template that generat
 cookiecutter https://github.com/AutoResearch/autora-user-cookiecutter
 ```
 
-If cookecutter is not recognized, you may need to run the following command:
+If cookiecutter is not recognized, you may need to run the following command:
 
 ```shell
 python -m cookiecutter https://github.com/AutoResearch/autora-user-cookiecutter

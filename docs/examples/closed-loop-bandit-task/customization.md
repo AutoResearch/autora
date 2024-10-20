@@ -11,3 +11,4 @@ Adjusting the workflow may involve:
 
 
 - **Behavioral experiment** ``testng_zone/src/design/main.js``: Here, you can customzie the web-based experiment that is shown to the participant. You can find great tutorials on how to build jsPsych experiments on their [website](https://www.jspsych.org/latest/). Keep in mind, that you should build your website in a way that the conditions are used to customize the experiment. A good way to do so is by creating trial-sequences in ``autora_workflow.py`` and using them as ``timeline_variables``.
+

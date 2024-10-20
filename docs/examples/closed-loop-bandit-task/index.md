@@ -14,7 +14,7 @@ It may also serve as a **starting point** for developing your own computational 
 ## What You’ll Learn:
 - **Set up a closed-loop AutoRA workflow**: Learn how to create an automated discovery process, iterating between computational model discovery, experimental design, and data collection.
 - **Automate experimental design with [SweetPea](https://sites.google.com/view/sweetpea-ai)**: Use SweetPea to generate experimental designs that adapt as the study progresses.
-- **Interfacing with web experiments**: Use AutoRA to update the parameterization of an existing web-based experiment writtin in jsPsych.
+- **Interfacing with web experiments**: Use AutoRA to update the parameterization of an existing web-based experiment written in jsPsych.
 - **Host experiments using [Google Firebase](https://firebase.google.com/)**: Set up a server for hosting your behavioral experiments, making them accessible to participants.
 - **Store experimental data with [Google Firestore](https://firebase.google.com/)**: Efficiently manage and store participant data collected from your experiment.
 - **Collect data from real participants with [Prolific](https://www.prolific.com/)**: Recruit and manage participants through Prolific, ensuring high-quality behavioral data.
