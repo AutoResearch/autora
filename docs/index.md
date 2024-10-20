@@ -34,15 +34,24 @@ AutoRA consists of different modules that can be used independently or in combin
 AutoRA can be used for a variety of research purposes in empirical sciences, such as psychology, 
 neuroscience, economics, physics, or materials science. Usages, as illustrated in the following tutorials, include:
 
-- [**Equation discovery**](tutorials/Theorist.ipynb) from empirical data
-- [**Experimental design**](tutorials/Experimentalist.ipynb) for follow-up experiments
-- **Research documentation and dissemination**
+- **Equation discovery** from empirical data
+    - Example: [Theorist Tutorial](tutorials/basic/Tutorial%20Ia%20Theorists.ipynb).
+- **Experimental design** for follow-up experiments
+    - Example: [Experimentalist Tutorial](tutorials/basic/Tutorial%20Ib%20Experimentalists.ipynb).
 - **Closed-loop empirical research**
+    - Example: [Closed-Loop Psychophysics Study Tutorial](examples/closed-loop-basic/index.md).
+- **Research documentation and dissemination**
 - **Computational analyses of the scientific process** (metascience, computational philosophy of science)
 
 ## Motivation
 
 The pace of empirical research is constrained by the rate at which scientists can alternate between the development of formal theories and the execution of experiments. However, attempts to increase this rate often compromise scientific rigor, leading to deficiencies such as the absence of formal modeling, non-replicable findings, and insufficient documentation. In order to surmount these limitations, we aim to develop AutoRA––an open-source framework that automates the generation, estimation, and empirical testing of scientific models. By automating steps of the empirical research process, we hope AutoRA can accelerate scientific discovery while promoting greater transparency and rigor in empirical research.
+
+## How to Get Started?
+
+We recommend that you have a look at the [Basic Tutorials](tutorials/index.md) to get started with AutoRA. These tutorials provide a step-by-step guide on how to set up a basic AutoRA workflow, including the creation of a theorist, experimentalist, and experiment runner.
+
+Once you are familiar with the basics, you can explore the [Use Case Tutorials](examples/index.md) to see how AutoRA can be used for different real-world research purposes. We recommend the [Closed-Loop Psychophysics Study](examples/closed-loop-basic/index.md) as a starting point for understanding how AutoRA can be used for closed-loop behavioral research.
 
 ## Pointers
 
@@ -56,8 +65,8 @@ The pace of empirical research is constrained by the rate at which scientists ca
 <a href="https://schmidtsciencefellows.org/"><img src="img/ssf.png" alt="BRAINSTORM Program" height="80"></img></a>
 
 
-This project is in active development by the [Autonomous Empirical Research Group](https://musslick.github.io/AER_website/Research.html), led by [Sebastian Musslick](https://smusslick.com), in collaboration with the [Center for Computation and Visualization at Brown University](https://ccv.brown.edu).
+This project is in active development by the [Autonomous Empirical Research Group](https://musslick.github.io/AER_website/Research.html).
 
-The development of this package is supported by Schmidt Science Fellows, in partnership with the Rhodes Trust, as well as the Carney BRAINSTORM program at Brown University.
+The development of this package was supported by Schmidt Science Fellows, in partnership with the Rhodes Trust, as well as the [Carney BRAINSTORM program](https://ccbs.carney.brown.edu/brainstorm) at Brown University. The development of auxiliary packages for AutoRA, such as `autodoc`, is supported by [Schmidt Sciences, LLC. and the Virtual Institute for Scientific Software (VISS)](https://www.schmidtsciences.org/viss/). The AutoRA package was developed using computational resources and services at the [Center for Computation and Visualization at Brown University](https://ccv.brown.edu).
 
 
