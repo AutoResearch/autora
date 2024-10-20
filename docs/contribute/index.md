@@ -38,7 +38,7 @@ In general, AutoRA follows the [PEP 8 – Style Guide for Python Code](https://p
 
 ### Documentation Style
 
-For documenation, AutoRA adheres to the maxim, "Everything should be made as simple as possible, but no simpler." That is, we strive to make documenation clear and comprehensive, but as concise and digestible as possible. We also encourage formatting and hyperlinking that facilitate understanding and make navigation of the docs intuitive. Finally, we encourage a strong form of title case for headings — that is, for all titles and subtitles, the first letter of each word should be capitalized, such as in the following example: This Is An Example Title
+For documentation, AutoRA adheres to the maxim, "Everything should be made as simple as possible, but no simpler." That is, we strive to make documentation clear and comprehensive, but as concise and digestible as possible. We also encourage formatting and hyperlinking that facilitate understanding and make navigation of the docs intuitive. Finally, we encourage a strong form of title case for headings — that is, for all titles and subtitles, the first letter of each word should be capitalized, such as in the following example: This Is An Example Title
 
 
 ## Module Contributions

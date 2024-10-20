@@ -49,10 +49,10 @@ you will still be able to install your package separately, in addition to `autor
 ### Add Documentation (Optional)
 
 It is highly encouraged that you add documentation of your package in `docs/index.md`. You can also add new or delete unnecessary pages 
-in the `docs` folder. However you structure your documentation, be sure that structure is reflected in the `mkdocs.yml` file.
+in the `docs` folder. However, you structure your documentation, be sure that structure is reflected in the `mkdocs.yml` file.
 
 You are also encouraged to describe basic usage of your module in the 
-python notebook ``Basic Usage.ipynb`` in the `docs` folder. Finally you can outline the basic setup of your module in 
+python notebook ``Basic Usage.ipynb`` in the `docs` folder. Finally, you can outline the basic setup of your module in 
 the `docs/quickstart.md` file.
 
 *Note: Documentation is required for your module to become part of the main 
@@ -73,7 +73,7 @@ pip install -e ".[dev]"
 There are several ways to publish your package, depending on how you set up your repository.
 
 ### Publishing Via GitHub Actions
-If you used the **cookiecutter template** with the advanced setup, and uploaded your repository to github.com, then you can use Github Actions to automatically publish your package to PyPI or Conda. 
+If you used the **cookiecutter template** with the advanced setup, and uploaded your repository to GitHub, then you can use GitHub Actions to automatically publish your package to PyPI or Conda. 
 
 Note, if your repository is part of the [AutoResearch Organization](https://github.com/AutoResearch) you can skip the step below for creating a new secret in your repository.
 
@@ -269,7 +269,7 @@ mkdocs serve
 the right place and renders correctly.
 
 
-Once everything is working locally, make a new PR on [github.com](https://github.com/autoresearch/autora) with your 
+Once everything is working locally, make a new PR on [GitHub.com](https://github.com/autoresearch/autora) with your 
 changes. Include: 
 
 - a description of the changes to the package, and 

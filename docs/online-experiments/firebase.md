@@ -31,7 +31,7 @@ This creates your ***project folder***. Before writing code for your website, yo
 
 - Create and log in to a Firebase account on the [Firebase website](https://firebase.google.com/).
 - Create a Firebase project by clicking add project and enter a project name.
-- You can choose to disable google analytics in the next page if you are not planning on using it for your project.
+- You can choose to disable Google Analytics in the next page if you are not planning on using it for your project.
 
 ### Copy Web App Credentials
 
