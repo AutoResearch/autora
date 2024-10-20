@@ -1,4 +1,4 @@
-# Customization (Optional)
+# Customization
 
 The code you used in this example may serve as a template for future projects. The most important files are:
 
