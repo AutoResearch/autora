@@ -203,6 +203,7 @@ nav:
 - User Guide:
   - Installation: 'installation.md'
   - Terminology: 'terminology.md'
+  - Cheat Sheet: 'cheat-sheet.md'
   - Core:
     - Home: 'core/docs/index.md'
     - State: 'core/docs/The State Mechanism.ipynb'
