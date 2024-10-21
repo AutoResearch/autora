@@ -49,9 +49,9 @@ In using AutoRA, it is helpful to be aware of its structure, which is described 
 
 ``autora`` is organized into one "parent" and many "child" packages.
 
-![image](img/package_overview.png)
+![image](img/contributor_model.png)
 
-The ``autora`` "parent" package depends on core packages, such as [`autora-core`](https://github.com/autoresearch/autora-core), [`autora-workflow`](https://github.com/autoresearch/autora-workflow), and [`autora-synthetic`](https://github.com/autoresearch/autora-synthetic), which are automatically installed with ``autora``. 
+The ``autora`` "parent" package depends on core packages, such as [`autora-core`](https://github.com/autoresearch/autora-core) and [`autora-synthetic`](https://github.com/autoresearch/autora-synthetic), which are automatically installed with ``autora``. 
 
 However, the ``autora`` ecosystem also includes vetted modules (child packages) as **optional dependencies** which users can choose to install. Below, we provide a list of all optional dependencies that are currently vetted by the ``autora`` core team.
 
@@ -62,7 +62,7 @@ To install any (combination) of optional dependencies, users should run the rele
 pip install -U "autora[desired-dependency]"
 ```
 
-For example, to install one of the [Theorists](theorist/index.md), such as the Bayesian Machine Scientist (BMS), a user should run:
+For example, to install one of the [Theorists](theorist/index.md), such as the Bayesian Machine Scientist (BMS) from the package `autora-theorist-bms`, a user should run:
 
 ```shell
 pip install -U "autora[theorist-bms]"
