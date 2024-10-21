@@ -37,7 +37,7 @@ Check out tutorials and documentation at
 
 ## Example
 
-The following example demonstrates how to use AutoRA to automate the process of model discovery, experimental design, and data collection. 
+The following basic example demonstrates how to use AutoRA to automate the process of model discovery, experimental design, and data collection. 
 
 The discovery problem is defined by a single independent variable $x \in [0, 2 \pi]$ and dependent variable $y$.
 The experiment amounts to a simple sine wave, $y = \sin(x)$, which is the model we are trying to discover.
@@ -127,6 +127,7 @@ for i in range(5):
     print('\n')
 ```
 
+If you are curious about how to apply AutoRA to real-world discovery problems, you can find use case examples of AutoRA in the [Use Case Tutorials](https://autoresearch.github.io/autora/examples/) section of the documentation.
 
 ## Contributions
 
@@ -134,11 +135,9 @@ We welcome contributions to the AutoRA project. Please refer to the [contributor
 
 ## About
 
-This project is in active development by 
-the [Autonomous Empirical Research Group](http://empiricalresearch.ai), 
-in collaboration with the [Center for Computation and Visualization at Brown University](https://ccv.brown.edu).
+This project is in active development by the [Autonomous Empirical Research Group](https://musslick.github.io/AER_website/Research.html).
 
-The development of this package is supported by Schmidt Science Fellows, in partnership with the Rhodes Trust, as well as the Carney BRAINSTORM program at Brown University.
+The development of this package was supported by [Schmidt Science Fellows](https://schmidtsciencefellows.org/), in partnership with the Rhodes Trust, as well as the [Carney BRAINSTORM program](https://ccbs.carney.brown.edu/brainstorm) at Brown University. The development of auxiliary packages for AutoRA, such as `autodoc`, is supported by [Schmidt Sciences, LLC. and the Virtual Institute for Scientific Software (VISS)](https://www.schmidtsciences.org/viss/). The AutoRA package was developed using computational resources and services at the [Center for Computation and Visualization at Brown University](https://ccv.brown.edu).
 
 
 ## Read More

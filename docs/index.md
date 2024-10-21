@@ -67,6 +67,6 @@ Once you are familiar with the basics, you can explore the [Use Case Tutorials](
 
 This project is in active development by the [Autonomous Empirical Research Group](https://musslick.github.io/AER_website/Research.html).
 
-The development of this package was supported by Schmidt Science Fellows, in partnership with the Rhodes Trust, as well as the [Carney BRAINSTORM program](https://ccbs.carney.brown.edu/brainstorm) at Brown University. The development of auxiliary packages for AutoRA, such as `autodoc`, is supported by [Schmidt Sciences, LLC. and the Virtual Institute for Scientific Software (VISS)](https://www.schmidtsciences.org/viss/). The AutoRA package was developed using computational resources and services at the [Center for Computation and Visualization at Brown University](https://ccv.brown.edu).
+The development of this package was supported by [Schmidt Science Fellows](https://schmidtsciencefellows.org/), in partnership with the Rhodes Trust, as well as the [Carney BRAINSTORM program](https://ccbs.carney.brown.edu/brainstorm) at Brown University. The development of auxiliary packages for AutoRA, such as `autodoc`, is supported by [Schmidt Sciences, LLC. and the Virtual Institute for Scientific Software (VISS)](https://www.schmidtsciences.org/viss/). The AutoRA package was developed using computational resources and services at the [Center for Computation and Visualization at Brown University](https://ccv.brown.edu).
 
 
