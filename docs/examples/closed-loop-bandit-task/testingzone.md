@@ -120,5 +120,5 @@ This includes a link to your web-based experiment. You can now open this link in
 
 ## Next Steps
 
-[Next: Initialize your AutoRA workflow in the researcher hub.](init_autora.md)
+[Next: Initialize your AutoRA workflow in the researcher hub.](init-autora.md)
 
