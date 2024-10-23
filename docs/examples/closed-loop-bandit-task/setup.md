@@ -7,7 +7,7 @@ First, we need to set up our local AutoRA project.
 ## Create Repository
 To ease the setup process for this example, we provide a template repository that contains all the necessary files and configurations. 
 
-Simply visit the following repository on GitHub: https://github.com/AutoResearch/autora-closed-loop-firebase-prolific-bandit-task
+Simply visit the following repository on GitHub: [https://github.com/AutoResearch/autora-closed-loop-firebase-prolific-bandit-task](https://github.com/AutoResearch/autora-closed-loop-firebase-prolific-bandit-task)
 
 Next, click on the green "Use this template" button to create a new repository in your account.
 ![use_template.png](../img/use_template.png)
@@ -75,6 +75,9 @@ npm install -g firebase-tools
 
 We will use this package to deploy our firebase functions for storing data.
 
+!!! hint
+    If you encounter any issues with the installation, make sure that you have the necessary permissions to install packages on your system. You may need to run the commands with `sudo` or as an administrator.
+
 ## Set Up Project Folder with Coockiecutter
 
 To establish an online closed-loop for AutoRA, there are two key components that need to be configured:
@@ -119,6 +122,9 @@ python -m cookiecutter https://github.com/AutoResearch/autora-user-cookiecutter
 You should now have the following project structure:
 
 ![project_structure.png](../img/project_structure.png)
+
+!!! hint
+    If you encounter any issues with the cookiecutter setup, make sure that you have the necessary permissions to install packages on your system. You may need to run the commands with `sudo` or as an administrator.
 
 [Next: Set up Firebase to host our experiment.](firebase.md)
 

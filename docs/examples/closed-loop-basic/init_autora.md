@@ -33,7 +33,7 @@ The AutoRA workflow (specifically the `autora-firebase-runner`) will need access
 - Click on ``Service accounts``.
 ![service_account.png](../img/service_account.png)
 - Having ``Node.js`` selected, click ``Generate a new private key``. This should generate a json file that you can download.
-- Open the file `autora_workflow.py` in the `research_hub`-folder and navigate to the part of the code that contains a placeholder for the credentials. It should look like this
+- Open the file `autora_workflow.py` in the `researcher_hub`-folder and navigate to the part of the code that contains a placeholder for the credentials. It should look like this
 ```python
 firebase_credentials = {
     "type": "type",

@@ -77,7 +77,7 @@ firebase init
   9. Don't overwrite the index.html file if the question pops up.
 
 ## Install jsPsych
-- Next, we install jsPsych (still within the testing_zone folder):
+- Next, we install jsPsych (still within the ``testing_zone`` folder):
 ```shell
 npm install jspsych@7.3.1
 ```
