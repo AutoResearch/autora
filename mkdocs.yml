@@ -203,6 +203,7 @@ nav:
 - User Guide:
   - Installation: 'installation.md'
   - Terminology: 'terminology.md'
+  - Cheat Sheet: 'cheat-sheet.md'
   - States and Workflows:
     - Home: 'core/docs/index.md'
     - AutoRA Variables: 'core/docs/Variable.ipynb'
