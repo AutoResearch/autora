@@ -15,14 +15,14 @@ Child packages are generally maintained by individual contributors. The parent p
 *core* packages, is maintained by the [Autonomous Empirical Research Group](https://musslick.github.io/AER_website/Team.html), 
 as well as external contributors.
 
-![image](../img/package_overview.png)
+![image](../img/contributor_model.png)
 
 [`autora`](https://github.com/autoresearch/autora) is the parent package which end users are expected to install. The
 parent depends on core packages, such as [`autora-core`](https://github.com/autoresearch/autora-core) and
 [`autora-synthetic`](https://github.com/autoresearch/autora-synthetic). It also includes vetted modules (child packages) as optional dependencies which users can choose 
 to install. 
 
-You may contribute to any of the core packages or develop your own module as a stand-alone package (see below).    
+You may contribute to any of the core packages or develop your own module as a stand-alone child package (see below).    
 
 
 ## Style Guide
