@@ -51,6 +51,10 @@ you will still be able to install your package separately, in addition to `autor
 It is highly encouraged that you add documentation of your package in `docs/index.md`. You can also add new or delete unnecessary pages 
 in the `docs` folder. However, you structure your documentation, be sure that structure is reflected in the `mkdocs.yml` file.
 
+!!! hint
+    When naming your documentation files, make sure to use `-` instead of `_` in the file name. For example, 
+    `random-sampler.md` instead of `random_sampler.md`. This style is in alignment with the AutoRA documentation.  
+
 You are also encouraged to describe basic usage of your module in the 
 python notebook ``Basic Usage.ipynb`` in the `docs` folder. Finally, you can outline the basic setup of your module in 
 the `docs/quickstart.md` file.
