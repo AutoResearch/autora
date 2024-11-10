@@ -203,15 +203,21 @@ nav:
 - User Guide:
   - Installation: 'installation.md'
   - Terminology: 'terminology.md'
-  - Core:
+  - States and Workflows:
     - Home: 'core/docs/index.md'
-    - State: 'core/docs/The State Mechanism.ipynb'
-    - Variable: 'core/docs/Variable.ipynb'
-    - Examples:
-      - 'core/docs/cycle/Basic Introduction to Functions and States.ipynb'
-      - 'core/docs/cycle/Combining Experimentalists with State.ipynb'
-      - 'core/docs/cycle/Dynamically Extending and Altering the State.ipynb'
-      - 'core/docs/cycle/Linear and Cyclical Workflows using Functions and States.ipynb'
+    - AutoRA Variables: 'core/docs/Variable.ipynb'
+    - States:
+      - Overview: 'core/docs/The State Mechanism.ipynb'
+      - Basic Usage: 'core/docs/cycle/Basic Introduction to Functions and States.ipynb'
+      - Combining Experimentalists with States: 'core/docs/cycle/Combining Experimentalists with State.ipynb'
+    - Workflows with States:
+      - Overview: 'core/docs/cycle/Linear and Cyclical Workflows using Functions and States.ipynb'
+      - Dynamically Altering the State: 'core/docs/cycle/Dynamically Extending and Altering the State.ipynb'
+    - Workflows for HPCs:
+      - "Command Line Interface": "core/docs/cli/index.md"
+      - "Basic Usage": "core/docs/cli/basic-usage/README.md"
+      - "Using Cylc": "core/docs/cli/cylc-pip/README.md"
+      - "Using Cylc and Slurm": "core/docs/cli/cylc-slurm-pip/README.md"
   - Theorists:
     - Home: 'theorist/index.md'
     - DARTS: '!import https://github.com/autoresearch/autora-theorist-darts/?branch=main&extra_imports=["mkdocs/base.yml"]'
@@ -264,11 +270,6 @@ nav:
         - Firebase-Prolific Runner: '!import https://github.com/autoresearch/autora-experiment-runner-firebase-prolific/?branch=main&extra_imports=["mkdocs/base.yml"]'
         - Firebase Experimentation Manager: '!import https://github.com/autoresearch/autora-experiment-runner-experimentation-manager-firebase/?branch=main&extra_imports=["mkdocs/base.yml"]'
         - Prolific Recruitment Manager: '!import https://github.com/autoresearch/autora-experiment-runner-recruitment-manager-prolific/?branch=main&extra_imports=["mkdocs/base.yml"]'
-  - "Command Line Interface":
-    - "Home": "core/docs/cli/index.md"
-    - "Basic Usage": "core/docs/cli/basic-usage/README.md"
-    - "Using Cylc": "core/docs/cli/cylc-pip/README.md"
-    - "Using Cylc and Slurm": "core/docs/cli/cylc-slurm-pip/README.md"
 - Contributor Guide:
   - Home: 'contribute/index.md'
   - Modules:
