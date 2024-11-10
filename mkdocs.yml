@@ -257,18 +257,18 @@ nav:
                 - 'synthetic/docs/Examples/Psychology/Q-Learning.ipynb'
             - Psychophysics:
                 - 'synthetic/docs/Examples/Psychophysics/Weber-Fechner-Law.ipynb'
-    - Firebase-Prolific: '!import https://github.com/autoresearch/autora-experiment-runner-firebase-prolific/?branch=main&extra_imports=["mkdocs/base.yml"]'
-    - Firebase: '!import https://github.com/autoresearch/autora-experiment-runner-experimentation-manager-firebase/?branch=main&extra_imports=["mkdocs/base.yml"]'
-    - Prolific: '!import https://github.com/autoresearch/autora-experiment-runner-recruitment-manager-prolific/?branch=main&extra_imports=["mkdocs/base.yml"]'
+    - Behavioral Web Experiments:
+        - Home: 'experiment-runner/behavioral/index.md'
+        - Example: 'experiment-runner/behavioral/example.md'
+        - Using Firebase: 'experiment-runner/behavioral/firebase.md'
+        - Firebase-Prolific Runner: '!import https://github.com/autoresearch/autora-experiment-runner-firebase-prolific/?branch=main&extra_imports=["mkdocs/base.yml"]'
+        - Firebase Experimentation Manager: '!import https://github.com/autoresearch/autora-experiment-runner-experimentation-manager-firebase/?branch=main&extra_imports=["mkdocs/base.yml"]'
+        - Prolific Recruitment Manager: '!import https://github.com/autoresearch/autora-experiment-runner-recruitment-manager-prolific/?branch=main&extra_imports=["mkdocs/base.yml"]'
   - "Command Line Interface":
     - "Home": "core/docs/cli/index.md"
     - "Basic Usage": "core/docs/cli/basic-usage/README.md"
     - "Using Cylc": "core/docs/cli/cylc-pip/README.md"
     - "Using Cylc and Slurm": "core/docs/cli/cylc-slurm-pip/README.md"
-  - Online Experiments:
-    - Home: 'online-experiments/index.md'
-    - Firebase: 'online-experiments/firebase.md'
-    - Example: 'user-cookiecutter/docs/index.md'
 - Contributor Guide:
   - Home: 'contribute/index.md'
   - Modules:
