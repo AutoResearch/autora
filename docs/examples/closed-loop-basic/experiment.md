@@ -231,7 +231,7 @@ Below, we elaborate a bit more on the code. However, if you are already familiar
 
 SweetBean organizes events into event sequences, and event sequences into blocks. Event sequences may correspond to trials, and blocks correspond to a sequence of experiment trials. 
 
-First, we define the instruction block, which consists of a series of text stimuli that provide instructions to the participants. Each text stimulus is defined as a ``TextStimulus`` object. The ``TextStimulus`` object takes as input the text to be displayed and the choices that the participant can make. The choices are defined as a list of keys that the participant can press to continue to the next instruction. In this case, the participant can continue by pressing the ``SPACE`` key.
+First, we define the instruction block, which consists of a series of text stimuli that provide instructions to the participants. Each text stimulus is defined as a ``Text`` object. The ``Text`` object takes as input the text to be displayed and the choices that the participant can make. The choices are defined as a list of keys that the participant can press to continue to the next instruction. In this case, the participant can continue by pressing the ``SPACE`` key.
 
 ```python
 # generate several text stimuli that serve as instructions
@@ -302,7 +302,7 @@ The random dot pattern stimulus is parameterized by two stimulus features, ``dot
   dot_stimulus_right = TimelineVariable('dots right')
 ```
 
-Next, we define the random dot pattern stimulus, as a ``RandomDotPatternsStimulus`` object, which is shown for 2000ms (``duration=2000``). It consists of two set of dots (``number_of_apertures=2``), which are parameterized by the two timeline variables ``number_of_oobs=[dot_stimulus_left, dot_stimulus_right]``. Finally, we allow participants to record a response on each stimulus, indicating whether the dots match or not by pressing the respective keys for `y` and `n` (``choices=["y", "n"]``)
+Next, we define the random dot pattern stimulus, as a ``RandomDotPatterns`` object, which is shown for 2000ms (``duration=2000``). It consists of two set of dots (``number_of_apertures=2``), which are parameterized by the two timeline variables ``number_of_oobs=[dot_stimulus_left, dot_stimulus_right]``. Finally, we allow participants to record a response on each stimulus, indicating whether the dots match or not by pressing the respective keys for `y` and `n` (``choices=["y", "n"]``)
 
 ```python
 # We can define a stimulus as a function of those stimulus features
