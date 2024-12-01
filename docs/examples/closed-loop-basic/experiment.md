@@ -351,13 +351,7 @@ Head over to the `testing_zone` folder:
 cd testing_zone
 ```
 
-Next, install the dependency for the dot stimulus jsPsych plugin: 
-
-```shell
-npm install @jspsych-contrib/plugin-rok
-```
-
-Also make sure to include the following lines in the `main.js` file in `testing_zone/src/design`:
+Make sure to include the following lines in the `main.js` file in `testing_zone/src/design`:
 ```javascript
 import jsPsychRok from '@jspsych-contrib/plugin-rok'
 global.jsPsychRok = jsPsychRok
@@ -377,6 +371,8 @@ Your ``main.js`` file should now look like this:
 ```javascript
 import { initJsPsych } from 'jspsych';
 import 'jspsych/css/jspsych.css'
+import 'sweetbean/dist/style/main.css';
+import 'sweetbean/dist/style/bandit.css';
 import htmlKeyboardResponse from '@jspsych/plugin-html-keyboard-response';
 import jsPsychRok from '@jspsych-contrib/plugin-rok'
 
