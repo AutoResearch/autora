@@ -31,7 +31,7 @@ Here, we will generate such a sequence of trials using [SweetPea](https://sites.
 
 !!! hint
     If you want to tinker with the SweetPea code just for this example, you can open the corresponding notebook in Google Colab by clicking the following badge:
-    [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/AutoResearch/autora/docs/examples/closed-loop-basic/notebooks/sweetpea.ipynb)
+    [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/AutoResearch/autora/blob/main/docs/examples/closed-loop-basic/notebooks/sweetpea.ipynb)
 
 The following function generates an experimental sequence of at least ``min_trials`` trials. Each trial consists of two conditions: the number of dots in the first set (``num_dots_1``) and the number of dots in the second set (``num_dots_2``). The function ``trial_sequence`` returns a list of dictionaries, where each dictionary represents a trial of a counterbalanced experiment sequence
 
@@ -64,7 +64,7 @@ def trial_sequence(num_dots_1, num_dots_2, min_trials):
 - To execute the script you will also need to ``pip install sweetpea`` in your virtual environment.
 - Make sure to add ``sweetpea`` as a dependency in the ``requirements.txt`` file within the ``researcher_hub`` folder.
 
-Below, we elaborate a bit more on the code. However, if you are already familiar with SweetPea, you may skip the "Explanation" section. Alternatively, you can gain an intuition for the code in the corresponding notebook:  [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/AutoResearch/autora/docs/examples/closed-loop-basic/notebooks/sweetpea.ipynb). 
+Below, we elaborate a bit more on the code. However, if you are already familiar with SweetPea, you may skip the "Explanation" section. Alternatively, you can gain an intuition for the code in the corresponding notebook:  [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/AutoResearch/autora/blob/main/docs/examples/closed-loop-basic/notebooks/sweetpea.ipynb). 
 
 ### Code Explanation 
 
@@ -124,7 +124,7 @@ Note that the function receives as input a ``timeline`` specifying a sequence of
 
 !!! hint
     If you want to tinker with the SweetBean code just for this example, you can open the corresponding notebook in Google Colab by clicking the following badge:
-    [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/AutoResearch/autora/docs/examples/closed-loop-basic/notebooks/sweetbean.ipynb)
+    [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/AutoResearch/autora/blob/main/docs/examples/closed-loop-basic/notebooks/sweetbean.ipynb)
 
 ```python
 from sweetbean.stimulus import Text, Fixation, RandomDotPatterns
@@ -223,7 +223,7 @@ Once both functions are integrated both functions, your researcher hub should co
 
 ![researcher_hub.png](img/researcher_hub.png)
 
-Below, we elaborate a bit more on the code. However, if you are already familiar with SweetBean, you may skip the "Explanation" section. Alternatively, you can gain an intuition for the code in the corresponding notebook:  [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/AutoResearch/autora/docs/examples/closed-loop-basic/notebooks/sweetbean.ipynb). 
+Below, we elaborate a bit more on the code. However, if you are already familiar with SweetBean, you may skip the "Explanation" section. Alternatively, you can gain an intuition for the code in the corresponding notebook:  [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/AutoResearch/autora/blob/main/docs/examples/closed-loop-basic/notebooks/sweetbean.ipynb). 
 
 
 
