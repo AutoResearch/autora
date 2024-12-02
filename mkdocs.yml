@@ -96,6 +96,9 @@ plugins:
       - name: bandit-random
         import_url: "https://github.com/AutoResearch/autora-experimentalist-bandit-random/?branch=main"
         imports: [ "src/" ]
+      - name: experiment-runner-firebase-prolific
+        import_url: "https://github.com/AutoResearch/autora-experiment-runner-firebase-prolific/?branch=main"
+        imports: [ "src/" ]
 
   gen-files:
     scripts: [ "mkdocs/generate_code_reference.py" ]
@@ -121,6 +124,7 @@ plugins:
           "./temp_dir/abstract-equation/src/",
           "./temp_dir/prediction-filter/src/",
           "./temp_dir/bandit-random/src/",
+          "./temp_dir/experiment-runner-firebase-prolific/src/",
         ]
         import:
           - https://scikit-learn.org/stable/objects.inv
