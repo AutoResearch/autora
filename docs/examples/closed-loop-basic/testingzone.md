@@ -80,16 +80,11 @@ firebase init
   8. Don't set up automatic builds and deploys with GitHub. Enter `N` and press ENTER. 
   9. Don't overwrite the index.html file if the question pops up.
 
-## Install jspsych
-- Next, we install jspsych (still within the ``testing_zone`` folder):
+## Install sweetbean
+- Next, we install sweetbean (still within the ``testing_zone`` folder):
 ```shell
-npm install jspsych@7.3.1
+npm install sweetbean
 ```
-- and a minimal package:
-```shell
-npm install @jspsych/plugin-html-keyboard-response
-```
-
 
 ## Build And Deploy To Firebase 
 The testing zone folder already contains a default web-based experiment. To serve this web-experiment on the internet, you must build and deploy it to Firebase. We will repeat this step later once we deploy our actual experiment.
