@@ -1,35 +1,80 @@
-cff-version: 0.1.1
-message: "If you use this software, please cite it as below."
+cff-version: "1.2.0"
 authors:
-- family-names: "Musslick"
-  given-names: "Sebastian"
+- family-names: Musslick
+  given-names: Sebastian
   orcid: "https://orcid.org/0000-0002-8896-639X"
-- family-names: "Andrew"
-  given-names: "Benjamin"
-- family-names: "Williams"
-  given-names: "Chad C."
+- family-names: Andrew
+  given-names: Benjamin
+- family-names: Williams
+  given-names: Chad C.
   orcid: "https://orcid.org/0000-0003-2016-5614"
-- family-names: "Hewson"
-  given-names: "Joshua T. S."
-- family-names: "Li"
-  given-names: "Sida"
+- family-names: Hewson
+  given-names: Joshua T. S.
+- family-names: Li
+  given-names: Sida
   orcid: "https://orcid.org/0009-0009-7849-1923"
-- family-names: "Marinescu"
-  given-names: "Ioana"
-- family-names: "Dubova"
-  given-names: "Marina"
+- family-names: Marinescu
+  given-names: Ioana
+- family-names: Dubova
+  given-names: Marina
   orcid: "https://orcid.org/0000-0001-5264-0489"
-- family-names: "Dang"
-  given-names: "George T."
+- family-names: Dang
+  given-names: George T.
   orcid: "https://orcid.org/0009-0008-1566-8245"
-- family-names: "Strittmatter"
-  given-names: "Younes"
+- family-names: Strittmatter
+  given-names: Younes
   orcid: "https://orcid.org/0000-0002-3414-2838"
-- family-names: "Holland"
-  given-names: "John G."
+- family-names: Holland
+  given-names: John G.
   orcid: "https://orcid.org/0000-0001-6845-8657"
-title: "AutoRA: Automated Research Assistant for Closed-Loop Empirical Research"
-version: 4.2.0
-doi: 10.5281/zenodo.10277415
-date-released: 2024-12-04
-url: "https://github.com/AutoResearch/autora"
+contact:
+- family-names: Musslick
+  given-names: Sebastian
+  orcid: "https://orcid.org/0000-0002-8896-639X"
+doi: 10.5281/zenodo.14278950
+message: If you use this software, please cite our article in the
+  Journal of Open Source Software.
+preferred-citation:
+  authors:
+  - family-names: Musslick
+    given-names: Sebastian
+    orcid: "https://orcid.org/0000-0002-8896-639X"
+  - family-names: Andrew
+    given-names: Benjamin
+  - family-names: Williams
+    given-names: Chad C.
+    orcid: "https://orcid.org/0000-0003-2016-5614"
+  - family-names: Hewson
+    given-names: Joshua T. S.
+  - family-names: Li
+    given-names: Sida
+    orcid: "https://orcid.org/0009-0009-7849-1923"
+  - family-names: Marinescu
+    given-names: Ioana
+  - family-names: Dubova
+    given-names: Marina
+    orcid: "https://orcid.org/0000-0001-5264-0489"
+  - family-names: Dang
+    given-names: George T.
+    orcid: "https://orcid.org/0009-0008-1566-8245"
+  - family-names: Strittmatter
+    given-names: Younes
+    orcid: "https://orcid.org/0000-0002-3414-2838"
+  - family-names: Holland
+    given-names: John G.
+    orcid: "https://orcid.org/0000-0001-6845-8657"
+  date-published: 2024-12-05
+  doi: 10.21105/joss.06839
+  issn: 2475-9066
+  issue: 104
+  journal: Journal of Open Source Software
+  publisher:
+    name: Open Journals
+  start: 6839
+  title: "AutoRA: Automated Research Assistant for Closed-Loop Empirical
+    Research"
+  type: article
+  url: "https://joss.theoj.org/papers/10.21105/joss.06839"
+  volume: 9
+title: "AutoRA: Automated Research Assistant for Closed-Loop Empirical
+  Research"
