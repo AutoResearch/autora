@@ -145,3 +145,21 @@ The development of this package was supported by [Schmidt Science Fellows](https
 - [AutoRA Pip Package](https://pypi.org/project/autora/)
 - [Autonomous Empirical Research Group](http://www.empiricalresearch.ai)
 
+## Citation
+ 
+If you would like to reference AutoRA, you can use the following BibTeX entry for the [associated publication in JOSS](https://joss.theoj.org/papers/10.21105/joss.06839):
+
+```bibtex
+@article{Musslick_AutoRA_Automated_Research_2024,
+author = {Musslick, Sebastian and Andrew, Benjamin and Williams, Chad C. and Hewson, Joshua T. S. and Li, Sida and Marinescu, Ioana and Dubova, Marina and Dang, George T. and Strittmatter, Younes and Holland, John G.},
+doi = {10.21105/joss.06839},
+journal = {Journal of Open Source Software},
+month = dec,
+number = {104},
+pages = {6839},
+title = {{AutoRA: Automated Research Assistant for Closed-Loop Empirical Research}},
+url = {https://joss.theoj.org/papers/10.21105/joss.06839},
+volume = {9},
+year = {2024}
+}
+```
