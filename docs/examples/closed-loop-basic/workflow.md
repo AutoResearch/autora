@@ -187,7 +187,7 @@ def runner_on_state(conditions):
         iv_1 = c['dots_left']
         iv_2 = c['dots_right']
         # get a timeline via sweetPea
-        timeline = trial_sequence(iv_1, iv_2, num_trials)[0]
+        timeline = trial_sequence(iv_1, iv_2, num_trials)
         print("Generated counterbalanced trial sequence.")
         # get js code via sweetBeaan
         js_code = stimulus_sequence(timeline)
@@ -452,7 +452,7 @@ We then define the function ``runner_on_state`` that uploads the experiment to F
         iv_1 = c['dots_left']
         iv_2 = c['dots_right']
         # get a timeline via sweetPea
-        timeline = trial_sequence(iv_1, iv_2, num_trials)[0]
+        timeline = trial_sequence(iv_1, iv_2, num_trials)
         print("Generated counterbalanced trial sequence.")
         # get js code via sweetBeaan
         js_code = stimulus_sequence(timeline)
