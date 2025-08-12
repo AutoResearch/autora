@@ -119,7 +119,8 @@ python -m cookiecutter https://github.com/AutoResearch/autora-user-cookiecutter
   4. You may select any experimentalist for determining novel experiment conditions. Here, we will select the ``autora[experimentalist-model-disagreement]`` option.
   5. Make sure to select the ``autora[experiment-runner-firebase-prolific]`` option
   6. Select ``yes`` to set up a firebase experiment. When asked to install further packages (create-react-app@5.0.1), select yes (y). This may take some time.
-  7. Finally, select ``Sweetbean`` as project type.
+  7. Select ``Sweetbean`` as project type.
+  8. If you are asked to enter a Firebase project ID, you can just press ENTER. It will fail to setup Firebase but we will set it up later manually.
 
 - Confirm that you have the following project folders:
 
