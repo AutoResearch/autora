@@ -373,12 +373,19 @@ import { initJsPsych } from 'jspsych';
 import 'jspsych/css/jspsych.css'
 import 'sweetbean/dist/style/main.css';
 import 'sweetbean/dist/style/bandit.css';
+import * as SweetBeanRuntime from 'sweetbean/dist/runtime';
+
 import htmlKeyboardResponse from '@jspsych/plugin-html-keyboard-response';
 import jsPsychRok from '@jspsych-contrib/plugin-rok'
-
 global.jsPsychRok = jsPsychRok
+
 global.initJsPsych = initJsPsych;
 global.jsPsychHtmlKeyboardResponse = htmlKeyboardResponse
+
+
+Object.entries(SweetBeanRuntime).forEach(([key, value]) => {
+    global[key] = value;
+});
 
 /**
  * This is the main function where you program your experiment. For example, you can install jsPsych via node and
@@ -391,6 +398,7 @@ const main = async (id, condition) => {
     const observation = await eval(condition['experiment_code'] + "\nrunExperiment();");
     return JSON.stringify(observation)
 }
+
 
 export default main
 ```
