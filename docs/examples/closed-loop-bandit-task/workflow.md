@@ -110,7 +110,7 @@ Note that it is important to use the `@on_state()` decorator to ensure that the 
 
 ### Model Disagreement Sampler
 
-The `ModelDisagreementPooler` is used to generate new experiment conditions in each cycle. It uses the best two models discovered so far to generate new reward trajectories that best distinguish between the two models.
+The `model_disagreement_sampler` is used to generate new experiment conditions in each cycle. It uses the best two models discovered so far to generate new reward trajectories that best distinguish between the two models.
 
 Since the predictions of a model has a non-standard format (it isn't a single number but a 2 x ``n_trials`` array), we need to create a custom distance function. 
 
