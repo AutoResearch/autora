@@ -1,0 +1,65 @@
+[scheduling]
+    cycling mode = integer
+    initial cycle point = 0
+    final cycle point = 5
+    [[graph]]
+        R1/0 = """
+        setup_python => initial_state
+        """
+        R1/1 = """
+            initial_state[^] => experimentalist => experiment_runner => theorist
+        """
+        2/P1 = """
+            theorist[-P1] => experimentalist => experiment_runner => theorist
+        """
+
+[runtime]
+    [[setup_python]]
+        script = """
+            virtualenv "$CYLC_WORKFLOW_SHARE_DIR/env" -p python
+            source "$CYLC_WORKFLOW_SHARE_DIR/env/bin/activate"
+            pip install --upgrade pip
+            pip install -r "$CYLC_WORKFLOW_RUN_DIR/requirements.txt"
+        """
+        platform = oscar
+        execution time limit = PT20M
+
+    [[initial_state]]
+    script = """
+            $CYLC_WORKFLOW_SHARE_DIR/env/bin/python \
+                -m autora.workflow \
+                runner.initial_state \
+                --out-path "$CYLC_WORKFLOW_SHARE_DIR/$CYLC_TASK_CYCLE_POINT/result"
+        """
+        platform = oscar
+
+    [[experimentalist]]
+        script = """
+            $CYLC_WORKFLOW_SHARE_DIR/env/bin/python -m autora.workflow \
+                runner.experimentalist \
+                --in-path "$CYLC_WORKFLOW_SHARE_DIR/$((CYLC_TASK_CYCLE_POINT - 1))/result" \
+                --out-path "$CYLC_WORKFLOW_SHARE_DIR/$CYLC_TASK_CYCLE_POINT/conditions"
+        """
+        platform = oscar
+
+    [[experiment_runner]]
+        script = """
+            $CYLC_WORKFLOW_SHARE_DIR/env/bin/python -m autora.workflow \
+                runner.experiment_runner \
+                --in-path "$CYLC_WORKFLOW_SHARE_DIR/$CYLC_TASK_CYCLE_POINT/conditions" \
+                --out-path "$CYLC_WORKFLOW_SHARE_DIR/$CYLC_TASK_CYCLE_POINT/data"
+        """
+        platform = oscar
+
+    [[theorist]]
+        script = """
+            $CYLC_WORKFLOW_SHARE_DIR/env/bin/python -m autora.workflow \
+                runner.theorist \
+                --in-path "$CYLC_WORKFLOW_SHARE_DIR/$CYLC_TASK_CYCLE_POINT/data" \
+                --out-path "$CYLC_WORKFLOW_SHARE_DIR/$CYLC_TASK_CYCLE_POINT/result"
+        """
+        platform = oscar
+        execution time limit = PT1H
+        [[[directives]]]
+            --partition = gpu
+            --gres = gpu:1

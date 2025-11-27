@@ -1,0 +1,2 @@
+autora-core>=4.1.0
+cylc-flow==8.1.4
